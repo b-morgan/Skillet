@@ -1,0 +1,53 @@
+## Interface: 20300
+## Title: Skillet |cff7fff7f -Ace2-|r
+## Notes: A replacement tradeskill window
+## Notes-esES: Una sustitucion de la ventana de Habilidades de Comercio
+## Author: nogudnik
+## Version 1.10
+## X-Category: Tradeskill
+## X-eMail: nogudnik@gmail.com
+## X-License GPL v3 or later
+## X-Credits Slartie (for ASTW), Nymbia (for Stitch)
+## X-RelSite-WoWI: 7571
+## X-AceForum: 9179
+## X-WoWIPortal: nogudnik
+## X-Website: http://www.wowace.com/wiki/Skillet
+#### X-RelSite-Curse:
+#### X-RelSite-UI.WoW:
+## SavedVariables: SkilletDB
+## SavedVariablesPerCharacter: SkilletDBPC
+## OptionalDeps: Ace2, Waterfall-1.0, AbacusLib, Fizzwidget Reagent Cost, LibPeriodicTable-3.1, WindowLib, LibStub, CharacterInfoStorage, Sanity2
+## X-Embeds: Ace2, Waterfall-1.0, AbacusLib, LibPeriodicTable-3.1, WindowLib, LibStub
+
+#### List of embedded Ace2 libraries
+embeds.xml
+
+#### Localization files
+Locale\Locale-enUS.lua
+Locale\Locale-deDE.lua
+Locale\Locale-zhTW.lua
+Locale\Locale-zhCN.lua
+Locale\Locale-koKR.lua
+Locale\Locale-frFR.lua
+Locale\Locale-esES.lua
+
+#### Main files
+LibPossessions.lua
+SkilletStitch-1.1.lua
+Skillet.lua
+TradeskillInfo.lua
+SkilletQueue.lua
+ThirdPartyHooks.lua
+Upgrades.lua
+
+#### UI files
+UI\Utils.lua
+UI\Sorting.lua
+UI\MainFrame.lua
+UI\MainFrame.xml
+UI\RecipeNotes.lua
+UI\RecipeNotes.xml
+UI\MerchantWindow.lua
+UI\MerchantWindow.xml
+UI\ShoppingList.lua
+UI\ShoppingList.xml
