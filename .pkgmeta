@@ -1,17 +1,17 @@
 package-as: Skillet
 
 externals:
-    /Libs/AceEvent-2.0:          http://svn.wowace.com/wowace/trunk/Ace2/AceEvent-2.0/
-    /Libs/AceAddon-2.0:          http://svn.wowace.com/wowace/trunk/Ace2/AceAddon-2.0/
-    /Libs/AceComm-2.0:           http://svn.wowace.com/wowace/trunk/Ace2/AceComm-2.0/
-    /Libs/AceLocale-2.2:         http://svn.wowace.com/wowace/trunk/Ace2/AceLocale-2.2/
-    /Libs/AceLibrary:            http://svn.wowace.com/wowace/trunk/Ace2/AceLibrary/
-    /Libs/AceHook-2.1:           http://svn.wowace.com/wowace/trunk/Ace2/AceHook-2.1/
-    /Libs/Abacus-2.0:            http://svn.wowace.com/wowace/trunk/AbacusLib/Abacus-2.0/
-    /Libs/LibStub:               http://svn.wowace.com/wowace/trunk/LibStub/
-    /Libs/AceDB-2.0:             http://svn.wowace.com/wowace/trunk/Ace2/AceDB-2.0/
-    /Libs/AceOO-2.0:             http://svn.wowace.com/wowace/trunk/Ace2/AceOO-2.0/
-    /Libs/Waterfall-1.0:         http://svn.wowace.com/wowace/trunk/Waterfall-1.0/Waterfall-1.0/
-    /Libs/AceConsole-2.0:        http://svn.wowace.com/wowace/trunk/Ace2/AceConsole-2.0/
-    /Libs/Window-1.0:            http://svn.wowace.com/wowace/trunk/WindowLib/Window-1.0/
-    /Libs/LibPeriodicTable-3.1:  http://svn.wowace.com/wowace/trunk/LibPeriodicTable-3.1/
+    Libs/Abacus-2.0:            http://svn.wowace.com/wowace/trunk/AbacusLib/Abacus-2.0
+    Libs/AceAddon-2.0:          http://svn.wowace.com/wowace/trunk/Ace2/AceAddon-2.0
+    Libs/AceComm-2.0:           http://svn.wowace.com/wowace/trunk/Ace2/AceComm-2.0
+    Libs/AceConsole-2.0:        http://svn.wowace.com/wowace/trunk/Ace2/AceConsole-2.0
+    Libs/AceDB-2.0:             http://svn.wowace.com/wowace/trunk/Ace2/AceDB-2.0
+    Libs/AceEvent-2.0:          http://svn.wowace.com/wowace/trunk/Ace2/AceEvent-2.0
+    Libs/AceHook-2.1:           http://svn.wowace.com/wowace/trunk/Ace2/AceHook-2.1
+    Libs/AceLibrary:            http://svn.wowace.com/wowace/trunk/Ace2/AceLibrary
+    Libs/AceLocale-2.2:         http://svn.wowace.com/wowace/trunk/Ace2/AceLocale-2.2
+    Libs/AceOO-2.0:             http://svn.wowace.com/wowace/trunk/Ace2/AceOO-2.0
+    Libs/LibPeriodicTable-3.1:  http://svn.wowace.com/wowace/trunk/LibPeriodicTable-3.1
+    Libs/LibStub:               http://svn.wowace.com/wowace/trunk/LibStub
+    Libs/Waterfall-1.0:         http://svn.wowace.com/wowace/trunk/Waterfall-1.0/Waterfall-1.0
+    Libs/Window-1.0:            http://svn.wowace.com/wowace/trunk/WindowLib/Window-1.0
