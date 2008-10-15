@@ -25,6 +25,7 @@ local COMMON_API    = "Common API" -- do not localize
 -- Ace addons will store realm data under "realm - faction"
 local playerrealm = GetRealmName():trim()
 local _,race = UnitRace("player")
+local PLAYER = UnitName("player")
 local faction
 if race == "Orc" or race == "Scourge" or race == "Troll" or race == "Tauren" or race == "BloodElf" then
     faction = FACTION_HORDE
@@ -65,9 +66,13 @@ local function sanity_GetItemCount(item)
 
     local count = 0
     for char,v in pairs(owners) do
-        local i = 0
-        for loc, ct in pairs(v) do
-            count = count + ct
+        -- NB: We skip the current player. That info is dynamnic and should
+        --     not be included in the values we return.
+        if char ~= PLAYER then
+            local i = 0
+            for loc, ct in pairs(v) do
+                count = count + ct
+            end
         end
      end
 
@@ -84,8 +89,12 @@ local function bagnondb_GetItemCount(item)
     local itemLink = select(2, GetItemInfo(item))
     local count = 0
     for playerName in BagnonDB:GetPlayers() do
-        for bag=0,NUM_BAG_SLOTS do
-            count = count + BagnonDB:GetItemCount(itemLink, bag, playerName)
+        -- NB: We skip the current player. That info is dynamnic and should
+        --     not be included in the values we return.
+        if playerName ~= PLAYER then
+            for bag=0,NUM_BAG_SLOTS do
+                count = count + BagnonDB:GetItemCount(itemLink, bag, playerName)
+            end
         end
     end
 
@@ -103,8 +112,12 @@ local function characterinfostorage_GetItemCount(itemid)
     local characters = CharacterInfoStorage:GetCharacters()
 
     for _,name in pairs(characters) do
-        local has = CharacterInfoStorage:GetNumItems(name, itemid)
-        count = count + CharacterInfoStorage:GetNumItems(name, itemid)
+        -- NB: We skip the current player. That info is dynamnic and should
+        --     not be included in the values we return.
+        if name ~= PLAYER then
+            local has = CharacterInfoStorage:GetNumItems(name, itemid)
+            count = count + CharacterInfoStorage:GetNumItems(name, itemid)
+        end
     end
 
     return count
@@ -126,35 +139,42 @@ local function bankitems_GetItemCount(itemid)
 
     for key, bankPlayer in pairs(BankItems_Save) do
         local player, realm = strsplit("|", key)
-        if type(bankPlayer) == "table" and realm == playerrealm then
-            for num = 1, 28 do
-                if bankPlayer[num] then
-                    local id = select(3, string.find(bankPlayer[num].link, "|Hitem:(%d+):"))
-                    if id then id = tonumber(id) end
-                    if id == itemid then
-                        count = count + (bankPlayer[num].count or 1)
+
+        -- NB: We skip the current player. That info is dynamnic and should
+        --     not be included in the values we return.
+        if player ~= PLAYER then
+
+            if type(bankPlayer) == "table" and realm == playerrealm then
+                for num = 1, 28 do
+                    if bankPlayer[num] then
+                        local id = select(3, string.find(bankPlayer[num].link, "|Hitem:(%d+):"))
+                        if id then id = tonumber(id) end
+                        if id == itemid then
+                            count = count + (bankPlayer[num].count or 1)
+                        end
                     end
                 end
-            end
-            for _, bagNum in ipairs(BAGNUMBERS) do
-                local theBag = bankPlayer["Bag"..bagNum]
-                if (bagNum ~= 100 and theBag) then
-                    local realSize = theBag.size;
-                    if (bagNum == 101) then
-                        realSize = #theBag;
-                    end
-                    for bagItem = 1, realSize do
-                        if theBag[bagItem] then
-                            local id = select(3, string.find(theBag[bagItem].link, "|Hitem:(%d+):"))
-                            if id then id = tonumber(id) end
-                            if id == itemid then
-                                count = count + (theBag[bagItem].count or 1)
+                for _, bagNum in ipairs(BAGNUMBERS) do
+                    local theBag = bankPlayer["Bag"..bagNum]
+                    if (bagNum ~= 100 and theBag) then
+                        local realSize = theBag.size;
+                        if (bagNum == 101) then
+                            realSize = #theBag;
+                        end
+                        for bagItem = 1, realSize do
+                            if theBag[bagItem] then
+                                local id = select(3, string.find(theBag[bagItem].link, "|Hitem:(%d+):"))
+                                if id then id = tonumber(id) end
+                                if id == itemid then
+                                    count = count + (theBag[bagItem].count or 1)
+                                end
                             end
                         end
                     end
                 end
             end
-        end
+
+        end -- player ~= PLAYER
     end
 
     return count
@@ -172,16 +192,20 @@ local function possessions_GetItemCount(itemid)
     end
 
     for charName, charData in pairs(PossessionsData[playerrealm]) do
-        for _, bag in pairs(charData.items) do
-            for _, item in pairs(bag) do
-                local id = item[0]
-                if id then
-                    _,_,id = string.find(id, "^(%d+):?")
-                    id = tonumber(id)
-                    if itemid == id then
-                        count = count + (item[3] or 0)
+        -- NB: We skip the current player. That info is dynamnic and should
+        --     not be included in the values we return.
+        if charName ~= PLAYER then
+            for _, bag in pairs(charData.items) do
+                for _, item in pairs(bag) do
+                    local id = item[0]
+                    if id then
+                        _,_,id = string.find(id, "^(%d+):?")
+                        id = tonumber(id)
+                        if itemid == id then
+                            count = count + (item[3] or 0)
+                        end
                     end
-                 end
+                end
             end
         end
     end
@@ -201,13 +225,17 @@ local function banklist_GetItemCount(itemid)
     end
 
     for charName, charData in pairs(BankList.db.realm.chars) do
-        for _, bag in pairs(charData.bags) do
-            for _, itemData in pairs(bag) do
-                local id = itemData.id:match('item:(%d+)')
-                if id then
-                    id = tonumber(id)
-                    if id == itemid then
-                        count = count + (itemData.count or 0)
+        -- NB: We skip the current player. That info is dynamnic and should
+        --     not be included in the values we return.
+        if charName ~= PLAYER then
+            for _, bag in pairs(charData.bags) do
+                for _, itemData in pairs(bag) do
+                    local id = itemData.id:match('item:(%d+)')
+                    if id then
+                      id = tonumber(id)
+                      if id == itemid then
+                          count = count + (itemData.count or 0)
+                      end
                     end
                 end
             end
@@ -228,16 +256,20 @@ local function oneview_GetItemCount(itemid)
         local fact = v.faction
         for k, v2 in ipairs(v) do
             local _, _, charName, charId = string.find(v2, "([^%-]+) . (.+)")
-            for bag = -1, 11 do
-                local itemId, size, isAmmo, isSoul, isProf = OneView.storage:BagInfo(fact, charId, bag)
-                for slot = 1, (tonumber(size) or 0) do
-                    local bag_itemId, qty = OneView.storage:SlotInfo(fact, charId, bag, slot)
-                    if bag_itemId then
-                        local id = bag_itemId:match('item:(%d+)')
-                        if id then id = tonumber(id) else id = -1 end
-                        if id == itemid then
+            -- NB: We skip the current player. That info is dynamnic and should
+            --     not be included in the values we return.
+            if charName ~= PLAYER then
+                for bag = -1, 11 do
+                    local itemId, size, isAmmo, isSoul, isProf = OneView.storage:BagInfo(fact, charId, bag)
+                    for slot = 1, (tonumber(size) or 0) do
+                        local bag_itemId, qty = OneView.storage:SlotInfo(fact, charId, bag, slot)
+                        if bag_itemId then
+                            local id = bag_itemId:match('item:(%d+)')
+                            if id then id = tonumber(id) else id = -1 end
+                            if id == itemid then
                             if type(qty) == "string" then qty = tonumber(qty) end
                             count = count + qty
+                            end
                         end
                     end
                 end
@@ -270,7 +302,9 @@ local function arkinventory_GetItemCount(itemid)
         local item_count_character = 0
         local item_count_guild = 0
 
-        if pd.info.realm == r and pd.info.faction == f then
+        -- NB: We skip the current player. That info is dynamnic and should
+        --     not be included in the values we return.
+        if pd.info.name ~= PLAYER and pd.info.realm == r and pd.info.faction == f then
 
             local location_entries = { }
 
@@ -342,7 +376,7 @@ do
 	local warned
 	function baggins_GetItemCount(itemid)
 		if BagginsAnywhereBags.GetItemCount then
-			return BagginsAnywhereBags:GetItemCount(itemid)	+ GetItemCount(itemid)	
+			return BagginsAnywhereBags:GetItemCount(itemid)
 		end
 		
 		if not warned then
@@ -366,10 +400,6 @@ end
 
 -- And put the newly created/discovered library into the global namespace
 _G.LibPossessions = LibPossessions
-
--- Need a frame to register event handler's with
-local frame = LibPossessions.frame or (_G.CreateFrame("Frame"))
-LibPossessions.frame = frame
 
 -- And a place to cache item lookups, for speed.
 local cache = LibPossessions.cache or ( {n = 0} )
@@ -397,11 +427,6 @@ LibPossessions.supportedAddons = {
 -- Currently selected inventory addon
 LibPossessions.inventoryAddon = LibPossessions.inventoryAddon or nil
 
--- Tracks when the number of items on hand changes. This invalidates our local cache
-frame:RegisterEvent("BAG_UPDATE")
-frame:RegisterEvent("TRADE_CLOSED")
-frame:RegisterEvent("UNIT_INVENTORY_CHANGED")
-
 --
 -- Searches for a supported addon. Does nothing is an addon has
 -- already been found
@@ -427,19 +452,6 @@ local function find_supported_addon(lib)
         end
     end
 end
-
-frame:SetScript("OnEvent", function(this, event, ...)
-    if cache.n > 0 then
-        -- All other events are ones that invalidate the cache
-
-        -- I'd love to be smart enough to save at least some of
-        -- the cache, but that is just too risky.
-        for k in pairs(cache) do
-            cache[k] = nil
-        end
-        cache.n = 0
-    end
-end)
 
 -- ========================================================================
 --                              Public API
@@ -522,30 +534,34 @@ function LibPossessions:GetItemCount(item)
 
     if type(item) ~= "number" then item = tonumber(item) end
 
-    if cache[item] then
-        return cache[item]
-    end
+    -- count of the items the currect character has in their bags and
+    -- inventory. This can change during the course of the session.
+    local current_character_count = GetItemCount(item, true)
 
-    find_supported_addon(self)
+    local alt_count = 0
+    if not cache[item] then
+        -- Item is not yet cached. Cache it now. We only store counts for
+        -- alts, which cannot change during the course of a session.
+        
+        find_supported_addon(self)
 
-    local count
-
-    if not self:IsAvailable() then
-        count = 0
-    else
-        local method = self.supportedAddons[self.inventoryAddon]
-        local ok,count = pcall(method, item)
-        if not ok then
-            print("Unable to obtain items counts using " .. self.inventoryAddon .. ": " .. count .. ". Will no longer use that addon")
-            self.supportedAddons[self.inventoryAddon] = nil -- remove it from the list
-            self.inventoryAddon = nil
-            count = 0
-        else
-            count = tonumber(count)
-            cache[item] = count
-            cache.n = cache.n + 1
+        if self:IsAvailable() then
+            local method = self.supportedAddons[self.inventoryAddon]
+            local ok,count = pcall(method, item)
+            if not ok then
+                print("Unable to obtain items counts using " .. self.inventoryAddon .. ": " .. count .. ". Will no longer use that addon")
+                self.supportedAddons[self.inventoryAddon] = nil -- remove it from the list
+                self.inventoryAddon = nil
+                alt_count = 0
+            else
+                alt_count = tonumber(count)
+                cache[item] = alt_count
+                cache.n = cache.n + 1
+            end
         end
+    else
+        alt_count = cache[item]
     end
 
-    return count
+    return current_character_count + alt_count, current_character_count, alt_count
 end

@@ -229,6 +229,11 @@ local function build_characters(self)
     return c
 end
 
+function Skillet:internal_ResetCharacterCache()
+    characters = nil
+    Skillet:internal_GetCharacters()
+end
+
 function Skillet:internal_GetCharacters()
     if not characters then
         characters = build_characters(self)
@@ -257,4 +262,30 @@ function  Skillet:internal_GetCharacterTradeskills(character_name, profession)
             end
         end
     end
+end
+
+function Skillet:internal_GetCraftersForItem(itemId)
+	local crafters = nil
+
+	local chars = self:internal_GetCharacters()
+	for i=1, #chars, 1 do
+		local profs = self:internal_GetCharacterProfessions(chars[i].name)
+		local found = false
+
+		for j=1,#profs,1 do
+			local skills = self:internal_GetCharacterTradeskills(chars[i].name, profs[j].name)
+			for k=1,#skills,1 do
+				if self:GetItemIDFromLink(skills[k].link) == itemId then
+					if not crafters then crafters = {} end
+					table.insert(crafters, chars[i].name)
+					found = true
+					break
+				end
+			end
+			if found then break end
+		end
+
+	end
+
+	return crafters
 end

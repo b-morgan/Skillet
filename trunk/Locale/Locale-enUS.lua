@@ -119,4 +119,7 @@ L:RegisterTranslations("enUS", function() return {
     ["SHOWCRAFTCOUNTSNAME"]         = "Show craftable counts",
     ["SHOWCRAFTCOUNTSDESC"]         = "Show the number of times you can craft a recipe, not the total number of items producable",
 
+    -- New in version 1.11
+    ["Crafted By"]                  = "Crafted by",
+
 } end)

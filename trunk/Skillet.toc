@@ -1,9 +1,9 @@
-## Interface: 20300
+## Interface: 30000
 ## Title: Skillet |cff7fff7f -Ace2-|r
 ## Notes: A replacement tradeskill window
 ## Notes-esES: Una sustitucion de la ventana de Habilidades de Comercio
 ## Author: nogudnik
-## Version 1.10
+## Version 1.11
 ## X-Category: Tradeskill
 ## X-eMail: nogudnik@gmail.com
 ## X-License GPL v3 or later
@@ -12,7 +12,7 @@
 ## X-AceForum: 9179
 ## X-WoWIPortal: nogudnik
 ## X-Website: http://www.wowace.com/wiki/Skillet
-#### X-RelSite-Curse:
+## X-RelSite-Curse: http://wow.curse.com/downloads/wow-addons/details/skillet.aspx
 #### X-RelSite-UI.WoW:
 ## SavedVariables: SkilletDB
 ## SavedVariablesPerCharacter: SkilletDBPC

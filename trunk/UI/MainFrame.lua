@@ -154,7 +154,7 @@ function Skillet:CreateTradeSkillWindow()
     SkilletShowOptionsButton:SetText(L["Options"])
     SkilletRescanButton:SetText(L["Rescan"])
     SkilletRecipeNotesButton:SetText(L["Notes"])
-    SkilletRecipeNotesButton:SetTextFontObject("GameFontNormalSmall")
+    SkilletRecipeNotesButton:SetNormalFontObject("GameFontNormalSmall")
     SkilletRecipeNotesFrameLabel:SetText(L["Notes"])
     SkilletShoppingListButton:SetText(L["Shopping List"])
 

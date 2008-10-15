@@ -124,4 +124,7 @@ L:RegisterTranslations("koKR", function() return {
 	["SHOWCRAFTCOUNTSNAME"]						= "제작 수량 보기",
 	["SHOWCRAFTCOUNTSDESC"]						= "제작 가능한 수량을 표시합니다. 총 가능한 수량은 아닙니다.",
 
+    -- New in version 1.11
+    ["Crafted By"]                  = "Crafted by",
+
 } end)

@@ -119,4 +119,7 @@ L:RegisterTranslations("esES", function() return {
     ["SHOWCRAFTCOUNTSNAME"]         = "Mostrar Contador Fabricación",
     ["SHOWCRAFTCOUNTSDESC"]         = "Mostrar el número de veces que se puede elaborar una receta, no el número total de elementos elaborables",
 
+
+    -- New in version 1.11
+    ["Crafted By"]                  = "Crafted by",
 } end)
