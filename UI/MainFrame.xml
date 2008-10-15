@@ -274,9 +274,6 @@
                 GameTooltip:Hide();
                 ResetCursor();
             </OnLeave>
-            <OnUpdate>
-                CursorOnUpdate();
-            </OnUpdate>
             <OnClick>
                 local link = Skillet:GetTradeSkillReagentItemLink(Skillet.selectedSkill, this:GetID())
                 if ( IsControlKeyDown() ) then
@@ -987,9 +984,6 @@
 						GameTooltip:Hide();
 						ResetCursor();
 					</OnLeave>
-					<OnUpdate>
-						CursorOnUpdate();
-					</OnUpdate>
 				</Scripts>
 			</Button>
 

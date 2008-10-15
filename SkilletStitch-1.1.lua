@@ -77,12 +77,13 @@ local difficultyr = {
 local function squishlink(link)
 	-- in:  |cffffffff|Hitem:13928:0:0:0:0:0:0:0|h[Grilled Squid]|h|r
 	-- out: ffffff|13928|Grilled Squid
-	local color, id, name = link:match("^|cff(......)|Hitem:(%d+):[^:]+:[^:]+:[^:]+:[^:]+:[^:]+:[^:]+:[^:]+|h%[([^%]]+)%]|h|r$")
+	local color, id, name = link:match("^|cff(......)|Hitem:(%d+):[^:]+:[^:]+:[^:]+:[^:]+:[^:]+:[^:]+:[^:]+:[^:]+|h%[([^%]]+)%]|h|r$")
 	if id then
 		return color.."|"..id.."|"..name
 	else
 		-- in:  |cffffffff|Henchant:7421|h[Runed Copper Rod]|h|r
 		-- out: |-7421|Runed Copper Rod
+        Skillet:Print("Link: " .. link:replace("|", "_"))
 		id, name = link:match("^|cffffd000|Henchant:(%d+)|h%[([^%]]+)%]|h|r$")
 		return "|-"..id.."|"..name
 	end
@@ -92,7 +93,7 @@ local function unsquishlink(link)
 	-- out: |cffffffff|Hitem:13928:0:0:0:0:0:0:0|h[Grilled Squid]|h|r  ,false
 	local color, id, name = link:match("^([^|].....)|(%d+)|(.+)$")
 	if id then
-		return "|cff"..color.."|Hitem:"..id..":0:0:0:0:0:0:0|h["..name.."]|h|r", false
+		return "|cff"..color.."|Hitem:"..id..":0:0:0:0:0:0:0:0|h["..name.."]|h|r", false
 	else
 		-- in:  |-7421|Runed Copper Rod
 		-- out: |cffffffff|Henchant:7421|h[Runed Copper Rod]|h|r ,true

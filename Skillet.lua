@@ -18,7 +18,7 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
 ]]--
 
-local MAJOR_VERSION = "1.10"
+local MAJOR_VERSION = "1.11"
 local MINOR_VERSION = ("$Revision$"):match("%d+") or 1
 local DATE = string.gsub("$Date$", "^.-(%d%d%d%d%-%d%d%-%d%d).-$", "%1")
 
@@ -395,6 +395,9 @@ function Skillet:OnEnable()
     self:RegisterEvent("CRAFT_SHOW")
 	self:RegisterEvent("CRAFT_CLOSE")
 
+    -- Learning or unlearning a tradeskill
+    self:RegisterEvent('SKILL_LINES_CHANGED')
+
     -- Tracks when the bumber of items on hand changes
 	self:RegisterEvent("BAG_UPDATE")
     self:RegisterEvent("TRADE_CLOSED")
@@ -545,6 +548,47 @@ local function cache_recipes_if_needed(self, force)
     end
 
     return false
+end
+
+local function Skillet_rescan_skills()
+    local numSkills = GetNumSkillLines()
+    local skills = {}
+    for skillIndex=1, numSkills do
+        local skillName = GetSkillLineInfo(skillIndex)
+        if skillName ~= nil then
+            skills[skillName] = skillName
+        end
+    end
+
+    local player = UnitName("player")
+
+    local changed = false
+    for profession, _ in pairs(Skillet.db.server.recipes[player]) do
+        if not skills[profession] then
+            changed = true
+            if profession ~= "UNKNOWN" then
+                -- where the hell does this come from?
+                Skillet:Print("No longer know: " .. profession)
+            end
+            Skillet.db.server.recipes[player][profession] = nil
+        end
+    end
+
+    if changed == true then
+        Skillet:HideAllWindows()
+        if Skillet.db.server.recipes[player] then
+            Skillet.stitch.data = Skillet.db.server.recipes[player]
+        end
+        Skillet.db.server.recipes[player] = Skillet.stitch.data
+        Skillet:internal_ResetCharacterCache()
+    end
+end
+
+-- Called when the list of trade skills know by the player has changed
+function Skillet:SKILL_LINES_CHANGED()
+    if not AceEvent:IsEventScheduled("Skillet_rescan_skills") then
+        AceEvent:ScheduleEvent("Skillet_rescan_skills", Skillet_rescan_skills, 10.0)
+    end
 end
 
 -- Called when a craft window is opened
@@ -923,6 +967,22 @@ function Skillet:AddItemNotesToTooltip(tooltip)
             end
             tooltip:AddLine(" " .. note, 1, 1, 1, 1) -- r,g,b, wrap
         end
+    end
+
+    local crafters = self:GetCraftersForItem(id);
+    if crafters then
+        header_added = true
+        local title_added = false
+
+        for i,name in ipairs(crafters) do
+        	if not title_added then
+        		title_added = true
+        		tooltip:AddDoubleLine(L["Crafted By"], name)
+        	else
+        		tooltip:AddDoubleLine(" ", name)
+        	end
+        end
+
     end
 
     return header_added
