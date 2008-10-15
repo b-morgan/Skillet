@@ -83,7 +83,6 @@ local function squishlink(link)
 	else
 		-- in:  |cffffffff|Henchant:7421|h[Runed Copper Rod]|h|r
 		-- out: |-7421|Runed Copper Rod
-        Skillet:Print("Link: " .. link:replace("|", "_"))
 		id, name = link:match("^|cffffd000|Henchant:(%d+)|h%[([^%]]+)%]|h|r$")
 		return "|-"..id.."|"..name
 	end
