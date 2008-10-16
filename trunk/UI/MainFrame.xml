@@ -505,7 +505,7 @@
 				</Anchors>
 			    <Scripts>
 					<OnVerticalScroll>
-					    FauxScrollFrame_OnVerticalScroll(SKILLET_TRADE_SKILL_HEIGHT, Skillet.SkillList_OnScroll);
+					    FauxScrollFrame_OnVerticalScroll(self, offset, SKILLET_TRADE_SKILL_HEIGHT, Skillet.SkillList_OnScroll);
      				</OnVerticalScroll>
    				</Scripts>
  			</ScrollFrame>
@@ -1328,7 +1328,7 @@
 				</Anchors>
 			    <Scripts>
 					<OnVerticalScroll>
-					    FauxScrollFrame_OnVerticalScroll(SKILLET_TRADE_SKILL_HEIGHT, Skillet.QueueList_OnScroll);
+					    FauxScrollFrame_OnVerticalScroll(self, offset, SKILLET_TRADE_SKILL_HEIGHT, Skillet.QueueList_OnScroll);
      				</OnVerticalScroll>
    				</Scripts>
  			</ScrollFrame>
