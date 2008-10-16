@@ -373,19 +373,19 @@ end
 
 local baggins_GetItemCount
 do
-	local warned
-	function baggins_GetItemCount(itemid)
-		if BagginsAnywhereBags.GetItemCount then
-			return BagginsAnywhereBags:GetItemCount(itemid)
-		end
-		
-		if not warned then
-			ChatFrame1:AddMessage(MAJOR_VERSION .. ": Baggins_AnywhereBags needs to be upgraded to be able to count items on alts. (BagginsAnywhereBags.GetItemCount is missing)")
-			warned = true
-		end
-		
-		return 0
-	end
+    local warned
+    function baggins_GetItemCount(itemid)
+        if BagginsAnywhereBags.GetItemCount then
+            return BagginsAnywhereBags:GetItemCount(itemid)
+        end
+        
+        if not warned then
+            ChatFrame1:AddMessage(MAJOR_VERSION .. ": Baggins_AnywhereBags needs to be upgraded to be able to count items on alts. (BagginsAnywhereBags.GetItemCount is missing)")
+            warned = true
+        end
+        
+        return 0
+    end
 end
 
 -- ========================================================================
@@ -421,7 +421,7 @@ LibPossessions.supportedAddons = {
     ["Bagnon_Forever"]          = bagnondb_GetItemCount,
     ["OneView"]                 = oneview_GetItemCount, -- Requires OneBag and OneBank as well.
     ["ArkInventory"]            = arkinventory_GetItemCount,
-	["Baggins_AnywhereBags"]	= baggins_GetItemCount,
+    ["Baggins_AnywhereBags"]    = baggins_GetItemCount,
 }
 
 -- Currently selected inventory addon
@@ -449,6 +449,9 @@ local function find_supported_addon(lib)
                 end
                 -- debug("Skipped: " .. name)
             end
+
+            -- no addon found
+            lib.inventoryAddon = "None"
         end
     end
 end
@@ -483,8 +486,10 @@ end
 -- @return      true is a supported mod was found or false otherwise
 --
 function LibPossessions:IsAvailable()
-    find_supported_addon(self)
-    return self.inventoryAddon ~= nil
+    if self.inventoryAddon == nil then
+        find_supported_addon(self)
+    end
+    return self.inventoryAddon ~= nil and self.inventoryAddon ~= "None"
 end
 
 --
@@ -519,7 +524,9 @@ end
 -- @return      The name of the inventory addon currently being used
 --
 function LibPossessions:GetSelectedAddon()
-    find_supported_addon(self)
+    if self.inventoryAddon == nil then
+        find_supported_addon(self)
+    end
     return self.inventoryAddon
 end
 
