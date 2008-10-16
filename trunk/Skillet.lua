@@ -88,51 +88,51 @@ local isCraft = false;
 local Skillet = Skillet
 Skillet.options =
 {
-	handler = Skillet,
-	type = 'group',
-	args = {
-		features = {
-			type = 'group',
-			name = L["Features"],
-			desc = L["FEATURESDESC"],
-			order = 11,
-			args = {
-				vendor_buy_button = {
-					type = "toggle",
-					name = L["VENDORBUYBUTTONNAME"],
-					desc = L["VENDORBUYBUTTONDESC"],
-					get = function()
-						return Skillet.db.profile.vendor_buy_button;
-					end,
-					set = function(value)
-						Skillet.db.profile.vendor_buy_button = value;
-					end,
-					order = 12
-				},
-				vendor_auto_buy = {
-					type = "toggle",
-					name = L["VENDORAUTOBUYNAME"],
-					desc = L["VENDORAUTOBUYDESC"],
-					get = function()
-						return Skillet.db.profile.vendor_auto_buy;
-					end,
-					set = function(value)
-						Skillet.db.profile.vendor_auto_buy = value;
-					end,
-					order = 12
-				},
-				show_item_notes_tooltip = {
-					type = "toggle",
-					name = L["SHOWITEMNOTESTOOLTIPNAME"],
-					desc = L["SHOWITEMNOTESTOOLTIPDESC"],
-					get = function()
-						return Skillet.db.profile.show_item_notes_tooltip;
-					end,
-					set = function(value)
-						Skillet.db.profile.show_item_notes_tooltip = value;
-					end,
-					order = 13
-				},
+    handler = Skillet,
+    type = 'group',
+    args = {
+        features = {
+            type = 'group',
+            name = L["Features"],
+            desc = L["FEATURESDESC"],
+            order = 11,
+            args = {
+                vendor_buy_button = {
+                    type = "toggle",
+                    name = L["VENDORBUYBUTTONNAME"],
+                    desc = L["VENDORBUYBUTTONDESC"],
+                    get = function()
+                        return Skillet.db.profile.vendor_buy_button;
+                    end,
+                    set = function(value)
+                        Skillet.db.profile.vendor_buy_button = value;
+                    end,
+                    order = 12
+                },
+                vendor_auto_buy = {
+                    type = "toggle",
+                    name = L["VENDORAUTOBUYNAME"],
+                    desc = L["VENDORAUTOBUYDESC"],
+                    get = function()
+                        return Skillet.db.profile.vendor_auto_buy;
+                    end,
+                    set = function(value)
+                        Skillet.db.profile.vendor_auto_buy = value;
+                    end,
+                    order = 12
+                },
+                show_item_notes_tooltip = {
+                    type = "toggle",
+                    name = L["SHOWITEMNOTESTOOLTIPNAME"],
+                    desc = L["SHOWITEMNOTESTOOLTIPDESC"],
+                    get = function()
+                        return Skillet.db.profile.show_item_notes_tooltip;
+                    end,
+                    set = function(value)
+                        Skillet.db.profile.show_item_notes_tooltip = value;
+                    end,
+                    order = 13
+                },
                 show_detailed_recipe_tooltip = {
                     type = "toggle",
                     name = L["SHOWDETAILEDRECIPETOOLTIPNAME"],
@@ -206,8 +206,8 @@ Skillet.options =
                     end,
                     order = 18,
                 },
-			}
-		},
+            }
+        },
         appearance = {
             type = 'group',
             name = L["Appearance"],
@@ -301,30 +301,30 @@ Skillet.options =
             },
         },
 
-		about = {
-			type = 'execute',
-			name = L["About"],
-			desc = L["ABOUTDESC"],
-			func = function()
-				Skillet:PrintAddonInfo()
-			end,
-			order = 50
-		},
-		config = {
-			type = 'execute',
-			name = L["Config"],
-			desc = L["CONFIGDESC"],
-			func = function()
-				if not (UnitAffectingCombat("player")) then
-					AceLibrary("Waterfall-1.0"):Open("Skillet")
-				else
-					DEFAULT_CHAT_FRAME:AddMessage("|cff8888ffSkillet|r: Combat lockdown restriction." ..
-												  " Leave combat and try again.")
-				end
-			end,
+        about = {
+            type = 'execute',
+            name = L["About"],
+            desc = L["ABOUTDESC"],
+            func = function()
+                Skillet:PrintAddonInfo()
+            end,
+            order = 50
+        },
+        config = {
+            type = 'execute',
+            name = L["Config"],
+            desc = L["CONFIGDESC"],
+            func = function()
+                if not (UnitAffectingCombat("player")) then
+                    AceLibrary("Waterfall-1.0"):Open("Skillet")
+                else
+                    DEFAULT_CHAT_FRAME:AddMessage("|cff8888ffSkillet|r: Combat lockdown restriction." ..
+                                                  " Leave combat and try again.")
+                end
+            end,
             guiHidden = true,
-			order = 51
-		},
+            order = 51
+        },
         shoppinglist = {
             type = 'execute',
             name = L["Shopping List"],
@@ -339,35 +339,35 @@ Skillet.options =
             end,
             order = 52
         },
-	}
+    }
 }
 
 -- Called when the addon is loaded
 function Skillet:OnInitialize()
 
-	-- hook default tooltips
-	local tooltipsToHook = { ItemRefTooltip, GameTooltip, ShoppingTooltip1, ShoppingTooltip2 };
-	for _, tooltip in pairs(tooltipsToHook) do
-		if tooltip and tooltip:HasScript("OnTooltipSetItem") then
-			if tooltip:GetScript("OnTooltipSetItem") then
-				local oldOnTooltipSetItem = tooltip:GetScript("OnTooltipSetItem")
-				tooltip:SetScript("OnTooltipSetItem", function(tooltip)
-					oldOnTooltipSetItem(tooltip)
-					Skillet:AddItemNotesToTooltip(tooltip)
-				end)
-			else
-				tooltip:SetScript("OnTooltipSetItem", function(tooltip)
-					Skillet:AddItemNotesToTooltip(tooltip)
-				end)
-			end
-		end
-	end
+    -- hook default tooltips
+    local tooltipsToHook = { ItemRefTooltip, GameTooltip, ShoppingTooltip1, ShoppingTooltip2 };
+    for _, tooltip in pairs(tooltipsToHook) do
+        if tooltip and tooltip:HasScript("OnTooltipSetItem") then
+            if tooltip:GetScript("OnTooltipSetItem") then
+                local oldOnTooltipSetItem = tooltip:GetScript("OnTooltipSetItem")
+                tooltip:SetScript("OnTooltipSetItem", function(tooltip)
+                    oldOnTooltipSetItem(tooltip)
+                    Skillet:AddItemNotesToTooltip(tooltip)
+                end)
+            else
+                tooltip:SetScript("OnTooltipSetItem", function(tooltip)
+                    Skillet:AddItemNotesToTooltip(tooltip)
+                end)
+            end
+        end
+    end
 
     -- no need to be spammy about the fact that we are here, they'll find out seen enough
-	-- self:Print("Skillet v" .. self.version .. " loaded");
+    -- self:Print("Skillet v" .. self.version .. " loaded");
 
-	-- Track trade skill creation
-	self.stitch = AceLibrary("SkilletStitch-1.1")
+    -- Track trade skill creation
+    self.stitch = AceLibrary("SkilletStitch-1.1")
 
     -- Make sure this is done in initialize, not enable as we want the chat
     -- commands to be available even when the mod is disabled. Otherwise,
@@ -393,19 +393,19 @@ function Skillet:OnEnable()
     self:RegisterEvent("TRADE_SKILL_SHOW")
     self:RegisterEvent("TRADE_SKILL_UPDATE")
     self:RegisterEvent("CRAFT_SHOW")
-	self:RegisterEvent("CRAFT_CLOSE")
+    self:RegisterEvent("CRAFT_CLOSE")
 
     -- Learning or unlearning a tradeskill
     self:RegisterEvent('SKILL_LINES_CHANGED')
 
     -- Tracks when the bumber of items on hand changes
-	self:RegisterEvent("BAG_UPDATE")
+    self:RegisterEvent("BAG_UPDATE")
     self:RegisterEvent("TRADE_CLOSED")
 
     -- MERCHANT_SHOW, MERCHANT_HIDE, MERCHANT_UPDATE events needed for auto buying.
     self:RegisterEvent("MERCHANT_SHOW")
-	self:RegisterEvent("MERCHANT_UPDATE")
-	self:RegisterEvent("MERCHANT_CLOSED")
+    self:RegisterEvent("MERCHANT_UPDATE")
+    self:RegisterEvent("MERCHANT_CLOSED")
 
     -- May need to show a shopping list when at the bank/auction house
     self:RegisterEvent("BANKFRAME_OPENED")
@@ -426,8 +426,8 @@ function Skillet:OnEnable()
     -- These we have to handle ourselves becuase we do crafts directly,
     -- rather than through the Stitch libary.
     self:RegisterEvent("UNIT_SPELLCAST_SUCCEEDED",   "CraftCastEnded")
-	self:RegisterEvent("UNIT_SPELLCAST_FAILED",      "CraftCastEnded")
-	self:RegisterEvent("UNIT_SPELLCAST_INTERRUPTED", "CraftCastEnded")
+    self:RegisterEvent("UNIT_SPELLCAST_FAILED",      "CraftCastEnded")
+    self:RegisterEvent("UNIT_SPELLCAST_INTERRUPTED", "CraftCastEnded")
 
     self.hideUncraftableRecipes = false
     self.hideTrivialRecipes = false
@@ -453,14 +453,14 @@ function Skillet:OnEnable()
     self.stitch:EnableDataGathering("Skillet")
     self.stitch:EnableQueue("Skillet")
 
-	AceLibrary("Waterfall-1.0"):Register("Skillet",
+    AceLibrary("Waterfall-1.0"):Register("Skillet",
                    "aceOptions", Skillet.options,
                    "title",      L["Skillet Trade Skills"],
                    "colorR",     0,
                    "colorG",     0.7,
                    "colorB",     0
                    )
-	AceLibrary("Waterfall-1.0"):Open("Skillet")
+    AceLibrary("Waterfall-1.0"):Open("Skillet")
 
 end
 
@@ -472,18 +472,35 @@ function Skillet:OnDisable()
     self:UnregisterAllEvents()
 
     AceLibrary("Waterfall-1.0"):Close("Skillet")
-	AceLibrary("Waterfall-1.0"):UnRegister("Skillet")
+    AceLibrary("Waterfall-1.0"):UnRegister("Skillet")
+end
+
+local function is_known_trade_skill(name)
+    -- Check to see if we actually know this skill or if the user is
+    -- opening a tradeskill that was linked to them. We can't just check 
+    -- the cached list of skills as this might also be a tradeskill that
+    -- the user has just learned.
+    local numSkills = GetNumSkillLines()
+    for skillIndex=1, numSkills do
+        local skillName = GetSkillLineInfo(skillIndex)
+        if skillName ~= nil and skillName == name then
+            return true
+        end
+    end
+
+    -- must not be a trade skill we know about.
+    return false
 end
 
 -- Checks to see if the current trade is one that we support. This
 -- requires isCraft to be set correctly.
 local function is_supported_trade(parent)
-	local name = parent:GetTradeSkillLine()
+    local name = parent:GetTradeSkillLine()
 
-	if isCraft and not parent.stitch:IsSupportedCraft(name) then
-		-- we don't handle this craft. (it's Beast Training BTW)
-		return false
-	end
+    if isCraft and not parent.stitch:IsSupportedCraft(name) then
+        -- we don't handle this craft. (it's Beast Training BTW)
+        return false
+    end
 
     -- EnchantingSell does not play well with the Skillet window, so
     -- if it is enabled, and it was the craft frame hidden, do not
@@ -495,7 +512,8 @@ local function is_supported_trade(parent)
          return false
     end
 
-	return true
+    return is_known_trade_skill(name)
+
 end
 
 local scan_in_progress = false
@@ -600,28 +618,28 @@ function Skillet:CRAFT_SHOW()
         self:HideAllWindows()
     end
 
-	isCraft = true
-	if is_supported_trade(self) then
-	    self:UpdateTradeSkill()
-	    self:ShowTradeSkillWindow()
-	else
-		self:HideAllWindows()
-	end
+    isCraft = true
+    if is_supported_trade(self) then
+        self:UpdateTradeSkill()
+        self:ShowTradeSkillWindow()
+    else
+        self:HideAllWindows()
+    end
 end
 
 -- Called when the trade skill window is closed
 function Skillet:CRAFT_CLOSE()
     show_after_scan = false
-	self:HideAllWindows()
+    self:HideAllWindows()
 end
 
 function Skillet:CraftCastEnded(unit)
-	if unit == "player" and isCraft then
+    if unit == "player" and isCraft then
         -- Pretend we're Stitch.
         -- Crafting can only be done one item at a time so
-	    -- pretend we're done.
-	    AceEvent:TriggerEvent("SkilletStitch_Queue_Complete")
-	end
+        -- pretend we're done.
+        AceEvent:TriggerEvent("SkilletStitch_Queue_Complete")
+    end
 end
 
 -- Called when the trade skill window is opened
@@ -634,13 +652,13 @@ function Skillet:TRADE_SKILL_SHOW()
         self:HideAllWindows()
     end
 
-	isCraft = false
-	if is_supported_trade(self) then
+    isCraft = false
+    if is_supported_trade(self) then
         self:UpdateTradeSkill()
         self:ShowTradeSkillWindow()
-	else
-		self:HideAllWindows()
-	end
+    else
+        self:HideAllWindows()
+    end
 end
 
 function Skillet:TRADE_SKILL_UPDATE()
@@ -654,14 +672,14 @@ end
 -- Called when the trade skill window is closed
 function Skillet:TRADE_SKILL_CLOSE()
     show_after_scan = false
-	self:HideAllWindows()
+    self:HideAllWindows()
 end
 
 -- Rescans the trades (and thus bags). Can only be called if the tradeskill
 -- window is open and a trade selected.
 local function Skillet_rescan_bags()
-	cache_recipes_if_needed(Skillet, false)
-	Skillet:UpdateTradeSkillWindow()
+    cache_recipes_if_needed(Skillet, false)
+    Skillet:UpdateTradeSkillWindow()
     Skillet:UpdateShoppingListWindow()
 end
 
@@ -675,18 +693,18 @@ function Skillet:BAG_UPDATE()
         showing = true
     end
 
-	if showing then
-		-- bag updates can happen fairly frequently and we don't want to
-		-- be scanning all the time so ... buffer updates to a single event
-		-- that fires after a 1/4 second.
-		if not AceEvent:IsEventScheduled("Skillet_rescan_bags") then
-			AceEvent:ScheduleEvent("Skillet_rescan_bags", Skillet_rescan_bags, 0.25)
-		end
+    if showing then
+        -- bag updates can happen fairly frequently and we don't want to
+        -- be scanning all the time so ... buffer updates to a single event
+        -- that fires after a 1/4 second.
+        if not AceEvent:IsEventScheduled("Skillet_rescan_bags") then
+            AceEvent:ScheduleEvent("Skillet_rescan_bags", Skillet_rescan_bags, 0.25)
+        end
     else
        -- no trade window open, but something change, we will need to rescan
        -- when the window is next opened.
        need_rescan_on_open = true
-	end
+    end
 
     if MerchantFrame and MerchantFrame:IsVisible() then
         -- may need to update the button on the merchant frame window ...
@@ -703,25 +721,25 @@ end
 
 -- Updates the tradeskill window, if the current trade has changed.
 function Skillet:UpdateTradeSkill()
-	local trade_changed = false
-	local new_trade = self:GetTradeSkillLine()
+    local trade_changed = false
+    local new_trade = self:GetTradeSkillLine()
 
-	if not self.currentTrade and new_trade then
-		trade_changed = true
-	elseif self.currentTrade ~= new_trade then
-		trade_changed = true
-	end
+    if not self.currentTrade and new_trade then
+        trade_changed = true
+    elseif self.currentTrade ~= new_trade then
+        trade_changed = true
+    end
 
-	if trade_changed then
-		self:HideNotesWindow();
+    if trade_changed then
+        self:HideNotesWindow();
 
-		-- remove any filters currently in place
-		local filterbox = getglobal("SkilletFilterBox");
+        -- remove any filters currently in place
+        local filterbox = getglobal("SkilletFilterBox");
         local filtertext = self:GetTradeSkillOption(new_trade, "filtertext") or ""
-    	filterbox:SetText(filtertext);
+        filterbox:SetText(filtertext);
 
-    	-- And start the update sequence through the rest of the mod
-		self:SetSelectedTrade(new_trade)
+        -- And start the update sequence through the rest of the mod
+        self:SetSelectedTrade(new_trade)
 
         cache_recipes_if_needed(self, need_rescan_on_open)
 
@@ -733,7 +751,7 @@ end
 
 -- Shows the trade skill frame.
 function Skillet:internal_ShowTradeSkillWindow()
-	local frame = self.tradeSkillFrame
+    local frame = self.tradeSkillFrame
     if not frame then
         frame = self:CreateTradeSkillWindow()
         self:UpdateTradeSkillWindow()
@@ -795,14 +813,14 @@ end
 
 -- Show the options window
 function Skillet:ShowOptions()
-	AceLibrary("Waterfall-1.0"):Open("Skillet");
+    AceLibrary("Waterfall-1.0"):Open("Skillet");
 end
 
 -- Triggers a rescan of the currently selected tradeskill
 function Skillet:RescanTrade(forced)
     scan_in_progress = true
     local trade = self:GetTradeSkillLine()
-    if trade and trade ~= "UNKNOWN" then
+    if trade and trade ~= "UNKNOWN" and is_known_trade_skill(trade) then
         if forced then
             forced_rescan = true
         end
@@ -827,32 +845,32 @@ end
 
 -- Notes when a new trade has been selected
 function Skillet:SetSelectedTrade(new_trade)
-	self.currentTrade = new_trade;
-	self:SetSelectedSkill(nil, false);
-	self.headerCollapsedState = {};
+    self.currentTrade = new_trade;
+    self:SetSelectedSkill(nil, false);
+    self.headerCollapsedState = {};
 
-	self:UpdateTradeSkillWindow()
+    self:UpdateTradeSkillWindow()
 
-	-- Stop the stitch queue and nuke anything in it.
-	-- would be nice to allow queuing items from different
-	-- trades, but the Blizzard design does not allow that
-	self.stitch:CancelCast();
+    -- Stop the stitch queue and nuke anything in it.
+    -- would be nice to allow queuing items from different
+    -- trades, but the Blizzard design does not allow that
+    self.stitch:CancelCast();
     self.stitch:StopCast();
-	self.stitch:ClearQueue();
+    self.stitch:ClearQueue();
 end
 
 -- Sets the specific trade skill that the user wants to see details on.
 function Skillet:SetSelectedSkill(skill_index, was_clicked)
-	if not skill_index then
-		-- no skill selected
-		self:HideNotesWindow()
-	elseif self.selectedSkill and self.selectedSkill ~= skill_index then
-		-- new skill selected
-		self:HideNotesWindow() -- XXX: should this be an update?
-	end
+    if not skill_index then
+        -- no skill selected
+        self:HideNotesWindow()
+    elseif self.selectedSkill and self.selectedSkill ~= skill_index then
+        -- new skill selected
+        self:HideNotesWindow() -- XXX: should this be an update?
+    end
 
-	self.selectedSkill = skill_index
-	self:UpdateDetailsWindow(skill_index)
+    self.selectedSkill = skill_index
+    self:UpdateDetailsWindow(skill_index)
 end
 
 --
@@ -860,13 +878,13 @@ end
 -- tradeskill
 --
 function Skillet:IsCraft()
-	return (isCraft and isCraft == true)
+    return (isCraft and isCraft == true)
 end
 
 -- Updates the text we filter the list of recipes against.
 function Skillet:UpdateFilter(text)
     self:SetTradeSkillOption(self.currentTrade, "filtertext", text)
-	self:UpdateTradeSkillWindow()
+    self:UpdateTradeSkillWindow()
 end
 
 -- Called when the queue has changed in some way
@@ -900,41 +918,41 @@ end
 -- If there is no user supplied note, then return nil
 -- The item can be either a recipe or reagent name
 function Skillet:GetItemNote(link)
-	local result
+    local result
 
     if not self.db.server.notes[UnitName("player")] then
         return
     end
 
     local id = self:GetItemIDFromLink(link)
-	if id and self.db.server.notes[UnitName("player")] then
-		result = self.db.server.notes[UnitName("player")][id]
-	else
-		self:Print("Error: Skillet:GetItemNote() could not determine item ID for " .. link);
-	end
+    if id and self.db.server.notes[UnitName("player")] then
+        result = self.db.server.notes[UnitName("player")][id]
+    else
+        self:Print("Error: Skillet:GetItemNote() could not determine item ID for " .. link);
+    end
 
-	if result and result == "" then
-		result = nil
-		self.db.server.notes[UnitName("player")][id] = nil
-	end
+    if result and result == "" then
+        result = nil
+        self.db.server.notes[UnitName("player")][id] = nil
+    end
 
-	return result
+    return result
 end
 
 -- Sets the note for the specified object, if there is already a note
 -- then it is overwritten
 function Skillet:SetItemNote(link, note)
-	local id = self:GetItemIDFromLink(link);
+    local id = self:GetItemIDFromLink(link);
 
     if not self.db.server.notes[UnitName("player")] then
         self.db.server.notes[UnitName("player")] = {}
     end
 
-	if id then
-		self.db.server.notes[UnitName("player")][id] = note
-	else
-		self:Print("Error: Skillet:SetItemNote() could not determine item ID for " .. link);
-	end
+    if id then
+        self.db.server.notes[UnitName("player")][id] = note
+    else
+        self:Print("Error: Skillet:SetItemNote() could not determine item ID for " .. link);
+    end
 
 end
 
@@ -942,14 +960,14 @@ end
 -- item.
 -- Returns true if tooltip modified.
 function Skillet:AddItemNotesToTooltip(tooltip)
-	local enabled = self.db.profile.show_item_notes_tooltip or false
-	if enabled == false or IsControlKeyDown() then
-		return
-	end
+    local enabled = self.db.profile.show_item_notes_tooltip or false
+    if enabled == false or IsControlKeyDown() then
+        return
+    end
 
-	-- get item name
-	local name,link = tooltip:GetItem();
-	if not link then return; end
+    -- get item name
+    local name,link = tooltip:GetItem();
+    if not link then return; end
 
     local id = self:GetItemIDFromLink(link);
     if not id then return end;
@@ -975,12 +993,12 @@ function Skillet:AddItemNotesToTooltip(tooltip)
         local title_added = false
 
         for i,name in ipairs(crafters) do
-        	if not title_added then
-        		title_added = true
-        		tooltip:AddDoubleLine(L["Crafted By"], name)
-        	else
-        		tooltip:AddDoubleLine(" ", name)
-        	end
+            if not title_added then
+                title_added = true
+                tooltip:AddDoubleLine(L["Crafted By"], name)
+            else
+                tooltip:AddDoubleLine(" ", name)
+            end
         end
 
     end
