@@ -270,7 +270,7 @@
             </Anchors>
             <Scripts>
                 <OnVerticalScroll>
-                    FauxScrollFrame_OnVerticalScroll(SKILLET_SHOPPING_LIST_HEIGHT, Skillet.ShoppingList_OnScroll)
+                    FauxScrollFrame_OnVerticalScroll(self, offset, SKILLET_SHOPPING_LIST_HEIGHT, Skillet.ShoppingList_OnScroll)
                 </OnVerticalScroll>
             </Scripts>
         </ScrollFrame>

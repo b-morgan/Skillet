@@ -152,7 +152,7 @@
 			</Anchors>
 		    <Scripts>
 				<OnVerticalScroll>
-				    FauxScrollFrame_OnVerticalScroll(SKILLET_NOTES_ITEM_HEIGHT, Skillet.NotesList_OnScroll);
+				    FauxScrollFrame_OnVerticalScroll(self, offset, SKILLET_NOTES_ITEM_HEIGHT, Skillet.NotesList_OnScroll);
 				</OnVerticalScroll>
 			</Scripts>
 		</ScrollFrame>
