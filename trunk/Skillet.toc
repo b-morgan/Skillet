@@ -11,7 +11,7 @@
 ## X-RelSite-WoWI: 7571
 ## X-AceForum: 9179
 ## X-WoWIPortal: nogudnik
-## X-Website: http://www.wowace.com/wiki/Skillet
+## X-Website: http://www.wowace.com/projects/skillet/
 ## X-RelSite-Curse: http://wow.curse.com/downloads/wow-addons/details/skillet.aspx
 #### X-RelSite-UI.WoW:
 ## SavedVariables: SkilletDB
