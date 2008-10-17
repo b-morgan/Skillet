@@ -56,6 +56,8 @@ do
         ENCHANTING_STRING = "附魔"
     elseif locale == "esES" then
         ENCHANTING_STRING = "Encantamiento"
+    elseif locale == "ruRU" then
+        ENCHANTING_STRING = "Наложение чар"
     end
 end
 local SkilletStitch = {}
