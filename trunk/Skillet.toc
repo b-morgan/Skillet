@@ -2,6 +2,7 @@
 ## Title: Skillet |cff7fff7f -Ace2-|r
 ## Notes: A replacement tradeskill window
 ## Notes-esES: Una sustitucion de la ventana de Habilidades de Comercio
+## Notes-ruRU: Заменяет окно профессий на более функциональное.
 ## Author: nogudnik
 ## Version 1.11
 ## X-Category: Tradeskill
@@ -24,6 +25,7 @@ embeds.xml
 
 #### Localization files
 Locale\Locale-enUS.lua
+Locale\Locale-ruRU.lua
 Locale\Locale-deDE.lua
 Locale\Locale-zhTW.lua
 Locale\Locale-zhCN.lua
