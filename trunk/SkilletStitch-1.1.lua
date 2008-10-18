@@ -464,7 +464,9 @@ function SkilletStitch:ProcessQueue()
 end
 -- Internal
 function SkilletStitch:SkilletStitch_AutoRescan()
-	if InCombatLockdown() then
+	if InCombatLockdown() or IsTradeSkillLinked() then
+        -- Do not try to scan skills when in combat or if the 
+        -- skill has been linked in chat.
 		return
 	end
 
@@ -479,6 +481,11 @@ function SkilletStitch:SkilletStitch_AutoRescan()
     end
 end
 function SkilletStitch:TRADE_SKILL_SHOW()
+    -- Don't scan when opening a linked tradeskill
+    if IsTradeSkillLinked() then
+        return
+    end
+
 	self.recenttrade = GetTradeSkillLine()
 	if self.queue[1] and type(self.queue[1]) == "table" and self.recenttrade ~= self.queue[1]["profession"] then
 		self:ClearQueue()
@@ -489,6 +496,11 @@ function SkilletStitch:TRADE_SKILL_SHOW()
 	end
 end
 function SkilletStitch:CRAFT_SHOW()
+    -- Don't scan when opening a linked tradeskill
+    if IsTradeSkillLinked() then
+        return
+    end
+
 	self.recentcraft = GetCraftName()
 	self:ScanCraft()
 	if self.data.UNKNOWN then
