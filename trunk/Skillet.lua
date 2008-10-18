@@ -18,7 +18,7 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
 ]]--
 
-local MAJOR_VERSION = "1.11"
+local MAJOR_VERSION = "1.12"
 local MINOR_VERSION = ("$Revision$"):match("%d+") or 1
 local DATE = string.gsub("$Date$", "^.-(%d%d%d%d%-%d%d%-%d%d).-$", "%1")
 
@@ -512,7 +512,7 @@ local function is_supported_trade(parent)
          return false
     end
 
-    return is_known_trade_skill(name)
+    return is_known_trade_skill(name) and not IsTradeSkillLinked()
 
 end
 
@@ -604,7 +604,7 @@ end
 
 -- Called when the list of trade skills know by the player has changed
 function Skillet:SKILL_LINES_CHANGED()
-    if not AceEvent:IsEventScheduled("Skillet_rescan_skills") then
+    if not AceEvent:IsEventScheduled("Skillet_rescan_skills") and not IsTradeSkillLinked() then
         AceEvent:ScheduleEvent("Skillet_rescan_skills", Skillet_rescan_skills, 10.0)
     end
 end
@@ -662,6 +662,9 @@ function Skillet:TRADE_SKILL_SHOW()
 end
 
 function Skillet:TRADE_SKILL_UPDATE()
+    if IsTradeSkillLinked() then
+        return
+    end
     self:UpdateTradeSkill()
     if not AceEvent:IsEventScheduled("Skillet_redo_the_update") then
         self:ResetTradeSkillWindow()
@@ -820,7 +823,7 @@ end
 function Skillet:RescanTrade(forced)
     scan_in_progress = true
     local trade = self:GetTradeSkillLine()
-    if trade and trade ~= "UNKNOWN" and is_known_trade_skill(trade) then
+    if trade and trade ~= "UNKNOWN" and is_known_trade_skill(trade) and not IsTradeSkillLinked() then
         if forced then
             forced_rescan = true
         end
