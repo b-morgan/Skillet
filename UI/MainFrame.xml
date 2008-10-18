@@ -3,29 +3,29 @@
 
     <!--
 
-	Skillet: A tradeskill window replacement.
-	Copyright (c) 2007 Robert Clark <nogudnik@gmail.com>
+    Skillet: A tradeskill window replacement.
+    Copyright (c) 2007 Robert Clark <nogudnik@gmail.com>
 
-	This program is free software: you can redistribute it and/or modify
-	it under the terms of the GNU General Public License as published by
-	the Free Software Foundation, either version 3 of the License, or
-	(at your option) any later version.
+    This program is free software: you can redistribute it and/or modify
+    it under the terms of the GNU General Public License as published by
+    the Free Software Foundation, either version 3 of the License, or
+    (at your option) any later version.
 
-	This program is distributed in the hope that it will be useful,
-	but WITHOUT ANY WARRANTY; without even the implied warranty of
-	MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
-	GNU General Public License for more details.
+    This program is distributed in the hope that it will be useful,
+    but WITHOUT ANY WARRANTY; without even the implied warranty of
+    MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+    GNU General Public License for more details.
 
-	You should have received a copy of the GNU General Public License
-	along with this program.  If not, see <http://www.gnu.org/licenses/>.
+    You should have received a copy of the GNU General Public License
+    along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
     -->
 
-	<!--
-	#
-	#   Template for all the buttons used in the list of known skills
-	#
-	-->
+    <!--
+    #
+    #   Template for all the buttons used in the list of known skills
+    #
+    -->
     <Button name="SkilletSkillButtonTemplate" hidden="true" virtual="true">
         <Size>
             <AbsDimension x="293" y="16"/>
@@ -114,93 +114,93 @@
         </Scripts>
     </Button>
 
-	<!--
-	#
-	#  Template for all the buttons used in the list of queued items
-	#
-	-->
-	<Frame name="SkilletQueueItemButtonTemplate_Count" hidden="false" virtual="true">
-		<Size>
-			<AbsDimension x="30" y="16"/>
-		</Size>
-		<Layers>
-			<Layer level="OVERLAY">
-				<FontString name="$parentText" inherits="GameFontNormal" justifyH="LEFT">
-					<Size>
-						<AbsDimension x="30" y="0"/>
-					</Size>
-					<Anchors>
-						<Anchor point="LEFT">
-						</Anchor>
-					</Anchors>
-					<Color r="1" g="1" b="1" a="1"/>
-				</FontString>
-			</Layer>
-		</Layers>
-	</Frame>
+    <!--
+    #
+    #  Template for all the buttons used in the list of queued items
+    #
+    -->
+    <Frame name="SkilletQueueItemButtonTemplate_Count" hidden="false" virtual="true">
+        <Size>
+            <AbsDimension x="30" y="16"/>
+        </Size>
+        <Layers>
+            <Layer level="OVERLAY">
+                <FontString name="$parentText" inherits="GameFontNormal" justifyH="LEFT">
+                    <Size>
+                        <AbsDimension x="30" y="0"/>
+                    </Size>
+                    <Anchors>
+                        <Anchor point="LEFT">
+                        </Anchor>
+                    </Anchors>
+                    <Color r="1" g="1" b="1" a="1"/>
+                </FontString>
+            </Layer>
+        </Layers>
+    </Frame>
 
-	<Frame name="SkilletQueueItemButtonTemplate_Name" hidden="false" virtual="true">
-		<Size>
-			<AbsDimension x="280" y="16"/>
-		</Size>
-		<Layers>
-			<Layer level="OVERLAY">
-				<FontString name="$parentText" inherits="GameFontNormal" justifyH="LEFT">
-					<Size>
-						<AbsDimension x="280" y="0"/>
-					</Size>
-					<Anchors>
-						<Anchor point="LEFT">
-						</Anchor>
-					</Anchors>
-					<Color r="1" g="1" b="1" a="1"/>
-				</FontString>
-			</Layer>
-		</Layers>
-	</Frame>
+    <Frame name="SkilletQueueItemButtonTemplate_Name" hidden="false" virtual="true">
+        <Size>
+            <AbsDimension x="280" y="16"/>
+        </Size>
+        <Layers>
+            <Layer level="OVERLAY">
+                <FontString name="$parentText" inherits="GameFontNormal" justifyH="LEFT">
+                    <Size>
+                        <AbsDimension x="280" y="0"/>
+                    </Size>
+                    <Anchors>
+                        <Anchor point="LEFT">
+                        </Anchor>
+                    </Anchors>
+                    <Color r="1" g="1" b="1" a="1"/>
+                </FontString>
+            </Layer>
+        </Layers>
+    </Frame>
 
-	<Frame name="SkilletQueueItemButtonTemplate" hidden="true" virtual="true">
-		<Size>
-			<AbsDimension x="290" y="16"/>
-		</Size>
-		<Frames>
-			<Frame name="$parentCount" inherits="SkilletQueueItemButtonTemplate_Count">
-				<Anchors>
-					<Anchor point="LEFT">
-						<Offset>
-							<AbsDimension x="0" y="0"/>
-						</Offset>
-					</Anchor>
-				</Anchors>
-			</Frame>
-			<Frame name="$parentName" inherits="SkilletQueueItemButtonTemplate_Name">
-				<Anchors>
-					<Anchor point="LEFT">
-						<Offset>
-							<AbsDimension x="34" y="0"/>
-						</Offset>
-					</Anchor>
-				</Anchors>
-			</Frame>
-			<Button name="$parentDeleteButton" inherits="UIPanelButtonTemplate" text="D">
-				<Size>
-					<AbsDimension x="20" y="22"/>
-				</Size>
-				<Anchors>
-					<Anchor point="LEFT" relativeTo="$parentName" relativePoint="RIGHT">
-						<Offset>
-							<AbsDimension x="8" y="0"/>
-						</Offset>
-					</Anchor>
-				</Anchors>
-				<Scripts>
-					<OnClick>
-						Skillet:RemoveQueuedItem(this:GetID());
-					</OnClick>
-				</Scripts>
-			</Button>
-		</Frames>
-	</Frame>
+    <Frame name="SkilletQueueItemButtonTemplate" hidden="true" virtual="true">
+        <Size>
+            <AbsDimension x="290" y="16"/>
+        </Size>
+        <Frames>
+            <Frame name="$parentCount" inherits="SkilletQueueItemButtonTemplate_Count">
+                <Anchors>
+                    <Anchor point="LEFT">
+                        <Offset>
+                            <AbsDimension x="0" y="0"/>
+                        </Offset>
+                    </Anchor>
+                </Anchors>
+            </Frame>
+            <Frame name="$parentName" inherits="SkilletQueueItemButtonTemplate_Name">
+                <Anchors>
+                    <Anchor point="LEFT">
+                        <Offset>
+                            <AbsDimension x="34" y="0"/>
+                        </Offset>
+                    </Anchor>
+                </Anchors>
+            </Frame>
+            <Button name="$parentDeleteButton" inherits="UIPanelButtonTemplate" text="D">
+                <Size>
+                    <AbsDimension x="20" y="22"/>
+                </Size>
+                <Anchors>
+                    <Anchor point="LEFT" relativeTo="$parentName" relativePoint="RIGHT">
+                        <Offset>
+                            <AbsDimension x="8" y="0"/>
+                        </Offset>
+                    </Anchor>
+                </Anchors>
+                <Scripts>
+                    <OnClick>
+                        Skillet:RemoveQueuedItem(this:GetID());
+                    </OnClick>
+                </Scripts>
+            </Button>
+        </Frames>
+    </Frame>
 
     <!--
     #
@@ -292,12 +292,12 @@
         </Scripts>
     </Frame>
 
-	<!--
-	#
-	# Template used when creating checkboxes
-	#
-	-->
-	<CheckButton name="SkilletCheckButtonTemplate" virtual="true">
+    <!--
+    #
+    # Template used when creating checkboxes
+    #
+    -->
+    <CheckButton name="SkilletCheckButtonTemplate" virtual="true">
         <Size>
             <AbsDimension x="20" y="20"/>
         </Size>
@@ -321,52 +321,52 @@
         <DisabledCheckedTexture file="Interface\Buttons\UI-CheckBox-Check-Disabled"/>
     </CheckButton>
 
-	<!--
-	#
-	# Tool tip to be used when hovering over recipe lines in the skill list
-	#
-	-->
-	<GameTooltip name="SkilletTradeskillTooltip" frameStrata="TOOLTIP" hidden="true">
-		<Backdrop bgFile="Interface\Tooltips\UI-Tooltip-Background" edgeFile="Interface\Tooltips\UI-Tooltip-Border" tile="true">
-			<EdgeSize>
-				<AbsValue val="16"/>
-			</EdgeSize>
-			<TileSize>
-				<AbsValue val="16"/>
-			</TileSize>
-			<BackgroundInsets>
-				<AbsInset left="5" right="5" top="5" bottom="5"/>
-			</BackgroundInsets>
-		</Backdrop>
-		<Layers>
-			<Layer level="ARTWORK">
-				<FontString name="$parentTextLeft1" inherits="GameTooltipTextSmall" hidden="true">
-					<Anchors>
-						<Anchor point="TOPLEFT">
-							<Offset>
-								<AbsDimension x="10" y="-10"/>
-							</Offset>
-						</Anchor>
-					</Anchors>
-				</FontString>
-				<FontString name="$parentTextRight1" inherits="GameTooltipTextSmall" hidden="true">
-					<Anchors>
-						<Anchor point="RIGHT" relativeTo="$parentTextLeft1" relativePoint="LEFT">
-							<Offset>
-								<AbsDimension x="40" y="0"/>
-							</Offset>
-						</Anchor>
-					</Anchors>
-				</FontString>
-			</Layer>
-		</Layers>
-	</GameTooltip>
+    <!--
+    #
+    # Tool tip to be used when hovering over recipe lines in the skill list
+    #
+    -->
+    <GameTooltip name="SkilletTradeskillTooltip" frameStrata="TOOLTIP" hidden="true">
+        <Backdrop bgFile="Interface\Tooltips\UI-Tooltip-Background" edgeFile="Interface\Tooltips\UI-Tooltip-Border" tile="true">
+            <EdgeSize>
+                <AbsValue val="16"/>
+            </EdgeSize>
+            <TileSize>
+                <AbsValue val="16"/>
+            </TileSize>
+            <BackgroundInsets>
+                <AbsInset left="5" right="5" top="5" bottom="5"/>
+            </BackgroundInsets>
+        </Backdrop>
+        <Layers>
+            <Layer level="ARTWORK">
+                <FontString name="$parentTextLeft1" inherits="GameTooltipTextSmall" hidden="true">
+                    <Anchors>
+                        <Anchor point="TOPLEFT">
+                            <Offset>
+                                <AbsDimension x="10" y="-10"/>
+                            </Offset>
+                        </Anchor>
+                    </Anchors>
+                </FontString>
+                <FontString name="$parentTextRight1" inherits="GameTooltipTextSmall" hidden="true">
+                    <Anchors>
+                        <Anchor point="RIGHT" relativeTo="$parentTextLeft1" relativePoint="LEFT">
+                            <Offset>
+                                <AbsDimension x="40" y="0"/>
+                            </Offset>
+                        </Anchor>
+                    </Anchors>
+                </FontString>
+            </Layer>
+        </Layers>
+    </GameTooltip>
 
     <!-- Don't change the name 'SkilletFrame' as other mods may depend on it -->
-	<Frame name="SkilletFrame" toplevel="true" movable="true" resizable="true" parent="UIParent" enableMouse="true" hidden="true">
-		<Size>
-			<AbsDimension x="660" y="512"/>
-		</Size>
+    <Frame name="SkilletFrame" toplevel="true" movable="true" resizable="true" parent="UIParent" enableMouse="true" hidden="true">
+        <Size>
+            <AbsDimension x="660" y="512"/>
+        </Size>
 
         <Layers>
             <Layer level="ARTWORK">
@@ -382,14 +382,14 @@
             </Layer>
         </Layers>
 
-		<Frames>
+        <Frames>
 
-		    <!--
-		    #
-		    # A button on the top right to close the window
-		    #
-		    -->
-			<Button name="SkilletFrameCloseButton" inherits="UIPanelCloseButton">
+            <!--
+            #
+            # A button on the top right to close the window
+            #
+            -->
+            <Button name="SkilletFrameCloseButton" inherits="UIPanelCloseButton">
                 <Anchors>
                     <Anchor point="TOPRIGHT" relativeTo="SkilletFrame" relativePoint="TOPRIGHT">
                         <Offset>
@@ -397,11 +397,48 @@
                         </Offset>
                     </Anchor>
                 </Anchors>
-				<Scripts>
-					<OnClick>
-						HideUIPanel(SkilletFrame);
-					</OnClick>
-				</Scripts>
+                <Scripts>
+                    <OnClick>
+                        HideUIPanel(SkilletFrame);
+                    </OnClick>
+                </Scripts>
+            </Button>
+
+            <!-- A button to link the current trade skill -->
+            <Button name="SkilletTradeSkillLinkButton">
+                <Size>
+                    <AbsDimension x="32" y="16"/>
+                </Size>
+                <Anchors>
+                    <Anchor point="RIGHT" relativeTo="SkilletFrameCloseButton" relativePoint="LEFT">
+                        <Offset>
+                            <AbsDimension x="-10" y="0"/>
+                        </Offset>
+                    </Anchor>
+                </Anchors>
+                <Scripts>
+                    <OnClick>
+                        local link=GetTradeSkillListLink();
+                        if (not ChatEdit_InsertLink(link) ) then
+                            ChatFrameEditBox:Show();
+                            ChatEdit_InsertLink(link);
+                        end
+                    </OnClick>
+                    <OnEnter>
+                        GameTooltip:SetOwner(self,"ANCHOR_TOPLEFT");
+                        GameTooltip:SetText(LINK_TRADESKILL_TOOLTIP, nil, nil, nil, nil, 1);
+                        GameTooltip:Show();
+                    </OnEnter>
+                    <OnLeave>
+                        GameTooltip:Hide();
+                    </OnLeave>
+                </Scripts>
+                <NormalTexture file="Interface\TradeSkillFrame\UI-TradeSkill-LinkButton">
+                    <TexCoords left="0" right="1.0" top="0" bottom="0.5"/>
+                </NormalTexture>
+                <HighlightTexture file="Interface\TradeSkillFrame\UI-TradeSkill-LinkButton" alphaMode="ADD">
+                    <TexCoords left="0" right="1.0" top="0.5" bottom="1.0"/>
+                </HighlightTexture>
             </Button>
 
             <!--
@@ -410,105 +447,105 @@
             #
             -->
             <StatusBar name="SkilletRankFrame" drawLayer="BACKGROUND" minValue="0" maxValue="1" defaultValue="0">
-				<Size>
-					<AbsDimension x="265" y="14"/>
-				</Size>
-				<Anchors>
-					<Anchor point="TOPRIGHT">
-						<Offset>
-							<AbsDimension x="-12" y="-37"/>
-						</Offset>
-					</Anchor>
-				</Anchors>
-				<Layers>
-					<Layer level="ARTWORK">
-						<FontString name="$parentSkillRank" inherits="GameFontHighlightSmall" justifyH="CENTER">
-							<Anchors>
-								<Anchor point="TOP" relativeTo="SkilletRankFrame">
-									<Offset>
-										<AbsDimension x="0" y="-1"/>
-									</Offset>
-								</Anchor>
-							</Anchors>
-						</FontString>
-					</Layer>
-					<Layer level="BACKGROUND">
-						<Texture name="$parentBackground">
-							<!-- <Color r="1.0" g="1.0" b="1.0" a="0.2"/> -->
-						</Texture>
-					</Layer>
-				</Layers>
-				<Frames>
-					<Button name="$parentBorder">
-						<Size>
-							<AbsDimension x="274" y="27"/>
-						</Size>
-						<Anchors>
-							<Anchor point="LEFT">
-								<Offset>
-									<AbsDimension x="-5" y="0"/>
-								</Offset>
-							</Anchor>
-						</Anchors>
-						<NormalTexture name="$parentNormal" file="Interface\PaperDollInfoFrame\UI-Character-Skills-BarBorder" />
-					</Button>
-				</Frames>
-				<Scripts>
-					<OnLoad>
-						<!-- this:RegisterEvent("SKILL_LINES_CHANGED"); -->
-					</OnLoad>
-					<OnEvent>
-						<!-- if ( event == "SKILL_LINES_CHANGED" ) then
-							Skillet:TradeSkillRank_Updated();
-						end
-						-->
-					</OnEvent>
-				</Scripts>
-				<BarTexture name="$parentBar" file="Interface\PaperDollInfoFrame\UI-Character-Skills-Bar" />
-				<!-- <BarColor r="0.35" g="0.35" b="1" a="1.0"/> -->
-			</StatusBar>
+                <Size>
+                    <AbsDimension x="265" y="14"/>
+                </Size>
+                <Anchors>
+                    <Anchor point="TOPRIGHT">
+                        <Offset>
+                            <AbsDimension x="-12" y="-37"/>
+                        </Offset>
+                    </Anchor>
+                </Anchors>
+                <Layers>
+                    <Layer level="ARTWORK">
+                        <FontString name="$parentSkillRank" inherits="GameFontHighlightSmall" justifyH="CENTER">
+                            <Anchors>
+                                <Anchor point="TOP" relativeTo="SkilletRankFrame">
+                                    <Offset>
+                                        <AbsDimension x="0" y="-1"/>
+                                    </Offset>
+                                </Anchor>
+                            </Anchors>
+                        </FontString>
+                    </Layer>
+                    <Layer level="BACKGROUND">
+                        <Texture name="$parentBackground">
+                            <!-- <Color r="1.0" g="1.0" b="1.0" a="0.2"/> -->
+                        </Texture>
+                    </Layer>
+                </Layers>
+                <Frames>
+                    <Button name="$parentBorder">
+                        <Size>
+                            <AbsDimension x="274" y="27"/>
+                        </Size>
+                        <Anchors>
+                            <Anchor point="LEFT">
+                                <Offset>
+                                    <AbsDimension x="-5" y="0"/>
+                                </Offset>
+                            </Anchor>
+                        </Anchors>
+                        <NormalTexture name="$parentNormal" file="Interface\PaperDollInfoFrame\UI-Character-Skills-BarBorder" />
+                    </Button>
+                </Frames>
+                <Scripts>
+                    <OnLoad>
+                        <!-- this:RegisterEvent("SKILL_LINES_CHANGED"); -->
+                    </OnLoad>
+                    <OnEvent>
+                        <!-- if ( event == "SKILL_LINES_CHANGED" ) then
+                            Skillet:TradeSkillRank_Updated();
+                        end
+                        -->
+                    </OnEvent>
+                </Scripts>
+                <BarTexture name="$parentBar" file="Interface\PaperDollInfoFrame\UI-Character-Skills-Bar" />
+                <!-- <BarColor r="0.35" g="0.35" b="1" a="1.0"/> -->
+            </StatusBar>
 
-			<!--
-			#
-			# The list of known recipes on the left hand side
-			#
-			-->
-			<Frame name="SkilletSkillListParent" parent="SkilletFrame">
-				<Size>
-					<AbsDimension x="320" y="430"/>
-				</Size>
-				<Anchors>
-					<Anchor point="TOPLEFT" relativeTo="SkilletFrame" relativePoint="TOPLEFT">
-						<Offset>
-							<AbsDimension x="10" y="-100"/>
-						</Offset>
-					</Anchor>
+            <!--
+            #
+            # The list of known recipes on the left hand side
+            #
+            -->
+            <Frame name="SkilletSkillListParent" parent="SkilletFrame">
+                <Size>
+                    <AbsDimension x="320" y="430"/>
+                </Size>
+                <Anchors>
+                    <Anchor point="TOPLEFT" relativeTo="SkilletFrame" relativePoint="TOPLEFT">
+                        <Offset>
+                            <AbsDimension x="10" y="-100"/>
+                        </Offset>
+                    </Anchor>
                     <Anchor point="BOTTOM" relativeTo="SkilletFrame" relativePoint="BOTTOM">
                         <Offset>
                             <AbsDimension x="0" y="5"/>
                         </Offset>
                     </Anchor>
-				</Anchors>
-			</Frame>
-			<ScrollFrame name="SkilletSkillList" inherits="FauxScrollFrameTemplate" parent="SkilletSkillListParent">
-				<Anchors>
-					<Anchor point="TOPLEFT" relativeTo="SkilletSkillListParent" relativePoint="TOPLEFT">
-						<Offset>
-							<AbsDimension x="5" y="-5"/>
-						</Offset>
-					</Anchor>
+                </Anchors>
+            </Frame>
+            <ScrollFrame name="SkilletSkillList" inherits="FauxScrollFrameTemplate" parent="SkilletSkillListParent">
+                <Anchors>
+                    <Anchor point="TOPLEFT" relativeTo="SkilletSkillListParent" relativePoint="TOPLEFT">
+                        <Offset>
+                            <AbsDimension x="5" y="-5"/>
+                        </Offset>
+                    </Anchor>
                     <Anchor point="BOTTOMRIGHT" relativeTo="SkilletSkillListParent" relativePoint="BOTTOMRIGHT">
                         <Offset>
                             <AbsDimension x="-27" y="5"/>
                         </Offset>
                     </Anchor>
-				</Anchors>
-			    <Scripts>
-					<OnVerticalScroll>
-					    FauxScrollFrame_OnVerticalScroll(self, offset, SKILLET_TRADE_SKILL_HEIGHT, Skillet.SkillList_OnScroll);
-     				</OnVerticalScroll>
-   				</Scripts>
- 			</ScrollFrame>
+                </Anchors>
+                <Scripts>
+                    <OnVerticalScroll>
+                        FauxScrollFrame_OnVerticalScroll(self, offset, SKILLET_TRADE_SKILL_HEIGHT, Skillet.SkillList_OnScroll);
+                    </OnVerticalScroll>
+                </Scripts>
+            </ScrollFrame>
 
             <!--
             #
@@ -577,160 +614,160 @@
                 </Anchors>
             </Button>
 
- 			<!--
- 			#
- 			# An edit box where users can type in filter text
- 			#
- 			-->
- 			<EditBox name="SkilletFilterBox" letters="50" historyLines="0" autoFocus="false">
-				<Size>
-					<AbsDimension x="130" y="20"/>
-				</Size>
-				<Anchors>
+            <!--
+            #
+            # An edit box where users can type in filter text
+            #
+            -->
+            <EditBox name="SkilletFilterBox" letters="50" historyLines="0" autoFocus="false">
+                <Size>
+                    <AbsDimension x="130" y="20"/>
+                </Size>
+                <Anchors>
                     <Anchor point="BOTTOMLEFT" relativeTo="SkilletSkillListParent" relativePoint="TOPLEFT">
                         <Offset>
                             <AbsDimension x="50" y="20"/>
                         </Offset>
                     </Anchor>
-				</Anchors>
-				<Layers>
-					<Layer level="BACKGROUND">
-						<Texture name="$parentLeft" file="Interface\Common\Common-Input-Border">
-							<Size>
-								<AbsDimension x="8" y="20"/>
-							</Size>
-							<Anchors>
-								<Anchor point="TOPLEFT">
-									<Offset>
-										<AbsDimension x="-5" y="0"/>
-									</Offset>
-								</Anchor>
-							</Anchors>
-							<TexCoords left="0" right="0.0625" top="0" bottom="0.625"/>
-						</Texture>
-						<Texture name="$parentRight" file="Interface\Common\Common-Input-Border">
-							<Size>
-								<AbsDimension x="8" y="20"/>
-							</Size>
-							<Anchors>
-								<Anchor point="RIGHT">
-									<Offset>
-										<AbsDimension x="0" y="0"/>
-									</Offset>
-								</Anchor>
-							</Anchors>
-							<TexCoords left="0.9375" right="1.0" top="0" bottom="0.625"/>
-						</Texture>
-						<Texture name="$parentMiddle" file="Interface\Common\Common-Input-Border">
-							<Size>
-								<AbsDimension x="10" y="20"/>
-							</Size>
-							<Anchors>
-								<Anchor point="LEFT" relativeTo="$parentLeft" relativePoint="RIGHT"/>
-								<Anchor point="RIGHT" relativeTo="$parentRight" relativePoint="LEFT"/>
-							</Anchors>
-							<TexCoords left="0.0625" right="0.9375" top="0" bottom="0.625"/>
-						</Texture>
-					</Layer>
-					<Layer level="ARTWORK">
-						<FontString name="SkilletFilterLabel" inherits="GameFontNormal" text="Filter">
-							<Anchors>
-								<Anchor point="RIGHT" relativeTo="$parent" relativePoint="LEFT">
-									<Offset>
-										<AbsDimension x="-10" y="0"/>
-									</Offset>
-								</Anchor>
-							</Anchors>
-							<Color r="1" g="1" b="1" a="1"/>
-						</FontString>
-					</Layer>
-				</Layers>
-				<Scripts>
-					<OnEnterPressed>
-						this:ClearFocus();
-					</OnEnterPressed>
-					<OnEscapePressed>
-						this:ClearFocus();
-					</OnEscapePressed>
-					<OnTextChanged>
-						Skillet:UpdateFilter(this:GetText());
-					</OnTextChanged>
-					<OnEditFocusLost>
-						this:HighlightText(0, 0);
-					</OnEditFocusLost>
-					<OnEditFocusGained>
-						this:HighlightText();
-					</OnEditFocusGained>
-				</Scripts>
-				<FontString inherits="ChatFontNormal"/>
-			</EditBox>
+                </Anchors>
+                <Layers>
+                    <Layer level="BACKGROUND">
+                        <Texture name="$parentLeft" file="Interface\Common\Common-Input-Border">
+                            <Size>
+                                <AbsDimension x="8" y="20"/>
+                            </Size>
+                            <Anchors>
+                                <Anchor point="TOPLEFT">
+                                    <Offset>
+                                        <AbsDimension x="-5" y="0"/>
+                                    </Offset>
+                                </Anchor>
+                            </Anchors>
+                            <TexCoords left="0" right="0.0625" top="0" bottom="0.625"/>
+                        </Texture>
+                        <Texture name="$parentRight" file="Interface\Common\Common-Input-Border">
+                            <Size>
+                                <AbsDimension x="8" y="20"/>
+                            </Size>
+                            <Anchors>
+                                <Anchor point="RIGHT">
+                                    <Offset>
+                                        <AbsDimension x="0" y="0"/>
+                                    </Offset>
+                                </Anchor>
+                            </Anchors>
+                            <TexCoords left="0.9375" right="1.0" top="0" bottom="0.625"/>
+                        </Texture>
+                        <Texture name="$parentMiddle" file="Interface\Common\Common-Input-Border">
+                            <Size>
+                                <AbsDimension x="10" y="20"/>
+                            </Size>
+                            <Anchors>
+                                <Anchor point="LEFT" relativeTo="$parentLeft" relativePoint="RIGHT"/>
+                                <Anchor point="RIGHT" relativeTo="$parentRight" relativePoint="LEFT"/>
+                            </Anchors>
+                            <TexCoords left="0.0625" right="0.9375" top="0" bottom="0.625"/>
+                        </Texture>
+                    </Layer>
+                    <Layer level="ARTWORK">
+                        <FontString name="SkilletFilterLabel" inherits="GameFontNormal" text="Filter">
+                            <Anchors>
+                                <Anchor point="RIGHT" relativeTo="$parent" relativePoint="LEFT">
+                                    <Offset>
+                                        <AbsDimension x="-10" y="0"/>
+                                    </Offset>
+                                </Anchor>
+                            </Anchors>
+                            <Color r="1" g="1" b="1" a="1"/>
+                        </FontString>
+                    </Layer>
+                </Layers>
+                <Scripts>
+                    <OnEnterPressed>
+                        this:ClearFocus();
+                    </OnEnterPressed>
+                    <OnEscapePressed>
+                        this:ClearFocus();
+                    </OnEscapePressed>
+                    <OnTextChanged>
+                        Skillet:UpdateFilter(this:GetText());
+                    </OnTextChanged>
+                    <OnEditFocusLost>
+                        this:HighlightText(0, 0);
+                    </OnEditFocusLost>
+                    <OnEditFocusGained>
+                        this:HighlightText();
+                    </OnEditFocusGained>
+                </Scripts>
+                <FontString inherits="ChatFontNormal"/>
+            </EditBox>
 
-			<!--
-			#
-			# Check boxes for various recipe filtering options.
-			#
-			-->
-			<CheckButton name="SkilletHideUncraftableRecipes" inherits="SkilletCheckButtonTemplate">
-				<Anchors>
-					<Anchor point="BOTTOMLEFT" relativeTo="SkilletSkillListParent" relativePoint="TOPLEFT">
-						<Offset>
-							<AbsDimension x="0" y="0"/>
-						</Offset>
-					</Anchor>
-				</Anchors>
-				<Scripts>
+            <!--
+            #
+            # Check boxes for various recipe filtering options.
+            #
+            -->
+            <CheckButton name="SkilletHideUncraftableRecipes" inherits="SkilletCheckButtonTemplate">
+                <Anchors>
+                    <Anchor point="BOTTOMLEFT" relativeTo="SkilletSkillListParent" relativePoint="TOPLEFT">
+                        <Offset>
+                            <AbsDimension x="0" y="0"/>
+                        </Offset>
+                    </Anchor>
+                </Anchors>
+                <Scripts>
                     <OnClick>
-                    	if this:GetChecked() then
-							PlaySound("igMainMenuOptionCheckBoxOn");
-						end
+                        if this:GetChecked() then
+                            PlaySound("igMainMenuOptionCheckBoxOn");
+                        end
                         local before = Skillet:GetTradeSkillOption(Skillet.currentTrade, "hideuncraftable")
                         Skillet:SetTradeSkillOption(Skillet.currentTrade, "hideuncraftable", not before)
                         Skillet:UpdateTradeSkillWindow()
                     </OnClick>
                 </Scripts>
-			</CheckButton>
-			<CheckButton name="SkilletHideTrivialRecipes" inherits="SkilletCheckButtonTemplate">
-				<Anchors>
-					<Anchor point="BOTTOMLEFT" relativeTo="SkilletSkillListParent" relativePoint="TOPLEFT">
-						<Offset>
-							<AbsDimension x="160" y="0"/>
-						</Offset>
-					</Anchor>
-				</Anchors>
-				<Scripts>
+            </CheckButton>
+            <CheckButton name="SkilletHideTrivialRecipes" inherits="SkilletCheckButtonTemplate">
+                <Anchors>
+                    <Anchor point="BOTTOMLEFT" relativeTo="SkilletSkillListParent" relativePoint="TOPLEFT">
+                        <Offset>
+                            <AbsDimension x="160" y="0"/>
+                        </Offset>
+                    </Anchor>
+                </Anchors>
+                <Scripts>
                     <OnClick>
-                    	if this:GetChecked() then
-							PlaySound("igMainMenuOptionCheckBoxOn");
-						end
+                        if this:GetChecked() then
+                            PlaySound("igMainMenuOptionCheckBoxOn");
+                        end
                         local before = Skillet:GetTradeSkillOption(Skillet.currentTrade, "hidetrivial")
                         Skillet:SetTradeSkillOption(Skillet.currentTrade, "hidetrivial", not before)
                         Skillet:UpdateTradeSkillWindow()
                     </OnClick>
                 </Scripts>
-			</CheckButton>
+            </CheckButton>
 
-			<!--
-			#
-			# A button that displays the options dialog
-			#
-			-->
-			<Button name="SkilletShowOptionsButton" inherits="UIPanelButtonTemplate" text="Options" parent="SkilletFrame">
-				<Size>
-					<AbsDimension x="100" y="22"/>
-				</Size>
-				<Anchors>
-					<Anchor point="TOPRIGHT" relativeTo="SkilletRankFrame" relativePoint="BOTTOMRIGHT">
-						<Offset>
-							<AbsDimension x="3" y="-1"/>
-						</Offset>
-					</Anchor>
-				</Anchors>
-				<Scripts>
-					<OnClick>
-						Skillet:ShowOptions();
-					</OnClick>
-				</Scripts>
-			</Button>
+            <!--
+            #
+            # A button that displays the options dialog
+            #
+            -->
+            <Button name="SkilletShowOptionsButton" inherits="UIPanelButtonTemplate" text="Options" parent="SkilletFrame">
+                <Size>
+                    <AbsDimension x="100" y="22"/>
+                </Size>
+                <Anchors>
+                    <Anchor point="TOPRIGHT" relativeTo="SkilletRankFrame" relativePoint="BOTTOMRIGHT">
+                        <Offset>
+                            <AbsDimension x="3" y="-1"/>
+                        </Offset>
+                    </Anchor>
+                </Anchors>
+                <Scripts>
+                    <OnClick>
+                        Skillet:ShowOptions();
+                    </OnClick>
+                </Scripts>
+            </Button>
             <!--
             #
             # A button that triggers a rescan of the tradeskill
@@ -754,94 +791,94 @@
                 </Scripts>
             </Button>
 
- 			<!--
- 			#
- 			# A highlight frame for the currently selected recipe
- 			#
- 			-->
- 			<Frame name="SkilletHighlightFrame" hidden="true">
-				<Size>
-					<AbsDimension x="290" y="16"/>
-				</Size>
-				<Anchors>
-					<Anchor point="TOPLEFT"/>
-				</Anchors>
-				<Layers>
-					<Layer level="ARTWORK">
-						<Texture name="SkilletHighlight" file="Interface\Buttons\UI-Listbox-Highlight2"/>
-					</Layer>
-				</Layers>
-			</Frame>
+            <!--
+            #
+            # A highlight frame for the currently selected recipe
+            #
+            -->
+            <Frame name="SkilletHighlightFrame" hidden="true">
+                <Size>
+                    <AbsDimension x="290" y="16"/>
+                </Size>
+                <Anchors>
+                    <Anchor point="TOPLEFT"/>
+                </Anchors>
+                <Layers>
+                    <Layer level="ARTWORK">
+                        <Texture name="SkilletHighlight" file="Interface\Buttons\UI-Listbox-Highlight2"/>
+                    </Layer>
+                </Layers>
+            </Frame>
 
- 			<!--
- 			#
- 			# And the list of 24 buttons that are in the scrollable area
- 			#
- 			-->
-			<Button name="SkilletScrollButton1" inherits="SkilletSkillButtonTemplate">
-				<Anchors>
-					<Anchor point="TOPLEFT" relativeTo="SkilletSkillList" relativePoint="TOPLEFT">
-						<Offset>
-							<AbsDimension x="0" y="0"/>
-						</Offset>
-					</Anchor>
-				</Anchors>
-			</Button>
+            <!--
+            #
+            # And the list of 24 buttons that are in the scrollable area
+            #
+            -->
+            <Button name="SkilletScrollButton1" inherits="SkilletSkillButtonTemplate">
+                <Anchors>
+                    <Anchor point="TOPLEFT" relativeTo="SkilletSkillList" relativePoint="TOPLEFT">
+                        <Offset>
+                            <AbsDimension x="0" y="0"/>
+                        </Offset>
+                    </Anchor>
+                </Anchors>
+            </Button>
             <!-- The rest of the buttons are created dynamically -->
 
- 			<!--
- 			#
- 			# A frame to hold the reagent list and associated details
- 			#
- 			-->
- 			<Frame name="SkilletReagentParent" parent="SkilletFrame">
-				<Size>
-					<AbsDimension x="280" y="260"/>
-				</Size>
-				<Anchors>
-					<Anchor point="TOPRIGHT" relativeTo="SkilletFrame" relativePoint="TOPRIGHT">
-						<Offset>
-							<AbsDimension x="-10" y="-75"/>
-						</Offset>
-					</Anchor>
-				</Anchors>
-				<Layers>
-					<Layer level="OVERLAY">
-						<FontString name="SkilletSkillName" inherits="GameFontNormal" text="Skill Name" justifyH="LEFT">
-							<Size>
-								<AbsDimension x="244" y="0"/>
-							</Size>
-							<Anchors>
-								<Anchor point="TOPLEFT" relativeTo="SkilletReagentParent" relativePoint="TOPLEFT">
-									<Offset>
-										<AbsDimension x="47" y="-10"/>
-									</Offset>
-								</Anchor>
-							</Anchors>
-						</FontString>
-						<!-- If the skill requires a special tool, this is the "Requires: " label for it -->
-						<FontString name="SkilletRequirementLabel" inherits="GameFontHighlightSmall" text="REQUIRES_LABEL">
-							<Anchors>
-								<Anchor point="TOPLEFT" relativeTo="SkilletSkillName" relativePoint="BOTTOMLEFT">
-									<Offset>
-										<AbsDimension x="0" y="-3"/>
-									</Offset>
-								</Anchor>
-							</Anchors>
-						</FontString>
-						<!-- If the skill requires a special tool, this is the place where that tools name is printed -->
-						<FontString name="SkilletRequirementText" inherits="GameFontHighlightSmall" justifyV="TOP" justifyH="LEFT">
-							<Size>
-								<AbsDimension x="180" y="0"/>
-							</Size>
-							<Anchors>
-								<Anchor point="TOPLEFT" relativeTo="SkilletRequirementLabel" relativePoint="TOPRIGHT" >
-									<Offset>
-										<AbsDimension x="4" y="0"/>
-									</Offset>
-								</Anchor>
-							</Anchors>
-						</FontString>
+            <!--
+            #
+            # A frame to hold the reagent list and associated details
+            #
+            -->
+            <Frame name="SkilletReagentParent" parent="SkilletFrame">
+                <Size>
+                    <AbsDimension x="280" y="260"/>
+                </Size>
+                <Anchors>
+                    <Anchor point="TOPRIGHT" relativeTo="SkilletFrame" relativePoint="TOPRIGHT">
+                        <Offset>
+                            <AbsDimension x="-10" y="-75"/>
+                        </Offset>
+                    </Anchor>
+                </Anchors>
+                <Layers>
+                    <Layer level="OVERLAY">
+                        <FontString name="SkilletSkillName" inherits="GameFontNormal" text="Skill Name" justifyH="LEFT">
+                            <Size>
+                                <AbsDimension x="244" y="0"/>
+                            </Size>
+                            <Anchors>
+                                <Anchor point="TOPLEFT" relativeTo="SkilletReagentParent" relativePoint="TOPLEFT">
+                                    <Offset>
+                                        <AbsDimension x="47" y="-10"/>
+                                    </Offset>
+                                </Anchor>
+                            </Anchors>
+                        </FontString>
+                        <!-- If the skill requires a special tool, this is the "Requires: " label for it -->
+                        <FontString name="SkilletRequirementLabel" inherits="GameFontHighlightSmall" text="REQUIRES_LABEL">
+                            <Anchors>
+                                <Anchor point="TOPLEFT" relativeTo="SkilletSkillName" relativePoint="BOTTOMLEFT">
+                                    <Offset>
+                                        <AbsDimension x="0" y="-3"/>
+                                    </Offset>
+                                </Anchor>
+                            </Anchors>
+                        </FontString>
+                        <!-- If the skill requires a special tool, this is the place where that tools name is printed -->
+                        <FontString name="SkilletRequirementText" inherits="GameFontHighlightSmall" justifyV="TOP" justifyH="LEFT">
+                            <Size>
+                                <AbsDimension x="180" y="0"/>
+                            </Size>
+                            <Anchors>
+                                <Anchor point="TOPLEFT" relativeTo="SkilletRequirementLabel" relativePoint="TOPRIGHT" >
+                                    <Offset>
+                                        <AbsDimension x="4" y="0"/>
+                                    </Offset>
+                                </Anchor>
+                            </Anchors>
+                        </FontString>
                         <!-- If there is extra info about a recipe that a mod wants to print, this is where they would
                              put the text -->
                         <FontString name="SkilletExtraDetailText" inherits="GameFontHighlightSmall" justifyV="TOP" justifyH="LEFT">
@@ -858,50 +895,50 @@
                                 </Anchor>
                             </Anchors>
                         </FontString>
-						<FontString name="SkilletSkillCooldown" inherits="GameFontRedSmall">
-							<Anchors>
-								<Anchor point="TOPLEFT" relativeTo="SkilletRequirementLabel" relativePoint="BOTTOMLEFT">
-									<Offset>
-										<AbsDimension x="0" y="0"/>
-									</Offset>
-								</Anchor>
-							</Anchors>
-						</FontString>
-						<FontString name="SkilletReagentLabel" inherits="GameFontNormalSmall" justifyH="LEFT" text="SPELL_REAGENTS">
-							<Anchors>
-								<Anchor point="TOPLEFT" relative="SkilletReagentParent" relativePoint="TOPLEFT">
-									<Offset>
-										<AbsDimension x="10" y="-50"/>
-									</Offset>
-								</Anchor>
-							</Anchors>
-						</FontString>
-					</Layer> <!-- OVERLAY -->
-				</Layers>
-			</Frame>
+                        <FontString name="SkilletSkillCooldown" inherits="GameFontRedSmall">
+                            <Anchors>
+                                <Anchor point="TOPLEFT" relativeTo="SkilletRequirementLabel" relativePoint="BOTTOMLEFT">
+                                    <Offset>
+                                        <AbsDimension x="0" y="0"/>
+                                    </Offset>
+                                </Anchor>
+                            </Anchors>
+                        </FontString>
+                        <FontString name="SkilletReagentLabel" inherits="GameFontNormalSmall" justifyH="LEFT" text="SPELL_REAGENTS">
+                            <Anchors>
+                                <Anchor point="TOPLEFT" relative="SkilletReagentParent" relativePoint="TOPLEFT">
+                                    <Offset>
+                                        <AbsDimension x="10" y="-50"/>
+                                    </Offset>
+                                </Anchor>
+                            </Anchors>
+                        </FontString>
+                    </Layer> <!-- OVERLAY -->
+                </Layers>
+            </Frame>
 
-			<!--
-			#
-			# A button that pops up the notes for this recipe/list of reagents
-			#
-			-->
-			<Button name="SkilletRecipeNotesButton" inherits="UIPanelButtonTemplate" text="Notes" parent="SkilletReagentParent">
-				<Size>
-					<AbsDimension x="75" y="18"/>
-				</Size>
-				<Anchors>
-					<Anchor point="TOPRIGHT" relativeTo="SkilletReagentParent" relativePoint="TOPRIGHT">
-						<Offset>
-							<AbsDimension x="-5" y="-5"/>
-						</Offset>
-					</Anchor>
-				</Anchors>
-				<Scripts>
-					<OnClick>
-						Skillet:ShowRecipeNotes();
-					</OnClick>
-				</Scripts>
-			</Button>
+            <!--
+            #
+            # A button that pops up the notes for this recipe/list of reagents
+            #
+            -->
+            <Button name="SkilletRecipeNotesButton" inherits="UIPanelButtonTemplate" text="Notes" parent="SkilletReagentParent">
+                <Size>
+                    <AbsDimension x="75" y="18"/>
+                </Size>
+                <Anchors>
+                    <Anchor point="TOPRIGHT" relativeTo="SkilletReagentParent" relativePoint="TOPRIGHT">
+                        <Offset>
+                            <AbsDimension x="-5" y="-5"/>
+                        </Offset>
+                    </Anchor>
+                </Anchors>
+                <Scripts>
+                    <OnClick>
+                        Skillet:ShowRecipeNotes();
+                    </OnClick>
+                </Scripts>
+            </Button>
 
             <!--
             #
@@ -929,23 +966,23 @@
                 </Scripts>
             </Button>
 
- 			<!--
- 			#
- 			# Not really a button, but we need a place to show the icon for the currently
- 			# selected skill.
- 			#
- 			-->
- 			<Button name="SkilletSkillIcon" parent="SkilletReagentParent">
-				<Size>
-					<AbsDimension x="37" y="37"/>
-				</Size>
-				<Anchors>
-					<Anchor point="TOPLEFT" relativeTo="SkilletReagentParent" relativePoint="TOPLEFT">
-						<Offset>
-							<AbsDimension x="10" y="-10"/>
-						</Offset>
-					</Anchor>
-				</Anchors>
+            <!--
+            #
+            # Not really a button, but we need a place to show the icon for the currently
+            # selected skill.
+            #
+            -->
+            <Button name="SkilletSkillIcon" parent="SkilletReagentParent">
+                <Size>
+                    <AbsDimension x="37" y="37"/>
+                </Size>
+                <Anchors>
+                    <Anchor point="TOPLEFT" relativeTo="SkilletReagentParent" relativePoint="TOPLEFT">
+                        <Offset>
+                            <AbsDimension x="10" y="-10"/>
+                        </Offset>
+                    </Anchor>
+                </Anchors>
                 <Layers>
                     <Layer level="ARTWORK">
                         <FontString name="SkilletSkillIconCount" inherits="NumberFontNormal" justifyH="RIGHT" hidden="false">
@@ -959,169 +996,169 @@
                         </FontString>
                     </Layer>
                 </Layers>
-				<Scripts>
-					<OnClick>
-						local link = Skillet:GetTradeskillItemLink(Skillet.selectedSkill);
-						if ( IsControlKeyDown() ) then
-							<!-- This opens up the dressing room window and display the character
-							     wearing the item (if that is possible) -->
-							DressUpItemLink(link);
-						elseif ( IsShiftKeyDown() ) then
-							<!-- This put a link to the *item* that can be created with this trade skill
-						         into the current chat edit box -->
-							ChatEdit_InsertLink(link);
-						end
-					</OnClick>
-					<OnEnter>
-						if ( Skillet.selectedSkill ~= -1 ) then
-							GameTooltip:SetOwner(this, "ANCHOR_TOPLEFT");
-							Skillet:SetTradeSkillToolTip(SkilletFrame.selectedSkill);
-							GameTooltip:Show()
-							CursorUpdate();
-						end
-					</OnEnter>
-					<OnLeave>
-						GameTooltip:Hide();
-						ResetCursor();
-					</OnLeave>
-				</Scripts>
-			</Button>
+                <Scripts>
+                    <OnClick>
+                        local link = Skillet:GetTradeskillItemLink(Skillet.selectedSkill);
+                        if ( IsControlKeyDown() ) then
+                            <!-- This opens up the dressing room window and display the character
+                                 wearing the item (if that is possible) -->
+                            DressUpItemLink(link);
+                        elseif ( IsShiftKeyDown() ) then
+                            <!-- This put a link to the *item* that can be created with this trade skill
+                                 into the current chat edit box -->
+                            ChatEdit_InsertLink(link);
+                        end
+                    </OnClick>
+                    <OnEnter>
+                        if ( Skillet.selectedSkill ~= -1 ) then
+                            GameTooltip:SetOwner(this, "ANCHOR_TOPLEFT");
+                            Skillet:SetTradeSkillToolTip(SkilletFrame.selectedSkill);
+                            GameTooltip:Show()
+                            CursorUpdate();
+                        end
+                    </OnEnter>
+                    <OnLeave>
+                        GameTooltip:Hide();
+                        ResetCursor();
+                    </OnLeave>
+                </Scripts>
+            </Button>
 
-			<!--
-			#
-			# And of course, buttons for the reagents ...
-			#
-			-->
-			<Button name="SkilletReagent1" inherits="SkilletItemTemplate" id="1" parent="SkilletReagentParent">
-				<Anchors>
-					<Anchor point="TOPLEFT" relativeTo="SkilletReagentLabel" relativePoint="BOTTOMLEFT">
-						<Offset>
-							<AbsDimension x="0" y="-16"/>
-						</Offset>
-					</Anchor>
-				</Anchors>
-			</Button>
-			<Button name="SkilletReagent2" inherits="SkilletItemTemplate" id="2" parent="SkilletReagentParent">
-				<Anchors>
-					<Anchor point="TOPLEFT" relativeTo="SkilletReagent1" relativePoint="BOTTOMLEFT">
-						<Offset>
-							<AbsDimension x="0" y="0"/>
-						</Offset>
-					</Anchor>
-				</Anchors>
-			</Button>
-			<Button name="SkilletReagent3" inherits="SkilletItemTemplate" id="3" parent="SkilletReagentParent">
-				<Anchors>
+            <!--
+            #
+            # And of course, buttons for the reagents ...
+            #
+            -->
+            <Button name="SkilletReagent1" inherits="SkilletItemTemplate" id="1" parent="SkilletReagentParent">
+                <Anchors>
+                    <Anchor point="TOPLEFT" relativeTo="SkilletReagentLabel" relativePoint="BOTTOMLEFT">
+                        <Offset>
+                            <AbsDimension x="0" y="-16"/>
+                        </Offset>
+                    </Anchor>
+                </Anchors>
+            </Button>
+            <Button name="SkilletReagent2" inherits="SkilletItemTemplate" id="2" parent="SkilletReagentParent">
+                <Anchors>
+                    <Anchor point="TOPLEFT" relativeTo="SkilletReagent1" relativePoint="BOTTOMLEFT">
+                        <Offset>
+                            <AbsDimension x="0" y="0"/>
+                        </Offset>
+                    </Anchor>
+                </Anchors>
+            </Button>
+            <Button name="SkilletReagent3" inherits="SkilletItemTemplate" id="3" parent="SkilletReagentParent">
+                <Anchors>
                     <Anchor point="TOPLEFT" relativeTo="SkilletReagent2" relativePoint="BOTTOMLEFT">
-						<Offset>
-							<AbsDimension x="0" y="0"/>
-						</Offset>
-					</Anchor>
-				</Anchors>
-			</Button>
-			<Button name="SkilletReagent4" inherits="SkilletItemTemplate" id="4" parent="SkilletReagentParent">
-				<Anchors>
+                        <Offset>
+                            <AbsDimension x="0" y="0"/>
+                        </Offset>
+                    </Anchor>
+                </Anchors>
+            </Button>
+            <Button name="SkilletReagent4" inherits="SkilletItemTemplate" id="4" parent="SkilletReagentParent">
+                <Anchors>
                     <Anchor point="TOPLEFT" relativeTo="SkilletReagent3" relativePoint="BOTTOMLEFT">
-						<Offset>
-							<AbsDimension x="0" y="0"/>
-						</Offset>
-					</Anchor>
-				</Anchors>
-			</Button>
-			<Button name="SkilletReagent5" inherits="SkilletItemTemplate" id="5" parent="SkilletReagentParent">
-				<Anchors>
+                        <Offset>
+                            <AbsDimension x="0" y="0"/>
+                        </Offset>
+                    </Anchor>
+                </Anchors>
+            </Button>
+            <Button name="SkilletReagent5" inherits="SkilletItemTemplate" id="5" parent="SkilletReagentParent">
+                <Anchors>
                     <Anchor point="TOPLEFT" relativeTo="SkilletReagent4" relativePoint="BOTTOMLEFT">
-						<Offset>
-							<AbsDimension x="0" y="0"/>
-						</Offset>
-					</Anchor>
-				</Anchors>
-			</Button>
-			<Button name="SkilletReagent6" inherits="SkilletItemTemplate" id="6" parent="SkilletReagentParent">
-				<Anchors>
+                        <Offset>
+                            <AbsDimension x="0" y="0"/>
+                        </Offset>
+                    </Anchor>
+                </Anchors>
+            </Button>
+            <Button name="SkilletReagent6" inherits="SkilletItemTemplate" id="6" parent="SkilletReagentParent">
+                <Anchors>
                     <Anchor point="TOPLEFT" relativeTo="SkilletReagent5" relativePoint="BOTTOMLEFT">
-						<Offset>
-							<AbsDimension x="0" y="0"/>
-						</Offset>
-					</Anchor>
-				</Anchors>
-			</Button>
-			<Button name="SkilletReagent7" inherits="SkilletItemTemplate" id="7" parent="SkilletReagentParent">
-				<Anchors>
+                        <Offset>
+                            <AbsDimension x="0" y="0"/>
+                        </Offset>
+                    </Anchor>
+                </Anchors>
+            </Button>
+            <Button name="SkilletReagent7" inherits="SkilletItemTemplate" id="7" parent="SkilletReagentParent">
+                <Anchors>
                     <Anchor point="TOPLEFT" relativeTo="SkilletReagent6" relativePoint="BOTTOMLEFT">
-						<Offset>
-							<AbsDimension x="0" y="0"/>
-						</Offset>
-					</Anchor>
-				</Anchors>
-			</Button>
-			<Button name="SkilletReagent8" inherits="SkilletItemTemplate" id="8" parent="SkilletReagentParent">
-				<Anchors>
+                        <Offset>
+                            <AbsDimension x="0" y="0"/>
+                        </Offset>
+                    </Anchor>
+                </Anchors>
+            </Button>
+            <Button name="SkilletReagent8" inherits="SkilletItemTemplate" id="8" parent="SkilletReagentParent">
+                <Anchors>
                     <Anchor point="TOPLEFT" relativeTo="SkilletReagent7" relativePoint="BOTTOMLEFT">
-						<Offset>
-							<AbsDimension x="0" y="0"/>
-						</Offset>
-					</Anchor>
-				</Anchors>
-			</Button>
+                        <Offset>
+                            <AbsDimension x="0" y="0"/>
+                        </Offset>
+                    </Anchor>
+                </Anchors>
+            </Button>
 
-			<!--
-			#
-			# Buttons to queue or create items
-			#
-			-->
-			<Button name="SkilletQueueAllButton" inherits="UIPanelButtonTemplate" text="QUEUE_ALL" parent="SkilletFrame">
-				<Size>
-					<AbsDimension x="85" y="22"/>
-				</Size>
-				<Anchors>
-					<Anchor point="TOPLEFT" relativeTo="SkilletReagentParent" relativePoint="BOTTOMLEFT">
-						<Offset>
-							<AbsDimension x="0" y="-2"/>
-						</Offset>
-					</Anchor>
-				</Anchors>
-				<Scripts>
-					<OnClick>
-						Skillet:QueueAllItems();
-					</OnClick>
-				</Scripts>
-			</Button>
-			<Button name="SkilletEnchantButton" inherits="UIPanelButtonTemplate" text="QUEUE_ALL" parent="SkilletFrame">
-				<Size>
-					<AbsDimension x="85" y="22"/>
-				</Size>
-				<Anchors>
-					<Anchor point="TOPLEFT" relativeTo="SkilletReagentParent" relativePoint="BOTTOMLEFT">
-						<Offset>
-							<AbsDimension x="0" y="-2"/>
-						</Offset>
-					</Anchor>
-				</Anchors>
-				<Scripts>
-					<OnClick>
-						Skillet:EnchantItem();
-					</OnClick>
-				</Scripts>
-			</Button>
+            <!--
+            #
+            # Buttons to queue or create items
+            #
+            -->
+            <Button name="SkilletQueueAllButton" inherits="UIPanelButtonTemplate" text="QUEUE_ALL" parent="SkilletFrame">
+                <Size>
+                    <AbsDimension x="85" y="22"/>
+                </Size>
+                <Anchors>
+                    <Anchor point="TOPLEFT" relativeTo="SkilletReagentParent" relativePoint="BOTTOMLEFT">
+                        <Offset>
+                            <AbsDimension x="0" y="-2"/>
+                        </Offset>
+                    </Anchor>
+                </Anchors>
+                <Scripts>
+                    <OnClick>
+                        Skillet:QueueAllItems();
+                    </OnClick>
+                </Scripts>
+            </Button>
+            <Button name="SkilletEnchantButton" inherits="UIPanelButtonTemplate" text="QUEUE_ALL" parent="SkilletFrame">
+                <Size>
+                    <AbsDimension x="85" y="22"/>
+                </Size>
+                <Anchors>
+                    <Anchor point="TOPLEFT" relativeTo="SkilletReagentParent" relativePoint="BOTTOMLEFT">
+                        <Offset>
+                            <AbsDimension x="0" y="-2"/>
+                        </Offset>
+                    </Anchor>
+                </Anchors>
+                <Scripts>
+                    <OnClick>
+                        Skillet:EnchantItem();
+                    </OnClick>
+                </Scripts>
+            </Button>
 
-			<Button name="SkilletCreateAllButton" inherits="UIPanelButtonTemplate" text="CREATE_ALL" parent="SkilletFrame">
-				<Size>
-					<AbsDimension x="85" y="22"/>
-				</Size>
-				<Anchors>
-					<Anchor point="TOPLEFT" relativeTo="SkilletQueueAllButton" relativePoint="BOTTOMLEFT">
-						<Offset>
-							<AbsDimension x="0" y="-1"/>
-						</Offset>
-					</Anchor>
-				</Anchors>
-				<Scripts>
-					<OnClick>
-						Skillet:CreateAllItems();
-					</OnClick>
-				</Scripts>
-			</Button>
+            <Button name="SkilletCreateAllButton" inherits="UIPanelButtonTemplate" text="CREATE_ALL" parent="SkilletFrame">
+                <Size>
+                    <AbsDimension x="85" y="22"/>
+                </Size>
+                <Anchors>
+                    <Anchor point="TOPLEFT" relativeTo="SkilletQueueAllButton" relativePoint="BOTTOMLEFT">
+                        <Offset>
+                            <AbsDimension x="0" y="-1"/>
+                        </Offset>
+                    </Anchor>
+                </Anchors>
+                <Scripts>
+                    <OnClick>
+                        Skillet:CreateAllItems();
+                    </OnClick>
+                </Scripts>
+            </Button>
 
             <!--
             #
@@ -1169,225 +1206,225 @@
                 </Scripts>
             </Button>
 
-			<!--
-			#
-			# The slider to select the number of items to be crafted
-			#
-			-->
-			<Slider name="SkilletCreateCountSlider" orientation="HORIZONTAL" enableMouse="true" parent="SkilletFrame">
-				<Size>
-					<AbsDimension x="135" y="17"/>
-				</Size>
-				<Anchors>
-					<Anchor point="LEFT" relativeTo="SkilletCreateAllButton" relativePoint="RIGHT">
-						<Offset>
-							<AbsDimension x="5" y="0"/>
-						</Offset>
-					</Anchor>
+            <!--
+            #
+            # The slider to select the number of items to be crafted
+            #
+            -->
+            <Slider name="SkilletCreateCountSlider" orientation="HORIZONTAL" enableMouse="true" parent="SkilletFrame">
+                <Size>
+                    <AbsDimension x="135" y="17"/>
+                </Size>
+                <Anchors>
+                    <Anchor point="LEFT" relativeTo="SkilletCreateAllButton" relativePoint="RIGHT">
+                        <Offset>
+                            <AbsDimension x="5" y="0"/>
+                        </Offset>
+                    </Anchor>
                     <Anchor point="RIGHT" relativeTo="SkilletCreateButton" relativePoint="LEFT">
                         <Offset>
                             <AbsDimension x="-5" y="0"/>
                         </Offset>
                     </Anchor>
-				</Anchors>
-				<HitRectInsets>
-					<AbsInset left="0" right="0" top="-10" bottom="-10"/>
-				</HitRectInsets>
-				<Backdrop bgFile="Interface\Buttons\UI-SliderBar-Background" edgeFile="Interface\Buttons\UI-SliderBar-Border" tile="true">
-					<EdgeSize>
-						<AbsValue val="8"/>
-					</EdgeSize>
-					<TileSize>
-						<AbsValue val="8"/>
-					</TileSize>
-					<BackgroundInsets>
-						<AbsInset left="3" right="3" top="6" bottom="6"/>
-					</BackgroundInsets>
-				</Backdrop>
-				<ThumbTexture name="$parentThumb" file="Interface\Buttons\UI-SliderBar-Button-Horizontal">
-					<Size>
-						<AbsDimension x="32" y="32"/>
-					</Size>
-				</ThumbTexture>
-				<Scripts>
-					<OnValueChanged>
-						Skillet:UpdateNumItemsSlider(arg1, true);
-					</OnValueChanged>
-				</Scripts>
-			</Slider>
+                </Anchors>
+                <HitRectInsets>
+                    <AbsInset left="0" right="0" top="-10" bottom="-10"/>
+                </HitRectInsets>
+                <Backdrop bgFile="Interface\Buttons\UI-SliderBar-Background" edgeFile="Interface\Buttons\UI-SliderBar-Border" tile="true">
+                    <EdgeSize>
+                        <AbsValue val="8"/>
+                    </EdgeSize>
+                    <TileSize>
+                        <AbsValue val="8"/>
+                    </TileSize>
+                    <BackgroundInsets>
+                        <AbsInset left="3" right="3" top="6" bottom="6"/>
+                    </BackgroundInsets>
+                </Backdrop>
+                <ThumbTexture name="$parentThumb" file="Interface\Buttons\UI-SliderBar-Button-Horizontal">
+                    <Size>
+                        <AbsDimension x="32" y="32"/>
+                    </Size>
+                </ThumbTexture>
+                <Scripts>
+                    <OnValueChanged>
+                        Skillet:UpdateNumItemsSlider(arg1, true);
+                    </OnValueChanged>
+                </Scripts>
+            </Slider>
 
-			<!--
-			#
-			# The text box where they can enter the number of items to craft.
-			#
-			-->
-			<EditBox name="SkilletItemCountInputBox" letters="3" historyLines="0" numeric="true" autoFocus="false">
-				<Size>
-					<AbsDimension x="30" y="20"/>
-				</Size>
-				<Anchors>
-					<Anchor point="BOTTOM" relativeTo="SkilletCreateCountSlider" relativePoint="TOP">
-						<Offset>
-							<AbsDimension x="0" y="5"/>
-						</Offset>
-					</Anchor>
-				</Anchors>
-				<Layers>
-					<Layer level="BACKGROUND">
-						<Texture name="$parentLeft" file="Interface\Common\Common-Input-Border">
-							<Size>
-								<AbsDimension x="8" y="20"/>
-							</Size>
-							<Anchors>
-								<Anchor point="TOPLEFT">
-									<Offset>
-										<AbsDimension x="-5" y="0"/>
-									</Offset>
-								</Anchor>
-							</Anchors>
-							<TexCoords left="0" right="0.0625" top="0" bottom="0.625"/>
-						</Texture>
-						<Texture name="$parentRight" file="Interface\Common\Common-Input-Border">
-							<Size>
-								<AbsDimension x="8" y="20"/>
-							</Size>
-							<Anchors>
-								<Anchor point="RIGHT">
-									<Offset>
-										<AbsDimension x="0" y="0"/>
-									</Offset>
-								</Anchor>
-							</Anchors>
-							<TexCoords left="0.9375" right="1.0" top="0" bottom="0.625"/>
-						</Texture>
-						<Texture name="$parentMiddle" file="Interface\Common\Common-Input-Border">
-							<Size>
-								<AbsDimension x="10" y="20"/>
-							</Size>
-							<Anchors>
-								<Anchor point="LEFT" relativeTo="$parentLeft" relativePoint="RIGHT"/>
-								<Anchor point="RIGHT" relativeTo="$parentRight" relativePoint="LEFT"/>
-							</Anchors>
-							<TexCoords left="0.0625" right="0.9375" top="0" bottom="0.625"/>
-						</Texture>
-					</Layer>
-				</Layers>
-				<Scripts>
-					<OnEnterPressed>
-						this:ClearFocus();
-					</OnEnterPressed>
-					<OnEscapePressed>
-						this:ClearFocus();
-					</OnEscapePressed>
-					<OnTextChanged>
-						if ( this:GetText() == "0" ) then
-							this:SetText("1");
-						end
-					</OnTextChanged>
-					<OnEditFocusLost>
-						this:HighlightText(0, 0);
-					</OnEditFocusLost>
-					<OnEditFocusGained>
-						this:HighlightText();
-					</OnEditFocusGained>
-				</Scripts>
-				<FontString inherits="ChatFontNormal"/>
-			</EditBox>
+            <!--
+            #
+            # The text box where they can enter the number of items to craft.
+            #
+            -->
+            <EditBox name="SkilletItemCountInputBox" letters="3" historyLines="0" numeric="true" autoFocus="false">
+                <Size>
+                    <AbsDimension x="30" y="20"/>
+                </Size>
+                <Anchors>
+                    <Anchor point="BOTTOM" relativeTo="SkilletCreateCountSlider" relativePoint="TOP">
+                        <Offset>
+                            <AbsDimension x="0" y="5"/>
+                        </Offset>
+                    </Anchor>
+                </Anchors>
+                <Layers>
+                    <Layer level="BACKGROUND">
+                        <Texture name="$parentLeft" file="Interface\Common\Common-Input-Border">
+                            <Size>
+                                <AbsDimension x="8" y="20"/>
+                            </Size>
+                            <Anchors>
+                                <Anchor point="TOPLEFT">
+                                    <Offset>
+                                        <AbsDimension x="-5" y="0"/>
+                                    </Offset>
+                                </Anchor>
+                            </Anchors>
+                            <TexCoords left="0" right="0.0625" top="0" bottom="0.625"/>
+                        </Texture>
+                        <Texture name="$parentRight" file="Interface\Common\Common-Input-Border">
+                            <Size>
+                                <AbsDimension x="8" y="20"/>
+                            </Size>
+                            <Anchors>
+                                <Anchor point="RIGHT">
+                                    <Offset>
+                                        <AbsDimension x="0" y="0"/>
+                                    </Offset>
+                                </Anchor>
+                            </Anchors>
+                            <TexCoords left="0.9375" right="1.0" top="0" bottom="0.625"/>
+                        </Texture>
+                        <Texture name="$parentMiddle" file="Interface\Common\Common-Input-Border">
+                            <Size>
+                                <AbsDimension x="10" y="20"/>
+                            </Size>
+                            <Anchors>
+                                <Anchor point="LEFT" relativeTo="$parentLeft" relativePoint="RIGHT"/>
+                                <Anchor point="RIGHT" relativeTo="$parentRight" relativePoint="LEFT"/>
+                            </Anchors>
+                            <TexCoords left="0.0625" right="0.9375" top="0" bottom="0.625"/>
+                        </Texture>
+                    </Layer>
+                </Layers>
+                <Scripts>
+                    <OnEnterPressed>
+                        this:ClearFocus();
+                    </OnEnterPressed>
+                    <OnEscapePressed>
+                        this:ClearFocus();
+                    </OnEscapePressed>
+                    <OnTextChanged>
+                        if ( this:GetText() == "0" ) then
+                            this:SetText("1");
+                        end
+                    </OnTextChanged>
+                    <OnEditFocusLost>
+                        this:HighlightText(0, 0);
+                    </OnEditFocusLost>
+                    <OnEditFocusGained>
+                        this:HighlightText();
+                    </OnEditFocusGained>
+                </Scripts>
+                <FontString inherits="ChatFontNormal"/>
+            </EditBox>
 
-			<!--
-			#
-			# A frame to hold the queue of recipes in line to be crafted
-			#
-			-->
-			<Frame name="SkilletQueueParent" parent="SkilletFrame">
-				<Anchors>
+            <!--
+            #
+            # A frame to hold the queue of recipes in line to be crafted
+            #
+            -->
+            <Frame name="SkilletQueueParent" parent="SkilletFrame">
+                <Anchors>
                     <Anchor point="TOP" relativeTo="SkilletCreateButton" relativePoint="BOTTOM">
-						<Offset>
-							<AbsDimension x="0" y="-3"/>
-						</Offset>
-					</Anchor>
+                        <Offset>
+                            <AbsDimension x="0" y="-3"/>
+                        </Offset>
+                    </Anchor>
                     <Anchor point="BOTTOMRIGHT" relativeTo="SkilletFrame" relativePoint="BOTTOMRIGHT">
                         <Offset>
                             <AbsDimension x="-10" y="32"/>
                         </Offset>
                     </Anchor>
-				</Anchors>
-			</Frame>
-			<ScrollFrame name="SkilletQueueList" inherits="FauxScrollFrameTemplate" parent="SkilletQueueParent">
-				<Anchors>
-					<Anchor point="TOPLEFT" relativeTo="SkilletQueueParent" relativePoint="TOPLEFT">
-						<Offset>
-							<AbsDimension x="5" y="-5"/>
-						</Offset>
-					</Anchor>
+                </Anchors>
+            </Frame>
+            <ScrollFrame name="SkilletQueueList" inherits="FauxScrollFrameTemplate" parent="SkilletQueueParent">
+                <Anchors>
+                    <Anchor point="TOPLEFT" relativeTo="SkilletQueueParent" relativePoint="TOPLEFT">
+                        <Offset>
+                            <AbsDimension x="5" y="-5"/>
+                        </Offset>
+                    </Anchor>
                     <Anchor point="BOTTOMRIGHT" relativeTo="SkilletQueueParent" relativePoint="BOTTOMRIGHT">
                         <Offset>
                             <AbsDimension x="-27" y="5"/>
                         </Offset>
                     </Anchor>
-				</Anchors>
-			    <Scripts>
-					<OnVerticalScroll>
-					    FauxScrollFrame_OnVerticalScroll(self, offset, SKILLET_TRADE_SKILL_HEIGHT, Skillet.QueueList_OnScroll);
-     				</OnVerticalScroll>
-   				</Scripts>
- 			</ScrollFrame>
- 			<Button name="SkilletQueueButton1" inherits="SkilletQueueItemButtonTemplate">
-				<Anchors>
-					<Anchor point="TOPLEFT" relativeTo="SkilletQueueList" relativePoint="TOPLEFT">
-						<Offset>
-							<AbsDimension x="1" y="-1"/>
-						</Offset>
-					</Anchor>
-				</Anchors>
-			</Button>
+                </Anchors>
+                <Scripts>
+                    <OnVerticalScroll>
+                        FauxScrollFrame_OnVerticalScroll(self, offset, SKILLET_TRADE_SKILL_HEIGHT, Skillet.QueueList_OnScroll);
+                    </OnVerticalScroll>
+                </Scripts>
+            </ScrollFrame>
+            <Button name="SkilletQueueButton1" inherits="SkilletQueueItemButtonTemplate">
+                <Anchors>
+                    <Anchor point="TOPLEFT" relativeTo="SkilletQueueList" relativePoint="TOPLEFT">
+                        <Offset>
+                            <AbsDimension x="1" y="-1"/>
+                        </Offset>
+                    </Anchor>
+                </Anchors>
+            </Button>
             <!-- rest of the buttons are created dynaically -->
 
-			<!--
-			#
-			# A button that starts or continues the queue
-			#
-			-->
+            <!--
+            #
+            # A button that starts or continues the queue
+            #
+            -->
             <Button name="SkilletStartQueueButton" inherits="UIPanelButtonTemplate" text="Start" parent="SkilletFrame">
-				<Size>
-					<AbsDimension x="80" y="22"/>
-				</Size>
-				<Anchors>
-					<Anchor point="TOPLEFT" relativeTo="SkilletQueueParent" relativePoint="BOTTOMLEFT">
-						<Offset>
-							<AbsDimension x="0" y="-1"/>
-						</Offset>
-					</Anchor>
-				</Anchors>
-				<Scripts>
-					<OnClick>
+                <Size>
+                    <AbsDimension x="80" y="22"/>
+                </Size>
+                <Anchors>
+                    <Anchor point="TOPLEFT" relativeTo="SkilletQueueParent" relativePoint="BOTTOMLEFT">
+                        <Offset>
+                            <AbsDimension x="0" y="-1"/>
+                        </Offset>
+                    </Anchor>
+                </Anchors>
+                <Scripts>
+                    <OnClick>
                         Skillet:StartQueue_OnClick(this)
-					</OnClick>
-				</Scripts>
-			</Button>
+                    </OnClick>
+                </Scripts>
+            </Button>
 
-			<!--
-			#
-			# A button that clears the current queue
-			#
-			-->
-			<Button name="SkilletEmptyQueueButton" inherits="UIPanelButtonTemplate" text="Clear" parent="SkilletFrame">
-				<Size>
-					<AbsDimension x="80" y="22"/>
-				</Size>
-				<Anchors>
+            <!--
+            #
+            # A button that clears the current queue
+            #
+            -->
+            <Button name="SkilletEmptyQueueButton" inherits="UIPanelButtonTemplate" text="Clear" parent="SkilletFrame">
+                <Size>
+                    <AbsDimension x="80" y="22"/>
+                </Size>
+                <Anchors>
                     <Anchor point="TOPLEFT" relativeTo="SkilletStartQueueButton" relativePoint="TOPRIGHT">
-						<Offset>
-							<AbsDimension x="5" y=""/>
-						</Offset>
-					</Anchor>
-				</Anchors>
-				<Scripts>
-					<OnClick>
-						Skillet:EmptyQueue()
-					</OnClick>
-				</Scripts>
-			</Button>
+                        <Offset>
+                            <AbsDimension x="5" y=""/>
+                        </Offset>
+                    </Anchor>
+                </Anchors>
+                <Scripts>
+                    <OnClick>
+                        Skillet:EmptyQueue()
+                    </OnClick>
+                </Scripts>
+            </Button>
 
             <!--
             #
@@ -1412,7 +1449,7 @@
                 </Scripts>
             </Button>
 
-		</Frames>
+        </Frames>
 
         <Scripts>
             <OnShow>
@@ -1432,6 +1469,6 @@
             </OnHide>
         </Scripts>
 
-	</Frame> <!-- main trade skill frame -->
+    </Frame> <!-- main trade skill frame -->
 
 </Ui>
