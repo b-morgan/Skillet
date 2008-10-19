@@ -283,84 +283,45 @@ end
 -- ========================================================================
 --                        ArkInventory Methods
 -- ========================================================================
+local ark_warned = false
 local function arkinventory_GetItemCount(itemid)
 
     local r = GetRealmName()
     local f = UnitFactionGroup( "player" )
 
-    local apd = ArkInventory.db.account.player.data
+    if not ArkInventory.Const.TOC or ArkInventory.Const.TOC < 30000 then
+        -- this is the old ark format
+        if not ark_warned then
+            error("Only version 3.01 (or later) of ArkInventory is supported. You will have to upgrade to be able to use it with Skillet.")
+            ark_warned = true
+        end
+        return 0
+    end
+
     local item_count_total = 0
 
-    local character_count = 0
-    -- local character_entries = { }
-
-    local guild_count = 0
-    -- local guild_entries = { }
-
-    for _, pd in ArkInventory.spairs( apd ) do
-
-        local item_count_character = 0
-        local item_count_guild = 0
+    for pid, pd in ArkInventory.spairs( ArkInventory.db.global.player.realm[r].faction[f].name ) do
 
         -- NB: We skip the current player. That info is dynamnic and should
         --     not be included in the values we return.
         if pd.info.name ~= PLAYER and pd.info.realm == r and pd.info.faction == f then
-
-            local location_entries = { }
-
-            local pl = ArkInventory.db.account.cache.realm[pd.info.realm].faction[pd.info.faction].character[pd.info.name]
-
-            if pl and pl.location then
-
-                -- local me = ""
-                -- if pd.info.player_id == ArkInventory.Global.Me.player_id then
-                --     me = ArkInventory.Localise["TOOLTIP_COUNT_ME"]
-                -- end
-
-                for l, ld in pairs( pl.location ) do
-
-                    local item_count_location = 0
-
-                    if ld.active then
-                        for b, bd in pairs( ld.bag ) do
-                            for s, sd in pairs( bd.slot ) do
-                                if sd.h and itemid == ArkInventory.ItemStringDecode( sd.h ) then
-                                    item_count_location = item_count_location + sd.count
+            for l, ld in pairs( pd.location ) do
+                if l ~= ArkInventory.Const.Location.Vault then
+                    -- we don't want to include guild vaults
+                    for b, bd in pairs( ld.bag ) do
+                        for s, sd in pairs( bd.slot ) do
+                            if sd and sd.h then 
+                                local id, _ = ArkInventory.ItemStringDecode( sd.h )
+                                if itemid == id then
+                                    -- print( "found [" .. bag.slot[s].count .. "] in bag [" .. b .. "] slot [" .. s .. "]" )
+                                    item_count_total = item_count_total + sd.count
                                 end
                             end
                         end
                     end
-
-                    if item_count_location > 0 then
-
-                        if l == ArkInventory.Const.Location.Vault then
-                            -- tinsert( location_entries, string.format( "(%s)", ArkInventory.Global.Location[l].Name ) )
-                            item_count_guild = item_count_guild + item_count_location
-                        else
-                            -- tinsert( location_entries, string.format( "(%s %s)", ArkInventory.Global.Location[l].Name, item_count_location ) )
-                            item_count_character = item_count_character + item_count_location
-                        end
-
-                    end
-
                 end
-
-                if item_count_character > 0 then
-                    -- tinsert( character_entries, string.format( "%s%s: %s %s", me, pd.info.display3 or pd.info.name, item_count_character, table.concat( location_entries, ", " ) ) )
-                    character_count = character_count + 1
-                    item_count_total = item_count_total + item_count_character
-                end
-
-                if item_count_guild > 0 then
-                    -- tinsert( guild_entries, string.format( "%s: %s %s", pd.info.display3 or pd.info.name, item_count_guild, table.concat( location_entries, ", " ) ) )
-                    guild_count = guild_count + 1
-                    --item_count_total = item_count_total + item_count_character
-                end
-
             end
-
         end
-
     end
 
     return item_count_total
