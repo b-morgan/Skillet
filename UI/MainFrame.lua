@@ -1281,13 +1281,10 @@ end
 function Skillet:Tradeskill_OnShow()
     -- Get rid of Blizzards windows. This can happen when the user
     -- changes from a skill that we do not support to one that we do.
-    if CraftFrame and CraftFrame:IsVisible() then
+    if TradeSkillFrame and TradeSkillFrame:IsVisible() then
         -- Can't really hide the frame as that has some nasty side effects
         -- like setting the current craft to UNKNOWN and causing bad results
         -- from GetTradeSkillLine() et al.
-        hide_blizz(CraftFrame, orig_craft_settings)
-    end
-    if TradeSkillFrame and TradeSkillFrame:IsVisible() then
         hide_blizz(TradeSkillFrame, orig_tradeskill_settings)
     end
 
@@ -1303,9 +1300,6 @@ end
 
 -- Called when the trade skill window is hidden
 function Skillet:Tradeskill_OnHide()
-    if CraftFrame then
-        restore_blizz(CraftFrame, orig_craft_settings)
-    end
     if TradeSkillFrame then
         restore_blizz(TradeSkillFrame, orig_tradeskill_settings)
     end
