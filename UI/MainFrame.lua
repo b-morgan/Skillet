@@ -150,7 +150,6 @@ function Skillet:CreateTradeSkillWindow()
     SkilletQueueButton:SetText(L["Queue"])
     SkilletStartQueueButton:SetText(L["Start"])
     SkilletEmptyQueueButton:SetText(L["Clear"])
-    SkilletEnchantButton:SetText(L["Enchant"])
     SkilletShowOptionsButton:SetText(L["Options"])
     SkilletRescanButton:SetText(L["Rescan"])
     SkilletRecipeNotesButton:SetText(L["Notes"])
@@ -446,35 +445,16 @@ function Skillet:internal_UpdateTradeSkillWindow()
     SkilletFrame:SetAlpha(self.db.profile.transparency)
     SkilletFrame:SetScale(self.db.profile.scale)
 
-    -- hide UI components that cannot be used for crafts and show that
-    -- that are only applicable to trade skills, as needed
-    if self:IsCraft() then
-        SkilletQueueAllButton:Hide()
-        SkilletQueueButton:Hide()
-        SkilletCreateAllButton:Hide()
-        SkilletCreateButton:Hide()
-        SkilletCreateCountSlider:Hide()
-        SkilletCreateCountSliderThumb:Hide()
-        SkilletItemCountInputBox:Hide()
-        SkilletQueueParent:Hide()
-        SkilletStartQueueButton:Hide()
-        SkilletEmptyQueueButton:Hide()
-
-        SkilletEnchantButton:Show();
-    else
-        SkilletQueueAllButton:Show()
-        SkilletQueueButton:Show()
-        SkilletCreateAllButton:Show()
-        SkilletCreateButton:Show()
-        SkilletCreateCountSlider:Show()
-        SkilletCreateCountSliderThumb:Show()
-        SkilletItemCountInputBox:Show()
-        SkilletQueueParent:Show()
-        SkilletStartQueueButton:Show()
-        SkilletEmptyQueueButton:Show()
-
-        SkilletEnchantButton:Hide()
-    end
+    SkilletQueueAllButton:Show()
+    SkilletQueueButton:Show()
+    SkilletCreateAllButton:Show()
+    SkilletCreateButton:Show()
+    SkilletCreateCountSlider:Show()
+    SkilletCreateCountSliderThumb:Show()
+    SkilletItemCountInputBox:Show()
+    SkilletQueueParent:Show()
+    SkilletStartQueueButton:Show()
+    SkilletEmptyQueueButton:Show()
 
     -- shopping list button always shown
     SkilletShoppingListButton:Show()
@@ -716,11 +696,9 @@ function Skillet:internal_UpdateTradeSkillWindow()
                 if ( self.selectedSkill and self.selectedSkill == skillIndex ) then
                     -- user has this skill selected
 
-                    if not self:IsCraft() then
-                        -- This is so mods that call GetTradeSkillSelectionIndex() will work
-                        -- tested with ArmorCraft.
-                        SelectTradeSkill(self.selectedSkill)
-                    end
+                    -- This is so mods that call GetTradeSkillSelectionIndex() will work
+                    -- tested with ArmorCraft.
+                    SelectTradeSkill(self.selectedSkill)
 
                     SkilletHighlightFrame:SetPoint("TOPLEFT", "SkilletScrollButton"..i, "TOPLEFT", 0, 0)
                     SkilletHighlightFrame:SetWidth(button:GetWidth())
@@ -882,18 +860,10 @@ end
 function Skillet:SetTradeSkillToolTip(skill, index)
     GameTooltip:ClearLines();
 
-    if Skillet:IsCraft() then
-        if index then
-            GameTooltip:SetCraftItem(skill, index)
-        else
-            GameTooltip:SetCraftSpell(skill)
-        end
+    if index then
+        GameTooltip:SetTradeSkillItem(skill, index)
     else
-        if index then
-            GameTooltip:SetTradeSkillItem(skill, index)
-        else
-            GameTooltip:SetTradeSkillItem(skill)
-        end
+        GameTooltip:SetTradeSkillItem(skill)
     end
 
     local s = self.stitch:GetItemDataByIndex(self.currentTrade, skill);
@@ -948,12 +918,7 @@ function Skillet:UpdateDetailsWindow(skill_index)
     SkilletRecipeNotesButton:Show();
 
     -- Whether or not it is in cooldown.
-    local cooldown = 0
-    if self:IsCraft() then
-        cooldown = GetCraftCooldown(skill_index)
-    else
-        cooldown = GetTradeSkillCooldown(skill_index)
-    end
+    local cooldown = GetTradeSkillCooldown(skill_index)
     if cooldown and cooldown > 0 then
         SkilletSkillCooldown:SetText(COOLDOWN_REMAINING.." "..SecondsToTime(cooldown))
     else
@@ -962,15 +927,10 @@ function Skillet:UpdateDetailsWindow(skill_index)
 
     -- Are special tools needed for this skill?
     if s.tools then
-        local text
         -- can't use s.tools here as GetCraftSpellFocus() needs an
         -- index rather than a name so it can do the lookups to see
         -- if we have the required item
-        if Skillet:IsCraft() then
-            text = BuildColoredListString(GetCraftSpellFocus(skill_index))
-        else
-            text = BuildColoredListString(GetTradeSkillTools(skill_index))
-        end
+        local text = BuildColoredListString(GetTradeSkillTools(skill_index))
 
         SkilletRequirementText:SetText(text)
         SkilletRequirementLabel:Show()

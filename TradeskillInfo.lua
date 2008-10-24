@@ -51,13 +51,7 @@ end
 function Skillet:GetTradeSkillInfo(index)
     if (not index) then return end
 
-    local skillName, skillType, numAvailable, isExpanded;
-    if self:IsCraft() then
-        skillName, craftSubSpellName, skillType, numAvailable, isExpanded = GetCraftInfo(index)
-    else
-        skillName, skillType, numAvailable, isExpanded = GetTradeSkillInfo(index)
-    end
-    return skillName, skillType, numAvailable, isExpanded;
+    return GetTradeSkillInfo(index)
 end
 
 --
@@ -120,22 +114,13 @@ end
 -- Gets a link to the recipe (not the item creafted by the recipe)
 -- for the current tradeskill
 function Skillet:GetTradeSkillRecipeLink(index)
-    if self:IsCraft() then
-        return GetCraftRecipeLink(index);
-    else
-        return GetTradeSkillRecipeLink(index);
-    end
+    return GetTradeSkillRecipeLink(index);
 end
 
 -- Gets the trade skill line, and knows how to do the right
 -- thing depending on whether or not this is a craft.
 function Skillet:GetTradeSkillLine()
-    local tradeskillName, currentLevel, maxLevel;
-    if self:IsCraft() then
-        tradeskillName, currentLevel, maxLevel = GetCraftDisplaySkillLine();
-    else
-        tradeskillName, currentLevel, maxLevel = GetTradeSkillLine();
-    end
+    local tradeskillName, currentLevel, maxLevel = GetTradeSkillLine()
     if(tradeskillName==nil) then
         tradeskillName = "";
     end
@@ -149,13 +134,7 @@ function Skillet:GetNumTradeSkills()
         stitch_count = 0
     end
 
-    local blizz_count = 0
-
-    if self:IsCraft() then
-        blizz_count = GetNumCrafts()
-    else
-        blizz_count = GetNumTradeSkills()
-    end
+    local blizz_count = GetNumTradeSkills()
 
     return math.max(stitch_count, blizz_count)
 end

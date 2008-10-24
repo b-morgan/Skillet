@@ -174,19 +174,11 @@ end
 function Skillet:GetReagentLabel(tradeskill, skill_index)
     if (FRC_PriceSource ~= nill and FRC_CraftFrame_SetSelection and FRC_TradeSkillFrame_SetSelection) then
         -- Support for Fizzwidget's Reagent Cost
-        if self:IsCraft() then
-            local Orig_CraftFrame_SetSelection = FRC_Orig_CraftFrame_SetSelection;
-            FRC_Orig_CraftFrame_SetSelection = Skillet_NOP;
-            FRC_CraftFrame_SetSelection(skill_index);
-            FRC_Orig_CraftFrame_SetSelection = Orig_CraftFrame_SetSelection;
-            return CraftReagentLabel:GetText();
-        else
-            local Orig_TradeSkillFrame_SetSelection = FRC_Orig_TradeSkillFrame_SetSelection
-            FRC_Orig_TradeSkillFrame_SetSelection = Skillet_NOP
-            FRC_TradeSkillFrame_SetSelection(skill_index)
-            FRC_Orig_TradeSkillFrame_SetSelection = Orig_TradeSkillFrame_SetSelection
-            return TradeSkillReagentLabel:GetText()
-        end
+        local Orig_TradeSkillFrame_SetSelection = FRC_Orig_TradeSkillFrame_SetSelection
+        FRC_Orig_TradeSkillFrame_SetSelection = Skillet_NOP
+        FRC_TradeSkillFrame_SetSelection(skill_index)
+        FRC_Orig_TradeSkillFrame_SetSelection = Orig_TradeSkillFrame_SetSelection
+        return TradeSkillReagentLabel:GetText()
     else
         -- boring
         return SPELL_REAGENTS;
@@ -197,10 +189,6 @@ end
 -- A hook to get text to prefix the name of the recipe in the scrolling list of recipes.
 -- If you hook this method, make sure to include any text you get from calling the hooked method.
 -- This will allow more than one mod to use the hook.
---
--- This will be called for both crafts and tradeskills, you can use Skillet:IsCraft()
--- to determine if it's a craft. This avoid having to localize the tradeskill name just to
--- see if it is a craft or a tradeskill.
 --
 -- Refer to the notes at the top of this file for how to hook this method.
 --
@@ -215,10 +203,6 @@ end
 -- If you hook this method, make sure to include any text you get from calling the hooked method.
 -- This will allow more than one mod to use the hook.
 --
--- This will be called for both crafts and tradeskills, you can use Skillet:IsCraft()
--- to determine if it's a craft. This avoid having to localize the tradeskill name just to
--- see if it is a craft or a tradeskill.
---
 -- Refer to the notes at the top of this file for how to hook this method.
 --
 -- @param tradeskill name of the currently selected tradeskill
@@ -231,10 +215,6 @@ end
 -- A hook to display extra information about a recipe. Any text returned from this function
 -- will be displayed in the recipe details frame when the user clicks on the recipe name.
 -- The text will be added to the bottom the frame, after the list of reagents.
---
--- This will be called for both crafts and tradeskills, you can use Skillet:IsCraft()
--- to determine if it's a craft. This avoid having to localize the tradeskill name just to
--- see if it is a craft or a tradeskill.
 --
 -- Refer to the notes at the top of this file for how to hook this method.
 --

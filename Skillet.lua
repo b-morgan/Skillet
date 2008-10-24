@@ -80,10 +80,6 @@ local L = AceLibrary("AceLocale-2.2"):new("Skillet")
 -- Events
 local AceEvent = AceLibrary("AceEvent-2.0")
 
--- Are we display a craft window or a trade window
--- This is a runtime only variable
-local isCraft = false;
-
 -- All the options that we allow the user to control.
 local Skillet = Skillet
 Skillet.options =
@@ -392,8 +388,6 @@ function Skillet:OnEnable()
     self:RegisterEvent("TRADE_SKILL_CLOSE")
     self:RegisterEvent("TRADE_SKILL_SHOW")
     self:RegisterEvent("TRADE_SKILL_UPDATE")
-    self:RegisterEvent("CRAFT_SHOW")
-    self:RegisterEvent("CRAFT_CLOSE")
 
     -- Learning or unlearning a tradeskill
     self:RegisterEvent('SKILL_LINES_CHANGED')
@@ -492,15 +486,9 @@ local function is_known_trade_skill(name)
     return false
 end
 
--- Checks to see if the current trade is one that we support. This
--- requires isCraft to be set correctly.
+-- Checks to see if the current trade is one that we support. 
 local function is_supported_trade(parent)
     local name = parent:GetTradeSkillLine()
-
-    if isCraft and not parent.stitch:IsSupportedCraft(name) then
-        -- we don't handle this craft. (it's Beast Training BTW)
-        return false
-    end
 
     -- EnchantingSell does not play well with the Skillet window, so
     -- if it is enabled, and it was the craft frame hidden, do not
@@ -508,7 +496,7 @@ local function is_supported_trade(parent)
     --
     -- EnchantingSell does some odd things to the enchanting toggle,
     -- so expect some odd bug reports about this.
-    if isCraft and ESeller and ESeller:IsActive() and ESeller.db.char.DisableDefaultCraftFrame then
+    if ESeller and ESeller:IsActive() and ESeller.db.char.DisableDefaultCraftFrame then
          return false
     end
 
@@ -609,53 +597,13 @@ function Skillet:SKILL_LINES_CHANGED()
     end
 end
 
--- Called when a craft window is opened
-function Skillet:CRAFT_SHOW()
-    if not isCraft then
-        -- previous trade was a craft, we need to close and reopen because
-        -- although we use the same window for trades and crafts, Blizzard does
-        -- not
-        self:HideAllWindows()
-    end
-
-    isCraft = true
-    if is_supported_trade(self) then
-        self:UpdateTradeSkill()
-        self:ShowTradeSkillWindow()
-    else
-        self:HideAllWindows()
-    end
-end
-
--- Called when the trade skill window is closed
-function Skillet:CRAFT_CLOSE()
-    show_after_scan = false
-    self:HideAllWindows()
-end
-
-function Skillet:CraftCastEnded(unit)
-    if unit == "player" and isCraft then
-        -- Pretend we're Stitch.
-        -- Crafting can only be done one item at a time so
-        -- pretend we're done.
-        AceEvent:TriggerEvent("SkilletStitch_Queue_Complete")
-    end
-end
-
 -- Called when the trade skill window is opened
 -- or when the window is open and the user selects another tradeskill
 function Skillet:TRADE_SKILL_SHOW()
-    if isCraft then
-        -- previous trade was a craft, we need to close and reopen because
-        -- although we use the same window for trades and crafts, Blizzard does
-        -- not
-        self:HideAllWindows()
-    end
-
-    isCraft = false
     if is_supported_trade(self) then
         self:UpdateTradeSkill()
         self:ShowTradeSkillWindow()
+        self.stitch:TRADE_SKILL_SHOW()
     else
         self:HideAllWindows()
     end
@@ -792,9 +740,7 @@ function Skillet:internal_HideAllWindows()
     local closed -- was anything closed?
 
     -- Cancel anything currently being created
-    if not self:IsCraft() then
-        self.stitch:CancelCast()
-    end
+    self.stitch:CancelCast()
 
     if self:HideTradeSkillWindow() then
         closed = true
@@ -836,11 +782,7 @@ function Skillet:RescanTrade(forced)
 
         self:UpdateScanningText(L["Scanning tradeskill"] .. " ...")
 
-        if isCraft then
-            Skillet.stitch:ScanCraft()
-        else
-            Skillet.stitch:ScanTrade()
-        end
+        Skillet.stitch:ScanTrade()
     else
         scan_in_progress = false
     end
@@ -874,14 +816,6 @@ function Skillet:SetSelectedSkill(skill_index, was_clicked)
 
     self.selectedSkill = skill_index
     self:UpdateDetailsWindow(skill_index)
-end
-
---
--- Checks to see if the currently selected profession is a craft or a
--- tradeskill
---
-function Skillet:IsCraft()
-    return (isCraft and isCraft == true)
 end
 
 -- Updates the text we filter the list of recipes against.
