@@ -39,27 +39,7 @@ local PT
 if AceLibrary:HasInstance("LibPeriodicTable-3.1") then
 	PT = AceLibrary("LibPeriodicTable-3.1")
 end
-local ENCHANTING_STRING
-do
-    local locale = GetLocale()
-    if locale == "enUS" then
-        ENCHANTING_STRING = "Enchanting"
-    elseif locale == "frFR" then
-        ENCHANTING_STRING = "Enchantement"
-    elseif locale == "deDE" then
-        ENCHANTING_STRING = "Verzauberkunst"
-    elseif locale == "koKR" then
-        ENCHANTING_STRING = "마법부여"
-    elseif locale == "zhCN" then
-        ENCHANTING_STRING = "附魔"
-    elseif locale == "zhTW" then
-        ENCHANTING_STRING = "附魔"
-    elseif locale == "esES" then
-        ENCHANTING_STRING = "Encantamiento"
-    elseif locale == "ruRU" then
-        ENCHANTING_STRING = "Наложение чар"
-    end
-end
+
 local SkilletStitch = {}
 SkilletStitch.hooks = {}
 -- Use to get item counts from alts. Requires compatible inventory mod/library.
@@ -299,10 +279,6 @@ function SkilletStitch:DecodeRecipe(datastring)
     return s
 end
 
-function SkilletStitch:IsSupportedCraft(craft)
-    return craft == ENCHANTING_STRING
-end
-
 function SkilletStitch:GetNumSkills(prof)
     if not self.data then
         return nil
@@ -324,9 +300,8 @@ end
 function SkilletStitch:EnableDataGathering(addon)
 	assert(tostring(addon),"Usage: EnableDataGathering('addon')")
 	self.datagatheraddons[addon] = true
-	self:RegisterEvent("TRADE_SKILL_SHOW")
-	self:RegisterEvent("CRAFT_SHOW")
-	self:RegisterEvent("CHAT_MSG_SKILL")
+	AceEvent:RegisterEvent("TRADE_SKILL_SHOW")
+	AceEvent:RegisterEvent("CHAT_MSG_SKILL")
 	if not self.data then
 		self.data = {}
 	end
@@ -344,7 +319,6 @@ function SkilletStitch:DisableDataGathering(addon)
 		return
 	end
 	self:UnregisterEvent("TRADE_SKILL_SHOW")
-	self:UnregisterEvent("CRAFT_SHOW")
 	self:UnregisterEvent("CHAT_MSG_SKILL")
 	self.data = nil
 end
@@ -474,11 +448,7 @@ function SkilletStitch:SkilletStitch_AutoRescan()
         AceEvent:CancelScheduledEvent("SkilletStitch_AutoRescan")
     end
 
-    if self.recentcraft == ENCHANTING_STRING then
-      self:ScanCraft()
-    else
-      self:ScanTrade()
-    end
+    self:ScanTrade()
 end
 function SkilletStitch:TRADE_SKILL_SHOW()
     -- Don't scan when opening a linked tradeskill
@@ -486,23 +456,13 @@ function SkilletStitch:TRADE_SKILL_SHOW()
         return
     end
 
-	self.recenttrade = GetTradeSkillLine()
-	if self.queue[1] and type(self.queue[1]) == "table" and self.recenttrade ~= self.queue[1]["profession"] then
+	local recenttrade = GetTradeSkillLine()
+	if self.queue[1] and type(self.queue[1]) == "table" and recenttrade ~= self.queue[1]["profession"] then
 		self:ClearQueue()
 	end
-	self:ScanTrade()
-	if self.data.UNKNOWN then
-		self.data.UNKNOWN = nil
-	end
-end
-function SkilletStitch:CRAFT_SHOW()
-    -- Don't scan when opening a linked tradeskill
-    if IsTradeSkillLinked() then
-        return
-    end
 
-	self.recentcraft = GetCraftName()
-	self:ScanCraft()
+	self:ScanTrade()
+
 	if self.data.UNKNOWN then
 		self.data.UNKNOWN = nil
 	end
@@ -560,7 +520,9 @@ function SkilletStitch:GetIDFromLink(link)
 end
 
 function SkilletStitch:AddToQueue(index, times)
-	if self.queue[1] and self.queue[1]["profession"] ~= self.recenttrade then
+    recenttrade = GetTradeSkillLine()
+
+	if self.queue[1] and self.queue[1]["profession"] ~= recenttrade then
 		self:ClearQueue()
 	end
 	if not times then
@@ -572,7 +534,7 @@ function SkilletStitch:AddToQueue(index, times)
     -- check to see if the item is already in the queue. If it is,
     -- then just increase the count
     for _,s in pairs(self.queue) do
-        if s.profession == self.recenttrade and s.index == index then
+        if s.profession == recenttrade and s.index == index then
             found = true
             s.numcasts = s.numcasts + times
             break
@@ -581,10 +543,10 @@ function SkilletStitch:AddToQueue(index, times)
 
     if not found then
         table.insert(self.queue, {
-            ["profession"] = self.recenttrade,
+            ["profession"] = recenttrade,
             ["index"] = index,
             ["numcasts"] = times,
-            ["recipe"] = self.data[self.recenttrade][index]
+            ["recipe"] = self.data[recenttrade][index]
         })
     end
 
@@ -605,72 +567,6 @@ function SkilletStitch:GetNumQueuedItems(index)
     return count
 end
 
-function SkilletStitch:ScanCraft()
-	local prof = GetCraftName()
-	if prof~=ENCHANTING_STRING then
-		return
-	end
-	if not self.data[prof] then
-		self.data[prof] = {}
-	end
-	cache[prof] = nil
-	local shred = false
-	for i=1,GetNumCrafts() do
-		local skillname, _, skilltype = GetCraftInfo(i)
-		if skilltype~="header" and skillname then
-			local newstr
-			local link = GetCraftItemLink(i)
-			if not link then
-				shred = true
-			else
-				local v1, _, v2, _, v3, _, v4 = GetCraftSpellFocus(i)
-				if v4 then
-					v1 = v1..", "..v2..", "..v3..", "..v4
-				elseif v3 then
-					v1 = v1..", "..v2..", "..v3
-				elseif v2 then
-					v1 = v1..", "..v2
-				elseif v1 then
-					v1 = v1
-				end
-				local linkname = link:match("%|h%[([^%]]+)%]%|h")
-				link = squishlink(link)
-
-                local minMade,maxMade = GetCraftNumMade(i)
-
-				if linkname == skillname then
-					newstr = ";"..link..";"..difficultyr[skilltype]..maxMade..";"..(v1 or "")..";"
-				else
-					newstr = skillname..";"..link..";"..difficultyr[skilltype]..maxMade..";"..(v1 or "")..";"
-				end
-				for j=1,GetCraftNumReagents(i) do
-					local _, _, rcount, _ = GetCraftReagentInfo(i,j)
-					local link = GetCraftReagentItemLink(i,j)
-					if not link then
-						shred = true
-					else
-						link = squishlink(link)
-						newstr = newstr..rcount..";"..link..";"
-					end
-				end
-			end
-			self.data[prof][i] = newstr
-		else
-			self.data[prof][i] = nil
-		end
-	end
-	if shred then
-		for k,v in pairs(self.data[prof]) do
-			self.data[prof][k] = nil
-		end
-		if not AceEvent:IsEventScheduled("SkilletStitch_AutoRescan") then
-			AceEvent:ScheduleEvent("SkilletStitch_AutoRescan", self.SkilletStitch_AutoRescan, 3,self)
-		end
-    else
-        AceEvent:TriggerEvent("SkilletStitch_Scan_Complete", prof)
-	end
-
-end
 function SkilletStitch:ScanTrade()
 	local prof = GetTradeSkillLine()
 	if prof == "UNKNOWN" then

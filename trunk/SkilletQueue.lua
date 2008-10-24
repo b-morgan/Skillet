@@ -169,15 +169,6 @@ function Skillet:CreateItems()
 	end
 end
 
--- Starts the enchant process for the selected recipe item
--- This does not go through the Stitch library because it does
--- not support queuing enchants (mainly because queueing enchants is silly) .
-function Skillet:EnchantItem()
-	if self:IsCraft() and self.selectedSkill then
-		DoCraft(self.selectedSkill)
-	end
-end
-
 -- Starts Processing any items in the queue
 function Skillet:ProcessQueue()
 	local queue = self.stitch:GetQueueInfo()
@@ -203,7 +194,7 @@ function Skillet:RemoveQueuedItem(id)
         return
     end
 
-    if id == 1 and not self:IsCraft() then
+    if id == 1 then
         self.stitch:CancelCast()
     end
 

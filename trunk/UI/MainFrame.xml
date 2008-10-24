@@ -1124,23 +1124,6 @@
                     </OnClick>
                 </Scripts>
             </Button>
-            <Button name="SkilletEnchantButton" inherits="UIPanelButtonTemplate" text="QUEUE_ALL" parent="SkilletFrame">
-                <Size>
-                    <AbsDimension x="85" y="22"/>
-                </Size>
-                <Anchors>
-                    <Anchor point="TOPLEFT" relativeTo="SkilletReagentParent" relativePoint="BOTTOMLEFT">
-                        <Offset>
-                            <AbsDimension x="0" y="-2"/>
-                        </Offset>
-                    </Anchor>
-                </Anchors>
-                <Scripts>
-                    <OnClick>
-                        Skillet:EnchantItem();
-                    </OnClick>
-                </Scripts>
-            </Button>
 
             <Button name="SkilletCreateAllButton" inherits="UIPanelButtonTemplate" text="CREATE_ALL" parent="SkilletFrame">
                 <Size>
@@ -1461,11 +1444,7 @@
                 Skillet:Tradeskill_OnHide()
 
                 -- so the rest of the Blizz API knows that it's closed
-                if Skillet:IsCraft() then
-                    CloseCraft()
-                else
-                    CloseTradeSkill()
-                end
+                CloseTradeSkill()
             </OnHide>
         </Scripts>
 
