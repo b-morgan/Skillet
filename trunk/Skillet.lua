@@ -359,7 +359,7 @@ function Skillet:OnInitialize()
         end
     end
 
-    -- no need to be spammy about the fact that we are here, they'll find out seen enough
+    -- no need to be spammy about the fact that we are here, they'll find out soon enough
     -- self:Print("Skillet v" .. self.version .. " loaded");
 
     -- Track trade skill creation
