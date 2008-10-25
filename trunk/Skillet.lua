@@ -417,12 +417,6 @@ function Skillet:OnEnable()
 
     self:RegisterEvent("SkilletStitch_Scan_Complete",  "ScanCompleted")
 
-    -- These we have to handle ourselves becuase we do crafts directly,
-    -- rather than through the Stitch libary.
-    self:RegisterEvent("UNIT_SPELLCAST_SUCCEEDED",   "CraftCastEnded")
-    self:RegisterEvent("UNIT_SPELLCAST_FAILED",      "CraftCastEnded")
-    self:RegisterEvent("UNIT_SPELLCAST_INTERRUPTED", "CraftCastEnded")
-
     self.hideUncraftableRecipes = false
     self.hideTrivialRecipes = false
     self.currentTrade = nil
