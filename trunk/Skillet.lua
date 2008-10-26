@@ -43,6 +43,7 @@ Skillet:RegisterDefaults('profile', {
     vendor_buy_button = true,
     vendor_auto_buy   = false,
     show_item_notes_tooltip = false,
+    show_crafters_tooltip = true,
     show_detailed_recipe_tooltip = true,
     link_craftable_reagents = true,
     queue_craftable_reagents = true,
@@ -129,6 +130,18 @@ Skillet.options =
                     end,
                     order = 13
                 },
+                show_crafters_tooltip = {
+                    type = "toggle",
+                    name = L["SHOWCRAFTERSTOOLTIPNAME"],
+                    desc = L["SHOWCRAFTERSTOOLTIPDESC"],
+                    get = function()
+                        return Skillet.db.profile.show_crafters_tooltip;
+                    end,
+                    set = function(value)
+                        Skillet.db.profile.show_crafters_tooltip = value;
+                    end,
+                    order = 14
+                },
                 show_detailed_recipe_tooltip = {
                     type = "toggle",
                     name = L["SHOWDETAILEDRECIPETOOLTIPNAME"],
@@ -139,7 +152,7 @@ Skillet.options =
                     set = function(value)
                         Skillet.db.profile.show_detailed_recipe_tooltip = value;
                     end,
-                    order = 14
+                    order = 15
                 },
                 link_craftable_reagents = {
                     type = "toggle",
@@ -151,7 +164,7 @@ Skillet.options =
                     set = function(value)
                         Skillet.db.profile.link_craftable_reagents = value;
                     end,
-                    order = 14
+                    order = 16
                 },
                 queue_craftable_reagents = {
                     type = "toggle",
@@ -163,7 +176,7 @@ Skillet.options =
                     set = function(value)
                         Skillet.db.profile.queue_craftable_reagents = value;
                     end,
-                    order = 15
+                    order = 17
                 },
                 display_shopping_list_at_bank = {
                     type = "toggle",
@@ -175,7 +188,7 @@ Skillet.options =
                     set = function(value)
                         Skillet.db.profile.display_shopping_list_at_bank = value;
                     end,
-                    order = 16
+                    order = 18
                 },
                 display_shopping_list_at_auction = {
                     type = "toggle",
@@ -187,7 +200,7 @@ Skillet.options =
                     set = function(value)
                         Skillet.db.profile.display_shopping_list_at_auction = value;
                     end,
-                    order = 17
+                    order = 19
                 },
                 show_craft_counts = {
                     type = "toggle",
@@ -200,7 +213,7 @@ Skillet.options =
                         Skillet.db.profile.show_craft_counts = value
                         Skillet:UpdateTradeSkillWindow()
                     end,
-                    order = 18,
+                    order = 20,
                 },
             }
         },
@@ -465,7 +478,7 @@ end
 
 local function is_known_trade_skill(name)
     -- Check to see if we actually know this skill or if the user is
-    -- opening a tradeskill that was linked to them. We can't just check 
+    -- opening a tradeskill that was linked to them. We can't just check
     -- the cached list of skills as this might also be a tradeskill that
     -- the user has just learned.
     local numSkills = GetNumSkillLines()
@@ -480,7 +493,7 @@ local function is_known_trade_skill(name)
     return false
 end
 
--- Checks to see if the current trade is one that we support. 
+-- Checks to see if the current trade is one that we support.
 local function is_supported_trade(parent)
     local name = parent:GetTradeSkillLine()
 
@@ -891,8 +904,15 @@ end
 -- item.
 -- Returns true if tooltip modified.
 function Skillet:AddItemNotesToTooltip(tooltip)
-    local enabled = self.db.profile.show_item_notes_tooltip or false
-    if enabled == false or IsControlKeyDown() then
+    if IsControlKeyDown() then
+        return
+    end
+
+    local notes_enabled = self.db.profile.show_item_notes_tooltip or false
+    local crafters_enabled = self.db.profile.show_crafters_tooltip or false
+
+    -- nothing to be added to the tooltip
+    if not notes_enabled and not crafters_enabled then
         return
     end
 
@@ -903,35 +923,38 @@ function Skillet:AddItemNotesToTooltip(tooltip)
     local id = self:GetItemIDFromLink(link);
     if not id then return end;
 
-    local header_added = false
-    for player,notes_table in pairs(self.db.server.notes) do
-        local note = notes_table[id]
-        if note then
-            if not header_added then
-                tooltip:AddLine("Skillet " .. L["Notes"] .. ":")
-                header_added = true
+    if notes_enabled then
+        local header_added = false
+        for player,notes_table in pairs(self.db.server.notes) do
+            local note = notes_table[id]
+            if note then
+                if not header_added then
+                    tooltip:AddLine("Skillet " .. L["Notes"] .. ":")
+                    header_added = true
+                end
+                if player ~= UnitName("player") then
+                    note = GRAY_FONT_COLOR_CODE .. player .. ": " .. FONT_COLOR_CODE_CLOSE .. note
+                end
+                tooltip:AddLine(" " .. note, 1, 1, 1, 1) -- r,g,b, wrap
             end
-            if player ~= UnitName("player") then
-                note = GRAY_FONT_COLOR_CODE .. player .. ": " .. FONT_COLOR_CODE_CLOSE .. note
-            end
-            tooltip:AddLine(" " .. note, 1, 1, 1, 1) -- r,g,b, wrap
         end
     end
 
-    local crafters = self:GetCraftersForItem(id);
-    if crafters then
-        header_added = true
-        local title_added = false
+    if crafters_enabled then
+        local crafters = self:GetCraftersForItem(id);
+        if crafters then
+            header_added = true
+            local title_added = false
 
-        for i,name in ipairs(crafters) do
-            if not title_added then
-                title_added = true
-                tooltip:AddDoubleLine(L["Crafted By"], name)
-            else
-                tooltip:AddDoubleLine(" ", name)
+            for i,name in ipairs(crafters) do
+                if not title_added then
+                    title_added = true
+                    tooltip:AddDoubleLine(L["Crafted By"], name)
+                else
+                    tooltip:AddDoubleLine(" ", name)
+                end
             end
         end
-
     end
 
     return header_added
