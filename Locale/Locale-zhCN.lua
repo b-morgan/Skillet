@@ -127,4 +127,8 @@ L:RegisterTranslations("zhCN", function() return {
     -- New in version 1.11
     ["Crafted By"]                  = "Crafted by",
 
+    -- New in 1.13
+    ["SHOWCRAFTERSTOOLTIPNAME"]     = "Show crafters in tooltips",
+    ["SHOWCRAFTERSTOOLTIPDESC"]     = "Display the alternate characters that can craft an item in the item's tooltip",
+
  } end)

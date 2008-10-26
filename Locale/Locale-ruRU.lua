@@ -1,4 +1,4 @@
-﻿--[[
+--[[
 
 Skillet: A tradeskill window replacement.
 Copyright (c) 2007 Robert Clark <nogudnik@gmail.com>
@@ -121,4 +121,8 @@ L:RegisterTranslations("ruRU", function() return {
 
     -- New in version 1.11
 	["Crafted By"]                  = "Изготовлено",
+
+    -- New in 1.13
+    ["SHOWCRAFTERSTOOLTIPNAME"]     = "Show crafters in tooltips",
+    ["SHOWCRAFTERSTOOLTIPDESC"]     = "Display the alternate characters that can craft an item in the item's tooltip",
 } end)
