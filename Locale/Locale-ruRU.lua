@@ -17,7 +17,7 @@ You should have received a copy of the GNU General Public License
 along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
 ]]--
-
+-- Translated by StingerSoft
 local L = AceLibrary("AceLocale-2.2"):new("Skillet")
 
 L:RegisterTranslations("ruRU", function() return {
@@ -123,6 +123,6 @@ L:RegisterTranslations("ruRU", function() return {
 	["Crafted By"]                  = "Изготовлено",
 
     -- New in 1.13
-    ["SHOWCRAFTERSTOOLTIPNAME"]     = "Show crafters in tooltips",
-    ["SHOWCRAFTERSTOOLTIPDESC"]     = "Display the alternate characters that can craft an item in the item's tooltip",
+    ["SHOWCRAFTERSTOOLTIPNAME"]     = "Умеющий персонаж в подсказке",
+    ["SHOWCRAFTERSTOOLTIPDESC"]     = "Отображает в подсказке предмета, альтернативного персонажа который может создать тот или иной предмет",
 } end)
