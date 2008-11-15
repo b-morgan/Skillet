@@ -311,8 +311,8 @@ local function arkinventory_GetItemCount(itemid)
                     for b, bd in pairs( ld.bag ) do
                         for s, sd in pairs( bd.slot ) do
                             if sd and sd.h then 
-                                local id, _ = ArkInventory.ItemStringDecode( sd.h )
-                                if itemid == id then
+                                local id = ArkInventory.ObjectStringDecodeItem( h )
+                                if id and itemid == id then
                                     -- print( "found [" .. bag.slot[s].count .. "] in bag [" .. b .. "] slot [" .. s .. "]" )
                                     item_count_total = item_count_total + sd.count
                                 end
