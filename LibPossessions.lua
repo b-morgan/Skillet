@@ -517,7 +517,9 @@ function LibPossessions:GetItemCount(item)
             local method = self.supportedAddons[self.inventoryAddon]
             local ok,count = pcall(method, item)
             if not ok then
-                print("Unable to obtain items counts using " .. self.inventoryAddon .. ": " .. count .. ". Will no longer use that addon")
+                -- if there was an error, the second return value from pcall
+                -- will be the error message.
+                print("Unable to obtain items counts for " .. item .. " using " .. self.inventoryAddon .. ": " .. count .. ". Will no longer use that addon")
                 self.supportedAddons[self.inventoryAddon] = nil -- remove it from the list
                 self.inventoryAddon = nil
                 alt_count = 0
