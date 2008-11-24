@@ -61,21 +61,15 @@ end
 -- Handy info: getglobal("ITEM_QUALITY" .. level .. "_DESC") returns "Epic", etc (localized)
 --
 -- @return
---     level: from 0 (Poor) to 6 (Artifact).
+--     level: from 0 (Poor) to 7 (Heirloom).
 --     r, g, b: color code for the items color
 --     hex: hexidecimal representation of the string, as well as "|c" in the beginning.
 function Skillet:GetQualityFromLink(link)
     if (not link) then return end
 
-    local color = link:match("(|c%x+)|Hitem:%p?%d+:%p?%d+:%p?%d+:%p?%d+:%p?%d+:%p?%d+:%p?%d+:%p?%d+|h%[.-%]|h|r")
-    if (color) then
-        for i = 0, 6 do
-            local r, g, b, hex = GetItemQualityColor(i)
-            if color == hex then
-                -- found it
-                return i, r, g, b, hex
-            end
-        end
+    local _, _, rarity = GetItemInfo(link)
+    if rarity then
+        return rarity, GetItemQualityColor(rarity)
     end
 
     -- no match

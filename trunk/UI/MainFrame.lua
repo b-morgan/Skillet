@@ -781,14 +781,9 @@ function Skillet:DisplayTradeskillTooltip(id)
         return
     end
 
-    -- Name of the recipe
-
-    local color = skill_style_type[s.difficulty]
-    if (color) then
-        SkilletTradeskillTooltip:AddLine(s.name, color.r, color.g, color.b, 0);
-    else
-        SkilletTradeskillTooltip:AddLine(s.name, NORMAL_FONT_COLOR.r, NORMAL_FONT_COLOR.g, NORMAL_FONT_COLOR.b, 0);
-    end
+    -- Hyper link for the recipe name, allows a full view of the item without
+    -- having to mouse over the item in the detail pane.
+    SkilletTradeskillTooltip:SetHyperlink(s.link)
 
     local num, numwbank, numwalts = get_craftable_counts(s)
 
