@@ -302,7 +302,7 @@ local function arkinventory_GetItemCount(itemid)
 
     for pid, pd in ArkInventory.spairs( ArkInventory.db.global.player.realm[r].faction[f].name ) do
 
-        -- NB: We skip the current player. That info is dynamnic and should
+        -- NB: We skip the current player. That info is dynamic and should
         --     not be included in the values we return.
         if pd.info.name ~= PLAYER and pd.info.realm == r and pd.info.faction == f then
             for l, ld in pairs( pd.location ) do
@@ -311,9 +311,9 @@ local function arkinventory_GetItemCount(itemid)
                     for b, bd in pairs( ld.bag ) do
                         for s, sd in pairs( bd.slot ) do
                             if sd and sd.h then 
-                                local id = ArkInventory.ObjectStringDecodeItem( h )
-                                if id and itemid == id then
-                                    -- print( "found [" .. bag.slot[s].count .. "] in bag [" .. b .. "] slot [" .. s .. "]" )
+                                local id = ArkInventory.ObjectStringDecodeItem( sd.h )
+                                if id and itemid == tonumber(id) then
+                                    -- print( sd.h .. " found [" .. sd.count .. "] in bag [" .. b .. "] slot [" .. s .. "] on [" .. pd.info.name .. "]" )
                                     item_count_total = item_count_total + sd.count
                                 end
                             end
