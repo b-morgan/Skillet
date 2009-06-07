@@ -129,7 +129,9 @@ end
 local function bankitems_GetItemCount(itemid)
     local count = 0
 
-    local BAGNUMBERS = {0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 100, 101};    -- List of bag numbers used internally by BankItems
+	-- List of bag numbers used internally by BankItems
+	-- Don't include bag 103 (contains items on AH)
+	local BAGNUMBERS = {0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 100, 101, 102, -2}
 
     -- kind of icky, this requires way too much knowledge about the
     -- internal structure of the BankItems data storage. This is extracted
@@ -148,24 +150,22 @@ local function bankitems_GetItemCount(itemid)
                 for num = 1, 28 do
                     if bankPlayer[num] then
                         local id = select(3, string.find(bankPlayer[num].link, "|Hitem:(%d+):"))
-                        if id then id = tonumber(id) end
-                        if id == itemid then
+						if tonumber(id) == itemid then
                             count = count + (bankPlayer[num].count or 1)
                         end
                     end
                 end
                 for _, bagNum in ipairs(BAGNUMBERS) do
                     local theBag = bankPlayer["Bag"..bagNum]
-                    if (bagNum ~= 100 and theBag) then
-                        local realSize = theBag.size;
-                        if (bagNum == 101) then
-                            realSize = #theBag;
+                    if theBag then
+                        local realSize = theBag.size
+						if bagNum == 101 or bagNum == 103 then
+                            realSize = #theBag
                         end
                         for bagItem = 1, realSize do
                             if theBag[bagItem] then
                                 local id = select(3, string.find(theBag[bagItem].link, "|Hitem:(%d+):"))
-                                if id then id = tonumber(id) end
-                                if id == itemid then
+								if tonumber(id) == itemid then
                                     count = count + (theBag[bagItem].count or 1)
                                 end
                             end
