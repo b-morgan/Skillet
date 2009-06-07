@@ -260,12 +260,13 @@ function SkilletStitch:DecodeRecipe(datastring)
             -- Workaround for missing items in the Periodic table library that
             local _,_,id = string.find(reagentlink, "|Hitem:(%d+):")
             id = tonumber(id)
-            if id == 30817 or id == 4539 or id == 38426 or id == 2593 or id == 34412 then
+            if id == 30817 or id == 4539 or id == 38426 or id == 2593 or id == 34412 or id == 39354 then
                 -- 30817 == simple flour
                 -- 4539 == Goldenbark Apple
                 -- 38426 == Eternium Thread
                 -- 2593 == Flask of Port
                 -- 34412 == Sparkling Apple Cider
+				-- 39354 == Light Parchment 
                 vendor = true
             end
         end
