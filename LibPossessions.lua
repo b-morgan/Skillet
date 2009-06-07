@@ -135,7 +135,7 @@ local function bankitems_GetItemCount(itemid)
     -- internal structure of the BankItems data storage. This is extracted
     -- from the BankItems_Search method
 
-    playerrealm = BankItems_Trim(playerrealm)
+    playerrealm = strtrim(playerrealm)
 
     for key, bankPlayer in pairs(BankItems_Save) do
         local player, realm = strsplit("|", key)
