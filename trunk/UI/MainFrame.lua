@@ -143,6 +143,9 @@ function Skillet:CreateTradeSkillWindow()
 
     local label = getglobal("SkilletFilterLabel");
     label:SetText(L["Filter"]);
+    
+    local label = getglobal("SkilletSortLabel");
+    label:SetText(L["Sorting"]);
 
     SkilletCreateAllButton:SetText(L["Create All"])
     SkilletQueueAllButton:SetText(L["Queue All"])
