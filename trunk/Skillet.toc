@@ -1,10 +1,10 @@
-## Interface: 30300
+﻿## Interface: 40000
 ## Title: Skillet |cff7fff7f -Ace2-|r
 ## Notes: A replacement tradeskill window
 ## Notes-esES: Una sustitucion de la ventana de Habilidades de Comercio
 ## Notes-ruRU: Заменяет окно профессий на более функциональное.
 ## Author: nogudnik
-## Version 1.13
+## Version 1.4
 ## X-Category: Tradeskill
 ## X-eMail: nogudnik@gmail.com
 ## X-License GPL v3 or later

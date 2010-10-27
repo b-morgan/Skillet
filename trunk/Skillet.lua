@@ -47,6 +47,7 @@ Skillet:RegisterDefaults('profile', {
     show_detailed_recipe_tooltip = true,
     link_craftable_reagents = true,
     queue_craftable_reagents = true,
+    queue_glyph_reagents = false,
     display_required_level = false,
     display_shopping_list_at_bank = false,
     display_shopping_list_at_auction = false,
@@ -215,6 +216,18 @@ Skillet.options =
                     end,
                     order = 20,
                 },
+                queue_glyph_reagents = {
+                    type = "toggle",
+                    name = L["QUEUEGLYPHREAGENTSNAME"],
+                    desc = L["QUEUEGLYPHREAGENTSDESC"],
+                    get = function()
+                        return Skillet.db.profile.queue_glyph_reagents;
+                    end,
+                    set = function(value)
+                        Skillet.db.profile.queue_glyph_reagents = value;
+                    end,
+                    order = 21
+                },                
             }
         },
         appearance = {
@@ -476,18 +489,26 @@ function Skillet:OnDisable()
     AceLibrary("Waterfall-1.0"):UnRegister("Skillet")
 end
 
+local function get_skills()
+    local skills = {}
+
+    local profs  = {GetProfessions()}
+    for _,profIndex in ipairs(profs) do
+         if profIndex then
+             local skillName = GetProfessionInfo(profIndex)
+             if skillName then skills[skillName] = skillName end
+         end
+    end
+    return skills
+end
+
 local function is_known_trade_skill(name)
     -- Check to see if we actually know this skill or if the user is
     -- opening a tradeskill that was linked to them. We can't just check
     -- the cached list of skills as this might also be a tradeskill that
     -- the user has just learned.
-    local numSkills = GetNumSkillLines()
-    for skillIndex=1, numSkills do
-        local skillName = GetSkillLineInfo(skillIndex)
-        if skillName ~= nil and skillName == name then
-            return true
-        end
-    end
+    local skills = get_skills()
+    if skills[name] then return true end
 
     -- must not be a trade skill we know about.
     return false
@@ -564,15 +585,7 @@ local function cache_recipes_if_needed(self, force)
 end
 
 local function Skillet_rescan_skills()
-    local numSkills = GetNumSkillLines()
-    local skills = {}
-    for skillIndex=1, numSkills do
-        local skillName = GetSkillLineInfo(skillIndex)
-        if skillName ~= nil then
-            skills[skillName] = skillName
-        end
-    end
-
+    local skills = get_skills()
     local player = UnitName("player")
 
     local changed = false

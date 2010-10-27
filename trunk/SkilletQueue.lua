@@ -38,8 +38,10 @@ local function add_items_to_queue(skillIndex, recipe, count)
     if QUEUE_DEBUG then
         Skillet:Print("Adding " .. count .. "x" .. recipe.link)
     end
-
-    if Skillet.db.profile.queue_craftable_reagents then
+       
+    local s = Skillet.stitch:GetItemDataByIndex(Skillet.currentTrade, skillIndex)
+    
+    if Skillet.db.profile.queue_craftable_reagents and (Skillet.db.profile.queue_glyph_reagents or not s.name:match("Glyph ")) then
         -- never more that 8 reagents
         for i=1, 8, 1 do
             reagent = recipe[i]
@@ -80,6 +82,10 @@ local function add_items_to_queue(skillIndex, recipe, count)
 
     -- XXX: This is a bit hacky, try to think of something smarter
     Skillet:SaveQueue(Skillet.db.server.queues, Skillet.currentTrade)
+end
+
+function Skillet:AddItemsToQueue(skillIndex, recipe, count)
+   add_items_to_queue(skillIndex, recipe, count)
 end
 
 -- Save the current queue into the provided database
