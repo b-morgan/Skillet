@@ -22,7 +22,6 @@ local L = AceLibrary("AceLocale-2.2"):new("Skillet")
 
 L:RegisterTranslations("ruRU", function() return {
 	["Skillet Trade Skills"] 		= "Skillet Trade Skills", -- default message
-	["Sorting"] 				 	= "Сортировать",
 	["Create"] 				 		= "Создать",
 	["Queue All"]					= "Всё в очередь",
 	["Create All"]					= "Создать Все",
@@ -126,4 +125,9 @@ L:RegisterTranslations("ruRU", function() return {
     -- New in 1.13
     ["SHOWCRAFTERSTOOLTIPNAME"]     = "Умеющий персонаж в подсказке",
     ["SHOWCRAFTERSTOOLTIPDESC"]     = "Отображает в подсказке предмета, альтернативного персонажа который может создать тот или иной предмет",
+
+    -- New in 1.4
+    ["QUEUEGLYPHREAGENTSNAME"]			= "Queue reagents for Glyphs",
+    ["QUEUEGLYPHREAGENTSDESC"]			= "If you can create a reagent needed for the current recipe, and don't have enough, then that reagent will be added to the queue. This option is separate for Glyphs only.",
+
 } end)

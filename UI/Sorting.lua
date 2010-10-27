@@ -368,7 +368,7 @@ function Skillet:SortDropdown_Initialize()
         info.func = Skillet.SortDropdown_OnClick
         info.value = i
         i = i + 1
-        info.owner = this:GetParent()
+        info.owner = self:GetParent()
         UIDropDownMenu_AddButton(info)
     end
 
@@ -379,8 +379,8 @@ end
 
 -- Called when the user selects an item in the sorting drop down
 function Skillet:SortDropdown_OnClick()
-    UIDropDownMenu_SetSelectedID(SkilletSortDropdown, this:GetID())
-    local entry = sorters[this:GetID()]
+    UIDropDownMenu_SetSelectedID(SkilletSortDropdown, self:GetID())
+    local entry = sorters[self:GetID()]
 
     Skillet:SetTradeSkillOption(Skillet.currentTrade, "sortmethod", entry.name)
 

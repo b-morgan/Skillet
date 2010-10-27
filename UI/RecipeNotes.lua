@@ -72,22 +72,22 @@ local function get_edit_box()
 	editbox:SetBackdrop(ControlBackdrop)
 	editbox:SetBackdropColor(0,0,0,1)
 
-	editbox:SetScript("OnEnterPressed", function()
-		this:Hide()
-		local b = this:GetParent()
+	editbox:SetScript("OnEnterPressed", function(self)
+		self:Hide()
+		local b = self:GetParent()
 		local l = b:GetAttribute("recipe_link")
 		local n = getglobal(b:GetName() .. "Notes")
 
-		local skillet = this.obj
+		local skillet = self.obj
 
-		skillet:SetItemNote(l, this:GetText())
+		skillet:SetItemNote(l, self:GetText())
 		n:Show();
 		skillet:UpdateNotesWindow()
 	end);
-	editbox:SetScript("OnEscapePressed", function()
-		this:Hide()
+	editbox:SetScript("OnEscapePressed", function(self)
+		self:Hide()
 
-		local b = this:GetParent()
+		local b = self:GetParent()
 		local n = getglobal(b:GetName() .. "Notes")
 		n:Show()
 	end);

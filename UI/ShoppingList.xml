@@ -116,12 +116,12 @@
         <OnClick>
             <!-- shift clicking will insert a link to the recipe in the chat window. -->
             if button == "LeftButton" and IsShiftKeyDown() then
-                ChatEdit_InsertLink(this.count .. "x" .. this.link)
+                ChatEdit_InsertLink(self.count .. "x" .. self.link)
             end            
         </OnClick>
         <OnEnter>            
             GameTooltip:SetOwner(this, "ANCHOR_CURSOR")
-            GameTooltip:SetHyperlink(this.link)
+            GameTooltip:SetHyperlink(self.link)
             GameTooltip:Show()
             CursorUpdate()
         </OnEnter>

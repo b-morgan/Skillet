@@ -126,4 +126,9 @@ L:RegisterTranslations("frFR", function() return {
     ["SHOWCRAFTERSTOOLTIPNAME"]     = "Show crafters in tooltips",
     ["SHOWCRAFTERSTOOLTIPDESC"]     = "Display the alternate characters that can craft an item in the item's tooltip",
 
+
+    -- New in 1.4
+    ["QUEUEGLYPHREAGENTSNAME"]			= "Queue reagents for Glyphs",
+    ["QUEUEGLYPHREAGENTSDESC"]			= "If you can create a reagent needed for the current recipe, and don't have enough, then that reagent will be added to the queue. This option is separate for Glyphs only.",
+
 } end)

@@ -59,13 +59,15 @@ local difficultyr = {
 local function squishlink(link)
     -- in:  |cffffffff|Hitem:13928:0:0:0:0:0:0:0|h[Grilled Squid]|h|r
     -- out: ffffff|13928|Grilled Squid
-    local color, id, name = link:match("^|cff(......)|Hitem:(%d+):[^:]+:[^:]+:[^:]+:[^:]+:[^:]+:[^:]+:[^:]+:[^:]+|h%[([^%]]+)%]|h|r$")
+    local color = link:match("^|cff(......)|")
+    local id = link:match("item:(%d+):")
+    local name = link:match("|h%[([^%]]+)%]|h|r$")
     if id then
         return color.."|"..id.."|"..name
     else
         -- in:  |cffffffff|Henchant:7421|h[Runed Copper Rod]|h|r
         -- out: |-7421|Runed Copper Rod
-        id, name = link:match("^|cffffd000|Henchant:(%d+)|h%[([^%]]+)%]|h|r$")
+        id = link:match("enchant:(%d+)|")
         return "|-"..id.."|"..name
     end
 end
@@ -329,7 +331,7 @@ end
 function SkilletStitch:EnableQueue(addon)
     assert(tostring(addon),"Usage: EnableQueue('addon')")
     self.queueaddons[addon] = true
-    self:RegisterEvent("UNIT_SPELLCAST_SUCCEEDED", "StopCastCheckUnit")
+    self:RegisterEvent("UNIT_SPELLCAST_SUCCEEDED",      "ContinueCastCheckUnit")
     self:RegisterEvent("UNIT_SPELLCAST_FAILED",      "StopCastCheckUnit")
     self:RegisterEvent("UNIT_SPELLCAST_INTERRUPTED", "StopCastCheckUnit")
     if not self.queue then
@@ -481,19 +483,28 @@ function SkilletStitch:CHAT_MSG_SKILL()
     self:SkilletStitch_AutoRescan()
 end
 
-function SkilletStitch:StopCastCheckUnit(unit)
+function SkilletStitch:ContinueCastCheckUnit(unit)
+    if unit == "player" then
+       self:ContinueCast()
+    end
+end
+
+function SkilletStitch:StopCastCheckUnit(unit) 
     if unit == "player" then
         self:StopCast()
     end
 end
 
-function SkilletStitch:StopCast()
+function SkilletStitch:StopCast()  
     if self.queuecasting then
-        if event ~= "UNIT_SPELLCAST_SUCCEEDED" then
-            AceEvent:TriggerEvent("SkilletStitch_Queue_Continue", #self.queue)
-            self.queuecasting = false
-            return
-        end
+	    AceEvent:TriggerEvent("SkilletStitch_Queue_Continue", #self.queue)
+    	self.queuecasting = false
+        return
+    end
+end
+
+function SkilletStitch:ContinueCast()
+    if self.queuecasting then
 
         if not self.queue[1] then
             self.queue = {}

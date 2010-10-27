@@ -99,16 +99,16 @@
         </Layers>
         <Scripts>
             <OnClick>
-                Skillet:SkillButton_OnClick(arg1)
+                Skillet:SkillButton_OnClick(self, button)
             </OnClick>
             <OnEnter>
-                getglobal(this:GetName().."Name"):SetTextColor(HIGHLIGHT_FONT_COLOR.r, HIGHLIGHT_FONT_COLOR.g, HIGHLIGHT_FONT_COLOR.b);
-                Skillet:DisplayTradeskillTooltip(this:GetID());
+                getglobal(self:GetName().."Name"):SetTextColor(HIGHLIGHT_FONT_COLOR.r, HIGHLIGHT_FONT_COLOR.g, HIGHLIGHT_FONT_COLOR.b);
+                Skillet:DisplayTradeskillTooltip(self, self:GetID());
             </OnEnter>
             <OnLeave>
-                local ct = getglobal(this:GetName().."Counts")
+                local ct = getglobal(self:GetName().."Counts")
                 local r,g,b = ct:GetTextColor()
-                getglobal(this:GetName().."Name"):SetTextColor(r, g, b)
+                getglobal(self:GetName().."Name"):SetTextColor(r, g, b)
                 SkilletTradeskillTooltip:Hide()
             </OnLeave>
         </Scripts>
@@ -195,7 +195,7 @@
                 </Anchors>
                 <Scripts>
                     <OnClick>
-                        Skillet:RemoveQueuedItem(this:GetID());
+                        Skillet:RemoveQueuedItem(self:GetID());
                     </OnClick>
                 </Scripts>
             </Button>
@@ -260,22 +260,22 @@
             <OnLoad>
                 <!-- want the icon to be under the main button so the enter and leave
                      events for the button are triggered over the icon -->
-                getglobal(this:GetName() .. "Icon"):SetFrameLevel(this:GetFrameLevel() - 1)
+                getglobal(self:GetName() .. "Icon"):SetFrameLevel(self:GetFrameLevel() - 1)
             </OnLoad>
             <OnEnter>
-                GameTooltip:SetOwner(this, "ANCHOR_TOPLEFT")
-                Skillet:SetTradeSkillToolTip(SkilletFrame.selectedSkill, this:GetID())
-                Skillet:ReagentButtonOnEnter(this, SkilletFrame.selectedSkill, this:GetID())
+                GameTooltip:SetOwner(self, "ANCHOR_TOPLEFT")
+                Skillet:SetTradeSkillToolTip(SkilletFrame.selectedSkill, self:GetID())
+                Skillet:ReagentButtonOnEnter(self, SkilletFrame.selectedSkill, self:GetID())
                 GameTooltip:Show()
                 CursorUpdate();
             </OnEnter>
             <OnLeave>
-                Skillet:ReagentButtonOnLeave(this, SkilletFrame.selectedSkill, this:GetID())
+                Skillet:ReagentButtonOnLeave(self, SkilletFrame.selectedSkill, self:GetID())
                 GameTooltip:Hide();
                 ResetCursor();
             </OnLeave>
             <OnClick>
-                local link = Skillet:GetTradeSkillReagentItemLink(Skillet.selectedSkill, this:GetID())
+                local link = Skillet:GetTradeSkillReagentItemLink(Skillet.selectedSkill, self:GetID())
                 if ( IsControlKeyDown() ) then
                 <!-- This opens up the dressing room window and display the character
                      wearing the item (if that is possible) -->
@@ -286,7 +286,7 @@
                 ChatEdit_InsertLink(link);
                 else
                 <!-- generic click action -->
-                Skillet:ReagentButtonOnClick(button, Skillet.selectedSkill, this:GetID())
+                Skillet:ReagentButtonOnClick(button, Skillet.selectedSkill, self:GetID())
                 end
             </OnClick>
         </Scripts>
@@ -492,7 +492,7 @@
                 </Frames>
                 <Scripts>
                     <OnLoad>
-                        <!-- this:RegisterEvent("SKILL_LINES_CHANGED"); -->
+                        <!-- self:RegisterEvent("SKILL_LINES_CHANGED"); -->
                     </OnLoad>
                     <OnEvent>
                         <!-- if ( event == "SKILL_LINES_CHANGED" ) then
@@ -684,19 +684,19 @@
                 </Layers>
                 <Scripts>
                     <OnEnterPressed>
-                        this:ClearFocus();
+                        self:ClearFocus();
                     </OnEnterPressed>
                     <OnEscapePressed>
-                        this:ClearFocus();
+                        self:ClearFocus();
                     </OnEscapePressed>
                     <OnTextChanged>
-                        Skillet:UpdateFilter(this:GetText());
+                        Skillet:UpdateFilter(self:GetText());
                     </OnTextChanged>
                     <OnEditFocusLost>
-                        this:HighlightText(0, 0);
+                        self:HighlightText(0, 0);
                     </OnEditFocusLost>
                     <OnEditFocusGained>
-                        this:HighlightText();
+                        self:HighlightText();
                     </OnEditFocusGained>
                 </Scripts>
                 <FontString inherits="ChatFontNormal"/>
@@ -717,7 +717,7 @@
                 </Anchors>
                 <Scripts>
                     <OnClick>
-                        if this:GetChecked() then
+                        if self:GetChecked() then
                             PlaySound("igMainMenuOptionCheckBoxOn");
                         end
                         local before = Skillet:GetTradeSkillOption(Skillet.currentTrade, "hideuncraftable")
@@ -736,7 +736,7 @@
                 </Anchors>
                 <Scripts>
                     <OnClick>
-                        if this:GetChecked() then
+                        if self:GetChecked() then
                             PlaySound("igMainMenuOptionCheckBoxOn");
                         end
                         local before = Skillet:GetTradeSkillOption(Skillet.currentTrade, "hidetrivial")
@@ -1011,7 +1011,7 @@
                     </OnClick>
                     <OnEnter>
                         if ( Skillet.selectedSkill ~= -1 ) then
-                            GameTooltip:SetOwner(this, "ANCHOR_TOPLEFT");
+                            GameTooltip:SetOwner(self, "ANCHOR_TOPLEFT");
                             Skillet:SetTradeSkillToolTip(SkilletFrame.selectedSkill);
                             GameTooltip:Show()
                             CursorUpdate();
@@ -1231,7 +1231,7 @@
                 </ThumbTexture>
                 <Scripts>
                     <OnValueChanged>
-                        Skillet:UpdateNumItemsSlider(arg1, true);
+                        Skillet:UpdateNumItemsSlider(value, true);
                     </OnValueChanged>
                 </Scripts>
             </Slider>
@@ -1294,21 +1294,21 @@
                 </Layers>
                 <Scripts>
                     <OnEnterPressed>
-                        this:ClearFocus();
+                        self:ClearFocus();
                     </OnEnterPressed>
                     <OnEscapePressed>
-                        this:ClearFocus();
+                        self:ClearFocus();
                     </OnEscapePressed>
                     <OnTextChanged>
-                        if ( this:GetText() == "0" ) then
-                            this:SetText("1");
+                        if ( self:GetText() == "0" ) then
+                            self:SetText("1");
                         end
                     </OnTextChanged>
                     <OnEditFocusLost>
-                        this:HighlightText(0, 0);
+                        self:HighlightText(0, 0);
                     </OnEditFocusLost>
                     <OnEditFocusGained>
-                        this:HighlightText();
+                        self:HighlightText();
                     </OnEditFocusGained>
                 </Scripts>
                 <FontString inherits="ChatFontNormal"/>
@@ -1381,7 +1381,7 @@
                 </Anchors>
                 <Scripts>
                     <OnClick>
-                        Skillet:StartQueue_OnClick(this)
+                        Skillet:StartQueue_OnClick(self)
                     </OnClick>
                 </Scripts>
             </Button>

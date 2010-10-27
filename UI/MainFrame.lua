@@ -655,8 +655,9 @@ function Skillet:internal_UpdateTradeSkillWindow()
 
                     text = text .. s.name
                     local num, numwbank, numwalts = get_craftable_counts(s)
+                    local count = ""
                     if num > 0 or numwbank > 0 or (numwalts and numwalts > 0) then
-                        local count = "[" .. num
+                        count = "[" .. num
                         -- only show bank and alt counts if it has been enabled
                         -- through the options.
                         if self.db.profile.show_bank_alt_counts then
@@ -668,8 +669,15 @@ function Skillet:internal_UpdateTradeSkillWindow()
                             end
                         end
                         count = count .. "]"
+                    end
+                    
+                    count = (self:GetRecipeCountPrefix(self.currentTrade, skillIndex) or "") 
+                      			.. count 
+                       			.. (self:GetRecipeCountSuffix(self.currentTrade, skillIndex) or "")
+
+					if count ~= "" then
                         countText:SetText(count)
-                        countText:Show()
+                        countText:Show()					
                     end
                     button:SetID(skillIndex)
 
@@ -754,7 +762,7 @@ end
 -- a recipe in the list of skills
 --
 -- id is the index of the skill in the currently selected trade.
-function Skillet:DisplayTradeskillTooltip(id)
+function Skillet:DisplayTradeskillTooltip(this, id)
 
     if id < 0 then
         -- it's header or not cached yet.
@@ -811,6 +819,8 @@ function Skillet:DisplayTradeskillTooltip(id)
         end
         SkilletTradeskillTooltip:AddLine(text, 1, 1, 1, 0); -- (text, r, g, b, wrap)
     end
+
+    Skillet:AddCustomTooltipInfo(SkilletTradeskillTooltip, self.currentTrade, id)
 
     SkilletTradeskillTooltip:AddLine("\n" .. self:GetReagentLabel(self.currentTrade, id));
 
@@ -1120,7 +1130,7 @@ function Skillet:UpdateQueueWindow()
 end
 
 -- When one of the skill buttons in the left scroll pane is clicked
-function Skillet:SkillButton_OnClick(button)
+function Skillet:SkillButton_OnClick(this, button)
     if(button=="LeftButton") then
         local id = this:GetID();
         if id == -1 then

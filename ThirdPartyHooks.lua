@@ -211,6 +211,19 @@ end
 function Skillet:GetRecipeNameSuffix(tradeskill, skill_index)
 end
 
+
+-- Hooks for tooltips
+function Skillet:AddCustomTooltipInfo(tooltip, currentTrade, id)
+end
+
+-- recipe count hooks
+function Skillet:GetRecipeCountPrefix(currentTrade, id)
+end
+
+function Skillet:GetRecipeCountSuffix(currentTrade, id)
+end
+
+
 --
 -- A hook to display extra information about a recipe. Any text returned from this function
 -- will be displayed in the recipe details frame when the user clicks on the recipe name.
