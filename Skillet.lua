@@ -493,7 +493,8 @@ local function get_skills()
     local skills = {}
 
     local profs  = {GetProfessions()}
-    for _,profIndex in ipairs(profs) do
+    for i=1,#profs do 
+         local profIndex=profs[i]
          if profIndex then
              local skillName = GetProfessionInfo(profIndex)
              if skillName then skills[skillName] = skillName end
