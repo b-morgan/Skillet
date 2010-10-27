@@ -22,6 +22,7 @@ local L = AceLibrary("AceLocale-2.2"):new("Skillet")
 
 L:RegisterTranslations("esES", function() return {
     ["Skillet Trade Skills"] 			= "Skillet - Habilidades de Comercio", -- default message
+    ["Sorting"] 				 	= true,
     ["Create"] 				 	= "Crear",
     ["Queue All"]				= "Encolar Todo",
     ["Create All"]				= "Crear Todo",
