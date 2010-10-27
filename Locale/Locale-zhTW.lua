@@ -27,6 +27,7 @@ local L = AceLibrary("AceLocale-2.2"):new("Skillet")
 
 L:RegisterTranslations("zhTW", function() return {
     ["Skillet Trade Skills"]    = "專業助手", -- default message
+    ["Sorting"] 				 	= true,
     ["Create"]                  = "製造",
     ["Queue All"]               = "全部排程",
     ["Create All"]              = "全部製造",
