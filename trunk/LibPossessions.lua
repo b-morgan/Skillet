@@ -381,7 +381,7 @@ LibPossessions.supportedAddons = {
     ["BankList"]                = banklist_GetItemCount,
     ["Bagnon_Forever"]          = bagnondb_GetItemCount,
     ["OneView"]                 = oneview_GetItemCount, -- Requires OneBag and OneBank as well.
-    ["ArkInventory"]            = arkinventory_GetItemCount,
+--    ["ArkInventory"]            = arkinventory_GetItemCount,
     ["Baggins_AnywhereBags"]    = baggins_GetItemCount,
 }
 
