@@ -120,7 +120,7 @@
             end            
         </OnClick>
         <OnEnter>            
-            GameTooltip:SetOwner(this, "ANCHOR_CURSOR")
+            GameTooltip:SetOwner(self, "ANCHOR_CURSOR")
             GameTooltip:SetHyperlink(self.link)
             GameTooltip:Show()
             CursorUpdate()
