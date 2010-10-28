@@ -26,7 +26,7 @@ local L = AceLibrary("AceLocale-2.2"):new("Skillet")
 
 L:RegisterTranslations("koKR", function() return {
 	["Skillet Trade Skills"]					= "Skillet 전문기술", -- default message
-	["Sorting"] 				 	= true,
+	["Sorting"] 				 	= "Sorting",
 	["Create"]							= "제작",
 	["Queue All"]							= "전부 예약",
 	["Create All"]							= "전부 제작",
