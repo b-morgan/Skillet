@@ -39,8 +39,9 @@ end
 
 -- Shows the recipe notes editor for the current window
 function Skillet:ShowRecipeNotes()
-	local s = self.stitch:GetItemDataByIndex(self.currentTrade, self.selectedSkill);
-	if not s then
+	local recipe = self:GetRecipeDataByTradeIndex(self.currentTrade, self.selectedSkill)
+		
+	if not recipe then
 		return
 	end
 
@@ -59,8 +60,8 @@ function Skillet:ShowRecipeNotes()
 
 	self:UpdateNotesWindow()
 	frame:Show()
-
 end
+
 
 local function get_edit_box()
 	local editbox = CreateFrame("EditBox", nil, nil)
@@ -75,7 +76,7 @@ local function get_edit_box()
 	editbox:SetScript("OnEnterPressed", function(self)
 		self:Hide()
 		local b = self:GetParent()
-		local l = b:GetAttribute("recipe_link")
+		local l = b:GetAttribute("notes_key")
 		local n = getglobal(b:GetName() .. "Notes")
 
 		local skillet = self.obj
@@ -99,8 +100,8 @@ function Skillet:RecipeNote_OnClick(button)
 	-- update the window so we know that we are starting from a known good location
 	self:UpdateNotesWindow()
 
-	local link = button:GetAttribute("recipe_link")
-
+	local key = button:GetAttribute("notes_key")
+	
 	local notesObject = getglobal(button:GetName() .. "Notes")
 	local notes = notesObject:GetText();
 
@@ -132,18 +133,19 @@ end
 --
 -- XXX: and tools?
 function Skillet:UpdateNotesWindow()
-	local s = self.stitch:GetItemDataByIndex(self.currentTrade, self.selectedSkill);
-	if not s then
+	local recipe, recipeID = self:GetRecipeDataByTradeIndex(self.currentTrade, self.selectedSkill)
+		
+	if not recipe then
 		return
 	end
-
+	
 	if editbox then
 		editbox:Hide()
 	end
 
 	SkilletRecipeNotesFrameLabel:SetText(L["Notes"]);
 
-	local numItems = 1 + #s
+	local numItems = 1 + #recipe.reagentData
 
 	-- Update the scroll frame
 	FauxScrollFrame_Update(SkilletNotesList,			    -- frame
@@ -172,23 +174,34 @@ function Skillet:UpdateNotesWindow()
 			else
 				button:SetWidth(190)
 			end
-
-			local link;
-
+			
+			local key
+			
 			if index == 1 then
+				local texture
+				
 				-- notes for the recipe itself
-				text:SetText(s.name)
-				icon:SetNormalTexture(s.texture)
-				link = s.link
+				text:SetText((GetSpellInfo(recipeID)))
+				
+				if recipe.numMade > 0 then
+					_,_,_,_,_,_,_,_,_,texture = GetItemInfo(recipe.itemID)		-- get the item texture
+				else
+					texture = "Interface\\Icons\\Spell_Holy_GreaterHeal"		-- standard enchant icon
+				end
+		
+				icon:SetNormalTexture(texture)
+				key = "enchant:"..recipeID
 			else
+				local name, link, _,_,_,_,_,_,_,texture = GetItemInfo(recipe.reagentData[index-1].id)
+				
 				-- notes for a reagent
-				text:SetText(s[index-1].name)
-				icon:SetNormalTexture(s[index-1].texture)
-				link = s[index-1].link
+				text:SetText(name)
+				icon:SetNormalTexture(texture)
+				key = "item:"..recipe.reagentData[index-1].id
 			end
 
-			button:SetAttribute("recipe_link", link)
-			notes_text = self:GetItemNote(link)
+			button:SetAttribute("notes_key", key)
+			notes_text = self:GetItemNote(key)
 
 			if notes_text then
 				notes:SetText(notes_text)

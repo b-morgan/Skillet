@@ -63,8 +63,14 @@
 			</Anchor>
 		  </Anchors>
 		  <Scripts>
+		  	<OnEnter>
+				Skillet:MerchantBuyButton_OnEnter(self)
+			</OnEnter>
+			<OnLeave>
+				Skillet:MerchantBuyButton_OnLeave(self)
+			</OnLeave>
 			<OnClick>
-				Skillet:BuyRequiredReagents();
+				Skillet:BuyRequiredReagents()
 			</OnClick>
 		  </Scripts>
 		</Button>

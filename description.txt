@@ -18,16 +18,15 @@ Skillet is a replacement for the default tradeskill and craft UI, and is based o
 [*]Items needed for crafting queued items can be automatically retrieved from your bank (by using the shopping list)
 [*]Sorting of recipes (name, difficulty, level, and quality of crafted item)
 [*]Complete or mostly complete localizations for deDE, koKR, zhCN, zhTW, and frFR.
-[*]Tracking of inventory on laternate characters (with supported inventory mod)
+[*]Complete support for Alternate characters (trade skills, queued recipes, reagent stocks)
 [/list]
 
 [B]Planned (Future) Features[/B]
 [list]
-[*]Ability to view queues of alts
-[*]Tracking inventory on alternate characters
 [*]Sorting by slot (head/arms/leg etc)
 [*]Custom filtering of recipes (have mats, have mats in bank, min level/max level, etc)
 [*]"Craft Until .." where Skillet will continue to make items until you run out of reagents or a certain skill level is met or until the recipe becomes grey/green.
+[*]Queue heirarchies so that deleting a item that queued up craftable reagents will also remove those queue entries
 [/list]
 
 [B]Supported / Tested Mods[/B]
@@ -58,6 +57,16 @@ When in doubt, contact me anyway. I'd rather hear about a problem twice than not
 I'm often available on the #wowace IRC channel ([URL=irc://irc.freenode.org/wowace]irc://irc.freenode.org/wowace[/URL]) if you'd like to chat with me.
 
 [B]ChangeLog[/B]
+
+[B]1.11 (lilspark)[/B]
+[list]
+[*]Completely reworked in the internal data gathering of skillet to use spell ids for all recipes
+[*]Alternate character tradeskill recipes are now browseable
+[*]Alternate character queues are viewable and editable
+[*]Alternate character inventories are tracked for "interesting" reagents (those that have been scanned into the global recipe list)
+[*]Tradeskills are selectable from inside the Skillet frame
+[/list]
+
 
 [B]1.10[/B]
 [list]
