@@ -126,11 +126,11 @@ function Skillet:EnableResize(frame, min_width, min_height, refresh_method)
     sizer_se:SetWidth(25)
     sizer_se:SetHeight(25)
     sizer_se:EnableMouse()
-    sizer_se:SetScript("OnMouseDown", function(this)
-        this:GetParent():StartSizing("BOTTOMRIGHT")
+    sizer_se:SetScript("OnMouseDown", function(self)
+        self:GetParent():StartSizing("BOTTOMRIGHT")
     end)
-    sizer_se:SetScript("OnMouseUp", function(this)
-        this:GetParent():StopMovingOrSizing()
+    sizer_se:SetScript("OnMouseUp", function(self)
+        self:GetParent():StopMovingOrSizing()
         -- 'Skillet' is passed for the hidden 'self' variable
         pcall(refresh_method, Skillet)
     end)
@@ -194,4 +194,87 @@ function Skillet:ShowInventoryInfoPopup()
     end
 
     infoBox:Show()
+end
+
+
+
+-- ripped from bilzzard GameTooltip_ShowCompareItem() function
+function Tooltip_ShowCompareItem(tip, link, sideOverride)
+--	local item, link = tip:GetItem();
+	if ( not link ) then
+		return;
+	end
+
+	local item1 = nil;
+	local item2 = nil;
+	local side = "left";
+	if ( ShoppingTooltip1:SetHyperlinkCompareItem(link, 1) ) then
+		item1 = true;
+	end
+	if ( ShoppingTooltip2:SetHyperlinkCompareItem(link, 2) ) then
+		item2 = true;
+	end
+
+	-- find correct side
+	local rightDist = 0;
+	local leftPos = tip:GetLeft();
+	local rightPos = tip:GetRight();
+	if ( not rightPos ) then
+		rightPos = 0;
+	end
+	if ( not leftPos ) then
+		leftPos = 0;
+	end
+
+	rightDist = GetScreenWidth() - rightPos;
+
+	if (leftPos and (rightDist < leftPos)) then
+		side = "left";
+	else
+		side = "right";
+	end
+	
+	side = sideOverride or side
+	
+	-- see if we should slide the tooltip
+	if ( tip:GetAnchorType() ) then
+		local totalWidth = 0;
+		if ( item1  ) then
+			totalWidth = totalWidth + ShoppingTooltip1:GetWidth();
+		end
+		if ( item2  ) then
+			totalWidth = totalWidth + ShoppingTooltip2:GetWidth();
+		end
+
+		if ( (side == "left") and (totalWidth > leftPos) ) then
+			tip:SetAnchorType(tip:GetAnchorType(), (totalWidth - leftPos), 0);
+		elseif ( (side == "right") and (rightPos + totalWidth) >  GetScreenWidth() ) then
+			tip:SetAnchorType(tip:GetAnchorType(), -((rightPos + totalWidth) - GetScreenWidth()), 0);
+		end
+	end
+
+	-- anchor the compare tooltips
+	if ( item1 ) then
+		ShoppingTooltip1:SetOwner(tip, "ANCHOR_NONE");
+		ShoppingTooltip1:ClearAllPoints();
+		if ( side and side == "left" ) then
+			ShoppingTooltip1:SetPoint("TOPRIGHT", tip:GetName(), "TOPLEFT", 0, -10);
+		else
+			ShoppingTooltip1:SetPoint("TOPLEFT", tip:GetName(), "TOPRIGHT", 0, -10);
+		end
+		ShoppingTooltip1:SetHyperlinkCompareItem(link, 1);
+		ShoppingTooltip1:Show();
+
+		if ( item2 ) then
+			ShoppingTooltip2:SetOwner(ShoppingTooltip1, "ANCHOR_NONE");
+			ShoppingTooltip2:ClearAllPoints();
+			if ( side and side == "left" ) then
+				ShoppingTooltip2:SetPoint("TOPRIGHT", "ShoppingTooltip1", "TOPLEFT", 0, 0);
+			else
+				ShoppingTooltip2:SetPoint("TOPLEFT", "ShoppingTooltip1", "TOPRIGHT", 0, 0);
+			end
+			ShoppingTooltip2:SetHyperlinkCompareItem(link, 2);
+			ShoppingTooltip2:Show();
+		end
+	end
 end

@@ -120,7 +120,9 @@ function Skillet:AddButtonToTradeskillWindow(button)
     elseif AC_UseButton and button == AC_UseButton then
         armorcraft_custom_add()
     end
-
+	
+	button:Hide()
+	
     -- See if this button has already been added ....
     for i=1, #SkilletFrame.added_buttons, 1 do
         if SkilletFrame.added_buttons[i] == button then
@@ -174,11 +176,19 @@ end
 function Skillet:GetReagentLabel(tradeskill, skill_index)
     if (FRC_PriceSource ~= nill and FRC_CraftFrame_SetSelection and FRC_TradeSkillFrame_SetSelection) then
         -- Support for Fizzwidget's Reagent Cost
-        local Orig_TradeSkillFrame_SetSelection = FRC_Orig_TradeSkillFrame_SetSelection
-        FRC_Orig_TradeSkillFrame_SetSelection = Skillet_NOP
-        FRC_TradeSkillFrame_SetSelection(skill_index)
-        FRC_Orig_TradeSkillFrame_SetSelection = Orig_TradeSkillFrame_SetSelection
-        return TradeSkillReagentLabel:GetText()
+        if self:IsCraft() then
+            local Orig_CraftFrame_SetSelection = FRC_Orig_CraftFrame_SetSelection;
+            FRC_Orig_CraftFrame_SetSelection = Skillet_NOP;
+            FRC_CraftFrame_SetSelection(skill_index);
+            FRC_Orig_CraftFrame_SetSelection = Orig_CraftFrame_SetSelection;
+            return CraftReagentLabel:GetText();
+        else
+            local Orig_TradeSkillFrame_SetSelection = FRC_Orig_TradeSkillFrame_SetSelection
+            FRC_Orig_TradeSkillFrame_SetSelection = Skillet_NOP
+            FRC_TradeSkillFrame_SetSelection(skill_index)
+            FRC_Orig_TradeSkillFrame_SetSelection = Orig_TradeSkillFrame_SetSelection
+            return TradeSkillReagentLabel:GetText()
+        end
     else
         -- boring
         return SPELL_REAGENTS;
@@ -189,6 +199,10 @@ end
 -- A hook to get text to prefix the name of the recipe in the scrolling list of recipes.
 -- If you hook this method, make sure to include any text you get from calling the hooked method.
 -- This will allow more than one mod to use the hook.
+--
+-- This will be called for both crafts and tradeskills, you can use Skillet:IsCraft()
+-- to determine if it's a craft. This avoid having to localize the tradeskill name just to
+-- see if it is a craft or a tradeskill.
 --
 -- Refer to the notes at the top of this file for how to hook this method.
 --
@@ -203,6 +217,10 @@ end
 -- If you hook this method, make sure to include any text you get from calling the hooked method.
 -- This will allow more than one mod to use the hook.
 --
+-- This will be called for both crafts and tradeskills, you can use Skillet:IsCraft()
+-- to determine if it's a craft. This avoid having to localize the tradeskill name just to
+-- see if it is a craft or a tradeskill.
+--
 -- Refer to the notes at the top of this file for how to hook this method.
 --
 -- @param tradeskill name of the currently selected tradeskill
@@ -211,23 +229,14 @@ end
 function Skillet:GetRecipeNameSuffix(tradeskill, skill_index)
 end
 
-
--- Hooks for tooltips
-function Skillet:AddCustomTooltipInfo(tooltip, currentTrade, id)
-end
-
--- recipe count hooks
-function Skillet:GetRecipeCountPrefix(currentTrade, id)
-end
-
-function Skillet:GetRecipeCountSuffix(currentTrade, id)
-end
-
-
 --
 -- A hook to display extra information about a recipe. Any text returned from this function
 -- will be displayed in the recipe details frame when the user clicks on the recipe name.
 -- The text will be added to the bottom the frame, after the list of reagents.
+--
+-- This will be called for both crafts and tradeskills, you can use Skillet:IsCraft()
+-- to determine if it's a craft. This avoid having to localize the tradeskill name just to
+-- see if it is a craft or a tradeskill.
 --
 -- Refer to the notes at the top of this file for how to hook this method.
 --
@@ -419,7 +428,7 @@ end
 -- window will not be updated.
 --
 function Skillet:UpdateTradeSkillWindow()
-    return self:internal_UpdateTradeSkillWindow()
+	return self:internal_UpdateTradeSkillWindow()
 end
 
 --
@@ -464,11 +473,23 @@ end
 --
 -- You should not hook this method, you should call it directly.
 --
--- @param force if true, the list of recipes will be resorted, if false
---        then recipes will only be resorted if they have changed
 --
-function Skillet:ResortRecipes(force)
-    self:internal_ResortRecipes(force)
+-- returns the number of trade skills in the sorted and filtered list
+function Skillet:SortAndFilterRecipes()
+    return self:internal_SortAndFilterRecipes()
+end
+
+
+--
+-- Can be hooked to add custom text to the tooltip
+--
+function Skillet:AddCustomTooltipInfo(tooltip, recipe)
+end
+
+--
+-- Can be hooked customize counts column
+--
+function Skillet:CustomizeCountsColumn(recipe, countsButton)
 end
 
 -- =================================================================

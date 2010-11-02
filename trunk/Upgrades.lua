@@ -83,10 +83,15 @@ function Skillet:UpgradeDataAndOptions()
         self.db.profile.show_bank_alt_counts = true
     end
 
-    -- option is new in 1.13 and I want it to default to true
-    if self.db.profile.show_crafters_tooltip == nil then
-        self.db.profile.show_crafters_tooltip = true
-    end
 
+	-- remove pre 1.11(?) recipe storage
+	if self.db.server.recipes then
+        self.db.server.recipes[UnitName("player")] = nil
+    end
+    
+    -- remove pre 1.11(?) queue storage
+    if self.db.server.queues then
+    	self.db.server.queues = nil
+    end
 end
 
