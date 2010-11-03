@@ -22,6 +22,12 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
 -- If you are doing localization and would like your name added here, please feel free
 -- to do so, or let me know and I will be happy to add you to the credits
+--[[ 
+2009-10-14, RaverJK:
+I did a complete review and proof reading  of the German translation. I changed a lot.
+Many terms have been shortened to have the lables more intuitive and the descriptions 
+more... erm..  descriptive. 
+]]--
 
 local L = AceLibrary("AceLocale-2.2"):new("Skillet")
 L:RegisterTranslations("deDE", function() return {
@@ -39,14 +45,14 @@ L:RegisterTranslations("deDE", function() return {
     ["reagents in inventory"]               = "Reagenzien im Inventar",
     ["bank"]                                = "Reagenzien in der Bank", -- "reagents in bank"
     ["alts"]                                = "Reagenzien auf Twinks", -- "reagents on alts"
-    ["can be created from reagents in your inventory"]  = "kann mit den Reagenzien in deinem Inventar erstellt werden",
-    ["can be created from reagents in your inventory and bank"] = "kann mit den Reagenzien in deinem Inventar und der Bank erstellt werden",
-    ["can be created from reagents on all characters"] = "kann mit den Reagenzien auf allen Charakteren erstellt werden",
+    ["can be created from reagents in your inventory"]  = "herstellbar mit den Reagenzien in deinem Inventar",
+    ["can be created from reagents in your inventory and bank"] = "herstellbar mit den Reagenzien in deinem Inventar und der Bank",
+    ["can be created from reagents on all characters"] = "herstellbar mit den Reagenzien auf allen Charakteren",
     ["Scanning tradeskill"]                 = "Scanne Berufe",
     ["Scan completed"]                      = "Scan abgeschlossen",
     ["Filter"]                              = "Filter",
-    ["Hide uncraftable"]                    = "Nicht herstellbare verstecken",
-    ["Hide trivial"]                        = "Graue Gegenst\195\164nde verstecken",
+    ["Hide uncraftable"]                    = "Nur herstellbare",
+    ["Hide trivial"]                        = "Graue verstecken",
     ["Options"]                             = "Optionen",
     ["Notes"]                               = "Notizen",
     ["Purchased"]                           = "Eingekauft",
@@ -54,41 +60,41 @@ L:RegisterTranslations("deDE", function() return {
     ["This merchant sells reagents you need!"]      = "Dieser H\195\164ndler verkauft Reagenzien die du brauchst!",
     ["Buy Reagents"]                        = "Reagenzien kaufen",
     ["click here to add a note"]            = "Hier klicken um eine Notiz hinzuzuf\195\188gen",
-    ["not yet cached"]                      = "noch nicht gecached",
+    ["not yet cached"]                      = "noch nicht im Cache",
 
     -- Options
-    ["About"]						= "Über",
-    ["ABOUTDESC"]					= "Gibt infos über Skillet aus",
+    ["About"]						= "Über Skillet",
+    ["ABOUTDESC"]					= "Gibt Informationen über Skillet aus",
     ["Config"]						= "Konfiguraton",
     ["CONFIGDESC"]					= "Öffnet ein Konfigurationsfenster für Skillet",
     ["Shopping List"]					= "Einkaufsliste",
     ["SHOPPINGLISTDESC"]				= "Zeigt die Einkaufsliste",
 
-    ["Features"]					= "Funktionen",
+    ["Features"]					= "Optionen",
     ["FEATURESDESC"]					= "Optionale Funktionen die ein- oder ausgeschaltet werden können.",
-    ["VENDORBUYBUTTONNAME"]				= "Zeige Reagenzien Kaufen Knopf bei Händlern",
-    ["VENDORBUYBUTTONDESC"]				= "Zeige einen Button bei Händlern die, die benötigten Reagenzien für Rezepte in der Warteschlange haben.",
+    ["VENDORBUYBUTTONNAME"]				= "Kaufen-Schaltfläche beim Händler",
+    ["VENDORBUYBUTTONDESC"]				= "Hat ein Händler Reagenzien, die in der Einkaufsliste sind, wird eine Schaltfläche zum Kaufen der Reagenzien angezeigt.",
     ["VENDORAUTOBUYNAME"]				= "Reagenzien automatisch kaufen",
-    ["VENDORAUTOBUYDESC"]				= "Wenn du Rezepte in der Warteschlange hast und mit einem Händler sprichst der etwas verkauft was für die Rezepte benötigt, wird es automatisch gekauft.",
-    ["SHOWITEMNOTESTOOLTIPNAME"]			= "Füge Benutzerdefinierte Notizen zum Tooltip hinzu",
-    ["SHOWITEMNOTESTOOLTIPDESC"]			= "Fügt Benutzerdefinierte Notizen für ein Item zum dazugehörigen Tooltip",
-    ["SHOWDETAILEDRECIPETOOLTIPNAME"]			= "Zeigt einen detaillierten Tooltip für Rezepte an",
-    ["SHOWDETAILEDRECIPETOOLTIPDESC"]			= "Zeigt einen detaillierten Tooltip wenn man über die Rezepte auf der linken Seite des Panels fährt",
-    ["LINKCRAFTABLEREAGENTSNAME"]			= "Mache Reagenzien Klickbar",
-    ["LINKCRAFTABLEREAGENTSDESC"]			= "Wenn du ein Reagenz für das aktuelle Rezept herstellen kannst wird ein Klick auf das Reagenz zum entsprechenden Rezept bringen.",
-    ["QUEUECRAFTABLEREAGENTSNAME"]			= "Füge herstellbare Reagenzien zur Warteschlange hinzu",
-    ["QUEUECRAFTABLEREAGENTSDESC"]			= "Wenn du ein Reagenz für das aktuelle Rezept herstellen kannst und nicht genug Reagenzien hast, wird das Reagenz zur Warteschlange hinzugefügt",
-    ["DISPLAYSHOPPINGLISTATBANKNAME"]			= "Zeige Einkaufsliste in der Bank",
-    ["DISPLAYSHOPPINGLISTATBANKDESC"]			= "Zeigt eine Einkaufsliste, die die Items zeigt die benötigt werden um die Rezepte in der Warteschlange herzustellen, aber nicht in deinen Taschen sind",
-    ["DISPLAYSGOPPINGLISTATAUCTIONNAME"]		= "Zeige Einkaufsliste im Auktionshaus",
-    ["DISPLAYSGOPPINGLISTATAUCTIONDESC"]		= "Zeigt eine Einkaufsliste, die die Items zeigt die benötigt werden um die Rezepte in der Warteschlange herzustellen, aber nicht in deinen Taschen sind",
+    ["VENDORAUTOBUYDESC"]				= "Hat ein Händler Reagenzien, die in der Einkaufsliste sind, werden diese automatisch gekauft.",
+    ["SHOWITEMNOTESTOOLTIPNAME"]			= "Notizen im Tooltip",
+    ["SHOWITEMNOTESTOOLTIPDESC"]			= "Zeigt die benutzerdefinierten Notizen für einen Gegenstand im Tooltip an.",
+    ["SHOWDETAILEDRECIPETOOLTIPNAME"]			= "Detaillierter Tooltip für Rezepte",
+    ["SHOWDETAILEDRECIPETOOLTIPDESC"]			= "Zeigt einen detaillierten Tooltip, wenn der Mauszeiger über ein Rezept auf der linken Seite gehalten wird.",
+    ["LINKCRAFTABLEREAGENTSNAME"]			= "Reagenzien anklickbar",
+    ["LINKCRAFTABLEREAGENTSDESC"]			= "Wenn ein Reagenz für das aktuelle Rezept hergestellt werden kann, führt ein Klick auf das Reagenz zu dessen Rezept.",
+    ["QUEUECRAFTABLEREAGENTSNAME"]			= "Herstellbare Reagenzien zur Warteschlange",
+    ["QUEUECRAFTABLEREAGENTSDESC"]			= "Wenn ein Reagenz für das aktuelle Rezept hergestellt werden kann aber nicht genug fertige davon da sind, wird das Reagenz zur Warteschlange hinzugefügt.",
+    ["DISPLAYSHOPPINGLISTATBANKNAME"]			= "Einkaufsliste in der Bank",
+    ["DISPLAYSHOPPINGLISTATBANKDESC"]			= "Zeigt eine Liste der in deinen Taschen fehlenden Ragenzien, die für die Herstellung der Gegenstände in der Warteschlange benötigt werden.",
+    ["DISPLAYSGOPPINGLISTATAUCTIONNAME"]		= "Einkaufsliste im Auktionshaus",
+    ["DISPLAYSGOPPINGLISTATAUCTIONDESC"]		= "Zeigt eine Liste der in deinen Taschen fehlenden Ragenzien, die für die Herstellung der Gegenstände in der Warteschlange benötigt werden.",
 
     ["Appearance"]					= "Aussehen",
     ["APPEARANCEDESC"]					= "Einstelungen die das Aussehen von Skillet ändern",
-    ["DISPLAYREQUIREDLEVELNAME"]			= "Zeige benötigten Level",
-    ["DISPLAYREQUIREDLEVELDESC"]			= "Wenn das hergestellte Item ein Level-Minimum erfordert um es zu benutzen, wird das Level im Rezept angezeigt",
+    ["DISPLAYREQUIREDLEVELNAME"]			= "Zeige benötigte Stufe",
+    ["DISPLAYREQUIREDLEVELDESC"]			= "Wenn der hergestellte Gegenstand eine Charakter-Mindeststufe erfordert, wird die Stufe im Rezept angezeigt",
     ["Transparency"]					= "Transparenz",
-    ["TRANSPARAENCYDESC"]				= "Transparenz des Haupt Berufsfensters",
+    ["TRANSPARAENCYDESC"]				= "Transparenz des Skillet-Fensters",
 
     -- New in version 1.6
     ["Shopping List"]               = "Einkaufsliste",
@@ -102,12 +108,12 @@ L:RegisterTranslations("deDE", function() return {
     ["None"]                        = "Nichts",
     ["By Name"]                     = "Nach Name",
     ["By Difficulty"]               = "Nach Schwierigkeit",
-    ["By Level"]                    = "Nach Level",
+    ["By Level"]                    = "Nach Stufe",
     ["Scale"]                       = "Skalierung",
     ["SCALEDESC"]                   = "Skalierung des Berufsfensters (Standard 1.0)",
     ["Could not find bag space for"] = "Kann keinen Taschenplatz finden für",
-    ["SORTASC"]                     = "Sortiere die Rezptliste vom höchsten (oben) zum nidrigsten (unten)",
-    ["SORTDESC"]                    = "Sortiere die Rezptliste vom nidrigsten (oben) tum höchsten (unten)",
+    ["SORTASC"]                     = "Sortiere aufsteigend",
+    ["SORTDESC"]                    = "Sortiere absteigend",
     ["By Quality"]                  = "Nach Qualität",
 
     -- New in version 1.10
@@ -125,11 +131,11 @@ L:RegisterTranslations("deDE", function() return {
     -- ["SHOWCRAFTCOUNTSDESC"]         = "Show the number of times you can craft a recipe, not the total number of items producable",
 
     -- New in version 1.11
-    ["Crafted By"]                  = "Crafted by",
+    ["Crafted By"]                  = "Herstellbar von",
 
     -- New in 1.13
-    ["SHOWCRAFTERSTOOLTIPNAME"]     = "Show crafters in tooltips",
-    ["SHOWCRAFTERSTOOLTIPDESC"]     = "Display the alternate characters that can craft an item in the item's tooltip",
+    ["SHOWCRAFTERSTOOLTIPNAME"]     = "Hersteller im Tooltip anzeigen",
+    ["SHOWCRAFTERSTOOLTIPDESC"]     = "Zeigt im Tooltip eines Gegenstandes die Twinks an, die ihn herstellen können.",
 
 
     -- New in 1.4
