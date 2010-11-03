@@ -452,7 +452,7 @@ end
 
 -- Called when the addon is loaded
 function Skillet:OnInitialize()
---	self:InitializeDatabase((UnitName("player")), true)  --- force clean rescan for now
+	self:InitializeDatabase((UnitName("player")), false)  --- force clean rescan for now
 
 	-- hook default tooltips
 	local tooltipsToHook = { ItemRefTooltip, GameTooltip, ShoppingTooltip1, ShoppingTooltip2 };
@@ -544,7 +544,6 @@ DebugSpam("initialize database for "..player)
 		self.db.server.linkDB = {}
 	end
 
-
 	if not self.data.groupList then
 		self.data.groupList = {}
 	end
@@ -571,6 +570,10 @@ DebugSpam("initialize database for "..player)
 
     if not self.data.skillIndexLookup[player] then
         self.data.skillIndexLookup[player] = {}
+    end
+
+    if not self.dataGatheringModules then
+        self.dataGatheringModules = {}
     end
 
  	if self.dataGatheringModules[player] then
