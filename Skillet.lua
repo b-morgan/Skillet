@@ -24,7 +24,7 @@ local DATE = string.gsub("$Date$", "^.-(%d%d%d%d%-%d%d%-%d%d).-$", "%1")
 
 Skillet = AceLibrary("AceAddon-2.0"):new("AceConsole-2.0", "AceEvent-2.0", "AceDB-2.0", "AceHook-2.1")
 Skillet.title   = "Skillet"
-Skillet.version = MAJOR_VERSION .. "-" .. MINOR_VERSION
+Skillet.version = MAJOR_VERSION .. "-" .. MINOR_VERSION .. "LS"
 Skillet.date    = DATE
 
 -- Pull it into the local namespace, it's faster to access that way
