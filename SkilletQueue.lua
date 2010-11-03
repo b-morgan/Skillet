@@ -276,7 +276,7 @@ function Skillet:QueueItems(count)
 		end
 	end
 
-	count = math.min(count, 99)
+	count = math.min(count, 999)
 
 	self.visited = {}
 
