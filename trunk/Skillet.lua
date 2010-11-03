@@ -449,6 +449,18 @@ function Skillet:DisableBlizzardFrame()
 	end
 end
 
+function Skillet:EnableBlizzardFrame()
+	if self.BlizzardTradeSkillFrame ~= nil then
+		if (not IsAddOnLoaded("Blizzard_TradeSkillUI")) then
+			LoadAddOn("Blizzard_TradeSkillUI");
+		end
+		TradeSkillFrame = self.BlizzardTradeSkillFrame
+		TradeSkillFrame_Show = self.BlizzardTradeSkillFrame_Show
+
+		self.BlizzardTradeSkillFrame = nil
+		self.BlizzardTradeSkillFrame_Show = nil
+	end
+end
 
 -- Called when the addon is loaded
 function Skillet:OnInitialize()
@@ -474,8 +486,6 @@ function Skillet:OnInitialize()
 
     -- no need to be spammy about the fact that we are here, they'll find out seen enough
 	-- self:Print("Skillet v" .. self.version .. " loaded");
-
-	self:DisableBlizzardFrame()
 
     self:RegisterChatCommand({"/skillet"}, self.options, "SKILLET")
 end
@@ -701,13 +711,14 @@ end
 
 -- Called when the addon is disabled
 function Skillet:OnDisable()
-    self:DisableDataGathering("Skillet")
-    self:DisableQueue("Skillet");
+    --self:DisableDataGathering("Skillet")
+    --self:DisableQueue("Skillet");
 
     self:UnregisterAllEvents()
 
     AceLibrary("Waterfall-1.0"):Close("Skillet")
 	AceLibrary("Waterfall-1.0"):UnRegister("Skillet")
+	self:EnableBlizzardFrame()
 end
 
 
