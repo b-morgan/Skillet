@@ -830,6 +830,45 @@
 				<PushedTexture file="Interface\Buttons\UI-MicroButton-Help-Down"/>
 				<HighlightTexture file="Interface\Buttons\UI-MicroButton-Hilight" alphaMode="ADD"/>
 			</Button>
+			
+
+            <!-- A button to link the current trade skill -->
+            <Button name="SkilletTradeSkillLinkButton">
+                <Size>
+                    <AbsDimension x="32" y="16"/>
+                </Size>
+                <Anchors>
+                    <Anchor point="RIGHT" relativeTo="SkilletShowOptionsButton" relativePoint="LEFT">
+                        <Offset>
+                            <AbsDimension x="-5" y="-6"/>
+                        </Offset>
+                    </Anchor>
+                </Anchors>
+                <Scripts>
+                    <OnClick>
+                        local link=GetTradeSkillListLink();
+                        if (not ChatEdit_InsertLink(link) ) then
+                            ChatFrameEditBox:Show();
+                            ChatEdit_InsertLink(link);
+                        end
+                    </OnClick>
+                    <OnEnter>
+                        GameTooltip:SetOwner(self,"ANCHOR_TOPLEFT");
+                        GameTooltip:SetText(LINK_TRADESKILL_TOOLTIP, nil, nil, nil, nil, 1);
+                        GameTooltip:Show();
+                    </OnEnter>
+                    <OnLeave>
+                        GameTooltip:Hide();
+                    </OnLeave>
+                </Scripts>
+                <NormalTexture file="Interface\TradeSkillFrame\UI-TradeSkill-LinkButton">
+                    <TexCoords left="0" right="1.0" top="0" bottom="0.5"/>
+                </NormalTexture>
+                <HighlightTexture file="Interface\TradeSkillFrame\UI-TradeSkill-LinkButton" alphaMode="ADD">
+                    <TexCoords left="0" right="1.0" top="0.5" bottom="1.0"/>
+                </HighlightTexture>
+            </Button>		
+			
 			<!--
 			#
 			# A status bar to show how much skill you have in this trade
