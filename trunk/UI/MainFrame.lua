@@ -1364,12 +1364,30 @@ function Skillet:SkillButton_OnEnter(button)
 
 	local recipe = self:GetRecipe(skill.recipeID) or skilletUnknownRecipe
 
-	local tip = SkilletSkillTooltip
+	if not self.db.profile.show_detailed_recipe_tooltip then
+		-- user does not want the tooltip displayed, it can get a bit big after all
+		button.locked = false
+		return
+	end
+
+	local tip = SkilletTradeskillTooltip
 
 	ShoppingTooltip1:Hide()
 	ShoppingTooltip2:Hide()
 
-	if IsControlKeyDown() then
+	tip:SetOwner(button, "ANCHOR_BOTTOMRIGHT",-300);
+	tip:SetBackdropColor(0,0,0,1);
+	tip:ClearLines();
+	tip:SetClampedToScreen(true)
+
+	-- Set the tooltip's scale to match that of the default UI
+	local uiScale = 1.0;
+	if ( GetCVar("useUiScale") == "1" ) then
+		uiScale = tonumber(GetCVar("uiscale"))
+	end
+	tip:SetScale(uiScale)
+
+	if IsControlKeyDown() or Skillet.db.profile.display_full_tooltip then
 		local name, link, quality, quantity
 
 		if recipe.itemID == 0 then
@@ -1382,21 +1400,7 @@ function Skillet:SkillButton_OnEnter(button)
 			quantity = recipe.numMade
 		end
 
-
-
-		tip:SetOwner(SkilletSkillListParent, "ANCHOR_NONE")
-		tip:SetPoint("TOPRIGHT",SkilletSkillListParent,"TOPLEFT", -10, 0)
-
---		tip:ClearLines()
 		tip:SetHyperlink(link)
-
-		tip:Show()
-
-
-		if EnhTooltip and EnhTooltip.TooltipCall then
---			EnhTooltip.TooltipCall(tip, name, link, quality, quantity)
-		end
-
 
 		if IsShiftKeyDown() then
 			if recipe.itemID == 0 then
@@ -1406,35 +1410,15 @@ function Skillet:SkillButton_OnEnter(button)
 			end
 		end
 	else
-		tip:Hide()
-	end
+		-- Name of the recipe
+	
+		local color = Skillet.skill_style_type[skill.difficulty]
+		if (color) then
+			tip:AddLine(skill.name, color.r, color.g, color.b, 0);
+		else
+			tip:AddLine(skill.name, NORMAL_FONT_COLOR.r, NORMAL_FONT_COLOR.g, NORMAL_FONT_COLOR.b, 0);
+		end
 
-	if not self.db.profile.show_detailed_recipe_tooltip then
-		-- user does not want the tooltip displayed, it can get a bit big after all
-		button.locked = false
-		return
-	end
-
-	SkilletTradeskillTooltip:SetOwner(button, "ANCHOR_BOTTOMRIGHT",-300);
-	SkilletTradeskillTooltip:SetBackdropColor(0,0,0,1);
-	SkilletTradeskillTooltip:ClearLines();
-	SkilletTradeskillTooltip:SetClampedToScreen(true)
-
-	-- Set the tooltip's scale to match that of the default UI
-	local uiScale = 1.0;
-	if ( GetCVar("useUiScale") == "1" ) then
-		uiScale = tonumber(GetCVar("uiscale"))
-	end
-	SkilletTradeskillTooltip:SetScale(uiScale)
-
-	-- Name of the recipe
-
-	local color = Skillet.skill_style_type[skill.difficulty]
-
-	if (color) then
-		SkilletTradeskillTooltip:AddLine(skill.name, color.r, color.g, color.b, 0);
-	else
-		SkilletTradeskillTooltip:AddLine(skill.name, NORMAL_FONT_COLOR.r, NORMAL_FONT_COLOR.g, NORMAL_FONT_COLOR.b, 0);
 	end
 
 	local num, numwvendor, numwbank, numwalts = get_craftable_counts(skill)
@@ -1442,7 +1426,7 @@ function Skillet:SkillButton_OnEnter(button)
 	-- how many can be created with the reagents in the inventory
 	if num > 0 then
 		local text = "\n" .. num .. " " .. L["can be created from reagents in your inventory"];
-		SkilletTradeskillTooltip:AddLine(text, 1, 1, 1, 0); -- (text, r, g, b, wrap)
+		tip:AddLine(text, 1, 1, 1, 0); -- (text, r, g, b, wrap)
 	end
 	-- how many can be created with the reagent in your inv + bank
 	if self.db.profile.show_bank_alt_counts and numwbank > 0 and numwbank ~= num then
@@ -1450,7 +1434,7 @@ function Skillet:SkillButton_OnEnter(button)
 		if num == 0 then
 			text = "\n" .. text;
 		end
-		SkilletTradeskillTooltip:AddLine(text, 1, 1, 1, 0);	-- (text, r, g, b, wrap)
+		tip:AddLine(text, 1, 1, 1, 0);	-- (text, r, g, b, wrap)
 	end
 	-- how many can be crafted with reagents on *all* alts, including this one.
 	if self.db.profile.show_bank_alt_counts and numwalts and numwalts > 0 and numwalts ~= num then
@@ -1458,12 +1442,12 @@ function Skillet:SkillButton_OnEnter(button)
 		if num and numwbank == 0 then
 			text = "\n" .. text;
 		end
-		SkilletTradeskillTooltip:AddLine(text, 1, 1, 1, 0);	-- (text, r, g, b, wrap)
+		tip:AddLine(text, 1, 1, 1, 0);	-- (text, r, g, b, wrap)
 	end
 
-	Skillet:AddCustomTooltipInfo(SkilletTradeskillTooltip, recipe)
+	Skillet:AddCustomTooltipInfo(tip, recipe)
 
-	SkilletTradeskillTooltip:AddLine("\n" .. self:GetReagentLabel(self.currentTrade, id));
+	tip:AddLine("\n" .. self:GetReagentLabel(self.currentTrade, id));
 
 --	local inventoryData = self.db.server.inventoryData[self.currentPlayer]
 
@@ -1504,21 +1488,14 @@ function Skillet:SkillButton_OnEnter(button)
 		end
 ]]
 
-		SkilletTradeskillTooltip:AddDoubleLine(text, counts, 1, 1, 1);
+		tip:AddDoubleLine(text, counts, 1, 1, 1);
 	end
 
 	local text = string.format("[%s/%s]", L["reagents in inventory"], L["bank"])
 
-	SkilletTradeskillTooltip:AddDoubleLine("\n", text)
+	tip:AddDoubleLine("\n", text)
 
-
-	-- Do any mods want to add extra info about this recipe?
---	local extra_text = self:GetExtraItemDetailText(self.currentTrade, id)
---	if extra_text then
---		SkilletTradeskillTooltip:AddLine("\n" .. extra_text)
---	end
-
-	SkilletTradeskillTooltip:Show();
+	tip:Show()
 
 	button.locked = false
 end

@@ -18,7 +18,7 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
 ]]--
 
-local MAJOR_VERSION = "2.00"
+local MAJOR_VERSION = "2.03"
 local MINOR_VERSION = ("$Revision$"):match("%d+") or 1
 local DATE = string.gsub("$Date$", "^.-(%d%d%d%d%-%d%d%-%d%d).-$", "%1")
 
@@ -57,6 +57,7 @@ Skillet:RegisterDefaults('profile', {
     display_shopping_list_at_bank = false,
     display_shopping_list_at_guildbank = false,
     display_shopping_list_at_auction = false,
+    display_full_tooltip = true,
     transparency = 1.0,
     scale = 1.0,
 } )
@@ -154,7 +155,7 @@ Skillet.options =
 					set = function(value)
 						Skillet.db.profile.vendor_auto_buy = value;
 					end,
-					order = 12
+					order = 13
 				},
 				show_item_notes_tooltip = {
 					type = "toggle",
@@ -166,20 +167,8 @@ Skillet.options =
 					set = function(value)
 						Skillet.db.profile.show_item_notes_tooltip = value;
 					end,
-					order = 13
+					order = 14
 				},
-                show_crafters_tooltip = {
-                    type = "toggle",
-                    name = L["SHOWCRAFTERSTOOLTIPNAME"],
-                    desc = L["SHOWCRAFTERSTOOLTIPDESC"],
-                    get = function()
-                        return Skillet.db.profile.show_crafters_tooltip;
-                    end,
-                    set = function(value)
-                        Skillet.db.profile.show_crafters_tooltip = value;
-                    end,
-                    order = 14
-                },
                 show_detailed_recipe_tooltip = {
                     type = "toggle",
                     name = L["SHOWDETAILEDRECIPETOOLTIPNAME"],
@@ -192,6 +181,30 @@ Skillet.options =
                     end,
                     order = 15
                 },
+                display_full_tooltip = {
+                    type = "toggle",
+                    name = L["SHOWFULLTOOLTIPNAME"],
+                    desc = L["SHOWFULLTOOLTIPDESC"],
+                    get = function()
+                        return Skillet.db.profile.display_full_tooltip;
+                    end,
+                    set = function(value)
+                        Skillet.db.profile.display_full_tooltip = value;
+                    end,
+                    order = 16
+                },                
+                show_crafters_tooltip = {
+                    type = "toggle",
+                    name = L["SHOWCRAFTERSTOOLTIPNAME"],
+                    desc = L["SHOWCRAFTERSTOOLTIPDESC"],
+                    get = function()
+                        return Skillet.db.profile.show_crafters_tooltip;
+                    end,
+                    set = function(value)
+                        Skillet.db.profile.show_crafters_tooltip = value;
+                    end,
+                    order = 17
+                },
                 link_craftable_reagents = {
                     type = "toggle",
                     name = L["LINKCRAFTABLEREAGENTSNAME"],
@@ -202,7 +215,7 @@ Skillet.options =
                     set = function(value)
                         Skillet.db.profile.link_craftable_reagents = value;
                     end,
-                    order = 16
+                    order = 18
                 },
                 queue_craftable_reagents = {
                     type = "toggle",
@@ -214,8 +227,20 @@ Skillet.options =
                     set = function(value)
                         Skillet.db.profile.queue_craftable_reagents = value;
                     end,
-                    order = 17
+                    order = 19
                 },
+                queue_glyph_reagents = {
+                    type = "toggle",
+                    name = L["QUEUEGLYPHREAGENTSNAME"],
+                    desc = L["QUEUEGLYPHREAGENTSDESC"],
+                    get = function()
+                        return Skillet.db.profile.queue_glyph_reagents;
+                    end,
+                    set = function(value)
+                        Skillet.db.profile.queue_glyph_reagents = value;
+                    end,
+                    order = 20
+                },                
                 display_shopping_list_at_bank = {
                     type = "toggle",
                     name = L["DISPLAYSHOPPINGLISTATBANKNAME"],
@@ -226,7 +251,7 @@ Skillet.options =
                     set = function(value)
                         Skillet.db.profile.display_shopping_list_at_bank = value;
                     end,
-                    order = 18
+                    order = 21
                 },
                 display_shopping_list_at_guildbank = {
                     type = "toggle",
@@ -238,7 +263,7 @@ Skillet.options =
                     set = function(value)
                         Skillet.db.profile.display_shopping_list_at_guildbank = value;
                     end,
-                    order = 19
+                    order = 22
                 },
                 display_shopping_list_at_auction = {
                     type = "toggle",
@@ -250,7 +275,7 @@ Skillet.options =
                     set = function(value)
                         Skillet.db.profile.display_shopping_list_at_auction = value;
                     end,
-                    order = 20
+                    order = 23
                 },
                 show_craft_counts = {
                     type = "toggle",
@@ -263,20 +288,8 @@ Skillet.options =
                         Skillet.db.profile.show_craft_counts = value
                         Skillet:UpdateTradeSkillWindow()
                     end,
-                    order = 21,
+                    order = 24,
                 },
-                queue_glyph_reagents = {
-                    type = "toggle",
-                    name = L["QUEUEGLYPHREAGENTSNAME"],
-                    desc = L["QUEUEGLYPHREAGENTSDESC"],
-                    get = function()
-                        return Skillet.db.profile.queue_glyph_reagents;
-                    end,
-                    set = function(value)
-                        Skillet.db.profile.queue_glyph_reagents = value;
-                    end,
-                    order = 22
-                },                
             }
         },
         appearance = {
