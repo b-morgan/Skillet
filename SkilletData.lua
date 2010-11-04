@@ -1192,7 +1192,7 @@ end
 
 function Skillet:CHAT_MSG_SYSTEM(msg)
 --DEFAULT_CHAT_FRAME:AddMessage("CHAT_MSG_SYSTEM "..(event or "nil"))
-	local cutString = string.sub(1,(string.find(ERR_LEARN_RECIPE_S,"%s")))
+	local cutString = string.sub(ERR_LEARN_RECIPE_S,1,(string.find(ERR_LEARN_RECIPE_S,"%%s")-1))
 --DebugSpam("CHAT_MSG_SYSTEM "..(arg1 or "nil").." vs "..cutString)
 	if msg and string.find(msg, cutString) then
 --		self:Skillet_AutoRescan()								-- the problem here is that the message comes before the actuality, it seems
