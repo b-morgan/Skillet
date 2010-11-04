@@ -662,7 +662,7 @@
 --                Skillet:SetTradeSkillToolTip(SkilletFrame.selectedSkill, self:GetID())
 				Skillet:ReagentButtonOnEnter(self, SkilletFrame.selectedSkill, self:GetID())
 --                GameTooltip:Show()
---                CursorUpdate();
+--                CursorUpdate(self);
 			</OnEnter>
 			<OnLeave>
 				Skillet:ReagentButtonOnLeave(self, SkilletFrame.selectedSkill, self:GetID())
@@ -1920,7 +1920,7 @@
 							GameTooltip:SetOwner(self, "ANCHOR_TOPLEFT");
 							Skillet:SetTradeSkillToolTip(SkilletFrame.selectedSkill);
 							GameTooltip:Show()
-							CursorUpdate();
+							CursorUpdate(self);
 						end
 					</OnEnter>
 					<OnLeave>
@@ -1936,7 +1936,7 @@
 								GameTooltip:SetOwner(self, "ANCHOR_TOPLEFT");
 								Skillet:SetTradeSkillToolTip(SkilletFrame.selectedSkill);
 								GameTooltip:Show()
-								CursorUpdate();
+								CursorUpdate(self);
 							end
 						end
 					</OnEvent>

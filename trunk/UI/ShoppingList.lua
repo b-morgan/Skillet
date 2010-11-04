@@ -129,7 +129,7 @@ function Skillet:ShoppingListButton_OnEnter(button)
 		EnhTooltip.TooltipCall(GameTooltip, name, link, quality, quantity)
 	end
 
-	CursorUpdate()
+	CursorUpdate(button)
 end
 
 function Skillet:GetShoppingList(player, includeBank)

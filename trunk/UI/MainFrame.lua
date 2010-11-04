@@ -2665,7 +2665,7 @@ function Skillet:ReagentButtonOnEnter(button, skillIndex, reagentIndex)
 	end
 
 	GameTooltip:Show()
-	CursorUpdate()
+	CursorUpdate(button)
 end
 
 -- called then the mouse leaves a reagent button
