@@ -153,4 +153,8 @@ L:RegisterTranslations("koKR", function() return {
     ["QUEUEGLYPHREAGENTSNAME"]			= "Queue reagents for Glyphs",
     ["QUEUEGLYPHREAGENTSDESC"]			= "If you can create a reagent needed for the current recipe, and don't have enough, then that reagent will be added to the queue. This option is separate for Glyphs only.",
 
+    -- New in 2.00
+    ["SHOWFULLTOOLTIPNAME"]     = "Use standard tooltips",
+    ["SHOWFULLTOOLTIPDESC"]     = "Display all informations about an item to be crafted. If you turn it off you will only see compressed tooltip (hold Ctrl to show full tooltip)",
+
 } end)

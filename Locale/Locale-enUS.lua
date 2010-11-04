@@ -68,8 +68,8 @@ L:RegisterTranslations("enUS", function() return {
     ["VENDORAUTOBUYDESC"]				= "If you have queued recipes and talk to a vendor that sells something needed for those reicpes, it will be automatically purchased.",
     ["SHOWITEMNOTESTOOLTIPNAME"]			= "Add user specified notes to tooltip",
     ["SHOWITEMNOTESTOOLTIPDESC"]			= "Adds notes you provide for an item to the tool tip for that item",
-    ["SHOWDETAILEDRECIPETOOLTIPNAME"]			= "Display a detailed tooltip for recipes",
-    ["SHOWDETAILEDRECIPETOOLTIPDESC"]			= "Displays a detailed tooltip when hovering over recipes in the left hand panel",
+    ["SHOWDETAILEDRECIPETOOLTIPNAME"]			= "Display tooltip for recipes",
+    ["SHOWDETAILEDRECIPETOOLTIPDESC"]			= "Displays a tooltip when hovering over recipes in the left hand panel",
     ["LINKCRAFTABLEREAGENTSNAME"]			= "Make reagents clickable",
     ["LINKCRAFTABLEREAGENTSDESC"]			= "If you can create a reagent needed for the current recipe, clicking the reagent will take you to its recipe.",
     ["QUEUECRAFTABLEREAGENTSNAME"]			= "Queue craftable reagents",
@@ -143,5 +143,10 @@ L:RegisterTranslations("enUS", function() return {
     -- New in 1.4
     ["QUEUEGLYPHREAGENTSNAME"]			= "Queue reagents for Glyphs",
     ["QUEUEGLYPHREAGENTSDESC"]			= "If you can create a reagent needed for the current recipe, and don't have enough, then that reagent will be added to the queue. This option is separate for Glyphs only.",
+
+    -- New in 2.00
+    ["SHOWFULLTOOLTIPNAME"]     = "Use standard tooltips",
+    ["SHOWFULLTOOLTIPDESC"]     = "Display all informations about an item to be crafted. If you turn it off you will only see compressed tooltip (hold Ctrl to show full tooltip)",
+
 
 } end)
