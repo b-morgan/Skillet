@@ -2330,6 +2330,7 @@ function Skillet:SkillButton_PasteSelected(button)
 		end
 
 		self:SortAndFilterRecipes()
+		self:UpdateTradeSkillWindow()
 	end
 end
 

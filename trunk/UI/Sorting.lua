@@ -174,7 +174,7 @@ end
 
 local function SkillIsFilteredOut(skillIndex)
 	if skillIndex == Skillet.selectedSkill then
-		return false								-- never hide the currently selected skill
+		--return false								-- never hide the currently selected skill
 	end
 
 	local skill = Skillet:GetSkill(Skillet.currentPlayer, Skillet.currentTrade, skillIndex)
@@ -353,6 +353,9 @@ local function SortAndFilterRecipes()
 					if not SkillIsFilteredOut(i) then		-- skill is not filtered out
 						button_index = button_index + 1
 						sortedSkillList[button_index] = {["recipeID"] = skill.id, ["spellID"] = recipe.spellID, ["name"] = recipe.name, ["skillIndex"] = i, ["skillData"] = skill, ["depth"] = 0}
+					elseif i == Skillet.selectedSkill then
+						--if filtered out and selected - deselect
+						Skillet.selectedSkill = nil
 					end
 				end
 			end
