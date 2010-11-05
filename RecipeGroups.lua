@@ -1066,7 +1066,7 @@ function Skillet:RecipeGroupOpDelete()
 		UIDropDownMenu_SetText(SkilletRecipeGroupDropdown, label)
 		
 		Skillet:SortAndFilterRecipes()
-		Skillet:UpdateTradeSkillFrame()
+		Skillet:UpdateTradeSkillWindow()
 	end
 end
 
