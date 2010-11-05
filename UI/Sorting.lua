@@ -216,6 +216,13 @@ local function SkillIsFilteredOut(skillIndex)
 
 	if filtertext and filtertext ~= "" then
 		local filter = string.lower(filtertext)
+		local nameOnly = false
+		
+		if string.sub(filter,1,1) == "!" then
+			filter = string.sub(filter,2)
+			nameOnly = true
+		end
+		
 		local word
 
 		local name = ""
@@ -229,25 +236,29 @@ local function SkillIsFilteredOut(skillIndex)
 
 
 		local searchText = ""
-
-		if not Skillet.data.tooltipCache or Skillet.data.tooltipCachedTrade ~= Skillet.currentTrade then
-			Skillet.data.tooltipCachedTrade = Skillet.currentTrade
-			Skillet.data.tooltipCache = {}
-		end
-
-		if not Skillet.data.tooltipCache[recipeID] then
-			tooltip:SetHyperlink("enchant:"..recipeID)
-			local tiplines = tooltip:NumLines()
-
-			for i=1, tiplines, 1 do
-				searchText = searchText.. " " .. string.lower(getglobal("SkilletParsingTooltipTextLeft"..i):GetText() or " ")
-				searchText = searchText.. " " .. string.lower(getglobal("SkilletParsingTooltipTextRight"..i):GetText() or " ")
-			end
-			Skillet.data.tooltipCache[recipeID] = searchText
+		if nameOnly then
+			searchText = recipe.name
 		else
-			searchText = Skillet.data.tooltipCache[recipeID]
+			if not Skillet.data.tooltipCache or Skillet.data.tooltipCachedTrade ~= Skillet.currentTrade then
+				Skillet.data.tooltipCachedTrade = Skillet.currentTrade
+				Skillet.data.tooltipCache = {}
+			end
+	
+			if not Skillet.data.tooltipCache[recipeID] then
+				tooltip:SetHyperlink("enchant:"..recipeID)
+				local tiplines = tooltip:NumLines()
+	
+				for i=1, tiplines, 1 do
+					searchText = searchText.. " " .. string.lower(getglobal("SkilletParsingTooltipTextLeft"..i):GetText() or " ")
+					searchText = searchText.. " " .. string.lower(getglobal("SkilletParsingTooltipTextRight"..i):GetText() or " ")
+				end
+				Skillet.data.tooltipCache[recipeID] = searchText
+			else
+				searchText = Skillet.data.tooltipCache[recipeID]
+			end
 		end
-
+		searchText = string.lower(searchText)
+		
 		local wordList = { string.split(" ",filter) }
 
 		for v,word in pairs(wordList) do
