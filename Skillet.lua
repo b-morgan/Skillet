@@ -18,7 +18,7 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
 ]]--
 
-local MAJOR_VERSION = "2.04"
+local MAJOR_VERSION = "2.05"
 local MINOR_VERSION = ("$Revision$"):match("%d+") or 1
 local DATE = string.gsub("$Date$", "^.-(%d%d%d%d%-%d%d%-%d%d).-$", "%1")
 
@@ -116,6 +116,8 @@ Skillet:RegisterDefaults('char', {
 
 -- Localization
 local L = AceLibrary("AceLocale-2.2"):new("Skillet")
+
+Skillet.L = L
 
 -- Events
 local AceEvent = AceLibrary("AceEvent-2.0")

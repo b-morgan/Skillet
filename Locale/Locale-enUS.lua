@@ -148,5 +148,7 @@ L:RegisterTranslations("enUS", function() return {
     ["SHOWFULLTOOLTIPNAME"]     = "Use standard tooltips",
     ["SHOWFULLTOOLTIPDESC"]     = "Display all informations about an item to be crafted. If you turn it off you will only see compressed tooltip (hold Ctrl to show full tooltip)",
 
+	["Select skill difficulty threshold"]	= true,
+	["Grouping"] = true,
 
 } end)

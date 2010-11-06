@@ -490,6 +490,8 @@ function Skillet:UpdateShoppingListWindow(use_cached_recipes)
 			if LSW then
 				button.valueText:SetText(LSW:FormatMoney(self.cachedShoppingList[itemIndex].value * self.cachedShoppingList[itemIndex].count, true)..self.cachedShoppingList[itemIndex].source)
 				totalPrice = totalPrice + self.cachedShoppingList[itemIndex].value * self.cachedShoppingList[itemIndex].count
+			else
+				button.valueText:Hide()
 			end
 
 			button.id  = self.cachedShoppingList[itemIndex].id

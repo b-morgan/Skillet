@@ -164,6 +164,7 @@ function Skillet:CreateTradeSkillWindow()
 	SkilletRecipeNotesFrameLabel:SetText(L["Notes"])
 	SkilletShoppingListButton:SetText(L["Shopping List"])
 	SkilletSortLabel:SetText(L["Sorting"])
+	SkilletGroupLabel:SetText(L["Grouping"])
 
 --	SkilletHideUncraftableRecipesText:SetText(L["Hide uncraftable"])
 --	SkilletHideTrivialRecipesText:SetText(L["Hide trivial"])
