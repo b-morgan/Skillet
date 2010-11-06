@@ -1508,7 +1508,7 @@
 	
 					<OnEnter>
 						GameTooltip:SetOwner(self, "ANCHOR_TOPLEFT")
-						GameTooltip:SetText("Select skill difficulty threshhold", nil, nil, nil, nil, 1)
+						GameTooltip:SetText(Skillet.L["Select skill difficulty threshold"], nil, nil, nil, nil, 1)
 						GameTooltip:Show()
 					</OnEnter>
 					
