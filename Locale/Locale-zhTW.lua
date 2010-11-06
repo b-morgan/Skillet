@@ -1,4 +1,4 @@
---[[
+﻿--[[
 
 Skillet: A tradeskill window replacement.
 Copyright (c) 2007 Robert Clark <nogudnik@gmail.com>
@@ -27,7 +27,7 @@ local L = AceLibrary("AceLocale-2.2"):new("Skillet")
 
 L:RegisterTranslations("zhTW", function() return {
     ["Skillet Trade Skills"]    = "專業助手", -- default message
-    ["Sorting"] 				 	= "Sorting",
+    ["Sorting"] 		= "排序",
     ["Create"]                  = "製造",
     ["Queue All"]               = "全部排程",
     ["Create All"]              = "全部製造",
@@ -120,25 +120,32 @@ L:RegisterTranslations("zhTW", function() return {
     ["SUPPORTEDADDONSDESC"]         = "可支援的可監視追蹤物品插件",
     -- ["SHOWBANKALTCOUNTSNAME"]       = "Include bank and alt character contents",
     -- ["SHOWBANKALTCOUNTSDESC"]       = "When calculating and displaying craftable itemn counts, include items from your bank and from your other characters",
-    -- ["ENHANCHEDRECIPEDISPLAYNAME"]  = "Show recipe difficulty as text",
-    -- ["ENHANCHEDRECIPEDISPLAYDESC"]  = "When enabled, recipe names will have one or more '+' characters appeneded to their name to inidcate the difficulty of the recipe.",
-    -- ["SHOWCRAFTCOUNTSNAME"]         = "Show craftable counts",
-    -- ["SHOWCRAFTCOUNTSDESC"]         = "Show the number of times you can craft a recipe, not the total number of items producable",
+    ["ENHANCHEDRECIPEDISPLAYNAME"]  = "以文字顯示配方難度",
+    ["ENHANCHEDRECIPEDISPLAYDESC"]  = "啟用時,配方名稱後將顯示一個或數個'+'來表示其難度",
+    ["SHOWCRAFTCOUNTSNAME"]         = "顯示可製造次數",
+    ["SHOWCRAFTCOUNTSDESC"]         = "顯示配方可製造次數,而非可製造數量",
 
     -- New in version 1.11
-    ["Crafted By"]                  = "Crafted by",
+    ["Crafted By"]                  = "可製造",
 
     -- New in 1.13
-    ["SHOWCRAFTERSTOOLTIPNAME"]     = "Show crafters in tooltips",
-    ["SHOWCRAFTERSTOOLTIPDESC"]     = "Display the alternate characters that can craft an item in the item's tooltip",
+    ["SHOWCRAFTERSTOOLTIPNAME"]     = "於物品提示顯示製造者",
+    ["SHOWCRAFTERSTOOLTIPDESC"]     = "於物品提示顯示可製造的角色",
 
 
     -- New in 1.4
-    ["QUEUEGLYPHREAGENTSNAME"]			= "Queue reagents for Glyphs",
-    ["QUEUEGLYPHREAGENTSDESC"]			= "If you can create a reagent needed for the current recipe, and don't have enough, then that reagent will be added to the queue. This option is separate for Glyphs only.",
+    ["QUEUEGLYPHREAGENTSNAME"]			= "為銘文排程材料",
+    ["QUEUEGLYPHREAGENTSDESC"]			= "如果你可以製造配方所需材料,且數量不足,此材料將被加入排程,此選項專指銘文學",
 
     -- New in 2.00
-    ["SHOWFULLTOOLTIPNAME"]     = "Use standard tooltips",
-    ["SHOWFULLTOOLTIPDESC"]     = "Display all informations about an item to be crafted. If you turn it off you will only see compressed tooltip (hold Ctrl to show full tooltip)",
+    ["SHOWFULLTOOLTIPNAME"]     = "使用標準提示",
+    ["SHOWFULLTOOLTIPDESC"]     = "顯示配方完整訊息,如果關閉將只會顯示精簡提示(按住Ctrl以顯示完整提示)",
+
+    -- Unknown
+    ["DISPLAYSHOPPINGLISTATGUILDBANKNAME"]		= "在公會銀行顯示購物清單",
+    ["DISPLAYSHOPPINGLISTATGUILDBANKDESC"]		= "顯示排程配方所需材料清單",
+    ["By Item Level"]                    = "根據物品等級",
+    ["Process"]						= "處理",
+
 
 } end)
