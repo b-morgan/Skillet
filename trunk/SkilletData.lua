@@ -217,8 +217,8 @@ end
 -- Checks to see if the current trade is one that we support.
 
 function Skillet:IsSupportedTradeskill(tradeID)
-	if not tradeID or tradeID == 5419 then
-		return false				-- beast training
+	if not tradeID or tradeID == 5419 or tradeID == 53428 then
+		return false				-- beast training, runeforging
 	end
 
 	if IsShiftKeyDown() then
