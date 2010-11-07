@@ -99,7 +99,7 @@ function Skillet:QueueAppendCommand(command, queueCraftables)
 
 			reagentsChanged[reagent.id] = true
   
-			if queueCraftables and need > have and (Skillet.db.profile.queue_glyph_reagents or not recipe.name:match("Glyph ")) then
+			if queueCraftables and need > have and (Skillet.db.profile.queue_glyph_reagents or not recipe.name:match(Skillet.L["Glyph "])) then
 				local recipeSource = self.data.itemRecipeSource[reagent.id]
 
 				if recipeSource then
@@ -116,8 +116,11 @@ function Skillet:QueueAppendCommand(command, queueCraftables)
 							local newCommand = self:QueueCommandIterate(recipeSourceID, newCount)
 
 							newCommand.level = (command.level or 0) + 1
-
-							self:QueueAppendCommand(newCommand, queueCraftables)
+							
+							-- do not add items from transmutation - this can create weird loops
+							if not Skillet.TradeSkillIgnoredMats[recipeSourceID] then
+								self:QueueAppendCommand(newCommand, queueCraftables)
+							end
 						end
 					end
 				end
@@ -155,7 +158,7 @@ function Skillet:AddToQueue(command)
 		if not added then
 			table.insert(queue, command)
 		end
-	else
+	elseif queue and #queue>0 then
 		local i=#queue
 		--check last item in queue - add current if they are the same
 		if queue[i].op == "iterate" and queue[i].recipeID == command.recipeID then
@@ -163,6 +166,8 @@ function Skillet:AddToQueue(command)
 		else
 			table.insert(queue, command)
 		end
+	else
+		table.insert(queue, command)
 	end
 
 	AceEvent:TriggerEvent("Skillet_Queue_Add")

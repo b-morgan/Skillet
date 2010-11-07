@@ -150,5 +150,6 @@ L:RegisterTranslations("enUS", function() return {
 
 	["Select skill difficulty threshold"]	= true,
 	["Grouping"] = true,
-
+	["Glyph "] = true,
+	
 } end)
