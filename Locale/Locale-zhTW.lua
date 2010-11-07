@@ -134,18 +134,20 @@ L:RegisterTranslations("zhTW", function() return {
 
 
     -- New in 1.4
-    ["QUEUEGLYPHREAGENTSNAME"]			= "為銘文排程材料",
-    ["QUEUEGLYPHREAGENTSDESC"]			= "如果你可以製造配方所需材料,且數量不足,此材料將被加入排程,此選項專指銘文學",
+    ["QUEUEGLYPHREAGENTSNAME"]	= "為銘文排程材料",
+    ["QUEUEGLYPHREAGENTSDESC"]	= "如果你可以製造配方所需材料,且數量不足,此材料將被加入排程,此選項專指銘文學",
 
     -- New in 2.00
     ["SHOWFULLTOOLTIPNAME"]     = "使用標準提示",
     ["SHOWFULLTOOLTIPDESC"]     = "顯示配方完整訊息,如果關閉將只會顯示精簡提示(按住Ctrl以顯示完整提示)",
 
-    -- Unknown
-    ["DISPLAYSHOPPINGLISTATGUILDBANKNAME"]		= "在公會銀行顯示購物清單",
-    ["DISPLAYSHOPPINGLISTATGUILDBANKDESC"]		= "顯示排程配方所需材料清單",
-    ["By Item Level"]                    = "根據物品等級",
-    ["Process"]						= "處理",
+    ["DISPLAYSHOPPINGLISTATGUILDBANKNAME"]	= "在公會銀行顯示購物清單",
+    ["DISPLAYSHOPPINGLISTATGUILDBANKDESC"]	= "顯示排程配方所需材料清單",
+    ["By Item Level"]				= "根據物品等級",
+    ["Process"]					= "處理",
+
+    ["Select skill difficulty threshold"]	= "選擇製造難度等級",
+    ["Grouping"]				= "群組",
 
 
 } end)
