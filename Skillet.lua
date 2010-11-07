@@ -879,7 +879,7 @@ function Skillet:FreeCaches()
 	end
 
 --	local kbA = collectgarbage("count")
-	Skillet.data = {}
+--	Skillet.data = {}
 --	collectgarbage("collect")
 --	local kbB = collectgarbage("count")
 -- DEFAULT_CHAT_FRAME:AddMessage("free'd " .. data .. " (" .. math.floor((kbA - kbB)*100+.5)/100 .. " Kb)")
