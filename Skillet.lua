@@ -18,7 +18,7 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
 ]]--
 
-local MAJOR_VERSION = "2.05"
+local MAJOR_VERSION = "2.06"
 local MINOR_VERSION = ("$Revision$"):match("%d+") or 1
 local DATE = string.gsub("$Date$", "^.-(%d%d%d%d%-%d%d%-%d%d).-$", "%1")
 
@@ -766,7 +766,7 @@ end
 function Skillet:SkilletShow()
 DebugSpam("SHOW WINDOW (was showing "..(self.currentTrade or "nil")..")");
 
-	if IsTradeSkillLinked() or IsTradeSkillGuild() then
+	if IsTradeSkillLinked() or (IsTradeSkillGuild and IsTradeSkillGuild()) then
 		local _, linkedPlayer = IsTradeSkillLinked()
 		
 		if not linkedPlayer then
