@@ -766,12 +766,18 @@ end
 function Skillet:SkilletShow()
 DebugSpam("SHOW WINDOW (was showing "..(self.currentTrade or "nil")..")");
 
-	if (IsTradeSkillLinked()) then
-		_, self.currentPlayer = IsTradeSkillLinked()
+	if IsTradeSkillLinked() or IsTradeSkillGuild() then
+		local _, linkedPlayer = IsTradeSkillLinked()
+		
+		if not linkedPlayer then
+			return
+		end		
+		
+		self.currentPlayer = linkedPlayer
+		
 		if (self.currentPlayer == UnitName("player")) then
 			self.currentPlayer = "All Data"
 		end
-
 		self:RegisterPlayerDataGathering(self.currentPlayer,SkilletLink,"sk")
 	else
 		self:InitializeAllDataLinks("All Data")

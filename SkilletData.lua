@@ -61,6 +61,44 @@ local TradeSkillRecipeCounts = {
 	[53428] = 0,	-- can't link
 }
 
+local TradeSkillIgnoredMats  = {
+		[11479] = 1, -- Transmute: Iron to Gold
+		[11480] = 1 , -- Transmute: Mithril to Truesilver
+		[60350] = 1 , -- Transmute: Titanium
+
+		[17559] = 1 , -- Transmute: Air to Fire
+		[17560] = 1 , -- Transmute: Fire to Earth
+		[17561] = 1 , -- Transmute: Earth to Water
+		[17562] = 1 , -- Transmute: Water to Air
+		[17563] = 1 , -- Transmute: Undeath to Water
+		[17565] = 1 , -- Transmute: Life to Earth
+		[17566] = 1, -- Transmute: Earth to Life
+
+		[28585] = 1 , -- Transmute: Primal Earth to Life
+		[28566] = 1 , -- Transmute: Primal Air to Fire
+		[28567] = 1 , -- Transmute: Primal Earth to Water
+		[28568] = 1 , -- Transmute: Primal Fire to Earth
+		[28569] = 1 , -- Transmute: Primal Water to Air
+		[28580] = 1 , -- Transmute: Primal Shadow to Water
+		[28581] = 1 , -- Transmute: Primal Water to Shadow
+		[28582] = 1 , -- Transmute: Primal Mana to Fire
+		[28583] = 1 , -- Transmute: Primal Fire to Mana
+		[28584] = 1 , -- Transmute: Primal Life to Earth
+		[53771] = 1 , -- Transmute: Eternal Life to Shadow
+		[53773] = 1, -- Transmute: Eternal Life to Fire
+		[53774] = 1 , -- Transmute: Eternal Fire to Water
+		[53775] = 1 , -- Transmute: Eternal Fire to Life
+		[53776] = 1 , -- Transmute: Eternal Air to Water
+		[53777] = 1 , -- Transmute: Eternal Air to Earth
+		[53779] = 1 , -- Transmute: Eternal Shadow to Earth
+		[53780] = 1 , -- Transmute: Eternal Shadow to Life
+		[53781] = 1 , -- Transmute: Eternal Earth to Air
+		[53782] = 1 , -- Transmute: Eternal Earth to Shadow
+		[53783] = 1 , -- Transmute: Eternal Water to Air
+		[53784] = 1 , -- Transmute: Eternal Water to Fire
+}
+
+Skillet.TradeSkillIgnoredMats = TradeSkillIgnoredMats
 
 
 SkilletData = {}				-- skillet data scanner
