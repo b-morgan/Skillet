@@ -209,12 +209,12 @@ function Skillet:BuyRequiredReagents()
 					else
 						local fullstackstobuy    = math.floor(count/stackSize);
 						local fullstackitemcount = math.floor(stackSize/quantity);
-						local resttobuy          = math.ceil((count-(fullstackstobuy*stackSize))/quantity);
+						local resttobuy          = math.ceil(count-(fullstackstobuy*stackSize));
 						if fullstackstobuy > 0 then
 							for l=1,fullstackstobuy,1 do
 								-- XXX: need some error checking here in case the
 								-- poor user runs out of money.
-								BuyMerchantItem(i,fullstackitemcount);
+								BuyMerchantItem(i,stackSize);
 							end
 						end
 						if resttobuy > 0 then
