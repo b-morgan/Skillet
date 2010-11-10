@@ -16,7 +16,7 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
 ]]--
 
-local L = AceLibrary("AceLocale-2.2"):new("Skillet")
+local L = LibStub("AceLocale-3.0"):GetLocale("Skillet")
 
 SKILLET_TRADE_SKILL_HEIGHT = 16
 SKILLET_NUM_REAGENT_BUTTONS = 8
@@ -38,9 +38,6 @@ local SKILLET_REAGENT_MAX_WIDTH = 320
 
 local nonLinkingTrade = { [2656] = true, [53428] = true }				-- smelting, runeforging
 
-
--- Events
-local AceEvent = AceLibrary("AceEvent-2.0")
 
 -- Stack of previsouly selected skills for use by the
 -- "click on reagent, go to recipe" code and for clicking on Queue'd recipes
@@ -147,7 +144,7 @@ function Skillet:CreateTradeSkillWindow()
 	titletext:SetTextColor(1,1,1)
 	titletext:SetText(L["Skillet Trade Skills"]);
 
-	local label = getglobal("SkilletFilterLabel");
+	local label = _G["SkilletFilterLabel"];
 	label:SetText(L["Filter"]);
 
 	SkilletCreateAllButton:SetText(L["Create All"])
@@ -260,13 +257,13 @@ function Skillet:CreateTradeSkillWindow()
 
 	-- Ace Window manager library, allows the window position (and size)
 	-- to be automatically saved
-	local windowManger = AceLibrary("Window-1.0")
+	local windowManger = LibStub("LibWindow-1.1")
 	local tradeSkillLocation = {
 		prefix = "tradeSkillLocation_"
 	}
-	windowManger:RegisterConfig(frame, self.db.char, tradeSkillLocation)
-	windowManger:RestorePosition(frame)  -- restores scale also
-	windowManger:MakeDraggable(frame)
+	windowManger.RegisterConfig(frame, self.db.char, tradeSkillLocation)
+	windowManger.RestorePosition(frame)  -- restores scale also
+	windowManger.MakeDraggable(frame)
 
 	-- lets play the resize me game!
 	local minwidth = self:GetMinSkillButtonWidth()
@@ -388,13 +385,16 @@ function Skillet:QueueList_OnScroll()
 end
 
 local function Skillet_redo_the_update(self)
-	AceEvent:CancelScheduledEvent("Skillet_redo_the_update")
+        if Skillet.redo_update_timer then
+            Skillet:CancelTimer(Skillet.redo_update_timer, true)
+            Skillet.redo_update_timer = nil
+        end
 --	self:UpdateTradeSkillWindow()
 end
 
 local num_recipe_buttons = 1
 local function get_recipe_button(i)
-	local button = getglobal("SkilletScrollButton"..i)
+	local button = _G["SkilletScrollButton"..i]
 
 	if not button then
 		button = CreateFrame("Button", "SkilletScrollButton"..i, SkilletSkillListParent, "SkilletSkillButtonTemplate")
@@ -405,7 +405,7 @@ local function get_recipe_button(i)
 		num_recipe_buttons = i
 	end
 
-	local buttonDrag = getglobal("SkilletScrollButtonDrag"..i)
+	local buttonDrag = _G["SkilletScrollButtonDrag"..i]
 	if not buttonDrag then
 		buttonDrag = CreateFrame("Frame", "SkilletScrollButtonDrag"..i, SkilletSkillListParent, "SkilletSkillButtonDragTemplate")
 		buttonDrag:SetParent(SkilletSkillListParent)
@@ -538,7 +538,7 @@ function Skillet:PlayerSelect_OnEnter(button)
 
 	GameTooltip:ClearLines()
 
-	local player = getglobal(button:GetName().."Text"):GetText()
+	local player = _G[button:GetName().."Text"]:GetText()
 
 	GameTooltip:AddLine(player,1,1,1)
 	GameTooltip:AddLine("Click to select a different character",.7,.7,.7)
@@ -583,7 +583,7 @@ function Skillet:TradeButton_OnEnter(button)
 			GameTooltip:AddLine("shift-click to link")
 		end
 
-		local buttonIcon = getglobal(button:GetName().."Icon")
+		local buttonIcon = _G[button:GetName().."Icon"]
 		local r,g,b = buttonIcon:GetVertexColor()
 
 		if g == 0 then
@@ -623,7 +623,7 @@ function Skillet:TradeButton_OnClick(this,button)
 			if player == UnitName("player") then
 				self:SetTradeSkill(self.currentPlayer, tradeID)
 			else
-				local link = self.db.server.linkDB[player][tradeID]
+				local link = self.db.realm.linkDB[player][tradeID]
 				local _,_,tradeString = string.find(link, "(trade:%d+:%d+:%d+:[0-9a-fA-F]+:[a-zA-Z0-9+/]+)")
 
 				if tradeString then
@@ -657,7 +657,7 @@ function Skillet:UpdateTradeButtons(player)
 
 	for playerAlt in pairs(self.dataGatheringModules) do
 		local frameName = "SkilletFrameTradeButtons-"..playerAlt
-		local frame = getglobal(frameName)
+		local frame = _G[frameName]
 
 		if frame then
 			frame:Hide()
@@ -668,7 +668,7 @@ function Skillet:UpdateTradeButtons(player)
 
 
 	local frameName = "SkilletFrameTradeButtons-"..player
-	local frame = getglobal(frameName)
+	local frame = _G[frameName]
 
 	if not frame then
 		frame = CreateFrame("Frame", frameName, SkilletFrame)
@@ -681,8 +681,8 @@ function Skillet:UpdateTradeButtons(player)
 		local ranks = self:GetSkillRanks(player, tradeID)
 		local tradeLink
 
-		if self.db.server.linkDB[player] then
-			tradeLink = self.db.server.linkDB[player][tradeID]
+		if self.db.realm.linkDB[player] then
+			tradeLink = self.db.realm.linkDB[player][tradeID]
 
 			if nonLinkingTrade[tradeID] then
 				tradeLink = nil
@@ -694,7 +694,7 @@ function Skillet:UpdateTradeButtons(player)
 			local spellName, _, spellIcon = GetSpellInfo(tradeID)
 
 			local buttonName = "SkilletFrameTradeButton-"..player.."-"..tradeID
-			local button = getglobal(buttonName)
+			local button = _G[buttonName]
 
 			if not button then
 				button = CreateFrame("CheckButton", buttonName, frame, "SkilletTradeButtonTemplate")
@@ -710,7 +710,7 @@ function Skillet:UpdateTradeButtons(player)
 			button:ClearAllPoints()
 			button:SetPoint("BOTTOMLEFT", SkilletRankFrame, "TOPLEFT", position, 0)
 
-			local buttonIcon = getglobal(buttonName.."Icon")
+			local buttonIcon = _G[buttonName.."Icon"]
 			buttonIcon:SetTexture(spellIcon)
 
 
@@ -744,7 +744,7 @@ function SkilletPluginDropdown_OnClick(this)
 --DEFAULT_CHAT_FRAME:AddMessage("click")
 	for i=1,#SkilletFrame.added_buttons do
 		local buttonName = "SkilletPluginDropdown"..i
-		local button = getglobal(buttonName)
+		local button = _G[buttonName]
 
 		if button then
 			button:Hide()
@@ -760,7 +760,7 @@ function Skillet:PluginButton_OnClick(button)
 			local oldButton = SkilletFrame.added_buttons[i]
 
 			local buttonName = "SkilletPluginDropdown"..i
-			local button = getglobal(buttonName)
+			local button = _G[buttonName]
 
 
 			if not button then
@@ -897,7 +897,7 @@ function Skillet:internal_UpdateTradeSkillWindow()
 	-- Window Title
 	local tradeName = self:GetTradeName(self.currentTrade)
 
-	local title = getglobal("SkilletTitleText");
+	local title = _G["SkilletTitleText"];
 	if title then
 		title:SetText(L["Skillet Trade Skills"] .. ": " .. self.currentPlayer .. "/" .. tradeName)
 	end
@@ -995,11 +995,11 @@ function Skillet:internal_UpdateTradeSkillWindow()
 
 			skillIndex = skill.skillIndex
 
-			local buttonText = getglobal(button:GetName() .. "Name")
-			local levelText = getglobal(button:GetName() .. "Level")
-			local countText = getglobal(button:GetName() .. "Counts")
+			local buttonText = _G[button:GetName() .. "Name"]
+			local levelText = _G[button:GetName() .. "Level"]
+			local countText = _G[button:GetName() .. "Counts"]
 
-			local buttonExpand = getglobal(button:GetName() .. "Expand")
+			local buttonExpand = _G[button:GetName() .. "Expand"]
 
 			buttonText:SetText("")
 			levelText:SetText("")
@@ -1048,11 +1048,11 @@ function Skillet:internal_UpdateTradeSkillWindow()
 			buttonExpand:SetPoint("RIGHT", levelText, "RIGHT", skill.depth*8-8, 0)
 			buttonExpand:SetPoint("LEFT", levelText, "RIGHT", skill.depth*8-24, 0)
 
-			getglobal(button:GetName() .. "ExpandNormal"):SetPoint("RIGHT", levelText, "RIGHT", skill.depth*8-8, 0)
-			getglobal(button:GetName() .. "ExpandNormal"):SetPoint("LEFT", levelText, "RIGHT", skill.depth*8-24, 0)
+			_G[button:GetName() .. "ExpandNormal"]:SetPoint("RIGHT", levelText, "RIGHT", skill.depth*8-8, 0)
+			_G[button:GetName() .. "ExpandNormal"]:SetPoint("LEFT", levelText, "RIGHT", skill.depth*8-24, 0)
 
-			getglobal(button:GetName() .. "ExpandHighlight"):SetPoint("RIGHT", levelText, "RIGHT", skill.depth*8-8, 0)
-			getglobal(button:GetName() .. "ExpandHighlight"):SetPoint("LEFT", levelText, "RIGHT", skill.depth*8-24, 0)
+			_G[button:GetName() .. "ExpandHighlight"]:SetPoint("RIGHT", levelText, "RIGHT", skill.depth*8-8, 0)
+			_G[button:GetName() .. "ExpandHighlight"]:SetPoint("LEFT", levelText, "RIGHT", skill.depth*8-24, 0)
 ]]
 
 			if skill.subGroup then
@@ -1105,7 +1105,7 @@ function Skillet:internal_UpdateTradeSkillWindow()
 
 				buttonExpand:Hide()
 --				button:SetNormalTexture("")
---				getglobal(button:GetName() .. "Highlight"):SetTexture("")
+--				_G[button:GetName() .. "Highlight"]:SetTexture("")
 
 				-- if the item has a minimum level requirement, then print that here
 				if self.db.profile.display_required_level then
@@ -1296,8 +1296,8 @@ function Skillet:internal_UpdateTradeSkillWindow()
 
 
 --    if nilFound then
---        if not AceEvent:IsEventScheduled("Skillet_redo_the_update") then
---            AceEvent:ScheduleEvent("Skillet_redo_the_update", 0.25, self)
+--        if not Skillet.redo_update_timer then
+--            Skillet.redo_update_timer = Skillet:ScheduleTimer("Skillet_redo_the_update", 0.25)
 --        end
 --    end
 
@@ -1331,7 +1331,7 @@ function Skillet:SkillButton_OnEnter(button)
 	end
 
 
-	local buttonName = getglobal(b.."Name")
+	local buttonName = _G[b.."Name"]
 
 	if button.skill.subGroup then			-- header
 		buttonName:SetTextColor(HIGHLIGHT_FONT_COLOR.r, HIGHLIGHT_FONT_COLOR.g, HIGHLIGHT_FONT_COLOR.b)
@@ -1388,20 +1388,30 @@ function Skillet:SkillButton_OnEnter(button)
 	end
 	tip:SetScale(uiScale)
 
+	-- If not displaying full tooltips you have to press Ctrl to see them
 	if IsControlKeyDown() or Skillet.db.profile.display_full_tooltip then
-		local name, link, quality, quantity
+		local name, link, quality, quantity, altlink
 
-		if recipe.itemID == 0 then
+
+		if recipe.itemID == 0 or not Skillet.db.profile.display_item_tooltip then
 			link = GetSpellLink(skill.recipeID)
 			name = GetSpellInfo(link)
 			quality = nil
 			quantity = nil
+			if recipe.itemID ~= 0 then
+				_, altlink = GetItemInfo(recipe.itemID)
+			end
 		else
 			name,link,quality = GetItemInfo(recipe.itemID)
+			altlink = GetSpellLink(skill.recipeID)
 			quantity = recipe.numMade
 		end
 
-		tip:SetHyperlink(link)
+		if altlink and IsAltKeyDown() then
+			tip:SetHyperlink(altlink)
+		else
+			tip:SetHyperlink(link)
+		end
 
 		if IsShiftKeyDown() then
 			if recipe.itemID == 0 then
@@ -1412,7 +1422,7 @@ function Skillet:SkillButton_OnEnter(button)
 		end
 	else
 		-- Name of the recipe
-	
+
 		local color = Skillet.skill_style_type[skill.difficulty]
 		if (color) then
 			tip:AddLine(skill.name, color.r, color.g, color.b, 0);
@@ -1450,7 +1460,7 @@ function Skillet:SkillButton_OnEnter(button)
 
 	tip:AddLine("\n" .. self:GetReagentLabel(self.currentTrade, id));
 
---	local inventoryData = self.db.server.inventoryData[self.currentPlayer]
+--	local inventoryData = self.db.realm.inventoryData[self.currentPlayer]
 
 	-- now the list of regents for this recipe and some info about them
 
@@ -1549,12 +1559,12 @@ function Skillet:SetReagentToolTip(reagentID, numNeeded, numCraftable)
 	end
 
 
-	if self.data.itemRecipeSource[reagentID] then
+	if self.db.global.itemRecipeSource[reagentID] then
 		GameTooltip:AppendText(GRAY_FONT_COLOR_CODE .. " (" .. L["craftable"] .. ")" .. FONT_COLOR_CODE_CLOSE)
 
-		for recipeID in pairs(self.data.itemRecipeSource[reagentID]) do
+		for recipeID in pairs(self.db.global.itemRecipeSource[reagentID]) do
 			local recipe = self:GetRecipe(recipeID)
-			--self.db.account.recipeData[self.db.account.itemRecipeSource[reagentID][i]]
+			--self.db.global.recipeData[self.db.global.itemRecipeSource[reagentID][i]]
 
 			GameTooltip:AddDoubleLine("Source: ",(self:GetTradeName(recipe.tradeID) or recipe.tradeID)..":"..self:GetRecipeName(recipeID),0,1,0,1,1,1)
 
@@ -1577,7 +1587,7 @@ function Skillet:SetReagentToolTip(reagentID, numNeeded, numCraftable)
 --	local recipe = self:GetRecipe(recipeID)
 	local _, inBags, _, inBank = self:GetInventory(self.currentPlayer, reagentID)
 
---	self.db.server.inventoryData[self.currentPlayer][reagentID].numCraftableBank
+--	self.db.realm.inventoryData[self.currentPlayer][reagentID].numCraftableBank
 	local surplus = inBank - numNeeded * numCraftable
 
 	if inBank < 0 then
@@ -1589,8 +1599,8 @@ function Skillet:SetReagentToolTip(reagentID, numNeeded, numCraftable)
 	end
 
 
-	if self.db.server.reagentsInQueue[self.currentPlayer] then
-		local inQueue = self.db.server.reagentsInQueue[self.currentPlayer][reagentID]
+	if self.db.realm.reagentsInQueue[self.currentPlayer] then
+		local inQueue = self.db.realm.reagentsInQueue[self.currentPlayer][reagentID]
 
 		if inQueue then
 			if inQueue < 0 then
@@ -1618,10 +1628,10 @@ local function bopCheck(item)
 
 	local _,link = GetItemInfo(item)
 --	if name then
-		local tooltip = getglobal("SkilletParsingTooltip")
+		local tooltip = _G["SkilletParsingTooltip"]
 
 		if tooltip == nil then
-			tooltip = CreateFrame("GameTooltip", "SkilletParsingTooltip", getglobal("ANCHOR_NONE"), "GameTooltipTemplate")
+			tooltip = CreateFrame("GameTooltip", "SkilletParsingTooltip", _G["ANCHOR_NONE"], "GameTooltipTemplate")
 			tooltip:SetOwner(WorldFrame, "ANCHOR_NONE");
 		end
 
@@ -1635,7 +1645,7 @@ local function bopCheck(item)
 --DEFAULT_CHAT_FRAME:AddMessage((link or "nil"))
 
 		for i=1, tiplines, 1 do
-			local lineText = string.lower(getglobal("SkilletParsingTooltipTextLeft"..i):GetText() or " ")
+			local lineText = string.lower(_G["SkilletParsingTooltipTextLeft"..i]:GetText() or " ")
 --DEFAULT_CHAT_FRAME:AddMessage(lineText)
 
 			if (string.find(lineText, "binds when picked up")) then
@@ -1677,7 +1687,7 @@ function Skillet:UpdateDetailsWindow(skillIndex)
 		SkilletCreateCountSlider:SetValue(1);
 
 		for i=1, SKILLET_NUM_REAGENT_BUTTONS, 1 do
-			local button = getglobal("SkilletReagent"..i)
+			local button = _G["SkilletReagent"..i]
 			button:Hide();
 		end
 
@@ -1804,11 +1814,11 @@ function Skillet:UpdateDetailsWindow(skillIndex)
 	local lastReagentButton
 
 	for i=1, SKILLET_NUM_REAGENT_BUTTONS, 1 do
-		local button = getglobal("SkilletReagent"..i)
-		local   text = getglobal(button:GetName() .. "Text")
-		local   icon = getglobal(button:GetName() .. "Icon")
-		local  count = getglobal(button:GetName() .. "Count")
-		local needed = getglobal(button:GetName() .. "Needed")
+		local button = _G["SkilletReagent"..i]
+		local   text = _G[button:GetName() .. "Text"]
+		local   icon = _G[button:GetName() .. "Icon"]
+		local  count = _G[button:GetName() .. "Count"]
+		local needed = _G[button:GetName() .. "Needed"]
 
 		local reagent = recipe.reagentData[i]
 
@@ -1827,7 +1837,7 @@ function Skillet:UpdateDetailsWindow(skillIndex)
 			local num = 0
 			local numBank = 0
 
-			local invData = self.db.server.inventoryData[Skillet.currentPlayer]
+			local invData = self.db.realm.inventoryData[Skillet.currentPlayer]
 
 			if invData then
 				invData = invData[reagent.id]
@@ -1988,7 +1998,7 @@ end
 
 local num_queue_buttons = 0
 local function get_queue_button(i)
-	local button = getglobal("SkilletQueueButton"..i)
+	local button = _G["SkilletQueueButton"..i]
 	if not button then
 		button = CreateFrame("Button", "SkilletQueueButton"..i, SkilletQueueParent, "SkilletQueueItemButtonTemplate")
 		button:SetParent(SkilletQueueParent)
@@ -2001,14 +2011,14 @@ end
 
 
 function Skillet:QueueItemButton_OnClick(button)
-	local queue = self.db.server.queueData[self.currentPlayer]
+	local queue = self.db.realm.queueData[self.currentPlayer]
 
 	local index = button:GetID()
 
 	local recipeID = queue[index].recipeID
 
 	local recipe = self:GetRecipe(recipeID)
-	--self.db.account.recipeData[recipeID]
+	--self.db.global.recipeData[recipeID]
 
 	local tradeID = recipe.tradeID
 
@@ -2025,7 +2035,7 @@ end
 -- Updates the window/scroll list displaying queue of items
 -- that are waiting to be crafted.
 function Skillet:UpdateQueueWindow()
-	local queue = self.db.server.queueData[self.currentPlayer]
+	local queue = self.db.realm.queueData[self.currentPlayer]
 	if not queue then
 		SkilletStartQueueButton:SetText(L["Process"])
 		SkilletEmptyQueueButton:Disable()
@@ -2070,11 +2080,11 @@ function Skillet:UpdateQueueWindow()
 		num_queue_buttons = math.max(num_queue_buttons, i)
 
 		local button       = get_queue_button(i)
-		local countFrame   = getglobal(button:GetName() .. "Count")
-		local queueCount   = getglobal(button:GetName() .. "CountText")
-		local nameButton   = getglobal(button:GetName() .. "Name")
-		local queueName    = getglobal(button:GetName() .. "NameText")
-		local deleteButton = getglobal(button:GetName() .. "DeleteButton")
+		local countFrame   = _G[button:GetName() .. "Count"]
+		local queueCount   = _G[button:GetName() .. "CountText"]
+		local nameButton   = _G[button:GetName() .. "Name"]
+		local queueName    = _G[button:GetName() .. "NameText"]
+		local deleteButton = _G[button:GetName() .. "DeleteButton"]
 
 		button:SetWidth(width)
 
@@ -2096,7 +2106,7 @@ function Skillet:UpdateQueueWindow()
 
 			if queueCommand then
 				local recipe = self:GetRecipe(queueCommand.recipeID)
-				--self.db.account.recipeData[queueCommand.recipeID]
+				--self.db.global.recipeData[queueCommand.recipeID]
 
 				queueName:SetText((self:GetTradeName(recipe.tradeID) or recipe.tradeID)..":"..(recipe.name or recipeID))
 				queueCount:SetText(queueCommand.count)
@@ -2219,8 +2229,8 @@ function Skillet:SkillButton_OnDragStart(button, mouse)
 
 			for i=1,self.visibleSkillButtons do
 				local button, buttonDrag = get_recipe_button(i)
-				local buttonText = getglobal(button:GetName().."Name")
-				local buttonDragText = getglobal(buttonDrag:GetName().."Name")
+				local buttonText = _G[button:GetName().."Name"]
+				local buttonDragText = _G[buttonDrag:GetName().."Name"]
 
 				buttonDrag.skill = button.skill
 
@@ -2442,7 +2452,7 @@ function Skillet:SkillButton_NameEditEnable(button)
 		SkillButtonNameEdit:SetText(button.skill.name)
 		SkillButtonNameEdit:SetParent(button:GetParent())
 
-		local buttonText = getglobal(button:GetName().."Name")
+		local buttonText = _G[button:GetName().."Name"]
 
 		local numPoints = button:GetNumPoints()
 
@@ -2577,7 +2587,7 @@ function Skillet:ScrollToSkillIndex(skillIndex)
 			end
 		end
 
-		local scrollbar = getglobal("SkilletSkillListScrollBar")
+		local scrollbar = _G["SkilletSkillListScrollBar"]
 
 		local button_count = SkilletSkillList:GetHeight() / SKILLET_TRADE_SKILL_HEIGHT
 		button_count = math.floor(button_count)
@@ -2654,8 +2664,8 @@ function Skillet:ReagentButtonOnEnter(button, skillIndex, reagentIndex)
 		Skillet:SetReagentToolTip(reagent.id, reagent.numNeeded, skill.numCraftableBank or 0)
 
 		if self.db.profile.link_craftable_reagents then
-			if self.data.itemRecipeSource[reagent.id] then
-				local icon = getglobal(button:GetName() .. "Icon")
+			if self.db.global.itemRecipeSource[reagent.id] then
+				local icon = _G[button:GetName() .. "Icon"]
 				gearTexture:SetParent(icon)
 				gearTexture:ClearAllPoints()
 				gearTexture:SetPoint("TOPLEFT", icon)
@@ -2698,7 +2708,7 @@ function Skillet:ReagentButtonOnClick(button, skillIndex, reagentIndex)
 
 	local recipe = self:GetRecipeDataByTradeIndex(self.currentTrade, skillIndex)
 	local reagent = recipe.reagentData[reagentIndex]
-	local newRecipeTable = self.data.itemRecipeSource[reagent.id]
+	local newRecipeTable = self.db.global.itemRecipeSource[reagent.id]
 
 	local skillIndexLookup = self.data.skillIndexLookup
 	local player = self.currentPlayer
@@ -2712,7 +2722,7 @@ function Skillet:ReagentButtonOnClick(button, skillIndex, reagentIndex)
 		self.data.recipeMenuTable = {}
 
 		if not self.recipeMenu then
-			self.recipeMenu = CreateFrame("Frame", "SkilletRecipeMenu", getglobal("UIParent"), "UIDropDownMenuTemplate")
+			self.recipeMenu = CreateFrame("Frame", "SkilletRecipeMenu", _G["UIParent"], "UIDropDownMenuTemplate")
 		end
 
 		-- TODO: popup with selection if there is more than 1 potential recipe source for the reagent (small prismatic shards, for example)
@@ -2761,7 +2771,7 @@ function Skillet:ReagentButtonOnClick(button, skillIndex, reagentIndex)
 			local x, y = GetCursorPosition()
 			local uiScale = UIParent:GetEffectiveScale()
 
-			EasyMenu(self.data.recipeMenuTable, self.recipeMenu, getglobal("UIParent"), x/uiScale,y/uiScale, "MENU", 5)
+			EasyMenu(self.data.recipeMenuTable, self.recipeMenu, _G["UIParent"], x/uiScale,y/uiScale, "MENU", 5)
 		end
 	end
 end
@@ -2800,7 +2810,7 @@ end
 -- Updates the "Scanning tradeskill" text area with provided text
 -- Set nil/empty text to hide the area
 function Skillet:UpdateScanningText(text)
-	local area = getglobal("SkilletFrameScanningText")
+	local area = _G["SkilletFrameScanningText"]
 	if area then
 		if text and string.len(text) > 0 then
 			area:SetText(text)
@@ -3073,7 +3083,7 @@ local skillMenuListHidden = {
 -- Called when the skill operators drop down is displayed
 function Skillet:SkilletSkillMenu_Show(button)
 	if not SkilletSkillMenu then
-		SkilletSkillMenu = CreateFrame("Frame", "SkilletSkillMenu", getglobal("UIParent"), "UIDropDownMenuTemplate")
+		SkilletSkillMenu = CreateFrame("Frame", "SkilletSkillMenu", _G["UIParent"], "UIDropDownMenuTemplate")
 	end
 
 	local x, y = GetCursorPosition()
@@ -3083,15 +3093,15 @@ function Skillet:SkilletSkillMenu_Show(button)
 
 	if button.skill.subGroup then
 		if button.skill.mainGroup then
-			EasyMenu(headerMenuListMainGroup, SkilletSkillMenu, getglobal("UIParent"), x/uiScale,y/uiScale, "MENU", 5)
+			EasyMenu(headerMenuListMainGroup, SkilletSkillMenu, _G["UIParent"], x/uiScale,y/uiScale, "MENU", 5)
 		else
-			EasyMenu(headerMenuList, SkilletSkillMenu, getglobal("UIParent"), x/uiScale,y/uiScale, "MENU", 5)
+			EasyMenu(headerMenuList, SkilletSkillMenu, _G["UIParent"], x/uiScale,y/uiScale, "MENU", 5)
 		end
 	else
 		if button:GetText() == "" then
-			EasyMenu(skillMenuListEmpty, SkilletSkillMenu, getglobal("UIParent"), x/uiScale,y/uiScale, "MENU", 5)
+			EasyMenu(skillMenuListEmpty, SkilletSkillMenu, _G["UIParent"], x/uiScale,y/uiScale, "MENU", 5)
 		else
-			EasyMenu(skillMenuList, SkilletSkillMenu, getglobal("UIParent"), x/uiScale,y/uiScale, "MENU", 5)
+			EasyMenu(skillMenuList, SkilletSkillMenu, _G["UIParent"], x/uiScale,y/uiScale, "MENU", 5)
 		end
 	end
 --	UIDropDownMenu_Initialize(SkilletSkillMenu, SkilletSkillMenu_Init, "MENU")
@@ -3174,7 +3184,7 @@ function Skillet:TSIGetRecipeSources(recipe, opposing)
 					Rtext = TSISourceColor[s]..vname.."|r: "..zone..pos.."|cff808080"..note.."|r"
 
 					if level ~= "" then
-						local rep = getglobal("FACTION_STANDING_LABEL"..level);
+						local rep = _G["FACTION_STANDING_LABEL"..level];
 						Rtext = Rtext.."\n(|cff60a0f0"..faction.."|r-"..rep.."|r)";
 					end
 

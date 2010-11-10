@@ -20,7 +20,7 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
 -- Handy utilities for Skillet UI methods.
 
-local L = AceLibrary("AceLocale-2.2"):new("Skillet")
+local L = LibStub("AceLocale-3.0"):GetLocale("Skillet")
 
 local infoBox
 -- Stolen from the AceAddon about frame code. Just too useful
@@ -233,9 +233,9 @@ function Tooltip_ShowCompareItem(tip, link, sideOverride)
 	else
 		side = "right";
 	end
-	
+
 	side = sideOverride or side
-	
+
 	-- see if we should slide the tooltip
 	if ( tip:GetAnchorType() ) then
 		local totalWidth = 0;
@@ -277,4 +277,13 @@ function Tooltip_ShowCompareItem(tip, link, sideOverride)
 			ShoppingTooltip2:Show();
 		end
 	end
+end
+
+function Skillet:MessageBox(msg)
+	DEFAULT_CHAT_FRAME:AddMessage(msg)
+end
+
+function Skillet:AskFor(msg, handler)
+	DEFAULT_CHAT_FRAME:AddMessage(msg)
+	handler()
 end

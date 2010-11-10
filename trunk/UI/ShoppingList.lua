@@ -28,7 +28,7 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
 SKILLET_SHOPPING_LIST_HEIGHT = 16
 
-local L = AceLibrary("AceLocale-2.2"):new("Skillet")
+local L = LibStub("AceLocale-3.0"):GetLocale("Skillet")
 
 -- Stolen from the Waterfall Ace2 addon.
 local ControlBackdrop  = {
@@ -100,13 +100,13 @@ local function createShoppingListFrame(self)
 
 	-- Ace Window manager library, allows the window position (and size)
 	-- to be automatically saved
-	local windowManger = AceLibrary("Window-1.0")
+	local windowManger = LibStub("LibWindow-1.1")
 	local tradeSkillLocation = {
 		prefix = "shoppingListLocation_"
 	}
-	windowManger:RegisterConfig(frame, self.db.char, shoppingListLocation)
-	windowManger:RestorePosition(frame)  -- restores scale also
-	windowManger:MakeDraggable(frame)
+	windowManger.RegisterConfig(frame, self.db.char, shoppingListLocation)
+	windowManger.RestorePosition(frame)  -- restores scale also
+	windowManger.MakeDraggable(frame)
 
 	-- lets play the resize me game!
 	Skillet:EnableResize(frame, 300, 165, Skillet.UpdateShoppingListWindow)
@@ -141,7 +141,7 @@ function Skillet:GetShoppingList(player, includeBank)
 	else
 		playerList = {}
 
-		for player,queue in pairs(self.db.server.reagentsInQueue) do
+		for player,queue in pairs(self.db.realm.reagentsInQueue) do
 			table.insert(playerList, player)
 		end
 	end
@@ -150,7 +150,7 @@ function Skillet:GetShoppingList(player, includeBank)
 
 	for i=1,#playerList,1 do
 		local player = playerList[i]
-		local reagentsInQueue = self.db.server.reagentsInQueue[player]
+		local reagentsInQueue = self.db.realm.reagentsInQueue[player]
 
 --DebugSpam("player: "..player)
 
@@ -402,7 +402,7 @@ end
 
 local num_buttons = 0
 local function get_button(i)
-	local button = getglobal("SkilletShoppingListButton"..i)
+	local button = _G["SkilletShoppingListButton"..i]
 	if not button then
 		button = CreateFrame("Button", "SkilletShoppingListButton"..i, SkilletShoppingListParent, "SkilletShoppingListItemButtonTemplate")
 		button:SetParent(SkilletShoppingList)
@@ -465,9 +465,9 @@ function Skillet:UpdateShoppingListWindow(use_cached_recipes)
 		local itemIndex = i + itemOffset
 
 		local button = get_button(i)
-		local count  = getglobal(button:GetName() .. "CountText")
-		local name   = getglobal(button:GetName() .. "NameText")
-		local player = getglobal(button:GetName() .. "PlayerText")
+		local count  = _G[button:GetName() .. "CountText"]
+		local name   = _G[button:GetName() .. "NameText"]
+		local player = _G[button:GetName() .. "PlayerText"]
 
 		button:SetWidth(width)
 
@@ -512,7 +512,7 @@ function Skillet:UpdateShoppingListWindow(use_cached_recipes)
 --DEFAULT_CHAT_FRAME:AddMessage("total price for shopping list "..LSW_formatMoney(totalPrice, true))
 
 	if LSW then
-		local totalPriceReport = getglobal("SkilletShoppingListTotalPrice")
+		local totalPriceReport = _G["SkilletShoppingListTotalPrice"]
 
 		if not totalPriceReport then
 			totalPriceReport = SkilletShoppingList:CreateFontString("SkilletShoppingListTotalPrice",nil, "GameFontNormal")

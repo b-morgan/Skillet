@@ -108,7 +108,7 @@
                     <Offset>
                         <AbsDimension x="268" y="0"/>
                     </Offset>
-                </Anchor>                
+                </Anchor>
             </Anchors>
         </Frame>
     </Frames>
@@ -117,10 +117,10 @@
             <!-- shift clicking will insert a link to the recipe in the chat window. -->
             if button == "LeftButton" and IsShiftKeyDown() then
 				local name,link = GetItemInfo(self.id)
-				
+
                 ChatEdit_InsertLink(self.count .. "x" .. link)
             end
-			
+
 			if button == "LeftButton" and IsAltKeyDown() then
 				if(CanSendAuctionQuery()) then
 					local name,link = GetItemInfo(self.id)
@@ -129,7 +129,7 @@
 					BrowseNoResultsText:SetText(BROWSE_NO_RESULTS)
 				end
 			end
-			
+
         </OnClick>
         <OnEnter>
         	Skillet:ShoppingListButton_OnEnter(self)
@@ -178,9 +178,9 @@
     <Size>
         <AbsDimension x="385" y="240"/>
     </Size>
-        
+
     <Frames>
-        
+
         <!--
         #
         # A button on the top right to close the window
@@ -200,7 +200,7 @@
                 </OnClick>
             </Scripts>
         </Button>
-        
+
         <!--
         #
         # A button to retrieve all the mats from the bank
@@ -294,7 +294,7 @@
         </Button>
         <!-- buttons 2 ... whatever are created dynamically in the Skillet:UpdateShoppingListWindow() function-->
     </Frames>
-</Frame>    
+</Frame>
 
 </Ui>
 

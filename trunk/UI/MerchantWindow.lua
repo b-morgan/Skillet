@@ -19,7 +19,7 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
 ]]--
 
 -- Localization
-local L = AceLibrary("AceLocale-2.2"):new("Skillet")
+local L = LibStub("AceLocale-3.0"):GetLocale("Skillet")
 
 local merchant_inventory = {}
 
@@ -54,13 +54,13 @@ end
 local function update_merchant_inventory()
 	if MerchantFrame and MerchantFrame:IsVisible() then
 		local count = GetMerchantNumItems()
-		
+
 		if count == 148 then				-- ??
 			count = 0
 		end
 		for i=1, count, 1 do
 			local link = GetMerchantItemLink(i)
-		
+
 			if link then
 				local name, texture, price, quantity, numAvailable, isUsable = GetMerchantItemInfo(i)
 				if numAvailable == -1  then
@@ -120,7 +120,7 @@ function Skillet:MERCHANT_SHOW()
         -- called when the merchant frame is not visible, this is a no-op
         return
     end
-	
+
 	merchant_inventory = {}
 
 	if Skillet.db.profile.vendor_buy_button or Skillet.db.profile.vendor_auto_buy then
@@ -169,7 +169,7 @@ function Skillet:BuyRequiredReagents()
 	end
 
 	local totalspent = 0;
-	local abacus = AceLibrary("Abacus-2.0")
+	local abacus = LibStub("LibAbacus-3.0")
 
 	local items_purchased = 0;
 
@@ -196,8 +196,7 @@ function Skillet:BuyRequiredReagents()
 				end
 
 				if count > 0 then
-					local name, texture, price, quantity, numAvailable, isUsable = GetMerchantItemInfo(i);
-					local sName, sLink, iQuality, iLevel, iMinLevel, sType, sSubType, stackSize = GetItemInfo(GetMerchantItemLink(i));
+					local sName, sLink, iQuality, iLevel, iMinLevel, sType, sSubType, stackSize = GetItemInfo(link);
 					local itemstobuy = math.ceil(count/quantity);
 
 					if(stackSize == nil) then
@@ -250,30 +249,30 @@ end
 
 
 function Skillet:MerchantBuyButton_OnEnter(button)
-	local abacus = AceLibrary("Abacus-2.0")
-	
+	local abacus = LibStub("LibAbacus-3.0")
+
 	GameTooltip:SetOwner(button, "ANCHOR_BOTTOMRIGHT")
 	GameTooltip:ClearLines()
 	GameTooltip:AddLine(L["Buy Reagents"])
-	
+
 	local needList = Skillet:GetShoppingList(UnitName("player"), false)
 	local totalCost = 0
-	
+
 	for i=1,#needList,1 do
 		local itemID = needList[i].id
-		
+
 		if merchant_inventory[itemID] then
 			local cost = merchant_inventory[itemID].price * math.ceil(needList[i].count/merchant_inventory[itemID].stack)
-			
+
 			totalCost = totalCost + cost
 			GameTooltip:AddDoubleLine((GetItemInfo(itemID)).." x "..needList[i].count, abacus:FormatMoneyFull(cost, true),1,1,0)
 		end
 	end
-	
+
 	if #needList > 1 then
 		GameTooltip:AddDoubleLine("Total Cost:", abacus:FormatMoneyFull(totalCost, true),0,1,0)
 	end
-		
+
 	GameTooltip:Show()
 end
 

@@ -18,7 +18,7 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
 ]]--
 
-local L = AceLibrary("AceLocale-2.2"):new("Skillet")
+local L = LibStub("AceLocale-3.0"):GetLocale("Skillet")
 
 local skill_style_type = {
 	["unknown"]         = { r = 1.00, g = 0.00, b = 0.00, level = 5},
@@ -173,9 +173,9 @@ end
 
 
 local function SkillIsFilteredOut(skillIndex)
-	if skillIndex == Skillet.selectedSkill then
-		--return false								-- never hide the currently selected skill
-	end
+--	if skillIndex == Skillet.selectedSkill then
+--		return false								-- never hide the currently selected skill
+--	end
 
 	local skill = Skillet:GetSkill(Skillet.currentPlayer, Skillet.currentTrade, skillIndex)
 	local recipe = Skillet:GetRecipe(skill.id)
@@ -217,20 +217,20 @@ local function SkillIsFilteredOut(skillIndex)
 	if filtertext and filtertext ~= "" then
 		local filter = string.lower(filtertext)
 		local nameOnly = false
-		
+
 		if string.sub(filter,1,1) == "!" then
 			filter = string.sub(filter,2)
 			nameOnly = true
 		end
-		
+
 		local word
 
 		local name = ""
 
-		local tooltip = getglobal("SkilletParsingTooltip")
+		local tooltip = _G["SkilletParsingTooltip"]
 
 		if tooltip == nil then
-			tooltip = CreateFrame("GameTooltip", "SkilletParsingTooltip", getglobal("ANCHOR_NONE"), "GameTooltipTemplate")
+			tooltip = CreateFrame("GameTooltip", "SkilletParsingTooltip", _G["ANCHOR_NONE"], "GameTooltipTemplate")
 			tooltip:SetOwner(WorldFrame, "ANCHOR_NONE");
 		end
 
@@ -243,14 +243,14 @@ local function SkillIsFilteredOut(skillIndex)
 				Skillet.data.tooltipCachedTrade = Skillet.currentTrade
 				Skillet.data.tooltipCache = {}
 			end
-	
+
 			if not Skillet.data.tooltipCache[recipeID] then
 				tooltip:SetHyperlink("enchant:"..recipeID)
 				local tiplines = tooltip:NumLines()
-	
+
 				for i=1, tiplines, 1 do
-					searchText = searchText.. " " .. string.lower(getglobal("SkilletParsingTooltipTextLeft"..i):GetText() or " ")
-					searchText = searchText.. " " .. string.lower(getglobal("SkilletParsingTooltipTextRight"..i):GetText() or " ")
+					searchText = searchText.. " " .. string.lower(_G["SkilletParsingTooltipTextLeft"..i]:GetText() or " ")
+					searchText = searchText.. " " .. string.lower(_G["SkilletParsingTooltipTextRight"..i]:GetText() or " ")
 				end
 				Skillet.data.tooltipCache[recipeID] = searchText
 			else
@@ -258,7 +258,7 @@ local function SkillIsFilteredOut(skillIndex)
 			end
 		end
 		searchText = string.lower(searchText)
-		
+
 		local wordList = { string.split(" ",filter) }
 
 		for v,word in pairs(wordList) do
@@ -311,7 +311,7 @@ end
 -- currently selected tradekskill and sorting method
 -- if no sorting, then headers will be included
 local function SortAndFilterRecipes()
---	if not (Skillet.db.server.skillDB[Skillet.currentPlayer] and Skillet.db.server.skillDB[Skillet.currentPlayer][Skillet.currentTrade]) then
+--	if not (Skillet.db.realm.skillDB[Skillet.currentPlayer] and Skillet.db.realm.skillDB[Skillet.currentPlayer][Skillet.currentTrade]) then
 --DebugSpam("No Data")
 --		return 0
 --	end
@@ -320,9 +320,9 @@ local function SortAndFilterRecipes()
 
 	DebugSpam("Sorting...");
 
---	local skillDB = Skillet.db.server.skillDB[Skillet.currentPlayer][Skillet.currentTrade]
+--	local skillDB = Skillet.db.realm.skillDB[Skillet.currentPlayer][Skillet.currentTrade]
 	local numSkills = Skillet:GetNumSkills(Skillet.currentPlayer, Skillet.currentTrade)
---	local recipeData = Skillet.db.account.recipeData
+--	local recipeData = Skillet.db.global.recipeData
 
 	if not Skillet.data.sortedSkillList then
 		Skillet.data.sortedSkillList = {}

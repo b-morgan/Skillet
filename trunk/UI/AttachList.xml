@@ -94,7 +94,7 @@
                     <Offset>
                         <AbsDimension x="0" y="0"/>
                     </Offset>
-                </Anchor>                
+                </Anchor>
             </Anchors>
         </Frame>
 		 <Frame name="$parentName" inherits="SkilletAttachListItemButtonTemplate_Name">
@@ -103,10 +103,10 @@
                     <Offset>
                         <AbsDimension x="0" y="0"/>
                     </Offset>
-                </Anchor>                
+                </Anchor>
             </Anchors>
         </Frame>
-   
+
     <Button name="$parentAttachButton" inherits="UIPanelButtonTemplate" text="Attach">
 				<Size>
 					<AbsDimension x="35" y="18"/>
@@ -123,7 +123,7 @@
 					Skillet:AttachItems(self:GetID());
 					</OnClick>
 				</Scripts>
-				
+
 	</Button>
 	 </Frames>
 </Frame>
@@ -133,7 +133,7 @@
 <Frame name="Skillet_AttachListMain" parent="UIParent" toplevel="true" movable="true" enableMouse="true" resizable="true" hidden="true" clampedToScreen="true">
  <Size><AbsDimension x="180" y="150"/></Size>
  <Anchors>
-  <Anchor point="CENTER"/> 
+  <Anchor point="CENTER"/>
  </Anchors>
  <Backdrop bgFile="Interface\Tooltips\UI-Tooltip-Background" edgeFile="Interface\Tooltips\UI-Tooltip-Border" tile="true">
 	<EdgeSize>
@@ -158,7 +158,7 @@
 		</Anchors>
 	</FontString>
 	</Layer>
-  </Layers> 
+  </Layers>
   <scripts>
 	<OnUpdate>
 		Skillet:AttachOnUpdate()
@@ -208,7 +208,7 @@
             </Anchors>
             <Scripts>
                 <OnVerticalScroll>
-                    FauxScrollFrame_OnVerticalScroll(SKILLET_ATTACH_LIST_HEIGHT, Skillet.AttachList_OnScroll) 
+                    FauxScrollFrame_OnVerticalScroll(SKILLET_ATTACH_LIST_HEIGHT, Skillet.AttachList_OnScroll)
                 </OnVerticalScroll>
             </Scripts>
         </ScrollFrame>
@@ -226,7 +226,7 @@
 </Frame>
 
 
-		
+
  <Button name="SkilletAttachMailButton" inherits="UIPanelButtonTemplate" text="0" parent="MailFrame">
 				<Size>
 					<AbsDimension x="30" y="20"/>
@@ -235,7 +235,7 @@
 					<Anchor point="TOPRIGHT" relativeTo="InboxCloseButton" relativePoint="TOPLEFT">
 						<Offset>
 							<AbsDimension x="-5" y="-5"/>
-							
+
 						</Offset>
 					</Anchor>
 				</Anchors>
@@ -253,7 +253,7 @@
 								GameTooltip:Hide();
 					</OnLeave>
 				</Scripts>
-				
+
 	</Button>
 
 </Ui>

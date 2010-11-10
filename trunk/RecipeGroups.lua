@@ -39,8 +39,8 @@ function Skillet:RecipeGroupRename(oldName, newName)
 		local oldKey =  self.currentPlayer..":"..self.currentTrade..":"..oldName
 		local key = self.currentPlayer..":"..self.currentTrade..":"..newName
 		
-		self.db.server.groupDB[key] = self.db.server.groupDB[oldKey]
-		self.db.server.groupDB[oldKey] = nil
+		self.db.realm.groupDB[key] = self.db.realm.groupDB[oldKey]
+		self.db.realm.groupDB[oldKey] = nil
 		
 		for groupName, groupData in pairs(list) do
 			groupData.key = key
@@ -280,8 +280,8 @@ DEFAULT_CHAT_FRAME:AddMessage((entry.subGroup.entries[i].name or "nil") .. " " .
 			local newIndex = self.data.skillIndexLookup[player][entry.recipeID]
 			
 			if not newIndex then
-				newIndex = #self.db.server.skillDB[player][tradeID]+1
-				self.db.server.skillDB[player][tradeID][newIndex] = "x"..entry.recipeID
+				newIndex = #self.db.realm.skillDB[player][tradeID]+1
+				self.db.realm.skillDB[player][tradeID][newIndex] = "x"..entry.recipeID
 			end
 			
 			self:RecipeGroupAddRecipe(parentGroup, entry.recipeID, newIndex)
@@ -333,7 +333,7 @@ function Skillet:RecipeGroupDeleteGroup(group)
 		
 		group.entries = nil
 		
-		self.db.server.groupDB[group.key][group.name] = nil
+		self.db.realm.groupDB[group.key][group.name] = nil
 	end
 end
 
@@ -594,11 +594,11 @@ function Skillet:RecipeGroupConstructDBString(group)
 				end
 			end
 			
-			if not self.db.server.groupDB[key] then
-				self.db.server.groupDB[key] = {}
+			if not self.db.realm.groupDB[key] then
+				self.db.realm.groupDB[key] = {}
 			end
 			
-			self.db.server.groupDB[key][group.name] = groupString
+			self.db.realm.groupDB[key][group.name] = groupString
 		end
 	end
 end
@@ -614,8 +614,8 @@ function Skillet:RecipeGroupPruneList()
 					for name, group in pairs(perLabelList) do
 						if type(group)=="table" and name ~= OVERALL_PARENT_GROUP_NAME and group.parent == nil then
 							perLabelList[name] = nil
-							if self.db.server.groupDB and self.db.server.groupDB[player..":"..trade..":"..label] then
-								self.db.server.groupDB[player..":"..trade..":"..label][name] = nil
+							if self.db.realm.groupDB and self.db.realm.groupDB[player..":"..trade..":"..label] then
+								self.db.realm.groupDB[player..":"..trade..":"..label][name] = nil
 							end
 						end
 					end
@@ -653,7 +653,7 @@ function Skillet:RecipeGroupDeconstructDBStrings()
 	local groupNames = {}
 	local serial = 1
 	
-	for key, groupList in pairs(self.db.server.groupDB) do
+	for key, groupList in pairs(self.db.realm.groupDB) do
 		local player, tradeID, label = string.split(":", key)
 		tradeID = tonumber(tradeID)
 		
@@ -675,7 +675,7 @@ function Skillet:RecipeGroupDeconstructDBStrings()
 	end
 	
 	
-	for key, groupList in pairs(self.db.server.groupDB) do
+	for key, groupList in pairs(self.db.realm.groupDB) do
 		local player, tradeID, label = string.split(":", key)	
 
 		tradeID = tonumber(tradeID)
@@ -873,7 +873,7 @@ end
 -- Called when the grouping operators drop down is displayed
 function Skillet:RecipeGroupOperations_OnClick(this)
 	if not RecipeGroupOpsMenu then
-		RecipeGroupOpsMenu = CreateFrame("Frame", "RecipeGroupOpsMenu", getglobal("UIParent"), "UIDropDownMenuTemplate")
+		RecipeGroupOpsMenu = CreateFrame("Frame", "RecipeGroupOpsMenu", _G["UIParent"], "UIDropDownMenuTemplate")
 	end
 	
 	UIDropDownMenu_Initialize(RecipeGroupOpsMenu, SkilletRecipeGroupOpsMenu_Init, "MENU")
@@ -1052,7 +1052,7 @@ function Skillet:RecipeGroupOpDelete()
 		local label = Skillet.currentGroupLabel
 		
 		Skillet.data.groupList[player][tradeID][label] = nil
-		Skillet.db.server.groupDB[player..":"..tradeID..":"..label] = nil
+		Skillet.db.realm.groupDB[player..":"..tradeID..":"..label] = nil
 		
 		collectgarbage("collect")
 		

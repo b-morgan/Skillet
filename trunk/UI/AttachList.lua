@@ -1,4 +1,4 @@
-﻿--[[
+--[[
 
 Skillet: A tradeskill window replacement.
 Copyright (c) 2007 Robert Clark <nogudnik@gmail.com>
@@ -21,14 +21,14 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
 --[[
 #
 # Deals with building and maintaining a the email attach list. It makes use of the shopping list to
-#  keep track of the mail flow. This method works for the most part, but there are issues. Need to 
+#  keep track of the mail flow. This method works for the most part, but there are issues. Need to
 #  convert it to have it's own Queue tracking log, over changing the shopping list directly.
 #
 ]]--
 
 SKILLET_ATTACH_LIST_HEIGHT = 18
 
-local L = AceLibrary("AceLocale-2.2"):new("Skillet")
+local L = LibStub("AceLocale-3.0"):GetLocale("Skillet")
 
 local ERROR_NOITEM = "ItemId is empty"
 local ERROR_NOLOCAL = "Item is unknown"
@@ -69,17 +69,17 @@ function Skillet:GetAttachLists(player, includeBank)
 	local list = {}
 	local playerList = {}
 	local CurPlayer=UnitName("player")
-	for player,queue in pairs(self.db.server.reagentsInQueue) do
+	for player,queue in pairs(self.db.realm.reagentsInQueue) do
 		if player~=CurPlayer then
 			table.insert(playerList, player)
 			DebugSpam(player)
 		end
 	end
-	
-	
+
+
 	for i=1,#playerList,1 do
 		local player = playerList[i]
-		local reagentsInQueue = self.db.server.reagentsInQueue[player]
+		local reagentsInQueue = self.db.realm.reagentsInQueue[player]
 		if reagentsInQueue then
 
 			for id,count in pairs(reagentsInQueue) do
@@ -87,15 +87,15 @@ function Skillet:GetAttachLists(player, includeBank)
 				local numAltInBags, _, numAltInBank = self:GetInventory(player, id)
 				local deficit=-(count+numAltInBank)
 				if numInBags>0 and deficit>0 then
-					
+
 					entry={["id"]=id,["count"] = deficit, ["numInBags"] = numInBags or 0,["player"]=player}
 					table.insert(list, entry)
 				end
 			end
 		end
 	end
-	
-	
+
+
 	return list
 end
 
@@ -122,7 +122,7 @@ local function findBagForItem(mItemId)
 	local isLocked = true
 	local foundLink
 	local total = 0
-	
+
 	for bag=0,4 do
 		for slot=1,GetContainerNumSlots(bag) do
 			local link = GetContainerItemLink(bag,slot)
@@ -145,15 +145,15 @@ local function findBagForItem(mItemId)
 				end
 			end
 		end
-		
+
 	end
 
 	return matches, total, blankBag, blankSlot, foundLink, isLocked
 end
 
 
--- 
--- Used to search your bags for an Item. 
+--
+-- Used to search your bags for an Item.
 -- It's idea is to find the item of a certain size, and returns the bag and slot location of said itemid
 -- Size cannot be bigger than the MaxStackSize. It is needed to call multiple times with a pcall function
 -- and prefrably in a timer.
@@ -165,7 +165,7 @@ function Skillet.useItemInBag(SearchItemID,size)
 		if GetTime() < wait then
 			local _, count = GetContainerItemInfo(bag,slot)
 			if count == prev then
-				return 
+				return
 			end
 		end
 		Skillet.moveWait[1] = nil
@@ -174,29 +174,29 @@ function Skillet.useItemInBag(SearchItemID,size)
 	if size > maxSize then
 		return error(ERROR_MAXSIZE)
 	end
-	
+
 	local matches, total, blankBag, blankSlot = findBagForItem(SearchItemID)
-	
+
 	if #matches == 0 then
 		return error(ERROR_NOTFOUND)
 	end
-	
+
 	if total < size then
 	    return error(ERROR_NOTENOUGH)
 	end
-	
+
 	for i=1, #matches do
 		local match = matches[i]
 		if match[3] == size then
 			return match[1], match[2]
 		end
 	end
-	
+
 		-- We will have to wait for the current process to complete
 	if (CursorHasItem() or SpellIsTargeting()) then
-		return 
+		return
 	end
-	
+
 	table.sort(matches, function (a,b) return a[3] < b[3] end)
 	if (matches[1][3] > size) then
 		-- Our smallest stack is bigger than what we need
@@ -217,18 +217,18 @@ function Skillet.useItemInBag(SearchItemID,size)
 		PickupContainerItem(matches[1][1], matches[1][2])
 		PickupContainerItem(matches[2][1], matches[2][2])
 	end
-	
+
 	Skillet.moveWait[1] = matches[1][1]
 	Skillet.moveWait[2] = matches[1][2]
 	Skillet.moveWait[3] = matches[1][3]
 	Skillet.moveWait[4] = GetTime() + 5
-end	
+end
 
 -- ===========================================================================================
 --    Window creation and update methods
 -- ===========================================================================================
 local function get_button(i)
-	local button = getglobal("SkilletAttachListButton"..i)
+	local button = _G["SkilletAttachListButton"..i]
 	if not button then
 		button = CreateFrame("Button", "SkilletAttachListButton"..i, SkilletAttachListParent, "SkilletAttachListItemButtonTemplate")
 		button:SetParent(SkilletAttachListParent)
@@ -253,7 +253,7 @@ function createAttachListFrame (self)
 	if not frame then
 		return nil
 	end
-	
+
 	frame:SetBackdropColor(0.1, 0.1, 0.1)
 	-- A title bar stolen from the Ace2 Waterfall window.
 	local r,g,b = 0, 0.7, 0; -- dark green
@@ -272,7 +272,7 @@ function createAttachListFrame (self)
 	titlebar:SetTexture(r,g,b,1)
 	titlebar2:SetGradientAlpha("VERTICAL",r*0.9,g*0.9,b*0.9,1,r*0.6,g*0.6,b*0.6,1)
 	titlebar2:SetTexture(r,g,b,1)
-	
+
 	local title = CreateFrame("Frame",nil,frame)
 	title:SetPoint("TOPLEFT",titlebar,"TOPLEFT",0,0)
 	title:SetPoint("BOTTOMRIGHT",titlebar2,"BOTTOMRIGHT",0,0)
@@ -286,26 +286,26 @@ function createAttachListFrame (self)
 	titletext:SetTextColor(1,1,1)
 	titletext:SetText("Skillet: Auto Mails")
 	--return frame
-	
+
 	-- The frame enclosing the scroll list needs a border and a background .....
 	local backdrop = SkilletAttachListParent
 	backdrop:SetBackdrop(ControlBackdrop)
 	backdrop:SetBackdropBorderColor(0.6, 0.6, 0.6)
 	backdrop:SetBackdropColor(0.05, 0.05, 0.05)
 	backdrop:SetResizable(true)
-	
-	local windowManger = AceLibrary("Window-1.0")
+
+	local windowManger = LibStub("LibWindow-1.1")
 	local AttachListLocation = {
 		prefix = "AttachListLocation_"
 	}
-	windowManger:RegisterConfig(frame, self.db.char, AttachListLocation)
-	windowManger:RestorePosition(frame)  -- restores scale also
-	windowManger:MakeDraggable(frame)
-	
+	windowManger.RegisterConfig(frame, self.db.char, AttachListLocation)
+	windowManger.RestorePosition(frame)  -- restores scale also
+	windowManger.MakeDraggable(frame)
+
 
 	-- lets play the resize me game!
 	Skillet:EnableResize(frame, 180,150, Skillet.UpdateAttachListWindow)
-	
+
 	return frame
 end
 
@@ -314,21 +314,21 @@ end
 --@param  reenable   Enable all disabled buttons
 --
 function Skillet:UpdateAttachListWindow(recache_recipes,reenable)
-	
+
 	DebugSpam("UpdateAttachListWindow")
-	
+
 	if recache_recipes or not self.cachedAttachList then
 		DebugSpam("Generate Cache List")
 		cache_list(self)
 	end
-	
+
 	local numItems = #self.cachedAttachList
-    
+
 	if SkilletAttachMailButton:IsVisible() then
 		DebugSpam("Update Button")
 		SkilletAttachMailButton:SetText(numItems)
-		
-	end 
+
+	end
 
 
 	if not self.attachList or not self.attachList:IsVisible() then
@@ -336,8 +336,8 @@ function Skillet:UpdateAttachListWindow(recache_recipes,reenable)
 		return
 	end
 
-	
-	
+
+
 	local button_count = SkilletAttachListList:GetHeight() / SKILLET_ATTACH_LIST_HEIGHT
 	button_count = math.floor(button_count)
 
@@ -358,31 +358,31 @@ function Skillet:UpdateAttachListWindow(recache_recipes,reenable)
 		local itemIndex = i + itemOffset
 
 		local button = get_button(i)
-		local player = getglobal(button:GetName() .. "Player")
-		local playerText = getglobal(button:GetName() .. "PlayerText")
-		local pname = getglobal(button:GetName() .. "Name")
-		local pnameText = getglobal(button:GetName() .. "NameText")
-		local attachButton = getglobal(button:GetName() .. "AttachButton")
+		local player = _G[button:GetName() .. "Player"]
+		local playerText = _G[button:GetName() .. "PlayerText"]
+		local pname = _G[button:GetName() .. "Name"]
+		local pnameText = _G[button:GetName() .. "NameText"]
+		local attachButton = _G[button:GetName() .. "AttachButton"]
 		button:SetWidth(width)
 
-		
+
 		local fixed_width = attachButton:GetWidth()
 		fixed_width = width - fixed_width - 20 -- 10 for the padding between items
 
-		player:SetWidth(fixed_width * 0.3-10) 
+		player:SetWidth(fixed_width * 0.3-10)
 		playerText:SetWidth(fixed_width * 0.3-10)
-		pname:SetWidth(fixed_width * 0.7-10) 
-		pnameText:SetWidth(fixed_width * 0.7-10) 
-		
+		pname:SetWidth(fixed_width * 0.7-10)
+		pnameText:SetWidth(fixed_width * 0.7-10)
+
 
 		if itemIndex <= numItems then
 			attachButton:SetID(itemIndex)
-		
+
 			playerText:SetText(self.cachedAttachList[itemIndex]["player"])
 			pnameText:SetText(self.cachedAttachList[itemIndex]["numInBags"].."/"..self.cachedAttachList[itemIndex]["count"].." : "..(GetItemInfo(self.cachedAttachList[itemIndex]["id"]) or id))
-	
+
 			button.id=itemIndex
-			
+
 			if (reenable) then
 				attachButton:Enable()
 			end
@@ -395,7 +395,7 @@ function Skillet:UpdateAttachListWindow(recache_recipes,reenable)
 			button:Hide()
 			player:Hide()
 			attachButton:Hide()
-			
+
 		end
 	end
 
@@ -444,7 +444,7 @@ end
 --
 -- Causes the button on the mail frame to toggle between showing and hiding
 --
-function Skillet:ToggleMailAttachVisible() 
+function Skillet:ToggleMailAttachVisible()
 	if not self.attachList or not self.attachList:IsVisible() then
 		self:DisplayAttachList()
 	else
@@ -465,25 +465,25 @@ end
 -- The reason for this is that we need to get correct stack sizes, and with Blizzes servers don't like doing it all in one go.
 -- @param   AttachID   Which button was clicked
 function Skillet:AttachItems (AttachID)
-	
+
 	if not SendMailFrame:IsVisible() then
 		MailFrameTab_OnClick(2)
 	end
-	
+
 	if  (SendMailNameEditBox:GetText()=="") then
 		SendMailNameEditBox:SetText(self.cachedAttachList[AttachID]["player"])
 	end
-	
-	--checks to make sure that your attaching the email to the right alt   
+
+	--checks to make sure that your attaching the email to the right alt
 	if  (SendMailNameEditBox:GetText()~=self.cachedAttachList[AttachID]["player"]) then
 		message("This needs to be sent to "..self.cachedAttachList[AttachID]["player"])
 		return
 	end
-	
+
 	if (SendMailSubjectEditBox:GetText()=="") then
 		SendMailSubjectEditBox:SetText("Skillet: Shoppinglist items")
 	end
-	
+
 	local amount=0
 	if self.cachedAttachList[AttachID]["numInBags"] > self.cachedAttachList[AttachID]["count"] then
 		amount=self.cachedAttachList[AttachID]["count"]
@@ -492,15 +492,15 @@ function Skillet:AttachItems (AttachID)
 	end
 	local itemid=self.cachedAttachList[AttachID]["id"]
 	local size=5
-	
-	
+
+
 	local _,link,_,_,_,_,_, maxSize = GetItemInfo(itemid)
 	local matches, total, blankBag, blankSlot = findBagForItem(itemid)
 
 	-- Creates the amount of stacks that need to be attached to the mail.
 	local majorstacks=math.floor(amount/maxSize)
 	local minorstacks=(amount % maxSize)
-	
+
 	--Add Items to the queue
 	--First the Major Stacks, size=maxSize. 1 Process Queue per stack
 	local size=maxSize
@@ -511,7 +511,7 @@ function Skillet:AttachItems (AttachID)
 		table.insert(Skillet.AttachRequests, { [0]=postId, itemid, size})
 		table.insert(postIds, postId)
 	end
-	
+
 	-- Add the remainder of items
 	size=minorstacks
 	if (size>0) then
@@ -521,8 +521,8 @@ function Skillet:AttachItems (AttachID)
 		table.insert(postIds, postId)
 	end
 	Skillet.AttachTimer=-1
-	
-	local button=getglobal("SkilletAttachListButton"..AttachID.."AttachButton")
+
+	local button=_G["SkilletAttachListButton"..AttachID.."AttachButton"]
 	--Disable the button
 	--pplocal button = get_button(AttachID)
 	button:Disable()
@@ -537,7 +537,7 @@ end
 -- ===========================================================================================
 
 
--- Start timer and timer delay 
+-- Start timer and timer delay
 Skillet.AttachTimer=-5
 Skillet.AttachTimer_Delay=0.1
 
@@ -552,14 +552,14 @@ local function processQueue()
 		Skillet.AttachTimer=-5
 		return
 	end
-	
+
 	local request=Skillet.AttachRequests[1]
-	
+
 	itemid=request[1]
 	size=request[2]
-	
+
 	-- Sees if there's an items of the correct size else it restacks it
-	
+
 	local success, bag, slot = pcall(Skillet.useItemInBag,itemid,size)
 	-- If the last action was not nat succesful, check if error, else return so that it can process again
 	if not success then
@@ -581,17 +581,17 @@ local function processQueue()
 				end
 				return
 	end
-			
+
 	if (CursorHasItem() or SpellIsTargeting()) then return end
-	
-	-- There was success, so we can now move attach the item 
+
+	-- There was success, so we can now move attach the item
 	if slot and slot>0 then
 		DebugSpam("Slot")
-		
+
 		-- Allow for lag, so that we can try to attach the item a bit later
 		local _,_, lag = GetNetStats()
 		lag = 2.5 * lag / 1000
-		
+
 		if (request[3]) then
 		  if GetTime() > request[3] then
 		    DebugSpam("LAG")
@@ -599,15 +599,15 @@ local function processQueue()
 		  end
 		end
 		local expire = GetTime() + lag
-		Skillet.AttachRequests[1][3] = expire 
-	
+		Skillet.AttachRequests[1][3] = expire
+
 		local texture, itemCount, locked, quality, readable = GetContainerItemInfo(bag,slot)
 		if not locked then
 			Skillet.AttachTimer=-1
 			UseContainerItem(bag,slot)
 			-- Success, the Item has been attached, so we can remove the item from the queue
 			table.remove(Skillet.AttachRequests, 1)
-		end 
+		end
 	end
 	Skillet.AttachTimer=-1
 end
@@ -624,26 +624,26 @@ function Skillet:AttachOnUpdate()
 end
 
 -- ===========================================================================================
---      OnEvent functions 
+--      OnEvent functions
 -- ===========================================================================================
 
 -- Called when the mail frame is opened
 function Skillet:MAIL_SHOW()
-	 
+
     local attachList=self:GetAttachLists();
 
 	cache_list(self)
-	
+
 	local numItems = #self.cachedAttachList
 	if numItems>0 then
 		self:DisplayAttachList()
 	end
-	
+
 
 	return
 end
 --
--- Called when mails are sent successfully. 
+-- Called when mails are sent successfully.
 -- It's main function is to re-update the Queues with any items that might have been sent to an alt
 --
 function Skillet:MAIL_SEND_SUCCESS()
@@ -651,23 +651,23 @@ function Skillet:MAIL_SEND_SUCCESS()
 	--remove the items that where sent from the Reagents Queue
 	local AttachedItems=#Skillet.AttachItemsMail
 	DebugSpam(AttachedItems)
-	
+
 	-- Run through the items that were attached, and adjust the queue if needed
 	for i=1,AttachedItems,1 do
 		local id,player,count = unpack (Skillet.AttachItemsMail[i])
-		local reagentsInQueue = self.db.server.reagentsInQueue[player]
+		local reagentsInQueue = self.db.realm.reagentsInQueue[player]
 		if reagentsInQueue[id] then
 			--Adjust the Invetories... for now, I'm going to just adjust it as if those items belong to the person it was sent to (As if it's in his bags)
 			--The only problem is that, if that other Char logs in, and doesn't remove the items from the mailbox, a rescan will just incorrectly re-adjust the numbers again.
 			-- Correct way would be to monitor what's going on in the Mailbox, and keep track of it - then  use those figures as well.
-							
+
 			--Adjust for Alt char
 			local numAltInBags, _, numAltInBank = self:GetInventory(player, id)
 			Skillet:SetInventory(player, id, numAltInBags+count, numAltInBank+count)
-			
+
 		end
 	 end
-	 
+
 	 -- Update the listbox if there were any items attached in the mail
 	 if AttachedItems>0 then
 		self:UpdateAttachListWindow(false,true)
@@ -685,9 +685,9 @@ function Skillet:MAIL_SEND_INFO_UPDATE()
 	local CurPlayer=UnitName("player")
 	local found=false
 	local mailPlayer=string.gsub(SendMailNameEditBox:GetText()," ","")
-	
+
 	-- Checks if the current recipient of the email is in the Queue
-	for player,queue in pairs(self.db.server.reagentsInQueue) do
+	for player,queue in pairs(self.db.realm.reagentsInQueue) do
 		if player~=CurPlayer then
 			if  (mailPlayer:upper()==player:upper()) then
 				DebugSpam("Found Player in Q")
@@ -699,11 +699,11 @@ function Skillet:MAIL_SEND_INFO_UPDATE()
 	end
 
 	if not found then return end
-	
+
 	-- Build attach list - only if a player is in the current queue will the items be added
 	-- I just cleared the list, and build in from scratch each time an item is added
 	Skillet.AttachItemsMail={}
-    
+
 	for i=1,12,1 do
 		Name, Texture, Count, Quality = GetSendMailItem(i)
 		if Name then
@@ -712,13 +712,13 @@ function Skillet:MAIL_SEND_INFO_UPDATE()
 		local entry={id,playername,Count}
 		table.insert(Skillet.AttachItemsMail, entry)
 		DebugSpam(i.." "..Name.." "..id.." "..playername)
-		
-		if self.db.server.reagentsInQueue[playername][id] then
-			DebugSpam(self.db.server.reagentsInQueue[playername][id])
+
+		if self.db.realm.reagentsInQueue[playername][id] then
+			DebugSpam(self.db.realm.reagentsInQueue[playername][id])
 		end
 		end
 	end
-	
+
 end
 --
 -- Called when the bank frame is closed
@@ -729,10 +729,10 @@ function Skillet:MAIL_CLOSED()
 	if not self.data.recipeList then
 		self.data.recipeList = {}
 	end
-	
+
 	--DebugSpam("Rescaning Reagents"..self.currentPlayer)
 	Skillet:ScanQueuedReagents()
-	
+
 	--Clear and hide all unused items
 	Skillet.AttachItemsMail={}
 	Skillet.AttachRequests={}

@@ -18,49 +18,57 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
 ]]--
 
-local MAJOR_VERSION = "2.06"
+local MAJOR_VERSION = "2.07"
 local MINOR_VERSION = ("$Revision$"):match("%d+") or 1
 local DATE = string.gsub("$Date$", "^.-(%d%d%d%d%-%d%d%-%d%d).-$", "%1")
 
-Skillet = AceLibrary("AceAddon-2.0"):new("AceConsole-2.0", "AceEvent-2.0", "AceDB-2.0", "AceHook-2.1")
+Skillet = LibStub("AceAddon-3.0"):NewAddon("Skillet", "AceConsole-3.0", "AceEvent-3.0", "AceHook-3.0", "AceTimer-3.0")
 Skillet.title   = "Skillet"
 Skillet.version = MAJOR_VERSION .. "-" .. MINOR_VERSION .. "LS"
 Skillet.date    = DATE
 
+local AceDB = LibStub("AceDB-3.0")
+
 -- Pull it into the local namespace, it's faster to access that way
 local Skillet = Skillet
 
-
 local nonLinkingTrade = { [2656] = true, [53428] = true }				-- smelting, runeforging
 
-
-
--- Is a copy of LibPossessions is avaialable, use it for alt
--- character inventory checks
---Skillet.inventoryCheck = LibStub and LibStub:GetLibrary('LibPossessions')
-
--- Register to have the AceDB class handle data and option persistence for us
-Skillet:RegisterDB("SkilletDB", "SkilletDBPC")
-
--- Global ( across all alts ) options
-Skillet:RegisterDefaults('profile', {
-    -- user configurable options
-    vendor_buy_button = true,
-    vendor_auto_buy   = false,
-    show_item_notes_tooltip = false,
-    show_crafters_tooltip = true,
-    show_detailed_recipe_tooltip = true,
-    link_craftable_reagents = true,
-    queue_craftable_reagents = true,
-    queue_glyph_reagents = false,
-    display_required_level = false,
-    display_shopping_list_at_bank = false,
-    display_shopping_list_at_guildbank = false,
-    display_shopping_list_at_auction = false,
-    display_full_tooltip = true,
-    transparency = 1.0,
-    scale = 1.0,
-} )
+local defaults = {
+	profile = {
+	    -- user configurable options
+	    vendor_buy_button = true,
+	    vendor_auto_buy   = false,
+	    show_item_notes_tooltip = false,
+	    show_crafters_tooltip = true,
+	    show_detailed_recipe_tooltip = true,        -- show any tooltips?
+	    display_full_tooltip = true,		         -- show full blizzards tooltip
+		display_item_tooltip = true,                    -- show item tooltip or recipe tooltip
+	    link_craftable_reagents = true,
+	    queue_craftable_reagents = true,
+	    queue_glyph_reagents = false,
+	    display_required_level = false,
+	    display_shopping_list_at_bank = false,
+	    display_shopping_list_at_guildbank = false,
+	    display_shopping_list_at_auction = false,
+	    transparency = 1.0,
+	    scale = 1.0,
+	},
+	factionrealm = {
+	    -- we tell Stitch to keep the "recipes" table up to data for us.
+	    recipes = {},
+	    -- and any queued up recipes
+	    queues = {},
+	    -- notes added to items crafted or used in crafting.
+	    notes = {},
+	},
+	char = {
+	    -- options specific to a current tradeskill
+	    tradeskill_options = {},
+	    -- Display alt's items in shopping list
+	    include_alts = true,
+	},
+}
 
 -- default options for each player/tradeskill
 
@@ -71,7 +79,7 @@ Skillet.defaultOptions = {
 	["filterInventory-bag"] = true,
 	["filterInventory-vendor"] = true,
 	["filterInventory-bank"] = true,
-	["filterInventory-alts"] = true,
+	["filterInventory-alts"] = false,
 	["filterLevel"] = 1,
 	["hideuncraftable"] = false,
 }
@@ -93,34 +101,9 @@ function DebugSpam(message)
 --	DEFAULT_CHAT_FRAME:AddMessage(message)
 end
 
--- Options specific to a single character
-Skillet:RegisterDefaults('server', {
-    -- we tell Stitch to keep the "recipes" table up to data for us.
-    recipes = {},
-
-    -- and any queued up recipes
-    queues = {},
-
-    -- notes added to items crafted or used in crafting.
-    notes = {},
-} )
-
--- Options specific to a single character
-Skillet:RegisterDefaults('char', {
-    -- options specific to a current tradeskill
-    tradeskill_options = {},
-
-    -- Display alt's items in shopping list
-    include_alts = true,
-} )
-
 -- Localization
-local L = AceLibrary("AceLocale-2.2"):new("Skillet")
-
+local L = LibStub("AceLocale-3.0"):GetLocale("Skillet")
 Skillet.L = L
-
--- Events
-local AceEvent = AceLibrary("AceEvent-2.0")
 
 -- All the options that we allow the user to control.
 local Skillet = Skillet
@@ -133,8 +116,13 @@ Skillet.options =
 			type = 'group',
 			name = L["Features"],
 			desc = L["FEATURESDESC"],
-			order = 11,
+			order = 10,
 			args = {
+				header = {
+					type = "header",
+					name = L["Skillet Trade Skills"].." "..MAJOR_VERSION,
+					order = 11
+				},
 				vendor_buy_button = {
 					type = "toggle",
 					name = L["VENDORBUYBUTTONNAME"],
@@ -194,7 +182,19 @@ Skillet.options =
                         Skillet.db.profile.display_full_tooltip = value;
                     end,
                     order = 16
-                },                
+                },
+				display_item_tooltip = {
+                    type = "toggle",
+                    name = L["SHOWITEMTOOLTIPNAME"],
+                    desc = L["SHOWITEMTOOLTIPDESC"],
+                    get = function()
+                        return Skillet.db.profile.display_item_tooltip;
+                    end,
+                    set = function(value)
+                        Skillet.db.profile.display_item_tooltip = value;
+                    end,
+                    order = 17
+				},
                 show_crafters_tooltip = {
                     type = "toggle",
                     name = L["SHOWCRAFTERSTOOLTIPNAME"],
@@ -205,7 +205,7 @@ Skillet.options =
                     set = function(value)
                         Skillet.db.profile.show_crafters_tooltip = value;
                     end,
-                    order = 17
+                    order = 18
                 },
                 link_craftable_reagents = {
                     type = "toggle",
@@ -217,7 +217,7 @@ Skillet.options =
                     set = function(value)
                         Skillet.db.profile.link_craftable_reagents = value;
                     end,
-                    order = 18
+                    order = 19
                 },
                 queue_craftable_reagents = {
                     type = "toggle",
@@ -229,7 +229,7 @@ Skillet.options =
                     set = function(value)
                         Skillet.db.profile.queue_craftable_reagents = value;
                     end,
-                    order = 19
+                    order = 20
                 },
                 queue_glyph_reagents = {
                     type = "toggle",
@@ -241,8 +241,8 @@ Skillet.options =
                     set = function(value)
                         Skillet.db.profile.queue_glyph_reagents = value;
                     end,
-                    order = 20
-                },                
+                    order = 21
+                },
                 display_shopping_list_at_bank = {
                     type = "toggle",
                     name = L["DISPLAYSHOPPINGLISTATBANKNAME"],
@@ -253,7 +253,7 @@ Skillet.options =
                     set = function(value)
                         Skillet.db.profile.display_shopping_list_at_bank = value;
                     end,
-                    order = 21
+                    order = 22
                 },
                 display_shopping_list_at_guildbank = {
                     type = "toggle",
@@ -265,7 +265,7 @@ Skillet.options =
                     set = function(value)
                         Skillet.db.profile.display_shopping_list_at_guildbank = value;
                     end,
-                    order = 22
+                    order = 23
                 },
                 display_shopping_list_at_auction = {
                     type = "toggle",
@@ -277,7 +277,7 @@ Skillet.options =
                     set = function(value)
                         Skillet.db.profile.display_shopping_list_at_auction = value;
                     end,
-                    order = 23
+                    order = 24
                 },
                 show_craft_counts = {
                     type = "toggle",
@@ -290,7 +290,7 @@ Skillet.options =
                         Skillet.db.profile.show_craft_counts = value
                         Skillet:UpdateTradeSkillWindow()
                     end,
-                    order = 24,
+                    order = 25,
                 },
             }
         },
@@ -388,22 +388,13 @@ Skillet.options =
             },
         },
 ]]
-		about = {
-			type = 'execute',
-			name = L["About"],
-			desc = L["ABOUTDESC"],
-			func = function()
-				Skillet:PrintAddonInfo()
-			end,
-			order = 50
-		},
 		config = {
 			type = 'execute',
 			name = L["Config"],
 			desc = L["CONFIGDESC"],
 			func = function()
 				if not (UnitAffectingCombat("player")) then
-					AceLibrary("Waterfall-1.0"):Open("Skillet")
+					Skillet:ShowOptions()
 				else
 					DebugSpam("|cff8888ffSkillet|r: Combat lockdown restriction." ..
 												  " Leave combat and try again.")
@@ -432,7 +423,7 @@ Skillet.options =
 
 -- replaces the standard bliz frameshow calls with this for supported tradeskills
 function DoNothing()
-DebugSpam("Do Nothing")
+	DebugSpam("Do Nothing")
 end
 
 
@@ -479,6 +470,8 @@ end
 
 -- Called when the addon is loaded
 function Skillet:OnInitialize()
+	self.db = AceDB:New("SkilletDB", defaults)
+
 	self:InitializeDatabase((UnitName("player")), false)  --- force clean rescan for now
 
 	-- hook default tooltips
@@ -499,14 +492,17 @@ function Skillet:OnInitialize()
 		end
 	end
 
-    -- no need to be spammy about the fact that we are here, they'll find out seen enough
-	-- self:Print("Skillet v" .. self.version .. " loaded");
+	local acecfg = LibStub("AceConfig-3.0")
+	acecfg:RegisterOptionsTable("Skillet", self.options, {"/skillet"})
+    acecfg:RegisterOptionsTable("Skillet Features", self.options.args.features)
+	acecfg:RegisterOptionsTable("Skillet Appearance", self.options.args.appearance)
+	acecfg:RegisterOptionsTable("Skillet Profiles", LibStub("AceDBOptions-3.0"):GetOptionsTable(self.db))
 
-    self:RegisterChatCommand({"/skillet"}, self.options, "SKILLET")
-end
+	local acedia = LibStub("AceConfigDialog-3.0")
+	acedia:AddToBlizOptions("Skillet Features", "Skillet")
+	acedia:AddToBlizOptions("Skillet Appearance", "Appearance", "Skillet")
+	acedia:AddToBlizOptions("Skillet Profiles", "Profiles", "Skillet")
 
-function EchoEvent(...)
-	DEFAULT_CHAT_FRAME:AddMessage("echo event: "..(event or "no event"))
 end
 
 
@@ -514,13 +510,13 @@ function Skillet:FlushAllData()
 	Skillet.data = {}
 	Skillet.data.recipeDB = {}
 
-	Skillet.db.server.skillRanks = {}
-	Skillet.db.server.skillDB = {}
-	Skillet.db.server.linkDB = {}
-	Skillet.db.server.groupDB = {}
-	Skillet.db.server.queueData = {}
-	Skillet.db.server.reagentsInQueue = {}
-	Skillet.db.server.inventoryData = {}
+	Skillet.db.realm.skillRanks = {}
+	Skillet.db.realm.skillDB = {}
+	Skillet.db.realm.linkDB = {}
+	Skillet.db.realm.groupDB = {}
+	Skillet.db.realm.queueData = {}
+	Skillet.db.realm.reagentsInQueue = {}
+	Skillet.db.realm.inventoryData = {}
 
 	Skillet:InitializeDatabase((UnitName("player")))
 end
@@ -529,28 +525,28 @@ end
 function Skillet:InitializeDatabase(player, clean)
 DebugSpam("initialize database for "..player)
 
-	if not self.db.server.groupDB then
-		self.db.server.groupDB = {}
+	if not self.db.realm.groupDB then
+		self.db.realm.groupDB = {}
 	end
 
-	if not self.db.server.inventoryData then
-		self.db.server.inventoryData = {}
+	if not self.db.realm.inventoryData then
+		self.db.realm.inventoryData = {}
 	end
 
-	if not self.db.server.inventoryData[player] then
-		self.db.server.inventoryData[player] = {}
+	if not self.db.realm.inventoryData[player] then
+		self.db.realm.inventoryData[player] = {}
 	end
 
-	if not self.db.server.reagentsInQueue then
-		self.db.server.reagentsInQueue = {}
+	if not self.db.realm.reagentsInQueue then
+		self.db.realm.reagentsInQueue = {}
 	end
 
-	if not self.db.server.skillDB then
-		self.db.server.skillDB = {}
+	if not self.db.realm.skillDB then
+		self.db.realm.skillDB = {}
 	end
 
-	if not self.db.server.skillRanks then
-		self.db.server.skillRanks = {}
+	if not self.db.realm.skillRanks then
+		self.db.realm.skillRanks = {}
 	end
 
 	if not self.data then
@@ -565,8 +561,8 @@ DebugSpam("initialize database for "..player)
 		self.data.skillList = {}
 	end
 
-	if not self.db.server.linkDB then
-		self.db.server.linkDB = {}
+	if not self.db.realm.linkDB then
+		self.db.realm.linkDB = {}
 	end
 
 	if not self.data.groupList then
@@ -581,12 +577,12 @@ DebugSpam("initialize database for "..player)
 		self.data.recipeDB = {}
 	end
 
-	if not self.db.server.queueData then
-		self.db.server.queueData = {}
+	if not self.db.realm.queueData then
+		self.db.realm.queueData = {}
 	end
 
-	if not self.db.server.queueData[player] then
- 		self.db.server.queueData[player] = {}
+	if not self.db.realm.queueData[player] then
+ 		self.db.realm.queueData[player] = {}
  	end
 
     if not self.data.skillIndexLookup then
@@ -597,6 +593,14 @@ DebugSpam("initialize database for "..player)
         self.data.skillIndexLookup[player] = {}
     end
 
+	if not self.db.global.itemRecipeSource then
+		self.db.global.itemRecipeSource = {}
+	end
+
+	if not self.db.global.SavedQueues then
+		self.db.global.SavedQueues = {}
+	end
+
     if not self.dataGatheringModules then
         self.dataGatheringModules = {}
     end
@@ -606,7 +610,7 @@ DebugSpam("initialize database for "..player)
 
  		mod.ScanPlayerTradeSkills(mod, player, clean)
  	else
- DebugSpam("data gather module is nil")
+		DebugSpam("data gather module is nil")
  	end
 
 	self:CollectRecipeInformation()
@@ -619,7 +623,7 @@ function Skillet:RegisterRecipeFilter(name, namespace, initMethod, filterMethod)
 	if not self.recipeFilters then
 		self.recipeFilters = {}
 	end
-DEFAULT_CHAT_FRAME:AddMessage("add recipe filter "..name)
+--DEFAULT_CHAT_FRAME:AddMessage("add recipe filter "..name)
 	self.recipeFilters[name] = { namespace = namespace, initMethod = initMethod, filterMethod = filterMethod }
 end
 
@@ -643,7 +647,7 @@ DebugSpam("RegisterPlayerDataGathering "..(player or "nil"))
 	if not self.recipeDB then
 		self.recipeDB = {}
 	end
-DebugSpam("A")
+
 	self.dataGatheringModules[player] = modules
 	self.recipeDB[player] = recipeDB
 DebugSpam("done with register")
@@ -681,11 +685,11 @@ function Skillet:OnEnable()
     -- These need to update the tradeskill window, not just the queue
     -- as we need to redisplay the number of items that can be crafted
     -- as we consume reagents.
-	self:RegisterEvent("Skillet_Queue_Continue", "QueueChanged")
-	self:RegisterEvent("Skillet_Queue_Complete", "QueueChanged")
-	self:RegisterEvent("Skillet_Queue_Add",      "QueueChanged")
+	self:RegisterMessage("Skillet_Queue_Continue", "QueueChanged")
+	self:RegisterMessage("Skillet_Queue_Complete", "QueueChanged")
+	self:RegisterMessage("Skillet_Queue_Add",      "QueueChanged")
 
---    self:RegisterEvent("SkilletStitch_Scan_Complete",  "ScanCompleted")
+--    self:RegisterMessage("SkilletStitch_Scan_Complete",  "ScanCompleted")
 
 
     self.hideUncraftableRecipes = false
@@ -701,27 +705,15 @@ function Skillet:OnEnable()
 
 
     -- hook up our copy of stitch to the data for this character
---    if self.db.server.recipes[self.currentPlayer] then
---        self.data = self.db.server.recipes[self.currentPlayer]
+--    if self.db.realm.recipes[self.currentPlayer] then
+--        self.data = self.db.realm.recipes[self.currentPlayer]
 --    end
---    self.db.server.recipes[self.currentPlayer] = self.db.account.recipeData
+--    self.db.realm.recipes[self.currentPlayer] = self.db.global.recipeData
 
  	self:EnableQueue("Skillet")
 	self:EnableDataGathering("Skillet")
 
---	self:InitializeDatabase((UnitName("player")))
-
-	AceLibrary("Waterfall-1.0"):Register("Skillet",
-                   "aceOptions", Skillet.options,
-                   "title",      L["Skillet Trade Skills"],
-                   "colorR",     0,
-                   "colorG",     0.7,
-                   "colorB",     0
-                   )
-
 	self:DisableBlizzardFrame()
-
---	AceLibrary("Waterfall-1.0"):Open("Skillet")
 end
 
 -- Called when the addon is disabled
@@ -731,8 +723,6 @@ function Skillet:OnDisable()
 
     self:UnregisterAllEvents()
 
-    AceLibrary("Waterfall-1.0"):Close("Skillet")
-	AceLibrary("Waterfall-1.0"):UnRegister("Skillet")
 	self:EnableBlizzardFrame()
 end
 
@@ -768,13 +758,13 @@ DebugSpam("SHOW WINDOW (was showing "..(self.currentTrade or "nil")..")");
 
 	if IsTradeSkillLinked() or (IsTradeSkillGuild and IsTradeSkillGuild()) then
 		local _, linkedPlayer = IsTradeSkillLinked()
-		
+
 		if not linkedPlayer then
 			return
-		end		
-		
+		end
+
 		self.currentPlayer = linkedPlayer
-		
+
 		if (self.currentPlayer == UnitName("player")) then
 			self.currentPlayer = "All Data"
 		end
@@ -820,7 +810,7 @@ DebugSpam("SkilletShow: "..self.currentTrade)
 
 
 		if IsControlKeyDown() then
-			self.db.server.skillDB[self.currentPlayer][self.currentTrade] = {}
+			self.db.realm.skillDB[self.currentPlayer][self.currentTrade] = {}
 		end
 
 		self:RescanTrade()
@@ -831,7 +821,7 @@ DebugSpam("SkilletShow: "..self.currentTrade)
 
 		self:ShowTradeSkillWindow()
 
-		local filterbox = getglobal("SkilletFilterBox")
+		local filterbox = _G["SkilletFilterBox"]
 		local oldtext = filterbox:GetText()
 		local filterText = self:GetTradeSkillOption("filtertext")
 
@@ -874,9 +864,9 @@ end
 
 function Skillet:FreeCaches()
 --	collectgarbage("collect")
-	if not cache then
-		cache = Skillet.data
-	end
+--	if not cache then
+--		cache = Skillet.data
+--	end
 
 --	local kbA = collectgarbage("count")
 --	Skillet.data = {}
@@ -897,7 +887,7 @@ end
 
 -- Rescans the trades (and thus bags). Can only be called if the tradeskill
 -- window is open and a trade selected.
-local function Skillet_rescan_bags()
+function Skillet:RescanBags()
 	local start = GetTime()
 
 
@@ -911,7 +901,7 @@ local function Skillet_rescan_bags()
 	if elapsed > 0.5 then
 		DEFAULT_CHAT_FRAME:AddMessage("WARNING: skillet inventory scan took " .. math.floor(elapsed*100+.5)/100 .. " seconds to complete.")
 	end
-
+	self.rescan_bags_timer = nil
 end
 
 
@@ -931,9 +921,9 @@ function Skillet:BAG_UPDATE()
 	if showing then
 		-- bag updates can happen fairly frequently and we don't want to
 		-- be scanning all the time so ... buffer updates to a single event
-		-- that fires after a 1/4 second.
-		if not AceEvent:IsEventScheduled("Skillet_rescan_bags") then
-			AceEvent:ScheduleEvent("Skillet_rescan_bags", Skillet_rescan_bags, 0.05)
+		-- that fires after a 1/5 second.
+		if not self.rescan_bags_timer then
+			self.rescan_bags_timer = self:ScheduleTimer("RescanBags", 0.2)
 		end
     else
        -- no trade window open, but something change, we will need to rescan
@@ -964,8 +954,8 @@ end
 
 function Skillet:SetTradeSkill(player, tradeID, skillIndex)
 DebugSpam("setting tradeskill to "..player.." "..tradeID.." "..(skillIndex or "nil"))
-    if not self.db.server.queueData[player] then
- 		self.db.server.queueData[player] = {}
+    if not self.db.realm.queueData[player] then
+ 		self.db.realm.queueData[player] = {}
  	end
 
  	if player ~= self.currentPlayer or tradeID ~= self.currentTrade then
@@ -1020,7 +1010,7 @@ DebugSpam("cast: "..self:GetTradeName(tradeID))
 			end
 
 			-- remove any filters currently in place
-			local filterbox = getglobal("SkilletFilterBox")
+			local filterbox = _G["SkilletFilterBox"]
 	        local oldtext = filterbox:GetText()
 	        local filterText = self:GetTradeSkillOption("filtertext")
 
@@ -1062,7 +1052,7 @@ DebugSpam("UPDATE TRADE SKILL")
 --		self:RescanTrade()
 
 		-- remove any filters currently in place
-		local filterbox = getglobal("SkilletFilterBox");
+		local filterbox = _G["SkilletFilterBox"];
         local filtertext = self:GetTradeSkillOption("filtertext", self.currentPlayer, new_trade)
     	-- this fires off a redraw event, so only change after data has been acquired
     	filterbox:SetText(filtertext);
@@ -1134,7 +1124,7 @@ end
 
 -- Show the options window
 function Skillet:ShowOptions()
-	AceLibrary("Waterfall-1.0"):Open("Skillet");
+	InterfaceOptionsFrame_OpenToCategory(LibStub("AceConfigDialog-3.0").BlizOptions.Skillet.Skillet.frame)
 end
 
 -- Notes when a new trade has been selected
@@ -1223,22 +1213,22 @@ end
 function Skillet:GetItemNote(key)
 	local result
 
-    if not self.db.server.notes[self.currentPlayer] then
+    if not self.db.realm.notes[self.currentPlayer] then
         return
     end
 
 --    local id = self:GetItemIDFromLink(link)
 	local kind, id = string.split(":", key)
 
-	if id and self.db.server.notes[self.currentPlayer] then
-		result = self.db.server.notes[self.currentPlayer][id]
+	if id and self.db.realm.notes[self.currentPlayer] then
+		result = self.db.realm.notes[self.currentPlayer][id]
 	else
 		self:Print("Error: Skillet:GetItemNote() could not determine item ID for " .. key);
 	end
 
 	if result and result == "" then
 		result = nil
-		self.db.server.notes[self.currentPlayer][id] = nil
+		self.db.realm.notes[self.currentPlayer][id] = nil
 	end
 
 	return result
@@ -1250,12 +1240,12 @@ function Skillet:SetItemNote(key, note)
 --	local id = self:GetItemIDFromLink(link);
 	local kind, id = string.split(":", key)
 
-    if not self.db.server.notes[self.currentPlayer] then
-        self.db.server.notes[self.currentPlayer] = {}
+    if not self.db.realm.notes[self.currentPlayer] then
+        self.db.realm.notes[self.currentPlayer] = {}
     end
 
 	if id then
-		self.db.server.notes[self.currentPlayer][id] = note
+		self.db.realm.notes[self.currentPlayer][id] = note
 	else
 		self:Print("Error: Skillet:SetItemNote() could not determine item ID for " .. key);
 	end
@@ -1287,7 +1277,7 @@ function Skillet:AddItemNotesToTooltip(tooltip)
 
     if notes_enabled then
         local header_added = false
-        for player,notes_table in pairs(self.db.server.notes) do
+        for player,notes_table in pairs(self.db.realm.notes) do
             local note = notes_table[id]
             if note then
                 if not header_added then
@@ -1335,7 +1325,7 @@ function Skillet:GetTradeSkillOption(option, playerOverride, tradeOverride)
     local player = playerOverride or self.currentPlayer
 	local trade = tradeOverride or self.currentTrade
 
-	local options = self.db.account.options
+	local options = self.db.global.options
 
     if not options or not options[player] or not options[player][trade] then
        return Skillet.defaultOptions[option]
@@ -1354,19 +1344,19 @@ function Skillet:SetTradeSkillOption(option, value, playerOverride, tradeOverrid
 	local player = playerOverride or self.currentPlayer
 	local trade = tradeOverride or self.currentTrade
 
-	if not self.db.account.options then
-		self.db.account.options = {}
+	if not self.db.global.options then
+		self.db.global.options = {}
 	end
 
-	if not self.db.account.options[player] then
-		self.db.account.options[player] = {}
+	if not self.db.global.options[player] then
+		self.db.global.options[player] = {}
 	end
 
-    if not self.db.account.options[player][trade] then
-        self.db.account.options[player][trade] = {}
+    if not self.db.global.options[player][trade] then
+        self.db.global.options[player][trade] = {}
     end
 
-    self.db.account.options[player][trade][option] = value
+    self.db.global.options[player][trade][option] = value
 end
 
 
@@ -1450,7 +1440,7 @@ function ProfessionPopup_Init(menuFrame, level)
 
 					if gatherModule == SkilletLink then
 						skillButton.arg1 = UIDROPDOWNMENU_MENU_VALUE
-						skillButton.arg2 = Skillet.db.server.linkDB[UIDROPDOWNMENU_MENU_VALUE][tradeID]
+						skillButton.arg2 = Skillet.db.realm.linkDB[UIDROPDOWNMENU_MENU_VALUE][tradeID]
 						skillButton.func = ProfessionPopup_SelectTradeLink
 					else
 						skillButton.arg1 = UIDROPDOWNMENU_MENU_VALUE
@@ -1480,12 +1470,17 @@ end
 
 function ProfessionPopup_Show(this)
 --	if not ProfessionPopupFrame then
-	ProfessionPopupFrame = CreateFrame("Frame", "ProfessionPopupFrame", getglobal("UIParent"), "UIDropDownMenuTemplate")
+	ProfessionPopupFrame = CreateFrame("Frame", "ProfessionPopupFrame", _G["UIParent"], "UIDropDownMenuTemplate")
 --	end
-	
+
 	Skillet.professionPopupButton = this
-	
+
 	UIDropDownMenu_Initialize(ProfessionPopupFrame, ProfessionPopup_Init, "MENU")
 	ToggleDropDownMenu(1, nil, ProfessionPopupFrame, Skillet.professionPopupButton, Skillet.professionPopupButton:GetWidth(), 0)
+end
+
+-- workaround for Ace2
+function Skillet:IsActive()
+	return Skillet:IsEnabled()
 end
 
