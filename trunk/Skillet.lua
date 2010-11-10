@@ -130,9 +130,10 @@ Skillet.options =
 					get = function()
 						return Skillet.db.profile.vendor_buy_button;
 					end,
-					set = function(value)
+					set = function(self,value)
 						Skillet.db.profile.vendor_buy_button = value;
 					end,
+					width = "double",
 					order = 12
 				},
 				vendor_auto_buy = {
@@ -142,9 +143,10 @@ Skillet.options =
 					get = function()
 						return Skillet.db.profile.vendor_auto_buy;
 					end,
-					set = function(value)
+					set = function(self,value)
 						Skillet.db.profile.vendor_auto_buy = value;
 					end,
+					width = "double",
 					order = 13
 				},
 				show_item_notes_tooltip = {
@@ -154,9 +156,10 @@ Skillet.options =
 					get = function()
 						return Skillet.db.profile.show_item_notes_tooltip;
 					end,
-					set = function(value)
+					set = function(self,value)
 						Skillet.db.profile.show_item_notes_tooltip = value;
 					end,
+					width = "double",
 					order = 14
 				},
                 show_detailed_recipe_tooltip = {
@@ -166,9 +169,10 @@ Skillet.options =
                     get = function()
                         return Skillet.db.profile.show_detailed_recipe_tooltip;
                     end,
-                    set = function(value)
+                    set = function(self,value)
                         Skillet.db.profile.show_detailed_recipe_tooltip = value;
                     end,
+					width = "double",
                     order = 15
                 },
                 display_full_tooltip = {
@@ -178,9 +182,10 @@ Skillet.options =
                     get = function()
                         return Skillet.db.profile.display_full_tooltip;
                     end,
-                    set = function(value)
+                    set = function(self,value)
                         Skillet.db.profile.display_full_tooltip = value;
                     end,
+					width = "double",
                     order = 16
                 },
 				display_item_tooltip = {
@@ -190,9 +195,10 @@ Skillet.options =
                     get = function()
                         return Skillet.db.profile.display_item_tooltip;
                     end,
-                    set = function(value)
+                    set = function(self,value)
                         Skillet.db.profile.display_item_tooltip = value;
                     end,
+					width = "double",
                     order = 17
 				},
                 show_crafters_tooltip = {
@@ -202,9 +208,10 @@ Skillet.options =
                     get = function()
                         return Skillet.db.profile.show_crafters_tooltip;
                     end,
-                    set = function(value)
+                    set = function(self,value)
                         Skillet.db.profile.show_crafters_tooltip = value;
                     end,
+					width = "double",
                     order = 18
                 },
                 link_craftable_reagents = {
@@ -214,9 +221,10 @@ Skillet.options =
                     get = function()
                         return Skillet.db.profile.link_craftable_reagents;
                     end,
-                    set = function(value)
+                    set = function(self,value)
                         Skillet.db.profile.link_craftable_reagents = value;
                     end,
+					width = "double",
                     order = 19
                 },
                 queue_craftable_reagents = {
@@ -226,9 +234,10 @@ Skillet.options =
                     get = function()
                         return Skillet.db.profile.queue_craftable_reagents;
                     end,
-                    set = function(value)
+                    set = function(self,value)
                         Skillet.db.profile.queue_craftable_reagents = value;
                     end,
+					width = "double",
                     order = 20
                 },
                 queue_glyph_reagents = {
@@ -238,9 +247,10 @@ Skillet.options =
                     get = function()
                         return Skillet.db.profile.queue_glyph_reagents;
                     end,
-                    set = function(value)
+                    set = function(self,value)
                         Skillet.db.profile.queue_glyph_reagents = value;
                     end,
+					width = "double",
                     order = 21
                 },
                 display_shopping_list_at_bank = {
@@ -250,9 +260,10 @@ Skillet.options =
                     get = function()
                         return Skillet.db.profile.display_shopping_list_at_bank;
                     end,
-                    set = function(value)
+                    set = function(self,value)
                         Skillet.db.profile.display_shopping_list_at_bank = value;
                     end,
+					width = "double",
                     order = 22
                 },
                 display_shopping_list_at_guildbank = {
@@ -262,9 +273,10 @@ Skillet.options =
                     get = function()
                         return Skillet.db.profile.display_shopping_list_at_guildbank;
                     end,
-                    set = function(value)
+                    set = function(self,value)
                         Skillet.db.profile.display_shopping_list_at_guildbank = value;
                     end,
+					width = "double",
                     order = 23
                 },
                 display_shopping_list_at_auction = {
@@ -274,9 +286,10 @@ Skillet.options =
                     get = function()
                         return Skillet.db.profile.display_shopping_list_at_auction;
                     end,
-                    set = function(value)
+                    set = function(self,value)
                         Skillet.db.profile.display_shopping_list_at_auction = value;
                     end,
+					width = "double",
                     order = 24
                 },
                 show_craft_counts = {
@@ -286,10 +299,11 @@ Skillet.options =
                     get = function()
                         return Skillet.db.profile.show_craft_counts
                     end,
-                    set = function(value)
+                    set = function(self,value)
                         Skillet.db.profile.show_craft_counts = value
                         Skillet:UpdateTradeSkillWindow()
                     end,
+					width = "double",
                     order = 25,
                 },
             }
@@ -307,10 +321,11 @@ Skillet.options =
                     get = function()
                         return Skillet.db.profile.display_required_level
                     end,
-                    set = function(value)
+                    set = function(self,value)
                         Skillet.db.profile.display_required_level = value
                         Skillet:UpdateTradeSkillWindow()
                     end,
+					width = "double",
                     order = 1
                 },
                 transparency = {
@@ -321,10 +336,11 @@ Skillet.options =
                     get = function()
                         return Skillet.db.profile.transparency
                     end,
-                    set = function(t)
+                    set = function(self,t)
                         Skillet.db.profile.transparency = t
                         Skillet:UpdateTradeSkillWindow()
                     end,
+					width = "double",
                     order = 2,
                 },
                 scale = {
@@ -335,10 +351,11 @@ Skillet.options =
                     get = function()
                         return Skillet.db.profile.scale
                     end,
-                    set = function(t)
+                    set = function(self,t)
                         Skillet.db.profile.scale = t
                         Skillet:UpdateTradeSkillWindow()
                     end,
+					width = "double",
                     order = 3,
                 },
                 enhanced_recipe_display = {
@@ -348,10 +365,11 @@ Skillet.options =
                     get = function()
                         return Skillet.db.profile.enhanced_recipe_display
                     end,
-                    set = function(value)
+                    set = function(self,value)
                         Skillet.db.profile.enhanced_recipe_display = value
                         Skillet:UpdateTradeSkillWindow()
                     end,
+					width = "double",
                     order = 2,
                 },
             },
@@ -1124,7 +1142,7 @@ end
 
 -- Show the options window
 function Skillet:ShowOptions()
-	InterfaceOptionsFrame_OpenToCategory(LibStub("AceConfigDialog-3.0").BlizOptions.Skillet.Skillet.frame)
+	InterfaceOptionsFrame_OpenToCategory("Skillet")
 end
 
 -- Notes when a new trade has been selected
