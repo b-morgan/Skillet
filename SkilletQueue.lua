@@ -18,12 +18,16 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
 ]]--
 
-local AceEvent = AceLibrary("AceEvent-2.0")
-
 local QUEUE_DEBUG = false
+
+Skillet.reagentsChanged = {}
 
 -- iterates through a list of reagentIDs and recalculates craftability
 function Skillet:AdjustInventory()
+
+	-- update queue for faster response time
+	self:UpdateQueueWindow()
+
 	if self.reagentsChanged then
 		for id,v in pairs(self.reagentsChanged) do
 			self:InventoryReagentCraftability(id)
@@ -34,6 +38,9 @@ function Skillet:AdjustInventory()
 	self.dataScanned = false
 
 	self.reagentsChanged = {}
+
+	-- update whole window to show craft counts
+	self:UpdateTradeSkillWindow()
 end
 
 
@@ -76,14 +83,14 @@ end
 
 
 -- queue up the command and reserve reagents
-function Skillet:QueueAppendCommand(command, queueCraftables)
+function Skillet:QueueAppendCommand(command, queueCraftables, noWindowRefresh)
 	local recipe = Skillet:GetRecipe(command.recipeID)
 
 	if recipe and not self.visited[command.recipeID] then
 		self.visited[command.recipeID] = true
 
 		local count = command.count
-		local reagentsInQueue = self.db.server.reagentsInQueue[Skillet.currentPlayer]
+		local reagentsInQueue = self.db.realm.reagentsInQueue[Skillet.currentPlayer]
 		local reagentsChanged = self.reagentsChanged
 		local skillIndexLookup = self.data.skillIndexLookup[Skillet.currentPlayer]
 
@@ -98,9 +105,9 @@ function Skillet:QueueAppendCommand(command, queueCraftables)
 			reagentsInQueue[reagent.id] = (reagentsInQueue[reagent.id] or 0) - need;
 
 			reagentsChanged[reagent.id] = true
-  
+
 			if queueCraftables and need > have and (Skillet.db.profile.queue_glyph_reagents or not recipe.name:match(Skillet.L["Glyph "])) then
-				local recipeSource = self.data.itemRecipeSource[reagent.id]
+				local recipeSource = self.db.global.itemRecipeSource[reagent.id]
 
 				if recipeSource then
 					for recipeSourceID in pairs(recipeSource) do
@@ -116,10 +123,10 @@ function Skillet:QueueAppendCommand(command, queueCraftables)
 							local newCommand = self:QueueCommandIterate(recipeSourceID, newCount)
 
 							newCommand.level = (command.level or 0) + 1
-							
+
 							-- do not add items from transmutation - this can create weird loops
 							if not Skillet.TradeSkillIgnoredMats[recipeSourceID] then
-								self:QueueAppendCommand(newCommand, queueCraftables)
+								self:QueueAppendCommand(newCommand, queueCraftables, true)
 							end
 						end
 					end
@@ -131,7 +138,7 @@ function Skillet:QueueAppendCommand(command, queueCraftables)
 
 		reagentsChanged[recipe.itemID] = true
 
-		Skillet:AddToQueue(command)
+		Skillet:AddToQueue(command, noWindowRefresh)
 
 		self.visited[command.recipeID] = nil
 	end
@@ -141,8 +148,8 @@ end
 -- command.complex means the queue entry requires additional crafting to take place prior to entering the queue.
 -- we can't just increase the # of the first command if it happens to be the same recipe without making sure
 -- the additional queue entry doesn't require some additional craftable reagents
-function Skillet:AddToQueue(command)
-	local queue = self.db.server.queueData[self.currentPlayer]
+function Skillet:AddToQueue(command, noWindowRefresh)
+	local queue = self.db.realm.queueData[self.currentPlayer]
 
 	if (not command.complex) then		-- we can add this queue entry to any of the other entries
 		local added
@@ -170,15 +177,19 @@ function Skillet:AddToQueue(command)
 		table.insert(queue, command)
 	end
 
-	AceEvent:TriggerEvent("Skillet_Queue_Add")
+	if not noWindowRefresh then
+		self:AdjustInventory()
+	end
+
+	self:SendMessage("Skillet_Queue_Add")
 end
 
 
 
 function Skillet:RemoveFromQueue(index)
-	local queue = self.db.server.queueData[self.currentPlayer]
+	local queue = self.db.realm.queueData[self.currentPlayer]
 	local command = queue[index]
-	local reagentsInQueue = self.db.server.reagentsInQueue[Skillet.currentPlayer]
+	local reagentsInQueue = self.db.realm.reagentsInQueue[Skillet.currentPlayer]
 	local reagentsChanged = self.reagentsChanged
 
 	if command.op == "iterate" then
@@ -203,10 +214,10 @@ end
 
 function Skillet:ClearQueue()
 DebugSpam("ClearQueue")
-	if #self.db.server.queueData[self.currentPlayer]>0 then
+	if #self.db.realm.queueData[self.currentPlayer]>0 then
 
-		self.db.server.queueData[self.currentPlayer] = {}
-		self.db.server.reagentsInQueue[self.currentPlayer] = {}
+		self.db.realm.queueData[self.currentPlayer] = {}
+		self.db.realm.reagentsInQueue[self.currentPlayer] = {}
 
 		self.dataScanned = false
 
@@ -214,13 +225,13 @@ DebugSpam("ClearQueue")
 	end
 DebugSpam("ClearQueue Complete")
 
-	AceEvent:TriggerEvent("Skillet_Queue_Complete")
+	self:SendMessage("Skillet_Queue_Complete")
 end
 
 
 function Skillet:ProcessQueue()
 DebugSpam("PROCESS QUEUE");
-	local queue = self.db.server.queueData[self.currentPlayer]
+	local queue = self.db.realm.queueData[self.currentPlayer]
 	local command = queue[1]
 	local skillIndexLookup = self.data.skillIndexLookup[self.currentPlayer]
 
@@ -250,8 +261,8 @@ DebugSpam("trying to process from an alt!")
 			DebugSpam("unsupported queue op: "..(command.op or "nil"))
 		end
 	else
-		self.db.server.queueData[self.currentPlayer] = {}
-		AceEvent:TriggerEvent("Skillet_Queue_Complete")
+		self.db.realm.queueData[self.currentPlayer] = {}
+		self:SendMessage("Skillet_Queue_Complete")
 	end
 end
 
@@ -289,16 +300,11 @@ function Skillet:QueueItems(count)
 		if self.currentTrade and self.selectedSkill then
 			if recipe then
 				local queueCommand = self:QueueCommandIterate(recipeID, count)
-
-				self.reagentsChanged = {}
 				self:QueueAppendCommand(queueCommand, Skillet.db.profile.queue_craftable_reagents)
-				self:AdjustInventory()
 			end
 		end
 	end
 
---	Skillet:UpdateQueueWindow()
-	Skillet:UpdateTradeSkillWindow()
 	return count
 end
 
@@ -336,18 +342,18 @@ if SkilletFrame:IsVisible() then
 --	DEFAULT_CHAT_FRAME:AddMessage("StopCast "..(spellBeingCast or "nocast").." "..(spell or "nopass").." "..(self.processingSpell or "noproc"))
 end
 
-	if not self.db.server.queueData then
-		self.db.server.queueData = {}
+	if not self.db.realm.queueData then
+		self.db.realm.queueData = {}
 	end
 
 
-	local queue = self.db.server.queueData[self.currentPlayer]
+	local queue = self.db.realm.queueData[self.currentPlayer]
 
 	if spell == self.processingSpell then
 		if success then
 			if not queue[1] then
-				self.db.server.queueData[self.currentPlayer] = {}
---				AceEvent:TriggerEvent("Skillet_Queue_Complete")
+				self.db.realm.queueData[self.currentPlayer] = {}
+--				self:SendMessage("Skillet_Queue_Complete")
 				self.queuecasting = false
 				self.processingSpell = nil
 
@@ -412,7 +418,7 @@ function Skillet:ScanQueuedReagents()
 DebugSpam("ScanQueuedReagents")
 	local reagentsInQueue = {}
 
-	for i,command in pairs(self.db.server.queueData[self.currentPlayer]) do
+	for i,command in pairs(self.db.realm.queueData[self.currentPlayer]) do
 		if command.op == "iterate" then
 			local recipe = self:GetRecipe(command.recipeID)
 
@@ -428,33 +434,33 @@ DebugSpam("ScanQueuedReagents")
 		end
 	end
 
-	self.db.server.reagentsInQueue[self.currentPlayer] = reagentsInQueue
+	self.db.realm.reagentsInQueue[self.currentPlayer] = reagentsInQueue
 end
 
 
 -- Returns a table {playername, queues} containing all queued
 -- items
 function Skillet:GetAllQueues()
-    if not self.db.server.queues then
+    if not self.db.realm.queues then
         return {}
     end
 
-    return self.db.server.queues
+    return self.db.realm.queues
 end
 
 -- Returns the list of queues for the specified player
 function Skillet:GetQueues(player)
     assert(tostring(player),"Usage: GetQueues('player_name')")
 
-    if not self.db.server.queues then
+    if not self.db.realm.queues then
         return {}
     end
 
-    if not self.db.server.queues[player] then
+    if not self.db.realm.queues[player] then
         return {}
     end
 
-    return self.db.server.queues[player]
+    return self.db.realm.queues[player]
 end
 
 -- Returns the list of queues for the current player

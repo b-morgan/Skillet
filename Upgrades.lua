@@ -25,10 +25,16 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
 -- Runs all the update functions, should they be required
 function Skillet:UpgradeDataAndOptions()
+
+    if self.db.server then
+       self.db.realm = self.db.server
+       self.db.server = nil
+    end
+
     -- Upgrade from Skillet 1.2 and earlier where recipes where (stupidly)
     -- stored per-charcter where no one else could see them
     if self.db.char.recipes then
-        self.db.server.recipes[UnitName("player")] = self.db.char.recipes
+        self.db.realm.recipes[UnitName("player")] = self.db.char.recipes
         self.db.char.recipes = nil
     end
 
@@ -57,7 +63,7 @@ function Skillet:UpgradeDataAndOptions()
 
     -- Moved any recipe notes to the server level so all alts can see then
     if self.db.char.notes then
-        self.db.server.notes[UnitName("player")] = self.db.char.notes
+        self.db.realm.notes[UnitName("player")] = self.db.char.notes
         self.db.char.notes = nil
     end
 
@@ -85,13 +91,13 @@ function Skillet:UpgradeDataAndOptions()
 
 
 	-- remove pre 1.11(?) recipe storage
-	if self.db.server.recipes then
-        self.db.server.recipes[UnitName("player")] = nil
+	if self.db.realm.recipes then
+        self.db.realm.recipes[UnitName("player")] = nil
     end
     
     -- remove pre 1.11(?) queue storage
-    if self.db.server.queues then
-    	self.db.server.queues = nil
+    if self.db.realm.queues then
+    	self.db.realm.queues = nil
     end
 end
 

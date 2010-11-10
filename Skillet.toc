@@ -1,24 +1,24 @@
-## Interface: 40000
-## Title: Skillet |cff7fff7f -Ace2-|r
+﻿## Interface: 40000
+## Title: Skillet |cff7fff7f -Ace3-|r
 ## Notes: A replacement tradeskill window
 ## Notes-esES: Una sustitucion de la ventana de Habilidades de Comercio
 ## Notes-ruRU: Заменяет окно профессий на более функциональное.
-## Author: nogudnik, lilsparky, yossa
-## Version 2.06
+## Author: yossa, lilsparky
+## Version 2.07
 ## X-Category: Tradeskill
-## X-eMail: skillet@luuz.org
+## X-eMail: yossa.addons@googlemail.com
 ## X-License GPL v3 or later
-## X-Credits Slartie (for ASTW)
+## X-Credits nogudnik (creator of Skillet), Slartie (for ASTW)
 ## X-RelSite-WoWI: 7571
 #### X-AceForum: 9179
-## X-WoWIPortal: nogudnik
+## X-WoWIPortal: yossa
 ## X-Website: http://www.wowace.com/addons/skillet/
 ## X-RelSite-Curse: http://wow.curse.com/downloads/wow-addons/details/skillet.aspx
 #### X-RelSite-UI.WoW:
 ## SavedVariables: SkilletDB
 ## SavedVariablesPerCharacter: SkilletDBPC
-## OptionalDeps: Ace2, Waterfall-1.0, AbacusLib, Fizzwidget Reagent Cost, LibPeriodicTable-3.1, WindowLib, LibStub, CharacterInfoStorage, Sanity2, tekDebug
-## X-Embeds: Ace2, Waterfall-1.0, AbacusLib, LibPeriodicTable-3.1, WindowLib
+## OptionalDeps: Ace3, LibAbacus-3.0, LibWindow-1.1, LibPeriodicTable-3.1, Fizzwidget Reagent Cost, TradeSkillInfo
+## X-Embeds: Ace3, LibStub, CallbackHandler-1.0, LibAbacus-3.0, LibWindow-1.1, LibPeriodicTable-3.1
 ## X-Revision: $Rev$
 
 ## LoadManagers: AddonLoader
@@ -27,21 +27,25 @@
 
 #### List of embedded libraries
 #@no-lib-strip@
-Libs\AceLibrary\AceLibrary.lua
-Libs\AceOO-2.0\AceOO-2.0.lua
-Libs\AceAddon-2.0\AceAddon-2.0.lua
-Libs\AceConsole-2.0\AceConsole-2.0.lua
-Libs\AceDB-2.0\AceDB-2.0.lua
-Libs\AceEvent-2.0\AceEvent-2.0.lua
-Libs\AceHook-2.1\AceHook-2.1.lua
-Libs\AceLocale-2.2\AceLocale-2.2.lua
-Libs\Waterfall-1.0\Waterfall-1.0.lua
-Libs\Abacus-2.0\Abacus-2.0.lua
+Libs\LibStub\LibStub.lua
+Libs\CallbackHandler-1.0\CallbackHandler-1.0.lua
+
+Libs\AceAddon-3.0\AceAddon-3.0.lua
+Libs\AceConfig-3.0\AceConfig-3.0.lua
+Libs\AceConsole-3.0\AceConsole-3.0.lua
+Libs\AceLocale-3.0\AceLocale-3.0.lua
+Libs\AceDB-3.0\AceDB-3.0.lua
+Libs\AceDBOptions-3.0\AceDBOptions-3.0.lua
+Libs\AceGUI-3.0\AceGUI-3.0.lua
+Libs\AceHook-3.0\AceHook-3.0.lua
+Libs\AceEvent-3.0\AceEvent-3.0.lua
+Libs\AceTimer-3.0\AceTimer-3.0.lua
+Libs\LibAbacus-3.0\LibAbacus-3.0.lua
+Libs\LibWindow-1.1\LibWindow-1.1.lua
 Libs\LibPeriodicTable-3.1\LibPeriodicTable-3.1.lua
 Libs\LibPeriodicTable-3.1\LibPeriodicTable-3.1-Tradeskill\LibPeriodicTable-3.1-Tradeskill.lua
 Libs\LibPeriodicTable-3.1\LibPeriodicTable-3.1-TradeskillResultMats\LibPeriodicTable-3.1-TradeskillResultMats.lua
 Libs\LibPeriodicTable-3.1\LibPeriodicTable-3.1-TradeskillLevels\LibPeriodicTable-3.1-TradeskillLevels.lua
-Libs\Window-1.0\Window-1.0.lua
 #@end-no-lib-strip@
 
 
@@ -56,7 +60,6 @@ Locale\Locale-frFR.lua
 Locale\Locale-esES.lua
 
 #### Main files
-#LibPossessions.lua
 Skillet.lua
 SkilletData.lua
 TradeskillInfo.lua

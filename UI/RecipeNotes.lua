@@ -21,7 +21,7 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
 SKILLET_NOTES_ITEM_DISPLAYED = 7
 SKILLET_NOTES_ITEM_HEIGHT    = SKILLET_TRADE_SKILL_HEIGHT * 3
 
-local L = AceLibrary("AceLocale-2.2"):new("Skillet")
+local L = LibStub("AceLocale-3.0"):GetLocale("Skillet")
 local NO_NOTE = GRAY_FONT_COLOR_CODE .. L["click here to add a note"] .. FONT_COLOR_CODE_CLOSE
 
 local editbox;
@@ -40,7 +40,7 @@ end
 -- Shows the recipe notes editor for the current window
 function Skillet:ShowRecipeNotes()
 	local recipe = self:GetRecipeDataByTradeIndex(self.currentTrade, self.selectedSkill)
-		
+
 	if not recipe then
 		return
 	end
@@ -77,7 +77,7 @@ local function get_edit_box()
 		self:Hide()
 		local b = self:GetParent()
 		local l = b:GetAttribute("notes_key")
-		local n = getglobal(b:GetName() .. "Notes")
+		local n = _G[b:GetName() .. "Notes"]
 
 		local skillet = self.obj
 
@@ -89,7 +89,7 @@ local function get_edit_box()
 		self:Hide()
 
 		local b = self:GetParent()
-		local n = getglobal(b:GetName() .. "Notes")
+		local n = _G[b:GetName() .. "Notes"]
 		n:Show()
 	end);
 
@@ -101,8 +101,8 @@ function Skillet:RecipeNote_OnClick(button)
 	self:UpdateNotesWindow()
 
 	local key = button:GetAttribute("notes_key")
-	
-	local notesObject = getglobal(button:GetName() .. "Notes")
+
+	local notesObject = _G[button:GetName() .. "Notes"]
 	local notes = notesObject:GetText();
 
 	if not editbox then
@@ -134,11 +134,11 @@ end
 -- XXX: and tools?
 function Skillet:UpdateNotesWindow()
 	local recipe, recipeID = self:GetRecipeDataByTradeIndex(self.currentTrade, self.selectedSkill)
-		
+
 	if not recipe then
 		return
 	end
-	
+
 	if editbox then
 		editbox:Hide()
 	end
@@ -161,12 +161,12 @@ function Skillet:UpdateNotesWindow()
 	for i=1, SKILLET_NOTES_ITEM_DISPLAYED, 1 do
 		local index = i + offset
 
-		local button = getglobal("SkilletNotesButton"..i)
+		local button = _G["SkilletNotesButton"..i]
 
 		if index <= numItems then
-			local text   = getglobal(button:GetName() .. "Text");
-			local icon   = getglobal(button:GetName() .. "Icon");
-			local notes  = getglobal(button:GetName() .. "Notes");
+			local text   = _G[button:GetName() .. "Text"];
+			local icon   = _G[button:GetName() .. "Icon"];
+			local notes  = _G[button:GetName() .. "Notes"];
 
 			-- set the width based on whether or not the scroll bar is displayed
 			if ( SkilletNotesList:IsShown() ) then
@@ -174,26 +174,26 @@ function Skillet:UpdateNotesWindow()
 			else
 				button:SetWidth(190)
 			end
-			
+
 			local key
-			
+
 			if index == 1 then
 				local texture
-				
+
 				-- notes for the recipe itself
 				text:SetText((GetSpellInfo(recipeID)))
-				
+
 				if recipe.numMade > 0 then
 					_,_,_,_,_,_,_,_,_,texture = GetItemInfo(recipe.itemID)		-- get the item texture
 				else
 					texture = "Interface\\Icons\\Spell_Holy_GreaterHeal"		-- standard enchant icon
 				end
-		
+
 				icon:SetNormalTexture(texture)
 				key = "enchant:"..recipeID
 			else
 				local name, link, _,_,_,_,_,_,_,texture = GetItemInfo(recipe.reagentData[index-1].id)
-				
+
 				-- notes for a reagent
 				text:SetText(name)
 				icon:SetNormalTexture(texture)

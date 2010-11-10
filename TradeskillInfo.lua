@@ -91,7 +91,7 @@ end
 -- Checks a link and returns the level of the that item's quality. If the link is
 -- invalid, or not item quality could be found, nil is returned.
 --
--- Handy info: getglobal("ITEM_QUALITY" .. level .. "_DESC") returns "Epic", etc (localized)
+-- Handy info: _G["ITEM_QUALITY" .. level .. "_DESC"] returns "Epic", etc (localized)
 --
 -- @return
 --     level: from 0 (Poor) to 6 (Artifact).
@@ -141,7 +141,7 @@ function Skillet:GetNumTradeSkills(tradeOverride, playerOverride)
 	local tradeID = tradeOverride or self.currentTrade
 	local player = playerOverride or self.currentPlayer
 	
-	local numSkills = #self.db.server.skillDB[playerOverride][tradeID]
+	local numSkills = #self.db.realm.skillDB[playerOverride][tradeID]
 	
 	return numSkills
 end
@@ -354,7 +354,7 @@ local function build_reagents(self, s, reagent)
 end
 
 local function build_skills(self, name, prof, skill_index)
-    local s = self:DecodeRecipe(self.db.server.recipes[name][prof][skill_index])
+    local s = self:DecodeRecipe(self.db.realm.recipes[name][prof][skill_index])
     local c = {
         name = s.name,
         link = s.link,
@@ -374,8 +374,8 @@ end
 local function build_profs(self, name, prof)
     local c = {name = prof}
 
-    for skill, _ in pairs(self.db.server.recipes[name][prof]) do
-        if self.db.server.recipes[name][prof][skill] ~= nil then
+    for skill, _ in pairs(self.db.realm.recipes[name][prof]) do
+        if self.db.realm.recipes[name][prof][skill] ~= nil then
             table.insert(c, build_skills(self, name, prof, skill))
         end
     end
@@ -386,7 +386,7 @@ end
 local function build_character(self, name)
     local c = {name = name}
 
-    for prof, _ in pairs(self.db.server.recipes[name]) do
+    for prof, _ in pairs(self.db.realm.recipes[name]) do
         if prof and prof ~= "" and prof ~= "UNKNOWN" then
             table.insert(c, build_profs(self, name, prof))
         end
@@ -398,7 +398,7 @@ end
 local function build_characters(self)
     local c = {}
 
-    for name, _ in pairs(self.db.server.recipes) do
+    for name, _ in pairs(self.db.realm.recipes) do
         table.insert(c, build_character(self, name))
     end
 
