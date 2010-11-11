@@ -25,4 +25,4 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
 local L = LibStub("AceLocale-3.0"):NewLocale("Skillet", "koKR")
 if not L then return end
 
---@localization(locale="koKR", format="lua_additive_table", handle-subnamespaces="concat")@
+--@localization(locale="koKR", format="lua_additive_table", handle-unlocalized="english", handle-subnamespaces="concat")@
