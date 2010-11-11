@@ -1616,7 +1616,7 @@ end
 
 
 local bopCache = {}
-local function bopCheck(item)
+function Skillet:bopCheck(item)
 
 	if bopCache[item] == 1 then
 		return true
@@ -1712,7 +1712,7 @@ function Skillet:UpdateDetailsWindow(skillIndex)
 
 	if not skill then
 		Skillet:HideDetailWindow()
-		return	
+		return
 	end
 
 --	if skill.id == lastUpdateSpellID then return end
@@ -1907,81 +1907,12 @@ function Skillet:UpdateDetailsWindow(skillIndex)
 	-- Do any mods want to add extra info to the details window?
 --	local extra_text = self:GetExtraItemDetailText(self.currentTrade, skillIndex)
 
-	local extra_text
-	local bop
-
-
-	if AckisRecipeList and AckisRecipeList.InitRecipeData then
-		local _, recipeList, mobList, trainerList = AckisRecipeList:InitRecipeData()
-
-		local recipeData = AckisRecipeList:GetRecipeData(skill.id)
-
-		if recipeData == nil and not ARLProfessionInitialized[recipe.tradeID] then
-			ARLProfessionInitialized[recipe.tradeID] = true
-
-			local profession = GetSpellInfo(recipe.tradeID)
-
-			AckisRecipeList:AddRecipeData(profession)
-
-			recipeData = AckisRecipeList:GetRecipeData(skill.id)
-		end
-
-
-		if recipeData then
-			extra_text = AckisRecipeList:GetRecipeLocations(skill.id)
-
---DEFAULT_CHAT_FRAME:AddMessage("ARL Data "..(extra_text or "nil"))
-
-			if extra_text == "" then extra_text = nil end
-		end
-	end
-
-	if TradeskillInfo and not extra_text then
--- tsi uses itemIDs for skill indices instead of enchantID numbers.  for enchants, the enchantID is negated to avoid overlaps
-		local tsiRecipeID = recipe.itemID
-
-		if tsiRecipeID == 0 and recipe.spellID then
-			tsiRecipeID = -recipe.spellID
-		elseif tsiRecipeID then
-			tsiRecipeID = TradeskillInfo:MakeSpecialCase(tsiRecipeID, recipe.spellID)
-		end
-
-		if tsiRecipeID then
-			local combineID = TradeskillInfo:GetCombineRecipe(tsiRecipeID)
-
-
-			if combineID then
-				_, extra_text = self:TSIGetRecipeSources(combineID, false)
-
-				if not extra_text then
-					extra_text = "Trained ("..(TradeskillInfo:GetCombineLevel(tsiRecipeID) or "??")..")"
-				end
-
-					--		SkilletExtraDetailText.dataSource = "TradeSkillInfo Mod - version "..(TradeskillInfo.version or "?")
---				local _, link = GetItemInfo(combineID)
---DEFAULT_CHAT_FRAME:AddMessage("recipe: "..(link or combineID))
-				if bopCheck(combineID) then
-					bop = true
-				end
-
-			else
-				extra_text = "|cffff0000Unknown|r"
-			end
-
-		else
-			extra_text = "can't find recipeID for item "..recipe.itemID
-		end
-	end
---DEFAULT_CHAT_FRAME:AddMessage(extra_text or "nil")
+	local label, extra_text = Skillet:GetExtraText(skill, recipe)
 
 	if extra_text then
 		SkilletExtraDetailTextLeft:SetPoint("TOPLEFT",lastReagentButton,"BOTTOMLEFT",0,-10)
 
-		if bop then
-			SkilletExtraDetailTextLeft:SetText(GRAY_FONT_COLOR_CODE.."Source:\n|cffff0000(*BOP*)|r")
-		else
-			SkilletExtraDetailTextLeft:SetText(GRAY_FONT_COLOR_CODE.."Source:")
-		end
+		SkilletExtraDetailTextLeft:SetText(GRAY_FONT_COLOR_CODE..label)
 
 		SkilletExtraDetailTextLeft:Show()
 
@@ -2015,25 +1946,29 @@ end
 
 
 
-function Skillet:QueueItemButton_OnClick(button)
+function Skillet:QueueItemButton_OnClick(this, button)
 	local queue = self.db.realm.queueData[self.currentPlayer]
 
-	local index = button:GetID()
+	local index = this:GetID()
 
-	local recipeID = queue[index].recipeID
+	if button == "LeftButton" then
+		local recipeID = queue[index].recipeID
 
-	local recipe = self:GetRecipe(recipeID)
-	--self.db.global.recipeData[recipeID]
+		local recipe = self:GetRecipe(recipeID)
+		--self.db.global.recipeData[recipeID]
 
-	local tradeID = recipe.tradeID
+		local tradeID = recipe.tradeID
 
-	local newSkillIndex = self.data.skillIndexLookup[self.currentPlayer][recipeID]
+		local newSkillIndex = self.data.skillIndexLookup[self.currentPlayer][recipeID]
 
-DebugSpam("selecting new skill "..tradeID..":"..(newSkillIndex or "nil"))
---	self:PushSkill(Skillet.currentPlayer, self.currentTrade, self.selectedSkill)			-- push the current skill or no?
+		DebugSpam("selecting new skill "..tradeID..":"..(newSkillIndex or "nil"))
+	--	self:PushSkill(Skillet.currentPlayer, self.currentTrade, self.selectedSkill)			-- push the current skill or no?
 
-	self:SetTradeSkill(self.currentPlayer, tradeID, newSkillIndex)
-DebugSpam("done selecting new skill")
+		self:SetTradeSkill(self.currentPlayer, tradeID, newSkillIndex)
+		DebugSpam("done selecting new skill")
+	elseif button == "RightButton" then
+		Skillet:SkilletQueueMenu_Show(this)
+	end
 end
 
 
@@ -3084,6 +3019,32 @@ local skillMenuListHidden = {
 	},
 }
 
+local queueMenuList = {
+	{
+		text = L["Move to Top"],
+		func = function()
+					Skillet:QueueMoveToTop(Skillet.queueMenuButton:GetID())
+				end,
+	},
+	{
+		text = L["Move Up"],
+		func = function()
+					Skillet:QueueMoveUp(Skillet.queueMenuButton:GetID())
+				end,
+	},
+	{
+		text = L["Move Down"],
+		func = function()
+					Skillet:QueueMoveDown(Skillet.queueMenuButton:GetID())
+				end,
+	},
+	{
+		text = L["Move to Bottom"],
+		func = function()
+					Skillet:QueueMoveToBottom(Skillet.queueMenuButton:GetID())
+				end,
+	},
+}
 
 -- Called when the skill operators drop down is displayed
 function Skillet:SkilletSkillMenu_Show(button)
@@ -3113,6 +3074,19 @@ function Skillet:SkilletSkillMenu_Show(button)
 --	ToggleDropDownMenu(1, nil, SkilletSkillMenu, button, 0, 0)
 end
 
+
+function Skillet:SkilletQueueMenu_Show(button)
+	if not SkilletQueueMenu then
+		SkilletQueueMenu = CreateFrame("Frame", "SkilletQueueMenu", _G["UIParent"], "UIDropDownMenuTemplate")
+	end
+
+	local x, y = GetCursorPosition()
+	local uiScale = UIParent:GetEffectiveScale()
+
+	self.queueMenuButton = button
+
+	EasyMenu(queueMenuList, SkilletQueueMenu, _G["UIParent"], x/uiScale,y/uiScale, "MENU", 5)
+end
 
 
 

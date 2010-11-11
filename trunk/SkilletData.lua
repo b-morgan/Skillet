@@ -624,6 +624,14 @@ DebugSpam("Scanning Trade "..(profession or "nil")..":"..(tradeID or "nil").." "
 		Skillet.data.skillIndexLookup[player] = {}
 	end
 
+	if not Skillet.data.skillList[player] then
+		Skillet.data.skillList[player] = {}
+	end
+
+	if not Skillet.data.skillList[player][tradeID] then
+		Skillet.data.skillList[player][tradeID] = {}
+	end
+
 	local skillData = Skillet.data.skillList[player][tradeID]
 
 	local lastHeader = nil

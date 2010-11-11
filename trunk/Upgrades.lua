@@ -26,16 +26,21 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
 -- Runs all the update functions, should they be required
 function Skillet:UpgradeDataAndOptions()
 
-    if self.db.server then
-       self.db.realm = self.db.server
-       self.db.server = nil
+    if SkilletDB.servers then
+       SkilletDB.realms = SkilletDB.servers
+	   SkilletDB.servers = nil
+
+	   self.db = LibStub("AceDB-3.0"):New("SkilletDB")
     end
 
     -- Upgrade from Skillet 1.2 and earlier where recipes where (stupidly)
     -- stored per-charcter where no one else could see them
     if self.db.char.recipes then
-        self.db.realm.recipes[UnitName("player")] = self.db.char.recipes
         self.db.char.recipes = nil
+    end
+
+	if self.db.realm.recipes then
+        self.db.realm.recipes = nil
     end
 
     -- Update from Skillet 1.5 or earlier where profile options were
@@ -67,37 +72,5 @@ function Skillet:UpgradeDataAndOptions()
         self.db.char.notes = nil
     end
 
-    -- Wipe out any pre-1.6 created queues. They just don't have what we need.
-    -- Specifically, they do no have the recipe links needed for checking queued
-    -- items for tradeskills we don't have on this character
-    for player,playerqueues in pairs(self:GetAllQueues()) do
-        -- check the queues for all professions
-        for _,queue in pairs(playerqueues) do
-            if queue and #queue > 0 then
-                for i=#queue,1,-1 do
-                    if not queue[i].recipe then
-                        table.remove(queue, i)
-                    end
-                end
-            end
-        end
-    end
-
-    -- option is new in 1.10 and I want it to default to true if it
-    -- does not already exist
-    if self.db.profile.show_bank_alt_counts == nil then
-        self.db.profile.show_bank_alt_counts = true
-    end
-
-
-	-- remove pre 1.11(?) recipe storage
-	if self.db.realm.recipes then
-        self.db.realm.recipes[UnitName("player")] = nil
-    end
-    
-    -- remove pre 1.11(?) queue storage
-    if self.db.realm.queues then
-    	self.db.realm.queues = nil
-    end
 end
 
