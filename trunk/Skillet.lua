@@ -54,7 +54,7 @@ local defaults = {
 	    transparency = 1.0,
 	    scale = 1.0,
 	},
-	factionrealm = {
+	realm = {
 	    -- we tell Stitch to keep the "recipes" table up to data for us.
 	    recipes = {},
 	    -- and any queued up recipes

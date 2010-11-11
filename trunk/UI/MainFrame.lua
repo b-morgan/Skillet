@@ -1660,13 +1660,7 @@ local function bopCheck(item)
 --	end
 end
 
-
-local lastDetailUpdate = 0
-local lastUpdateSpellID = nil
-local ARLProfessionInitialized = {}
--- Updates the details window with information about the currently selected skill
-function Skillet:UpdateDetailsWindow(skillIndex)
-	if not skillIndex or skillIndex < 0 then
+function Skillet:HideDetailWindow()
 		SkilletSkillName:SetText("")
 		SkilletSkillCooldown:SetText("")
 		SkilletRequirementLabel:Hide()
@@ -1694,7 +1688,15 @@ function Skillet:UpdateDetailsWindow(skillIndex)
 		for c,s in pairs(SkilletRankFrame.subRanks) do
 			s:Hide()
 		end
+end
 
+local lastDetailUpdate = 0
+local lastUpdateSpellID = nil
+local ARLProfessionInitialized = {}
+-- Updates the details window with information about the currently selected skill
+function Skillet:UpdateDetailsWindow(skillIndex)
+	if not skillIndex or skillIndex < 0 then
+		Skillet:HideDetailWindow()
 		return
 	end
 
@@ -1708,13 +1710,16 @@ function Skillet:UpdateDetailsWindow(skillIndex)
 
 	local skill = self:GetSkill(self.currentPlayer, self.currentTrade, skillIndex)
 
+	if not skill then
+		Skillet:HideDetailWindow()
+		return	
+	end
+
 --	if skill.id == lastUpdateSpellID then return end
 
 	lastUpdateSpellID = skill.id
 
 	local recipe = skilletUnknownRecipe
-
-	if not skill then return end
 
 	if skill then
 		recipe = self:GetRecipe(skill.id) or skilletUnknownRecipe
