@@ -438,76 +438,35 @@ DebugSpam("ScanQueuedReagents")
 end
 
 
--- Returns a table {playername, queues} containing all queued
--- items
-function Skillet:GetAllQueues()
-    if not self.db.realm.queues then
-        return {}
-    end
-
-    return self.db.realm.queues
+function Skillet:QueueMoveToTop(index)
+	local queue = self.db.realm.queueData[self.currentPlayer]
+	if index>1 and index<=#queue then
+		table.insert(queue, 1, queue[index])
+		table.remove(queue, index+1)
+	end
+	self:UpdateTradeSkillWindow()
 end
-
--- Returns the list of queues for the specified player
-function Skillet:GetQueues(player)
-    assert(tostring(player),"Usage: GetQueues('player_name')")
-
-    if not self.db.realm.queues then
-        return {}
-    end
-
-    if not self.db.realm.queues[player] then
-        return {}
-    end
-
-    return self.db.realm.queues[player]
+function Skillet:QueueMoveUp(index)
+	local queue = self.db.realm.queueData[self.currentPlayer]
+	if index>1 and index<=#queue then
+		table.insert(queue, index-1, queue[index])
+		table.remove(queue, index+1)
+	end
+	self:UpdateTradeSkillWindow()
 end
-
--- Returns the list of queues for the current player
-function Skillet:GetPlayerQueues()
-    return self:GetQueues(self.currentPlayer)
+function Skillet:QueueMoveDown(index)
+	local queue = self.db.realm.queueData[self.currentPlayer]
+	if index>0 and index<#queue then
+		table.insert(queue, index+2, queue[index])
+		table.remove(queue, index)
+	end
+	self:UpdateTradeSkillWindow()
 end
-
---
--- Checks the queued items and calculates how many of each reagent is required.
--- The table of reagents and counts is returned. The will examine the queues for
--- all professions, not just the currently selected on.
---
--- If the player name is not provided, then the queues for all players are checked.
---
--- The returned table contains:
---     name : name of the item
---     link : link for the item
---     count : how many of this item is needed
---     player : comma separated list of players that need the item for their queues
---
-function Skillet:ReserveReagentsForQueuedRecipes(playername)
-    local list = {}
-
-    for player,playerqueues in pairs(self:GetAllQueues()) do
-        -- check the queues for all professions
-        if not playername or playername == player then
-            for _,queue in pairs(playerqueues) do
-                -- this is what we need
-                if queue and #queue > 0 then
-                    for i=1,#queue,1 do
-                    	if (queue[i].op == "iterate") then
-                    		local recipe = self:GetRecipe(queue[i].recipeID)
-                    		local count = queue[i].count
-
-							for j=1, #recipe.reagentData, 1 do
-								local reagent = recipe.reagentData[j]
-								local needed = count * reagent.numNeeded
-
-								list[reagentID] = needed
-							end
-                        end
-
-                    end
-                end
-            end
-        end
-    end
-
-	self.reagentsInQueue = list
+function Skillet:QueueMoveToBottom(index)
+	local queue = self.db.realm.queueData[self.currentPlayer]
+	if index>0 and index<#queue then
+		table.insert(queue, queue[index])
+		table.remove(queue, index)
+	end
+	self:UpdateTradeSkillWindow()
 end

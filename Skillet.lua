@@ -55,10 +55,6 @@ local defaults = {
 	    scale = 1.0,
 	},
 	realm = {
-	    -- we tell Stitch to keep the "recipes" table up to data for us.
-	    recipes = {},
-	    -- and any queued up recipes
-	    queues = {},
 	    -- notes added to items crafted or used in crafting.
 	    notes = {},
 	},
@@ -421,6 +417,22 @@ Skillet.options =
             guiHidden = true,
 			order = 51
 		},
+		standby = {
+			type = 'execute',
+			name = L["STANDBYNAME"],
+			desc = L["STANDBYDESC"],
+			func = function()
+				if Skillet:IsEnabled() then
+					Skillet:Disable()
+					Skillet:Print(RED_FONT_COLOR_CODE..L["is now disabled"]..FONT_COLOR_CODE_CLOSE)
+				else
+					Skillet:Enable()
+					Skillet:Print(GREEN_FONT_COLOR_CODE..L["is now enabled"]..FONT_COLOR_CODE_CLOSE)
+				end
+			end,
+            guiHidden = true,
+			order = 52
+		},
         shoppinglist = {
             type = 'execute',
             name = L["Shopping List"],
@@ -511,7 +523,7 @@ function Skillet:OnInitialize()
 	end
 
 	local acecfg = LibStub("AceConfig-3.0")
-	acecfg:RegisterOptionsTable("Skillet", self.options, {"/skillet"})
+	acecfg:RegisterOptionsTable("Skillet", self.options, "skillet")
     acecfg:RegisterOptionsTable("Skillet Features", self.options.args.features)
 	acecfg:RegisterOptionsTable("Skillet Appearance", self.options.args.appearance)
 	acecfg:RegisterOptionsTable("Skillet Profiles", LibStub("AceDBOptions-3.0"):GetOptionsTable(self.db))
@@ -721,12 +733,6 @@ function Skillet:OnEnable()
     -- run the upgrade code to convert any old settings
     self:UpgradeDataAndOptions()
 
-
-    -- hook up our copy of stitch to the data for this character
---    if self.db.realm.recipes[self.currentPlayer] then
---        self.data = self.db.realm.recipes[self.currentPlayer]
---    end
---    self.db.realm.recipes[self.currentPlayer] = self.db.global.recipeData
 
  	self:EnableQueue("Skillet")
 	self:EnableDataGathering("Skillet")
