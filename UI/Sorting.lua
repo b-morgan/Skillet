@@ -56,11 +56,11 @@ local function sort_recipe_by_skill_level(tradeskill, a, b)
 	local leftDifficulty = 0
 	local rightDifficulty = 0
 
-	if a.skillData then
+	if a.skillData and a.skillData.difficulty then
 		leftDifficulty = skill_style_type[a.skillData.difficulty].level
 	end
 
-	if b.skillData then
+	if b.skillData and b.skillData.difficulty then
 		rightDifficulty = skill_style_type[b.skillData.difficulty].level
 	end
 
