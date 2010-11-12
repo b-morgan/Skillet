@@ -527,6 +527,9 @@ end
 
 
 function SkilletData:GetNumSkills(player, trade)
+	if not Skillet.db.realm.skillDB[player] then return 0 end
+	if not Skillet.db.realm.skillDB[player][trade] then return 0 end
+
 	return #Skillet.db.realm.skillDB[player][trade]
 end
 
