@@ -33,6 +33,10 @@ function Skillet:UpgradeDataAndOptions()
 	   self.db = LibStub("AceDB-3.0"):New("SkilletDB")
     end
 
+	if self.db.profile.transparency<0.1 or self.db.profile.transparency>1 then
+		self.db.profile.transparency=1
+	end
+
     -- Upgrade from Skillet 1.2 and earlier where recipes where (stupidly)
     -- stored per-charcter where no one else could see them
     if self.db.char.recipes then
