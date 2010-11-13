@@ -18,7 +18,7 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
 ]]--
 
-local MAJOR_VERSION = "2.08"
+local MAJOR_VERSION = "2.09"
 local MINOR_VERSION = ("$Revision$"):match("%d+") or 1
 local DATE = string.gsub("$Date$", "^.-(%d%d%d%d%-%d%d%-%d%d).-$", "%1")
 
@@ -53,6 +53,8 @@ local defaults = {
 	    display_shopping_list_at_auction = false,
 	    transparency = 1.0,
 	    scale = 1.0,
+	    plugins = {},
+		SavedQueues = {},
 	},
 	realm = {
 	    -- notes added to items crafted or used in crafting.
@@ -533,6 +535,8 @@ function Skillet:OnInitialize()
 	acedia:AddToBlizOptions("Skillet Appearance", "Appearance", "Skillet")
 	acedia:AddToBlizOptions("Skillet Profiles", "Profiles", "Skillet")
 
+	Skillet:InitializePlugins()
+
 end
 
 
@@ -627,8 +631,8 @@ DebugSpam("initialize database for "..player)
 		self.db.global.itemRecipeSource = {}
 	end
 
-	if not self.db.global.SavedQueues then
-		self.db.global.SavedQueues = {}
+	if not self.db.profile.SavedQueues then
+		self.db.profile.SavedQueues = {}
 	end
 
     if not self.dataGatheringModules then

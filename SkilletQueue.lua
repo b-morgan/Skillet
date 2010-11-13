@@ -19,6 +19,7 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
 ]]--
 
 local QUEUE_DEBUG = false
+local L = Skillet.L
 
 Skillet.reagentsChanged = {}
 
@@ -469,4 +470,78 @@ function Skillet:QueueMoveToBottom(index)
 		table.remove(queue, index)
 	end
 	self:UpdateTradeSkillWindow()
+end
+
+local function tcopy(t)
+  local u = { }
+  for k, v in pairs(t) do u[k] = v end
+  return setmetatable(u, getmetatable(t))
+end
+
+function Skillet:SaveQueue(name, overwrite)
+	local queue = self.db.realm.queueData[self.currentPlayer]
+	local reagents = self.db.realm.reagentsInQueue[self.currentPlayer]
+
+	if not name or name == "" then return end
+
+	if not queue or #queue == 0 then
+		Skillet:MessageBox(L["Queue is empty"])
+		return
+	end
+
+	if self.db.profile.SavedQueues[name] and not overwrite then
+		Skillet:AskFor(L["Queue with this name already exsists. Overwrite?"],
+			function() Skillet:SaveQueue(name, true)  end
+			)
+		return
+	end
+	self.db.profile.SavedQueues[name] = {}
+	self.db.profile.SavedQueues[name].queue = tcopy(queue)
+	self.db.profile.SavedQueues[name].reagents = tcopy(reagents)
+	Skillet.selectedQueueName = name
+	Skillet:QueueLoadDropdown_OnShow()
+	SkilletQueueSaveEditBox:SetText("")
+end
+
+function Skillet:LoadQueue(name, overwrite)
+	local queue = self.db.realm.queueData[self.currentPlayer]
+
+	if not name or name == "" then return end
+
+	if not self.db.profile.SavedQueues[name] then
+		Skillet:MessageBox(L["No such queue saved"])
+		return
+	end
+
+	if queue and #queue > 0 and not overwrite then
+		Skillet:AskFor(L["Queue is not empty. Overwrite?"],
+			function() Skillet:LoadQueue(name, true)  end
+			)
+		return
+	end
+	self.db.realm.queueData[self.currentPlayer] = tcopy(self.db.profile.SavedQueues[name].queue)
+	self.db.realm.reagentsInQueue[self.currentPlayer] = tcopy(self.db.profile.SavedQueues[name].reagents)
+	Skillet:UpdateTradeSkillWindow()
+end
+
+function Skillet:DeleteQueue(name, overwrite)
+	local queue = self.db.realm.queueData[self.currentPlayer]
+
+	if not name or name == "" then return end
+
+	if not self.db.profile.SavedQueues[name] then
+		Skillet:MessageBox(L["No such queue saved"])
+		return
+	end
+
+	if not overwrite then
+		Skillet:AskFor(L["Really delete this queue?"],
+			function() Skillet:DeleteQueue(name, true)  end
+			)
+		return
+	end
+	self.db.profile.SavedQueues[name] = nil
+	Skillet.selectedQueueName = ""
+	Skillet:QueueLoadDropdown_OnShow()
+	Skillet:UpdateTradeSkillWindow()
 end

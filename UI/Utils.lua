@@ -279,11 +279,39 @@ function Tooltip_ShowCompareItem(tip, link, sideOverride)
 	end
 end
 
+StaticPopupDialogs["SKILLETMSG"] = {
+	button1 = OKAY,
+	button2 = nil,
+	timeout = 0,
+	OnAccept = function()
+	end,
+	OnCancel = function()
+	end,
+	whileDead = 1,
+	hideOnEscape = 1,
+}
+
+
 function Skillet:MessageBox(msg)
-	DEFAULT_CHAT_FRAME:AddMessage(msg)
+	StaticPopupDialogs["SKILLETMSG"].text = msg
+	StaticPopup_Show("SKILLETMSG")
 end
 
+
+StaticPopupDialogs["SKILLETASKFOR"] = {
+	button1 = YES,
+	button2 = NO,
+	timeout = 0,
+	OnAccept = function()
+	end,
+	OnCancel = function()
+	end,
+	whileDead = 1,
+	hideOnEscape = 1,
+}
+
 function Skillet:AskFor(msg, handler)
-	DEFAULT_CHAT_FRAME:AddMessage(msg)
-	handler()
+	StaticPopupDialogs["SKILLETASKFOR"].text = msg
+	StaticPopupDialogs["SKILLETASKFOR"].OnAccept = handler
+	StaticPopup_Show("SKILLETASKFOR")
 end

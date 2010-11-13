@@ -21,7 +21,9 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
 Skillet.displayDetailPlugins = {}
 
-function Skillet:RegisterDisplayDetailPlugin(moduleName)
+function Skillet:RegisterDisplayDetailPlugin(moduleName, priority)
+	if not priority then priority = 100 end
+	
 	if type(moduleName)	 == "string" then
 		module = Skillet[moduleName]
 		if module and type(module) == "table" and module.GetExtraText then
@@ -60,3 +62,10 @@ function Skillet:GetExtraText(skill, recipe)
 	return output_label, output_text
 end
 
+function Skillet:InitializePlugins()
+	for k,v in pairs(Skillet.displayDetailPlugins) do
+		if v and v.OnInitialize then
+			v.OnInitialize()
+		end
+	end
+end

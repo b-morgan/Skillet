@@ -163,6 +163,13 @@ function Skillet:CreateTradeSkillWindow()
 	SkilletSortLabel:SetText(L["Sorting"])
 	SkilletGroupLabel:SetText(L["Grouping"])
 
+	SkilletQueueManagementButton:SetText(L["Queues"])
+--	SkilletDetailsManagementButton:SetText("Details")
+	SkilletQueueLoadButton:SetText(L["Load"])
+	SkilletQueueDeleteButton:SetText(L["Delete"])
+	SkilletQueueSaveButton:SetText(L["Save"])
+
+
 --	SkilletHideUncraftableRecipesText:SetText(L["Hide uncraftable"])
 --	SkilletHideTrivialRecipesText:SetText(L["Hide trivial"])
 
@@ -244,6 +251,12 @@ function Skillet:CreateTradeSkillWindow()
 	backdrop:SetBackdropBorderColor(0.6, 0.6, 0.6)
 	backdrop:SetResizable(true)
 	backdrop:Hide() -- initially hidden
+
+	backdrop = SkilletQueueManagementParent
+	backdrop:SetBackdrop(ControlBackdrop)
+	backdrop:SetBackdropBorderColor(0.6, 0.6, 0.6)
+	backdrop:SetBackdropColor(0.05, 0.05, 0.05)
+	backdrop:SetResizable(true)
 
 	gearTexture = SkilletReagentParent:CreateTexture(nil, "OVERLAY")
 	gearTexture:SetTexture("Interface\\Icons\\Trade_Engineering")
@@ -879,6 +892,7 @@ function Skillet:internal_UpdateTradeSkillWindow()
 	end
 
 	SkilletReagentParent:SetWidth(reagent_width)
+	SkilletQueueManagementParent:SetWidth(reagent_width)
 	SkilletQueueParent:SetWidth(reagent_width)
 
 
@@ -1805,7 +1819,8 @@ function Skillet:UpdateDetailsWindow(skillIndex)
 	end
 
 	-- How many can we queue/create?
-	SkilletCreateCountSlider:SetMinMaxValues(1, math.max(20, (skill.numCraftableBank or 0))) -- s.numcraftablewbank));
+	--SkilletCreateCountSlider:SetMinMaxValues(1, math.max(20, (skill.numCraftableBank or 0))) -- s.numcraftablewbank));
+	--SkilletCreateCountSlider:SetMinMaxValues(1, math.min(20, (skill.numCraftableBank or 0))) -- s.numcraftablewbank));
 	SkilletCreateCountSlider:SetValue(self.numItemsToCraft);
 	SkilletItemCountInputBox:SetText("" .. self.numItemsToCraft);
 	SkilletItemCountInputBox:HighlightText()
@@ -1952,6 +1967,9 @@ function Skillet:QueueItemButton_OnClick(this, button)
 	local index = this:GetID()
 
 	if button == "LeftButton" then
+
+		Skillet:QueueManagementToggle(true)
+
 		local recipeID = queue[index].recipeID
 
 		local recipe = self:GetRecipe(recipeID)
@@ -2416,6 +2434,9 @@ local lastClick = 0
 -- When one of the skill buttons in the left scroll pane is clicked
 function Skillet:SkillButton_OnClick(button, mouse)
 	if (mouse=="LeftButton") then
+
+		Skillet:QueueManagementToggle(true)
+
 		local doubleClicked = false
 		local thisClick = GetTime()
 		local delay = thisClick - lastClick
@@ -3195,3 +3216,17 @@ function Skillet:TSIGetRecipeSources(recipe, opposing)
 	return number_found,res
 end
 
+
+function Skillet:QueueManagementToggle(showDetails)
+	if SkilletQueueManagementParent:IsVisible() or showDetails then
+		SkilletQueueManagementParent:Hide();
+		SkilletReagentParent:Show()
+		SkilletReagentParent:SetHeight(260)
+		SkilletQueueManagementParent:SetHeight(260)
+	else
+		SkilletQueueManagementParent:Show();
+		SkilletReagentParent:Hide()
+		SkilletReagentParent:SetHeight(100)
+		SkilletQueueManagementParent:SetHeight(100)
+	end
+end

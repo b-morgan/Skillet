@@ -20,7 +20,7 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
 
 local PT = LibStub("LibPeriodicTable-3.1")
-
+local L = Skillet.L
 
 -- a table of tradeskills by id (lowest qualifying skill only)
 local TradeSkillList = {
@@ -581,10 +581,6 @@ function SkilletLink:GetRecipe(id)
 	return Skillet.data.recipeList[id] or Skillet.unknownRecipe
 end
 
-
-
-
-
 function SkilletLink:ScanTrade()
 DebugSpam("ScanTrade")
 	if self.scanInProgress == true then
@@ -615,6 +611,19 @@ DebugSpam("TRADE MISMATCH for player "..(Skillet.currentPlayer or "nil").."!  ".
 	if not self.recacheRecipe then
 		self.recacheRecipe = {}
 	end
+
+	if not self.alreadyScanned then
+		self.alreadyScanned = {}
+	end
+
+	if not self.alreadyScanned[player] then
+		self.alreadyScanned[player] = {}
+	end
+
+	if not self.alreadyScanned[player][tradeID] then
+		self.alreadyScanned[player][tradeID] = 0
+	end
+
 
 	self:ResetTradeSkillFilter()						-- verify the search filter is blank (so we get all skills)
 
@@ -652,7 +661,7 @@ DebugSpam("Scanning Trade "..(profession or "nil")..":"..(tradeID or "nil").." "
 	local groupList = {}
 
 	local numHeaders = 0
-
+	local alreadyScannedThisRun = 0
 
 	for i = 1, numSkills, 1 do
 		repeat
@@ -886,7 +895,18 @@ DebugSpam("Scanning Trade "..(profession or "nil")..":"..(tradeID or "nil").." "
 
 		if gotNil and recipeID then
 			self.recacheRecipe[recipeID] = true
+		else
+			alreadyScannedThisRun = alreadyScannedThisRun + 1
 		end
+
+		if alreadyScannedThisRun > self.alreadyScanned[player][tradeID] then
+			self.alreadyScanned[player][tradeID] = alreadyScannedThisRun
+			local progress = math.ceil(alreadyScannedThisRun*100/numSkills)
+			if progress < 100 then
+				Skillet:UpdateScanningText(L["Scanning tradeskill"]..": "..progress.."%")
+			end
+		end
+
 	end
 
 
@@ -910,6 +930,8 @@ DebugSpam("all sorted")
 		skillData.scanned = false
 		return false
 	end
+
+	Skillet:UpdateScanningText()
 
 	skillData.scanned = true
 
@@ -1474,6 +1496,18 @@ DebugSpam("TRADE MISMATCH for player "..(Skillet.currentPlayer or "nil").."!  ".
 		self.recacheRecipe = {}
 	end
 
+	if not self.alreadyScanned then
+		self.alreadyScanned = {}
+	end
+
+	if not self.alreadyScanned[player] then
+		self.alreadyScanned[player] = {}
+	end
+
+	if not self.alreadyScanned[player][tradeID] then
+		self.alreadyScanned[player][tradeID] = 0
+	end
+
 
 	if not IsTradeSkillLinked() then
 		Skillet.db.realm.skillRanks[player][tradeID] = rank.." "..maxRank
@@ -1524,6 +1558,7 @@ DebugSpam("Scanning Trade "..(profession or "nil")..":"..(tradeID or "nil").." "
 
 	local numHeaders = 0
 
+	local alreadyScannedThisRun = 0
 	for i = 1, numSkills, 1 do
 		repeat
 --DebugSpam("scanning index "..i)
@@ -1752,7 +1787,18 @@ DebugSpam("Scanning Trade "..(profession or "nil")..":"..(tradeID or "nil").." "
 
 		if gotNil and recipeID then
 			self.recacheRecipe[recipeID] = true
+		else
+			alreadyScannedThisRun = alreadyScannedThisRun + 1
 		end
+
+		if alreadyScannedThisRun > self.alreadyScanned[player][tradeID] then
+			self.alreadyScanned[player][tradeID] = alreadyScannedThisRun
+			local progress = math.ceil(alreadyScannedThisRun*100/numSkills)
+			if progress < 100 then
+				Skillet:UpdateScanningText(L["Scanning tradeskill"]..": "..progress.."%")
+			end
+		end
+
 	end
 
 
@@ -1775,6 +1821,8 @@ DebugSpam("all sorted")
 		skillData.scanned = false
 		return false
 	end
+
+    Skillet:UpdateScanningText()
 
 	skillData.scanned = true
 	return true
