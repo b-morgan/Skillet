@@ -22,6 +22,7 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
 Skillet.TSIPlugin = {}
 
 local plugin = Skillet.TSIPlugin
+local L = Skillet.L
 
 function plugin.GetExtraText(skill, recipe)
 	local extra_text, label
@@ -32,8 +33,6 @@ function plugin.GetExtraText(skill, recipe)
 	if TradeskillInfo then
 -- tsi uses itemIDs for skill indices instead of enchantID numbers.  for enchants, the enchantID is negated to avoid overlaps
 		local tsiRecipeID = recipe.itemID
-
-		local L = Skillet.L
 
 		if tsiRecipeID == 0 and recipe.spellID then
 			tsiRecipeID = -recipe.spellID

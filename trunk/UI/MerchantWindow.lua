@@ -270,7 +270,7 @@ function Skillet:MerchantBuyButton_OnEnter(button)
 	end
 
 	if #needList > 1 then
-		GameTooltip:AddDoubleLine("Total Cost:", abacus:FormatMoneyFull(totalCost, true),0,1,0)
+		GameTooltip:AddDoubleLine(L["Total Cost:"], abacus:FormatMoneyFull(totalCost, true),0,1,0)
 	end
 
 	GameTooltip:Show()

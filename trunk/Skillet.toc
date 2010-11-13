@@ -4,7 +4,7 @@
 ## Notes-esES: Una sustitucion de la ventana de Habilidades de Comercio
 ## Notes-ruRU: Заменяет окно профессий на более функциональное.
 ## Author: yossa, lilsparky
-## Version 2.08
+## Version 2.09
 ## X-Category: Tradeskill
 ## X-eMail: yossa.addons@googlemail.com
 ## X-License GPL v3 or later
@@ -81,6 +81,7 @@ Plugins\BeanCounter.lua
 #### UI files
 UI\Utils.lua
 UI\Sorting.lua
+UI\QueueMgt.lua
 UI\MainFrame.lua
 UI\MainFrame.xml
 UI\RecipeNotes.lua
@@ -89,3 +90,4 @@ UI\MerchantWindow.lua
 UI\MerchantWindow.xml
 UI\ShoppingList.lua
 UI\ShoppingList.xml
+

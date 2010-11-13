@@ -22,18 +22,80 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
 Skillet.BCPlugin = {}
 
 local plugin = Skillet.BCPlugin
+local L = Skillet.L
+
+plugin.options =
+{
+        type = 'group',
+        name = "BeanCounter",
+        order = 1,
+        args = {
+            enabled = {
+                type = "toggle",
+                name = L["Enabled"],
+                get = function()
+                    return Skillet.db.profile.plugins.beancounter.enabled
+                end,
+                set = function(self,value)
+                    Skillet.db.profile.plugins.beancounter.enabled = value
+                    Skillet:UpdateTradeSkillWindow()
+                end,
+				width = "double",
+                order = 1
+            },
+            days = {
+                type = "range",
+                name = L["Sells for "].."x"..L[" days"],
+                min = 1, max = 180, step = 1, isPercent = false,
+                get = function()
+                    return Skillet.db.profile.plugins.beancounter.days
+                end,
+                set = function(self,t)
+                    Skillet.db.profile.plugins.beancounter.days = t
+                    Skillet:UpdateTradeSkillWindow()
+                end,
+				width = "double",
+                order = 2,
+            },
+        },
+}
+
+
+function plugin.OnInitialize()
+	if not Skillet.db.profile.plugins.beancounter then
+		Skillet.db.profile.plugins.beancounter = {}
+	end
+	if not Skillet.db.profile.plugins.beancounter.enabled then
+		Skillet.db.profile.plugins.beancounter.enabled = true
+	end
+	if not Skillet.db.profile.plugins.beancounter.days then
+		Skillet.db.profile.plugins.beancounter.days = 30
+	end
+	local acecfg = LibStub("AceConfig-3.0")
+    acecfg:RegisterOptionsTable("Skillet BeanCounter", plugin.options)
+
+	local acedia = LibStub("AceConfigDialog-3.0")
+	acedia:AddToBlizOptions("Skillet BeanCounter", "BeanCounter", "Skillet")
+end
 
 function plugin.GetExtraText(skill, recipe)
 	local extra_text, label
-	
+
 	if not skill or not recipe then return end
-	
-	local daysNum = 30
+
+	local daysNum = Skillet.db.profile.plugins.beancounter.days
 	local itemID = recipe.itemID
 
 	local L = Skillet.L
 
-	if BeanCounterDB and itemID then
+	if BeanCounterDB and itemID and Skillet.db.profile.plugins.beancounter.enabled then
+
+		if BeanCounter and BeanCounterBaseFrame and BeanCounterBaseFrame:IsVisible() then
+				name = GetItemInfo(itemID)
+				if name then
+					BeanCounter.API.search(name)
+				end
+		end
 
 		local server = GetRealmName()
 
