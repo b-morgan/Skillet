@@ -337,6 +337,7 @@ Skillet.options =
                     set = function(self,t)
                         Skillet.db.profile.transparency = t
                         Skillet:UpdateTradeSkillWindow()
+						Skillet:UpdateShoppingListWindow()
                     end,
 					width = "double",
                     order = 2,
@@ -352,6 +353,7 @@ Skillet.options =
                     set = function(self,t)
                         Skillet.db.profile.scale = t
                         Skillet:UpdateTradeSkillWindow()
+						Skillet:UpdateShoppingListWindow()
                     end,
 					width = "double",
                     order = 3,
