@@ -431,6 +431,9 @@ function Skillet:UpdateShoppingListWindow(use_cached_recipes)
 		cache_list(self)
 	end
 
+	SkilletShoppingList:SetAlpha(self.db.profile.transparency)
+	SkilletShoppingList:SetScale(self.db.profile.scale)
+
 	local numItems = #self.cachedShoppingList
 
 	if numItems == 0 then
