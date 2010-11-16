@@ -352,7 +352,7 @@ local function SortAndFilterRecipes()
 				if skill.id ~= 0 then							-- not a header
 					if not SkillIsFilteredOut(i) then		-- skill is not filtered out
 						button_index = button_index + 1
-						sortedSkillList[button_index] = {["recipeID"] = skill.id, ["spellID"] = recipe.spellID, ["name"] = recipe.name, ["skillIndex"] = i, ["skillData"] = skill, ["depth"] = 0}
+						sortedSkillList[button_index] = {["recipeID"] = skill.id, ["spellID"] = recipe.spellID, ["name"] = recipe.name, ["skillIndex"] = i, ["recipeData"] = recipe, ["skillData"] = skill, ["depth"] = 0}
 					elseif i == Skillet.selectedSkill then
 						--if filtered out and selected - deselect
 						Skillet.selectedSkill = nil

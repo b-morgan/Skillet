@@ -61,6 +61,45 @@ plugin.options =
 }
 
 
+	function plugin.SortGoldEarned(skill,a,b)
+		while a.subGroup and #a.subGroup.entries>0 do
+			a = a.subGroup.entries[1]
+		end
+
+		while b.subGroup and #b.subGroup.entries>0 do
+			b = b.subGroup.entries[1]
+		end
+
+		local _, _, _, _, itemValueA = plugin.GetBCValues(a.itemID) or 0
+		local _, _, _, _, itemValueB = plugin.GetBCValues(b.itemID) or 0
+
+		itemValueA = itemValueA or 0
+		itemValueB = itemValueB or 0
+
+		return (itemValueA > itemValueB)
+	end
+
+	function plugin.SortSoldAmount(skill,a,b)
+		while a.subGroup and #a.subGroup.entries>0 do
+			a = a.subGroup.entries[1]
+		end
+
+		while b.subGroup and #b.subGroup.entries>0 do
+			b = b.subGroup.entries[1]
+		end
+
+		local _, _, itemValueA = plugin.GetBCValues(a.recipeData.itemID)
+		local _, _, itemValueB = plugin.GetBCValues(a.recipeData.itemID)
+
+		itemValueA = itemValueA or 0
+		itemValueB = itemValueB or 0
+
+		--DEFAULT_CHAT_FRAME:AddMessage(a.name.." "..itemValueA.." "..(a.recipeData.itemID or 0))
+		--DEFAULT_CHAT_FRAME:AddMessage(b.name.." "..itemValueB.." "..(a.recipeData.itemID or 0))
+
+		return (itemValueA > itemValueB)
+	end
+
 function plugin.OnInitialize()
 	if not Skillet.db.profile.plugins.beancounter then
 		Skillet.db.profile.plugins.beancounter = {}
@@ -76,6 +115,55 @@ function plugin.OnInitialize()
 
 	local acedia = LibStub("AceConfigDialog-3.0")
 	acedia:AddToBlizOptions("Skillet BeanCounter", "BeanCounter", "Skillet")
+
+	--Skillet:AddRecipeSorter("BC: "..L["Sold amount"], plugin.SortSoldAmount)
+	--Skillet:AddRecipeSorter("BC: "..L["Gold earned"], plugin.SortGoldEarned)
+end
+
+
+function plugin.GetBCValues(itemID)
+		local success, failed, sucessStack, failedStack, earned = 0, 0, 0, 0, 0
+		local daysNum = Skillet.db.profile.plugins.beancounter.days or 0
+		local server = GetRealmName()
+
+		local now = time()
+		local days = daysNum * 86400 --days to seconds
+
+		if itemID and BeanCounterDB[server] then
+			itemID = tostring(itemID)
+			for _, playerData in pairs(BeanCounterDB[server]) do
+				if playerData["completedAuctions"][itemID] then
+					for key in pairs(playerData["completedAuctions"][itemID] ) do
+						for i, text in pairs(playerData["completedAuctions"][itemID][key]) do
+							local stack, money, deposit, _, _, _, _, auctime = strsplit(";", text)
+							auctime, stack, deposit, money = tonumber(auctime), tonumber(stack), tonumber(deposit), tonumber(money)
+
+							if (now - auctime) < (days) then
+								success = success + 1
+								sucessStack = sucessStack + stack
+								earned = earned + money - deposit
+							end
+						end
+					end
+				end
+				if playerData["failedAuctions"][itemID] then
+					for key in pairs(playerData["failedAuctions"][itemID]) do
+						for i, text in pairs(playerData["failedAuctions"][itemID][key]) do
+							local stack, _, deposit, _, _, _, _, auctime = strsplit(";", text)
+							auctime, stack, deposit = tonumber(auctime), tonumber(stack), tonumber(deposit)
+
+							if (now - auctime) < (days) then
+								failed = failed + 1
+								failedStack = failedStack + stack
+								earned = earned - deposit
+							end
+						end
+					end
+				end
+			end
+
+		end
+		return success, failed, sucessStack, failedStack, earned
 end
 
 function plugin.GetExtraText(skill, recipe)
@@ -83,70 +171,29 @@ function plugin.GetExtraText(skill, recipe)
 
 	if not skill or not recipe then return end
 
-	local daysNum = Skillet.db.profile.plugins.beancounter.days
+
 	local itemID = recipe.itemID
 
 	local L = Skillet.L
 
 	if BeanCounterDB and itemID and Skillet.db.profile.plugins.beancounter.enabled then
 
-		if BeanCounter and BeanCounterBaseFrame and BeanCounterBaseFrame:IsVisible() then
+		if BeanCounter and BeanCounterUiFrame and BeanCounterUiFrame:IsVisible() then
 				name = GetItemInfo(itemID)
 				if name then
 					BeanCounter.API.search(name)
 				end
 		end
 
-		local server = GetRealmName()
-
 		label="\n"..GRAY_FONT_COLOR_CODE;
-		label=label..L["Sold amount:"].."\n";
-		label=label..L["Gold earned:"]..FONT_COLOR_CODE_CLOSE;
+		label=label..L["Sold amount"]..":\n";
+		label=label..L["Gold earned"]..":"..FONT_COLOR_CODE_CLOSE;
 
-		if not BeanCounterDB[server] then return end
-
-		local now = time()
-		local success, failed, sucessStack, failedStack, earned = 0, 0, 0, 0, 0
-		local days = daysNum * 86400 --days to seconds
-
-		itemID = tostring(itemID)
-
-		for _, playerData in pairs(BeanCounterDB[server]) do
-
-			if playerData["completedAuctions"][itemID] then
-				for key in pairs(playerData["completedAuctions"][itemID] ) do
-					for i, text in pairs(playerData["completedAuctions"][itemID][key]) do
-						local stack, money, deposit, _, _, _, _, auctime = strsplit(";", text)
-						auctime, stack, deposit, money = tonumber(auctime), tonumber(stack), tonumber(deposit), tonumber(money)
-
-						if (now - auctime) < (days) then
-							success = success + 1
-							sucessStack = sucessStack + stack
-							earned = earned + money - deposit
-						end
-					end
-				end
-			end
-			if playerData["failedAuctions"][itemID] then
-				for key in pairs(playerData["failedAuctions"][itemID]) do
-					for i, text in pairs(playerData["failedAuctions"][itemID][key]) do
-						local stack, _, deposit, _, _, _, _, auctime = strsplit(";", text)
-						auctime, stack, deposit = tonumber(auctime), tonumber(stack), tonumber(deposit)
-
-						if (now - auctime) < (days) then
-							failed = failed + 1
-							failedStack = failedStack + stack
-							earned = earned - deposit
-						end
-					end
-				end
-			end
-
-		end
+		local success, failed, sucessStack, failedStack, earned  = plugin.GetBCValues(itemID)
 
 		local abacus = LibStub("LibAbacus-3.0")
 
-		extra_text = L["Sells for "]..daysNum..L[" days"].."\n"
+		extra_text = L["Sells for "]..(Skillet.db.profile.plugins.beancounter.days or 0)..L[" days"].."\n"
 		extra_text = extra_text..GREEN_FONT_COLOR_CODE..sucessStack..FONT_COLOR_CODE_CLOSE.." / "..RED_FONT_COLOR_CODE..failedStack.."\n"
 		extra_text = extra_text..FONT_COLOR_CODE_CLOSE..abacus:FormatMoneyFull(earned, true);
 	end
