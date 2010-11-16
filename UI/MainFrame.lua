@@ -397,14 +397,6 @@ function Skillet:QueueList_OnScroll()
 	Skillet:UpdateQueueWindow()
 end
 
-local function Skillet_redo_the_update(self)
-        if Skillet.redo_update_timer then
-            Skillet:CancelTimer(Skillet.redo_update_timer, true)
-            Skillet.redo_update_timer = nil
-        end
---	self:UpdateTradeSkillWindow()
-end
-
 local num_recipe_buttons = 1
 local function get_recipe_button(i)
 	local button = _G["SkilletScrollButton"..i]
@@ -1308,12 +1300,6 @@ function Skillet:internal_UpdateTradeSkillWindow()
 
 	SkilletFrameEmptySpace:SetPoint("BOTTOMRIGHT",SkilletSkillListParent,"BOTTOMRIGHT")
 
-
---    if nilFound then
---        if not Skillet.redo_update_timer then
---            Skillet.redo_update_timer = Skillet:ScheduleTimer("Skillet_redo_the_update", 0.25)
---        end
---    end
 
 	updateWindowBusy = false
 
@@ -2547,6 +2533,7 @@ function Skillet:ScrollToSkillIndex(skillIndex)
 				break
 			end
 		end
+		sortedIndex = sortedIndex or 1
 
 		local scrollbar = _G["SkilletSkillListScrollBar"]
 
@@ -3230,3 +3217,53 @@ function Skillet:QueueManagementToggle(showDetails)
 		SkilletQueueManagementParent:SetHeight(100)
 	end
 end
+
+--[[
+local listOfQueueOnlyFrames = {
+	["SkilletQueueOnlyButton"]=1,
+	["SkilletShoppingListButton"]=1,
+	["SkilletEmptyQueueButton"]=1,
+	["SkilletStartQueueButton"]=1,
+	["SkilletQueueParent"]=1,
+	["SkilletFrameCloseButton"]=1,
+	["SkilletTitleText"]=1,
+}
+
+Skillet.fullView = true
+
+function Skillet:QueueOnlyViewToggle()
+
+	Skillet.fullView = not Skillet.fullView
+
+	if Skillet.fullView then
+		SkilletFrame:SetWidth(SkilletFrame.SkilletFullWidth)
+		SkilletFrame:SetHeight(SkilletFrame.SkilletFullHeight)
+
+		local kids = { SkilletFrame:GetChildren() };
+		for _, child in ipairs(kids) do
+			if not listOfQueueOnlyFrames[child:GetName()] then
+				if child.SkilletFullVisibility then
+					child:Show()
+				end
+			end
+		end
+		SkilletQueueParent:SetPoint("TOP",SkilletCreateButton,"BOTTOM",0,-3)
+		SkilletQueueOnlyButton:SetText(">--<")
+	else
+		SkilletFrame.SkilletFullWidth = SkilletFrame:GetWidth()
+		SkilletFrame.SkilletFullHeight = SkilletFrame:GetHeight()
+
+		local kids = { SkilletFrame:GetChildren() };
+		for _, child in ipairs(kids) do
+			if not listOfQueueOnlyFrames[child:GetName()] then
+				child.SkilletFullVisibility = child:IsVisible()
+				child:Hide()
+			end
+		end
+		SkilletQueueParent:SetPoint("TOP",SkilletFrame,"TOP",10,-30)
+		SkilletFrame:SetWidth(SkilletQueueParent:GetWidth()+50)
+		SkilletFrame:SetHeight(SkilletQueueParent:GetHeight()+50)
+		SkilletQueueOnlyButton:SetText("<-->")
+	end
+end
+]]

@@ -2557,6 +2557,28 @@
 
 			<!--
 			#
+			# A button to switch queue only view
+			#
+			-->
+			<Button name="SkilletQueueOnlyButton" inherits="UIPanelButtonTemplate" text="--" parent="SkilletFrame" hidden="true">
+				<Size>
+					<AbsDimension x="40" y="22"/>
+				</Size>
+				<Anchors>
+					<Anchor point="TOPLEFT" relativeTo="SkilletEmptyQueueButton" relativePoint="TOPRIGHT">
+						<Offset>
+							<AbsDimension x="5" y=""/>
+						</Offset>
+					</Anchor>
+				</Anchors>
+				<Scripts>
+					<OnClick>
+						Skillet:QueueOnlyViewToggle()
+					</OnClick>
+				</Scripts>
+			</Button>
+			<!--
+			#
 			# Button to display the shopping list window
 			#
 			-->

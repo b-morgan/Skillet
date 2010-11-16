@@ -903,7 +903,7 @@ DebugSpam("Scanning Trade "..(profession or "nil")..":"..(tradeID or "nil").." "
 			self.alreadyScanned[player][tradeID] = alreadyScannedThisRun
 			local progress = math.ceil(alreadyScannedThisRun*100/numSkills)
 			if progress < 100 then
-				Skillet:UpdateScanningText(L["Scanning tradeskill"]..": "..progress.."%")
+				--Skillet:UpdateScanningText(L["Scanning tradeskill"]..": "..progress.."%")
 			end
 		end
 
@@ -1212,25 +1212,33 @@ function Skillet:StopCastCheckUnit(event, unit, spell, rank)
 end
 
 
+local rescan_time = 1
 -- Internal
 function Skillet:Skillet_AutoRescan()
+	Skillet.scheduleRescan = false
+
 local start = GetTime()
 --DEFAULT_CHAT_FRAME:AddMessage("AUTO RESCAN")
 	if InCombatLockdown() or not SkilletFrame:IsVisible() then
+		self.auto_rescan_timer = nil
 		return
 	end
 
-	if self.auto_rescan_timer then
-		self:CancelTimer(self.auto_rescan_timer, true)
+	local scanResult = self:RescanTrade()
+	if not scanResult or Skillet.scheduleRescan then
+		if rescan_time > 10 then
+			rescan_time = 1
+			self.auto_rescan_timer = nil
+			return
+		end
+
+		self.auto_rescan_timer = self:ScheduleTimer("Skillet_AutoRescan", rescan_time)
+		rescan_time = rescan_time + 5
+	else
+		rescan_time = 1
 		self.auto_rescan_timer = nil
 	end
-
-	if not self:RescanTrade() then
---DEFAULT_CHAT_FRAME:AddMessage("AUTO RESCAN FAILED!?")
-		self.auto_rescan_timer = self:ScheduleTimer("Skillet_AutoRescan", 0.5)
-	end
-
-
+--DEFAULT_CHAT_FRAME:AddMessage("AUTO RESCAN COMPLETE!?")
 	self:UpdateTradeSkillWindow()
 DebugSpam("AUTO RESCAN COMPLETE")
 
@@ -1242,24 +1250,21 @@ end
 
 function Skillet:TRADE_SKILL_UPDATE()
 --DEFAULT_CHAT_FRAME:AddMessage("TRADE_SKILL_UPDATE "..(event or "nil").." "..(arg1 or "nil"))
-	if self.auto_rescan_timer then
-		self:CancelTimer(self.auto_rescan_timer, true)
-		self.auto_rescan_timer = nil
+	if not Skillet.scanInProgress and not self.auto_rescan_timer then
+		self.auto_rescan_timer = self:ScheduleTimer("Skillet_AutoRescan", 0.5)
+	else
+--		Skillet.scheduleRescan = true
 	end
-
-	self.auto_rescan_timer = self:ScheduleTimer("Skillet_AutoRescan", 0.5)
 end
 
 
 function Skillet:CHAT_MSG_SKILL()
 --DEFAULT_CHAT_FRAME:AddMessage("CHAT_MSG_SKILL "..(event or "nil"))
---	self:Skillet_AutoRescan()									-- the problem here is that the message comes before the actuality, it seems
-	if self.auto_rescan_timer then
-		self:CancelTimer(self.auto_rescan_timer, true)
-		self.auto_rescan_timer = nil
+	if not Skillet.scanInProgress and not self.auto_rescan_timer then
+		self.auto_rescan_timer = self:ScheduleTimer("Skillet_AutoRescan", 0.5)
+	else
+		Skillet.scheduleRescan = true
 	end
-
-	self.auto_rescan_timer = self:ScheduleTimer("Skillet_AutoRescan", 0.5)
 end
 
 function Skillet:CHAT_MSG_SYSTEM(event,msg)
@@ -1267,13 +1272,11 @@ function Skillet:CHAT_MSG_SYSTEM(event,msg)
 	local cutString = string.sub(ERR_LEARN_RECIPE_S,1,(string.find(ERR_LEARN_RECIPE_S,"%%s")-1))
 --DebugSpam("CHAT_MSG_SYSTEM "..(arg1 or "nil").." vs "..cutString)
 	if msg and string.find(msg, cutString) then
---		self:Skillet_AutoRescan()								-- the problem here is that the message comes before the actuality, it seems
-		if self.auto_rescan_timer then
-			self:CancelTimer(self.auto_rescan_timer, true)
-			self.auto_rescan_timer = nil
+		if not Skillet.scanInProgress and not self.auto_rescan_timer then
+			self.auto_rescan_timer = self:ScheduleTimer("Skillet_AutoRescan", 0.5)
+		else
+			Skillet.scheduleRescan = true
 		end
-
-		self.auto_rescan_timer = self:ScheduleTimer("Skillet_AutoRescan", 0.5)
 	end
 end
 
@@ -1311,7 +1314,10 @@ DebugSpam("RescanTrade")
 	local dataModule = self.dataGatheringModules[self.currentPlayer]
 
 	if dataModule and dataModule.RescanTrade then
-		return dataModule.RescanTrade(dataModule, force)
+		Skillet.scanInProgress = true
+		local val = dataModule.RescanTrade(dataModule, force)
+		Skillet.scanInProgress = false
+		return val
 	end
 
 	return true
@@ -1795,7 +1801,7 @@ DebugSpam("Scanning Trade "..(profession or "nil")..":"..(tradeID or "nil").." "
 			self.alreadyScanned[player][tradeID] = alreadyScannedThisRun
 			local progress = math.ceil(alreadyScannedThisRun*100/numSkills)
 			if progress < 100 then
-				Skillet:UpdateScanningText(L["Scanning tradeskill"]..": "..progress.."%")
+				--Skillet:UpdateScanningText(L["Scanning tradeskill"]..": "..progress.."%")
 			end
 		end
 
@@ -1805,6 +1811,7 @@ DebugSpam("Scanning Trade "..(profession or "nil")..":"..(tradeID or "nil").." "
 --	Skillet:RecipeGroupConstructDBString(mainGroup)
 
 DebugSpam("Scan Complete")
+--DEFAULT_CHAT_FRAME:AddMessage("Scan Complete "..numHeaders)
 
 --	CloseTradeSkill()
 

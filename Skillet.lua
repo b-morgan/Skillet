@@ -1497,7 +1497,6 @@ function ProfessionPopup_Init(menuFrame, level)
 	end
 end
 
-
 function ProfessionPopup_Show(this)
 --	if not ProfessionPopupFrame then
 	ProfessionPopupFrame = CreateFrame("Frame", "ProfessionPopupFrame", _G["UIParent"], "UIDropDownMenuTemplate")
