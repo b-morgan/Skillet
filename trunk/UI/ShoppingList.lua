@@ -104,7 +104,7 @@ local function createShoppingListFrame(self)
 	local tradeSkillLocation = {
 		prefix = "shoppingListLocation_"
 	}
-	windowManger.RegisterConfig(frame, self.db.char, shoppingListLocation)
+	windowManger.RegisterConfig(frame, self.db.char, tradeSkillLocation)
 	windowManger.RestorePosition(frame)  -- restores scale also
 	windowManger.MakeDraggable(frame)
 

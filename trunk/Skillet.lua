@@ -18,7 +18,7 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
 ]]--
 
-local MAJOR_VERSION = "2.09"
+local MAJOR_VERSION = "2.10"
 local MINOR_VERSION = ("$Revision$"):match("%d+") or 1
 local DATE = string.gsub("$Date$", "^.-(%d%d%d%d%-%d%d%-%d%d).-$", "%1")
 
@@ -26,7 +26,6 @@ Skillet = LibStub("AceAddon-3.0"):NewAddon("Skillet", "AceConsole-3.0", "AceEven
 Skillet.title   = "Skillet"
 Skillet.version = MAJOR_VERSION .. "-" .. MINOR_VERSION .. "LS"
 Skillet.date    = DATE
-
 local AceDB = LibStub("AceDB-3.0")
 
 -- Pull it into the local namespace, it's faster to access that way
@@ -338,6 +337,7 @@ Skillet.options =
                         Skillet.db.profile.transparency = t
                         Skillet:UpdateTradeSkillWindow()
 						Skillet:UpdateShoppingListWindow()
+						Skillet:UpdateStandaloneQueueWindow()
                     end,
 					width = "double",
                     order = 2,
@@ -354,6 +354,7 @@ Skillet.options =
                         Skillet.db.profile.scale = t
                         Skillet:UpdateTradeSkillWindow()
 						Skillet:UpdateShoppingListWindow()
+						Skillet:UpdateStandaloneQueueWindow()
                     end,
 					width = "double",
                     order = 3,
@@ -1101,6 +1102,8 @@ DebugSpam("internal_ShowTradeSkillWindow")
 
     self:ResetTradeSkillWindow()
 
+	Skillet:ShowFullView()
+
     if not frame:IsVisible() then
 		frame:Show()
 		self:UpdateTradeSkillWindow()
@@ -1143,6 +1146,10 @@ function Skillet:internal_HideAllWindows()
     end
 
     if self:HideShoppingList() then
+        closed = true
+    end
+
+    if self:HideStandaloneQueue() then
         closed = true
     end
 
