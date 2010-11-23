@@ -2453,15 +2453,14 @@
 				</Scripts>
 				<FontString inherits="ChatFontNormal"/>
 			</EditBox>
-
 			<!--
 			#
-			# A frame to hold the queue of recipes in line to be crafted
+			# A frame to hold the queue and buttons
 			#
 			-->
-			<Frame name="SkilletQueueParent" parent="SkilletFrame">
+			<Frame name="SkilletQueueParentBase" parent="SkilletFrame">
 				<Anchors>
-					<Anchor point="TOP" relativeTo="SkilletCreateButton" relativePoint="BOTTOM">
+					<Anchor point="TOPLEFT" relativeTo="SkilletCreateAllButton" relativePoint="BOTTOMLEFT">
 						<Offset>
 							<AbsDimension x="0" y="-3"/>
 						</Offset>
@@ -2469,6 +2468,25 @@
 					<Anchor point="BOTTOMRIGHT" relativeTo="SkilletFrame" relativePoint="BOTTOMRIGHT">
 						<Offset>
 							<AbsDimension x="-10" y="32"/>
+						</Offset>
+					</Anchor>
+				</Anchors>
+			</Frame>
+			<!--
+			#
+			# A frame to hold the queue of recipes in line to be crafted
+			#
+			-->
+			<Frame name="SkilletQueueParent" parent="SkilletQueueParentBase">
+				<Anchors>
+					<Anchor point="TOPLEFT" relativeTo="SkilletQueueParentBase" relativePoint="TOPLEFT">
+						<Offset>
+							<AbsDimension x="0" y="0"/>
+						</Offset>
+					</Anchor>
+					<Anchor point="BOTTOMRIGHT" relativeTo="SkilletQueueParentBase" relativePoint="BOTTOMRIGHT">
+						<Offset>
+							<AbsDimension x="0" y="0"/>
 						</Offset>
 					</Anchor>
 				</Anchors>
@@ -2492,7 +2510,7 @@
 					</OnVerticalScroll>
 				</Scripts>
 			</ScrollFrame>
-			<Button name="SkilletQueueButton1" inherits="SkilletQueueItemButtonTemplate">
+			<Button name="SkilletQueueButton1" inherits="SkilletQueueItemButtonTemplate" parent="SkilletQueueParent">
 				<Anchors>
 					<Anchor point="TOPLEFT" relativeTo="SkilletQueueList" relativePoint="TOPLEFT">
 						<Offset>
@@ -2501,6 +2519,7 @@
 					</Anchor>
 				</Anchors>
 			</Button>
+
 			<!-- rest of the buttons are created dynaically -->
 
 			<!--
@@ -2508,7 +2527,7 @@
 			# A button that starts or continues the queue
 			#
 			-->
-			<Button name="SkilletStartQueueButton" inherits="UIPanelButtonTemplate" text="Start" parent="SkilletFrame">
+			<Button name="SkilletStartQueueButton" inherits="UIPanelButtonTemplate" text="Start" parent="SkilletQueueParentBase">
 				<Size>
 					<AbsDimension x="80" y="22"/>
 				</Size>
@@ -2535,7 +2554,7 @@
 			# A button that clears the current queue
 			#
 			-->
-			<Button name="SkilletEmptyQueueButton" inherits="UIPanelButtonTemplate" text="Clear" parent="SkilletFrame">
+			<Button name="SkilletEmptyQueueButton" inherits="UIPanelButtonTemplate" text="Clear" parent="SkilletQueueParentBase">
 				<Size>
 					<AbsDimension x="80" y="22"/>
 				</Size>
@@ -2560,9 +2579,9 @@
 			# A button to switch queue only view
 			#
 			-->
-			<Button name="SkilletQueueOnlyButton" inherits="UIPanelButtonTemplate" text="--" parent="SkilletFrame" hidden="true">
+			<Button name="SkilletQueueOnlyButton" inherits="UIPanelButtonTemplate" text="-" parent="SkilletQueueParentBase">
 				<Size>
-					<AbsDimension x="40" y="22"/>
+					<AbsDimension x="15" y="22"/>
 				</Size>
 				<Anchors>
 					<Anchor point="TOPLEFT" relativeTo="SkilletEmptyQueueButton" relativePoint="TOPRIGHT">
@@ -2582,7 +2601,7 @@
 			# Button to display the shopping list window
 			#
 			-->
-			<Button name="SkilletShoppingListButton" inherits="UIPanelButtonTemplate" text="Shopping List" parent="SkilletFrame">
+			<Button name="SkilletShoppingListButton" inherits="UIPanelButtonTemplate" text="Shopping List" parent="SkilletQueueParentBase">
 				<Size>
 					<AbsDimension x="100" y="22"/>
 				</Size>
@@ -2632,5 +2651,37 @@
 		</Scripts>
 
 	</Frame> <!-- main trade skill frame -->
+
+
+	<Frame name="SkilletStandalonQueue" toplevel="true" movable="true" resizable="true" parent="UIParent" enableMouse="true" hidden="true">
+		<Size>
+			<AbsDimension x="385" y="240"/>
+		</Size>
+
+		<Frames>
+
+			<!--
+			#
+			# A button on the top right to close the window
+			#
+			-->
+			<Button name="SkilletStandalonQueueCloseButton" inherits="UIPanelCloseButton" parent="SkilletStandalonQueue">
+				<Anchors>
+					<Anchor point="TOPRIGHT" relativeTo="SkilletStandalonQueue" relativePoint="TOPRIGHT">
+						<Offset>
+							<AbsDimension x="-2" y="-2"/>
+						</Offset>
+					</Anchor>
+				</Anchors>
+				<Scripts>
+					<OnClick>
+						Skillet:StandaloneQueueClose()
+					</OnClick>
+				</Scripts>
+			</Button>
+
+
+		</Frames>
+	</Frame>
 
 </Ui>

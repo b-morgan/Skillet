@@ -168,6 +168,7 @@ function Skillet:CreateTradeSkillWindow()
 	SkilletQueueLoadButton:SetText(L["Load"])
 	SkilletQueueDeleteButton:SetText(L["Delete"])
 	SkilletQueueSaveButton:SetText(L["Save"])
+	SkilletQueueOnlyButton:SetText(">")
 
 
 --	SkilletHideUncraftableRecipesText:SetText(L["Hide uncraftable"])
@@ -296,7 +297,7 @@ function Skillet:CreateTradeSkillWindow()
 
 	self:ConfigureRecipeControls(false)				-- initial setting
 
-
+	self.skilletStandalonQueue=Skillet:CreateStandaloneQueueFrame()
 
 
 	return frame
@@ -885,7 +886,7 @@ function Skillet:internal_UpdateTradeSkillWindow()
 
 	SkilletReagentParent:SetWidth(reagent_width)
 	SkilletQueueManagementParent:SetWidth(reagent_width)
-	SkilletQueueParent:SetWidth(reagent_width)
+	--SkilletQueueParent:SetWidth(reagent_width)
 
 
 	local width = SkilletFrame:GetWidth() - reagent_width - 20 -- padding
@@ -3218,52 +3219,124 @@ function Skillet:QueueManagementToggle(showDetails)
 	end
 end
 
---[[
-local listOfQueueOnlyFrames = {
-	["SkilletQueueOnlyButton"]=1,
-	["SkilletShoppingListButton"]=1,
-	["SkilletEmptyQueueButton"]=1,
-	["SkilletStartQueueButton"]=1,
-	["SkilletQueueParent"]=1,
-	["SkilletFrameCloseButton"]=1,
-	["SkilletTitleText"]=1,
-}
 
 Skillet.fullView = true
 
+function Skillet:ShowFullView()
+	Skillet.fullView = true
+	SkilletQueueParentBase:SetParent(SkilletFrame)
+	SkilletQueueParentBase:SetPoint("TOPLEFT",SkilletCreateAllButton,"BOTTOMLEFT",0,-3)
+	SkilletQueueParentBase:SetPoint("BOTTOMRIGHT",SkilletFrame,"BOTTOMRIGHT",-10,32)
+	SkilletStandalonQueue:Hide()
+	SkilletQueueOnlyButton:SetText(">")
+	Skillet:UpdateQueueWindow()
+end
+function Skillet:ShowQueueView()
+	Skillet.fullView = false
+	SkilletQueueParentBase:SetParent(SkilletStandalonQueue)
+	SkilletQueueParentBase:SetPoint("TOPLEFT",SkilletStandalonQueue,"TOPLEFT",5,-32)
+	SkilletQueueParentBase:SetPoint("BOTTOMRIGHT",SkilletStandalonQueue,"BOTTOMRIGHT",-5,30)
+	SkilletStandalonQueue:Show()
+	SkilletQueueOnlyButton:SetText("<")
+	Skillet:UpdateQueueWindow()
+end
 function Skillet:QueueOnlyViewToggle()
 
 	Skillet.fullView = not Skillet.fullView
-
 	if Skillet.fullView then
-		SkilletFrame:SetWidth(SkilletFrame.SkilletFullWidth)
-		SkilletFrame:SetHeight(SkilletFrame.SkilletFullHeight)
-
-		local kids = { SkilletFrame:GetChildren() };
-		for _, child in ipairs(kids) do
-			if not listOfQueueOnlyFrames[child:GetName()] then
-				if child.SkilletFullVisibility then
-					child:Show()
-				end
-			end
-		end
-		SkilletQueueParent:SetPoint("TOP",SkilletCreateButton,"BOTTOM",0,-3)
-		SkilletQueueOnlyButton:SetText(">--<")
+		Skillet:ShowFullView()
+		SkilletFrame:Show()
 	else
-		SkilletFrame.SkilletFullWidth = SkilletFrame:GetWidth()
-		SkilletFrame.SkilletFullHeight = SkilletFrame:GetHeight()
-
-		local kids = { SkilletFrame:GetChildren() };
-		for _, child in ipairs(kids) do
-			if not listOfQueueOnlyFrames[child:GetName()] then
-				child.SkilletFullVisibility = child:IsVisible()
-				child:Hide()
-			end
-		end
-		SkilletQueueParent:SetPoint("TOP",SkilletFrame,"TOP",10,-30)
-		SkilletFrame:SetWidth(SkilletQueueParent:GetWidth()+50)
-		SkilletFrame:SetHeight(SkilletQueueParent:GetHeight()+50)
-		SkilletQueueOnlyButton:SetText("<-->")
+		Skillet:ShowQueueView()
+		SkilletFrame:Hide()
 	end
 end
-]]
+
+function Skillet:StandaloneQueueClose()
+	Skillet:ShowFullView()
+	Skillet:SkilletFrameForceClose()
+end
+
+function Skillet:HideStandaloneQueue()
+	if not self.skilletStandalonQueue or not self.skilletStandalonQueue:IsVisible() then
+		return
+	end
+	SkilletStandalonQueue:Hide()
+end
+
+
+-- Creates and sets up the shopping list window
+function Skillet:CreateStandaloneQueueFrame()
+	local frame = SkilletStandalonQueue
+	if not frame then
+		return nil
+	end
+
+	frame:SetBackdrop(FrameBackdrop);
+	frame:SetBackdropColor(0.1, 0.1, 0.1)
+
+	-- A title bar stolen from the Ace2 Waterfall window.
+	local r,g,b = 0, 0.7, 0; -- dark green
+	local titlebar = frame:CreateTexture(nil,"BACKGROUND")
+	local titlebar2 = frame:CreateTexture(nil,"BACKGROUND")
+
+	titlebar:SetPoint("TOPLEFT",frame,"TOPLEFT",3,-4)
+	titlebar:SetPoint("TOPRIGHT",frame,"TOPRIGHT",-3,-4)
+	titlebar:SetHeight(13)
+
+	titlebar2:SetPoint("TOPLEFT",titlebar,"BOTTOMLEFT",0,0)
+	titlebar2:SetPoint("TOPRIGHT",titlebar,"BOTTOMRIGHT",0,0)
+	titlebar2:SetHeight(13)
+
+	titlebar:SetGradientAlpha("VERTICAL",r*0.6,g*0.6,b*0.6,1,r,g,b,1)
+	titlebar:SetTexture(r,g,b,1)
+	titlebar2:SetGradientAlpha("VERTICAL",r*0.9,g*0.9,b*0.9,1,r*0.6,g*0.6,b*0.6,1)
+	titlebar2:SetTexture(r,g,b,1)
+
+	local title = CreateFrame("Frame",nil,frame)
+	title:SetPoint("TOPLEFT",titlebar,"TOPLEFT",0,0)
+	title:SetPoint("BOTTOMRIGHT",titlebar2,"BOTTOMRIGHT",0,0)
+
+	local titletext = title:CreateFontString("SkilletStandalonQueueTitleText", "OVERLAY", "GameFontNormalLarge")
+	titletext:SetPoint("TOPLEFT",title,"TOPLEFT",0,0)
+	titletext:SetPoint("TOPRIGHT",title,"TOPRIGHT",0,0)
+	titletext:SetHeight(26)
+	titletext:SetShadowColor(0,0,0)
+	titletext:SetShadowOffset(1,-1)
+	titletext:SetTextColor(1,1,1)
+	titletext:SetText("Skillet: " .. L["Queue"])
+
+	-- The frame enclosing the scroll list needs a border and a background .....
+	local backdrop = SkilletShoppingListParent
+	backdrop:SetBackdrop(ControlBackdrop)
+	backdrop:SetBackdropBorderColor(0.6, 0.6, 0.6)
+	backdrop:SetBackdropColor(0.05, 0.05, 0.05)
+	backdrop:SetResizable(true)
+
+	-- Ace Window manager library, allows the window position (and size)
+	-- to be automatically saved
+	local windowManger = LibStub("LibWindow-1.1")
+	local standaloneQueueLocation = {
+		prefix = "standaloneQueueLocation_"
+	}
+	windowManger.RegisterConfig(frame, self.db.char, standaloneQueueLocation)
+	windowManger.RestorePosition(frame)  -- restores scale also
+	windowManger.MakeDraggable(frame)
+
+	-- lets play the resize me game!
+	Skillet:EnableResize(frame, 320, 165, Skillet.UpdateStandaloneQueueWindow)
+
+	-- so hitting [ESC] will close the window
+	--tinsert(UISpecialFrames, frame:GetName())
+	return frame
+end
+
+function Skillet:UpdateStandaloneQueueWindow()
+	if not self.skilletStandalonQueue or not self.skilletStandalonQueue:IsVisible() then
+		return
+	end
+
+	SkilletStandalonQueue:SetAlpha(self.db.profile.transparency)
+	SkilletStandalonQueue:SetScale(self.db.profile.scale)
+end
+
