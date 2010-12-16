@@ -276,6 +276,7 @@ local missingVendorItems = {
 	[43120] = true, 			--Celestial Ink
 	[43122] = true, 			--Shimmering Ink
 	[43124] = true,  			--Ethereal Ink
+	[43126] = true,  			--Ink of the Sea
 }
 
 
@@ -521,7 +522,9 @@ end
 
 function SkilletData:GetSkillRanks(player, trade)
 	if player and trade then
-		return Skillet.db.realm.skillRanks[player][trade]
+		if Skillet.db.realm.skillRanks[player] then
+			return Skillet.db.realm.skillRanks[player][trade]
+		end
 	end
 end
 
@@ -582,9 +585,9 @@ function SkilletLink:GetRecipe(id)
 end
 
 function SkilletLink:ScanTrade()
-DebugSpam("ScanTrade")
+--DebugSpam("ScanTrade")
 	if self.scanInProgress == true then
-DebugSpam("SCAN BUSY!")
+--DebugSpam("SCAN BUSY!")
 		return
 	end
 
@@ -595,14 +598,14 @@ DebugSpam("SCAN BUSY!")
 	local API = {}
 
 	local profession, rank, maxRank = GetTradeSkillLine()
-DebugSpam("GetTradeSkill: "..(profession or "nil"))
+--DebugSpam("GetTradeSkill: "..(profession or "nil"))
 
 
 	-- get the tradeID from the profession name (data collected earlier).
 	tradeID = TradeSkillIDsByName[profession] or 2656				-- "mining" doesn't exist as a spell, so instead use smelting (id 2656)
 
 	if tradeID ~= Skillet.currentTrade then
-DebugSpam("TRADE MISMATCH for player "..(Skillet.currentPlayer or "nil").."!  "..(tradeID or "nil").." vs "..(Skillet.currentTrade or "nil"));
+--DebugSpam("TRADE MISMATCH for player "..(Skillet.currentPlayer or "nil").."!  "..(tradeID or "nil").." vs "..(Skillet.currentTrade or "nil"));
 	end
 
 
@@ -919,7 +922,7 @@ DebugSpam("Scan Complete")
 	Skillet:InventoryScan()
 	Skillet:CalculateCraftableCounts()
 	Skillet:SortAndFilterRecipes()
-DebugSpam("all sorted")
+--DebugSpam("all sorted")
 	self.scanInProgress = false
 
 	collectgarbage("collect")
@@ -1112,10 +1115,21 @@ function Skillet:InitializeAllDataLinks(name)
 end
 
 
-function Skillet:EnableDataGathering(addon)
+function Skillet:EnableUpdateEvents()
 	self:RegisterEvent("CHAT_MSG_SKILL")
 	self:RegisterEvent("CHAT_MSG_SYSTEM")
 	self:RegisterEvent("TRADE_SKILL_UPDATE")
+end
+
+function Skillet:DisableUpdateEvents()
+	self:UnregisterEvent("CHAT_MSG_SKILL")
+	self:UnregisterEvent("CHAT_MSG_SYSTEM")
+	self:UnregisterEvent("TRADE_SKILL_UPDATE")
+end
+
+
+function Skillet:EnableDataGathering(addon)
+	Skillet:EnableUpdateEvents()
 
 	self.dataScanned = false
 
@@ -1213,7 +1227,9 @@ end
 
 
 local rescan_time = 1
+
 -- Internal
+-- scan trade, if it fails, rescan after 1 sek, if it fails, rescan after 5 sek and give up
 function Skillet:Skillet_AutoRescan()
 	Skillet.scheduleRescan = false
 
@@ -1226,20 +1242,20 @@ local start = GetTime()
 
 	local scanResult = self:RescanTrade()
 	if not scanResult or Skillet.scheduleRescan then
-		if rescan_time > 10 then
+		if rescan_time > 5 then
 			rescan_time = 1
 			self.auto_rescan_timer = nil
 			return
 		end
 
 		self.auto_rescan_timer = self:ScheduleTimer("Skillet_AutoRescan", rescan_time)
-		rescan_time = rescan_time + 5
+		rescan_time = rescan_time + 4
 	else
 		rescan_time = 1
 		self.auto_rescan_timer = nil
+		self:UpdateTradeSkillWindow()
 	end
 --DEFAULT_CHAT_FRAME:AddMessage("AUTO RESCAN COMPLETE!?")
-	self:UpdateTradeSkillWindow()
 DebugSpam("AUTO RESCAN COMPLETE")
 
 local elapsed = GetTime() - start
@@ -1313,14 +1329,19 @@ DebugSpam("RescanTrade")
 
 	local dataModule = self.dataGatheringModules[self.currentPlayer]
 
+	local val = true
+
 	if dataModule and dataModule.RescanTrade then
 		Skillet.scanInProgress = true
-		local val = dataModule.RescanTrade(dataModule, force)
+
+		Skillet:DisableUpdateEvents()
+		val = dataModule.RescanTrade(dataModule, force)
+		Skillet:EnableUpdateEvents()
+
 		Skillet.scanInProgress = false
-		return val
 	end
 
-	return true
+	return val
 end
 
 
