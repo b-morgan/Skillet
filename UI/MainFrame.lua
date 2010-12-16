@@ -1225,6 +1225,16 @@ function Skillet:internal_UpdateTradeSkillWindow()
 				if countWidth > 0 then
 					countWidth = countWidth + 20
 				end
+				
+				if skill_color.alttext == "+++" then
+					local _, _, _, _, _, numSkillUps  = GetTradeSkillInfo(skillIndex)
+					if numSkillUps>1 then					
+						local count = "{++"..numSkillUps.."} "..(countText:GetText() or "")
+						countWidth = countWidth + 20
+						countText:SetText(count)
+						countText:Show()								
+					end
+				end
 
 				countText:SetWidth(countWidth)
 
@@ -1241,7 +1251,6 @@ function Skillet:internal_UpdateTradeSkillWindow()
 				-- distinguishing between the difficulty colours we use.
 
 				text = text .. (self:GetRecipeNameSuffix(self.currentTrade, skillIndex) or "")
-
 				buttonText:SetText(text)
 				buttonText:SetWidth(max_text_width)
 
