@@ -630,8 +630,20 @@ function SkilletLink:ScanTrade()
 
 	self:ResetTradeSkillFilter()						-- verify the search filter is blank (so we get all skills)
 
-
 	local numSkills = GetNumTradeSkills()
+
+	for i = 1, numSkills do
+		local _, skillType, _, isExpanded = GetTradeSkillInfo(i)
+		if skillType == "header" then
+			if not isExpanded then
+				ExpandTradeSkillSubClass(i)
+			end
+
+		end
+	end
+
+	numSkills = GetNumTradeSkills()
+
 
 DebugSpam("Scanning Trade "..(profession or "nil")..":"..(tradeID or "nil").." "..numSkills.." recipes")
 
@@ -1543,8 +1555,19 @@ DebugSpam("TRADE MISMATCH for player "..(Skillet.currentPlayer or "nil").."!  ".
 
 	self:ResetTradeSkillFilter()						-- verify the search filter is blank (so we get all skills)
 
-
 	local numSkills = API.GetNumSkills()
+
+	for i = 1, numSkills do
+		local _, skillType, _, isExpanded = GetTradeSkillInfo(i)
+		if skillType == "header" then
+			if not isExpanded then
+				ExpandTradeSkillSubClass(i)
+			end
+
+		end
+	end
+
+	numSkills = API.GetNumSkills()
 
 
 DebugSpam("Scanning Trade "..(profession or "nil")..":"..(tradeID or "nil").." "..numSkills.." recipes")

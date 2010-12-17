@@ -18,7 +18,7 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
 ]]--
 
-local MAJOR_VERSION = "2.10"
+local MAJOR_VERSION = "2.11"
 local MINOR_VERSION = ("$Revision$"):match("%d+") or 1
 local DATE = string.gsub("$Date$", "^.-(%d%d%d%d%-%d%d%-%d%d).-$", "%1")
 
@@ -787,6 +787,26 @@ end
 function Skillet:SkilletShow()
 DebugSpam("SHOW WINDOW (was showing "..(self.currentTrade or "nil")..")");
 
+
+-- this comes from the blizzard ui tradeskill_show() routine.  for some reason, one (or all) of these needs to be called to prevent skill-ups from killing the DoTrade repeat
+	TradeSkillCreateButton:Disable();
+	TradeSkillCreateAllButton:Disable();
+	local tsIndex = 0;
+	if ( GetTradeSkillSelectionIndex() == 0 ) then
+		tsIndex = GetFirstTradeSkill();
+	else
+		tsIndex = GetTradeSkillSelectionIndex();
+	end
+	TradeSkillFrame_SetSelection(tsIndex);
+	FauxScrollFrame_SetOffset(TradeSkillListScrollFrame, 0);
+	TradeSkillListScrollFrameScrollBar:SetMinMaxValues(0, 0);
+	TradeSkillListScrollFrameScrollBar:SetValue(0);
+	TradeSkillFrame_Update();
+	TradeSkillSetFilter(-1, -1);
+
+-- end of weird blizzard code stuff
+
+
 	if IsTradeSkillLinked() or (IsTradeSkillGuild and IsTradeSkillGuild()) then
 		local _, linkedPlayer = IsTradeSkillLinked()
 
@@ -821,7 +841,6 @@ DebugSpam("SHOW WINDOW (was showing "..(self.currentTrade or "nil")..")");
 		end
 	end
 ]]
-
 
 	self.currentTrade = self.tradeSkillIDsByName[(GetTradeSkillLine())] or 2656      -- smelting caveat
 
@@ -863,33 +882,12 @@ DebugSpam("SkilletShow: "..self.currentTrade)
 			self:UpdateTradeSkillWindow()
 		end
 
--- this comes from the blizzard ui tradeskill_show() routine.  for some reason, one (or all) of these needs to be called to prevent skill-ups from killing the DoTrade repeat
-		TradeSkillCreateButton:Disable();
-		TradeSkillCreateAllButton:Disable();
-		if ( GetTradeSkillSelectionIndex() == 0 ) then
-			TradeSkillFrame_SetSelection(GetFirstTradeSkill());
-		else
-			TradeSkillFrame_SetSelection(GetTradeSkillSelectionIndex());
-		end
-		FauxScrollFrame_SetOffset(TradeSkillListScrollFrame, 0);
-		TradeSkillListScrollFrameScrollBar:SetMinMaxValues(0, 0);
-		TradeSkillListScrollFrameScrollBar:SetValue(0);
-		SetPortraitTexture(TradeSkillFramePortrait, "player");
-		-- ToDo ERROR
-		--TradeSkillOnlyShowMakeable(TradeSkillFrameAvailableFilterCheckButton:GetChecked());
-		TradeSkillFrame_Update();
-
-		-- Moved to the bottom to prevent addons which hook it from blocking tradeskills
-		CloseDropDownMenus();
--- end of weird blizzard code stuff
-
-
-
 		self.dataSource = "api"
 	else
 		self:HideAllWindows()
 		self:BlizzardTradeSkillFrame_Show()
 	end
+
 end
 
 
