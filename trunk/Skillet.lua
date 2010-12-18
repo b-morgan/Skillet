@@ -18,7 +18,7 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
 ]]--
 
-local MAJOR_VERSION = "2.11"
+local MAJOR_VERSION = "2.12"
 local MINOR_VERSION = ("$Revision$"):match("%d+") or 1
 local DATE = string.gsub("$Date$", "^.-(%d%d%d%d%-%d%d%-%d%d).-$", "%1")
 
@@ -788,24 +788,7 @@ function Skillet:SkilletShow()
 DebugSpam("SHOW WINDOW (was showing "..(self.currentTrade or "nil")..")");
 
 
--- this comes from the blizzard ui tradeskill_show() routine.  for some reason, one (or all) of these needs to be called to prevent skill-ups from killing the DoTrade repeat
-	TradeSkillCreateButton:Disable();
-	TradeSkillCreateAllButton:Disable();
-	local tsIndex = 0;
-	if ( GetTradeSkillSelectionIndex() == 0 ) then
-		tsIndex = GetFirstTradeSkill();
-	else
-		tsIndex = GetTradeSkillSelectionIndex();
-	end
-	TradeSkillFrame_SetSelection(tsIndex);
-	FauxScrollFrame_SetOffset(TradeSkillListScrollFrame, 0);
-	TradeSkillListScrollFrameScrollBar:SetMinMaxValues(0, 0);
-	TradeSkillListScrollFrameScrollBar:SetValue(0);
 	TradeSkillFrame_Update();
-	TradeSkillSetFilter(-1, -1);
-
--- end of weird blizzard code stuff
-
 
 	if IsTradeSkillLinked() or (IsTradeSkillGuild and IsTradeSkillGuild()) then
 		local _, linkedPlayer = IsTradeSkillLinked()
@@ -828,20 +811,6 @@ DebugSpam("SHOW WINDOW (was showing "..(self.currentTrade or "nil")..")");
 
 --DEFAULT_CHAT_FRAME:AddMessage("SkilletShow")
 
---[[
-	if self.currentTrade then
-		if self.craftOpen and event == "TRADE_SKILL_SHOW" then		-- crafting is open, but we've been asked to show tradeskills
-			self.craftOpen = false
-			CloseCraft()
-		end
-
-		if self.tradeSkillOpen and event == "CRAFT_SHOW" then		-- tradeskill is open, but we've been asked to show crafting
-			self.tradeSkillOpen = false
-			CloseTradeSkill()
-		end
-	end
-]]
-
 	self.currentTrade = self.tradeSkillIDsByName[(GetTradeSkillLine())] or 2656      -- smelting caveat
 
 
@@ -857,8 +826,15 @@ DebugSpam("SkilletShow: "..self.currentTrade)
 		self.selectedSkill = nil
 
 		self.dataScanned = false
+		self:ScheduleTimer("SkilletShowWindow", 0.5)
+	else
+		self:HideAllWindows()
+		self:BlizzardTradeSkillFrame_Show()
+	end
 
+end
 
+function Skillet:SkilletShowWindow()
 		if IsControlKeyDown() then
 			self.db.realm.skillDB[self.currentPlayer][self.currentTrade] = {}
 		end
@@ -883,13 +859,7 @@ DebugSpam("SkilletShow: "..self.currentTrade)
 		end
 
 		self.dataSource = "api"
-	else
-		self:HideAllWindows()
-		self:BlizzardTradeSkillFrame_Show()
-	end
-
 end
-
 
 function Skillet:FreeCaches()
 --	collectgarbage("collect")
