@@ -268,22 +268,36 @@ local missingVendorItems = {
 	[4539] = true,				-- Goldenbark Apple
 	[17035] = true,				-- Stranglethorn seed
 	[17034] = true, 			-- Maple seed
-	[37101] = true, 			--Ivory Ink
-	[39469] = true, 			--Moonglow Ink
-	[39774] = true, 			--Midnight Ink
-	[43116] = true, 			--Lions Ink
-	[43118] = true, 			--Jadefire Ink
-	[43120] = true, 			--Celestial Ink
-	[43122] = true, 			--Shimmering Ink
-	[43124] = true,  			--Ethereal Ink
-	[43126] = true,  			--Ink of the Sea
 }
 
+local specialVendorItems = {
+	[37101] = {1, 61978}, 			--Ivory Ink
+	[39469] = {1, 61978}, 			--Moonglow Ink
+	[39774] = {1, 61978}, 			--Midnight Ink
+	[43116] = {1, 61978}, 			--Lions Ink
+	[43118] = {1, 61978}, 			--Jadefire Ink
+	[43120] = {1, 61978}, 			--Celestial Ink
+	[43122] = {1, 61978}, 			--Shimmering Ink
+	[43124] = {1, 61978},  			--Ethereal Ink
+	[43126] = {1, 61978},  			--Ink of the Sea
+	[43127] = {10, 61978},  		--Snowfall Ink
+	[61981] = {10, 61978},  		--Inferno Ink
+}
+
+function Skillet:VendorItemAvailable(itemID)
+	if specialVendorItems[itemID] then
+		local divider = specialVendorItems[itemID][1]
+		local currency = specialVendorItems[itemID][2]
+		return math.floor(self:GetInventory(self.currentPlayer, currency) / divider)
+	else
+		return 100000		
+	end	
+end
 
 -- queries periodic table for vendor info for a particual itemID
 function Skillet:VendorSellsReagent(itemID)
 	if PT then
-		if missingVendorItems[itemID] then
+		if missingVendorItems[itemID] or specialVendorItems[itemID] then
 			return true
 		end
 

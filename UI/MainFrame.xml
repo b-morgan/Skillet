@@ -1575,6 +1575,69 @@
 				</Scripts>
 			</Button>
 
+			<Button name="SkilletCollapseAllButton">
+				<Size>
+					<AbsDimension x="20" y="20"/>
+				</Size>
+
+				<NormalTexture name="$parentIcon" file="Interface\Addons\Skillet\Icons\collapse_icon.tga"/>
+
+				<Anchors>
+					<Anchor point="BOTTOMRIGHT" relativeTo="SkilletRecipeDifficultyButton" relativePoint="BOTTOMLEFT">
+						<Offset>
+							<AbsDimension x="-5" y="0"/>
+						</Offset>
+					</Anchor>
+				</Anchors>
+
+				<Scripts>
+					<OnClick>
+						Skillet:CollapseAll()
+					</OnClick>
+
+					<OnEnter>
+						GameTooltip:SetOwner(self, "ANCHOR_TOPLEFT")
+						GameTooltip:SetText(Skillet.L["Collapse all groups"], nil, nil, nil, nil, 1)
+						GameTooltip:Show()
+					</OnEnter>
+
+					<OnLeave>
+						GameTooltip:Hide()
+					</OnLeave>
+				</Scripts>
+			</Button>
+
+			<Button name="SkilletExpandAllButton">
+				<Size>
+					<AbsDimension x="20" y="20"/>
+				</Size>
+
+				<NormalTexture name="$parentIcon" file="Interface\Addons\Skillet\Icons\expand_icon.tga"/>
+
+				<Anchors>
+					<Anchor point="BOTTOMRIGHT" relativeTo="SkilletCollapseAllButton" relativePoint="BOTTOMLEFT">
+						<Offset>
+							<AbsDimension x="-5" y="0"/>
+						</Offset>
+					</Anchor>
+				</Anchors>
+
+				<Scripts>
+					<OnClick>
+						Skillet:ExpandAll()
+					</OnClick>
+
+					<OnEnter>
+						GameTooltip:SetOwner(self, "ANCHOR_TOPLEFT")
+						GameTooltip:SetText(Skillet.L["Expand all groups"], nil, nil, nil, nil, 1)
+						GameTooltip:Show()
+					</OnEnter>
+
+					<OnLeave>
+						GameTooltip:Hide()
+					</OnLeave>
+				</Scripts>
+			</Button>
 
 
 	<!--

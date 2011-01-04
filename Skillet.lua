@@ -18,7 +18,7 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
 ]]--
 
-local MAJOR_VERSION = "2.12"
+local MAJOR_VERSION = "2.13"
 local MINOR_VERSION = ("$Revision$"):match("%d+") or 1
 local DATE = string.gsub("$Date$", "^.-(%d%d%d%d%-%d%d%-%d%d).-$", "%1")
 
@@ -790,15 +790,24 @@ DebugSpam("SHOW WINDOW (was showing "..(self.currentTrade or "nil")..")");
 
 	TradeSkillFrame_Update();
 
+	self.linkedSkill = false
+
 	if IsTradeSkillLinked() or (IsTradeSkillGuild and IsTradeSkillGuild()) then
+		local guildSkills = IsTradeSkillGuild and IsTradeSkillGuild()
 		local _, linkedPlayer = IsTradeSkillLinked()
 
 		if not linkedPlayer then
-			return
+			if guildSkills then
+				linkedPlayer = "Guild Recipes"
+			else
+				return
+			end
 		end
 
 		self.currentPlayer = linkedPlayer
-
+		
+		self.linkedSkill = true
+				
 		if (self.currentPlayer == UnitName("player")) then
 			self.currentPlayer = "All Data"
 		end
