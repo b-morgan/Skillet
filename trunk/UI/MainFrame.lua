@@ -617,9 +617,9 @@ function Skillet:TradeButton_OnClick(this,button)
 	if button == "LeftButton" then
 		if player == UnitName("player") or (data and data ~= "") then
 			if self.currentTrade == tradeID and IsShiftKeyDown() then
-				local link=GetTradeSkillListLink()
-
-				if (ChatEdit_GetLastActiveWindow():IsVisible() or WIM_EditBoxInFocus ~= nil) then
+				local link=GetTradeSkillListLink();
+				local activeEditBox =  ChatEdit_GetActiveWindow();
+				if activeEditBox or WIM_EditBoxInFocus ~= nil then
 					ChatEdit_InsertLink(link)
 				else
 					DEFAULT_CHAT_FRAME:AddMessage(link)

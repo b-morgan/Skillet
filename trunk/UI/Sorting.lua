@@ -305,7 +305,37 @@ local function show_sort_toggle()
     end
 end
 
+function Skillet:ExpandAll()
+	local skillListKey = Skillet.currentPlayer..":"..Skillet.currentTrade..":"..Skillet.currentGroupLabel
+	if self.data.sortedSkillList[skillListKey] then
+		local sortedSkillList = self.data.sortedSkillList[skillListKey]	
+		local numTradeSkills = sortedSkillList.count
+		for i=1, numTradeSkills, 1 do
+			local skill = sortedSkillList[i]
+			if skill.subGroup then
+				skill.subGroup.expanded = true
+			end
+		end
+	end
+	Skillet:SortAndFilterRecipes()
+	Skillet:UpdateTradeSkillWindow()
+end
 
+function Skillet:CollapseAll()
+	local skillListKey = Skillet.currentPlayer..":"..Skillet.currentTrade..":"..Skillet.currentGroupLabel
+	if self.data.sortedSkillList[skillListKey] then
+		local sortedSkillList = self.data.sortedSkillList[skillListKey]	
+		local numTradeSkills = sortedSkillList.count
+		for i=1, numTradeSkills, 1 do
+			local skill = sortedSkillList[i]
+			if skill.subGroup then
+				skill.subGroup.expanded = false
+			end
+		end
+	end
+	Skillet:SortAndFilterRecipes()
+	Skillet:UpdateTradeSkillWindow()
+end
 
 -- Builds a sorted and fitlered list of recipes for the
 -- currently selected tradekskill and sorting method

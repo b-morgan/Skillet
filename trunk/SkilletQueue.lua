@@ -152,6 +152,8 @@ end
 function Skillet:AddToQueue(command, noWindowRefresh)
 	local queue = self.db.realm.queueData[self.currentPlayer]
 
+	-- if self.linkedSkill then return end 
+
 	if (not command.complex) then		-- we can add this queue entry to any of the other entries
 		local added
 
@@ -233,21 +235,46 @@ end
 function Skillet:ProcessQueue()
 DebugSpam("PROCESS QUEUE");
 	local queue = self.db.realm.queueData[self.currentPlayer]
-	local command = queue[1]
+	local qpos = 1
 	local skillIndexLookup = self.data.skillIndexLookup[self.currentPlayer]
 
 	if self.currentPlayer ~= (UnitName("player")) then
 DebugSpam("trying to process from an alt!")
 		return
 	end
+	
+	local command 
+	
+	repeat
+		command = queue[qpos]
+		if command and command.op == "iterate" then
+			local recipe = self:GetRecipe(command.recipeID)
+			local craftable = true
+			for i=1,#recipe.reagentData,1 do
+				local reagent = recipe.reagentData[i]										
+				local numInBags = self:GetInventory(self.currentPlayer, reagent.id)
+				if numInBags < reagent.numNeeded then
+					local reagentName = GetItemInfo(reagent.id) or reagent.id
+					Skillet:Print(L["Skipping"],recipe.name,"-",L["need"],reagent.numNeeded,"x",reagentName,"("..L["have"],numInBags..")")
+					craftable = false
+					break
+				end
+			end
+			if craftable then break end			
+		end
+		qpos = qpos + 1
+	until qpos>#queue
 
+	-- if we can't craft anything, show error from first item in queue
+	if qpos > #queue then
+		command = queue[1]
+	end
 
 	if command then
-		if command.op == "iterate" then
+		if command.op == "iterate" then	
 			self.queuecasting = true
 
 			local recipe = self:GetRecipe(command.recipeID)
-
 			if self.currentTrade ~= recipe.tradeID then
     			CastSpellByName(self:GetTradeName(recipe.tradeID))					-- switch professions
             end
