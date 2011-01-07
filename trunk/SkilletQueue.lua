@@ -237,6 +237,9 @@ DebugSpam("PROCESS QUEUE");
 	local queue = self.db.realm.queueData[self.currentPlayer]
 	local qpos = 1
 	local skillIndexLookup = self.data.skillIndexLookup[self.currentPlayer]
+	
+	self.processingPosition = nil
+	self.processingCommand = nil
 
 	if self.currentPlayer ~= (UnitName("player")) then
 DebugSpam("trying to process from an alt!")
@@ -267,7 +270,8 @@ DebugSpam("trying to process from an alt!")
 
 	-- if we can't craft anything, show error from first item in queue
 	if qpos > #queue then
-		command = queue[1]
+		qpos = 1
+		command = queue[qpos]
 	end
 
 	if command then
@@ -280,8 +284,9 @@ DebugSpam("trying to process from an alt!")
             end
 
 			self.processingSpell = self:GetRecipeName(command.recipeID)
---DEFAULT_CHAT_FRAME:AddMessage("processing: "..(self.processingSpell or "nil"))
-
+			self.processingPosition = qpos
+			self.processingCommand = command
+			
 			DoTradeSkill(skillIndexLookup[command.recipeID],command.count)
 
 			return
@@ -377,38 +382,53 @@ end
 
 	local queue = self.db.realm.queueData[self.currentPlayer]
 
-	if spell == self.processingSpell then
-		if success then
-			if not queue[1] then
-				self.db.realm.queueData[self.currentPlayer] = {}
+	if spell == self.processingSpell then	
+		if success then		
+			local qpos = self.processingPosition or 1
+			local command = nil
+			
+			if not queue[qpos] or queue[qpos] ~= self.processingCommand then
+				for i=1,#queue,1 do
+					if queue[i] == self.processingCommand then
+						command = queue[i]
+						qpos = i
+						break
+					end
+				end
+			else
+				command = queue[qpos]
+			end
+					
+			-- empty queue or command not found (removed?)
+			if not queue[1] or not command then
 --				self:SendMessage("Skillet_Queue_Complete")
 				self.queuecasting = false
 				self.processingSpell = nil
+				self.processingPosition = nil
+				self.processingCommand = nil
 
 				self:UpdateTradeSkillWindow()
 				return
---			else
---				if self:GetRecipe(queue[1].recipeID).tradeID == 7411 then
---					self.queuecasting = false
---					self.processingSpell = nil
---				end
 			end
 
-			if queue[1].op == "iterate" then
-				queue[1].count = queue[1].count - 1
---DEFAULT_CHAT_FRAME:AddMessage("remove 1 from queue")
+			if command.op == "iterate" then
+				command.count = command.count - 1
 
-				if queue[1].count < 1 then
+				if command.count < 1 then
 					self.queuecasting = false
 					self.processingSpell = nil
+					self.processingPosition = nil
+					self.processingCommand = nil						
 					self.reagentsChanged = {}
-					self:RemoveFromQueue(1)		-- implied queued reagent inventory adjustment in remove routine
+					self:RemoveFromQueue(qpos)		-- implied queued reagent inventory adjustment in remove routine
 					self:RescanTrade()
 --					DEFAULT_CHAT_FRAME:AddMessage("removed queue command")
 				end
 			end
 		else
 			self.processingSpell = nil
+			self.processingPosition = nil
+			self.processingCommand = nil			
 			self.queuecasting = false
 		end
 
