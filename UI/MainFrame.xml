@@ -53,6 +53,26 @@
 		<CheckedTexture alphaMode="ADD" file="Interface\Buttons\CheckButtonHilight"/>
 	</CheckButton>
 
+	<Button name="SkilletTradeButtonAdditionalTemplate" inherits="SecureActionButtonTemplate" virtual="true" hidden="true">
+		<Size>
+			<AbsDimension x="25" y="25"/>
+		</Size>
+		<Layers>
+			<Layer level="BACKGROUND">
+				<Texture name="$parentIcon"/>
+			</Layer>
+		</Layers>
+		<Scripts>
+			<OnEnter>
+				Skillet:TradeButtonAdditional_OnEnter(self);
+			</OnEnter>
+			<OnLeave>
+				GameTooltip:Hide();
+			</OnLeave>
+		</Scripts>		
+		<HighlightTexture alphaMode="ADD" file="Interface\Buttons\ButtonHilight-Square"/>
+	</Button>
+
 	<StatusBar name="SkilletRankFrameTemplate" drawLayer="BACKGROUND" minValue="0" maxValue="1" defaultValue="0" virtual="true">
 		<Size>
 			<AbsDimension x="297" y="5"/>

@@ -604,6 +604,21 @@ function Skillet:TradeButton_OnEnter(button)
 	GameTooltip:Show()
 end
 
+function Skillet:TradeButtonAdditional_OnEnter(button)
+	GameTooltip:SetOwner(button, "ANCHOR_TOPLEFT")
+	GameTooltip:ClearLines()
+	
+	local spellID = button:GetID()
+	GameTooltip:AddLine(GetSpellInfo(spellID))
+	
+	local itemID = Skillet:GetAutoTargetItem(spellID)
+	if itemID and IsAltKeyDown() then
+		GameTooltip:AddLine("/use "..GetItemInfo(itemID))
+	end
+	
+	GameTooltip:Show()
+end
+
 
 function Skillet:TradeButton_OnClick(this,button)
 	local name = this:GetName()
@@ -656,7 +671,6 @@ function Skillet:TradeButton_OnClick(this,button)
 	GameTooltip:Hide()
 end
 
-
 function Skillet:UpdateTradeButtons(player)
 	local position = 0 -- pixels
 	local tradeSkillList = self.tradeSkillList
@@ -681,7 +695,9 @@ function Skillet:UpdateTradeButtons(player)
 	end
 
 	frame:Show()
-
+	
+	Skillet.AutoButtonsList = {}
+	
 	for i=1,#tradeSkillList,1 do					-- iterate thru all skills in defined order for neatness (professions, secondary, class skills)
 		local tradeID = tradeSkillList[i]
 		local ranks = self:GetSkillRanks(player, tradeID)
@@ -719,8 +735,6 @@ function Skillet:UpdateTradeButtons(player)
 			local buttonIcon = _G[buttonName.."Icon"]
 			buttonIcon:SetTexture(spellIcon)
 
-
-
 			position = position + button:GetWidth()
 
 			if tradeID == self.currentTrade then
@@ -736,8 +750,67 @@ function Skillet:UpdateTradeButtons(player)
 			end
 
 			button:Show()
+			
+			-- create additional spells for cooking fire, milling, prospecting, disenchanting for current player
+			local additionalSpellTab = Skillet.TradeSkillAdditionalAbilities[tradeID]			
+			if additionalSpellTab and player == UnitName("player")then
+				table.insert(Skillet.AutoButtonsList, additionalSpellTab)
+			end
 		end
 	end
+	
+	position = position + 10
+	
+	for i=1,#Skillet.AutoButtonsList,1 do					-- iterate thru all skills in defined order for neatness (professions, secondary, class skills)
+		local additionalSpellTab = Skillet.AutoButtonsList[i]
+		local additionalSpellId = additionalSpellTab[1]
+		local additionalSpellName = additionalSpellTab[2]
+		
+		local spellName, _, spellIcon = GetSpellInfo(additionalSpellId)
+
+		local buttonName = "SkilletDo"..additionalSpellName
+		local buttonAutoName = "SkilletAuto"..additionalSpellName
+		
+		local button = _G[buttonName]
+		local buttonAuto = _G[buttonAutoName]
+
+		if not button then
+			button = CreateFrame("Button", buttonName, frame, "SkilletTradeButtonAdditionalTemplate")
+			button:SetID(additionalSpellId)
+			
+			buttonAuto = CreateFrame("Button", buttonAutoName, frame, "SkilletTradeButtonAdditionalTemplate")
+			buttonAuto:SetID(additionalSpellId)			
+			
+			-- shift / caps - auto milling / prospecting
+			button:SetAttribute("alt-type*", "macro");
+			buttonAuto:SetAttribute("type*", "macro");
+			
+			local itemID = Skillet:GetAutoTargetItem(additionalSpellId)	
+			local macrotext
+			if itemID then
+				macrotext = "/cast "..GetSpellInfo(additionalSpellId).."\n/use "..GetItemInfo(itemID)
+			else
+				macrotext = "/cast "..GetSpellInfo(additionalSpellId)
+			end			
+			button:SetAttribute("macrotext", macrotext)
+			buttonAuto:SetAttribute("macrotext", macrotext)
+							
+			-- no modifier - pure spell
+			button:SetAttribute("type", "spell");
+			button:SetAttribute("spell", additionalSpellId);
+		end
+
+		button:ClearAllPoints()
+		button:SetPoint("BOTTOMLEFT", SkilletRankFrame, "TOPLEFT", position, 0)
+
+		local buttonIcon = _G[buttonName.."Icon"]
+		buttonIcon:SetTexture(spellIcon)
+
+		position = position + button:GetWidth()
+
+		button:Show()
+		buttonAuto:Hide()	
+	end	
 
 DebugSpam("UpdateTradeButtons complete")
 end
