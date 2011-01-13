@@ -43,6 +43,101 @@ local TradeSkillList = {
 --	5149, 			-- beast training (not supported, but i need to know the number)... err... or maybe i don't
 }
 
+Skillet.TradeSkillAdditionalAbilities = {
+    [7411]  = {13262,"Disenchant"},        -- enchanting = disenchant
+    [2550]  = {818,"Basic_Campfire"},          -- cooking = basic campfire
+    [45357] = {51005,"Milling"},        -- inscription = milling
+    [25229] = {31252,"Prospecting"},        -- jewelcrafting = prospecting
+}
+
+Skillet.AutoButtonsList = {}
+
+Skillet.TradeSkillAutoTarget = {
+	[7411] =  {   -- Enchanting
+		[38682] = 1, -- Enchanting Vellum
+	},
+	[31252] = {
+		[2770]  = 5, --Copper Ore
+		[2771]  = 5, --Tin Ore
+		[2772]  = 5, --Iron Ore
+		[3858]  = 5, --Mithril Ore
+		[10620] = 5, --Thorium Ore
+	
+		[23424] = 5, --Fel Iron Ore
+		[23425] = 5, --Adamantite Ore
+
+		[36909] = 5, --Cobalt Ore
+		[36910] = 5, --Titanium Ore
+		[36912] = 5, --Saronite Ore
+		
+		[53038] = 5, -- Obsidium Ore
+		[52183] = 5, -- Pyrite Ore
+		[52185] = 5, -- Elementium Ore
+	},
+	[51005] = {   -- Millling
+		[765]  = 5, -- Silverleaf
+		[2449] = 5, -- Earthroot
+		[2447] = 5, -- Peacebloom
+
+		[2450] = 5, -- Briarthorn
+		[2453] = 5, -- Bruiseweed
+		[785]  = 5, -- Mageroyal
+		[3820] = 5, -- Stranglekelp
+		[2452] = 5, -- Swiftthistle
+		
+		[3355] = 5, -- Wild Steelbloom
+		[3369] = 5, -- Grave Moss
+		[3357] = 5, -- Liferoot
+		[3356] = 5, -- Kingsblood		
+		
+		[3818] = 5, -- Fadeleaf
+		[3821] = 5, -- Goldthorn
+		[3358] = 5, -- Khadgar\'s Whisker
+		[3819] = 5, -- Dragon\'s Teeth
+		
+		[8831] = 5, -- Purple Lotus
+		[8836] = 5, -- Arthas\' Tears
+		[8838] = 5, -- Sungrass
+		[4625] = 5, -- Firebloom
+		[8839] = 5, -- Blindweed
+		[8845] = 5, -- Ghost Mushroom
+		[8846] = 5, -- Gromsblood
+
+		[13463] = 5, -- Dreamfoil
+		[13464] = 5, -- Golden Sansam
+		[13465] = 5, -- Mountain Silversage
+		[13466] = 5, -- Sorrowmoss
+		[13467] = 5, -- Icecap
+		[39969] = 5, -- Fire Seed
+
+		[22789] = 5, -- Terocone
+		[22786] = 5, -- Dreaming Glory
+		[22787] = 5, -- Ragveil
+		[22785] = 5, -- Felweed
+		[22790] = 5, -- Ancient Lichen
+		[22792] = 5, -- Nightmare Vine
+		[22793] = 5, -- Mana Thistle
+		[22791] = 5, -- Netherbloom
+		
+		[36901] = 5, -- Goldclover
+		[36907] = 5, -- Talandra\'s Rose
+		[37921] = 5, -- Deadnettle
+		[36904] = 5, -- Tiger Lily
+		[36905] = 5, -- Lichbloom
+		[36906] = 5, -- Icethorn
+		[36903] = 5, -- Adder\'s Tongue
+		[39970] = 5, -- Fire Leaf		
+		
+		[52983] = 5, -- Cinderbloom
+		[52984] = 5, -- Stormvine
+		[52985] = 5, -- Azshara\'s Veil
+		[52986] = 5, -- Heartblossom
+		[52987] = 5, -- Twilight Jasmine
+		[52988] = 5, -- Whiptail
+		[52989] = 5, -- Deathspore Pod
+	}
+}
+
 local TradeSkillRecipeCounts = {
 	[3908] = 438,
 	[7411] = 306,
@@ -97,7 +192,6 @@ local TradeSkillIgnoredMats  = {
 
 Skillet.TradeSkillIgnoredMats = TradeSkillIgnoredMats
 
-
 SkilletData = {}				-- skillet data scanner
 SkilletLink = {}
 
@@ -129,7 +223,29 @@ local skill_style_type = {
 	["header"]          = { r = 1.00, g = 0.82, b = 0,    level = 0, alttext="",    cstring = "|cffffc800"},
 }
 
+local lastAutoTarget = {}
 
+function Skillet:GetAutoTargetItem(tradeID)
+	if Skillet.TradeSkillAutoTarget[tradeID] then
+		local itemID = lastAutoTarget[tradeID]
+		if itemID then
+			local limit  = Skillet.TradeSkillAutoTarget[tradeID][itemID]
+			local count = GetItemCount(itemID)
+			if count >= limit then
+				return itemID
+			end
+		end	
+		
+		for itemID,limit in pairs(Skillet.TradeSkillAutoTarget[tradeID]) do
+			local count = GetItemCount(itemID)
+			if count >= limit then
+				lastAutoTarget[tradeID] = itemID
+				return itemID
+			end			
+		end
+		lastAutoTarget[tradeID] = nil
+	end 
+end
 
 -- adds an recipe source for an itemID (recipeID produces itemID)
 function Skillet:ItemDataAddRecipeSource(itemID,recipeID)
@@ -864,8 +980,15 @@ DebugSpam("Scanning Trade "..(profession or "nil")..":"..(tradeID or "nil").." "
 
 							Skillet:ItemDataAddRecipeSource(itemID,recipeID)					-- add a cross reference for the source of particular items
 						else
-							recipe.numMade = 1
-							recipe.itemID = 0												-- indicates an enchant
+							recipe.numMade = 1						
+							if LSW and LSW.scrollData and LSW.scrollData[recipeID] then
+								local itemID = LSW.scrollData[recipeID]
+								recipe.itemID = itemID
+								itemString = itemID
+								Skillet:ItemDataAddRecipeSource(itemID,recipeID)					-- add a cross reference for the source of particular items
+							else
+								recipe.itemID = 0												-- indicates an enchant
+							end
 						end
 
 						local reagentString = nil
@@ -1791,8 +1914,15 @@ DebugSpam("Scanning Trade "..(profession or "nil")..":"..(tradeID or "nil").." "
 
 							Skillet:ItemDataAddRecipeSource(itemID,recipeID)					-- add a cross reference for the source of particular items
 						else
-							recipe.numMade = 1
-							recipe.itemID = 0												-- indicates an enchant
+							recipe.numMade = 1						
+							if LSW and LSW.scrollData and LSW.scrollData[recipeID] then
+								local itemID = LSW.scrollData[recipeID]
+								recipe.itemID = itemID
+								itemString = itemID
+								Skillet:ItemDataAddRecipeSource(itemID,recipeID)					-- add a cross reference for the source of particular items
+							else
+								recipe.itemID = 0												-- indicates an enchant
+							end
 						end
 
 						local reagentString = "-"
