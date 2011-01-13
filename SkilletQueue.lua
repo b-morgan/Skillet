@@ -288,12 +288,12 @@ DebugSpam("trying to process from an alt!")
 			self.processingCommand = command
 			
 			DoTradeSkill(skillIndexLookup[command.recipeID],command.count)
-			
+
 			-- if shift down and caps lock auto use items / like vellums
 			if IsAltKeyDown() then
 				local itemID = Skillet:GetAutoTargetItem(recipe.tradeID)
 				if itemID then
-					CastSpellByName("/use "..GetItemInfo(itemID))
+					UseItemByName(itemID)
 				end
 			end
 			
