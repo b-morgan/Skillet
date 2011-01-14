@@ -18,7 +18,7 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
 ]]--
 
-local MAJOR_VERSION = "2.15"
+local MAJOR_VERSION = "2.16"
 local MINOR_VERSION = ("$Revision$"):match("%d+") or 1
 local DATE = string.gsub("$Date$", "^.-(%d%d%d%d%-%d%d%-%d%d).-$", "%1")
 
@@ -702,6 +702,7 @@ function Skillet:OnEnable()
 
     -- TODO: Tracks when the number of items on hand changes
 	self:RegisterEvent("BAG_UPDATE")
+	self:RegisterEvent("BAG_OPEN")
 --    self:RegisterEvent("TRADE_CLOSED")
 --	self:RegisterEvent("CHAT_MSG_LOOT")
 
@@ -743,6 +744,8 @@ function Skillet:OnEnable()
 
  	self:EnableQueue("Skillet")
 	self:EnableDataGathering("Skillet")
+
+	Skillet:UpdateAutoTradeButtons()
 
 	self:DisableBlizzardFrame()
 end
@@ -912,13 +915,15 @@ function Skillet:RescanBags()
 	self.rescan_bags_timer = nil
 end
 
-
+function Skillet:BAG_OPEN()
+	Skillet:UpdateAutoTradeButtons()
+end
 
 -- So we can track when the players inventory changes and update craftable counts
 function Skillet:BAG_UPDATE()
 
 	if not self.rescan_auto_targets_timer then
-		self.rescan_auto_targets_timer = self:ScheduleTimer("InventoryScanAutoTargets", 0.3)
+		self.rescan_auto_targets_timer = self:ScheduleTimer("UpdateAutoTradeButtons", 0.3)
 	end
 		
 	local showing = false

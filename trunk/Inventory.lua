@@ -193,36 +193,6 @@ invscan = invscan + 1
 DebugSpam("InventoryScan Complete")
 end
 
-function Skillet:InventoryScanAutoTargets()
-   -- scan auto buttons
-	for i=1,#Skillet.AutoButtonsList,1 do					-- iterate thru all skills in defined order for neatness (professions, secondary, class skills)
-		local additionalSpellTab = Skillet.AutoButtonsList[i]
-		local additionalSpellId = additionalSpellTab[1]
-		local additionalSpellName = additionalSpellTab[2]
-		
-		local buttonName = "SkilletDo"..additionalSpellName		
-		local button = _G[buttonName]
-			
-		if button then
-			local buttonAutoName = "SkilletAuto"..additionalSpellName		
-			local buttonAuto = _G[buttonAutoName]
-		
-			local itemID = Skillet:GetAutoTargetItem(additionalSpellId)	
-			local macrotext
-			if itemID then
-				macrotext = "/cast "..GetSpellInfo(additionalSpellId).."\n/use "..GetItemInfo(itemID)
-			else
-				macrotext = "/cast "..GetSpellInfo(additionalSpellId)
-			end			
-			button:SetAttribute("macrotext", macrotext)
-			buttonAuto:SetAttribute("macrotext", macrotext)	
-		end
-	end
-	self.rescan_auto_targets_timer = nil
-end
-
-
-
 -- recipe iteration check: calculate how many times a recipe can be iterated with materials available
 -- (not to be confused with the reagent craftability which is designed to determine how many craftable reagents are available for recipe iterations)
 function Skillet:InventorySkillIterations(tradeID, skillIndex, playerOverride)

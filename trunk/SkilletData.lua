@@ -247,6 +247,15 @@ function Skillet:GetAutoTargetItem(tradeID)
 	end 
 end
 
+function Skillet:GetAutoTargetMacro(additionalSpellId)
+	local itemID = Skillet:GetAutoTargetItem(additionalSpellId)	
+	if itemID then
+		return "/cast "..GetSpellInfo(additionalSpellId).."\n/use "..GetItemInfo(itemID)
+	else
+		return "/cast "..GetSpellInfo(additionalSpellId)
+	end	
+end
+
 -- adds an recipe source for an itemID (recipeID produces itemID)
 function Skillet:ItemDataAddRecipeSource(itemID,recipeID)
 	if not itemID or not recipeID then return end
