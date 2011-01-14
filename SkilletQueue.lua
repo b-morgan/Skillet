@@ -232,7 +232,7 @@ DebugSpam("ClearQueue Complete")
 end
 
 
-function Skillet:ProcessQueue()
+function Skillet:ProcessQueue(altMode)
 DebugSpam("PROCESS QUEUE");
 	local queue = self.db.realm.queueData[self.currentPlayer]
 	local qpos = 1
@@ -287,14 +287,18 @@ DebugSpam("trying to process from an alt!")
 			self.processingPosition = qpos
 			self.processingCommand = command
 			
-			DoTradeSkill(skillIndexLookup[command.recipeID],command.count)
-
-			-- if shift down and caps lock auto use items / like vellums
-			if IsAltKeyDown() then
+			-- if alt down/right click - auto use items / like vellums
+			if altMode then
 				local itemID = Skillet:GetAutoTargetItem(recipe.tradeID)
 				if itemID then
+					DoTradeSkill(skillIndexLookup[command.recipeID],1)
 					UseItemByName(itemID)
+					self.queuecasting = false
+				else
+					DoTradeSkill(skillIndexLookup[command.recipeID],command.count)
 				end
+			else
+				DoTradeSkill(skillIndexLookup[command.recipeID],command.count)
 			end
 			
 			return
@@ -358,16 +362,16 @@ end
 
 
 -- Adds the currently selected number of items to the queue and then starts the queue
-function Skillet:CreateItems(count)
+function Skillet:CreateItems(count, mouse)
 	if self:QueueItems(count) > 0 then
-		self:ProcessQueue()
+		self:ProcessQueue(mouse == "RightButton" or IsAltKeyDown())
 	end
 end
 
 -- Queue and create the max number of craftable items for the currently selected skill
-function Skillet:CreateAllItems()
+function Skillet:CreateAllItems(mouse)
 	if self:QueueAllItems() > 0 then
-		self:ProcessQueue()
+		self:ProcessQueue(mouse == "RightButton" or IsAltKeyDown())
 	end
 end
 

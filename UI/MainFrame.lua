@@ -696,8 +696,6 @@ function Skillet:UpdateTradeButtons(player)
 
 	frame:Show()
 	
-	Skillet.AutoButtonsList = {}
-	
 	for i=1,#tradeSkillList,1 do					-- iterate thru all skills in defined order for neatness (professions, secondary, class skills)
 		local tradeID = tradeSkillList[i]
 		local ranks = self:GetSkillRanks(player, tradeID)
@@ -750,18 +748,17 @@ function Skillet:UpdateTradeButtons(player)
 			end
 
 			button:Show()
-			
-			-- create additional spells for cooking fire, milling, prospecting, disenchanting for current player
-			local additionalSpellTab = Skillet.TradeSkillAdditionalAbilities[tradeID]			
-			if additionalSpellTab and player == UnitName("player")then
-				table.insert(Skillet.AutoButtonsList, additionalSpellTab)
-			end
 		end
 	end
 	
 	position = position + 10
 	
 	for i=1,#Skillet.AutoButtonsList,1 do					-- iterate thru all skills in defined order for neatness (professions, secondary, class skills)
+		
+		if InCombatLockdown() then
+			break
+		end
+	
 		local additionalSpellTab = Skillet.AutoButtonsList[i]
 		local additionalSpellId = additionalSpellTab[1]
 		local additionalSpellName = additionalSpellTab[2]
@@ -769,34 +766,16 @@ function Skillet:UpdateTradeButtons(player)
 		local spellName, _, spellIcon = GetSpellInfo(additionalSpellId)
 
 		local buttonName = "SkilletDo"..additionalSpellName
-		local buttonAutoName = "SkilletAuto"..additionalSpellName
-		
 		local button = _G[buttonName]
-		local buttonAuto = _G[buttonAutoName]
-
 		if not button then
 			button = CreateFrame("Button", buttonName, frame, "SkilletTradeButtonAdditionalTemplate")
 			button:SetID(additionalSpellId)
-			
-			buttonAuto = CreateFrame("Button", buttonAutoName, frame, "SkilletTradeButtonAdditionalTemplate")
-			buttonAuto:SetID(additionalSpellId)			
-			
-			-- shift / caps - auto milling / prospecting
-			button:SetAttribute("alt-type*", "macro");
-			buttonAuto:SetAttribute("type*", "macro");
-			
-			local itemID = Skillet:GetAutoTargetItem(additionalSpellId)	
-			local macrotext
-			if itemID then
-				macrotext = "/cast "..GetSpellInfo(additionalSpellId).."\n/use "..GetItemInfo(itemID)
-			else
-				macrotext = "/cast "..GetSpellInfo(additionalSpellId)
-			end			
-			button:SetAttribute("macrotext", macrotext)
-			buttonAuto:SetAttribute("macrotext", macrotext)
-							
+
 			-- no modifier - pure spell
-			button:SetAttribute("type", "spell");
+			button:SetAttribute("type1", "spell");
+			button:SetAttribute("type2", "macro");
+			button:SetAttribute("alt-type*", "macro");
+						
 			button:SetAttribute("spell", additionalSpellId);
 		end
 
@@ -809,12 +788,61 @@ function Skillet:UpdateTradeButtons(player)
 		position = position + button:GetWidth()
 
 		button:Show()
-		buttonAuto:Hide()	
 	end	
-
+	
+	Skillet:UpdateAutoTradeButtons()
+	
 DebugSpam("UpdateTradeButtons complete")
 end
 
+function Skillet:UpdateAutoTradeButtons()
+	
+	if InCombatLockdown() then
+		self.rescan_auto_targets_timer = nil
+		return
+	end
+	
+	local tradeSkillList = self.tradeSkillList
+	
+	Skillet.AutoButtonsList = {}
+	
+	for i=1,#tradeSkillList,1 do
+		local tradeID = tradeSkillList[i]
+		local ranks = self:GetSkillRanks(UnitName("player"), tradeID)
+		if ranks then
+			local additionalSpellTab = Skillet.TradeSkillAdditionalAbilities[tradeID]			
+			if additionalSpellTab then
+				table.insert(Skillet.AutoButtonsList, additionalSpellTab)
+
+				local additionalSpellId = additionalSpellTab[1]
+				local additionalSpellName = additionalSpellTab[2]
+
+				local spellName, _, spellIcon = GetSpellInfo(additionalSpellId)
+
+				local buttonName = "SkilletDo"..additionalSpellName
+				local buttonAutoName = "SkilletAuto"..additionalSpellName
+
+				local button = _G[buttonName]			
+				local buttonAuto = _G[buttonAutoName]
+
+				if not buttonAuto then
+					buttonAuto = CreateFrame("Button", buttonAutoName, frame, "SkilletTradeButtonAdditionalTemplate")
+					buttonAuto:SetID(additionalSpellId)					
+					buttonAuto:SetAttribute("type*", "macro");
+					buttonAuto:Hide()
+				end
+
+				local macrotext = Skillet:GetAutoTargetMacro(additionalSpellId)
+				if button then
+					button:SetAttribute("macrotext", macrotext)
+				end
+				buttonAuto:SetAttribute("macrotext", macrotext)
+			end		
+		end
+	end	
+
+	self.rescan_auto_targets_timer = nil
+end
 
 
 function SkilletPluginDropdown_OnClick(this)
@@ -2826,14 +2854,14 @@ function Skillet:SkilletFrameForceClose()
 end
 
 -- The start/pause queue button.
-function Skillet:StartQueue_OnClick(button)
+function Skillet:StartQueue_OnClick(button,mouse)
 	if self.queuecasting then
 		self:CancelCast() -- next update will reset the text
 		button:Disable()
 		self.queuecasting = false
 	else
 		button:SetText(L["Pause"])
-		self:ProcessQueue()
+		self:ProcessQueue(mouse == "RightButton" or IsAltKeyDown())
 	end
 	self:UpdateQueueWindow()
 end
