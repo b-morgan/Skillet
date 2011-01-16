@@ -826,7 +826,7 @@ function Skillet:UpdateAutoTradeButtons()
 				local buttonAuto = _G[buttonAutoName]
 
 				if not buttonAuto then
-					buttonAuto = CreateFrame("Button", buttonAutoName, frame, "SkilletTradeButtonAdditionalTemplate")
+					buttonAuto = CreateFrame("Button", buttonAutoName, UIParent, "SkilletTradeButtonAdditionalTemplate")
 					buttonAuto:SetID(additionalSpellId)					
 					buttonAuto:SetAttribute("type*", "macro");
 					buttonAuto:Hide()
