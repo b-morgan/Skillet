@@ -250,9 +250,9 @@ end
 function Skillet:GetAutoTargetMacro(additionalSpellId)
 	local itemID = Skillet:GetAutoTargetItem(additionalSpellId)	
 	if itemID then
-		return "/cast "..GetSpellInfo(additionalSpellId).."\n/use "..GetItemInfo(itemID)
+		return "/cast "..(GetSpellInfo(additionalSpellId) or "").."\n/use "..(GetItemInfo(itemID) or "")
 	else
-		return "/cast "..GetSpellInfo(additionalSpellId)
+		return "/cast "..(GetSpellInfo(additionalSpellId) or "")
 	end	
 end
 
