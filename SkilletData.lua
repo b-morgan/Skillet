@@ -188,6 +188,10 @@ local TradeSkillIgnoredMats  = {
 		[53782] = 1 , -- Transmute: Eternal Earth to Shadow
 		[53783] = 1 , -- Transmute: Eternal Water to Air
 		[53784] = 1 , -- Transmute: Eternal Water to Fire
+		[45765] = 1 , -- Void Shatter
+		[42615] = 1 , -- small prismatic shard
+		[42613] = 1 , -- nexus transformation
+		[28022] = 1 , -- large prismatic shard
 }
 
 Skillet.TradeSkillIgnoredMats = TradeSkillIgnoredMats
