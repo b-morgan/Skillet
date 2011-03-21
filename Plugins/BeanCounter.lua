@@ -137,11 +137,13 @@ function plugin.GetBCValues(itemID)
 						for i, text in pairs(playerData["completedAuctions"][itemID][key]) do
 							local stack, money, deposit, _, _, _, _, auctime = strsplit(";", text)
 							auctime, stack, deposit, money = tonumber(auctime), tonumber(stack), tonumber(deposit), tonumber(money)
-
-							if (now - auctime) < (days) then
-								success = success + 1
-								sucessStack = sucessStack + stack
-								earned = earned + money - deposit
+							
+							if auctime ~= nil and stack ~= nil and deposit ~= nil and money ~= nil then								
+								if (now - auctime) < (days) then
+									success = success + 1
+									sucessStack = sucessStack + stack
+									earned = earned + money - deposit
+								end
 							end
 						end
 					end

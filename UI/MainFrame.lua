@@ -1329,7 +1329,7 @@ function Skillet:internal_UpdateTradeSkillWindow()
 				
 				if skill_color.alttext == "+++" then
 					local _, _, _, _, _, numSkillUps  = GetTradeSkillInfo(skillIndex)
-					if numSkillUps>1 then					
+					if numSkillUps and numSkillUps>1 then					
 						local count = "{++"..numSkillUps.."} "..(countText:GetText() or "")
 						countWidth = countWidth + 20
 						countText:SetText(count)
@@ -2559,9 +2559,8 @@ function Skillet:SkillButton_OnClick(button, mouse)
 
 				self:SortAndFilterRecipes()
 			else
-				local recipe = self:GetRecipe(button.skill.recipeID)
-				local spellLink = GetSpellLink(recipe.spellID)
-
+				local id = this:GetID()
+				local spellLink = GetTradeSkillRecipeLink(id)
 				if (ChatEdit_GetLastActiveWindow():IsVisible() or WIM_EditBoxInFocus ~= nil) then
 					ChatEdit_InsertLink(spellLink)
 				else

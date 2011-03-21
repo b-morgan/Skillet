@@ -398,6 +398,7 @@ local missingVendorItems = {
 	[17035] = true,				-- Stranglethorn seed
 	[17034] = true, 			-- Maple seed
 	[52188] = true,             -- Jeweler's Setting
+	[4399]  = true,             -- Wooden Stock
 }
 
 local specialVendorItems = {
