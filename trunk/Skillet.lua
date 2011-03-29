@@ -700,6 +700,8 @@ function Skillet:OnEnable()
 	self:RegisterEvent("TRADE_SKILL_SHOW",				"SkilletShow")
 --	self:RegisterEvent("TRADE_SKILL_UPDATE")
 
+	self:RegisterEvent("GUILD_RECIPE_KNOWN_BY_MEMBERS", "SkilletShowGuildCrafters")
+
     -- TODO: Tracks when the number of items on hand changes
 	self:RegisterEvent("BAG_UPDATE")
 	self:RegisterEvent("BAG_OPEN")

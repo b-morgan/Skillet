@@ -21,6 +21,27 @@
 
 	-->
 
+	<Button name="SkilletGuildCrafterButtonTemplate" hidden="false" virtual="true">
+		<Size>
+			<AbsDimension x="152" y="16"/>
+		</Size>
+		<ButtonText name="$parentText">
+			<Size x="0" y="16"/>
+			<Anchors>
+				<Anchor point="LEFT" x="4" y="0"/>
+			</Anchors>
+		</ButtonText>
+		<Scripts>
+			<OnClick>
+				ChatFrame_SendTell(self.name);
+			</OnClick>
+		</Scripts>
+		<NormalFont style="GameFontHighlightLeft"/>
+		<HighlightFont style="GameFontHighlightLeft"/>
+		<DisabledFont style="GameFontDisableLeft"/>
+		<HighlightTexture file="Interface\FriendsFrame\UI-FriendsFrame-HighlightBar-Blue" setAllPoints="true" alphaMode="ADD"/>
+	</Button>
+
 	<!--
 	#
 	#   Template for trade buttons in skillet frame for Main
@@ -2064,6 +2085,122 @@
 				</Frames>
 			</Frame>
 
+
+			<Frame name="SkilletViewCraftersParent" parent="SkilletFrame" hidden="true">
+				<Size>
+					<AbsDimension x="280" y="260"/>
+				</Size>
+				<Anchors>
+					<Anchor point="TOPRIGHT" relativeTo="SkilletFrame" relativePoint="TOPRIGHT">
+						<Offset>
+							<AbsDimension x="-10" y="-100"/>
+						</Offset>
+					</Anchor>
+				</Anchors>
+
+				<Frames>
+						<ScrollFrame name="SkilletViewCraftersScrollFrame" inherits="FauxScrollFrameTemplate">
+							<Anchors>
+								<Anchor point="TOPLEFT">
+									<Offset x="0" y="-4"/>
+								</Anchor>
+								<Anchor point="BOTTOMRIGHT">
+									<Offset x="-26" y="4"/>
+								</Anchor>
+							</Anchors>
+							<Scripts>
+								<OnVerticalScroll>
+									FauxScrollFrame_OnVerticalScroll(self, offset, TRADE_SKILL_HEIGHT, Skillet.ViewCraftersUpdate);
+								</OnVerticalScroll>
+							</Scripts>
+						</ScrollFrame>
+						<Button name="SkilletGuildCrafter1" inherits="SkilletGuildCrafterButtonTemplate" id="1">
+							<Anchors>
+								<Anchor point="TOPLEFT" relativeTo="$parent" relativePoint="TOPLEFT" x="4" y="-4"/>
+							</Anchors>
+						</Button>
+						<Button name="SkilletGuildCrafter2" inherits="SkilletGuildCrafterButtonTemplate" id="2">
+							<Anchors>
+								<Anchor point="TOPLEFT" relativeTo="SkilletGuildCrafter1" relativePoint="BOTTOMLEFT" x="0" y="0"/>
+							</Anchors>
+						</Button>
+						<Button name="SkilletGuildCrafter3" inherits="SkilletGuildCrafterButtonTemplate" id="3">
+							<Anchors>
+								<Anchor point="TOPLEFT" relativeTo="SkilletGuildCrafter2" relativePoint="BOTTOMLEFT" x="0" y="0"/>
+							</Anchors>
+						</Button>
+						<Button name="SkilletGuildCrafter4" inherits="SkilletGuildCrafterButtonTemplate" id="4">
+							<Anchors>
+								<Anchor point="TOPLEFT" relativeTo="SkilletGuildCrafter3" relativePoint="BOTTOMLEFT" x="0" y="0"/>
+							</Anchors>
+						</Button>
+						<Button name="SkilletGuildCrafter5" inherits="SkilletGuildCrafterButtonTemplate" id="5">
+							<Anchors>
+								<Anchor point="TOPLEFT" relativeTo="SkilletGuildCrafter4" relativePoint="BOTTOMLEFT" x="0" y="0"/>
+							</Anchors>
+						</Button>
+						<Button name="SkilletGuildCrafter6" inherits="SkilletGuildCrafterButtonTemplate" id="6">
+							<Anchors>
+								<Anchor point="TOPLEFT" relativeTo="SkilletGuildCrafter5" relativePoint="BOTTOMLEFT" x="0" y="0"/>
+							</Anchors>
+						</Button>
+						<Button name="SkilletGuildCrafter7" inherits="SkilletGuildCrafterButtonTemplate" id="7">
+							<Anchors>
+								<Anchor point="TOPLEFT" relativeTo="SkilletGuildCrafter6" relativePoint="BOTTOMLEFT" x="0" y="0"/>
+							</Anchors>
+						</Button>
+						<Button name="SkilletGuildCrafter8" inherits="SkilletGuildCrafterButtonTemplate" id="8">
+							<Anchors>
+								<Anchor point="TOPLEFT" relativeTo="SkilletGuildCrafter7" relativePoint="BOTTOMLEFT" x="0" y="0"/>
+							</Anchors>
+						</Button>
+						<Button name="SkilletGuildCrafter9" inherits="SkilletGuildCrafterButtonTemplate" id="9">
+							<Anchors>
+								<Anchor point="TOPLEFT" relativeTo="SkilletGuildCrafter8" relativePoint="BOTTOMLEFT" x="0" y="0"/>
+							</Anchors>
+						</Button>
+						<Button name="SkilletGuildCrafter10" inherits="SkilletGuildCrafterButtonTemplate" id="10">
+							<Anchors>
+								<Anchor point="TOPLEFT" relativeTo="SkilletGuildCrafter9" relativePoint="BOTTOMLEFT" x="0" y="0"/>
+							</Anchors>
+						</Button>
+						<Button name="SkilletGuildCrafter11" inherits="SkilletGuildCrafterButtonTemplate" id="11">
+							<Anchors>
+								<Anchor point="TOPLEFT" relativeTo="SkilletGuildCrafter10" relativePoint="BOTTOMLEFT" x="0" y="0"/>
+							</Anchors>
+						</Button>
+						<Button name="SkilletGuildCrafter12" inherits="SkilletGuildCrafterButtonTemplate" id="12">
+							<Anchors>
+								<Anchor point="TOPLEFT" relativeTo="SkilletGuildCrafter11" relativePoint="BOTTOMLEFT" x="0" y="0"/>
+							</Anchors>
+						</Button>
+						<Button name="SkilletGuildCrafter13" inherits="SkilletGuildCrafterButtonTemplate" id="13">
+							<Anchors>
+								<Anchor point="TOPLEFT" relativeTo="SkilletGuildCrafter12" relativePoint="BOTTOMLEFT" x="0" y="0"/>
+							</Anchors>
+						</Button>
+						<Button name="SkilletGuildCrafter14" inherits="SkilletGuildCrafterButtonTemplate" id="14">
+							<Anchors>
+								<Anchor point="TOPLEFT" relativeTo="SkilletGuildCrafter13" relativePoint="BOTTOMLEFT" x="0" y="0"/>
+							</Anchors>
+						</Button>
+						<Button name="SkilletGuildCrafter15" inherits="SkilletGuildCrafterButtonTemplate" id="15">
+							<Anchors>
+								<Anchor point="TOPLEFT" relativeTo="SkilletGuildCrafter14" relativePoint="BOTTOMLEFT" x="0" y="0"/>
+							</Anchors>
+						</Button>
+												
+				</Frames>
+				<Scripts>
+					<OnLoad>
+						self:SetBackdropBorderColor(TOOLTIP_DEFAULT_COLOR.r, TOOLTIP_DEFAULT_COLOR.g, TOOLTIP_DEFAULT_COLOR.b);
+						self:SetBackdropColor(0.0, 0.0, 0.0, 0.9);
+					</OnLoad>
+				</Scripts>
+
+			</Frame>
+
+
 			<!--
 			#
 			# A button that pops up the notes for this recipe/list of reagents
@@ -2105,6 +2242,25 @@
 					</OnClick>
 				</Scripts>
 			</Button>
+			
+			<Button name="SkilletViewCraftersButton" inherits="UIPanelButtonTemplate" parent="SkilletFrame" hidden="true">
+				<Size>
+					<AbsDimension x="120" y="20"/>
+				</Size>
+				<Anchors>
+					<Anchor point="RIGHT" relativeTo="SkilletQueueManagementButton" relativePoint="LEFT">
+						<Offset>
+							<AbsDimension x="0" y="0"/>
+						</Offset>
+					</Anchor>
+				</Anchors>
+				<Scripts>
+					<OnClick>
+						Skillet:ViewCraftersClicked()
+					</OnClick>
+				</Scripts>
+			</Button>
+						
 <!--
 			<Button name="SkilletDetailsManagementButton" inherits="UIPanelButtonTemplate" parent="SkilletFrame">
 				<Size>

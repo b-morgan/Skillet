@@ -162,7 +162,8 @@ function Skillet:CreateTradeSkillWindow()
 	SkilletShoppingListButton:SetText(L["Shopping List"])
 	SkilletSortLabel:SetText(L["Sorting"])
 	SkilletGroupLabel:SetText(L["Grouping"])
-
+	
+    SkilletViewCraftersButton:SetText(L["View Crafters"])
 	SkilletQueueManagementButton:SetText(L["Queues"])
 --	SkilletDetailsManagementButton:SetText("Details")
 	SkilletQueueLoadButton:SetText(L["Load"])
@@ -258,6 +259,12 @@ function Skillet:CreateTradeSkillWindow()
 	backdrop:SetBackdropBorderColor(0.6, 0.6, 0.6)
 	backdrop:SetBackdropColor(0.05, 0.05, 0.05)
 	backdrop:SetResizable(true)
+	
+	backdrop = SkilletViewCraftersParent
+	backdrop:SetBackdrop(ControlBackdrop)
+	backdrop:SetBackdropBorderColor(0.6, 0.6, 0.6)
+	backdrop:SetBackdropColor(0.05, 0.05, 0.05)
+	backdrop:SetResizable(true)	
 
 	gearTexture = SkilletReagentParent:CreateTexture(nil, "OVERLAY")
 	gearTexture:SetTexture("Interface\\Icons\\Trade_Engineering")
@@ -954,6 +961,18 @@ function Skillet:internal_UpdateTradeSkillWindow()
 	self:UpdateTradeButtons(self.currentPlayer)
 
 
+	local _, _, isGuildView = Skillet:IsTradeSkillLinked()
+	
+	if isGuildView and self.selectedSkill then	
+		if not SkilletViewCraftersButton:IsVisible() then
+			SkilletViewCraftersButton:Show()
+		end
+	else
+		if SkilletViewCraftersButton:IsVisible() then
+			SkilletViewCraftersButton:Hide()
+			Skillet:ViewCraftersToggle(true)
+		end
+	end
 
 
 	if not self.currentTrade then
@@ -987,6 +1006,7 @@ function Skillet:internal_UpdateTradeSkillWindow()
 
 	SkilletReagentParent:SetWidth(reagent_width)
 	SkilletQueueManagementParent:SetWidth(reagent_width)
+	SkilletViewCraftersParent:SetWidth(reagent_width)
 	--SkilletQueueParent:SetWidth(reagent_width)
 
 
@@ -3313,21 +3333,110 @@ function Skillet:TSIGetRecipeSources(recipe, opposing)
 	return number_found,res
 end
 
+function Skillet:ReAnchorButtons(newFrame)
+	SkilletRecipeNotesButton:SetPoint("BOTTOMRIGHT",newFrame,"TOPRIGHT",0,0)
+	SkilletQueueAllButton:SetPoint("TOPLEFT",newFrame,"BOTTOMLEFT",0,-2)
+	SkilletEnchantButton:SetPoint("TOPLEFT",newFrame,"BOTTOMLEFT",0,-2)
+	SkilletQueueButton:SetPoint("TOPRIGHT",newFrame,"BOTTOMRIGHT",0,-2)
+end
 
-function Skillet:QueueManagementToggle(showDetails)
-	if SkilletQueueManagementParent:IsVisible() or showDetails then
+function Skillet:ShowReagentDetails()
 		SkilletQueueManagementParent:Hide();
+		SkilletViewCraftersParent:Hide()
+		
 		SkilletReagentParent:Show()
 		SkilletReagentParent:SetHeight(260)
 		SkilletQueueManagementParent:SetHeight(260)
+		SkilletViewCraftersParent:SetHeight(260)
+		
+		Skillet:ReAnchorButtons(SkilletReagentParent)
+end
+
+function Skillet:QueueManagementToggle(showDetails)
+	if SkilletQueueManagementParent:IsVisible() or showDetails then
+		Skillet:ShowReagentDetails()
 	else
 		SkilletQueueManagementParent:Show();
+		SkilletQueueManagementParent:SetHeight(100)
+		
+		SkilletViewCraftersParent:Hide()
+		SkilletViewCraftersParent:SetHeight(100)
+		
 		SkilletReagentParent:Hide()
 		SkilletReagentParent:SetHeight(100)
-		SkilletQueueManagementParent:SetHeight(100)
+		
+		Skillet:ReAnchorButtons(SkilletQueueManagementParent)
 	end
 end
 
+function Skillet:ViewCraftersClicked()
+	if SkilletViewCraftersParent:IsVisible() then
+		Skillet:ShowReagentDetails()
+	else
+		self.queriedSkill = self.selectedSkill
+		SelectTradeSkill(self.selectedSkill);
+		QueryGuildMembersForRecipe();		
+	end
+end
+
+function Skillet:SkilletShowGuildCrafters()
+	if ( self.queriedSkill == self.selectedSkill ) then
+		Skillet:ShowViewCrafters()
+	end
+	
+end
+
+function Skillet:ShowViewCrafters()
+		SkilletQueueManagementParent:SetHeight(260)	
+		SkilletQueueManagementParent:Hide();
+
+		SkilletViewCraftersParent:SetHeight(260)
+		SkilletViewCraftersParent:Show()
+		
+		SkilletReagentParent:SetHeight(260)
+		SkilletReagentParent:Hide()
+		
+		Skillet:ReAnchorButtons(SkilletViewCraftersParent)
+		
+		SkilletViewCraftersScrollFrameScrollBar:SetValue(0);
+		Skillet.ViewCraftersUpdate()
+end
+
+function Skillet:ViewCraftersToggle(showDetails)
+	if SkilletViewCraftersParent:IsVisible() or showDetails then
+		Skillet:ShowReagentDetails()
+	else
+		Skillet:ShowViewCrafters()
+	end
+end
+
+function Skillet.ViewCraftersUpdate()
+	local skillLineID, recipeID, numMembers = GetGuildRecipeInfoPostQuery();
+	local offset = FauxScrollFrame_GetOffset(SkilletViewCraftersScrollFrame);
+	local index, button, name, online;
+	local SKILLET_CRAFTERS_DISPLAYED = 15
+	
+	--DEFAULT_CHAT_FRAME:AddMessage("Skillet.ViewCraftersUpdate "..numMembers.." - "..offset)	
+	
+	for i = 1, SKILLET_CRAFTERS_DISPLAYED, 1 do
+		index = i + offset;
+		button = _G["SkilletGuildCrafter"..i];
+		if ( index > numMembers ) then
+			button:Hide();
+		else
+			name, online = GetGuildRecipeMember(index);
+			button:SetText(name);
+			if ( online ) then
+				button:Enable();
+			else
+				button:Disable();
+			end
+			button:Show();
+			button.name = name;
+		end
+	end
+	FauxScrollFrame_Update(SkilletViewCraftersScrollFrame, numMembers, SKILLET_CRAFTERS_DISPLAYED, TRADE_SKILL_HEIGHT);
+end
 
 Skillet.fullView = true
 
