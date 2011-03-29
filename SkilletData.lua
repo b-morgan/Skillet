@@ -399,6 +399,7 @@ local missingVendorItems = {
 	[17034] = true, 			-- Maple seed
 	[52188] = true,             -- Jeweler's Setting
 	[4399]  = true,             -- Wooden Stock
+	[38682] = true,             -- Enchanting Vellum
 }
 
 local specialVendorItems = {
@@ -419,9 +420,19 @@ function Skillet:VendorItemAvailable(itemID)
 	if specialVendorItems[itemID] then
 		local divider = specialVendorItems[itemID][1]
 		local currency = specialVendorItems[itemID][2]
-		return math.floor(self:GetInventory(self.currentPlayer, currency) / divider)
+		
+		local reagentAvailability, _, reagentAvailabilityBank = self:GetInventory(self.currentPlayer, currency)
+		
+		local reagentAvailabilityAlts = 0
+		for player in pairs(self.db.realm.inventoryData) do
+			local _,_, altBank = self:GetInventory(player, currency)
+
+			reagentAvailabilityAlts = reagentAvailabilityAlts + (altBank or 0)
+		end	
+			
+		return math.floor(reagentAvailability / divider), math.floor(reagentAvailabilityBank / divider), math.floor(reagentAvailabilityAlts / divider)
 	else
-		return 100000		
+		return 100000, 100000, 100000		
 	end	
 end
 

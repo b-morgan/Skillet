@@ -246,8 +246,11 @@ function Skillet:InventorySkillIterations(tradeID, skillIndex, playerOverride)
 				end
 
 				if self:VendorSellsReagent(reagentID) then											-- if it's available from a vendor, then only worry about bag inventory
-					numCraftable = math.min(numCraftable, math.floor(reagentAvailability/numNeeded))					
-					numCraftableVendor = math.min(numCraftableVendor, Skillet:VendorItemAvailable(reagentID))
+					numCraftable = math.min(numCraftable, math.floor(reagentAvailability/numNeeded))
+					local vendorAvailable, vendorAvailableBank, vendorAvailableAlt = Skillet:VendorItemAvailable(reagentID)					
+					numCraftableVendor = math.min(numCraftableVendor, vendorAvailable)
+					numCraftableBank = math.min(numCraftableBank, vendorAvailableBank)
+					numCraftableAlts = math.min(numCraftableAlts, vendorAvailableAlt)
 				else
 					vendorOnly = false
 
