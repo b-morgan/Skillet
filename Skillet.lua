@@ -782,19 +782,7 @@ function Skillet:ScanCompleted()
  --   end
 end
 
-
-
--- show the tradeskill window
--- only gets called from TRADE_SKILL_SHOW and CRAFT_SHOW events
--- this means, the skill being shown is for the main toon (not an alt)
-function Skillet:SkilletShow()
-DebugSpam("SHOW WINDOW (was showing "..(self.currentTrade or "nil")..")");
-
-
-	TradeSkillFrame_Update();
-
-	self.linkedSkill = false
-
+function Skillet:IsTradeSkillLinked()
 	if IsTradeSkillLinked() or (IsTradeSkillGuild and IsTradeSkillGuild()) then
 		local guildSkills = IsTradeSkillGuild and IsTradeSkillGuild()
 		local _, linkedPlayer = IsTradeSkillLinked()
@@ -806,11 +794,24 @@ DebugSpam("SHOW WINDOW (was showing "..(self.currentTrade or "nil")..")");
 				return
 			end
 		end
+		return true, linkedPlayer, (IsTradeSkillGuild and IsTradeSkillGuild())
+	end
+	return false, nil
+end
 
-		self.currentPlayer = linkedPlayer
-		
-		self.linkedSkill = true
-				
+-- show the tradeskill window
+-- only gets called from TRADE_SKILL_SHOW and CRAFT_SHOW events
+-- this means, the skill being shown is for the main toon (not an alt)
+function Skillet:SkilletShow()
+DebugSpam("SHOW WINDOW (was showing "..(self.currentTrade or "nil")..")");
+
+
+	TradeSkillFrame_Update();
+	
+	self.linkedSkill, self.currentPlayer = Skillet:IsTradeSkillLinked()
+	
+	if self.linkedSkill then
+
 		if (self.currentPlayer == UnitName("player")) then
 			self.currentPlayer = "All Data"
 		end

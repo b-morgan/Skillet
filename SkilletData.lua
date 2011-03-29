@@ -644,10 +644,10 @@ function SkilletLink:GetSkillRanks(player, trade)
 		local _,_,tradeID, rank, maxRank = string.find(Skillet.db.realm.linkDB[player][trade], "trade:(%d+):(%d+):(%d+)")
 		return rank .. " " .. maxRank
 	end
-
-	if (IsTradeSkillLinked()) then
-		local _, linkedPlayer = IsTradeSkillLinked()
-
+	
+	local linkedSkill, linkedPlayer = Skillet:IsTradeSkillLinked()
+	
+	if linkedSkill then
 		if linkedPlayer == player then
 			local skill, rank, max = GetTradeSkillLine()
 
@@ -660,9 +660,9 @@ end
 
 
 function SkilletLink:GetNumSkills(player, trade)
-	if (IsTradeSkillLinked()) then
-		local _, linkedPlayer = IsTradeSkillLinked()
-
+	local linkedSkill, linkedPlayer = Skillet:IsTradeSkillLinked()
+	
+	if linkedSkill then
 --		if linkedPlayer == player then
 			local skill, rank, max = GetTradeSkillLine()
 
@@ -1244,7 +1244,7 @@ function SkilletLink:ScanPlayerTradeSkills(player, clean)
 		return true
 	end
 
-	local isLinked, playerLinked = IsTradeSkillLinked()
+	local isLinked, playerLinked = Skillet:IsTradeSkillLinked()
 
 	if isLinked and player == playerLinked then
 		return true
@@ -1711,7 +1711,7 @@ DebugSpam("TRADE MISMATCH for player "..(Skillet.currentPlayer or "nil").."!  ".
 	end
 
 
-	if not IsTradeSkillLinked() then
+	if not Skillet:IsTradeSkillLinked() then
 		Skillet.db.realm.skillRanks[player][tradeID] = rank.." "..maxRank
 	end
 
