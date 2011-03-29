@@ -2559,7 +2559,7 @@ function Skillet:SkillButton_OnClick(button, mouse)
 
 				self:SortAndFilterRecipes()
 			else
-				local id = this:GetID()
+				local id = button:GetID()
 				local spellLink = GetTradeSkillRecipeLink(id)
 				if (ChatEdit_GetLastActiveWindow():IsVisible() or WIM_EditBoxInFocus ~= nil) then
 					ChatEdit_InsertLink(spellLink)
