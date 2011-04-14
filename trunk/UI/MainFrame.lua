@@ -1347,6 +1347,18 @@ function Skillet:internal_UpdateTradeSkillWindow()
 					countWidth = countWidth + 20
 				end
 				
+				-- check for Altoholic, then show the count of the item currently owned that the recipe will produce
+				if Altoholic then
+					local numowned = (Altoholic:GetItemCount(recipe.itemID) or 0)
+				
+					if numowned > 0 then
+						local count = "|cff95fcff("..numowned..") "..(countText:GetText() or "")
+						countWidth = countWidth + 20
+						countText:SetText(count)
+						countText:Show()
+					end
+				end
+					
 				if skill_color.alttext == "+++" then
 					local _, _, _, _, _, numSkillUps  = GetTradeSkillInfo(skillIndex)
 					if numSkillUps and numSkillUps>1 then					
