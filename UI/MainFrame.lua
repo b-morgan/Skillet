@@ -3032,7 +3032,7 @@ local skillMenuList = {
 	{
 		text = "Link Recipe",
 		func = function()
-					local spellLink = GetSpellLink(Skillet.menuButton.skill.recipeID)
+					local spellLink = GetTradeSkillRecipeLink(Skillet.menuButton:GetID())
 
 					if (ChatEdit_GetLastActiveWindow():IsVisible() or WIM_EditBoxInFocus ~= nil) then
 						ChatEdit_InsertLink(spellLink)
