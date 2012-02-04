@@ -2873,6 +2873,7 @@ function Skillet:SkilletFrameForceClose()
 		CloseTradeSkill()
 
 		self.dataSource = "none"
+		self:HideAllWindows()
 		self:FreeCaches()
 		return true
 	else
