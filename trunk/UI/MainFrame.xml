@@ -458,8 +458,6 @@
 			<Color r="1" g="1" b="1" a="1"/>
 		</FontString>
 		<Scripts>
-			<OnClick>
-			</OnClick>
 			<OnTabPressed>
 				Skillet:NameEditSave()
 			</OnTabPressed>
@@ -503,8 +501,6 @@
 			<Color r="1" g="1" b="1" a="1"/>
 		</FontString>
 		<Scripts>
-			<OnClick>
-			</OnClick>
 			<OnTabPressed>
 				Skillet:GroupNameEditSave()
 			</OnTabPressed>
@@ -843,10 +839,10 @@
 					</Anchor>
 				</Anchors>
 				<Scripts>
-					<OnClick>
+					<OnHide>
 						Skillet:InventoryFilterButtons_Hide()
 						Skillet:SkilletFrameForceClose()
-					</OnClick>
+					</OnHide>
 				</Scripts>
 			</Button>
 

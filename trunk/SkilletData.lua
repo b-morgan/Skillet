@@ -400,6 +400,7 @@ local missingVendorItems = {
 	[52188] = true,             -- Jeweler's Setting
 	[4399]  = true,             -- Wooden Stock
 	[38682] = true,             -- Enchanting Vellum
+	[3857]  = true,   			-- Coal
 }
 
 local specialVendorItems = {
