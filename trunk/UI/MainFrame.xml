@@ -840,8 +840,10 @@
 				</Anchors>
 				<Scripts>
 					<OnHide>
-						Skillet:InventoryFilterButtons_Hide()
-						Skillet:SkilletFrameForceClose()
+						if Skillet.fullView then
+							Skillet:InventoryFilterButtons_Hide()
+							Skillet:SkilletFrameForceClose()
+						end
 					</OnHide>
 				</Scripts>
 			</Button>
