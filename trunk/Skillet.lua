@@ -18,7 +18,7 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
 ]]--
 
-local MAJOR_VERSION = "2.21"
+local MAJOR_VERSION = "2.3"
 local MINOR_VERSION = ("$Revision$"):match("%d+") or 1
 local DATE = string.gsub("$Date$", "^.-(%d%d%d%d%-%d%d%-%d%d).-$", "%1")
 
@@ -436,7 +436,7 @@ Skillet.options =
 				end
 			end,
             guiHidden = true,
-			order = 52
+			order = 55
 		},
         shoppinglist = {
             type = 'execute',
@@ -452,6 +452,28 @@ Skillet.options =
             end,
             order = 52
         },
+        reset = {
+            type = 'execute',
+            name = L["Reset"],
+            desc = L["RESETDESC"],
+            func = function()
+                if not (UnitAffectingCombat("player")) then
+                    SkilletFrame:SetWidth(700);
+                    SkilletFrame:SetHeight(600);
+                    SkilletFrame:SetPoint("TOPLEFT",200,-100);                    
+					SkilletStandalonQueue:SetWidth(385);
+                    SkilletStandalonQueue:SetHeight(240);
+                    SkilletStandalonQueue:SetPoint("TOPLEFT",300,-150);
+                    local windowManger = LibStub("LibWindow-1.1")
+                    windowManger.SavePosition(SkilletFrame)
+                    windowManger.SavePosition(SkilletStandalonQueue) 
+                else
+                    DebugSpam("|cff8888ffSkillet|r: Combat lockdown restriction." ..
+                                                  " Leave combat and try again.")
+                end
+            end,
+            order = 99
+        },        
 	}
 }
 
@@ -506,6 +528,8 @@ end
 -- Called when the addon is loaded
 function Skillet:OnInitialize()
 	self.db = AceDB:New("SkilletDB", defaults)
+
+	_,_,_,self.wowVersion = GetBuildInfo();
 
 	self:InitializeDatabase((UnitName("player")), false)  --- force clean rescan for now
 

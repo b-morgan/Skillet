@@ -417,7 +417,25 @@ local specialVendorItems = {
 	[61981] = {10, 61978},  		--Inferno Ink
 }
 
+local specialVendorItemsMoP	 = {
+	[37101] = {1, 79254}, 			--Ivory Ink
+	[39469] = {1, 79254}, 			--Moonglow Ink
+	[39774] = {1, 79254}, 			--Midnight Ink
+	[43116] = {1, 79254}, 			--Lions Ink
+	[43118] = {1, 79254}, 			--Jadefire Ink
+	[43120] = {1, 79254}, 			--Celestial Ink
+	[43122] = {1, 79254}, 			--Shimmering Ink
+	[43124] = {1, 79254},  			--Ethereal Ink
+	[43126] = {1, 79254},  			--Ink of the Sea
+	[43127] = {10, 79254},  		--Snowfall Ink
+	[61981] = {10, 79254},  		--Inferno Ink
+	[79255] = {10, 79254},  		--Starlight Ink	
+}
+
 function Skillet:VendorItemAvailable(itemID)
+	if Skillet.wowVersion>50000 then
+		specialVendorItems = specialVendorItemsMoP
+	end
 	if specialVendorItems[itemID] then
 		local divider = specialVendorItems[itemID][1]
 		local currency = specialVendorItems[itemID][2]
@@ -440,6 +458,9 @@ end
 -- queries periodic table for vendor info for a particual itemID
 function Skillet:VendorSellsReagent(itemID)
 	if PT then
+		if Skillet.wowVersion>50000 then
+			specialVendorItems = specialVendorItemsMoP
+		end
 		if missingVendorItems[itemID] or specialVendorItems[itemID] then
 			return true
 		end
@@ -452,8 +473,14 @@ end
 
 -- resets the blizzard tradeskill search filters just to make sure no other addon has monkeyed with them
 function SkilletData:ResetTradeSkillFilter()
-	if not GetTradeSkillSubClassFilter(0) then
-		SetTradeSkillSubClassFilter(0, 1, 1)
+	if (Skillet.wowVersion>50000) then 
+		if not GetTradeSkillCategoryFilter(0) then
+			SetTradeSkillCategoryFilter(0, 1, 1)
+		end
+	else
+		if not GetTradeSkillSubClassFilter(0) then
+			SetTradeSkillSubClassFilter(0, 1, 1)
+		end	
 	end
 	SetTradeSkillItemNameFilter("")
 	SetTradeSkillItemLevelFilter(0,0)
@@ -461,8 +488,14 @@ end
 
 
 function SkilletLink:ResetTradeSkillFilter()
-	if not GetTradeSkillSubClassFilter(0) then
-		SetTradeSkillSubClassFilter(0, 1, 1)
+	if (Skillet.wowVersion>50000) then 
+		if not GetTradeSkillCategoryFilter(0) then
+			SetTradeSkillCategoryFilter(0, 1, 1)
+		end
+	else
+		if not GetTradeSkillSubClassFilter(0) then
+			SetTradeSkillSubClassFilter(0, 1, 1)
+		end	
 	end
 	SetTradeSkillItemNameFilter("")
 	SetTradeSkillItemLevelFilter(0,0)

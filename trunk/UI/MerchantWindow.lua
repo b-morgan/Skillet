@@ -93,10 +93,13 @@ local function update_merchant_buy_button()
         return
     end
 
-	SkilletMerchantBuyFrameTopText:SetText(L["This merchant sells reagents you need!"]);
-	SkilletMerchantBuyFrameButton:SetText(L["Buy Reagents"]);
-
-	SkilletMerchantBuyFrame:SetPoint("TOPLEFT", "MerchantFrame", "TOPLEFT" , 60, -28);
+	SkilletMerchantBuyFrameButton:SetText(L["Reagents"]);
+	if Skillet.wowVersion > 50000 then
+		SkilletMerchantBuyFrame:SetPoint("TOPLEFT", "MerchantFrame", "TOPLEFT" , 55, -5);
+	else
+		SkilletMerchantBuyFrame:SetPoint("TOPLEFT", "MerchantFrame", "TOPLEFT" , 60, -28);
+	end
+	
 	SkilletMerchantBuyFrame:SetFrameStrata("HIGH");
 	SkilletMerchantBuyFrame:Show();
 end
