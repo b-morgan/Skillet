@@ -31,29 +31,12 @@
 -->
 <Frame name="SkilletMerchantBuyFrame" parent="UIParent" hidden="true">
 	<Size>
-		<AbsDimension x="300" y="50"/>
+		<AbsDimension x="120" y="50"/>
 	</Size>
-	<Layers>
-		<Layer level="OVERLAY">
-			<FontString name="$parentTopText" inherits="GameFontNormalSmall" justifyH="CENTER" justifyV="TOP" text="This merchant sells reagents you need!">
-				<Size>
-					<AbsDimension x="300" y="0"/>
-				</Size>
-				<Anchors>
-					<Anchor point="TOP">
-						<Offset>
-							<AbsDimension x="0" y="-10"/>
-						</Offset>
-					</Anchor>
-				</Anchors>
-				<Color r="1" g="1" b="1" a="1"/>
-			</FontString>
-		</Layer>
-	</Layers>
 	<Frames>
-		<Button name="$parentButton" inherits="GameMenuButtonTemplate" parent="SkilletMerchantBuyFrame" text="Buy Reagents">
+		<Button name="$parentButton" inherits="GameMenuButtonTemplate" parent="SkilletMerchantBuyFrame" text="Reagents">
 		  <Size>
-			<AbsDimension x="150" y="18"/>
+			<AbsDimension x="100" y="18"/>
 		  </Size>
 		  <Anchors>
 			<Anchor point="TOP">
