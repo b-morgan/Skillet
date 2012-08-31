@@ -1558,9 +1558,9 @@ function Skillet:SkillButton_OnEnter(button)
 
 		if IsShiftKeyDown() then
 			if recipe.itemID == 0 then
-				Tooltip_ShowCompareItem(tip, GetInventoryItemLink("player", recipe.slot), "left")
+				Skillet:Tooltip_ShowCompareItem(tip, GetInventoryItemLink("player", recipe.slot), "left")
 			else
-				Tooltip_ShowCompareItem(tip, link, "left")
+				Skillet:Tooltip_ShowCompareItem(tip, link, "left")
 			end
 		end
 	else
@@ -1679,7 +1679,7 @@ function Skillet:SetTradeSkillToolTip(skillIndex)
 			GameTooltip:SetHyperlink("enchant:"..recipe.spellID)				-- doesn't create an item, just tell us about the recipe
 
 			if IsShiftKeyDown() then
-				Tooltip_ShowCompareItem(GameTooltip, GetInventoryItemLink("player", recipe.slot), "left")
+				Skillet:Tooltip_ShowCompareItem(GameTooltip, GetInventoryItemLink("player", recipe.slot), "left")
 			end
 		end
 	end

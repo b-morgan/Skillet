@@ -529,7 +529,8 @@ end
 function Skillet:OnInitialize()
 	self.db = AceDB:New("SkilletDB", defaults)
 
-	_,_,_,self.wowVersion = GetBuildInfo();
+	local _,_,_,wowVersion = GetBuildInfo();
+	self.wowVersion = wowVersion
 
 	self:InitializeDatabase((UnitName("player")), false)  --- force clean rescan for now
 

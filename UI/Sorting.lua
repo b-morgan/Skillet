@@ -132,8 +132,8 @@ local function sort_recipe_by_item_quality(tradeskill, a, b)
 	local left_r = Skillet:GetRecipe(a.recipeID)
 	local right_r = Skillet:GetRecipe(b.recipeID)
 
-	_,_,  left = GetItemInfo(left_r.itemID)
-	_,_, right = GetItemInfo(right_r.itemID)
+	local _,_, left = GetItemInfo(left_r.itemID)
+	local _,_, right = GetItemInfo(right_r.itemID)
 
     if not left  then  left = 0 end
     if not right then right = 0 end

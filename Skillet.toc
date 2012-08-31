@@ -17,8 +17,8 @@
 #### X-RelSite-UI.WoW:
 ## SavedVariables: SkilletDB
 ## SavedVariablesPerCharacter: SkilletDBPC
-## OptionalDeps: Ace3, LibAbacus-3.0, LibWindow-1.1, LibPeriodicTable-3.1, Fizzwidget Reagent Cost, TradeSkillInfo
-## X-Embeds: Ace3, LibStub, CallbackHandler-1.0, LibAbacus-3.0, LibWindow-1.1, LibPeriodicTable-3.1
+## OptionalDeps: Ace3, LibAbacus-3.0, LibDialog-1.0, LibWindow-1.1, LibPeriodicTable-3.1, Fizzwidget Reagent Cost, TradeSkillInfo
+## X-Embeds: Ace3, LibStub, CallbackHandler-1.0, LibAbacus-3.0, LibDialog-1.0, LibWindow-1.1, LibPeriodicTable-3.1
 ## X-Revision: $Rev$
 ## X-Curse-Packaged-Version: 2.10
 ## X-Curse-Project-Name: Skillet
@@ -46,6 +46,7 @@ Libs\AceConfig-3.0\AceConfig-3.0.xml
 Libs\AceTimer-3.0\AceTimer-3.0.xml
 
 Libs\LibAbacus-3.0\lib.xml
+Libs\LibDialog-1.0\lib.xml
 Libs\LibWindow-1.1\LibWindow-1.1.lua
 Libs\LibPeriodicTable-3.1\LibPeriodicTable-3.1.lua
 Libs\LibPeriodicTable-3.1\LibPeriodicTable-3.1-Tradeskill\LibPeriodicTable-3.1-Tradeskill.lua

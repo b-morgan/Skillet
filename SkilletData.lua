@@ -871,10 +871,10 @@ DebugSpam("Scanning Trade "..(profession or "nil")..":"..(tradeID or "nil").." "
 	for i = 1, numSkills, 1 do
 		repeat
 --DebugSpam("scanning index "..i)
-			local skillName, skillType, isExpanded, subSpell, extra
+			local subSpell, extra
 
 
-			skillName, skillType, _, isExpanded = GetTradeSkillInfo(i)
+			local skillName, skillType, _, isExpanded = GetTradeSkillInfo(i)
 
 
 --DEFAULT_CHAT_FRAME:AddMessage("**** skill: "..(skillName or "nil").." "..i)
@@ -1287,7 +1287,7 @@ end
 
 -- [3273] = "|cffffd000|Htrade:3274:148:150:23F381A:zD<<t=|h[First Aid]|h|r",
 
-local allDataInitialize = false
+local allDataInitialized = false
 function Skillet:InitializeAllDataLinks(name)
 	if allDataInitialized then return end
 
@@ -1812,7 +1812,7 @@ DebugSpam("Scanning Trade "..(profession or "nil")..":"..(tradeID or "nil").." "
 			local skillName, skillType, isExpanded, subSpell, extra
 
 
-			skillName, skillType, _, isExpanded = GetTradeSkillInfo(i)
+			local skillName, skillType, _, isExpanded = GetTradeSkillInfo(i)
 
 
 --DebugSpam("**** skill: "..(skillName or "nil"))
