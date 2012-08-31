@@ -13,7 +13,8 @@ externals:
     Libs/AceHook-3.0:            svn://svn.wowace.com/wow/ace3/mainline/trunk/AceHook-3.0
     Libs/AceEvent-3.0:           svn://svn.wowace.com/wow/ace3/mainline/trunk/AceEvent-3.0
     Libs/AceTimer-3.0:           svn://svn.wowace.com/wow/ace3/mainline/trunk/AceTimer-3.0
-    Libs/LibAbacus-3.0:          svn://svn.wowace.com/wow/libabacus-3-0/mainline/trunk                        
+    Libs/LibAbacus-3.0:          svn://svn.wowace.com/wow/libabacus-3-0/mainline/trunk
+    Libs/LibDialog-1.0:          svn://svn.wowace.com/wow/libdialog-1-0/mainline/trunk
     Libs/LibWindow-1.1:          svn://svn.wowace.com/wow/libwindow-1-1/mainline/trunk/LibWindow-1.1
     Libs/LibPeriodicTable-3.1:   svn://svn.wowace.com/wow/libperiodictable-3-1/mainline/trunk/LibPeriodicTable-3.1
     Libs/LibPeriodicTable-3.1/LibPeriodicTable-3.1-Tradeskill:   svn://svn.wowace.com/wow/libperiodictable-3-1/mainline/trunk/LibPeriodicTable-3.1-Tradeskill
