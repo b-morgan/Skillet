@@ -184,7 +184,8 @@ function Skillet:UpdateNotesWindow()
 				text:SetText((GetSpellInfo(recipeID)))
 
 				if recipe.numMade > 0 then
-					_,_,_,_,_,_,_,_,_,texture = GetItemInfo(recipe.itemID)		-- get the item texture
+					local a
+					a,a,a,a,a,a,a,a,a,texture = GetItemInfo(recipe.itemID)		-- get the item texture
 				else
 					texture = "Interface\\Icons\\Spell_Holy_GreaterHeal"		-- standard enchant icon
 				end

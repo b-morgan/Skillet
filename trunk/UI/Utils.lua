@@ -21,6 +21,7 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
 -- Handy utilities for Skillet UI methods.
 
 local L = LibStub("AceLocale-3.0"):GetLocale("Skillet")
+local Dialog = LibStub("LibDialog-1.0")
 
 local infoBox
 -- Stolen from the AceAddon about frame code. Just too useful
@@ -199,7 +200,7 @@ end
 
 
 -- ripped from bilzzard GameTooltip_ShowCompareItem() function
-function Tooltip_ShowCompareItem(tip, link, sideOverride)
+function Skillet:Tooltip_ShowCompareItem(tip, link, sideOverride)
 --	local item, link = tip:GetItem();
 	if ( not link ) then
 		return;
@@ -279,39 +280,49 @@ function Tooltip_ShowCompareItem(tip, link, sideOverride)
 	end
 end
 
-StaticPopupDialogs["SKILLETMSG"] = {
-	button1 = OKAY,
-	button2 = nil,
-	timeout = 0,
-	OnAccept = function()
+Dialog:Register("SKILLETMSG", {
+	text = "",
+	on_show = function(self, data)
+		self.text:SetText(data.msg)
 	end,
-	OnCancel = function()
-	end,
-	whileDead = 1,
-	hideOnEscape = 1,
-}
-
+	buttons = {
+		{
+			text = OKAY,
+		},
+	},
+	show_while_dead = true,
+	hide_on_escape = true,
+})
 
 function Skillet:MessageBox(msg)
-	StaticPopupDialogs["SKILLETMSG"].text = msg
-	StaticPopup_Show("SKILLETMSG")
+	Dialog:Spawn("SKILLETMSG", {
+		msg = msg,
+	})
 end
 
-
-StaticPopupDialogs["SKILLETASKFOR"] = {
-	button1 = YES,
-	button2 = NO,
-	timeout = 0,
-	OnAccept = function()
+Dialog:Register("SKILLETASKFOR", {
+	text = "",
+	on_show = function(self, data)
+		self.text:SetText(data.msg)
 	end,
-	OnCancel = function()
-	end,
-	whileDead = 1,
-	hideOnEscape = 1,
-}
+	buttons = {
+		{
+			text = YES,
+			on_click = function(self, data)
+				data.handler()
+			end,
+		},
+		{
+			text = NO,
+		},
+	},
+	show_while_dead = true,
+	hide_on_escape = true,
+})
 
 function Skillet:AskFor(msg, handler)
-	StaticPopupDialogs["SKILLETASKFOR"].text = msg
-	StaticPopupDialogs["SKILLETASKFOR"].OnAccept = handler
-	StaticPopup_Show("SKILLETASKFOR")
+	Dialog:Spawn("SKILLETMSG", {
+		msg = msg,
+		handler = handler,
+	})
 end

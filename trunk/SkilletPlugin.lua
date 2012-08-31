@@ -25,7 +25,7 @@ function Skillet:RegisterDisplayDetailPlugin(moduleName, priority)
 	if not priority then priority = 100 end
 	
 	if type(moduleName)	 == "string" then
-		module = Skillet[moduleName]
+		local module = Skillet[moduleName]
 		if module and type(module) == "table" and module.GetExtraText then
 			Skillet.displayDetailPlugins[moduleName]=module
 		end
