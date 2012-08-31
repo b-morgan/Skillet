@@ -1552,7 +1552,7 @@ function Skillet:SkillButton_OnEnter(button)
 
 		if altlink and IsAltKeyDown() then
 			tip:SetHyperlink(altlink)
-		elseif link
+		elseif link then
 			tip:SetHyperlink(link)
 		end
 
