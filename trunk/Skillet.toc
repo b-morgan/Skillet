@@ -1,10 +1,10 @@
-﻿## Interface: 50000
+﻿## Interface: 50001
 ## Title: Skillet |cff7fff7f -Ace3-|r
 ## Notes: A replacement tradeskill window
 ## Notes-esES: Una sustitucion de la ventana de Habilidades de Comercio
 ## Notes-ruRU: Заменяет окно профессий на более функциональное.
 ## Author: yossa, lilsparky
-## Version 2.31
+## Version 2.32
 ## X-Category: Tradeskill
 ## X-eMail: yossa.addons@googlemail.com
 ## X-License GPL v3 or later
@@ -20,10 +20,6 @@
 ## OptionalDeps: Ace3, LibAbacus-3.0, LibDialog-1.0, LibWindow-1.1, LibPeriodicTable-3.1, Fizzwidget Reagent Cost, TradeSkillInfo
 ## X-Embeds: Ace3, LibStub, CallbackHandler-1.0, LibAbacus-3.0, LibDialog-1.0, LibWindow-1.1, LibPeriodicTable-3.1
 ## X-Revision: $Rev$
-## X-Curse-Packaged-Version: 2.10
-## X-Curse-Project-Name: Skillet
-## X-Curse-Project-ID: skillet
-## X-Curse-Repository-ID: wow/skillet/mainline
 
 ## LoadManagers: AddonLoader
 ## X-LoadOn-Always: delayed
