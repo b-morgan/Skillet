@@ -753,7 +753,14 @@ function SkilletLink:GetSkill(player,trade,index)
 --DEFAULT_CHAT_FRAME:AddMessage("getskillLink "..(player or "noplayer").." "..(trade or "notrade").." "..(index or "noindex"))
 
 		if scanned then
-			return Skillet.data.skillList[player][trade][index]
+			local skill = Skillet.data.skillList[player]
+			if skill then
+				local trade = skill[trade]
+				if trade then
+					return trade[index]
+				end
+			end
+			return nil
 		else
 			return nil
 		end
