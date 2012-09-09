@@ -1428,7 +1428,7 @@ end
 
 function Skillet:ContinueCastCheckUnit(event, unit, spell, rank)
 --DEFAULT_CHAT_FRAME:AddMessage("ContinueCastCheckUnit "..(unit or "nil"))
-	if unit == "player" then
+	if unit == "player" and spell==self.processingSpell then
 		self:ContinueCast(spell)
 --		AceEvent:ScheduleEvent("Skillet_StopCast", self.StopCast, 0.1,self,event,spell)
 	end
