@@ -745,7 +745,7 @@ function Skillet:UpdateTradeButtons(player)
 			if tradeID == self.currentTrade then
 				button:SetChecked(1)
 
-				if Skillet.data.skillList[player][tradeID].scanned then
+				if Skillet.data.skillList[player][tradeID] and Skillet.data.skillList[player][tradeID].scanned then
 					buttonIcon:SetVertexColor(1,1,1)
 				else
 					buttonIcon:SetVertexColor(1,0,0)
