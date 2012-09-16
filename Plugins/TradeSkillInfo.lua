@@ -45,6 +45,7 @@ function plugin.GetExtraText(skill, recipe)
 
 
 			if combineID then
+				local _
 				_, extra_text = Skillet:TSIGetRecipeSources(combineID, false)
 
 				if not extra_text then
