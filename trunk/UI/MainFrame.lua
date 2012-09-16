@@ -1542,6 +1542,7 @@ function Skillet:SkillButton_OnEnter(button)
 			quality = nil
 			quantity = nil
 			if recipe.itemID ~= 0 then
+				local _
 				_, altlink = GetItemInfo(recipe.itemID)
 			end
 		else
