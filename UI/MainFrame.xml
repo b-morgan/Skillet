@@ -2461,6 +2461,27 @@
 			</Button>
 
 			<!--
+			# Auctionator button
+			-->
+			<Button name="SkilletAuctionatorButton" inherits="UIPanelButtonTemplate" text="Auctionator" parent="SkilletFrame">
+				<Size>
+					<AbsDimension x="85" y="22"/>
+				</Size>
+				<Anchors>
+					<Anchor point="BOTTOMLEFT" relativeTo="SkilletReagentParent" relativePoint="BOTTOMLEFT">
+						<Offset>
+							<AbsDimension x="2" y="2"/>
+						</Offset>
+					</Anchor>
+				</Anchors>
+				<Scripts>
+					<OnClick>
+						Skillet:AuctionatorSearch();
+					</OnClick>
+				</Scripts>
+			</Button>
+			
+			<!--
 			#
 			# Buttons to queue or create items
 			#
