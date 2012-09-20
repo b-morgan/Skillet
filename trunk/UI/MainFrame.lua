@@ -1815,6 +1815,7 @@ function Skillet:HideDetailWindow()
 		SkilletPreviousItemButton:Hide()
 		SkilletExtraDetailTextLeft:Hide()
 		SkilletExtraDetailTextRight:Hide()
+		SkilletAuctionatorButton:Hide()
 
 		SkilletHighlightFrame:Hide()
 		SkilletFrame.selectedSkill = -1;
@@ -1938,6 +1939,9 @@ function Skillet:UpdateDetailsWindow(skillIndex)
 
 	SkilletSkillIcon:SetNormalTexture(texture)
 	SkilletSkillIcon:Show()
+	if AuctionFrame then
+		SkilletAuctionatorButton:Show()
+	end
 
 	-- How many of these items are produced at one time ..
 	if recipe.numMade > 1 then
@@ -3572,3 +3576,50 @@ function Skillet:UpdateStandaloneQueueWindow()
 	SkilletStandalonQueue:SetScale(self.db.profile.scale)
 end
 
+-- Add Auctionator support
+function Skillet:AuctionatorSearch()
+	
+	if not AuctionFrame then 
+		return
+	end
+	if not AuctionFrame:IsShown() then
+		Atr_Error_Display (ZT("When the Auction House is open\nclicking this button tells Auctionator\nto scan for the item and all its reagents."))
+		return
+	end
+	
+	local recipe, recipeId = self:GetRecipeDataByTradeIndex(self.currentTrade, self.selectedSkill)
+	if not recipe then
+		return
+	end
+	
+	local BUY_TAB = 3;
+	Atr_SelectPane (BUY_TAB);
+
+
+	local numReagents = #recipe.reagentData
+
+	local shoppingListName = GetItemInfo(recipe.itemID)
+	if (shoppingListName == nil) then
+		shoppingListName = self:GetRecipeName(recipeId)
+	end
+	
+	local reagentIndex
+	local items = {}
+	
+	if (shoppingListName) then
+		table.insert (items, shoppingListName)
+	end
+	
+	for reagentIndex = 1, numReagents do
+		local reagentId = recipe.reagentData[reagentIndex].id
+		if (reagentId and (reagentId ~= 3371)) then
+			local reagentName = GetItemInfo(reagentId)
+			if (reagentName) then
+				table.insert (items, reagentName)
+				-- DEFAULT_CHAT_FRAME:AddMessage("Reagent num "..reagentIndex.." ("..reagentId..") "..reagentName.." added")
+			end
+		end
+	end
+
+	Atr_SearchAH (shoppingListName, items)
+end
