@@ -197,7 +197,11 @@ function Skillet:RemoveFromQueue(index)
 
 	if command.op == "iterate" then
 		local recipe = self:GetRecipe(command.recipeID)
-
+		
+		if not command.count then
+			command.count = 1
+		end
+		
 		reagentsInQueue[recipe.itemID] = (reagentsInQueue[recipe.itemID] or 0) - recipe.numMade * command.count
 		reagentsChanged[recipe.itemID] = true
 
