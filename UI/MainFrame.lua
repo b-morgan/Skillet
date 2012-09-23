@@ -1939,10 +1939,10 @@ function Skillet:UpdateDetailsWindow(skillIndex)
 
 	SkilletSkillIcon:SetNormalTexture(texture)
 	SkilletSkillIcon:Show()
-	if AuctionFrame then
+	if AuctionFrame and AuctionatorLoaded then
 		SkilletAuctionatorButton:Show()
 	end
-
+	
 	-- How many of these items are produced at one time ..
 	if recipe.numMade > 1 then
 		SkilletSkillIconCount:SetText(recipe.numMade)
