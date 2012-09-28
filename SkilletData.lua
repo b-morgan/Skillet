@@ -364,10 +364,11 @@ function Skillet:CollectRecipeInformation()
 				if skillString then
 					local skillData = string.split(" ",skillString)
 
-					if skillData ~= "header" then
+					if skillData ~= "header" or skillData ~= "subheader" then
 						local recipeID = string.sub(skillData,2)
 
-						recipeID = tonumber(recipeID)
+						recipeID = tonumber(recipeID) or 0
+						
 						self.data.skillIndexLookup[player][recipeID] = i
 					end
 				end
@@ -831,7 +832,7 @@ function SkilletLink:ScanTrade()
 
 	for i = 1, numSkills do
 		local _, skillType, _, isExpanded = GetTradeSkillInfo(i)
-		if skillType == "header" then
+		if skillType == "header" or skillType == "subheader" then
 			if not isExpanded then
 				ExpandTradeSkillSubClass(i)
 			end
@@ -875,6 +876,7 @@ DebugSpam("Scanning Trade "..(profession or "nil")..":"..(tradeID or "nil").." "
 	local numHeaders = 0
 	local alreadyScannedThisRun = 0
 
+	local parentGroup=nil
 	for i = 1, numSkills, 1 do
 		repeat
 --DebugSpam("scanning index "..i)
@@ -889,7 +891,7 @@ DebugSpam("Scanning Trade "..(profession or "nil")..":"..(tradeID or "nil").." "
 			gotNil = false
 
 			if skillName then
-				if skillType == "header" then
+				if skillType == "header" or skillType == "subheader" then
 					numHeaders = numHeaders + 1
 
 					if not isExpanded then
@@ -915,7 +917,12 @@ DebugSpam("Scanning Trade "..(profession or "nil")..":"..(tradeID or "nil").." "
 					currentGroup = Skillet:RecipeGroupNew(player, tradeID, "Blizzard", groupName)
 					currentGroup.autoGroup = true
 
-					Skillet:RecipeGroupAddSubGroup(mainGroup, currentGroup, i)
+					if skillType == "header" then
+						parentGroup = currentGroup
+						Skillet:RecipeGroupAddSubGroup(mainGroup, currentGroup, i)
+					else
+						Skillet:RecipeGroupAddSubGroup(parentGroup, currentGroup, i)
+					end
 				else
 					local recipeLink = GetTradeSkillRecipeLink(i)
 					local recipeID = Skillet:GetItemIDFromLink(recipeLink)
@@ -1181,7 +1188,7 @@ function SkilletData:GetSkill(player,trade,index)
 
 				local data = { string.split(" ",skillString) }
 
-				if data[1] == "header" then
+				if data[1] == "header" or data[1] == "subheader" then
 					skill.id = 0
 				else
 					local difficulty = string.sub(data[1],1,1)
@@ -1763,7 +1770,7 @@ DebugSpam("TRADE MISMATCH for player "..(Skillet.currentPlayer or "nil").."!  ".
 
 	for i = 1, numSkills do
 		local _, skillType, _, isExpanded = GetTradeSkillInfo(i)
-		if skillType == "header" then
+		if skillType == "header" or skillType == "subheader" then
 			if not isExpanded then
 				ExpandTradeSkillSubClass(i)
 			end
@@ -1811,7 +1818,7 @@ DebugSpam("Scanning Trade "..(profession or "nil")..":"..(tradeID or "nil").." "
 	Skillet.db.realm.linkDB[player][tradeID] = GetTradeSkillListLink()
 
 	local numHeaders = 0
-
+	local parentGroup
 	local alreadyScannedThisRun = 0
 	for i = 1, numSkills, 1 do
 		repeat
@@ -1828,7 +1835,7 @@ DebugSpam("Scanning Trade "..(profession or "nil")..":"..(tradeID or "nil").." "
 
 
 			if skillName then
-				if skillType == "header" then
+				if skillType == "header" or skillType == "subheader" then
 					numHeaders = numHeaders + 1
 
 					if not isExpanded then
@@ -1850,8 +1857,13 @@ DebugSpam("Scanning Trade "..(profession or "nil")..":"..(tradeID or "nil").." "
 
 					currentGroup = Skillet:RecipeGroupNew(player, tradeID, "Blizzard", groupName)
 					currentGroup.autoGroup = true
-
-					Skillet:RecipeGroupAddSubGroup(mainGroup, currentGroup, i)
+					
+					if skillType == "header" then
+						parentGroup = currentGroup
+						Skillet:RecipeGroupAddSubGroup(mainGroup, currentGroup, i)
+					else
+						Skillet:RecipeGroupAddSubGroup(parentGroup, currentGroup, i)
+					end
 				else
 					local recipeLink = API.GetRecipeLink(i)
 					local recipeID = Skillet:GetItemIDFromLink(recipeLink)

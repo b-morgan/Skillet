@@ -745,7 +745,7 @@ function Skillet:UpdateTradeButtons(player)
 			if tradeID == self.currentTrade then
 				button:SetChecked(1)
 
-				if Skillet.data.skillList[player][tradeID] and Skillet.data.skillList[player][tradeID].scanned then
+				if Skillet.data.skillList[player][tradeID].scanned then
 					buttonIcon:SetVertexColor(1,1,1)
 				else
 					buttonIcon:SetVertexColor(1,0,0)
@@ -1128,6 +1128,7 @@ function Skillet:internal_UpdateTradeSkillWindow()
 			local countText = _G[button:GetName() .. "Counts"]
 
 			local buttonExpand = _G[button:GetName() .. "Expand"]
+			local skillRankBar = _G[button:GetName() .. "SubSkillRankBar"]						
 
 			buttonText:SetText("")
 			levelText:SetText("")
@@ -1137,6 +1138,8 @@ function Skillet:internal_UpdateTradeSkillWindow()
 			countText:Hide()
 			countText:SetWidth(10)
 
+			skillRankBar:Hide()
+			
 --			buttonText:SetPoint("LEFT", levelText, "RIGHT", skill.depth*8-8, 0)
 			levelText:SetWidth(skill.depth*8+20)
 
@@ -1185,6 +1188,8 @@ function Skillet:internal_UpdateTradeSkillWindow()
 
 			if skill.subGroup then
 				if SkillButtonNameEdit.originalButton ~= buttonText then
+					local _, _, _, _, _, _,_,showProgressBar, currentRank,maxRank,startingRank  = GetTradeSkillInfo(skillIndex)
+					
 					buttonText:SetTextColor(NORMAL_FONT_COLOR.r, NORMAL_FONT_COLOR.g, NORMAL_FONT_COLOR.b, textAlpha)
 					countText:SetTextColor(NORMAL_FONT_COLOR.r, NORMAL_FONT_COLOR.g, NORMAL_FONT_COLOR.b, textAlpha)
 
@@ -1207,11 +1212,22 @@ function Skillet:internal_UpdateTradeSkillWindow()
 					button.skill = skill
 
 					button:UnlockHighlight() -- headers never get highlighted
-					buttonExpand:Show()
+					buttonExpand:Show()					
 
-					local button_width = button:GetTextWidth()
+					local rankBarWidth = 0					
+					if ( showProgressBar ) then
+						skillRankBar:Show();
+						skillRankBar:SetMinMaxValues(startingRank,maxRank);
+						skillRankBar:SetValue(currentRank);
+						skillRankBar.currentRank = currentRank;
+						skillRankBar.maxRank = maxRank;
+						skillRankBar.Rank:SetText(currentRank.."/"..maxRank);
+						rankBarWidth = 60;
+					end					
+					
+					local button_width = button:GetTextWidth()				
 
---					while button_width > max_text_width - skill.depth*8 do
+--					while button_width > max_text_width - skill.depth*8 - rankBarWidth do
 --						text = string.sub(text, 0, -2)
 --						buttonText:SetText(text .. "..")
 --						button_width = button:GetTextWidth()
@@ -1542,7 +1558,6 @@ function Skillet:SkillButton_OnEnter(button)
 			quality = nil
 			quantity = nil
 			if recipe.itemID ~= 0 then
-				local _
 				_, altlink = GetItemInfo(recipe.itemID)
 			end
 		else
@@ -1815,7 +1830,6 @@ function Skillet:HideDetailWindow()
 		SkilletPreviousItemButton:Hide()
 		SkilletExtraDetailTextLeft:Hide()
 		SkilletExtraDetailTextRight:Hide()
-		SkilletAuctionatorButton:Hide()
 
 		SkilletHighlightFrame:Hide()
 		SkilletFrame.selectedSkill = -1;
@@ -1939,10 +1953,7 @@ function Skillet:UpdateDetailsWindow(skillIndex)
 
 	SkilletSkillIcon:SetNormalTexture(texture)
 	SkilletSkillIcon:Show()
-	if AuctionFrame and AuctionatorLoaded then
-		SkilletAuctionatorButton:Show()
-	end
-	
+
 	-- How many of these items are produced at one time ..
 	if recipe.numMade > 1 then
 		SkilletSkillIconCount:SetText(recipe.numMade)
@@ -3576,50 +3587,3 @@ function Skillet:UpdateStandaloneQueueWindow()
 	SkilletStandalonQueue:SetScale(self.db.profile.scale)
 end
 
--- Add Auctionator support
-function Skillet:AuctionatorSearch()
-	
-	if not AuctionFrame then 
-		return
-	end
-	if not AuctionFrame:IsShown() then
-		Atr_Error_Display (ZT("When the Auction House is open\nclicking this button tells Auctionator\nto scan for the item and all its reagents."))
-		return
-	end
-	
-	local recipe, recipeId = self:GetRecipeDataByTradeIndex(self.currentTrade, self.selectedSkill)
-	if not recipe then
-		return
-	end
-	
-	local BUY_TAB = 3;
-	Atr_SelectPane (BUY_TAB);
-
-
-	local numReagents = #recipe.reagentData
-
-	local shoppingListName = GetItemInfo(recipe.itemID)
-	if (shoppingListName == nil) then
-		shoppingListName = self:GetRecipeName(recipeId)
-	end
-	
-	local reagentIndex
-	local items = {}
-	
-	if (shoppingListName) then
-		table.insert (items, shoppingListName)
-	end
-	
-	for reagentIndex = 1, numReagents do
-		local reagentId = recipe.reagentData[reagentIndex].id
-		if (reagentId and (reagentId ~= 3371)) then
-			local reagentName = GetItemInfo(reagentId)
-			if (reagentName) then
-				table.insert (items, reagentName)
-				-- DEFAULT_CHAT_FRAME:AddMessage("Reagent num "..reagentIndex.." ("..reagentId..") "..reagentName.." added")
-			end
-		end
-	end
-
-	Atr_SearchAH (shoppingListName, items)
-end
