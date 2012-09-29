@@ -73,6 +73,10 @@ Skillet.TradeSkillAutoTarget = {
 		[53038] = 5, -- Obsidium Ore
 		[52183] = 5, -- Pyrite Ore
 		[52185] = 5, -- Elementium Ore
+		
+		[72092] = 5, -- Ghost Iron Ore
+		[72103] = 5, -- White Trillium Ore
+		[72094] = 5, -- Black Trillium Ore
 	},
 	[51005] = {   -- Millling
 		[765]  = 5, -- Silverleaf
@@ -135,6 +139,12 @@ Skillet.TradeSkillAutoTarget = {
 		[52987] = 5, -- Twilight Jasmine
 		[52988] = 5, -- Whiptail
 		[52989] = 5, -- Deathspore Pod
+		
+		[79011] = 5, -- Fool's Cap
+		[79010] = 5, -- Snow Lily
+		[72235] = 5, -- Silkweed
+		[72234] = 5, -- Green Tea Leaf
+		[72237] = 5, -- Rain Poppy
 	}
 }
 
