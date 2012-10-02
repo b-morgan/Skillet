@@ -48,6 +48,7 @@ Skillet.TradeSkillAdditionalAbilities = {
     [2550]  = {818,"Basic_Campfire"},          -- cooking = basic campfire
     [45357] = {51005,"Milling"},        -- inscription = milling
     [25229] = {31252,"Prospecting"},        -- jewelcrafting = prospecting
+    [2018]  = {87216,"Thermal Anvil"},        -- blacksmithing = thermal anvil
 }
 
 Skillet.AutoButtonsList = {}
