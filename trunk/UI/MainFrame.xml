@@ -160,7 +160,7 @@
 			<AbsDimension x="16" y="16" />
 		</Size>
 
-			<NormalTexture name="$parentNormal" file="Interface\Buttons\UI-MinusButton-UP">
+		<NormalTexture name="$parentNormal" file="Interface\Buttons\UI-MinusButton-UP">
 			<Size>
   				<AbsDimension x="16" y="16" />
   			</Size>
@@ -677,12 +677,12 @@
 			<Layer level="OVERLAY">
 				<FontString name="$parentText" inherits="GameFontNormalSmall" justifyH="LEFT" justifyV="MIDDLE">
 					<Size>
-						<AbsDimension x="160" y="16"/>
+						<AbsDimension x="150" y="16"/>
 					</Size>
 					<Anchors>
 						<Anchor point="TOPLEFT" relativeTo="$parent" relativePoint="TOPLEFT">
 							<Offset>
-								<AbsDimension x="44" y="0"/>
+								<AbsDimension x="54" y="0"/>
 							</Offset>
 						</Anchor>
 					</Anchors>
@@ -703,7 +703,7 @@
 				</FontString>
 				<FontString name="$parentNeeded" inherits="GameFontNormalSmall" justifyH="RIGHT" justifyV="MIDDLE">
 					<Size>
-						<AbsDimension x="24" y="16"/>
+						<AbsDimension x="34" y="16"/>
 					</Size>
 					<Anchors>
 						<Anchor point="TOPLEFT" relativeTo="$parent" relativePoint="TOPLEFT">
