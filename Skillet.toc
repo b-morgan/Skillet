@@ -52,14 +52,17 @@ Libs\LibPeriodicTable-3.1\LibPeriodicTable-3.1-TradeskillLevels\LibPeriodicTable
 
 
 #### Localization files
+Locale\Locale-ptBR.lua
 Locale\Locale-enUS.lua
-Locale\Locale-ruRU.lua
+Locale\Locale-frFR.lua
 Locale\Locale-deDE.lua
+Locale\Locale-itIT.lua
+Locale\Locale-koKR.lua
+Locale\Locale-ruRU.lua
 Locale\Locale-zhTW.lua
 Locale\Locale-zhCN.lua
-Locale\Locale-koKR.lua
-Locale\Locale-frFR.lua
 Locale\Locale-esES.lua
+
 
 #### Main files
 Skillet.lua
