@@ -203,6 +203,7 @@ local TradeSkillIgnoredMats  = {
 		[42615] = 1 , -- small prismatic shard
 		[42613] = 1 , -- nexus transformation
 		[28022] = 1 , -- large prismatic shard
+		[118239] = 1 , -- sha shatter
 		[118238] = 1 , -- ethereal shard shatter
 		[118237] = 1 , -- mysterious diffusion
 }
