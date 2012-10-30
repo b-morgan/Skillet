@@ -321,7 +321,7 @@ Dialog:Register("SKILLETASKFOR", {
 })
 
 function Skillet:AskFor(msg, handler)
-	Dialog:Spawn("SKILLETMSG", {
+	Dialog:Spawn("SKILLETASKFOR", {
 		msg = msg,
 		handler = handler,
 	})
