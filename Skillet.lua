@@ -18,7 +18,7 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
 ]]--
 
-local MAJOR_VERSION = "2.40"
+local MAJOR_VERSION = "2.41"
 local MINOR_VERSION = ("$Revision$"):match("%d+") or 1
 local DATE = string.gsub("$Date$", "^.-(%d%d%d%d%-%d%d%-%d%d).-$", "%1")
 
@@ -1024,7 +1024,7 @@ DebugSpam("setting tradeskill to "..player.." "..tradeID.." "..(skillIndex or "n
 			self.currentGroupLabel = self:GetTradeSkillOption("grouping")
 			self:RecipeGroupDropdown_OnShow()
 
-DebugSpam("cast: "..self:GetTradeName(tradeID))
+-- DebugSpam("cast: "..self:GetTradeName(tradeID))
 
 			CastSpellByName(self:GetTradeName(tradeID))				-- this will trigger the whole rescan process via a TRADE_SKILL_SHOW/CRAFT_SHOW event
         else

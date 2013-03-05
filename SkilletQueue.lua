@@ -486,6 +486,10 @@ DebugSpam("ScanQueuedReagents")
 		if command.op == "iterate" then
 			local recipe = self:GetRecipe(command.recipeID)
 
+			if not command.count then
+				command.count = 1
+			end
+
 			if recipe.numMade > 0 then
 				reagentsInQueue[recipe.itemID] = command.count * recipe.numMade + (reagentsInQueue[recipe.itemID] or 0)
 			end
