@@ -1090,7 +1090,7 @@ DebugSpam("Scanning Trade "..(profession or "nil")..":"..(tradeID or "nil").." "
 							local reagentID = 0
 
 							if reagentName then
-								local reagentLink = GetTradeSkillReagentItemLink(i,j)
+								local reagentLink = FixedGetTradeSkillReagentItemLink(i,j)
 
 								reagentID = Skillet:GetItemIDFromLink(reagentLink)
 							else
@@ -1706,9 +1706,14 @@ DebugSpam("Forced Rescan")
 	return Skillet.dataScanned
 end
 
-
-
-
+local function FixedGetTradeSkillReagentItemLink(i,j) 
+	local tooltip = CreateFrame("GameTooltip", "SkilletDataScanTooltip", UIParent, "GameTooltipTemplate")
+	tooltip:SetOwner(UIParent, "ANCHOR_NONE")
+	tooltip:ClearLines()
+	tooltip:SetTradeSkillItem(i,j)
+	local _, reagentLink = tooltip:GetItem()
+	return reagentLink
+end
 
 function SkilletData:ScanTrade()
 DebugSpam("ScanTrade")
@@ -1736,7 +1741,8 @@ DebugSpam("GetTradeSkill: "..(profession or "nil"))
 	API.GetNumMade = GetTradeSkillNumMade
 	API.GetNumReagents = GetTradeSkillNumReagents
 	API.GetReagentInfo = GetTradeSkillReagentInfo
-	API.GetReagentLink = GetTradeSkillReagentItemLink
+--	API.GetReagentLink = GetTradeSkillReagentItemLink
+	API.GetReagentLink = FixedGetTradeSkillReagentItemLink
 
 	-- get the tradeID from the profession name (data collected earlier).
 	tradeID = TradeSkillIDsByName[profession] or 2656				-- "mining" doesn't exist as a spell, so instead use smelting (id 2656)
