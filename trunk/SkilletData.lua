@@ -243,6 +243,16 @@ local skill_style_type = {
 
 local lastAutoTarget = {}
 
+local SkilletDataScanTooltip = CreateFrame("GameTooltip", "SkilletDataScanTooltip", UIParent, "GameTooltipTemplate")
+SkilletDataScanTooltip:SetOwner(UIParent, "ANCHOR_NONE")
+
+local function FixedGetTradeSkillReagentItemLink(i,j) 
+	local tooltip = SkilletDataScanTooltip
+	tooltip:ClearLines()
+	tooltip:SetTradeSkillItem(i,j)
+	return select(2,tooltip:GetItem())
+end
+
 function Skillet:GetAutoTargetItem(tradeID)
 	if Skillet.TradeSkillAutoTarget[tradeID] then
 		local itemID = lastAutoTarget[tradeID]
@@ -1704,15 +1714,6 @@ DebugSpam("Forced Rescan")
 	DebugSpam("TRADESKILL HAS BEEN SCANNED")
 
 	return Skillet.dataScanned
-end
-
-local function FixedGetTradeSkillReagentItemLink(i,j) 
-	local tooltip = CreateFrame("GameTooltip", "SkilletDataScanTooltip", UIParent, "GameTooltipTemplate")
-	tooltip:SetOwner(UIParent, "ANCHOR_NONE")
-	tooltip:ClearLines()
-	tooltip:SetTradeSkillItem(i,j)
-	local _, reagentLink = tooltip:GetItem()
-	return reagentLink
 end
 
 function SkilletData:ScanTrade()
