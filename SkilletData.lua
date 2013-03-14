@@ -243,8 +243,8 @@ local skill_style_type = {
 
 local lastAutoTarget = {}
 
-local SkilletDataScanTooltip = CreateFrame("GameTooltip", "SkilletDataScanTooltip", UIParent, "GameTooltipTemplate")
-SkilletDataScanTooltip:SetOwner(UIParent, "ANCHOR_NONE")
+local SkilletDataScanTooltip = CreateFrame("GameTooltip", "SkilletDataScanTooltip", nil, "GameTooltipTemplate")
+SkilletDataScanTooltip:SetOwner(WorldFrame, "ANCHOR_NONE")
 
 local function FixedGetTradeSkillReagentItemLink(i,j) 
 	local tooltip = SkilletDataScanTooltip
