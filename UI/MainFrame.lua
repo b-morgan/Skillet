@@ -652,7 +652,12 @@ function Skillet:TradeButton_OnClick(this,button)
 				self:SetTradeSkill(self.currentPlayer, tradeID)
 			else
 				local link = self.db.realm.linkDB[player][tradeID]
-				local _,_,tradeString = string.find(link, "(trade:%d+:%d+:%d+:[0-9a-fA-F]+:[a-zA-Z0-9+/]+)")
+				local _,tradeString
+				if Skillet.wowVersion >= 50300 then
+					_,_,tradeString = string.find(link, "(trade:[0-9a-fA-F]+:%d+:%d+:%d+:[a-zA-Z0-9+/:]+)")
+				else
+					_,_,tradeString = string.find(link, "(trade:%d+:%d+:%d+:[0-9a-fA-F]+:[a-zA-Z0-9+/]+)")
+				end
 
 				if tradeString then
 					SetItemRef(tradeString,link,"LeftButton")

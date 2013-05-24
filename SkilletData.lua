@@ -700,7 +700,13 @@ end
 
 function SkilletLink:GetSkillRanks(player, trade)
 	if Skillet.db.realm.linkDB[player] and Skillet.db.realm.linkDB[player][trade] then
-		local _,_,tradeID, rank, maxRank = string.find(Skillet.db.realm.linkDB[player][trade], "trade:(%d+):(%d+):(%d+)")
+		local _,tradeID, rank, maxRank
+		if Skillet.wowVersion >= 50300 then
+			_,_,tradeID, rank, maxRank = string.find(Skillet.db.realm.linkDB[player][trade], "trade:%x+:(%d+):(%d+):(%d+)")
+		else
+			_,_,tradeID, rank, maxRank = string.find(Skillet.db.realm.linkDB[player][trade], "trade:(%d+):(%d+):(%d+)")
+		end			
+		
 		return rank .. " " .. maxRank
 	end
 	
@@ -1342,8 +1348,13 @@ function Skillet:InitializeAllDataLinks(name)
 	if not link then allDataInitialized = false return end
 
 
-	local _,_,uid = string.find(link,"trade:%d+:%d+:%d+:([0-9a-fA-F]+)")
-
+	local _,uid
+	if Skillet.wowVersion >= 50300 then
+		_,_,uid = string.find(link,"trade:([0-9a-fA-F]+):%d+:%d+:%d+")
+	else
+		_,_,uid = string.find(link,"trade:%d+:%d+:%d+:([0-9a-fA-F]+)")
+	end
+	
 	local uid = UnitGUID("player"):gsub("0x0+","")
 
 	for tradeID, bitmapLength in pairs(TradeSkillRecipeCounts) do
@@ -1354,8 +1365,12 @@ function Skillet:InitializeAllDataLinks(name)
 		local encodedString = string.rep("/",encodingLength)
 
 --DEFAULT_CHAT_FRAME:AddMessage("AllData Link "..tradeID.." "..(uid or "nil").." "..(spellName or "nil"))
-
-		self.db.realm.linkDB[name][tradeID] = "|cffffd00|Htrade:"..tradeID..":375:450:"..(uid or "23F381A")..":"..encodedString.."|h["..spellName.."]|h|r"
+		
+		if Skillet.wowVersion >= 50300 then
+			self.db.realm.linkDB[name][tradeID] = "|cffffd00|Htrade:"..(uid or "23F381A")..":"..tradeID..":600:600:"..encodedString.."|h["..spellName.."]|h|r"
+		else
+			self.db.realm.linkDB[name][tradeID] = "|cffffd00|Htrade:"..tradeID..":375:450:"..(uid or "23F381A")..":"..encodedString.."|h["..spellName.."]|h|r"
+		end		
 	end
 
 	self:RegisterPlayerDataGathering(name,SkilletLink,"sk")
