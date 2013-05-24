@@ -2741,24 +2741,64 @@ function Skillet:PushSkill(player, tradeID, skillIndex)
 end
 
 
+function Skillet:getGuildPerk()
+	-- icy: calculate working overtime bonus
+	local wot1 = 14
+	local wot2 = 22
+
+	local gLevel = GetGuildLevel()
+	if (gLevel < wot1 ) then
+		return 0
+	elseif ((gLevel >= wot1) and (gLevel < wot2)) then
+		return 1.10
+	else
+		return 1.20
+	end
+end
+
+
+function Skillet:getLvlUpChance()
+	-- icy: 03.03.2012:
+	-- according to pope (http://www.wowhead.com/spell=83949#comments)
+	-- % to level up with this receipt is calculated by: (greySkill - yourSkill) / (greySkill - yellowSkill
+	-- Lets add this information to skillet :)
+	local currentLevelString, maxlevel = string.split(" ", self:GetSkillRanks(self.currentPlayer, self.currentTrade) or "0 0")
+	local currentLevel = tonumber(currentLevelString)
+	local gray = tonumber(SkilletRankFrame.subRanks.green:GetValue())
+	local yellow = tonumber(SkilletRankFrame.subRanks.orange:GetValue())
+	local chance
+	local guildperk = Skillet:getGuildPerk()
+	if (currentLevel > gray) then
+		return 0
+	end
+	
+	if (gray - yellow) == 0 then return 0 end
+	
+	chance = ((gray - currentLevel) / ( gray - yellow ))
+	chance = chance * guildperk
+	chance = chance * 100
+	return chance
+end
+
 -- Called when then mouse enters the rank status bar
 function Skillet:RankFrame_OnEnter(button)
-
-
---	if button ~= SkilletRankFrame then
-		GameTooltip:SetOwner(button, "ANCHOR_BOTTOMLEFT")
-		local r,g,b = SkilletSkillName:GetTextColor()
-		GameTooltip:AddLine(SkilletSkillName:GetText(),r,g,b)
-
-		local gray = SkilletRankFrame.subRanks.green:GetValue()
-		local green = SkilletRankFrame.subRanks.yellow:GetValue()
-		local yellow = SkilletRankFrame.subRanks.orange:GetValue()
-		local orange = SkilletRankFrame.subRanks.red:GetValue()
-
-		GameTooltip:AddLine(COLORORANGE..orange.."|r/"..COLORYELLOW..yellow.."|r/"..COLORGREEN..green.."|r/"..COLORGRAY..gray)
-
-		GameTooltip:Show()
---	end
+	
+	-- if button ~= SkilletRankFrame then
+	GameTooltip:SetOwner(button, "ANCHOR_BOTTOMLEFT")
+	local r,g,b = SkilletSkillName:GetTextColor()
+	GameTooltip:AddLine(SkilletSkillName:GetText(),r,g,b)
+	
+	local gray = SkilletRankFrame.subRanks.green:GetValue()
+	local green = SkilletRankFrame.subRanks.yellow:GetValue()
+	local yellow = SkilletRankFrame.subRanks.orange:GetValue()
+	local orange = SkilletRankFrame.subRanks.red:GetValue()
+	
+	-- lets add the chance to level up that skill with that receipt
+	local chance = Skillet:getLvlUpChance()
+	GameTooltip:AddLine(COLORORANGE..orange.."|r/"..COLORYELLOW..yellow.."|r/"..COLORGREEN..green.."|r/"..COLORGRAY..gray.."|r/ Chance:"..chance.."|r%")
+	
+	GameTooltip:Show()
+-- end
 end
 
 
