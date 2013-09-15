@@ -107,32 +107,33 @@ end
 local invscan = 1
 
 function Skillet:InventoryScan(playerOverride)
---DEFAULT_CHAT_FRAME:AddMessage("InventoryScan "..invscan)
-invscan = invscan + 1
+
+	DebugSpam("InventoryScan "..invscan)
+	invscan = invscan + 1
 	local player = playerOverride or self.currentPlayer
 	local cachedInventory = self.db.realm.inventoryData[player]
-
+	
 	local inventoryData = {}
 	local numInBags, numInBank
-
+	
 	local reagent
-
+	
 	if not self.data then self.data = {} end
-
-
+	
+	
 	if self.data.itemRecipeUsedIn then
 		for reagentID in pairs(self.data.itemRecipeUsedIn) do
-
-	--DebugSpam("reagent "..GetItemInfo(reagentID).." "..(inventoryData[reagentID] or "nil"))
-
+			
+			-- DebugSpam("reagent "..GetItemInfo(reagentID).." "..(inventoryData[reagentID] or "nil"))
+			
 			if reagentID and not inventoryData[reagentID] then								-- have we calculated this one yet?
 				if self.currentPlayer == (UnitName("player")) then							-- if this is the current player, use the api
 					numInBags = GetItemCount(reagentID)
 					numInBank = GetItemCount(reagentID,true)								-- both bank and bags, actually
 				elseif cachedInventory and cachedInventory[reagentID] then										-- otherwise, use the what cached data is available
---[[
+					--[[
 					local data = { string.split(" ", cachedInventory[reagentID]) }
-
+					
 					if #data == 1 then
 						numInBags = data[1]
 						numInBank = data[1]
@@ -143,9 +144,9 @@ invscan = invscan + 1
 						numInBags = data[1]
 						numInBank = data[3]
 					end
-]]
+					]]
 					local a,b,c,d = string.split(" ", cachedInventory[reagentID])
-
+					
 					if not b then
 						numInBags = a
 						numInBank = a
@@ -160,28 +161,28 @@ invscan = invscan + 1
 					numInBags = 0
 					numInBank = 0
 				end
-
+				
 				if numInBags == numInBank then
 					inventoryData[reagentID] = tostring(numInBags)							-- if items are all in bags, then leave off bank
 				else
 					inventoryData[reagentID] = numInBags.." "..numInBank					-- only setting the bags and bank for now (no craftability info)
 				end
-	--DebugSpam(inventoryData[reagentID])
+				-- DebugSpam(inventoryData[reagentID])
 			end
 		end
 	end
-
+	
 	self.db.realm.inventoryData[player] = inventoryData
-
-
-	self.visited = {}							-- this is a simple infinite loop avoidance scheme: basically, don't visit the same node twice
-
+	
+	
+	self.visited = {} -- this is a simple infinite loop avoidance scheme: basically, don't visit the same node twice
+	
 	if inventoryData then
 		-- now calculate the craftability of these same reagents
 		for reagentID,inventory in pairs(inventoryData) do
 			self:InventoryReagentCraftability(reagentID, player)
 		end
-
+		
 		-- remove any reagents that don't show up in our inventory
 		for reagentID,inventory in pairs(inventoryData) do
 			if inventoryData[reagentID] == 0 or inventoryData[reagentID] == "0" or inventoryData[reagentID] == "0 0" or inventoryData[reagentID] == "0 0 0 0" then
@@ -189,8 +190,8 @@ invscan = invscan + 1
 			end
 		end
 	end
-
-DebugSpam("InventoryScan Complete")
+	
+	DebugSpam("InventoryScan Complete")
 end
 
 -- recipe iteration check: calculate how many times a recipe can be iterated with materials available

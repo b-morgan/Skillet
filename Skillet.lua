@@ -95,7 +95,7 @@ Skillet.unknownRecipe = {
 
 
 function DebugSpam(message)
---	DEFAULT_CHAT_FRAME:AddMessage(message)
+	-- DEFAULT_CHAT_FRAME:AddMessage("Skillet debug: "..message)
 end
 
 -- Localization
@@ -574,7 +574,7 @@ function Skillet:FlushAllData()
 
 	Skillet.db.realm.skillRanks = {}
 	Skillet.db.realm.skillDB = {}
-	Skillet.db.realm.linkDB = {}
+	Skillet.db.realm.tradeSkills = {}
 	Skillet.db.realm.groupDB = {}
 	Skillet.db.realm.queueData = {}
 	Skillet.db.realm.reagentsInQueue = {}
@@ -585,19 +585,19 @@ end
 
 
 function Skillet:InitializeDatabase(player, clean)
-DebugSpam("initialize database for "..player)
-
-	if Skillet.wowVersion >= 50300 then
-		if not self.db.realm.dataVersion or self.db.realm.dataVersion < 2 then
-			self.db.realm.dataVersion = 2
+	DebugSpam("initialize database for "..player)
+	
+	if Skillet.wowVersion >= 50400 then
+		if not self.db.realm.dataVersion or self.db.realm.dataVersion < 3 then
+			self.db.realm.dataVersion = 3
 			self:FlushAllData()
 		end 
 	end
-
+	
 	if not self.db.realm.groupDB then
 		self.db.realm.groupDB = {}
 	end
-
+	
 	if not self.db.realm.inventoryData then
 		self.db.realm.inventoryData = {}
 	end
@@ -630,8 +630,8 @@ DebugSpam("initialize database for "..player)
 		self.data.skillList = {}
 	end
 
-	if not self.db.realm.linkDB then
-		self.db.realm.linkDB = {}
+	if not self.db.realm.tradeSkills then
+		self.db.realm.tradeSkills = {}
 	end
 
 	if not self.data.groupList then
@@ -654,14 +654,14 @@ DebugSpam("initialize database for "..player)
  		self.db.realm.queueData[player] = {}
  	end
 
-    if not self.data.skillIndexLookup then
-        self.data.skillIndexLookup = {}
-    end
-
-    if not self.data.skillIndexLookup[player] then
-        self.data.skillIndexLookup[player] = {}
-    end
-
+	if not self.data.skillIndexLookup then
+		self.data.skillIndexLookup = {}
+	end
+	
+	if not self.data.skillIndexLookup[player] then
+		self.data.skillIndexLookup[player] = {}
+	end
+	
 	if not self.db.global.itemRecipeSource then
 		self.db.global.itemRecipeSource = {}
 	end
@@ -670,21 +670,21 @@ DebugSpam("initialize database for "..player)
 		self.db.profile.SavedQueues = {}
 	end
 
-    if not self.dataGatheringModules then
-        self.dataGatheringModules = {}
-    end
-
+	if not self.dataGatheringModules then
+		self.dataGatheringModules = {}
+	end
+	
  	if self.dataGatheringModules[player] then
  		local mod = self.dataGatheringModules[player]
-
+		
  		mod.ScanPlayerTradeSkills(mod, player, clean)
  	else
 		DebugSpam("data gather module is nil")
  	end
-
+	
 	self:CollectRecipeInformation()
-
---	self:RecipeGroupDeconstructDBStrings()
+	
+	-- self:RecipeGroupDeconstructDBStrings()
 end
 
 
@@ -692,7 +692,7 @@ function Skillet:RegisterRecipeFilter(name, namespace, initMethod, filterMethod)
 	if not self.recipeFilters then
 		self.recipeFilters = {}
 	end
---DEFAULT_CHAT_FRAME:AddMessage("add recipe filter "..name)
+	-- DebugSpam("add recipe filter "..name)
 	self.recipeFilters[name] = { namespace = namespace, initMethod = initMethod, filterMethod = filterMethod }
 end
 
@@ -708,7 +708,7 @@ end
 
 
 function Skillet:RegisterPlayerDataGathering(player, modules, recipeDB)
-DebugSpam("RegisterPlayerDataGathering "..(player or "nil"))
+	DebugSpam("RegisterPlayerDataGathering "..(player or "nil"))
 	if not self.dataGatheringModules then
 		self.dataGatheringModules = {}
 	end
@@ -719,26 +719,26 @@ DebugSpam("RegisterPlayerDataGathering "..(player or "nil"))
 
 	self.dataGatheringModules[player] = modules
 	self.recipeDB[player] = recipeDB
-DebugSpam("done with register")
+	DebugSpam("done with register")
 end
 
 
 -- Called when the addon is enabled
 function Skillet:OnEnable()
-    -- Hook into the events that we care about
-
-    -- Trade skill window changes
+	-- Hook into the events that we care about
+	
+	-- Trade skill window changes
 	self:RegisterEvent("TRADE_SKILL_CLOSE",				"SkilletClose")
 	self:RegisterEvent("TRADE_SKILL_SHOW",				"SkilletShow")
---	self:RegisterEvent("TRADE_SKILL_UPDATE")
+	-- self:RegisterEvent("TRADE_SKILL_UPDATE")
 
 	self:RegisterEvent("GUILD_RECIPE_KNOWN_BY_MEMBERS", "SkilletShowGuildCrafters")
 
-    -- TODO: Tracks when the number of items on hand changes
+	-- TODO: Tracks when the number of items on hand changes
 	self:RegisterEvent("BAG_UPDATE")
 	self:RegisterEvent("BAG_OPEN")
---    self:RegisterEvent("TRADE_CLOSED")
---	self:RegisterEvent("CHAT_MSG_LOOT")
+	-- self:RegisterEvent("TRADE_CLOSED")
+	-- self:RegisterEvent("CHAT_MSG_LOOT")
 
     -- MERCHANT_SHOW, MERCHANT_HIDE, MERCHANT_UPDATE events needed for auto buying.
     self:RegisterEvent("MERCHANT_SHOW")
@@ -820,7 +820,7 @@ function Skillet:IsTradeSkillLinked()
 	if IsTradeSkillLinked() or (IsTradeSkillGuild and IsTradeSkillGuild()) then
 		local guildSkills = IsTradeSkillGuild and IsTradeSkillGuild()
 		local _, linkedPlayer = IsTradeSkillLinked()
-
+		
 		if not linkedPlayer then
 			if guildSkills then
 				linkedPlayer = "Guild Recipes"
@@ -828,6 +828,7 @@ function Skillet:IsTradeSkillLinked()
 				return
 			end
 		end
+		-- DebugSpam("IsTradeSkillLinked Player "..linkedPlayer);
 		return true, linkedPlayer, (IsTradeSkillGuild and IsTradeSkillGuild())
 	end
 	return false, nil
@@ -837,94 +838,94 @@ end
 -- only gets called from TRADE_SKILL_SHOW and CRAFT_SHOW events
 -- this means, the skill being shown is for the main toon (not an alt)
 function Skillet:SkilletShow()
-DebugSpam("SHOW WINDOW (was showing "..(self.currentTrade or "nil")..")");
-
-
+	DebugSpam("SHOW WINDOW (was showing "..(self.currentTrade or "nil")..")");
+	
+	
 	TradeSkillFrame_Update();
 	
 	self.linkedSkill, self.currentPlayer = Skillet:IsTradeSkillLinked()
 	
 	if self.linkedSkill then
-
-		if (self.currentPlayer == UnitName("player")) then
-			self.currentPlayer = "All Data"
-		end
+		
+		-- if (self.currentPlayer == UnitName("player")) then
+		-- 	self.currentPlayer = "All Data"
+		-- end
+		-- DebugSpam("SkilletShow ".." player "..self.currentPlayer)
 		self:RegisterPlayerDataGathering(self.currentPlayer,SkilletLink,"sk")
 	else
 		self:InitializeAllDataLinks("All Data")
-
+		
 		self.currentPlayer = (UnitName("player"))
 	end
-
---DEFAULT_CHAT_FRAME:AddMessage("SkilletShow")
-
+	
+	-- DebugSpam("SkilletShow")
+	
 	self.currentTrade = self.tradeSkillIDsByName[(GetTradeSkillLine())] or 2656      -- smelting caveat
-
-
+	
+	
 	self:InitializeDatabase(self.currentPlayer)
-
+	
 	if self:IsSupportedTradeskill(self.currentTrade) then
 		self:InventoryScan()
-
-
+		
 		self.tradeSkillOpen = true
-DebugSpam("SkilletShow: "..self.currentTrade)
-
+		DebugSpam("SkilletShow: "..self.currentTrade)
+		
 		self.selectedSkill = nil
-
+		
 		self.dataScanned = false
 		self:ScheduleTimer("SkilletShowWindow", 0.5)
 	else
 		self:HideAllWindows()
 		self:BlizzardTradeSkillFrame_Show()
 	end
-
+	
 end
 
 function Skillet:SkilletShowWindow()
 		if IsControlKeyDown() then
 			self.db.realm.skillDB[self.currentPlayer][self.currentTrade] = {}
 		end
-
+		
 		self:RescanTrade()
-
+		
 		self.currentGroup = nil
 		self.currentGroupLabel = self:GetTradeSkillOption("grouping")
 		self:RecipeGroupDropdown_OnShow()
-
+		
 		self:ShowTradeSkillWindow()
-
+		
 		local filterbox = _G["SkilletFilterBox"]
 		local oldtext = filterbox:GetText()
 		local filterText = self:GetTradeSkillOption("filtertext")
-
+		
 		-- if the text is changed, set the new text (which fires off an update) otherwise just do the update
 		if filterText ~= oldtext then
 			filterbox:SetText(filterText)
 		else
 			self:UpdateTradeSkillWindow()
 		end
-
+		
 		self.dataSource = "api"
 end
 
 function Skillet:FreeCaches()
---	collectgarbage("collect")
---	if not cache then
---		cache = Skillet.data
---	end
-
---	local kbA = collectgarbage("count")
---	Skillet.data = {}
---	collectgarbage("collect")
---	local kbB = collectgarbage("count")
--- DEFAULT_CHAT_FRAME:AddMessage("free'd " .. data .. " (" .. math.floor((kbA - kbB)*100+.5)/100 .. " Kb)")
+	-- collectgarbage("collect")
+	-- if not cache then
+	-- 	cache = Skillet.data
+	-- end
+	
+	-- local kbA = collectgarbage("count")
+	-- Skillet.data = {}
+	-- collectgarbage("collect")
+	-- local kbB = collectgarbage("count")
+	-- DebugSpam("free'd " .. data .. " (" .. math.floor((kbA - kbB)*100+.5)/100 .. " Kb)")
 end
 
 
 function Skillet:SkilletClose()
-DebugSpam("SKILLET CLOSE")
-	if self.dataSource == "api" then			-- if the skillet system is using the api for data access, then close the skillet window
+	DebugSpam("SKILLET CLOSE")
+	if self.dataSource == "api" then -- if the skillet system is using the api for data access, then close the skillet window
 		self:HideAllWindows()
 		self:FreeCaches()
 	end
@@ -935,17 +936,17 @@ end
 -- window is open and a trade selected.
 function Skillet:RescanBags()
 	local start = GetTime()
-
-
+	
+	
 	Skillet:InventoryScan()
 	Skillet:UpdateTradeSkillWindow()
-    Skillet:UpdateShoppingListWindow()
-
-
+	Skillet:UpdateShoppingListWindow()
+	
+	
 	local elapsed = GetTime() - start
-
+	
 	if elapsed > 0.5 then
-		DEFAULT_CHAT_FRAME:AddMessage("WARNING: skillet inventory scan took " .. math.floor(elapsed*100+.5)/100 .. " seconds to complete.")
+		DebugSpam("WARNING: skillet inventory scan took " .. math.floor(elapsed*100+.5)/100 .. " seconds to complete.")
 	end
 	self.rescan_bags_timer = nil
 end
@@ -1010,19 +1011,19 @@ DebugSpam("setting tradeskill to "..player.." "..tradeID.." "..(skillIndex or "n
  	end
 
  	if player ~= self.currentPlayer or tradeID ~= self.currentTrade then
---		local kbA = collectgarbage("count")
---		self.data.recipeList = {}
---		self.data.skillList = {}
---		self.data.groupList = {}
---		collectgarbage("collect")
---		local kbB = collectgarbage("count")
---DEFAULT_CHAT_FRAME:AddMessage("free'd " .. math.floor((kbA - kbB)*100+.5)/100 .. " Kb")
-
+		-- local kbA = collectgarbage("count")
+		-- self.data.recipeList = {}
+		-- self.data.skillList = {}
+		-- self.data.groupList = {}
+		-- collectgarbage("collect")
+		-- local kbB = collectgarbage("count")
+		-- DebugSpam("free'd " .. math.floor((kbA - kbB)*100+.5)/100 .. " Kb")
+		
 		collectgarbage("collect")
-
+		
 	 	self.currentPlayer = player
 		local oldTradeID = self.currentTrade
-
+		
 		if player == (UnitName("player")) then								-- we can update the tradeskills if this toon is the current one
 			self.dataSource = "api"
 			self.dataScanned = false
@@ -1030,41 +1031,41 @@ DebugSpam("setting tradeskill to "..player.." "..tradeID.." "..(skillIndex or "n
 
 			self.currentGroupLabel = self:GetTradeSkillOption("grouping")
 			self:RecipeGroupDropdown_OnShow()
-
--- DebugSpam("cast: "..self:GetTradeName(tradeID))
-
+			
+			-- DebugSpam("cast: "..self:GetTradeName(tradeID))
+			
 			CastSpellByName(self:GetTradeName(tradeID))				-- this will trigger the whole rescan process via a TRADE_SKILL_SHOW/CRAFT_SHOW event
         else
             self.dataSource = "cache"
 			CloseTradeSkill()
-
+			
 			self.dataScanned = false
-
+			
 			self:HideNotesWindow();
-
+			
 			self.currentTrade = tradeID
 			self.currentGroup = nil
 			self.currentGroupLabel = self:GetTradeSkillOption("grouping")
-
---			self:RecipeGroupDeconstructDBStrings()
-
+			
+			-- self:RecipeGroupDeconstructDBStrings()
+			
 			self:RecipeGroupGenerateAutoGroups()
-
+			
 			self:RecipeGroupDropdown_OnShow()
-
+			
 			if not self.data.skillList[player] then
 				self.data.skillList[player] = {}
 			end
-
+			
 			if not self.data.skillList[player][tradeID] then
 				self.data.skillList[player][tradeID] = {}
 			end
-
+			
 			-- remove any filters currently in place
 			local filterbox = _G["SkilletFilterBox"]
 	        local oldtext = filterbox:GetText()
 	        local filterText = self:GetTradeSkillOption("filtertext")
-
+		
 	    	-- if the text is changed, set the new text (which fires off an update) otherwise just do the update
 	    	if filterText ~= oldtext then
 	    		filterbox:SetText(filterText)
@@ -1072,17 +1073,17 @@ DebugSpam("setting tradeskill to "..player.." "..tradeID.." "..(skillIndex or "n
 	    		self:UpdateTradeSkillWindow()
 	    	end
 	 	end
-
-DebugSpam("Tradeskill is set to "..(self.currentPlayer or "nil").." "..(self.currentTrade or "nil"))
-    end
- 	self:SetSelectedSkill(skillIndex, false)
+		
+		DebugSpam("Tradeskill is set to "..(self.currentPlayer or "nil").." "..(self.currentTrade or "nil"))
+	end
+	self:SetSelectedSkill(skillIndex, false)
 end
 
 
 -- Updates the tradeskill window, if the current trade has changed.
 function Skillet:UpdateTradeSkill()
-DebugSpam("UPDATE TRADE SKILL")
-
+	DebugSpam("UPDATE TRADE SKILL")
+	
 	local trade_changed = false
 	local new_trade = self:GetTradeSkillLine()
 
@@ -1113,24 +1114,24 @@ end
 
 -- Shows the trade skill frame.
 function Skillet:internal_ShowTradeSkillWindow()
-DebugSpam("internal_ShowTradeSkillWindow")
+	DebugSpam("internal_ShowTradeSkillWindow")
 	local frame = self.tradeSkillFrame
-    if not frame then
-        frame = self:CreateTradeSkillWindow()
-        self.tradeSkillFrame = frame
-    end
-
-    self:ResetTradeSkillWindow()
-
+	if not frame then
+		frame = self:CreateTradeSkillWindow()
+		self.tradeSkillFrame = frame
+	end
+	
+	self:ResetTradeSkillWindow()
+	
 	Skillet:ShowFullView()
-
-    if not frame:IsVisible() then
+	
+	if not frame:IsVisible() then
 		frame:Show()
 		self:UpdateTradeSkillWindow()
-    else
-    	self:UpdateTradeSkillWindow()
-    end
-DebugSpam("internal_ShowTradeSkillWindow complete")
+	else
+		self:UpdateTradeSkillWindow()
+	end
+	DebugSpam("internal_ShowTradeSkillWindow complete")
 end
 
 --
@@ -1422,23 +1423,37 @@ function ProfessionPopup_SelectPlayerTrade(menuFrame,player,tradeID)
 	Skillet:SetTradeSkill(player,tradeID)
 end
 
---|c%x+|Htrade:%d+:%d+:%d+:[0-9a-fA-F]+:[<-{]+|h%[[%a%s]+%]|h|r]]
---	[3273] = "|cffffd000|Htrade:3274:148:150:23F381A:zD<<t=|h[First Aid]|h|r",
-
--- Patch 5.3
--- addded Player Id and Recipe list (bitset)
--- |cffffd000|Htrade:5000000027407E5:110406:600:600:8LPPYdAB|h[First Aid]|h|r
-
-function ProfessionPopup_SelectTradeLink(menuFrame,player,link)
---	link = "|cffffd000|Htrade:3274:400:450:23F381A:{{{{{{|h[First Aid]|h|r"
+--[[ link sample
+	|c%x+|Htrade:%d+:%d+:%d+:[0-9a-fA-F]+:[<-{]+|h%[ - [%a%s]+%]|h|r] - ]      -- >
+	[3273] = "|cffffd000|Htrade:3274:148:150:23F381A:zD<<t=|h[First Aid]|h|r", -- >
+	
+	Patch 5.4
+		link |cffffd000|Htrade:010000000000D4C3:2550:333|h[Cooking]|h|r
+	Patch 5.3
+		addded Player Id and Recipe list (bitset)
+		|cffffd000|Htrade:5000000027407E5:110406:600:600:8LPPYdAB|h[First Aid]|h|r
+	Patch < 5.3
+	link |cffffd000|Htrade:3274:400:450:23F381A:{{{{{{|h[First Aid]|h|r
+]]
+function ProfessionPopup_SelectTradeLink(menuFrame,player,tradeSkill)
+	
+	if player ~= (UnitName("player")) then  -- patch 5.4 issue
+		DEFAULT_CHAT_FRAME:AddMessage("Patch 5.4 issue: can't show tradeskill for "..player)
+		return 
+	end
+	
 	ToggleDropDownMenu(1, nil, ProfessionPopupFrame, Skillet.professionPopupButton, Skillet.professionPopupButton:GetWidth(), 0)
 	local _,tradeString
-	if Skillet.wowVersion >= 50300 then
+	local link = tradeSkill.link
+	if Skillet.wowVersion >= 50400 then
+		_,_,tradeString = string.find(link, "(trade:[0-9a-fA-F]+:%d+:%d+)")
+	elseif Skillet.wowVersion >= 50300 then
 		_,_,tradeString = string.find(link, "(trade:[0-9a-fA-F]+:%d+:%d+:%d+:[A-Za-z0-9+/:]+)")
 	else
 		_,_,tradeString = string.find(link, "(trade:%d+:%d+:%d+:[0-9a-fA-F]+:[A-Za-z0-9+/]+)")
 	end	
-
+	
+	DebugSpam("ProfessionPopup_SelectTradeLink ".." player="..player.." link="..link.." "..string.gsub(link,"\124","\124\124").." tradeString="..tradeString)
 	SetItemRef(tradeString,link,"LeftButton")
 end
 
@@ -1496,7 +1511,7 @@ function ProfessionPopup_Init(menuFrame, level)
 			if not nonLinkingTrade[tradeID] or UIDROPDOWNMENU_MENU_VALUE == UnitName("player") then
 				if list then
 
-					local rank, maxRank = string.split(" ", list)
+					local rank, maxRank = list.rank, list.maxRank
 
 					skillButton.text = Skillet:GetTradeName(tradeID).." |cff00ff00["..(rank or "?").."/"..(maxRank or "?").."]|r"
 					skillButton.value = tradeID
@@ -1506,7 +1521,7 @@ function ProfessionPopup_Init(menuFrame, level)
 
 					if gatherModule == SkilletLink then
 						skillButton.arg1 = UIDROPDOWNMENU_MENU_VALUE
-						skillButton.arg2 = Skillet.db.realm.linkDB[UIDROPDOWNMENU_MENU_VALUE][tradeID]
+						skillButton.arg2 = Skillet.db.realm.tradeSkills[UIDROPDOWNMENU_MENU_VALUE][tradeID]
 						skillButton.func = ProfessionPopup_SelectTradeLink
 					else
 						skillButton.arg1 = UIDROPDOWNMENU_MENU_VALUE
