@@ -248,13 +248,18 @@ end
 -- thing depending on whether or not this is a craft.
 function Skillet:GetTradeSkillLine()
 	local tradeName = GetSpellInfo(self.currentTrade)
-	local ranks = self:GetSkillRanks(self.currentPlayer, self.currentTrade)	
+	local ranks = self:GetSkillRanks(self.currentPlayer, self.currentTrade)
 	
-	local rank, maxRank = string.split(" ",ranks)
-	
---DEFAULT_CHAT_FRAME:AddMessage("GetTradeSkillLine "..(tradeName or "nil").." "..(rank or "nil").." "..(maxRank or "nil"))	
+	local rank, maxRank
+	if ranks then
+		rank, maxRank = ranks.rank, ranks.maxRank
+	else
+		rank, maxRank = 0, 0
+	end
+		
+	DebugSpam("GetTradeSkillLine "..(tradeName or "nil").." "..(rank or "nil").." "..(maxRank or "nil"))	
 
-	return tradeName, tonumber(rank), tonumber(maxRank)
+	return tradeName, rank, maxRank
 end
 
 

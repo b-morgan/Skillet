@@ -699,15 +699,12 @@ end
 
 
 function SkilletLink:GetSkillRanks(player, trade)
-	if Skillet.db.realm.linkDB[player] and Skillet.db.realm.linkDB[player][trade] then
-		local _,tradeID, rank, maxRank
-		if Skillet.wowVersion >= 50300 then
-			_,_,tradeID, rank, maxRank = string.find(Skillet.db.realm.linkDB[player][trade], "trade:%x+:(%d+):(%d+):(%d+)")
-		else
-			_,_,tradeID, rank, maxRank = string.find(Skillet.db.realm.linkDB[player][trade], "trade:(%d+):(%d+):(%d+)")
-		end			
+	local skillRanks = {}
+	if Skillet.db.realm.tradeSkills[player] and Skillet.db.realm.tradeSkills[player][trade] then
+		skillRanks.rank = Skillet.db.realm.tradeSkills[player][trade].rank
+		skillRanks.maxRank = Skillet.db.realm.tradeSkills[player][trade].maxRank
 		
-		return rank .. " " .. maxRank
+		return skillRanks
 	end
 	
 	local linkedSkill, linkedPlayer = Skillet:IsTradeSkillLinked()
@@ -715,9 +712,11 @@ function SkilletLink:GetSkillRanks(player, trade)
 	if linkedSkill then
 		if linkedPlayer == player then
 			local skill, rank, max = GetTradeSkillLine()
-
+			
 			if GetSpellInfo(trade) == skill then
-				return rank.." "..max
+				skillRanks.rank = rank
+				skillRanks.maxRank = max
+				return skillRanks
 			end
 		end
 	end
@@ -777,11 +776,11 @@ end
 function SkilletLink:GetSkill(player,trade,index)
 	if player and trade and index then
 		local scanned = true
+		-- DebugSpam("getskillLink "..(player or "noplayer").." "..(trade or "notrade").." "..(index or "noindex"))
 
 		if not Skillet.data.skillList[player] or not Skillet.data.skillList[player][trade] then
 			scanned = self:RescanTrade()
 		end
---DEFAULT_CHAT_FRAME:AddMessage("getskillLink "..(player or "noplayer").." "..(trade or "notrade").." "..(index or "noindex"))
 
 		if scanned then
 			local skill = Skillet.data.skillList[player]
@@ -806,7 +805,7 @@ function SkilletLink:GetRecipe(id)
 
 	if (not Skillet.data.recipeList[id]) then
 		self:RescanTrade()
---DEFAULT_CHAT_FRAME:AddMessage("can't find recipe "..id);
+		-- DebugSpam("can't find recipe "..id);
 	end
 
 	return Skillet.data.recipeList[id] or Skillet.unknownRecipe
@@ -1164,35 +1163,34 @@ DebugSpam("Scanning Trade "..(profession or "nil")..":"..(tradeID or "nil").." "
 		end
 
 	end
-
-
---	Skillet:RecipeGroupConstructDBString(mainGroup)
-
-DebugSpam("Scan Complete")
-
---	CloseTradeSkill()
-
+	
+	
+	-- Skillet:RecipeGroupConstructDBString(mainGroup)
+	
+	DebugSpam("Scan Complete")
+	
+	-- CloseTradeSkill()
+	
 	Skillet:InventoryScan()
 	Skillet:CalculateCraftableCounts()
 	Skillet:SortAndFilterRecipes()
---DebugSpam("all sorted")
+	-- DebugSpam("all sorted")
 	self.scanInProgress = false
-
+	
 	collectgarbage("collect")
-
-
-
+	
+	
 	if numHeaders == 0 then
 		skillData.scanned = false
 		return false
 	end
-
+	
 	Skillet:UpdateScanningText()
-
+	
 	skillData.scanned = true
-
+	
 	return true
---	Skillet:SendMessage("Skillet_Scan_Complete", profession)
+	-- Skillet:SendMessage("Skillet_Scan_Complete", profession)
 end
 
 
@@ -1275,41 +1273,44 @@ end
 -- this routine collects the basic data (which tradeskills a player has)
 -- clean = true means wipe the old data
 function SkilletData:ScanPlayerTradeSkills(player, clean)
-	if player == (UnitName("player")) then			            -- only for active player
-
+	
+	if player == (UnitName("player")) then -- only for active player
+		
 		if clean or not Skillet.db.realm.skillRanks[player] then
 			Skillet.db.realm.skillRanks[player] = {}
 		end
-
+		
 		local skillRanksData = Skillet.db.realm.skillRanks[player]
-
+		
 		for i=1,#TradeSkillList,1 do
-
+			
 			local id = TradeSkillList[i]
 			local name = GetSpellInfo(id)			            -- always returns data
 			local _, rankName, icon = GetSpellInfo(name)		    -- only returns data if you have this spell in your spellbook
-
-
-DebugSpam("collecting tradeskill data for "..name.." "..(rank or "nil"))
-
+			
+			
+			DebugSpam("collecting tradeskill data for "..name.." "..(rank or "nil"))
+			
 			if rankName then
 				if not skillRanksData[id] then
-					skillRanksData[id] = ""
+					skillRanksData[id] = {}
+					skillRanksData[id].rank = 0
+					skillRanksData[id].maxRank = 0
 				end
 			else
 				skillRanksData[id] = nil
 			end
 		end
-
+		
 		if not Skillet.db.realm.faction then
 			Skillet.db.realm.faction = {}
 		end
-
+		
 		Skillet.db.realm.faction[player] = UnitFactionGroup("player")
-
+		
 	end
-
-
+	
+	
 	return Skillet.db.realm.skillRanks[player]
 end
 
@@ -1318,59 +1319,74 @@ end
 -- this routine collects the basic data (which tradeskills a player has)
 -- clean = true means wipe the old data
 function SkilletLink:ScanPlayerTradeSkills(player, clean)
-	if Skillet.db.realm.linkDB[player] then
+	if Skillet.db.realm.tradeSkills[player] then
 		return true
 	end
-
+	
 	local isLinked, playerLinked = Skillet:IsTradeSkillLinked()
-
+	
 	if isLinked and player == playerLinked then
 		return true
 	end
 end
 
--- [3273] = "|cffffd000|Htrade:3274:148:150:23F381A:zD<<t=|h[First Aid]|h|r",
+-- [3273] = "|cffffd000|Htrade:3274:148:150:23F381A:zD<<t=|h[First Aid]|h|r",  -- >>
 
 local allDataInitialized = false
 function Skillet:InitializeAllDataLinks(name)
 	if allDataInitialized then return end
-
+	
 	allDataInitialized = true
-
-	if not self.db.realm.linkDB then
-		self.db.realm.linkDB = {}
+	
+	if Skillet.wowVersion >= 50400 then -- patch 5.4 issue
+		self.db.realm.tradeSkills[name] = nil
+		return
 	end
-
-	self.db.realm.linkDB[name] = {}
-
+	
+	if not self.db.realm.tradeSkills then
+		self.db.realm.tradeSkills = {}
+	end
+	
+	self.db.realm.tradeSkills[name] = {}
+	
 	local link = GetTradeSkillListLink()
-
+	
 	if not link then allDataInitialized = false return end
-
-
+	
+	--[[
 	local _,uid
-	if Skillet.wowVersion >= 50300 then
+	if Skillet.wowVersion >= 50400 then
+		_,_,uid = string.find(link,"trade:([0-9a-fA-F]+):%d+")
+	elseif Skillet.wowVersion >= 50300 then
 		_,_,uid = string.find(link,"trade:([0-9a-fA-F]+):%d+:%d+:%d+")
 	else
 		_,_,uid = string.find(link,"trade:%d+:%d+:%d+:([0-9a-fA-F]+)")
 	end
+	]]
 	
 	local uid = UnitGUID("player"):gsub("0x0+","")
-
+	
 	for tradeID, bitmapLength in pairs(TradeSkillRecipeCounts) do
 		local spellName = GetSpellInfo(tradeID)
-
-		local encodingLength = floor((bitmapLength+5) / 6)
-
-		local encodedString = string.rep("/",encodingLength)
-
---DEFAULT_CHAT_FRAME:AddMessage("AllData Link "..tradeID.." "..(uid or "nil").." "..(spellName or "nil"))
+		local link
 		
-		if Skillet.wowVersion >= 50300 then
-			self.db.realm.linkDB[name][tradeID] = "|cffffd00|Htrade:"..(uid or "23F381A")..":"..tradeID..":600:600:"..encodedString.."|h["..spellName.."]|h|r"
+		local encodingLength = floor((bitmapLength+5) / 6)
+		local encodedString = string.rep("/",encodingLength)
+		
+		if Skillet.wowVersion >= 50400 then
+			link = "|cffffd000|Htrade:"..(uid or "23F381A")..":"..tradeID..":333|h["..spellName.."]|h|r"
+		elseif Skillet.wowVersion >= 50300 then
+			link = "|cffffd00|Htrade:"..(uid or "23F381A")..":"..tradeID..":600:600:"..encodedString.."|h["..spellName.."]|h|r"
 		else
-			self.db.realm.linkDB[name][tradeID] = "|cffffd00|Htrade:"..tradeID..":375:450:"..(uid or "23F381A")..":"..encodedString.."|h["..spellName.."]|h|r"
-		end		
+			link = "|cffffd00|Htrade:"..tradeID..":375:450:"..(uid or "23F381A")..":"..encodedString.."|h["..spellName.."]|h|r"
+		end
+		
+		DebugSpam("AllData Link "..tradeID.." "..(uid or "nil").." "..(spellName or "nil").." "..link)
+		
+		self.db.realm.tradeSkills[name][tradeID] = {}
+		self.db.realm.tradeSkills[name][tradeID].link = link
+		self.db.realm.tradeSkills[name][tradeID].rank = 600
+		self.db.realm.tradeSkills[name][tradeID].maxRank = 600
 	end
 
 	self:RegisterPlayerDataGathering(name,SkilletLink,"sk")
@@ -1399,13 +1415,13 @@ function Skillet:EnableDataGathering(addon)
 
 	self:RegisterRecipeDatabase("sk",SkilletData)
 
-	if self.db and self.db.realm and self.db.realm.linkDB then
-		for player in pairs(self.db.realm.linkDB) do
+	if self.db and self.db.realm and self.db.realm.tradeSkills then
+		for player in pairs(self.db.realm.tradeSkills) do
 			self:RegisterPlayerDataGathering(player,SkilletLink,"sk")
 		end
 	end
 
-	self:RegisterPlayerDataGathering((UnitName("player")),SkilletData, "sk")		-- make sure to add the current player as well
+	self:RegisterPlayerDataGathering((UnitName("player")),SkilletData, "sk") -- make sure to add the current player as well
 
 
 	SkilletARL:Enable()
@@ -1415,20 +1431,21 @@ end
 
 function Skillet:EnableQueue(addon)
 	assert(tostring(addon),"Usage: EnableDataGathering('addon')")
---	self.queueaddons[addon] = true
+	-- self.queueaddons[addon] = true
 	self:RegisterEvent("UNIT_SPELLCAST_SUCCEEDED",   "ContinueCastCheckUnit")
 	self:RegisterEvent("UNIT_SPELLCAST_FAILED",      "StopCastCheckUnit")
 	self:RegisterEvent("UNIT_SPELLCAST_INTERRUPTED", "StopCastCheckUnit")
 	self:RegisterEvent("UNIT_SPELLCAST_STOPPED",     "StopCastCheckUnit")
---	if not self.queue then
---		self.queue = {}
---	end
---	self.queueenabled = true
+	-- if not self.queue then
+	-- 	self.queue = {}
+	-- end
+	-- self.queueenabled = true
 end
 
 
 function Skillet:DisableQueue(addon)
---[[	if not addon then
+	
+	--[[ if not addon then
 		self.queue = nil
 		self.queueaddons = {}
 		self.queueenabled = false
@@ -1439,13 +1456,14 @@ function Skillet:DisableQueue(addon)
 	if next(self.queueaddons) then
 		return
 	end
-]]--
+	]]
+	
 	self:UnregisterEvent("UNIT_SPELLCAST_SUCCEEDED")
 	self:UnregisterEvent("UNIT_SPELLCAST_FAILED")
 	self:UnregisterEvent("UNIT_SPELLCAST_INTERRUPTED")
 	self:UnregisterEvent("UNIT_SPELLCAST_STOPPED")
---	self.queueenabled = false
---	self.queue = nil
+	-- self.queueenabled = false
+	-- self.queue = nil
 end
 
 
@@ -1454,36 +1472,37 @@ function Skillet:GetRecipeDataByTradeIndex(tradeID, index)
 	if not tradeID or not index then
 		return self.unknownRecipe
 	end
-
+	
 	local skill = self:GetSkill(self.currentPlayer, tradeID, index)
-
+	
 	if skill then
-
+		
 		local recipeID = skill.id
-
+		
 		if recipeID then
-	--		local recipeData = self.db.global.recipeData[recipeID] or selfUnknownRecipe
+			-- local recipeData = self.db.global.recipeData[recipeID] or selfUnknownRecipe
 			local recipeData = self:GetRecipe(recipeID)
-
+			
 			return recipeData, recipeData.spellID
 		end
 	end
-
+	
 	return self.unknownRecipe, 0
 end
 
 function Skillet:ContinueCastCheckUnit(event, unit, spell, rank)
---DEFAULT_CHAT_FRAME:AddMessage("ContinueCastCheckUnit "..(unit or "nil"))
+	
+	-- DebugSpam("ContinueCastCheckUnit "..(unit or "nil"))
 	if unit == "player" and spell==self.processingSpell then
 		self:ContinueCast(spell)
---		AceEvent:ScheduleEvent("Skillet_StopCast", self.StopCast, 0.1,self,event,spell)
+		-- AceEvent:ScheduleEvent("Skillet_StopCast", self.StopCast, 0.1,self,event,spell)
 	end
 end
 
 function Skillet:StopCastCheckUnit(event, unit, spell, rank)
 	if unit == "player" then
 		self:StopCast(spell)
---		AceEvent:ScheduleEvent("Skillet_StopCast", self.StopCast, 0.1,self,event,spell)
+		-- AceEvent:ScheduleEvent("Skillet_StopCast", self.StopCast, 0.1,self,event,spell)
 	end
 end
 
@@ -1494,14 +1513,14 @@ local rescan_time = 1
 -- scan trade, if it fails, rescan after 1 sek, if it fails, rescan after 5 sek and give up
 function Skillet:Skillet_AutoRescan()
 	Skillet.scheduleRescan = false
-
-local start = GetTime()
---DEFAULT_CHAT_FRAME:AddMessage("AUTO RESCAN")
+	
+	local start = GetTime()
+	DebugSpam("AUTO RESCAN START")
 	if InCombatLockdown() or not SkilletFrame:IsVisible() then
 		self.auto_rescan_timer = nil
 		return
 	end
-
+	
 	local scanResult = self:RescanTrade()
 	if not scanResult or Skillet.scheduleRescan then
 		if rescan_time > 5 then
@@ -1509,7 +1528,7 @@ local start = GetTime()
 			self.auto_rescan_timer = nil
 			return
 		end
-
+		
 		self.auto_rescan_timer = self:ScheduleTimer("Skillet_AutoRescan", rescan_time)
 		rescan_time = rescan_time + 4
 	else
@@ -1517,27 +1536,26 @@ local start = GetTime()
 		self.auto_rescan_timer = nil
 		self:UpdateTradeSkillWindow()
 	end
---DEFAULT_CHAT_FRAME:AddMessage("AUTO RESCAN COMPLETE!?")
-DebugSpam("AUTO RESCAN COMPLETE")
-
-local elapsed = GetTime() - start
-
---DEFAULT_CHAT_FRAME:AddMessage("Skillet Auto-Rescan: "..(math.floor(elapsed*100+.5)/100).." seconds")
+	
+	local elapsed = GetTime() - start
+	
+	DebugSpam("AUTO RESCAN COMPLETE")
+	DebugSpam("Skillet Auto-Rescan: "..(math.floor(elapsed*100+.5)/100).." seconds")
 end
 
 
 function Skillet:TRADE_SKILL_UPDATE()
---DEFAULT_CHAT_FRAME:AddMessage("TRADE_SKILL_UPDATE "..(event or "nil").." "..(arg1 or "nil"))
+	DebugSpam("TRADE_SKILL_UPDATE "..(event or "nil").." "..(arg1 or "nil"))
 	if not Skillet.scanInProgress and not self.auto_rescan_timer then
 		self.auto_rescan_timer = self:ScheduleTimer("Skillet_AutoRescan", 0.5)
 	else
---		Skillet.scheduleRescan = true
+		-- Skillet.scheduleRescan = true
 	end
 end
 
 
 function Skillet:CHAT_MSG_SKILL()
---DEFAULT_CHAT_FRAME:AddMessage("CHAT_MSG_SKILL "..(event or "nil"))
+	-- DebugSpam("CHAT_MSG_SKILL "..(event or "nil"))
 	if not Skillet.scanInProgress and not self.auto_rescan_timer then
 		self.auto_rescan_timer = self:ScheduleTimer("Skillet_AutoRescan", 0.5)
 	else
@@ -1546,9 +1564,9 @@ function Skillet:CHAT_MSG_SKILL()
 end
 
 function Skillet:CHAT_MSG_SYSTEM(event,msg)
---DEFAULT_CHAT_FRAME:AddMessage("CHAT_MSG_SYSTEM "..(msg or "nil"))
+	-- DebugSpam("CHAT_MSG_SYSTEM "..(msg or "nil"))
 	local cutString = string.sub(ERR_LEARN_RECIPE_S,1,(string.find(ERR_LEARN_RECIPE_S,"%%s")-1))
---DebugSpam("CHAT_MSG_SYSTEM "..(arg1 or "nil").." vs "..cutString)
+	-- DebugSpam("CHAT_MSG_SYSTEM "..(arg1 or "nil").." vs "..cutString)
 	if msg and string.find(msg, cutString) then
 		if not Skillet.scanInProgress and not self.auto_rescan_timer then
 			self.auto_rescan_timer = self:ScheduleTimer("Skillet_AutoRescan", 0.5)
@@ -1561,24 +1579,22 @@ end
 
 
 function Skillet:CalculateCraftableCounts(playerOverride)
-DebugSpam("CalculateCraftableCounts")
+	DebugSpam("CalculateCraftableCounts Start")
 	local player = playerOverride or self.currentPlayer
---	local skillDB = self.db.realm.skillDB[player][self.currentTrade]
-DebugSpam((player or "nil").." "..(self.currentTrade or "nil"))
-
-DebugSpam("recalculating crafting counts")
+	-- local skillDB = self.db.realm.skillDB[player][self.currentTrade]
+	DebugSpam((player or "nil").." "..(self.currentTrade or "nil"))
+	DebugSpam("recalculating crafting counts")
 	self.visited = {}
-
-
+	
 	for i=1,self:GetNumSkills(player, self.currentTrade) do
 		local skill = self:GetSkill(player, self.currentTrade, i)
-
-		if skill then			-- skip headers
+		
+		if skill then -- skip headers
 			skill.numCraftable, skill.numCraftableVendor, skill.numCraftableBank, skill.numCraftableAlts = self:InventorySkillIterations(self.currentTrade, i, player)
 		end
 	end
-
-DebugSpam("CalculateCraftableCounts Complete")
+	
+	DebugSpam("CalculateCraftableCounts Complete")
 end
 
 
@@ -1586,7 +1602,7 @@ end
 
 
 function Skillet:RescanTrade(force)
-DebugSpam("RescanTrade")
+	DebugSpam("RescanTrade")
 	if not self.currentPlayer or not self.currentTrade then return end
 
 	local dataModule = self.dataGatheringModules[self.currentPlayer]
@@ -1625,25 +1641,22 @@ function SkilletLink:RescanTrade(force)
 	end
 
 	if force then
-DebugSpam("Forced Rescan")
---			self.db.realm.skillRanks[self.currentPlayer]={}
+		DebugSpam("Forced Rescan")
+		-- self.db.realm.skillRanks[self.currentPlayer]={}
 		Skillet.data.skillList[player]={}
---			self.db.realm.skillDB[self.currentPlayer]={}
---			self.db.realm.groupDB = {}
-
+		-- self.db.realm.skillDB[self.currentPlayer]={}
+		-- self.db.realm.groupDB = {}
 		Skillet:InitializeDatabase(player, true)
 	end
-
-
+	
 	Skillet:ScanQueuedReagents()
-
+	
 	Skillet.dataScanned = self:ScanTrade()
-
+	
 	DebugSpam("TRADESKILL HAS BEEN SCANNED")
-
-
+	
 	self:RecipeGroupGenerateAutoGroups()
-
+	
 	return Skillet.dataScanned
 end
 
@@ -1652,19 +1665,19 @@ end
 
 -- Triggers a rescan of the currently selected tradeskill
 function SkilletData:RescanTrade(force)
---	if not SkilletFrame:IsVisible() then
---DebugSpam("Skillet frame not open")
---		return
---	end
-
+	
+	-- if not SkilletFrame:IsVisible() then
+		-- DebugSpam("Skillet frame not open")
+		-- return
+	-- end
+	
 	if not Skillet.currentPlayer or not Skillet.currentTrade then return end
-
+	
 	local player, tradeID = Skillet.currentPlayer, Skillet.currentTrade
-
---	self:InitializeDatabase(self.currentPlayer, false)
-
-
-	if player == (UnitName("player")) then			-- only allow actual skill rescans of current player data
+	
+	-- self:InitializeDatabase(self.currentPlayer, false)
+	
+	if player == (UnitName("player")) then -- only allow actual skill rescans of current player data
 		if not Skillet.data.skillList[player] then
 			Skillet.data.skillList[player] = {}
 		end
@@ -1683,26 +1696,25 @@ function SkilletData:RescanTrade(force)
 		end
 
 		if force then
-DebugSpam("Forced Rescan")
---			self.db.realm.skillRanks[self.currentPlayer]={}
+			DebugSpam("Forced Rescan")
+			-- self.db.realm.skillRanks[self.currentPlayer]={}
 			Skillet.data.skillList[player]={}
---			self.db.realm.skillDB[self.currentPlayer]={}
---			self.db.realm.groupDB = {}
-
-
+			-- self.db.realm.skillDB[self.currentPlayer]={}
+			-- self.db.realm.groupDB = {}
+			
 			Skillet:InitializeDatabase(player, true)
-
+			
 			local firstSkill
-
+			
 			for id,list in pairs(Skillet.db.realm.skillRanks[player]) do
 				if not firstSkill then
 					firstSkill = id
 				end
-
+				
 				Skillet.data.skillList[player][id] = {}
 				Skillet.db.realm.skillDB[player][id] = {}
 			end
-
+			
 			Skillet.data.skillIndexLookup[player] = {}
 
 			if not Skillet.db.realm.skillRanks[player] then
@@ -1732,22 +1744,24 @@ DebugSpam("Forced Rescan")
 end
 
 function SkilletData:ScanTrade()
-DebugSpam("ScanTrade")
+
+	DebugSpam("ScanTrade")
 	if self.scanInProgress == true then
-DebugSpam("SCAN BUSY!")
+		DebugSpam("SCAN BUSY!")
 		return
 	end
-
+	
 	self.scanInProgress = true
-
+	
 	local tradeID
-
+	
 	local API = {}
-
+	
+	local link = GetTradeSkillListLink()
 	local profession, rank, maxRank = GetTradeSkillLine()
-DebugSpam("GetTradeSkill: "..(profession or "nil"))
-
-
+	DebugSpam("GetTradeSkill: "..(profession or "nil").." link="..link.." "..string.gsub(link, "\124", "\124\124"))
+	
+	
 	API.GetNumSkills = GetNumTradeSkills
 	API.ExpandLine = ExpandTradeSkillSubClass
 	API.GetRecipeLink = GetTradeSkillRecipeLink
@@ -1757,27 +1771,27 @@ DebugSpam("GetTradeSkill: "..(profession or "nil"))
 	API.GetNumMade = GetTradeSkillNumMade
 	API.GetNumReagents = GetTradeSkillNumReagents
 	API.GetReagentInfo = GetTradeSkillReagentInfo
---	API.GetReagentLink = GetTradeSkillReagentItemLink
+	-- API.GetReagentLink = GetTradeSkillReagentItemLink
 	API.GetReagentLink = FixedGetTradeSkillReagentItemLink
-
+	
 	-- get the tradeID from the profession name (data collected earlier).
 	tradeID = TradeSkillIDsByName[profession] or 2656				-- "mining" doesn't exist as a spell, so instead use smelting (id 2656)
-
---[[
+	
+	--[[
 	if profession ~= GetSpellName(tradeID) then
 		DEFAULT_CHAT_FRAME:AddMessage("Skillet Error in Trade ID "..(profession or "nil").." ("..tradeID..")")
 		self.scanInProgress = false
 		return
 	end
-]]
-
+	]]
+	
 	if tradeID ~= Skillet.currentTrade then
-DebugSpam("TRADE MISMATCH for player "..(Skillet.currentPlayer or "nil").."!  "..(tradeID or "nil").." vs "..(Skillet.currentTrade or "nil"));
+		DebugSpam("TRADE MISMATCH for player "..(Skillet.currentPlayer or "nil").."!  "..(tradeID or "nil").." vs "..(Skillet.currentTrade or "nil"));
 	end
-
-
+	
+	
 	local player = Skillet.currentPlayer
-
+	
 	if not self.recacheRecipe then
 		self.recacheRecipe = {}
 	end
@@ -1796,7 +1810,9 @@ DebugSpam("TRADE MISMATCH for player "..(Skillet.currentPlayer or "nil").."!  ".
 
 
 	if not Skillet:IsTradeSkillLinked() then
-		Skillet.db.realm.skillRanks[player][tradeID] = rank.." "..maxRank
+		Skillet.db.realm.skillRanks[player][tradeID] = {}
+		Skillet.db.realm.skillRanks[player][tradeID].rank = rank
+		Skillet.db.realm.skillRanks[player][tradeID].maxRank = maxRank
 	end
 
 
@@ -1815,9 +1831,9 @@ DebugSpam("TRADE MISMATCH for player "..(Skillet.currentPlayer or "nil").."!  ".
 	end
 
 	numSkills = API.GetNumSkills()
-
-
-DebugSpam("Scanning Trade "..(profession or "nil")..":"..(tradeID or "nil").." "..numSkills.." recipes")
+	
+	
+	DebugSpam("Scanning Trade "..(profession or "nil")..":"..(tradeID or "nil").." "..numSkills.." recipes")
 
 	if not Skillet.data.skillIndexLookup[player] then
 		Skillet.data.skillIndexLookup[player] = {}
@@ -1847,11 +1863,17 @@ DebugSpam("Scanning Trade "..(profession or "nil")..":"..(tradeID or "nil").." "
 	local groupList = {}
 
 
-	if not Skillet.db.realm.linkDB[player] then
-		Skillet.db.realm.linkDB[player] = {}
+	if not Skillet.db.realm.tradeSkills[player] then
+		Skillet.db.realm.tradeSkills[player] = {}
+	end
+	if not Skillet.db.realm.tradeSkills[player][tradeID] then
+		Skillet.db.realm.tradeSkills[player][tradeID] = {}
 	end
 
-	Skillet.db.realm.linkDB[player][tradeID] = GetTradeSkillListLink()
+	local skillName, rank, maxRank = GetTradeSkillLine()
+	Skillet.db.realm.tradeSkills[player][tradeID].link = link
+	Skillet.db.realm.tradeSkills[player][tradeID].rank = rank
+	Skillet.db.realm.tradeSkills[player][tradeID].maxRank = maxRank
 
 	local numHeaders = 0
 	local parentGroup
@@ -2111,32 +2133,32 @@ DebugSpam("Scanning Trade "..(profession or "nil")..":"..(tradeID or "nil").." "
 	end
 
 
---	Skillet:RecipeGroupConstructDBString(mainGroup)
-
-DebugSpam("Scan Complete")
---DEFAULT_CHAT_FRAME:AddMessage("Scan Complete "..numHeaders)
-
---	CloseTradeSkill()
-
+	-- Skillet:RecipeGroupConstructDBString(mainGroup)
+	
+	DebugSpam("Scan Complete")
+	-- DebugSpam("Scan Complete "..numHeaders)
+	
+	-- CloseTradeSkill()
+	
 	Skillet:InventoryScan()
 	Skillet:CalculateCraftableCounts()
 	Skillet:SortAndFilterRecipes()
-DebugSpam("all sorted")
+	DebugSpam("all sorted")
 	self.scanInProgress = false
-
+	
 	collectgarbage("collect")
-
-
+	
+	
 	if numHeaders == 0 then
 		skillData.scanned = false
 		return false
 	end
-
-    Skillet:UpdateScanningText()
-
+	
+	Skillet:UpdateScanningText()
+	
 	skillData.scanned = true
 	return true
---	Skillet:SendMessage("Skillet_Scan_Complete", profession)
+	-- Skillet:SendMessage("Skillet_Scan_Complete", profession)
 end
 
 
@@ -2241,9 +2263,9 @@ function Skillet:GenerateAltKnowledgeBase()
 	local unknownRecipes = {}
 
 	for label in pairs(Skillet.dataGatheringModules) do
-		local rankString = Skillet:GetSkillRanks(label, tradeID)
+		local rankData = Skillet:GetSkillRanks(label, tradeID)
 
-		if label ~= "All Data" and rankString then
+		if label ~= "All Data" and rankData then
 
 			Skillet:InitGroupList(player, tradeID, label, true)
 
@@ -2257,11 +2279,9 @@ function Skillet:GenerateAltKnowledgeBase()
 					local knownCount = 0
 
 					mainGroup.initialized = true
-
-					local rank = string.split(" ", rankString)
-
-					rank = tonumber(rank)
-
+					
+					local rank = rankData.rank
+					
 					-- first, accumulate all skill data
 					for id, skill in pairs(Skillet.data.skillList[player][tradeID]) do
 						if type(id) == "number" and type(skill) == "table" then
