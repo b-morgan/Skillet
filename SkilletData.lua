@@ -28,19 +28,19 @@ local TradeSkillList = {
 	2018,           -- blacksmithing
 	7411,           -- enchanting
 	4036,           -- engineering
-	45357,			-- inscription
+	45357,		-- inscription
 	25229,          -- jewelcrafting
 	2108,           -- leatherworking
---	2575,			-- mining (or smelting?)
+ 	-- 2575,	-- mining (or smelting?)
 	2656,           -- smelting (from mining)
 	3908,           -- tailoring
 	2550,           -- cooking
 	3273,           -- first aid
---	2842,           -- poisons
-
-	53428,			-- runeforging
-
---	5149, 			-- beast training (not supported, but i need to know the number)... err... or maybe i don't
+	-- 2842,	-- poisons
+	
+	53428,		-- runeforging
+	
+	-- 5149,	-- beast training (not supported, but i need to know the number)... err... or maybe i don't
 }
 
 Skillet.TradeSkillAdditionalAbilities = {
@@ -158,10 +158,10 @@ local TradeSkillRecipeCounts = {
 	[3273] = 36,
 	[45357] = 450,
 	[4036] = 324,
-	[2656] = 0,		-- can't link
+	[2656] = 0,		-- can't link [Smelting]
 	[2018] = 522,
 	[2259] = 264,
-	[53428] = 0,	-- can't link
+	[53428] = 0,		-- can't link [Runeforging]
 }
 
 local TradeSkillIgnoredMats  = {
@@ -812,27 +812,27 @@ function SkilletLink:GetRecipe(id)
 end
 
 function SkilletLink:ScanTrade()
---DebugSpam("ScanTrade")
+	-- DebugSpam("ScanTrade")
 	if self.scanInProgress == true then
---DebugSpam("SCAN BUSY!")
+		-- DebugSpam("SCAN BUSY!")
 		return
 	end
-
+	
 	self.scanInProgress = true
-
+	
 	local tradeID
-
+	
 	local API = {}
-
+	
 	local profession, rank, maxRank = GetTradeSkillLine()
---DebugSpam("GetTradeSkill: "..(profession or "nil"))
-
-
+	-- DebugSpam("GetTradeSkill: "..(profession or "nil"))
+	
+	
 	-- get the tradeID from the profession name (data collected earlier).
 	tradeID = TradeSkillIDsByName[profession] or 2656				-- "mining" doesn't exist as a spell, so instead use smelting (id 2656)
-
+	
 	if tradeID ~= Skillet.currentTrade then
---DebugSpam("TRADE MISMATCH for player "..(Skillet.currentPlayer or "nil").."!  "..(tradeID or "nil").." vs "..(Skillet.currentTrade or "nil"));
+		-- DebugSpam("TRADE MISMATCH for player "..(Skillet.currentPlayer or "nil").."!  "..(tradeID or "nil").." vs "..(Skillet.currentTrade or "nil"));
 	end
 
 
@@ -1681,20 +1681,19 @@ function SkilletData:RescanTrade(force)
 		if not Skillet.data.skillList[player] then
 			Skillet.data.skillList[player] = {}
 		end
-
+		
 		if not Skillet.data.skillList[player][tradeID] then
 			Skillet.data.skillList[player][tradeID]={}
 		end
-
-
+		
 		if not Skillet.db.realm.skillDB[player] then
 			Skillet.db.realm.skillDB[player] = {}
 		end
-
+		
 		if not Skillet.db.realm.skillDB[player][tradeID] then
 			Skillet.db.realm.skillDB[player][tradeID] = {}
 		end
-
+		
 		if force then
 			DebugSpam("Forced Rescan")
 			-- self.db.realm.skillRanks[self.currentPlayer]={}
@@ -1716,35 +1715,35 @@ function SkilletData:RescanTrade(force)
 			end
 			
 			Skillet.data.skillIndexLookup[player] = {}
-
+			
 			if not Skillet.db.realm.skillRanks[player] then
 				Skillet.currentTrade = firstSkill
 			end
 		end
-
-
+		
+		
 		Skillet:ScanQueuedReagents()
-
+		
 		Skillet.dataScanned = self:ScanTrade()
-	else				-- it's an alt, just do the inventory and craftability update stuff
+	else	-- it's an alt, just do the inventory and craftability update stuff
 		Skillet:ScanQueuedReagents()
 		Skillet:InventoryScan()
 		Skillet:CalculateCraftableCounts()
-
+		
 		Skillet.dataScanned = true
 	end
-
-
+	
+	
 	self:RecipeGroupGenerateAutoGroups()
-
-
+	
+	
 	DebugSpam("TRADESKILL HAS BEEN SCANNED")
-
+	
 	return Skillet.dataScanned
 end
 
 function SkilletData:ScanTrade()
-
+	
 	DebugSpam("ScanTrade")
 	if self.scanInProgress == true then
 		DebugSpam("SCAN BUSY!")
@@ -1759,8 +1758,11 @@ function SkilletData:ScanTrade()
 	
 	local link = GetTradeSkillListLink()
 	local profession, rank, maxRank = GetTradeSkillLine()
-	DebugSpam("GetTradeSkill: "..(profession or "nil").." link="..link.." "..string.gsub(link, "\124", "\124\124"))
-	
+	if link then
+		DebugSpam("GetTradeSkill: "..(profession or "nil").." link="..link.." "..string.gsub(link, "\124", "\124\124"))
+	else
+		DebugSpam("GetTradeSkill: "..(profession or "nil").." non linkable")
+	end
 	
 	API.GetNumSkills = GetNumTradeSkills
 	API.ExpandLine = ExpandTradeSkillSubClass
@@ -1775,7 +1777,7 @@ function SkilletData:ScanTrade()
 	API.GetReagentLink = FixedGetTradeSkillReagentItemLink
 	
 	-- get the tradeID from the profession name (data collected earlier).
-	tradeID = TradeSkillIDsByName[profession] or 2656				-- "mining" doesn't exist as a spell, so instead use smelting (id 2656)
+	tradeID = TradeSkillIDsByName[profession] or 2656	-- "mining" doesn't exist as a spell, so instead use smelting (id 2656)
 	
 	--[[
 	if profession ~= GetSpellName(tradeID) then
@@ -1795,103 +1797,101 @@ function SkilletData:ScanTrade()
 	if not self.recacheRecipe then
 		self.recacheRecipe = {}
 	end
-
+	
 	if not self.alreadyScanned then
 		self.alreadyScanned = {}
 	end
-
+	
 	if not self.alreadyScanned[player] then
 		self.alreadyScanned[player] = {}
 	end
-
+	
 	if not self.alreadyScanned[player][tradeID] then
 		self.alreadyScanned[player][tradeID] = 0
 	end
-
-
+	
+	
 	if not Skillet:IsTradeSkillLinked() then
 		Skillet.db.realm.skillRanks[player][tradeID] = {}
 		Skillet.db.realm.skillRanks[player][tradeID].rank = rank
 		Skillet.db.realm.skillRanks[player][tradeID].maxRank = maxRank
 	end
-
-
+	
+	
 	self:ResetTradeSkillFilter()						-- verify the search filter is blank (so we get all skills)
-
+	
 	local numSkills = API.GetNumSkills()
-
+	
 	for i = 1, numSkills do
 		local _, skillType, _, isExpanded = GetTradeSkillInfo(i)
 		if skillType == "header" or skillType == "subheader" then
 			if not isExpanded then
 				ExpandTradeSkillSubClass(i)
 			end
-
 		end
 	end
-
+	
 	numSkills = API.GetNumSkills()
 	
 	
 	DebugSpam("Scanning Trade "..(profession or "nil")..":"..(tradeID or "nil").." "..numSkills.." recipes")
-
+	
 	if not Skillet.data.skillIndexLookup[player] then
 		Skillet.data.skillIndexLookup[player] = {}
 	end
-
+	
 	local skillDB = Skillet.db.realm.skillDB[player][tradeID]
 	local skillData = Skillet.data.skillList[player][tradeID]
 	local recipeDB = Skillet.data.recipeDB
-
+	
 	if not skillData then
 		self.scanInProgress = false
 		return false
 	end
-
+	
 	local lastHeader = nil
 	local gotNil = false
-
+	
 	local currentGroup = nil
-
+	
 	local mainGroup = Skillet:RecipeGroupNew(player,tradeID,"Blizzard")
-
+	
 	mainGroup.locked = true
 	mainGroup.autoGroup = true
-
+	
 	Skillet:RecipeGroupClearEntries(mainGroup)
-
+	
 	local groupList = {}
-
-
+	
+	
 	if not Skillet.db.realm.tradeSkills[player] then
 		Skillet.db.realm.tradeSkills[player] = {}
 	end
 	if not Skillet.db.realm.tradeSkills[player][tradeID] then
 		Skillet.db.realm.tradeSkills[player][tradeID] = {}
 	end
-
+	
 	local skillName, rank, maxRank = GetTradeSkillLine()
 	Skillet.db.realm.tradeSkills[player][tradeID].link = link
 	Skillet.db.realm.tradeSkills[player][tradeID].rank = rank
 	Skillet.db.realm.tradeSkills[player][tradeID].maxRank = maxRank
-
+	
 	local numHeaders = 0
 	local parentGroup
 	local alreadyScannedThisRun = 0
 	for i = 1, numSkills, 1 do
 		repeat
---DebugSpam("scanning index "..i)
+			-- DebugSpam("scanning index "..i)
 			local skillName, skillType, isExpanded, subSpell, extra
-
-
+			
 			local skillName, skillType, _, isExpanded = GetTradeSkillInfo(i)
-
-
---DebugSpam("**** skill: "..(skillName or "nil"))
-
+			
+			
+			-- DebugSpam("**** skill: "..(skillName or "nil"))
+			
 			gotNil = false
-
-
+			
+			
 			if skillName then
 				if skillType == "header" or skillType == "subheader" then
 					numHeaders = numHeaders + 1
@@ -1941,16 +1941,16 @@ function SkilletData:ScanTrade()
 					-- break recipes into lists by profession for ease of sorting
 					skillData[i] = {}
 
-	--					skillData[i].name = skillName
+					-- skillData[i].name = skillName
 					skillData[i].id = recipeID
 					skillData[i].difficulty = skillType
 					skillData[i].color = skill_style_type[skillType]
-	--				skillData[i].category = lastHeader
-
-
+					-- skillData[i].category = lastHeader
+					
+					
 					local skillDBString = DifficultyChar[skillType]..recipeID
-
-
+					
+					
 					local tools = { API.GetTools(i) }
 
 					skillData[i].tools = {}
