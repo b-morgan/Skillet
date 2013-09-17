@@ -35,35 +35,35 @@ local nonLinkingTrade = { [2656] = true, [53428] = true }				-- smelting, runefo
 
 local defaults = {
 	profile = {
-	    -- user configurable options
-	    vendor_buy_button = true,
-	    vendor_auto_buy   = false,
-	    show_item_notes_tooltip = false,
-	    show_crafters_tooltip = true,
-	    show_detailed_recipe_tooltip = true,        -- show any tooltips?
-	    display_full_tooltip = true,		         -- show full blizzards tooltip
+		-- user configurable options
+		vendor_buy_button = true,
+		vendor_auto_buy   = false,
+		show_item_notes_tooltip = false,
+		show_crafters_tooltip = true,
+		show_detailed_recipe_tooltip = true,        -- show any tooltips?
+		display_full_tooltip = true,		         -- show full blizzards tooltip
 		display_item_tooltip = true,                    -- show item tooltip or recipe tooltip
-	    link_craftable_reagents = true,
-	    queue_craftable_reagents = true,
-	    queue_glyph_reagents = false,
-	    display_required_level = false,
-	    display_shopping_list_at_bank = false,
-	    display_shopping_list_at_guildbank = false,
-	    display_shopping_list_at_auction = false,
-	    transparency = 1.0,
-	    scale = 1.0,
-	    plugins = {},
+		link_craftable_reagents = true,
+		queue_craftable_reagents = true,
+		queue_glyph_reagents = false,
+		display_required_level = false,
+		display_shopping_list_at_bank = false,
+		display_shopping_list_at_guildbank = false,
+		display_shopping_list_at_auction = false,
+		transparency = 1.0,
+		scale = 1.0,
+		plugins = {},
 		SavedQueues = {},
 	},
 	realm = {
-	    -- notes added to items crafted or used in crafting.
-	    notes = {},
+		-- notes added to items crafted or used in crafting.
+		notes = {},
 	},
 	char = {
-	    -- options specific to a current tradeskill
-	    tradeskill_options = {},
-	    -- Display alt's items in shopping list
-	    include_alts = true,
+		-- options specific to a current tradeskill
+		tradeskill_options = {},
+		-- Display alt's items in shopping list
+		include_alts = true,
 	},
 }
 
