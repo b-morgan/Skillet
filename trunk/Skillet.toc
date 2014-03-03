@@ -4,7 +4,7 @@
 ## Notes-esES: Una sustitucion de la ventana de Habilidades de Comercio
 ## Notes-ruRU: Заменяет окно профессий на более функциональное.
 ## Author: yossa, lilsparky
-## Version 2.45
+## Version 2.45h
 ## X-Category: Tradeskill
 ## X-eMail: yossa.addons@googlemail.com
 ## X-License GPL v3 or later
@@ -20,16 +20,18 @@
 ## OptionalDeps: Ace3, LibAbacus-3.0, LibDialog-1.0, LibWindow-1.1, LibPeriodicTable-3.1, Fizzwidget Reagent Cost, TradeSkillInfo
 ## X-Embeds: Ace3, LibStub, CallbackHandler-1.0, LibAbacus-3.0, LibDialog-1.0, LibWindow-1.1, LibPeriodicTable-3.1
 ## X-Revision: $Rev$
+## X-Curse-Packaged-Version: 2.45
+## X-Curse-Project-Name: Skillet
+## X-Curse-Project-ID: skillet
+## X-Curse-Repository-ID: wow/skillet/mainline
 
 ## LoadManagers: AddonLoader
 ## X-LoadOn-Always: delayed
-
 
 #### List of embedded libraries
 #@no-lib-strip@
 Libs\LibStub\LibStub.lua
 Libs\CallbackHandler-1.0\CallbackHandler-1.0.xml
-
 Libs\AceAddon-3.0\AceAddon-3.0.xml
 Libs\AceEvent-3.0\AceEvent-3.0.xml
 Libs\AceHook-3.0\AceHook-3.0.xml
@@ -40,7 +42,6 @@ Libs\AceConsole-3.0\AceConsole-3.0.xml
 Libs\AceGUI-3.0\AceGUI-3.0.xml
 Libs\AceConfig-3.0\AceConfig-3.0.xml
 Libs\AceTimer-3.0\AceTimer-3.0.xml
-
 Libs\LibAbacus-3.0\lib.xml
 Libs\LibDialog-1.0\lib.xml
 Libs\LibWindow-1.1\LibWindow-1.1.lua
@@ -49,7 +50,6 @@ Libs\LibPeriodicTable-3.1\LibPeriodicTable-3.1-Tradeskill\LibPeriodicTable-3.1-T
 Libs\LibPeriodicTable-3.1\LibPeriodicTable-3.1-TradeskillResultMats\LibPeriodicTable-3.1-TradeskillResultMats.lua
 Libs\LibPeriodicTable-3.1\LibPeriodicTable-3.1-TradeskillLevels\LibPeriodicTable-3.1-TradeskillLevels.lua
 #@end-no-lib-strip@
-
 
 #### Localization files
 Locale\Locale-ptBR.lua
@@ -63,7 +63,6 @@ Locale\Locale-zhTW.lua
 Locale\Locale-zhCN.lua
 Locale\Locale-esES.lua
 
-
 #### Main files
 Skillet.lua
 SkilletData.lua
@@ -75,12 +74,12 @@ SkillLevelData.lua
 RecipeGroups.lua
 Inventory.lua
 SkilletPlugin.lua
+DebugAids.lua
 
 #### Plugins
 Plugins\AckisRecipeList.lua
 Plugins\TradeSkillInfo.lua
 Plugins\BeanCounter.lua
-
 
 #### UI files
 UI\Utils.lua
@@ -94,4 +93,3 @@ UI\MerchantWindow.lua
 UI\MerchantWindow.xml
 UI\ShoppingList.lua
 UI\ShoppingList.xml
-

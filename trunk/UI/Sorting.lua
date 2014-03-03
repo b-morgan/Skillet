@@ -1,3 +1,5 @@
+local addonName,addonTable = ...
+local DA = _G[addonName] -- for DebugAids.lua
 --[[
 
 Skillet: A tradeskill window replacement.
@@ -42,8 +44,6 @@ local function sort_recipe_by_name(tradeskill, a, b)
 	end
 end
 
-
-
 local function sort_recipe_by_skill_level(tradeskill, a, b)
 	while a.subGroup and #a.subGroup.entries>0 do
 		a = a.subGroup.entries[1]
@@ -65,8 +65,8 @@ local function sort_recipe_by_skill_level(tradeskill, a, b)
 	end
 
 	if leftDifficulty == rightDifficulty then
---DEFAULT_CHAT_FRAME:AddMessage("a: "..(a.spellID or "nil"))
---DEFAULT_CHAT_FRAME:AddMessage("b: "..(b.spellID or "nil"))
+--		DA.CHAT("a: "..(a.spellID or "nil"))
+--		DA.CHAT("b: "..(b.spellID or "nil"))
 		local left = Skillet:GetTradeSkillLevels(a.spellID)
 		local right = Skillet:GetTradeSkillLevels(b.spellID)
 
@@ -83,7 +83,6 @@ local function sort_recipe_by_skill_level(tradeskill, a, b)
 		return leftDifficulty > rightDifficulty
 	end
 end
-
 
 local function sort_recipe_by_item_level(tradeskill, a, b)
 	while a.subGroup and #a.subGroup.entries>0 do
@@ -147,7 +146,6 @@ local function sort_recipe_by_item_quality(tradeskill, a, b)
 
 end
 
-
 local function sort_recipe_by_index(tradeskill, a, b)
 	if a.subGroup and not b.subGroup then
 		return true
@@ -157,7 +155,6 @@ local function sort_recipe_by_index(tradeskill, a, b)
 		return false
 	end
 
-
 	if (a.skillIndex or 0) == (b.skillIndex or 0) then
 		return (a.name or "A") < (b.name or "B")
 	else
@@ -165,12 +162,9 @@ local function sort_recipe_by_index(tradeskill, a, b)
 	end
 end
 
-
 local function NOSORT(tradeskill, a, b)
     return (a.skillIndex or 0) < (b.skillIndex or 0)
 end
-
-
 
 local function SkillIsFilteredOut(skillIndex)
 --	if skillIndex == Skillet.selectedSkill then
@@ -202,7 +196,6 @@ local function SkillIsFilteredOut(skillIndex)
 		end
 	end
 
-
 	if Skillet.recipeFilters then
 		for _,f in pairs(Skillet.recipeFilters) do
 			if f.filterMethod(f.namespace, skillIndex) then
@@ -233,7 +226,6 @@ local function SkillIsFilteredOut(skillIndex)
 			tooltip = CreateFrame("GameTooltip", "SkilletParsingTooltip", _G["ANCHOR_NONE"], "GameTooltipTemplate")
 			tooltip:SetOwner(WorldFrame, "ANCHOR_NONE");
 		end
-
 
 		local searchText = ""
 		if nameOnly then
@@ -271,7 +263,6 @@ local function SkillIsFilteredOut(skillIndex)
 	return false
 end
 
-
 local function set_sort_desc(toggle)
     for _,entry in pairs(sorters) do
         if entry.sorter == recipe_sort_method then
@@ -291,7 +282,6 @@ local function is_sort_desc()
     -- default to true
     return true
 end
-
 
 local function show_sort_toggle()
     SkilletSortDescButton:Hide()
@@ -342,13 +332,13 @@ end
 -- if no sorting, then headers will be included
 local function SortAndFilterRecipes()
 --	if not (Skillet.db.realm.skillDB[Skillet.currentPlayer] and Skillet.db.realm.skillDB[Skillet.currentPlayer][Skillet.currentTrade]) then
---DebugSpam("No Data")
+--DA.DEBUG(0,"No Data")
 --		return 0
 --	end
 
 	local skillListKey = Skillet.currentPlayer..":"..Skillet.currentTrade..":"..Skillet.currentGroupLabel
 
-	DebugSpam("Sorting...");
+	DA.DEBUG(0,"Sorting...");
 
 --	local skillDB = Skillet.db.realm.skillDB[Skillet.currentPlayer][Skillet.currentTrade]
 	local numSkills = Skillet:GetNumSkills(Skillet.currentPlayer, Skillet.currentTrade)
@@ -361,7 +351,6 @@ local function SortAndFilterRecipes()
 	if not Skillet.data.sortedSkillList[skillListKey] then
 		Skillet.data.sortedSkillList[skillListKey] = {}
 	end
-
 
 	local sortedSkillList = Skillet.data.sortedSkillList[skillListKey]
 
@@ -399,7 +388,6 @@ local function SortAndFilterRecipes()
 			end
 		end
 
-
  		if not is_sort_desc() then
         	table.sort(sortedSkillList, function(a,b)
            		return recipe_sort_method(Skillet.currentTrade, a, b)
@@ -411,7 +399,7 @@ local function SortAndFilterRecipes()
         end
 	else
 		local group = Skillet:RecipeGroupFind(Skillet.currentPlayer, Skillet.currentTrade, Skillet.currentGroupLabel, Skillet.currentGroup)
-DebugSpam("current grouping "..Skillet.currentGroupLabel.." "..(Skillet.currentGroup or "nil"))
+DA.DEBUG(0,"current grouping "..Skillet.currentGroupLabel.." "..(Skillet.currentGroup or "nil"))
 
 		if recipe_sort_method ~= NOSORT then
 			Skillet:RecipeGroupSort(group, recipe_sort_method, is_sort_desc())
@@ -425,13 +413,11 @@ DebugSpam("current grouping "..Skillet.currentGroupLabel.." "..(Skillet.currentG
 		end
 	end
 
-
-DebugSpam("sorted "..button_index.." skills")
+DA.DEBUG(0,"sorted "..button_index.." skills")
 	sortedSkillList.count = button_index
 
 	return button_index
 end
-
 
 --
 -- Adds the sorting routine to the list of sorting routines.
@@ -489,16 +475,12 @@ function Skillet:InitializeSorting()
 
 end
 
-
-
 --
 -- Causes the list of recipes to be resorted
 --
 function Skillet:internal_SortAndFilterRecipes()
 	return SortAndFilterRecipes()
 end
-
-
 
 --[[
 --
@@ -531,7 +513,6 @@ function Skillet:GetSortedRecipes()
     return sorted_recipes
 end
 ]]
-
 
 -- called when the sort drop down is first loaded
 function Skillet:SortDropdown_OnLoad()
