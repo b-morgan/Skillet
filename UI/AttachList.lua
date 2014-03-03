@@ -1,3 +1,5 @@
+local addonName,addonTable = ...
+local DA = _G[addonName] -- for DebugAids.lua
 --[[
 
 Skillet: A tradeskill window replacement.
@@ -19,12 +21,10 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
 ]]--
 
 --[[
-#
-# Deals with building and maintaining a the email attach list. It makes use of the shopping list to
+## Deals with building and maintaining a the email attach list. It makes use of the shopping list to
 #  keep track of the mail flow. This method works for the most part, but there are issues. Need to
 #  convert it to have it's own Queue tracking log, over changing the shopping list directly.
-#
-]]--
+#]]--
 
 SKILLET_ATTACH_LIST_HEIGHT = 18
 
@@ -47,14 +47,12 @@ Skillet.Const = {
 	ERROR_NOTFOUND = ERROR_NOTFOUND,
 	ERROR_NOTENOUGH = ERROR_NOTENOUGH,
 	ERROR_FAILRETRY = ERROR_FAILRETRY,
-}
-local attachRequests={}
+}local attachRequests={}
 local attachItemsMail={}
 Skillet.AttachRequests=attachRequests
 Skillet.AttachItemsMail  =attachItemsMail
 
 local num_buttons = 0
-
 
 -- ===========================================================================================
 --      ReagentQueue Data functions
@@ -72,10 +70,9 @@ function Skillet:GetAttachLists(player, includeBank)
 	for player,queue in pairs(self.db.realm.reagentsInQueue) do
 		if player~=CurPlayer then
 			table.insert(playerList, player)
-			DebugSpam(player)
+			DA.DEBUG(0,player)
 		end
 	end
-
 
 	for i=1,#playerList,1 do
 		local player = playerList[i]
@@ -94,7 +91,6 @@ function Skillet:GetAttachLists(player, includeBank)
 			end
 		end
 	end
-
 
 	return list
 end
@@ -150,7 +146,6 @@ local function findBagForItem(mItemId)
 
 	return matches, total, blankBag, blankSlot, foundLink, isLocked
 end
-
 
 --
 -- Used to search your bags for an Item.
@@ -244,11 +239,9 @@ local ControlBackdrop  = {
 	edgeFile = "Interface\\Tooltips\\UI-Tooltip-Border",
 	tile = true, tileSize = 16, edgeSize = 16,
 	insets = { left = 3, right = 3, top = 3, bottom = 3 }
-}
-
--- Additional things to used to modify the XML created frame
+}-- Additional things to used to modify the XML created frame
 function createAttachListFrame (self)
-	DebugSpam("createAttachListFrame")
+	DA.DEBUG(0,"createAttachListFrame")
 	local frame = Skillet_AttachListMain
 	if not frame then
 		return nil
@@ -302,7 +295,6 @@ function createAttachListFrame (self)
 	windowManger.RestorePosition(frame)  -- restores scale also
 	windowManger.MakeDraggable(frame)
 
-
 	-- lets play the resize me game!
 	Skillet:EnableResize(frame, 180,150, Skillet.UpdateAttachListWindow)
 
@@ -315,28 +307,25 @@ end
 --
 function Skillet:UpdateAttachListWindow(recache_recipes,reenable)
 
-	DebugSpam("UpdateAttachListWindow")
+	DA.DEBUG(0,"UpdateAttachListWindow")
 
 	if recache_recipes or not self.cachedAttachList then
-		DebugSpam("Generate Cache List")
+		DA.DEBUG(0,"Generate Cache List")
 		cache_list(self)
 	end
 
 	local numItems = #self.cachedAttachList
 
 	if SkilletAttachMailButton:IsVisible() then
-		DebugSpam("Update Button")
+		DA.DEBUG(0,"Update Button")
 		SkilletAttachMailButton:SetText(numItems)
 
 	end
 
-
 	if not self.attachList or not self.attachList:IsVisible() then
-	    DebugSpam("No attachList not visible so return")
+	    DA.DEBUG(0,"No attachList not visible so return")
 		return
 	end
-
-
 
 	local button_count = SkilletAttachListList:GetHeight() / SKILLET_ATTACH_LIST_HEIGHT
 	button_count = math.floor(button_count)
@@ -365,7 +354,6 @@ function Skillet:UpdateAttachListWindow(recache_recipes,reenable)
 		local attachButton = _G[button:GetName() .. "AttachButton"]
 		button:SetWidth(width)
 
-
 		local fixed_width = attachButton:GetWidth()
 		fixed_width = width - fixed_width - 20 -- 10 for the padding between items
 
@@ -373,7 +361,6 @@ function Skillet:UpdateAttachListWindow(recache_recipes,reenable)
 		playerText:SetWidth(fixed_width * 0.3-10)
 		pname:SetWidth(fixed_width * 0.7-10)
 		pnameText:SetWidth(fixed_width * 0.7-10)
-
 
 		if itemIndex <= numItems then
 			attachButton:SetID(itemIndex)
@@ -399,7 +386,6 @@ function Skillet:UpdateAttachListWindow(recache_recipes,reenable)
 		end
 	end
 
-
 	-- Hide any of the buttons that we created, but don't need right now
 	for i = button_count+1, num_buttons, 1 do
 	   local button = get_button(i)
@@ -413,7 +399,7 @@ end
 --
 
 function Skillet:internal_DisplayAttachList()
-	DebugSpam("internal_DisplayAttachList")
+	DA.DEBUG(0,"internal_DisplayAttachList")
 
 	if not self.attachList then
 		self.attachList = createAttachListFrame(self)
@@ -423,14 +409,14 @@ function Skillet:internal_DisplayAttachList()
 	cache_list(self)
 
 	if not frame:IsVisible() then
-		DebugSpam("wants to show Attach list")
+		DA.DEBUG(0,"wants to show Attach list")
     	frame:Show()
 	end
 
 	-- false == use cached recipes, we just loaded them after all
 	-- true == re-enable the disabled buttons
 	self:UpdateAttachListWindow(false,true)
-	DebugSpam("internal_DisplayAttachList complete")
+	DA.DEBUG(0,"internal_DisplayAttachList complete")
 end
 
 -- Hides the shopping list window
@@ -493,7 +479,6 @@ function Skillet:AttachItems (AttachID)
 	local itemid=self.cachedAttachList[AttachID]["id"]
 	local size=5
 
-
 	local _,link,_,_,_,_,_, maxSize = GetItemInfo(itemid)
 	local matches, total, blankBag, blankSlot = findBagForItem(itemid)
 
@@ -528,14 +513,9 @@ function Skillet:AttachItems (AttachID)
 	button:Disable()
 end
 
-
-
-
-
 -- ===========================================================================================
 --      ProcessQueue and Timer functions
 -- ===========================================================================================
-
 
 -- Start timer and timer delay
 Skillet.AttachTimer=-5
@@ -572,7 +552,7 @@ local function processQueue()
 				or err == ERROR_AHCLOSED       -- AH is not open
 				or err == ERROR_NOTFOUND       -- Item was not found in inventory
 				or err == ERROR_NOTENOUGH then -- Not enough of item available
-					DebugSpam("Aborting request: {{"..err.."}} "..#Skillet.AttachRequests)
+					DA.DEBUG(0,"Aborting request: {{"..err.."}} "..#Skillet.AttachRequests)
 					message(err)
 					table.remove(Skillet.AttachRequests, 1)
 					Skillet.AttachTimer=-0.5
@@ -586,7 +566,7 @@ local function processQueue()
 
 	-- There was success, so we can now move attach the item
 	if slot and slot>0 then
-		DebugSpam("Slot")
+		DA.DEBUG(0,"Slot")
 
 		-- Allow for lag, so that we can try to attach the item a bit later
 		local _,_, lag = GetNetStats()
@@ -594,7 +574,7 @@ local function processQueue()
 
 		if (request[3]) then
 		  if GetTime() > request[3] then
-		    DebugSpam("LAG")
+		    DA.DEBUG(0,"LAG")
 			return
 		  end
 		end
@@ -611,8 +591,6 @@ local function processQueue()
 	end
 	Skillet.AttachTimer=-1
 end
-
-
 
 -- A simple timer that runs on each OnUpdate
 function Skillet:AttachOnUpdate()
@@ -639,7 +617,6 @@ function Skillet:MAIL_SHOW()
 		self:DisplayAttachList()
 	end
 
-
 	return
 end
 --
@@ -647,10 +624,10 @@ end
 -- It's main function is to re-update the Queues with any items that might have been sent to an alt
 --
 function Skillet:MAIL_SEND_SUCCESS()
-	DebugSpam("Mail Success")
+	DA.DEBUG(0,"Mail Success")
 	--remove the items that where sent from the Reagents Queue
 	local AttachedItems=#Skillet.AttachItemsMail
-	DebugSpam(AttachedItems)
+	DA.DEBUG(0,AttachedItems)
 
 	-- Run through the items that were attached, and adjust the queue if needed
 	for i=1,AttachedItems,1 do
@@ -690,7 +667,7 @@ function Skillet:MAIL_SEND_INFO_UPDATE()
 	for player,queue in pairs(self.db.realm.reagentsInQueue) do
 		if player~=CurPlayer then
 			if  (mailPlayer:upper()==player:upper()) then
-				DebugSpam("Found Player in Q")
+				DA.DEBUG(0,"Found Player in Q")
 				found=true
 				playername=player
 				break
@@ -711,10 +688,10 @@ function Skillet:MAIL_SEND_INFO_UPDATE()
 		local id = Skillet:GetItemIDFromLink(link)
 		local entry={id,playername,Count}
 		table.insert(Skillet.AttachItemsMail, entry)
-		DebugSpam(i.." "..Name.." "..id.." "..playername)
+		DA.DEBUG(0,i.." "..Name.." "..id.." "..playername)
 
 		if self.db.realm.reagentsInQueue[playername][id] then
-			DebugSpam(self.db.realm.reagentsInQueue[playername][id])
+			DA.DEBUG(0,self.db.realm.reagentsInQueue[playername][id])
 		end
 		end
 	end
@@ -730,23 +707,18 @@ function Skillet:MAIL_CLOSED()
 		self.data.recipeList = {}
 	end
 
-	--DebugSpam("Rescaning Reagents"..self.currentPlayer)
+	--DA.DEBUG(0,"Rescaning Reagents"..self.currentPlayer)
 	Skillet:ScanQueuedReagents()
 
 	--Clear and hide all unused items
 	Skillet.AttachItemsMail={}
 	Skillet.AttachRequests={}
 	self:HideAttachList()
-	DebugSpam("close Mail")
+	DA.DEBUG(0,"close Mail")
 end
-
 
 self:RegisterEvent("MAIL_SHOW")
     self:RegisterEvent("MAIL_CLOSED")
 	self:RegisterEvent("MAIL_SEND_SUCCESS")
 	self:RegisterEvent("MAIL_SEND_INFO_UPDATE")
-
-
-
-
 
