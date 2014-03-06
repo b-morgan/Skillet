@@ -169,6 +169,30 @@
 	<DisabledCheckedTexture file="Interface\Buttons\UI-CheckBox-Check-Disabled"/>
 </CheckButton>
 
+<CheckButton name="SkilletShoppingListCheckButtonTemplate2" virtual="true">
+	<Size>
+		<AbsDimension x="20" y="20"/>
+	</Size>
+	<Layers>
+		<Layer level="ARTWORK">
+			<FontString name="$parentText" inherits="GameFontHighlightSmall">
+				<Anchors>
+					<Anchor point="LEFT" relativePoint="RIGHT">
+						<Offset>
+							<AbsDimension x="0" y="1"/>
+						</Offset>
+					</Anchor>
+				</Anchors>
+			</FontString>
+		</Layer>
+	</Layers>
+	<NormalTexture file="Interface\Buttons\UI-CheckBox-Up"/>
+	<PushedTexture file="Interface\Buttons\UI-CheckBox-Down"/>
+	<HighlightTexture file="Interface\Buttons\UI-CheckBox-Highlight" alphaMode="ADD"/>
+	<CheckedTexture file="Interface\Buttons\UI-CheckBox-Check"/>
+	<DisabledCheckedTexture file="Interface\Buttons\UI-CheckBox-Check-Disabled"/>
+</CheckButton>
+
 <!--
  #
  #  The shopping list window ....
@@ -213,7 +237,7 @@
 			<Anchors>
 				<Anchor point="BOTTOMLEFT" relativeTo="SkilletShoppingList" relativePoint="BOTTOMLEFT">
 					<Offset>
-						<AbsDimension x="5" y="30"/>
+						<AbsDimension x="5" y="50"/>
 					</Offset>
 				</Anchor>
 			</Anchors>
@@ -233,7 +257,7 @@
 			<Anchors>
 				<Anchor point="BOTTOMRIGHT" relativeTo="SkilletShoppingList" relativePoint="BOTTOMRIGHT">
 					<Offset>
-						<AbsDimension x="-10" y="10"/>
+						<AbsDimension x="-10" y="30"/>
 					</Offset>
 				</Anchor>
 			</Anchors>
@@ -245,11 +269,27 @@
 			</Scripts>
 		</CheckButton>
 
-		<CheckButton name="SkilletShowQueuesInItemOrder" inherits="SkilletShoppingListCheckButtonTemplate">
+		<CheckButton name="SkilletShowQueuesIncludeGuild" inherits="SkilletShoppingListCheckButtonTemplate">
 			<Anchors>
-				<Anchor point="BOTTOMRIGHT" relativeTo="SkilletShowQueuesFromAllAlts" relativePoint="BOTTOMLEFT">
+				<Anchor point="BOTTOMRIGHT" relativeTo="SkilletShoppingList" relativePoint="BOTTOMRIGHT">
 					<Offset>
-						<AbsDimension x="-70" y="0"/>
+						<AbsDimension x="-10" y="10"/>
+					</Offset>
+				</Anchor>
+			</Anchors>
+			<Scripts>
+				<OnClick>
+					Skillet:ShoppingListToggleIncludeGuild()
+					Skillet:UpdateShoppingListWindow(false)
+				</OnClick>
+			</Scripts>
+		</CheckButton>
+
+		<CheckButton name="SkilletShowQueuesInItemOrder" inherits="SkilletShoppingListCheckButtonTemplate2">
+			<Anchors>
+				<Anchor point="BOTTOMLEFT" relativeTo="SkilletShoppingList" relativePoint="BOTTOMLEFT">
+					<Offset>
+						<AbsDimension x="10" y="30"/>
 					</Offset>
 				</Anchor>
 			</Anchors>
@@ -261,33 +301,17 @@
 			</Scripts>
 		</CheckButton>
 
-		<CheckButton name="SkilletShowQueuesMergeItems" inherits="SkilletShoppingListCheckButtonTemplate">
+		<CheckButton name="SkilletShowQueuesMergeItems" inherits="SkilletShoppingListCheckButtonTemplate2">
 			<Anchors>
-				<Anchor point="BOTTOMRIGHT" relativeTo="SkilletShowQueuesInItemOrder" relativePoint="BOTTOMLEFT">
+				<Anchor point="BOTTOMLEFT" relativeTo="SkilletShoppingList" relativePoint="BOTTOMLEFT">
 					<Offset>
-						<AbsDimension x="-80" y="0"/>
+						<AbsDimension x="10" y="10"/>
 					</Offset>
 				</Anchor>
 			</Anchors>
 			<Scripts>
 				<OnClick>
 					Skillet:ShoppingListToggleMergeItems()
-					Skillet:UpdateShoppingListWindow(false)
-				</OnClick>
-			</Scripts>
-		</CheckButton>
-
-		<CheckButton name="SkilletShowQueuesIncludeGuild" inherits="SkilletShoppingListCheckButtonTemplate">
-			<Anchors>
-				<Anchor point="BOTTOMRIGHT" relativeTo="SkilletShowQueuesMergeItems" relativePoint="BOTTOMLEFT">
-					<Offset>
-						<AbsDimension x="-80" y="0"/>
-					</Offset>
-				</Anchor>
-			</Anchors>
-			<Scripts>
-				<OnClick>
-					Skillet:ShoppingListToggleIncludeGuild()
 					Skillet:UpdateShoppingListWindow(false)
 				</OnClick>
 			</Scripts>
@@ -307,7 +331,7 @@
 				</Anchor>
 				<Anchor point="BOTTOMRIGHT" relativeTo="SkilletShoppingList" relativePoint="BOTTOMRIGHT">
 					<Offset>
-						<AbsDimension x="-5" y="50"/>
+						<AbsDimension x="-5" y="70"/>
 					</Offset>
 				</Anchor>
 			</Anchors>

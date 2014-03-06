@@ -824,7 +824,7 @@ function Skillet:UpdateShoppingListWindow(use_cached_recipes)
 		local totalPriceReport = _G["SkilletShoppingListTotalPrice"]
 		if not totalPriceReport then
 			totalPriceReport = SkilletShoppingList:CreateFontString("SkilletShoppingListTotalPrice",nil, "GameFontNormal")
-			totalPriceReport:SetPoint("BOTTOMLEFT", SkilletShoppingList, "BOTTOMLEFT", 50, 30)
+			totalPriceReport:SetPoint("BOTTOMLEFT", SkilletShoppingList, "BOTTOMLEFT", 50, 50)
 			totalPriceReport:SetText("shopping list cost: 00 00")
 			totalPriceReport:SetWidth(200)
 			totalPriceReport:SetHeight(20)
