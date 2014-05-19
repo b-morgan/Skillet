@@ -262,32 +262,18 @@ end
 -- adds a recipe usage for an itemID (recipeID uses itemID as a reagent)
 function Skillet:ItemDataAddUsedInRecipe(itemID,recipeID)
 	if not itemID or not recipeID then return end
-	if not self.data.itemRecipeUsedIn then
-		self.data.itemRecipeUsedIn = {}
+	if not self.db.global.itemRecipeUsedIn then
+		self.db.global.itemRecipeUsedIn = {}
 	end
-	if not self.data.itemRecipeUsedIn[itemID] then
-		self.data.itemRecipeUsedIn[itemID] = {}
+	if not self.db.global.itemRecipeUsedIn[itemID] then
+		self.db.global.itemRecipeUsedIn[itemID] = {}
 	end
-	self.data.itemRecipeUsedIn[itemID][recipeID] = true
+	self.db.global.itemRecipeUsedIn[itemID][recipeID] = true
 end
 
 -- goes thru the stored recipe list and collects reagent and item information as well as skill lookups
 function Skillet:CollectRecipeInformation()
---[[
-	for recipeID in pairs(self.db.global.recipeDB) do
-		local recipe = self:GetRecipe(recipeID)
-		if recipe.itemID ~= 0 then
-			self:ItemDataAddRecipeSource(recipe.itemID, recipeID)
-		end
-		local reagentData = recipe.reagentData
-		if reagentData then
-			for r=1,#reagentData do
-				self:ItemDataAddUsedInRecipe(reagentData[r].id, recipeID)
-			end
-		end
-	end
-]]
-	for recipeID, recipeString in pairs(self.data.recipeDB) do
+	for recipeID, recipeString in pairs(self.db.global.recipeDB) do
 		local tradeID, itemString, reagentString, toolString = string.split(" ",recipeString)
 		local itemID, numMade = 0, 1
 		local slot = nil
@@ -447,19 +433,6 @@ function SkilletLink:ResetTradeSkillFilter()
 	SetTradeSkillItemLevelFilter(0,0)
 end
 
-function Skillet:IsRecipe(id)
-	if not id then return end
-	return true
---[[
-	return recipeName
-	local m,i = string.split("/",id)
-	local recipeModule = self.recipeDataModules[m]
-	if recipeModule and tonumber(i) then
-		return true
-	end
-]]
-end
-
 function SkilletData:GetRecipeName(id)
 	if not id then return "unknown" end
 	local name = GetSpellInfo(id)
@@ -500,8 +473,8 @@ end
 function SkilletData:GetRecipe(id)
 	if not id or id == 0 then return self.unknownRecipe end
 	--DA.DEBUG(0,"skilletData "..(id or "nil"))
-	if (not Skillet.data.recipeList[id]) and Skillet.data.recipeDB[id] then
-		local recipeString = Skillet.data.recipeDB[id]
+	if (not Skillet.data.recipeList[id]) and Skillet.db.global.recipeDB[id] then
+		local recipeString = Skillet.db.global.recipeDB[id]
 		local tradeID, itemString, reagentString, toolString = string.split(" ",recipeString)
 		local itemID, numMade = 0, 1
 		local slot = nil
@@ -596,8 +569,8 @@ end
 
 function SkilletData:GetSkillRanks(player, trade)
 	if player and trade then
-		if Skillet.db.realm.skillRanks[player] then
-			return Skillet.db.realm.skillRanks[player][trade]
+		if Skillet.db.realm.tradeSkills[player] then
+			return Skillet.db.realm.tradeSkills[player][trade]
 		end
 	end
 end
@@ -975,10 +948,10 @@ end
 -- clean = true means wipe the old data
 function SkilletData:ScanPlayerTradeSkills(player, clean)
 	if player == (UnitName("player")) then -- only for active player
-		if clean or not Skillet.db.realm.skillRanks[player] then
-			Skillet.db.realm.skillRanks[player] = {}
+		if clean or not Skillet.db.realm.tradeSkills[player] then
+			Skillet.db.realm.tradeSkills[player] = {}
 		end
-		local skillRanksData = Skillet.db.realm.skillRanks[player]
+		local skillRanksData = Skillet.db.realm.tradeSkills[player]
 		for i=1,#TradeSkillList,1 do
 			local id = TradeSkillList[i]
 			local name = GetSpellInfo(id)			            -- always returns data
@@ -999,7 +972,7 @@ function SkilletData:ScanPlayerTradeSkills(player, clean)
 		end
 		Skillet.db.realm.faction[player] = UnitFactionGroup("player")
 	end
-	return Skillet.db.realm.skillRanks[player]
+	return Skillet.db.realm.tradeSkills[player]
 end
 
 -- this routine collects the basic data (which tradeskills a player has)
@@ -1256,7 +1229,7 @@ function SkilletLink:RescanTrade(force)
 	end
 	if force then
 		DA.DEBUG(0,"Forced Rescan")
-		-- self.db.realm.skillRanks[self.currentPlayer]={}
+		-- self.db.realm.tradeSkills[self.currentPlayer]={}
 		Skillet.data.skillList[player]={}
 		-- self.db.realm.skillDB[self.currentPlayer]={}
 		-- self.db.realm.groupDB = {}
@@ -1292,13 +1265,13 @@ function SkilletData:RescanTrade(force)
 		end
 		if force then
 			DA.DEBUG(0,"Forced Rescan")
-			-- self.db.realm.skillRanks[self.currentPlayer]={}
+			-- self.db.realm.tradeSkills[self.currentPlayer]={}
 			Skillet.data.skillList[player]={}
 			-- self.db.realm.skillDB[self.currentPlayer]={}
 			-- self.db.realm.groupDB = {}
 			Skillet:InitializeDatabase(player, true)
 			local firstSkill
-			for id,list in pairs(Skillet.db.realm.skillRanks[player]) do
+			for id,list in pairs(Skillet.db.realm.tradeSkills[player]) do
 				if not firstSkill then
 					firstSkill = id
 				end
@@ -1306,7 +1279,7 @@ function SkilletData:RescanTrade(force)
 				Skillet.db.realm.skillDB[player][id] = {}
 			end
 			Skillet.data.skillIndexLookup[player] = {}
-			if not Skillet.db.realm.skillRanks[player] then
+			if not Skillet.db.realm.tradeSkills[player] then
 				Skillet.currentTrade = firstSkill
 			end
 		end
@@ -1376,9 +1349,9 @@ function SkilletData:ScanTrade()
 		self.alreadyScanned[player][tradeID] = 0
 	end
 	if not Skillet:IsTradeSkillLinked() then
-		Skillet.db.realm.skillRanks[player][tradeID] = {}
-		Skillet.db.realm.skillRanks[player][tradeID].rank = rank
-		Skillet.db.realm.skillRanks[player][tradeID].maxRank = maxRank
+		Skillet.db.realm.tradeSkills[player][tradeID] = {}
+		Skillet.db.realm.tradeSkills[player][tradeID].rank = rank
+		Skillet.db.realm.tradeSkills[player][tradeID].maxRank = maxRank
 	end
 		self:ResetTradeSkillFilter() -- verify the search filter is blank (so we get all skills)
 	local numSkills = API.GetNumSkills()
@@ -1397,7 +1370,7 @@ function SkilletData:ScanTrade()
 	end
 	local skillDB = Skillet.db.realm.skillDB[player][tradeID]
 	local skillData = Skillet.data.skillList[player][tradeID]
-	local recipeDB = Skillet.data.recipeDB
+	local recipeDB = Skillet.db.global.recipeDB
 	if not skillData then
 		self.scanInProgress = false
 		return false
@@ -1548,9 +1521,9 @@ function SkilletData:ScanTrade()
 								local itemID = LSW.scrollData[recipeID]
 								recipe.itemID = itemID
 								itemString = itemID
-								Skillet:ItemDataAddRecipeSource(itemID,recipeID)					-- add a cross reference for the source of particular items
+								Skillet:ItemDataAddRecipeSource(itemID,recipeID)	-- add a cross reference for the source of particular items
 							else
-								recipe.itemID = 0												-- indicates an enchant
+								recipe.itemID = 0									-- indicates an enchant
 							end
 						end
 						local reagentString = "-"
@@ -1573,7 +1546,7 @@ function SkilletData:ScanTrade()
 							else
 								reagentString = reagentID..":"..numNeeded
 							end
-							Skillet:ItemDataAddUsedInRecipe(reagentID, recipeID)				-- add a cross reference for where a particular item is used
+							Skillet:ItemDataAddUsedInRecipe(reagentID, recipeID)	-- add a cross reference for where a particular item is used
 						end
 						recipe.reagentData = reagentData
 						if gotNil then
@@ -1625,11 +1598,11 @@ function SkilletData:ScanTrade()
 end
 
 function SkilletData:EnchantingRecipeSlotAssign(recipeID, slot)
-	local recipeString = Skillet.data.recipeDB[recipeID]
+	local recipeString = Skillet.db.global.recipeDB[recipeID]
 	local tradeID, itemString, reagentString, toolString = string.split(" ",recipeString)
 	if itemString == "0" then
 		itemString = "0:"..slot
-		Skillet.data.recipeDB[recipeID] = tradeID.." 0:"..slot.." "..reagentString.." "..toolString
+		Skillet.db.global.recipeDB[recipeID] = tradeID.." 0:"..slot.." "..reagentString.." "..toolString
 		Skillet:GetRecipe(recipeID)
 --DA.DEBUG(0,(Skillet.data.recipeList[recipeID].name or "noName")
 		Skillet.data.recipeList[recipeID].slot = slot
@@ -1766,12 +1739,10 @@ function Skillet:GenerateAltKnowledgeBase()
 end
 
 function SkilletData:RecipeGroupGenerateAutoGroups()
---	Skillet:RecipeGroupDeconstructDBStrings()
 	Skillet:GenerateAltKnowledgeBase()
 end
 
 function SkilletLink:RecipeGroupGenerateAutoGroups()
---	Skillet:RecipeGroupDeconstructDBStrings()
 	Skillet:GenerateAltKnowledgeBase()
 end
 
@@ -2006,10 +1977,3 @@ function SkilletARL:Enable()
 		Skillet.defaultOptions["recipeSourceFilter-unknown"] = true
 	end
 end
--- common skills hooks
--- [id] = itemCreated[:count] itemReagents:count[:...] [level]
-local commonSkillsRecipes = {
-	[13361] = "10939 10938:3",			-- greater magic essence
-	[13362] = "10938:3 10939:1",			-- lesser magic essence
-}
-SkilletCommonSkills = {}

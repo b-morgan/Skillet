@@ -20,7 +20,7 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
 ]]--
 
-local MAJOR_VERSION = "2.50"
+local MAJOR_VERSION = "2.51"
 local MINOR_VERSION = ("$Revision$"):match("%d+") or 1
 local DATE = string.gsub("$Date$", "^.-(%d%d%d%d%-%d%d%-%d%d).-$", "%1")
 
@@ -643,8 +643,7 @@ end
 
 function Skillet:FlushAllData()
 	Skillet.data = {}
-	Skillet.data.recipeDB = {}
-	Skillet.db.realm.skillRanks = {}
+	Skillet.db.global.recipeDB = {}
 	Skillet.db.realm.skillDB = {}
 	Skillet.db.realm.tradeSkills = {}
 	Skillet.db.realm.groupDB = {}
@@ -677,9 +676,6 @@ function Skillet:InitializeDatabase(player, clean)
 	if not self.db.realm.skillDB then
 		self.db.realm.skillDB = {}
 	end
-	if not self.db.realm.skillRanks then
-		self.db.realm.skillRanks = {}
-	end
 	if not self.data then
 		self.data = {}
 	end
@@ -698,8 +694,8 @@ function Skillet:InitializeDatabase(player, clean)
 	if not self.data.groupList[player] then
 		self.data.groupList[player] = {}
 	end
-	if not self.data.recipeDB then
-		self.data.recipeDB = {}
+	if not self.db.global.recipeDB then
+		self.db.global.recipeDB = {}
 	end
 	if not self.db.realm.queueData then
 		self.db.realm.queueData = {}

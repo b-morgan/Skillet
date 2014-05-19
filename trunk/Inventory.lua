@@ -90,10 +90,11 @@ function Skillet:InventoryScan(playerOverride)
 	local inventoryData = {}
 	local numInBags, numInBank
 	local reagent
-	if not self.data then self.data = {} end
-	if self.data.itemRecipeUsedIn then
-		for reagentID in pairs(self.data.itemRecipeUsedIn) do
-			DA.TRACE("reagent "..GetItemInfo(reagentID).." "..(inventoryData[reagentID] or "nil"))
+	if self.db.global.itemRecipeUsedIn then
+		for reagentID in pairs(self.db.global.itemRecipeUsedIn) do
+			local a = GetItemInfo(reagentID)
+			local b = inventoryData[reagentID]
+			DA.TRACE("reagent "..tostring(a).." "..tostring(b))
 			if reagentID and not inventoryData[reagentID] then				-- have we calculated this one yet?
 				if self.currentPlayer == (UnitName("player")) then			-- if this is the current player, use the API
 					DA.TRACE("Using API")
