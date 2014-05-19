@@ -1079,7 +1079,7 @@ function Skillet:internal_UpdateTradeSkillWindow()
 						levelText:SetText(level)
 					end
 				end
-				text = (self:GetRecipeNamePrefix(self.currentTrade, skillIndex) or "") .. skill.name
+				text = (self:GetRecipeNamePrefix(self.currentTrade, skillIndex) or "") .. skill.name or ""
 				if #recipe.reagentData > 0 then
 					local num, numwvendor, numwbank, numwalts = get_craftable_counts(skill.skillData, recipe.numMade)
 					local cbag = "|cffffff80"
