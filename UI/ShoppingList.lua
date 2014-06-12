@@ -146,6 +146,29 @@ function Skillet:ShoppingListButton_OnEnter(button)
 	CursorUpdate(button)
 end
 
+function Skillet:ClearShoppingList(player)
+	DA.DEBUG(0,"ClearShoppingList(",player,")")
+	local playerList
+	if player then
+		playerList = { player }
+	else
+		playerList = {}
+		for player,queue in pairs(self.db.realm.reagentsInQueue) do
+			table.insert(playerList, player)
+		end
+	end
+	DA.DEBUG(0,"clear shopping list for: "..(player or "all players"))
+	for i=1,#playerList,1 do
+		local player = playerList[i]
+		DA.DEBUG(1,"player: "..player)
+		self.db.realm.reagentsInQueue[player] = {}
+		self.db.realm.queueData[player] = {}
+		self.db.realm.inventoryData[player] = {}
+	end
+	self:UpdateShoppingListWindow(false)
+	self:UpdateTradeSkillWindow()
+end
+
 function Skillet:GetShoppingList(player, includeBank, includeGuildbank)
 	DA.DEBUG(0,"GetShoppingList(",player,includeBank,includeGuildbank,")")
 	self:InventoryScan()
@@ -184,7 +207,7 @@ function Skillet:GetShoppingList(player, includeBank, includeGuildbank)
 		if reagentsInQueue then
 			for id,count in pairs(reagentsInQueue) do
 			DA.DEBUG(2,"reagent: "..id.." x "..count)
-				local defecit = count -- defecit is usually negative
+				local deficit = count -- deficit is usually negative
 				local numInBags, numInBank, numInBagsCurrent, numInBankCurrent, numGuildbank = 0,0,0,0,0
 				if not usedInventory[player][id] then
 					numInBags, _, numInBank = self:GetInventory(player, id)
@@ -203,9 +226,9 @@ function Skillet:GetShoppingList(player, includeBank, includeGuildbank)
 					end
 				end
 				if includeBank then
-					defecit = defecit + numInBank + numInBankCurrent
+					deficit = deficit + numInBank + numInBankCurrent
 				else
-					defecit = defecit + numInBags + numInBagsCurrent
+					deficit = deficit + numInBags + numInBagsCurrent
 				end
 				if curGuild and not cachedGuildbank[curGuild][id] then
 					cachedGuildbank[curGuild][id] = 0
@@ -218,19 +241,19 @@ function Skillet:GetShoppingList(player, includeBank, includeGuildbank)
 				-- only count guild bank items when not at the guild bank because
 				-- we might start using them.
 				if includeGuildbank and curGuild and not guildbankFrameOpen then
-					DA.DEBUG(2,"defecit=",defecit,"cachedGuildbank=",cachedGuildbank[curGuild][id],"usedGuild=",usedGuild[id])
-					local temp = -1 * math.min(defecit,0) -- calculate exactly how many are needed
-					defecit = defecit + cachedGuildbank[curGuild][id] - usedGuild[id]
+					DA.DEBUG(2,"deficit=",deficit,"cachedGuildbank=",cachedGuildbank[curGuild][id],"usedGuild=",usedGuild[id])
+					local temp = -1 * math.min(deficit,0) -- calculate exactly how many are needed
+					deficit = deficit + cachedGuildbank[curGuild][id] - usedGuild[id]
 					usedGuild[id] = usedGuild[id] + temp  -- keep track how many have been used
 					usedGuild[id] = math.min(usedGuild[id], cachedGuildbank[curGuild][id]) -- but don't use more than there is
 				end
-				if defecit < 0 then
+				if deficit < 0 then
 					if LSW and LSW.GetItemCost then
 						local value, source = LSW:GetItemCost(id)
-						local entry = { ["id"] = id, ["count"] = -defecit, ["player"] = player, ["value"] = (value or 0), ["source"] = source }
+						local entry = { ["id"] = id, ["count"] = -deficit, ["player"] = player, ["value"] = (value or 0), ["source"] = source }
 						table.insert(list, entry)
 					else
-						local entry = { ["id"] = id, ["count"] = -defecit, ["player"] = player, ["value"] = 0, ["source"] = "?" }
+						local entry = { ["id"] = id, ["count"] = -deficit, ["player"] = player, ["value"] = 0, ["source"] = "?" }
 						table.insert(list, entry)
 					end
 				end
@@ -807,6 +830,7 @@ function Skillet:UpdateShoppingListWindow(use_cached_recipes)
 			end
 			button.id  = self.cachedShoppingList[itemIndex].id
 			button.count = self.cachedShoppingList[itemIndex].count
+			button.player = self.cachedShoppingList[itemIndex].player
 			button:Show()
 			name:Show()
 			count:Show()

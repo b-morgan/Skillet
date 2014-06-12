@@ -4,7 +4,7 @@
 ## Notes-esES: Una sustitucion de la ventana de Habilidades de Comercio
 ## Notes-ruRU: Заменяет окно профессий на более функциональное.
 ## Author: yossa, lilsparky
-## Version 2.50
+## Version 2.52
 ## X-Category: Tradeskill
 ## X-eMail: yossa.addons@googlemail.com
 ## X-License GPL v3 or later
@@ -25,6 +25,10 @@
 ## X-Curse-Project-ID: skillet
 ## X-Curse-Repository-ID: wow/skillet/mainline
 ## X-Curse-Packaged-Version: r327
+## X-Curse-Project-Name: Skillet
+## X-Curse-Project-ID: skillet
+## X-Curse-Repository-ID: wow/skillet/mainline
+## X-Curse-Packaged-Version: 2.50
 ## X-Curse-Project-Name: Skillet
 ## X-Curse-Project-ID: skillet
 ## X-Curse-Repository-ID: wow/skillet/mainline

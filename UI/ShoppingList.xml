@@ -113,14 +113,17 @@
 		</Frame>
 	</Frames>
 	<Scripts>
+		<OnLoad>
+			self:RegisterForClicks("LeftButtonUp","RightButtonUp")
+		</OnLoad>
 		<OnClick>
 			<!-- shift clicking will insert a link to the recipe in the chat window. -->
 			if button == "LeftButton" and IsShiftKeyDown() then
 				local name,link = GetItemInfo(self.id)
-
 				ChatEdit_InsertLink(self.count .. "x" .. link)
 			end
 
+			<!-- alt clicking will insert the item name into the Auction House. -->
 			if button == "LeftButton" and IsAltKeyDown() then
 				if(CanSendAuctionQuery()) then
 					local name,link = GetItemInfo(self.id)
@@ -130,6 +133,15 @@
 				end
 			end
 
+			<!-- control clicking will remove this player's entries. -->
+			if button == "LeftButton" and IsControlKeyDown() then
+				Skillet:ClearShoppingList(self.player)
+			end
+
+			<!-- right clicking will remove this player's entries. -->
+			if button == "RightButton" then
+				Skillet:ClearShoppingList(self.player)
+			end
 		</OnClick>
 		<OnEnter>
 			Skillet:ShoppingListButton_OnEnter(self)

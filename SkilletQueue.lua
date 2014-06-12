@@ -26,6 +26,7 @@ Skillet.reagentsChanged = {}
 
 -- iterates through a list of reagentIDs and recalculates craftability
 function Skillet:AdjustInventory()
+	DA.DEBUG(0,"AdjustInventory")
 	-- update queue for faster response time
 	self:UpdateQueueWindow()
 	if self.reagentsChanged then
@@ -43,6 +44,7 @@ end
 -- this is the simplest command:  iterate recipeID x count
 -- this is the only currently implemented queue command
 function Skillet:QueueCommandIterate(recipeID, count)
+	DA.DEBUG(0,"QueueCommandIterate("..tostring(recipeID)..", "..tostring(count)..")")
 	local newCommand = {}
 	newCommand.op = "iterate"
 	newCommand.recipeID = recipeID
@@ -53,6 +55,7 @@ end
 -- command to craft "recipeID" until inventory has "count" "itemID"
 -- not currently implemented
 function Skillet:QueueCommandInventory(recipeID, itemID, count)
+	DA.DEBUG(0,"QueueCommandInventory")
 	local newCommand = {}
 	newCommand.op = "inventory"
 	newCommand.recipeID = recipeID
@@ -64,6 +67,7 @@ end
 -- command to craft "recipeID" until a certain crafting level has been reached
 -- not currently implemented
 function Skillet:QueueCommandSkillLevel(recipeID, level)
+	DA.DEBUG(0,"QueueCommandSkillLevel")
 	local newCommand = {}
 	newCommand.op = "skillLevel"
 	newCommand.recipeID = recipeID
@@ -73,7 +77,9 @@ end
 
 -- queue up the command and reserve reagents
 function Skillet:QueueAppendCommand(command, queueCraftables, noWindowRefresh)
+	DA.DEBUG(0,"QueueAppendCommand("..DA.DUMP1(command)..", "..tostring(queueCraftables)..", "..tostring(noWindowRefresh)..")")
 	local recipe = Skillet:GetRecipe(command.recipeID)
+	DA.DEBUG(1,"recipe= "..DA.DUMP1(recipe)..", visited= "..tostring(self.visited[command.recipeID]))
 	if recipe and not self.visited[command.recipeID] then
 		self.visited[command.recipeID] = true
 		local count = command.count
@@ -82,16 +88,24 @@ function Skillet:QueueAppendCommand(command, queueCraftables, noWindowRefresh)
 		local skillIndexLookup = self.data.skillIndexLookup[Skillet.currentPlayer]
 		for i=1,#recipe.reagentData,1 do
 			local reagent = recipe.reagentData[i]
+			DA.DEBUG(1,"reagent= "..DA.DUMP1(reagent))
 			local need = count * reagent.numNeeded
-			local _,_,numInBank = Skillet:GetInventory(Skillet.currentPlayer, reagent.id)
-			local have = numInBank + (reagentsInQueue[reagent.id] or 0);
+			local numInBags, bagsCraft, numInBank, bankCraft = Skillet:GetInventory(Skillet.currentPlayer, reagent.id)
+			DA.DEBUG(1,"numBags= "..numInBags..", craftBags= "..bagsCraft..", numBank= "..numInBank..", craftBank= "..bankCraft)
+			local have = numInBags + numInBank + (reagentsInQueue[reagent.id] or 0);
+			if queueCraftables and bagsCraft >= need then
+				have = numInBags + (reagentsInQueue[reagent.id] or 0)
+			end
 			reagentsInQueue[reagent.id] = (reagentsInQueue[reagent.id] or 0) - need;
 			reagentsChanged[reagent.id] = true
+			DA.DEBUG(1,"queueCraftables= "..tostring(queueCraftables)..", need= "..tostring(need)..", have= "..tostring(have))
 			if queueCraftables and need > have and (Skillet.db.profile.queue_glyph_reagents or not recipe.name:match(Skillet.L["Glyph "])) then
 				local recipeSource = self.db.global.itemRecipeSource[reagent.id]
+				DA.DEBUG(1,"recipeSource= "..DA.DUMP1(recipeSource))
 				if recipeSource then
 					for recipeSourceID in pairs(recipeSource) do
 						local skillIndex = skillIndexLookup[recipeSourceID]
+						DA.DEBUG("skillIndex= "..tostring(skillIndex))
 						if skillIndex then
 							command.complex = true						-- identify that this queue has craftable reagent requirements
 							local recipeSource = Skillet:GetRecipe(recipeSourceID)
@@ -118,6 +132,7 @@ end
 -- we can't just increase the # of the first command if it happens to be the same recipe without making sure
 -- the additional queue entry doesn't require some additional craftable reagents
 function Skillet:AddToQueue(command, noWindowRefresh)
+	DA.DEBUG(0,"AddToQueue("..DA.DUMP1(command)..", "..tostring(noWindowRefresh)..")")
 	local queue = self.db.realm.queueData[self.currentPlayer]
 	-- if self.linkedSkill then return end
 	if (not command.complex) then		-- we can add this queue entry to any of the other entries
@@ -150,6 +165,7 @@ function Skillet:AddToQueue(command, noWindowRefresh)
 end
 
 function Skillet:RemoveFromQueue(index)
+	DA.DEBUG(0,"RemoveFromQueue")
 	local queue = self.db.realm.queueData[self.currentPlayer]
 	local command = queue[index]
 	local reagentsInQueue = self.db.realm.reagentsInQueue[Skillet.currentPlayer]
@@ -172,37 +188,38 @@ function Skillet:RemoveFromQueue(index)
 end
 
 function Skillet:ClearQueue()
-DA.DEBUG(0,"ClearQueue")
+	DA.DEBUG(0,"ClearQueue")
 	if #self.db.realm.queueData[self.currentPlayer]>0 then
 		self.db.realm.queueData[self.currentPlayer] = {}
 		self.db.realm.reagentsInQueue[self.currentPlayer] = {}
 		self.dataScanned = false
 		self:UpdateTradeSkillWindow()
 	end
-DA.DEBUG(0,"ClearQueue Complete")
+	DA.DEBUG(0,"ClearQueue Complete")
 	self:SendMessage("Skillet_Queue_Complete")
 end
 
 function Skillet:ProcessQueue(altMode)
-DA.DEBUG(0,"PROCESS QUEUE");
+	DA.DEBUG(0,"ProcessQueue");
 	local queue = self.db.realm.queueData[self.currentPlayer]
 	local qpos = 1
 	local skillIndexLookup = self.data.skillIndexLookup[self.currentPlayer]
 	self.processingPosition = nil
 	self.processingCommand = nil
 	if self.currentPlayer ~= (UnitName("player")) then
-DA.DEBUG(0,"trying to process from an alt!")
+		DA.DEBUG(0,"trying to process from an alt!")
 		return
 	end
 	local command
 	repeat
 		command = queue[qpos]
+		DA.DEBUG(1,DA.DUMP1(command))
 		if command and command.op == "iterate" then
 			local recipe = self:GetRecipe(command.recipeID)
 			local craftable = true
 			for i=1,#recipe.reagentData,1 do
 				local reagent = recipe.reagentData[i]
-				local numInBags = self:GetInventory(self.currentPlayer, reagent.id)
+				local numInBags, bagsCraft, numInBank, bankCraft = self:GetInventory(self.currentPlayer, reagent.id)
 				if numInBags < reagent.numNeeded then
 					local reagentName = GetItemInfo(reagent.id) or reagent.id
 					Skillet:Print(L["Skipping"],recipe.name,"-",L["need"],reagent.numNeeded,"x",reagentName,"("..L["have"],numInBags..")")
@@ -254,6 +271,7 @@ end
 
 -- Adds the currently selected number of items to the queue
 function Skillet:QueueItems(count)
+	DA.DEBUG(0,"QueueItems");
 	local skill = self:GetSkill(self.currentPlayer, self.currentTrade, self.selectedSkill)
 	if not skill then return 0 end
 	local recipe = self:GetRecipe(skill.id)
@@ -285,6 +303,7 @@ end
 
 -- Queue the max number of craftable items for the currently selected skill
 function Skillet:QueueAllItems()
+	DA.DEBUG(0,"QueueAllItems");
 	local count = self:QueueItems()						-- no argument means queue em all
 	self:UpdateNumItemsSlider(0, false)
 	return count
@@ -292,6 +311,7 @@ end
 
 -- Adds the currently selected number of items to the queue and then starts the queue
 function Skillet:CreateItems(count, mouse)
+	DA.DEBUG(0,"CreateItems");
 	if self:QueueItems(count) > 0 then
 		self:ProcessQueue(mouse == "RightButton" or IsAltKeyDown())
 	end
@@ -299,6 +319,7 @@ end
 
 -- Queue and create the max number of craftable items for the currently selected skill
 function Skillet:CreateAllItems(mouse)
+	DA.DEBUG(0,"CreateAllItems");
 	if self:QueueAllItems() > 0 then
 		self:ProcessQueue(mouse == "RightButton" or IsAltKeyDown())
 	end
