@@ -450,6 +450,20 @@ Skillet.options =
 			end,
 			order = 52
 		},
+		shoppingclear = {
+			type = 'execute',
+			name = L["Shopping Clear"],
+			desc = L["SHOPPINGCLEARDESC"],
+			func = function()
+				if not (UnitAffectingCombat("player")) then
+					Skillet:ClearShoppingList()
+				else
+					DA.DEBUG(0,"|cff8888ffSkillet|r: Combat lockdown restriction." ..
+												  " Leave combat and try again.")
+				end
+			end,
+			order = 53
+		},
 
 		WarnShow = {
 			type = "toggle",
