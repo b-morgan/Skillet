@@ -17,7 +17,7 @@
 #### X-RelSite-UI.WoW:
 ## SavedVariables: SkilletDB
 ## SavedVariablesPerCharacter: SkilletDBPC
-## OptionalDeps: Ace3, LibAbacus-3.0, LibDialog-1.0, LibWindow-1.1, LibPeriodicTable-3.1, Fizzwidget Reagent Cost, TradeSkillInfo
+## OptionalDeps: Ace3, LibAbacus-3.0, LibDialog-1.0, LibWindow-1.1, LibPeriodicTable-3.1, Fizzwidget Reagent Cost, TradeSkillInfo, TradeSkillMaster
 ## X-Embeds: Ace3, LibStub, CallbackHandler-1.0, LibAbacus-3.0, LibDialog-1.0, LibWindow-1.1, LibPeriodicTable-3.1
 ## X-Revision: $Rev$
 ## X-Curse-Packaged-Version: 2.45
@@ -29,6 +29,10 @@
 ## X-Curse-Project-ID: skillet
 ## X-Curse-Repository-ID: wow/skillet/mainline
 ## X-Curse-Packaged-Version: 2.50
+## X-Curse-Project-Name: Skillet
+## X-Curse-Project-ID: skillet
+## X-Curse-Repository-ID: wow/skillet/mainline
+## X-Curse-Packaged-Version: r337
 ## X-Curse-Project-Name: Skillet
 ## X-Curse-Project-ID: skillet
 ## X-Curse-Repository-ID: wow/skillet/mainline
@@ -88,6 +92,7 @@ DebugAids.lua
 Plugins\AckisRecipeList.lua
 Plugins\TradeSkillInfo.lua
 Plugins\BeanCounter.lua
+Plugins\TradeSkillMaster.lua
 
 #### UI files
 UI\Utils.lua
