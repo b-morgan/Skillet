@@ -893,6 +893,9 @@ function Skillet:SkilletShow()
 	self.currentTrade = self.tradeSkillIDsByName[(GetTradeSkillLine())] or 2656      -- smelting caveat
 	self:InitializeDatabase(self.currentPlayer)
 	if self:IsSupportedTradeskill(self.currentTrade) then
+		if TradeSkillMaster then
+			Skillet.TSMPlugin.Hide()
+		end
 		self:InventoryScan()
 		self.tradeSkillOpen = true
 		DA.DEBUG(1,"SkilletShow: "..self.currentTrade)

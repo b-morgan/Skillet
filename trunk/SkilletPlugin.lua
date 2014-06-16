@@ -1,3 +1,5 @@
+local addonName,addonTable = ...
+local DA = _G[addonName] -- for DebugAids.lua
 --[[
 
 Skillet: A tradeskill window replacement.
@@ -18,16 +20,15 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
 ]]--
 
-
 Skillet.displayDetailPlugins = {}
 
 function Skillet:RegisterDisplayDetailPlugin(moduleName, priority)
+	DA.DEBUG(0,"RegisterDisplayDetailPlugin("..tostring(moduleName)..", "..tostring(priority))
 	if not priority then priority = 100 end
-	
-	if type(moduleName)	 == "string" then
+	if type(moduleName) == "string" then
 		local module = Skillet[moduleName]
 		if module and type(module) == "table" and module.GetExtraText then
-			Skillet.displayDetailPlugins[moduleName]=module
+			Skillet.displayDetailPlugins[moduleName] = module
 		end
 	end
 end
@@ -63,7 +64,9 @@ function Skillet:GetExtraText(skill, recipe)
 end
 
 function Skillet:InitializePlugins()
+	DA.DEBUG(0,"InitializePlugins()")
 	for k,v in pairs(Skillet.displayDetailPlugins) do
+		DA.DEBUG(1,"k= "..tostring(k)..", v= "..tostring(v))
 		if v and v.OnInitialize then
 			v.OnInitialize()
 		end
