@@ -471,15 +471,17 @@ end
 
 -- reconstruct a recipe from a recipeString and cache it into our system for this session
 function SkilletData:GetRecipe(id)
+	DA.DEBUG(2,"GetRecipe("..tostring(id)..")")
 	if not id or id == 0 then return self.unknownRecipe end
-	--DA.DEBUG(0,"skilletData "..(id or "nil"))
 	if (not Skillet.data.recipeList[id]) and Skillet.db.global.recipeDB[id] then
 		local recipeString = Skillet.db.global.recipeDB[id]
+		DA.DEBUG(2,"recipeString= "..tostring(recipeString))
 		local tradeID, itemString, reagentString, toolString = string.split(" ",recipeString)
 		local itemID, numMade = 0, 1
 		local slot = nil
 		if itemString ~= "0" then
 			local a, b = string.split(":",itemString)
+			DA.DEBUG(2,"itemString a= "..tostring(a)..", b= "..tostring(b))
 			if a ~= "0" then
 				itemID, numMade = a,b
 			else
@@ -662,7 +664,7 @@ function SkilletLink:ScanTrade()
 		end
 	end
 	numSkills = GetNumTradeSkills()
-DA.DEBUG(0,"Scanning Trade "..(profession or "nil")..":"..(tradeID or "nil").." "..numSkills.." recipes")
+	DA.DEBUG(0,"Scanning Trade "..(profession or "nil")..":"..(tradeID or "nil").." "..numSkills.." recipes")
 	if not Skillet.data.skillIndexLookup[player] then
 		Skillet.data.skillIndexLookup[player] = {}
 	end
@@ -686,10 +688,10 @@ DA.DEBUG(0,"Scanning Trade "..(profession or "nil")..":"..(tradeID or "nil").." 
 	local parentGroup=nil
 	for i = 1, numSkills, 1 do
 		repeat
---DA.DEBUG(0,"scanning index "..i)
+--			DA.DEBUG(0,"scanning index "..i)
 			local subSpell, extra
 			local skillName, skillType, _, isExpanded = GetTradeSkillInfo(i)
---DA.DEBUG(0,("**** skill: "..(skillName or "nil").." "..i)
+--			DA.DEBUG(0,("**** skill: "..(skillName or "nil").." "..i)
 			gotNil = false
 			if skillName then
 				if skillType == "header" or skillType == "subheader" then
@@ -838,7 +840,7 @@ DA.DEBUG(0,"Scanning Trade "..(profession or "nil")..":"..(tradeID or "nil").." 
 --							else
 --								reagentString = reagentID..":"..numNeeded
 --							end
-							Skillet:ItemDataAddUsedInRecipe(reagentID, recipeID)				-- add a cross reference for where a particular item is used
+							Skillet:ItemDataAddUsedInRecipe(reagentID, recipeID)		-- add a cross reference for where a particular item is used
 						end
 						recipe.reagentData = reagentData
 						if gotNil then
@@ -1105,10 +1107,10 @@ function Skillet:GetRecipeDataByTradeIndex(tradeID, index)
 		if recipeID then
 			-- local recipeData = self.db.global.recipeData[recipeID] or selfUnknownRecipe
 			local recipeData = self:GetRecipe(recipeID)
-			return recipeData, recipeData.spellID
+			return recipeData, recipeData.spellID, recipeData.ItemID
 		end
 	end
-	return self.unknownRecipe, 0
+	return self.unknownRecipe
 end
 
 function Skillet:ContinueCastCheckUnit(event, unit, spell, rank)

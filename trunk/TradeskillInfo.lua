@@ -38,7 +38,6 @@ function Skillet:GetItemIDFromLink(link)				-- works with items or enchants
 		local found, _, string = string.find(link, "^|c%x+|H(.+)|h%[.+%]")
 		if found then
 			local _, id = strsplit(":", string)
-		
 			return tonumber(id);
 		else
 			return nil
@@ -50,12 +49,10 @@ end
 function Skillet:GetItemInfo(id)
 	if id then
 		local name = GetItemInfo(id)
-		
 		if not name then
 			GameTooltip:SetHyperlink("item:"..id)
 			GameTooltip:SetHyperlink("enchant:"..id)
 		end
-		
 		return GetItemInfo(id)
 	end
 end
@@ -64,17 +61,13 @@ end
 function Skillet:GetTradeSkillInfo(skillIndex)
 	local tradeID = self.currentTrade
 	local skill = self:GetSkill(self.currentPlayer, tradeID, skillIndex)
-
 	if skill then
 		local id = skill.id
 		local skillName = self:GetRecipeName(id)
 		local difficulty = skill.difficulty
-		
 		if id and id ~= 0 then
 			local recipe = self:GetRecipe(id)
-			
 			local numAvailable = (skill.numCraftableBank or 0) / (recipe.numMade or 1)
-			
 			return skillName, difficulty, numAvailable, 0	
 		else
 			return skillName, "header", 0, 1
@@ -96,7 +89,6 @@ end
 --     hex: hexidecimal representation of the string, as well as "|c" in the beginning.
 function Skillet:GetQualityFromLink(link)
 	if (not link) then return end
-
 	local color = link:match("(|c%x+)|Hitem:%p?%d+:%p?%d+:%p?%d+:%p?%d+:%p?%d+:%p?%d+:%p?%d+:%p?%d+|h%[.-%]|h|r")
 	if (color) then
 		for i = 0, 6 do
@@ -107,7 +99,6 @@ function Skillet:GetQualityFromLink(link)
 			end
 		end
 	end
-
 	-- no match
 end
 
@@ -123,7 +114,6 @@ function Skillet:GetTradeSkillItemLink(index)
 	local recipe, recipeID = self:GetRecipeDataByTradeIndex(self.currentTrade, index)
 		if recipe then
 		local _, link = GetItemInfo(recipe.itemID)
-		
 		return link
 	end
 		return nil
@@ -140,9 +130,7 @@ function Skillet:GetTradeSkillCooldown(skillIndex)
 	local skill = self.GetSkill(self.currentPlayer, self.currentTrade, skillIndex)
 		if skill then
 		local coolDown = skill.cooldown
-		
 		local now = GetTime()
-		 
 		if coolDown then
 			return math.max(0,coolDown - now)
 		end
@@ -151,7 +139,6 @@ end
 
 function Skillet:GetTradeSkillNumReagents(skillIndex)
 	local recipe = self:GetRecipeDataByTradeIndex(self.currentTrade, skillIndex)
-
 	if recipe then
 		return #recipe.reagentData
 	end
@@ -159,17 +146,12 @@ end
 
 function Skillet:GetTradeSkillReagentInfo(skillIndex, reagentIndex)
 	local recipe = self:GetRecipeDataByTradeIndex(self.currentTrade, skillIndex)
-
 	if recipe then
-
 		local reagentID = recipe.reagentData[reagentIndex].id
-		
 		local reagentName = GetItemInfo(reagentID)
 		local reagentTexture = GetItemIcon(reagentID)
 		local reagentCount = recipe.reagentData[reagentIndex].numNeeded
 		local _,playerReagentCount = self:GetInventory(reagentID)
-		
-		
 		return reagentName, reagentTexture, reagentCount, playerReagentCount
 	end
 end
@@ -179,7 +161,6 @@ end
 function Skillet:GetTradeSkillReagentItemLink(skillIndex, index)
 	if skillIndex and index then
 		local recipe = self:GetRecipeDataByTradeIndex(self.currentTrade, skillIndex)
-
 		if recipe and recipe.reagentData[index] then
 			local _, link = GetItemInfo(recipe.reagentData[index].id)
 			return link;
@@ -192,14 +173,12 @@ end
 -- for the current tradeskill
 function Skillet:GetTradeSkillRecipeLink(skillIndex)
 	local recipe, id = self:GetRecipeDataByTradeIndex(self.currentTrade, skillIndex)
-
 	if recipe and id then
---DA.CHAT("get tradeskill recipe link: "..(id or "nil"))
+--	DA.DEBUG(0,"get tradeskill recipe link: "..(id or "nil"))
 		local link = GetSpellLink(id)		
-		
 		return link
 	end
-		return nil
+	return nil
 end
 
 function Skillet:GetTradeSkillTools(skillIndex)
@@ -207,12 +186,10 @@ function Skillet:GetTradeSkillTools(skillIndex)
 		if skill then
 		local recipe = self:GetRecipe(skill.id)
 		local toolList = {}
-		
 		for i=1,#recipe.tools do
 			toolList[i*2-1] = recipe.tools[i]
 			toolList[i*2  ] = skill.tools[i] or 1
 		end
-		
 		return unpack(toolList)
 	end
 end
@@ -231,15 +208,12 @@ function Skillet:GetTradeSkillLine()
 	else
 		rank, maxRank = 0, 0
 	end
-		
 	DA.DEBUG(0,"GetTradeSkillLine "..(tradeName or "nil").." "..(rank or "nil").." "..(maxRank or "nil"))	
-
 	return tradeName, rank, maxRank
 end
 
 -- Returns the number of trade or craft skills
 function Skillet:GetNumTradeSkills()
-
 	return self:GetNumSkills(self.currentPlayer, self.currentTrade)
 end
 
@@ -247,7 +221,6 @@ function Skillet:GetTradeSkillCooldown(index)
 	local skill = self:GetSkill(self.currentPlayer, self.currentTrade, index)
 		if skill and skill.cooldown then
 		local cooldown = skill.cooldown - GetTime()
-		
 		if cooldown > 0 then
 			return cooldown
 		end
@@ -257,37 +230,33 @@ end
 function Skillet:GetTradeSkillIcon(skillIndex)
 	local recipe = self:GetRecipeDataByTradeIndex(self.currentTrade, skillIndex)
 	local texture
-		if recipe then
+	if recipe then
 		if recipe.numMade > 0 then
 			texture = GetItemIcon(recipe.itemID)						-- get the item texture
 		else
 			texture = "Interface\\Icons\\Spell_Holy_GreaterHeal"		-- standard enchant icon
 		end
 	end
-		return texture or "Interface\\Icons\\INV_Misc_QuestionMark"
+	return texture or "Interface\\Icons\\INV_Misc_QuestionMark"
 end
 
 function Skillet:GetTradeSkillNumMade(skillIndex)
 	local recipe = self:GetRecipeDataByTradeIndex(self.currentTrade, skillIndex)
-		if recipe then
+	if recipe then
 		return recipe.numMade, recipe.numMade
 	end
-		return 1,1
+	return 1,1
 end
 
 function Skillet:internal_GetCraftersForItem(itemId)
 	return nil
 end
-
 --[[
-function Skillet:internal_GetCraftersForItem(itemId)
 	local crafters = nil
-
 	local chars = self:internal_GetCharacters()
 	for i=1, #chars, 1 do
 		local profs = self:internal_GetCharacterProfessions(chars[i].name)
 		local found = false
-
 		for j=1,#profs,1 do
 			local skills = self:internal_GetCharacterTradeskills(chars[i].name, profs[j].name)
 			for k=1,#skills,1 do
@@ -300,9 +269,7 @@ function Skillet:internal_GetCraftersForItem(itemId)
 			end
 			if found then break end
 		end
-
 	end
-
 	return crafters
 end
 ]]
@@ -321,7 +288,6 @@ local function build_reagents(self, s, reagent)
 		needed = reagent.needed,
 		texture = reagent.texture,
 	}
-
 	return r
 end
 
@@ -335,45 +301,37 @@ local function build_skills(self, name, prof, skill_index)
 		numname = s.nummade or 1,
 		count = #s
 	}
-
 	for i=1, #s, 1 do
 		table.insert(c, build_reagents(self, s, s[i]))
 	end
-
 	return c
 end
 
 local function build_profs(self, name, prof)
 	local c = {name = prof}
-
 	for skill, _ in pairs(self.db.realm.recipes[name][prof]) do
 		if self.db.realm.recipes[name][prof][skill] ~= nil then
 			table.insert(c, build_skills(self, name, prof, skill))
 		end
 	end
-
 	return c
 end
 
 local function build_character(self, name)
 	local c = {name = name}
-
 	for prof, _ in pairs(self.db.realm.recipes[name]) do
 		if prof and prof ~= "" and prof ~= "UNKNOWN" then
 			table.insert(c, build_profs(self, name, prof))
 		end
 	end
-
 	return c
 end
 
 local function build_characters(self)
 	local c = {}
-
 	for name, _ in pairs(self.db.realm.recipes) do
 		table.insert(c, build_character(self, name))
 	end
-
 	return c
 end
 
@@ -381,13 +339,11 @@ function Skillet:internal_GetCharacters()
 	if not characters then
 		characters = build_characters(self)
 	end
-
 	return characters
 end
 
 function Skillet:internal_GetCharacterProfessions(character_name)
 	local chars = self:internal_GetCharacters()
-
 	for i=1, #chars, 1 do
 		if chars[i].name == character_name then
 			return chars[i]
@@ -397,7 +353,6 @@ end
 
 function  Skillet:internal_GetCharacterTradeskills(character_name, profession)
 	local profs = self:internal_GetCharacterProfessions(character_name)
-
 	if profs then
 		for i=1, #profs, 1 do
 			if profs[i].name == profession then
