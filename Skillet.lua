@@ -200,6 +200,7 @@ Skillet.options =
 					type = "toggle",
 					name = L["SHOWCRAFTERSTOOLTIPNAME"],
 					desc = L["SHOWCRAFTERSTOOLTIPDESC"],
+					disabled = true, -- because of 5.4 changes to trade links 
 					get = function()
 						return Skillet.db.profile.show_crafters_tooltip;
 					end,
@@ -742,14 +743,14 @@ function Skillet:InitializeDatabase(player, clean)
 		DA.DEBUG(0,"data gather module is nil")
 	end
 	self:CollectRecipeInformation()
-	-- self:RecipeGroupDeconstructDBStrings()
+--	self:RecipeGroupDeconstructDBStrings()
 end
 
 function Skillet:RegisterRecipeFilter(name, namespace, initMethod, filterMethod)
 	if not self.recipeFilters then
 		self.recipeFilters = {}
 	end
-	--DA.DEBUG(0,"add recipe filter "..name)
+--	DA.DEBUG(0,"add recipe filter "..name)
 	self.recipeFilters[name] = { namespace = namespace, initMethod = initMethod, filterMethod = filterMethod }
 end
 
@@ -865,7 +866,7 @@ function Skillet:IsTradeSkillLinked()
 				return
 			end
 		end
-		--DA.DEBUG(0,"IsTradeSkillLinked Player "..linkedPlayer);
+--		DA.DEBUG(0,"IsTradeSkillLinked Player "..linkedPlayer);
 		return true, linkedPlayer, (IsTradeSkillGuild and IsTradeSkillGuild())
 	end
 	return false, nil
@@ -882,13 +883,13 @@ function Skillet:SkilletShow()
 --		if (self.currentPlayer == UnitName("player")) then
 --		self.currentPlayer = "All Data"
 --		end
-		--DA.DEBUG(1,"SkilletShow ".." player "..self.currentPlayer)
+--		DA.DEBUG(1,"SkilletShow ".." player "..self.currentPlayer)
 		self:RegisterPlayerDataGathering(self.currentPlayer,SkilletLink,"sk")
 	else
 		self:InitializeAllDataLinks("All Data")
 		self.currentPlayer = (UnitName("player"))
 	end
-	--DA.DEBUG(1,"SkilletShow")
+--	DA.DEBUG(1,"SkilletShow")
 	self.currentTrade = self.tradeSkillIDsByName[(GetTradeSkillLine())] or 2656      -- smelting caveat
 	self:InitializeDatabase(self.currentPlayer)
 	if self:IsSupportedTradeskill(self.currentTrade) then
@@ -930,12 +931,11 @@ function Skillet:FreeCaches()
 --	if not cache then
 --		cache = Skillet.data
 --	end
-
 --	local kbA = collectgarbage("count")
 --	Skillet.data = {}
 --	collectgarbage("collect")
 --	local kbB = collectgarbage("count")
-	--DA.DEBUG(0,"free'd " .. data .. " (" .. math.floor((kbA - kbB)*100+.5)/100 .. " Kb)")
+--	DA.DEBUG(0,"free'd " .. data .. " (" .. math.floor((kbA - kbB)*100+.5)/100 .. " Kb)")
 end
 
 function Skillet:SkilletClose()
@@ -1022,13 +1022,13 @@ DA.DEBUG(0,"setting tradeskill to "..player.." "..tradeID.." "..(skillIndex or "
 		self.db.realm.queueData[player] = {}
 	end
 	if player ~= self.currentPlayer or tradeID ~= self.currentTrade then
-		-- local kbA = collectgarbage("count")
-		-- self.data.recipeList = {}
-		-- self.data.skillList = {}
-		-- self.data.groupList = {}
-		-- collectgarbage("collect")
-		-- local kbB = collectgarbage("count")
-		--DA.DEBUG(1,"free'd " .. math.floor((kbA - kbB)*100+.5)/100 .. " Kb")
+--		local kbA = collectgarbage("count")
+--		self.data.recipeList = {}
+--		self.data.skillList = {}
+--		self.data.groupList = {}
+--		collectgarbage("collect")
+--		local kbB = collectgarbage("count")
+--		DA.DEBUG(1,"free'd " .. math.floor((kbA - kbB)*100+.5)/100 .. " Kb")
 		collectgarbage("collect")
 	 	self.currentPlayer = player
 		local oldTradeID = self.currentTrade
@@ -1184,7 +1184,6 @@ function Skillet:SetSelectedSkill(skillIndex, wasClicked)
 	end
 --	if skillIndex then
 --		local recipe = self:GetRecipeDataByProfessionIndex(self.currentTrade, skillIndex)
---
 --		self:ConfigureRecipeControls(recipe.numMade==0)			-- numMade==0 indicates an enchantment
 --	else
 --		self:ConfigureRecipeControls(false)
@@ -1236,13 +1235,21 @@ end
 -- If there is no user supplied note, then return nil
 -- The item can be either a recipe or reagent name
 function Skillet:GetItemNote(key)
+	DA.DEBUG(1,"GetItemNote("..tostring(key)..")")
 	local result
 	if not self.db.realm.notes[self.currentPlayer] then
 		return
 	end
 --	local id = self:GetItemIDFromLink(link)
 	local kind, id = string.split(":", key)
-	if id and self.db.realm.notes[self.currentPlayer] then
+	id = tonumber(id) or 0
+	if kind == "enchant" then 					-- get the note by the itemID, not the recipeID
+		if self.data.recipeList[id] then
+			id = self.data.recipeList[id].itemID or 0
+		end
+	end
+	DA.DEBUG(1,"GetItemNote itemID="..tostring(id))
+	if id then
 		result = self.db.realm.notes[self.currentPlayer][id]
 	else
 		self:Print("Error: Skillet:GetItemNote() could not determine item ID for " .. key);
@@ -1257,8 +1264,16 @@ end
 -- Sets the note for the specified object, if there is already a note
 -- then it is overwritten
 function Skillet:SetItemNote(key, note)
+	DA.DEBUG(1,"SetItemNote("..tostring(key)..", "..tostring(note)..")")
 --	local id = self:GetItemIDFromLink(link);
 	local kind, id = string.split(":", key)
+	id = tonumber(id) or 0
+	if kind == "enchant" then 					-- store the note by the itemID, not the recipeID
+		if self.data.recipeList[id] then
+			id = self.data.recipeList[id].itemID or 0
+		end
+	end
+	DA.DEBUG(1,"SetItemNote itemID="..tostring(id))
 	if not self.db.realm.notes[self.currentPlayer] then
 		self.db.realm.notes[self.currentPlayer] = {}
 	end
@@ -1273,24 +1288,32 @@ end
 -- item.
 -- Returns true if tooltip modified.
 function Skillet:AddItemNotesToTooltip(tooltip)
+	DA.DEBUG(0,"AddItemNotesToTooltip()")
 	if IsControlKeyDown() then
 		return
 	end
 	local notes_enabled = self.db.profile.show_item_notes_tooltip or false
 	local crafters_enabled = self.db.profile.show_crafters_tooltip or false
-	-- nothing to be added to the tooltip
 	if not notes_enabled and not crafters_enabled then
-		return
+		return -- nothing to be added to the tooltip
 	end
 	-- get item name
 	local name,link = tooltip:GetItem();
-	if not link then return; end
+	if not link then 
+		DA.DEBUG(0,"Error: Skillet:AddItemNotesToTooltip() could not determine link");
+		return;
+	end
 	local id = self:GetItemIDFromLink(link);
-	if not id then return end;
+	if not id then
+		DA.DEBUG(0,"Error: Skillet:AddItemNotesToTooltip() could not determine id");
+		return
+	end
+	DA.DEBUG(1,"link= "..tostring(link)..", id= "..tostring(id)..", notes= "..tostring(notes_enabled)..", crafters= "..tostring(crafters_enabled))
 	if notes_enabled then
 		local header_added = false
 		for player,notes_table in pairs(self.db.realm.notes) do
 			local note = notes_table[id]
+			DA.DEBUG(1,"player= "..tostring(player)..", table= "..DA.DUMP1(notes_table)..", note= '"..tostring(note).."'")
 			if note then
 				if not header_added then
 					tooltip:AddLine("Skillet " .. L["Notes"] .. ":")
@@ -1303,8 +1326,9 @@ function Skillet:AddItemNotesToTooltip(tooltip)
 			end
 		end
 	end
+-- Blizzard's changes to trade links in 5.4 broke this code.
 	if crafters_enabled then
-		local crafters = self:GetCraftersForItem(id);
+		local crafters = self:GetCraftersForItem(id); -- current implementation always returns nil
 		if crafters then
 			header_added = true
 			local title_added = false
@@ -1312,9 +1336,9 @@ function Skillet:AddItemNotesToTooltip(tooltip)
 				if not title_added then
 					title_added = true
 					tooltip:AddDoubleLine(L["Crafted By"], name)
-				else
-					tooltip:AddDoubleLine(" ", name)
 				end
+				DA.DEBUG(1,"name= '"..name.."'")
+				tooltip:AddDoubleLine(" ", name)
 			end
 		end
 	end
