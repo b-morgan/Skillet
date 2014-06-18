@@ -825,6 +825,8 @@ function Skillet:OnEnable()
 	self:EnableDataGathering("Skillet")
 	Skillet:UpdateAutoTradeButtons()
 	self:DisableBlizzardFrame()
+	
+	Skillet:EnablePlugins()
 end
 
 -- Called when the addon is disabled
@@ -893,9 +895,6 @@ function Skillet:SkilletShow()
 	self.currentTrade = self.tradeSkillIDsByName[(GetTradeSkillLine())] or 2656      -- smelting caveat
 	self:InitializeDatabase(self.currentPlayer)
 	if self:IsSupportedTradeskill(self.currentTrade) then
-		if TradeSkillMaster then
-			Skillet.TSMPlugin.Hide()
-		end
 		self:InventoryScan()
 		self.tradeSkillOpen = true
 		DA.DEBUG(1,"SkilletShow: "..self.currentTrade)
@@ -905,6 +904,7 @@ function Skillet:SkilletShow()
 	else
 		self:HideAllWindows()
 		self:BlizzardTradeSkillFrame_Show()
+		Skillet.TSMPlugin.TSMShow()
 	end
 end
 

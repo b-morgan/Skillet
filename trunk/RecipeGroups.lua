@@ -451,7 +451,7 @@ end
 
 -- make a db string for saving groups
 function Skillet:RecipeGroupConstructDBString(group)
-	DA.DEBUG(0,"constructing group db strings "..group.name)
+--	DA.DEBUG(0,"constructing group db strings "..group.name)
 	if group and not group.autoGroup then
 		local key = group.key
 		local player, tradeID, label = string.split(":",key)
