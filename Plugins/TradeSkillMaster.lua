@@ -24,42 +24,22 @@ Skillet.TSMPlugin = {}
 local plugin = Skillet.TSMPlugin
 local L = Skillet.L
 
-function plugin.OnInitialize()
-	DA.DEBUG(0,"TSMPlugin.OnInitialize()")
-	plugin.TSM = {}
-	plugin.GUI = {}
-	local TSM = LibStub("AceAddon-3.0"):GetAddon("TSM_Crafting", true)
-	if TSM then
-		plugin.TSM = TSM
+function plugin.OnEnable()
+	plugin.TSM = LibStub("AceAddon-3.0"):GetAddon("TSM_Crafting", true)
+	if plugin.TSM and plugin.TSM.CraftingGUI then
+		plugin.GUI = plugin.TSM.CraftingGUI
+		plugin.ShowProfessionWindow = plugin.GUI.ShowProfessionWindow
+		plugin.GUI.ShowProfessionWindow = function () end
 	end
-	if plugin.TSM and plugin.TSM.moduleObjects then
-		local GUI = plugin.TSM.moduleObjects["CraftingGUI"]
-		if GUI then
-			plugin.GUI = GUI
-		end
-	end
-	DA.DEBUG("TSM= "..tostring(TSM))
-	DA.DEBUG("GUI= "..tostring(GUI))
 end
 
 function plugin.GetExtraText(skill, recipe)
 end
 
-function plugin.TSMHide()
-	DA.DEBUG(0,"TSMHide()")
-	plugin.TSM = LibStub("AceAddon-3.0"):GetAddon("TSM_Crafting", true)
-	if plugin.TSM and plugin.TSM.moduleObjects then
-		plugin.GUI = plugin.TSM.moduleObjects["CraftingGUI"]
-		if plugin.TSM and plugin.GUI and plugin.GUI.frame then
-			plugin.GUI.frame:Hide();
-		end
-	end
-end
-
 function plugin.TSMShow()
 	DA.DEBUG(0,"TSMShow()")
-	if plugin.TSM and plugin.GUI and plugin.GUI.frame then
-		plugin.GUI.frame:Show();
+	if plugin.TSM and plugin.GUI and plugin.ShowProfessionWindow then
+		plugin.ShowProfessionWindow();
 	end
 end
 

@@ -72,3 +72,13 @@ function Skillet:InitializePlugins()
 		end
 	end
 end
+
+function Skillet:EnablePlugins()
+	DA.DEBUG(0,"EnablePlugins()")
+	for k,v in pairs(Skillet.displayDetailPlugins) do
+		DA.DEBUG(1,"k= "..tostring(k)..", v= "..tostring(v))
+		if v and v.OnEnable then
+			v.OnEnable()
+		end
+	end
+end
