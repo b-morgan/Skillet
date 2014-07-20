@@ -174,7 +174,7 @@ end
 -- @param skill_index the index of the currently selected recipe
 --
 function Skillet:GetReagentLabel(tradeskill, skill_index)
-    if (FRC_PriceSource ~= nill and FRC_CraftFrame_SetSelection and FRC_TradeSkillFrame_SetSelection) then
+    if (FRC_PriceSource ~= nil and FRC_CraftFrame_SetSelection and FRC_TradeSkillFrame_SetSelection) then
         -- Support for Fizzwidget's Reagent Cost
         if self:IsCraft() then
             local Orig_CraftFrame_SetSelection = FRC_Orig_CraftFrame_SetSelection;
@@ -249,7 +249,7 @@ end
 --
 -- Returns the minimum width of the skill button. This is the
 -- button that displays the name of the recipe in the scrolling
--- list. If you was to add text to the button and need more room,
+-- list. If you were to add text to the button and need more room,
 -- then hook this method and return a minimum width for the button
 -- that works for your mod.
 --
