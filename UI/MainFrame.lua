@@ -1394,7 +1394,8 @@ function Skillet:SetTradeSkillToolTip(skillIndex)
 	local recipe, recipeID = self:GetRecipeDataByTradeIndex(self.currentTrade, skillIndex)
 	if recipe then
 		if recipe.itemID ~= 0 then
-			GameTooltip:SetHyperlink("item:"..recipe.itemID)			-- creates an item, that's more interesting than the recipe
+--			GameTooltip:SetHyperlink("item:"..recipe.itemID)			-- creates an item, that's more interesting than the recipe
+			GameTooltip:SetTradeSkillItem(skillIndex)
 			if EnhTooltip and EnhTooltip.TooltipCall then
 				local name, link, quality = GetItemInfo("item:"..recipe.itemID)
 				quantity = recipe.numMade
