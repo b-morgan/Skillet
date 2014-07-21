@@ -471,17 +471,17 @@ end
 
 -- reconstruct a recipe from a recipeString and cache it into our system for this session
 function SkilletData:GetRecipe(id)
-	DA.DEBUG(2,"GetRecipe("..tostring(id)..")")
+--	DA.DEBUG(3,"GetRecipe("..tostring(id)..")")
 	if not id or id == 0 then return self.unknownRecipe end
 	if (not Skillet.data.recipeList[id]) and Skillet.db.global.recipeDB[id] then
 		local recipeString = Skillet.db.global.recipeDB[id]
-		DA.DEBUG(2,"recipeString= "..tostring(recipeString))
+--		DA.DEBUG(3,"recipeString= "..tostring(recipeString))
 		local tradeID, itemString, reagentString, toolString = string.split(" ",recipeString)
 		local itemID, numMade = 0, 1
 		local slot = nil
 		if itemString ~= "0" then
 			local a, b = string.split(":",itemString)
-			DA.DEBUG(2,"itemString a= "..tostring(a)..", b= "..tostring(b))
+--			DA.DEBUG(3,"itemString a= "..tostring(a)..", b= "..tostring(b))
 			if a ~= "0" then
 				itemID, numMade = a,b
 			else
@@ -748,7 +748,7 @@ function SkilletLink:ScanTrade()
 					end
 					local cd = GetTradeSkillCooldown(i)
 					if cd then
-						skillData[i].cooldown = cd + time()		-- this is when your cooldown will be up
+						skillData[i].cooldown = cd + time()						-- this is when your cooldown will be up
 --						skillDBString = skillDBString.." cd=" .. cd + time()
 					end
 					local numTools = #tools+1
@@ -808,16 +808,16 @@ function SkilletLink:ScanTrade()
 							else
 								itemString = itemID
 							end
-							Skillet:ItemDataAddRecipeSource(itemID,recipeID)					-- add a cross reference for the source of particular items
+							Skillet:ItemDataAddRecipeSource(itemID,recipeID)	-- add a cross reference for the source of particular items
 						else
 							recipe.numMade = 1
 							if LSW and LSW.scrollData and LSW.scrollData[recipeID] then
 								local itemID = LSW.scrollData[recipeID]
 								recipe.itemID = itemID
 								itemString = itemID
-								Skillet:ItemDataAddRecipeSource(itemID,recipeID)					-- add a cross reference for the source of particular items
+								Skillet:ItemDataAddRecipeSource(itemID,recipeID)	-- add a cross reference for the source of particular items
 							else
-								recipe.itemID = 0												-- indicates an enchant
+								recipe.itemID = 0								-- indicates an enchant
 							end
 						end
 						local reagentString = nil
@@ -840,7 +840,7 @@ function SkilletLink:ScanTrade()
 --							else
 --								reagentString = reagentID..":"..numNeeded
 --							end
-							Skillet:ItemDataAddUsedInRecipe(reagentID, recipeID)		-- add a cross reference for where a particular item is used
+							Skillet:ItemDataAddUsedInRecipe(reagentID, recipeID)	-- add a cross reference for where a particular item is used
 						end
 						recipe.reagentData = reagentData
 						if gotNil then
@@ -956,8 +956,8 @@ function SkilletData:ScanPlayerTradeSkills(player, clean)
 		local skillRanksData = Skillet.db.realm.tradeSkills[player]
 		for i=1,#TradeSkillList,1 do
 			local id = TradeSkillList[i]
-			local name = GetSpellInfo(id)			            -- always returns data
-			local _, rankName, icon = GetSpellInfo(name)		    -- only returns data if you have this spell in your spellbook
+			local name = GetSpellInfo(id)									-- always returns data
+			local _, rankName, icon = GetSpellInfo(name)					-- only returns data if you have this spell in your spellbook
 			DA.DEBUG(0,"collecting tradeskill data for "..name.." "..(rank or "nil"))
 			if rankName then
 				if not skillRanksData[id] then

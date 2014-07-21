@@ -47,11 +47,12 @@ local FrameBackdrop = {
 }
 
 local bankFrameOpen = false
+local bank                   -- Detailed contents of the bank.
+
 local guildbankFrameOpen = false
 local guildbankQuery = 0     -- Need to wait until all the QueryGuildBankTab()s finish
 local guildbankOnce = true   -- but only indexGuildBank once for each OPENED
-local bank
-local guildbank
+local guildbank              -- Detailed contents of the guildbank
 
 -- Creates and sets up the shopping list window
 local function createShoppingListFrame(self)
@@ -280,6 +281,7 @@ function Skillet:BANKFRAME_OPENED()
 	end
 	Skillet.bankBusy = false
 	Skillet.bankQueue = {}
+	bank = {}
 	cache_list(self)
 	if #self.cachedShoppingList == 0 then
 		return
@@ -304,6 +306,7 @@ function Skillet:GUILDBANKFRAME_OPENED()
 	end
 	Skillet.guildBusy = false
 	Skillet.guildQueue = {}
+	guildbank = {}
 	local numTabs = GetNumGuildBankTabs()
 	for tab=1, numTabs, 1 do
 		QueryGuildBankTab(tab)
@@ -455,7 +458,7 @@ local function getItemFromBank(itemID, bag, slot, count)
 	ClearCursor()
 	local _, available = GetContainerItemInfo(bag, slot)
 	local num_moved = 0
-	if available == 1 or count >= available then
+	if available and available == 1 or count >= available then
 		DA.DEBUG(1,"PickupContainerItem(",bag,", ", slot,")")
 		PickupContainerItem(bag, slot)
 		num_moved = available
@@ -523,8 +526,8 @@ local function processBankQueue(where)
 				local v = queueitem["list"]
 				local i = queueitem["i"]
 				local item = queueitem["item"]
-				DA.DEBUG(3,"j=",j,", v=",DA.DUMP1(v))
-				DA.DEBUG(3,"i=",i,", item=",DA.DUMP1(item))
+--				DA.DEBUG(3,"j=",j,", v=",DA.DUMP1(v))
+--				DA.DEBUG(3,"i=",i,", item=",DA.DUMP1(item))
 				Skillet.gotBankEvent = false
 				Skillet.gotBagUpdateEvent = false
 				local moved = getItemFromBank(id, item.bag, item.slot, v.count)
@@ -543,7 +546,7 @@ end
 
 -- Subset of the BAG_UPDATE event processed in Skillet.lua
 -- It may look like a real Blizzard event but its not.
-function Skillet:BANK_UPDATE(bagID) 
+function Skillet:BANK_UPDATE(event,bagID) 
 	DA.DEBUG(2,"BANK_UPDATE( "..tostring(bagID).." )")
 	if Skillet.bankBusy then
 		DA.DEBUG(1, "BANK_UPDATE and bankBusy")
@@ -587,7 +590,7 @@ local function processGuildQueue(where)
 end
 
 -- Event is fired when the guild bank contents change.
-function Skillet:GUILDBANKBAGSLOTS_CHANGED()
+function Skillet:GUILDBANKBAGSLOTS_CHANGED(event)
 	DA.DEBUG(2,"GUILDBANKBAGSLOTS_CHANGED")
 	guildbankQuery = guildbankQuery + 1
 	if guildbankQuery == GetNumGuildBankTabs() and guildbankOnce then
@@ -599,6 +602,18 @@ function Skillet:GUILDBANKBAGSLOTS_CHANGED()
 		Skillet.gotGuildbankEvent = true
 		if Skillet.gotGuildbankEvent and Skillet.gotBagUpdateEvent then
 			processGuildQueue("guild bank")
+		end
+	end
+end
+
+-- Event is fired when the main bank (bagID == -1) contents change.
+function Skillet:PLAYERBANKSLOTS_CHANGED(event)
+	DA.DEBUG(2,"PLAYERBANKSLOTS_CHANGED")
+	if Skillet.bankBusy then
+		DA.DEBUG(1,"PLAYERBANKSLOTS_CHANGED and bankBusy")
+		Skillet.gotBankEvent = true
+		if Skillet.gotBankEvent and Skillet.gotBagUpdateEvent then
+			processBankQueue("bag update")
 		end
 	end
 end
@@ -625,13 +640,14 @@ end
 
 -- Gets all the reagents possible for queued recipes from the bank
 function Skillet:GetReagentsFromBanks()
+	DA.DEBUG(0,"GetReagentsFromBanks")
 	local list = self.cachedShoppingList
 	local incAlts = Skillet.db.char.include_alts
 	local name = UnitName("player")
 
 	-- Do things using a queue and events.
 	if bankFrameOpen then
-		if not bank then
+		if #bank == 0 then
 			indexBank()
 			DA.DEBUG(0,"#bank= ",#bank)
 		else
@@ -640,24 +656,26 @@ function Skillet:GetReagentsFromBanks()
 		DA.DEBUG(0,"#list=",#list)
 		local bankQueue = Skillet.bankQueue
 		for j,v in pairs(list) do
+			DA.DEBUG(2,"j=",j,", v=",DA.DUMP1(v))
 			local id = v.id
 			if incAlts or v.player == name then
 				for i,item in pairs(bank) do
-					if item.id == id and item.count > 0 and v.count > 0 then
-						DA.DEBUG(2,"j=",j,", v=",DA.DUMP1(v))
+					if item.id == id then
 						DA.DEBUG(2,"i=",i,", item=",DA.DUMP1(item))
-						table.insert(bankQueue, {
-							["id"]    = id,
-							["bag"]   = item.bag,
-							["slot"]  = item.slot,
-							["j"]     = j,
-							["list"]  = v,
-							["i"]     = i,
-							["item"]  = item,
-						})
-						if not Skillet.bankBusy then
-							Skillet.bankBusy = true
-							processBankQueue("get reagents")
+						if item.count > 0 and v.count > 0 then
+							table.insert(bankQueue, {
+								["id"]    = id,
+								["bag"]   = item.bag,
+								["slot"]  = item.slot,
+								["j"]     = j,
+								["list"]  = v,
+								["i"]     = i,
+								["item"]  = item,
+							})
+							if not Skillet.bankBusy then
+								Skillet.bankBusy = true
+								processBankQueue("get reagents")
+							end
 						end
 					end
 				end
@@ -667,7 +685,7 @@ function Skillet:GetReagentsFromBanks()
 
 	-- Do things using a queue and events.
 	if guildbankFrameOpen then
-		if not guildbank then
+		if #guildbank == 0 then
 			indexGuildBank()
 			DA.DEBUG(0,"#guildbank= ",#guildbank)
 		else
@@ -676,24 +694,26 @@ function Skillet:GetReagentsFromBanks()
 		DA.DEBUG(0,"#list=",#list)
 		local guildQueue = Skillet.guildQueue
 		for j,v in pairs(list) do
+			DA.DEBUG(2,"j=",j,", v=",DA.DUMP1(v))
 			local id = v.id
 			if incAlts or v.player == name then
 				for i,item in pairs(guildbank) do
-					if item.id == id and item.count > 0 and v.count > 0 then
-						DA.DEBUG(2,"j=",j,", v=",DA.DUMP1(v))
+					if item.id == id then
 						DA.DEBUG(2,"i=",i,", item=",DA.DUMP1(item))
-						table.insert(guildQueue, {
-							["id"]    = id,
-							["bag"]   = item.bag,
-							["slot"]  = item.slot,
-							["j"]     = j,
-							["list"]  = v,
-							["i"]     = i,
-							["item"]  = item,
-						})
-						if not Skillet.guildBusy then
-							Skillet.guildBusy = true
-							processGuildQueue("get reagents")
+						if item.count > 0 and v.count > 0 then
+							table.insert(guildQueue, {
+								["id"]    = id,
+								["bag"]   = item.bag,
+								["slot"]  = item.slot,
+								["j"]     = j,
+								["list"]  = v,
+								["i"]     = i,
+								["item"]  = item,
+							})
+							if not Skillet.guildBusy then
+								Skillet.guildBusy = true
+								processGuildQueue("get reagents")
+							end
 						end
 					end
 				end
