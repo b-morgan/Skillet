@@ -42,101 +42,104 @@ local DA = _G[addonName]
 -- text to the circular table without printing to 
 -- the default chat frame. 
 -- 
-DA.WarnShow = false;
-DA.DebugShow = false;
-DA.TraceShow = false;
-DA.TraceLog = false;
-DA.DebugLevel = 1;
-DA.DebugLog = {}; -- Add to SavedVariable for debugging
-DA.MAXDEBUG = 1000;
-DA.STATUS_COLOR = "|c0033CCFF";
-DA.DEBUG_COLOR  = "|c0000FF00";
-DA.TRACE_COLOR  = "|c0000FFA0";
-DA.WARN_COLOR   = "|c0000FFE0";
+DA.WarnShow = false
+DA.DebugShow = false
+DA.TraceShow = false
+DA.TraceLog = false
+DA.DebugLevel = 1
+DA.DebugLog = {} -- Add to SavedVariables for debugging
+DA.MAXDEBUG = 2000
+DA.STATUS_COLOR = "|c0033CCFF"
+DA.DEBUG_COLOR  = "|c0000FF00"
+DA.TRACE_COLOR  = "|c0000FFA0"
+DA.WARN_COLOR   = "|c0000FFE0"
 
 function DA.CHAT(text)
-	print(DA.STATUS_COLOR..text);
+	print(DA.STATUS_COLOR..text)
 end
 
 function DA.WARN(...)
-	local text = "";
+	local text = ""
 	local comma = ""
 	for i = 1, select("#", ...), 1 do
 		if (i > 2) then 
-			comma = ", ";
+			comma = ", "
 		end
 		local value = select(i,...)
-		local vtype = type(value);
+		local vtype = type(value)
 		if (vtype == "nil") then 
-			text = text..comma.."(nil)";
+			text = text..comma.."(nil)"
 		elseif (vtype == "number") then 
-			text = text..comma..tostring(value);
+			text = text..comma..tostring(value)
 		elseif (vtype == "string") then
 			t = string.sub(value,1,2)
 			if t == ", " then
-				text = text..value;
+				text = text..value
 			else
 				text = text..comma..value
 			end
 		elseif (vtype == "boolean") then 
 			if (value) then
-				text = text..comma.."true"; 
+				text = text..comma.."true" 
 			else 
-				text = text..comma.."false"; 
+				text = text..comma.."false" 
 			end
 		elseif (vtype == "table" or vtype == "function" or vtype == "thread" or vtype == "userdata") then 
-			text = text..comma.."("..vtype..")";
+			text = text..comma.."("..vtype..")"
 		else                               
-			text = text..comma.."(unknown)";
+			text = text..comma.."(unknown)"
 		end
 	end
 	if (DA.WarnShow) then
-		DA.CHAT(DA.WARN_COLOR..addonName..": "..text);
+		DA.CHAT(DA.WARN_COLOR..addonName..": "..text)
 	end
-	table.insert(DA.DebugLog,date().."(W): "..text);
+	table.insert(DA.DebugLog,date().."(W): "..text)
 	if (table.getn(DA.DebugLog) > DA.MAXDEBUG) then
-		table.remove(DA.DebugLog,1);
+		table.remove(DA.DebugLog,1)
 	end
 end
 
 function DA.DEBUG(...)
 	local k = select("#",...)
 	local level = select(1, ...)
-	local text = "";
+	local text = ""
 	local comma = ""
 	local j = 2
 	local t = type(level)
+	if (t == "number" and level == -1) then
+		return
+	end
 	if (t ~= "number" or level < 0 or level > 10) then
-		level = 0; -- assume this is a deprecated call and
+		level = 0 -- assume this is a deprecated call and
 		j = 1      -- process it as the first parameter.
 	end
 	for i = j, k, 1 do
 		if (i > 2) then 
-			comma = ", ";
+			comma = ", "
 		end
 		local value = select(i,...)
-		local vtype = type(value);
+		local vtype = type(value)
 		if (vtype == "nil") then 
-			text = text..comma.."(nil)";
+			text = text..comma.."(nil)"
 		elseif (vtype == "number") then 
-			text = text..comma..tostring(value);
+			text = text..comma..tostring(value)
 		elseif (vtype == "string") then
 			t = string.sub(value,1,2)
 			if t == ", " then
-				text = text..value;
+				text = text..value
 			else
 				text = text..comma..value
 			end
 		elseif (vtype == "boolean") then 
 			if (value) then
-				text = text..comma.."true"; 
+				text = text..comma.."true" 
 			else 
-				text = text..comma.."false"; 
+				text = text..comma.."false" 
 			end
 		elseif (vtype == "table" or vtype == "function" or vtype == "thread" or vtype == "userdata") then 
-			text = text..comma.."("..vtype..")";
+			text = text..comma.."("..vtype..")"
 		else                               
-			text = text..comma.."(unknown)";
+			text = text..comma.."(unknown)"
 		end
 	end
 	local dlevel = tonumber(DA.DebugLevel) -- sanity check
@@ -144,53 +147,53 @@ function DA.DEBUG(...)
 	elseif dlevel < 1 then dlevel = 1
 	elseif dlevel > 9 then dlevel = 10 end
 	if (DA.DebugShow and level < dlevel) then
-		DA.CHAT(DA.DEBUG_COLOR..addonName..": "..text);
+		DA.CHAT(DA.DEBUG_COLOR..addonName..": "..text)
 	end
-	table.insert(DA.DebugLog,date().."(D"..level.."): "..text);
+	table.insert(DA.DebugLog,date().."(D"..level.."): "..text)
 	if (table.getn(DA.DebugLog) > DA.MAXDEBUG) then
-		table.remove(DA.DebugLog,1);
+		table.remove(DA.DebugLog,1)
 	end
 end
 
 function DA.TRACE(...)
-	local text = "";
+	local text = ""
 	local comma = ""
 	for i = 1, select("#", ...), 1 do
 		if (i > 2) then 
-			comma = ", ";
+			comma = ", "
 		end
 		local value = select(i,...)
-		local vtype = type(value);
+		local vtype = type(value)
 		if (vtype == "nil") then 
-			text = text..comma.."(nil)";
+			text = text..comma.."(nil)"
 		elseif (vtype == "number") then 
-			text = text..comma..tostring(value);
+			text = text..comma..tostring(value)
 		elseif (vtype == "string") then
 			t = string.sub(value,1,2)
 			if t == ", " then
-				text = text..value;
+				text = text..value
 			else
 				text = text..comma..value
 			end
 		elseif (vtype == "boolean") then 
 			if (value) then
-				text = text..comma.."true"; 
+				text = text..comma.."true" 
 			else 
-				text = text..comma.."false"; 
+				text = text..comma.."false" 
 			end
 		elseif (vtype == "table" or vtype == "function" or vtype == "thread" or vtype == "userdata") then 
-			text = text..comma.."("..vtype..")";
+			text = text..comma.."("..vtype..")"
 		else                               
-			text = text..comma.."(unknown)";
+			text = text..comma.."(unknown)"
 		end
 	end
 	if (DA.TraceShow) then
-		DA.CHAT(DA.TRACE_COLOR..addonName..": "..text);
+		DA.CHAT(DA.TRACE_COLOR..addonName..": "..text)
 	end
 	if (DA.TraceShow or DA.TraceLog) then
-		table.insert(DA.DebugLog,date().."(T): "..text);
+		table.insert(DA.DebugLog,date().."(T): "..text)
 		if (table.getn(DA.DebugLog) > DA.MAXDEBUG) then
-			table.remove(DA.DebugLog,1);
+			table.remove(DA.DebugLog,1)
 		end
 	end
 end
@@ -198,21 +201,21 @@ end
 -- Convert a table into a string with line breaks and indents.
 function DA.DUMP(o,n)
     if type(o) == 'table' then
-        local s;
-		local i = "";
+        local s
+		local i = ""
 		if (n) then
-			i = string.rep(" ",n);
+			i = string.rep(" ",n)
 		else
-			n = 0;
+			n = 0
 		end
-		s = i..'{\n';
+		s = i..'{\n'
         for k,v in pairs(o) do
 			if type(k) ~= 'number' then 
 				k = "'"..k.."'" 
 			end
-			s = s..i..'['..k..'] = '..DA.DUMP(v,n+1)..'\n';
+			s = s..i..'['..k..'] = '..DA.DUMP(v,n+1)..'\n'
         end
-        return s..i..'}\n';
+        return s..i..'}\n'
     else
         return tostring(o)
     end
@@ -221,18 +224,18 @@ end
 -- Convert a table into a one line string.
 function DA.DUMP1(o)
     if type(o) == 'table' then
-        local s;
-		s = '{ ';
+        local s
+		s = '{ '
         for k,v in pairs(o) do
 			if type(k) ~= 'number' then 
 				k = "'"..k.."'"
 			end
-			s = s..'['..k..'] = '..DA.DUMP1(v)..', ';
+			s = s..'['..k..'] = '..DA.DUMP1(v)..', '
         end
         if strlen(s) > 2 then
-			return strsub(s,1,strlen(s)-2)..' }';
+			return strsub(s,1,strlen(s)-2)..' }'
 		else
-			return s..'}';
+			return s..'}'
 		end
     else
         return tostring(o)
@@ -246,21 +249,21 @@ end
 --
 --[[
 function DA.Command(msg)
-	local _,_,command,options = string.find(msg,"([%w%p]+)%s*(.*)$");
-	command = string.lower(command);
-	options = string.lower(options);
+	local _,_,command,options = string.find(msg,"([%w%p]+)%s*(.*)$")
+	command = string.lower(command)
+	options = string.lower(options)
 	if(command == "warn") then  
-		DA.Warn();                         -- Undocumented: Enable warning output
+		DA.Warn()                         -- Undocumented: Enable warning output
 	elseif(command == "debug") then
-		DA.Debug();                        -- Undocumented: Enable debug output
+		DA.Debug()                        -- Undocumented: Enable debug output
 	elseif(command == "dlevel") then
 		DA.DLevel(options)                 -- Undocumented: Set debug level
 	elseif(command == "trace") then
-		DA.Trace();                        -- Undocumented: Enable trace output
+		DA.Trace()                        -- Undocumented: Enable trace output
 	elseif(command == "clear") then
-		DA.ClearDebugLog();                -- Undocumented: Clear debug storage
+		DA.ClearDebugLog()                -- Undocumented: Clear debug storage
 	elseif(command == "tlog") then
-		DA.TLog();                         -- Undocumented: Clear debug storage
+		DA.TLog()                         -- Undocumented: Clear debug storage
 	end
 end
 
@@ -269,8 +272,8 @@ end
 -- Replace ? with the appropriate name.
 --
 function DA.OnLoad()
-	SLASH_?1 = "/?";
-	SlashCmdList["?"] = DA.Command;
+	SLASH_?1 = "/?"
+	SlashCmdList["?"] = DA.Command
 end
 ]]--
 --
@@ -281,34 +284,34 @@ end
 --
 --[[
 function DA.Warn()
-   DA.WarnShow = not DA.WarnShow;
+   DA.WarnShow = not DA.WarnShow
    if (DA.WarnShow) then
-      DA.WARN("Warning output enabled.");
+      DA.WARN("Warning output enabled.")
    else
-      DA.CHAT("Warning output disabled.");
+      DA.CHAT("Warning output disabled.")
    end
 end
 
 function DA.Debug()
-   DA.DebugShow = not DA.DebugShow;
+   DA.DebugShow = not DA.DebugShow
    if (DA.DebugShow) then
-      DA.DEBUG(0,"Debug output enabled.");
+      DA.DEBUG(0,"Debug output enabled.")
    else
-      DA.CHAT("Debug output disabled.");
+      DA.CHAT("Debug output disabled.")
    end
 end
 
 function DA.ClearDebugLog()
-	DA.CHAT("DebugLog initialized.");
-	DA.DebugLog = {};
+	DA.CHAT("DebugLog initialized.")
+	DA.DebugLog = {}
 end
 
 function DA.Trace()
-	DA.TraceShow = not DA.TraceShow;
+	DA.TraceShow = not DA.TraceShow
 	if (DA.TraceShow) then
-		DA.TRACE("Trace output enabled.");
+		DA.TRACE("Trace output enabled.")
 	else
-		DA.CHAT("Trace output disabled.");
+		DA.CHAT("Trace output disabled.")
 	end
 end
 
@@ -321,11 +324,11 @@ function DA.DLevel(options)
 end
 
 function DA.TLog()
-	DA.TraceLog = not DA.TraceLog;
+	DA.TraceLog = not DA.TraceLog
 	if (DA.TraceLog) then
-		DA.CHAT("Trace logging enabled.");
+		DA.CHAT("Trace logging enabled.")
 	else
-		DA.CHAT("Trace logging disabled.");
+		DA.CHAT("Trace logging disabled.")
 	end
 end
 ]]--

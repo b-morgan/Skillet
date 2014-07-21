@@ -1,3 +1,5 @@
+local addonName,addonTable = ...
+local DA = _G[addonName] -- for DebugAids.lua
 --[[
 
 Skillet: A tradeskill window replacement.

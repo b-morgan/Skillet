@@ -32,7 +32,7 @@ local AceDB = LibStub("AceDB-3.0")
 
 -- Pull it into the local namespace, it's faster to access that way
 local Skillet = Skillet
-local DA = Skillet
+local DA = Skillet -- needed because LibStub changed the definition of Skillet
 
 local nonLinkingTrade = { [2656] = true, [53428] = true }				-- smelting, runeforging
 
@@ -794,7 +794,7 @@ function Skillet:OnEnable()
 	self:RegisterEvent("MERCHANT_CLOSED")
 	-- May need to show a shopping list when at the bank/guildbank/auction house
 	self:RegisterEvent("BANKFRAME_OPENED")
-	-- BANKBAGSLOTS_CHANGED doesn't exist but is handled by BAG_UPDATE
+	self:RegisterEvent("PLAYERBANKSLOTS_CHANGED")
 	self:RegisterEvent("BANKFRAME_CLOSED")
 	self:RegisterEvent("GUILDBANKFRAME_OPENED")
 	self:RegisterEvent("GUILDBANKBAGSLOTS_CHANGED")
@@ -811,7 +811,6 @@ function Skillet:OnEnable()
 	self:RegisterMessage("Skillet_Queue_Continue", "QueueChanged")
 	self:RegisterMessage("Skillet_Queue_Complete", "QueueChanged")
 	self:RegisterMessage("Skillet_Queue_Add",      "QueueChanged")
---	self:RegisterMessage("SkilletStitch_Scan_Complete",  "ScanCompleted")
 	self.hideUncraftableRecipes = false
 	self.hideTrivialRecipes = false
 	self.currentTrade = nil
@@ -831,30 +830,8 @@ end
 
 -- Called when the addon is disabled
 function Skillet:OnDisable()
---	self:DisableDataGathering("Skillet")
---	self:DisableQueue("Skillet");
 	self:UnregisterAllEvents()
 	self:EnableBlizzardFrame()
-end
-
-local scan_in_progress = false
-local need_rescan_on_open = false
-local forced_rescan = false
-
-function Skillet:ScanCompleted()
---	if scan_in_progress then
---		if forced_rescan and not need_rescan_on_open then
-			--only print this if we are not not doing a bag rescan,
-			-- i.e. a first time or forced rescan.
---			local name = self:GetTradeSkillLine()
---			self:Print(L["Scan completed"] .. ": " .. name);
---		end
---		self:UpdateScanningText("")
---		scan_in_progress = false
---		need_rescan_on_open = false
---		forced_rescan = false
-		self:UpdateTradeSkillWindow()
---	end
 end
 
 function Skillet:IsTradeSkillLinked()
@@ -891,7 +868,6 @@ function Skillet:SkilletShow()
 		self:InitializeAllDataLinks("All Data")
 		self.currentPlayer = (UnitName("player"))
 	end
---	DA.DEBUG(1,"SkilletShow")
 	self.currentTrade = self.tradeSkillIDsByName[(GetTradeSkillLine())] or 2656      -- smelting caveat
 	self:InitializeDatabase(self.currentPlayer)
 	if self:IsSupportedTradeskill(self.currentTrade) then
@@ -929,23 +905,10 @@ function Skillet:SkilletShowWindow()
 		self.dataSource = "api"
 end
 
-function Skillet:FreeCaches()
---	collectgarbage("collect")
---	if not cache then
---		cache = Skillet.data
---	end
---	local kbA = collectgarbage("count")
---	Skillet.data = {}
---	collectgarbage("collect")
---	local kbB = collectgarbage("count")
---	DA.DEBUG(0,"free'd " .. data .. " (" .. math.floor((kbA - kbB)*100+.5)/100 .. " Kb)")
-end
-
 function Skillet:SkilletClose()
 	DA.DEBUG(0,"SKILLET CLOSE")
 	if self.dataSource == "api" then -- if the skillet system is using the api for data access, then close the skillet window
 		self:HideAllWindows()
-		self:FreeCaches()
 	end
 end
 
@@ -961,7 +924,6 @@ function Skillet:RescanBags()
 	if elapsed > 0.5 then
 		DA.DEBUG(0,"WARNING: skillet inventory scan took " .. math.floor(elapsed*100+.5)/100 .. " seconds to complete.")
 	end
-	self.rescan_bags_timer = nil
 end
 
 function Skillet:BAG_OPEN(event, bagID) -- Fires when a non-inventory container is opened.
@@ -982,20 +944,14 @@ function Skillet:BAG_UPDATE(event, bagID)
 		showing = true
 	end
 	-- bagID = tonumber(bagID)
-	if showing and bagID >= 0 and bagID <= 4 then
-		-- bag updates can happen fairly frequently and we don't want to
-		-- be scanning all the time so ... buffer updates to a single event
-		-- that fires after a 1/5 second.
-		if not self.rescan_bags_timer then
---			self.rescan_bags_timer = self:ScheduleTimer("RescanBags", 0.2)
+	if showing then
+		if bagID >= 0 and bagID <= 4 then
+			-- an inventory bag update, do nothing (wait for the BAG_UPDATE_DELAYED).
 		end
-	elseif showing then
-		-- a bank update, process it in ShoppingList.lua
-		Skillet:BANK_UPDATE(bagID) -- Looks like an event but its not.
-	else
-		-- no trade window open, but something changed, we will need to rescan
-		-- when the window is next opened.
-		need_rescan_on_open = true
+		if bagID == -1 or bagID >= 5 then
+			-- a bank update, process it in ShoppingList.lua
+			Skillet:BANK_UPDATE(event,bagID) -- Looks like an event but its not.
+		end
 	end
 	if MerchantFrame and MerchantFrame:IsVisible() then
 		-- may need to update the button on the merchant frame window ...
@@ -1238,7 +1194,7 @@ end
 -- If there is no user supplied note, then return nil
 -- The item can be either a recipe or reagent name
 function Skillet:GetItemNote(key)
-	DA.DEBUG(1,"GetItemNote("..tostring(key)..")")
+--	DA.DEBUG(0,"GetItemNote("..tostring(key)..")")
 	local result
 	if not self.db.realm.notes[self.currentPlayer] then
 		return
@@ -1251,7 +1207,7 @@ function Skillet:GetItemNote(key)
 			id = self.data.recipeList[id].itemID or 0
 		end
 	end
-	DA.DEBUG(1,"GetItemNote itemID="..tostring(id))
+--	DA.DEBUG(0,"GetItemNote itemID="..tostring(id))
 	if id then
 		result = self.db.realm.notes[self.currentPlayer][id]
 	else
@@ -1267,7 +1223,7 @@ end
 -- Sets the note for the specified object, if there is already a note
 -- then it is overwritten
 function Skillet:SetItemNote(key, note)
-	DA.DEBUG(1,"SetItemNote("..tostring(key)..", "..tostring(note)..")")
+--	DA.DEBUG(0,"SetItemNote("..tostring(key)..", "..tostring(note)..")")
 --	local id = self:GetItemIDFromLink(link);
 	local kind, id = string.split(":", key)
 	id = tonumber(id) or 0
@@ -1276,7 +1232,7 @@ function Skillet:SetItemNote(key, note)
 			id = self.data.recipeList[id].itemID or 0
 		end
 	end
-	DA.DEBUG(1,"SetItemNote itemID="..tostring(id))
+--	DA.DEBUG(0,"SetItemNote itemID="..tostring(id))
 	if not self.db.realm.notes[self.currentPlayer] then
 		self.db.realm.notes[self.currentPlayer] = {}
 	end
@@ -1291,7 +1247,7 @@ end
 -- item.
 -- Returns true if tooltip modified.
 function Skillet:AddItemNotesToTooltip(tooltip)
-	DA.DEBUG(0,"AddItemNotesToTooltip()")
+--	DA.DEBUG(0,"AddItemNotesToTooltip()")
 	if IsControlKeyDown() then
 		return
 	end
@@ -1311,12 +1267,12 @@ function Skillet:AddItemNotesToTooltip(tooltip)
 		DA.DEBUG(0,"Error: Skillet:AddItemNotesToTooltip() could not determine id");
 		return
 	end
-	DA.DEBUG(1,"link= "..tostring(link)..", id= "..tostring(id)..", notes= "..tostring(notes_enabled)..", crafters= "..tostring(crafters_enabled))
+--	DA.DEBUG(1,"link= "..tostring(link)..", id= "..tostring(id)..", notes= "..tostring(notes_enabled)..", crafters= "..tostring(crafters_enabled))
 	if notes_enabled then
 		local header_added = false
 		for player,notes_table in pairs(self.db.realm.notes) do
 			local note = notes_table[id]
-			DA.DEBUG(1,"player= "..tostring(player)..", table= "..DA.DUMP1(notes_table)..", note= '"..tostring(note).."'")
+--			DA.DEBUG(1,"player= "..tostring(player)..", table= "..DA.DUMP1(notes_table)..", note= '"..tostring(note).."'")
 			if note then
 				if not header_added then
 					tooltip:AddLine("Skillet " .. L["Notes"] .. ":")
