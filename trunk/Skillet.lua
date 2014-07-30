@@ -571,7 +571,7 @@ Skillet.options =
 }
 
 -- replaces the standard bliz frameshow calls with this for supported tradeskills
-function DoNothing()
+local function DoNothing()
 	DA.DEBUG(0,"Do Nothing")
 end
 
@@ -1289,7 +1289,7 @@ function Skillet:AddItemNotesToTooltip(tooltip)
 	if crafters_enabled then
 		local crafters = self:GetCraftersForItem(id); -- current implementation always returns nil
 		if crafters then
-			header_added = true
+			local header_added = true
 			local title_added = false
 			for i,name in ipairs(crafters) do
 				if not title_added then
@@ -1385,7 +1385,7 @@ function ProfessionPopup_Init(menuFrame, level)
 		UIDropDownMenu_AddButton(title)
 		local i=1
 		for player, gatherModule in pairs(Skillet.dataGatheringModules) do
-			skillData = gatherModule.ScanPlayerTradeSkills(gatherModule, player)
+			local skillData = gatherModule.ScanPlayerTradeSkills(gatherModule, player)
 			if skillData then
 				playerMenu.text = player
 				playerMenu.hasArrow = true

@@ -181,7 +181,7 @@ function plugin.GetExtraText(skill, recipe)
 	if BeanCounterDB and itemID and Skillet.db.profile.plugins.beancounter.enabled then
 
 		if BeanCounter and BeanCounterUiFrame and BeanCounterUiFrame:IsVisible() then
-				name = GetItemInfo(itemID)
+				local name = GetItemInfo(itemID)
 				if name then
 					BeanCounter.API.search(name)
 				end

@@ -72,7 +72,7 @@ function DA.WARN(...)
 		elseif (vtype == "number") then 
 			text = text..comma..tostring(value)
 		elseif (vtype == "string") then
-			t = string.sub(value,1,2)
+			local t = string.sub(value,1,2)
 			if t == ", " then
 				text = text..value
 			else
@@ -169,7 +169,7 @@ function DA.TRACE(...)
 		elseif (vtype == "number") then 
 			text = text..comma..tostring(value)
 		elseif (vtype == "string") then
-			t = string.sub(value,1,2)
+			local t = string.sub(value,1,2)
 			if t == ", " then
 				text = text..value
 			else

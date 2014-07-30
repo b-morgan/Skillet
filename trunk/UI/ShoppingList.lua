@@ -141,7 +141,7 @@ function Skillet:ShoppingListButton_OnEnter(button)
 	GameTooltip:SetHyperlink(link)
 	GameTooltip:Show()
 	if EnhTooltip and EnhTooltip.TooltipCall then
-		quantity = button.count
+		local quantity = button.count
 		EnhTooltip.TooltipCall(GameTooltip, name, link, quality, quantity)
 	end
 	CursorUpdate(button)
@@ -210,6 +210,7 @@ function Skillet:GetShoppingList(player, includeBank, includeGuildbank)
 			DA.DEBUG(2,"reagent: "..id.." x "..count)
 				local deficit = count -- deficit is usually negative
 				local numInBags, numInBank, numInBagsCurrent, numInBankCurrent, numGuildbank = 0,0,0,0,0
+				local _
 				if not usedInventory[player][id] then
 					numInBags, _, numInBank = self:GetInventory(player, id)
 				end
