@@ -942,9 +942,9 @@ function Skillet:internal_UpdateTradeSkillWindow()
 	button_count = math.floor(button_count)
 	-- Update the scroll frame
 	FauxScrollFrame_Update(SkilletSkillList,				-- frame
-						   numTradeSkills,                  -- num items
-						   button_count,                    -- num to display
-						   SKILLET_TRADE_SKILL_HEIGHT)      -- value step (item height)
+							numTradeSkills,					-- num items
+							button_count,					-- num to display
+							SKILLET_TRADE_SKILL_HEIGHT)		-- value step (item height)
 	-- Where in the list of skill to start counting.
 	local skillOffset = FauxScrollFrame_GetOffset(SkilletSkillList);
 	-- Remove any selected highlight, it will be added back as needed
@@ -955,7 +955,7 @@ function Skillet:internal_UpdateTradeSkillWindow()
 		-- adjust for the width of the scroll bar, if it is visible.
 		width = width - 20
 	end
-
+	local text, color, skillIndex
 	local max_text_width = width
 	local showBag = self:GetTradeSkillOption("filterInventory-bag")
 	local showVendor = self:GetTradeSkillOption("filterInventory-vendor")
@@ -973,7 +973,7 @@ function Skillet:internal_UpdateTradeSkillWindow()
 		button:SetWidth(width)
 		if rawSkillIndex <= numTradeSkills then
 			local skill = sortedSkillList[rawSkillIndex]
-			skillIndex = skill.skillIndex
+			local skillIndex = skill.skillIndex
 			local buttonText = _G[button:GetName() .. "Name"]
 			local levelText = _G[button:GetName() .. "Level"]
 			local countText = _G[button:GetName() .. "Counts"]
@@ -1292,7 +1292,7 @@ function Skillet:SkillButton_OnEnter(button)
 	tip:SetScale(uiScale)
 	-- If not displaying full tooltips you have to press Ctrl to see them
 	if IsControlKeyDown() or Skillet.db.profile.display_full_tooltip then
-		local name, link, quality, quantity, altlink
+		local name, link, quality, quantity, altlink, _
 		if recipe.itemID == 0 or not Skillet.db.profile.display_item_tooltip then
 			link = GetSpellLink(skill.recipeID)
 			name = GetSpellInfo(link)
@@ -1398,7 +1398,7 @@ function Skillet:SetTradeSkillToolTip(skillIndex)
 			GameTooltip:SetTradeSkillItem(skillIndex)
 			if EnhTooltip and EnhTooltip.TooltipCall then
 				local name, link, quality = GetItemInfo("item:"..recipe.itemID)
-				quantity = recipe.numMade
+				local quantity = recipe.numMade
 				EnhTooltip.TooltipCall(GameTooltip, name, link, quality, quantity)
 			end
 			if IsShiftKeyDown() then
@@ -2305,7 +2305,7 @@ function Skillet:ReagentButtonSkillSelect(player, id)
 	gearTexture:Hide()
 	GameTooltip:Hide()
 --	button:Hide()		-- hide the button so that if a new button is shown in this slot, a new "OnEnter" event will fire
-	newRecipe = self:GetRecipe(id)
+	local newRecipe = self:GetRecipe(id)
 	self:PushSkill(self.currentPlayer, self.currentTrade, self.selectedSkill)
 	self:SetTradeSkill(player, newRecipe.tradeID, skillIndexLookup[id])
 end

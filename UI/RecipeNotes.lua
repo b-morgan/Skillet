@@ -169,7 +169,7 @@ function Skillet:UpdateNotesWindow()
 				key = "item:"..recipe.reagentData[index-1].id
 			end
 			button:SetAttribute("notes_key", key)
-			notes_text = self:GetItemNote(key)
+			local notes_text = self:GetItemNote(key)
 			if notes_text then
 				notes:SetText(notes_text)
 			else

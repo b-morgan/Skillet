@@ -447,13 +447,13 @@ function Skillet:GetRecipeName(id)
 	--DA.DEBUG(0,"name "..(id or "nil").." "..(name or "nil"))
 	if name then return name, id end
 	id = tonumber(id)
-	local name = "unknown"
+	name = "unknown"
 	for n,m in pairs(self.recipeDataModules) do
-		if recipeName == "unknown" then
-			recipeName = m.GetRecipeName(m, id)
+		if name == "unknown" then
+			name = m.GetRecipeName(m, id)
 		end
 	end
-	return recipeName
+	return name
 end
 
 function Skillet:GetRecipe(id)
@@ -1689,7 +1689,7 @@ function Skillet:GenerateAltKnowledgeBase()
 						if type(id) == "number" and type(skill) == "table" then
 							local recipeID = skill.id
 							if skill.id then
-								spellID = skill.id
+								local spellID = skill.id
 								unknownRecipes[spellID] = spellID
 								unknownCount = unknownCount + 1
 							end
@@ -1930,7 +1930,7 @@ function SkilletARL:RecipeFilterOperatorOLD(skillIndex)
 	if Skillet:GetTradeSkillOption("recipeSourceFilter") then
 		local skill = Skillet:GetSkill(Skillet.currentPlayer, Skillet.currentTrade, skillIndex)
 		local _, recipeList, mobList, trainerList = AckisRecipeList:InitRecipeData()
-		recipeData = AckisRecipeList:GetRecipeData(skill.id)
+		local recipeData = AckisRecipeList:GetRecipeData(skill.id)
 		if recipeData == nil and not ARLProfessionInitialized[Skillet.currentTrade] then
 			local profession = GetSpellInfo(Skillet.currentTrade)
 			AckisRecipeList:AddRecipeData(profession)
@@ -1938,7 +1938,7 @@ function SkilletARL:RecipeFilterOperatorOLD(skillIndex)
 			recipeData = AckisRecipeList:GetRecipeData(skill.id)
 		end
 		if recipeData then
-			recipeSource = recipeData["Acquire"]
+			local recipeSource = recipeData["Acquire"]
 			for i,data in pairs(recipeSource) do
 				if data["Type"] == 1 and Skillet:GetTradeSkillOption("recipeSourceFilter-trainer") then
 					return false
