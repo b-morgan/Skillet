@@ -2211,20 +2211,6 @@ function Skillet:PushSkill(player, tradeID, skillIndex)
 	table.insert(skillStack, entry)
 end
 
-function Skillet:getGuildPerk()
-	-- icy: calculate working overtime bonus
-	local wot1 = 14
-	local wot2 = 22
-	local gLevel = GetGuildLevel()
-	if (gLevel < wot1 ) then
-		return 0
-	elseif ((gLevel >= wot1) and (gLevel < wot2)) then
-		return 1.10
-	else
-		return 1.20
-	end
-end
-
 function Skillet:getLvlUpChance()
 	-- icy: 03.03.2012:
 	-- according to pope (http://www.wowhead.com/spell=83949#comments)
@@ -2237,14 +2223,20 @@ function Skillet:getLvlUpChance()
 	end
 	local gray = tonumber(SkilletRankFrame.subRanks.green:GetValue())
 	local yellow = tonumber(SkilletRankFrame.subRanks.orange:GetValue())
-	local chance
-	local guildperk = Skillet:getGuildPerk()
 	if (currentLevel > gray) then
 		return 0
 	end
-		if (gray - yellow) == 0 then return 0 end
-		chance = ((gray - currentLevel) / ( gray - yellow ))
-	chance = chance * guildperk
+	if (gray - yellow) == 0 then
+		return 0
+	end
+	local bonus = 1
+	if IsSpellKnown(83949) then -- Working Overtime, Rank 1
+		bonus = 1.1
+	elseif IsSpellKnown(118021) then -- Working Overtime, Rank 2
+		bonus = 1.2
+	end
+	local chance = ((gray - currentLevel) / ( gray - yellow ))
+	chance = chance * bonus
 	chance = chance * 100
 	return chance
 end
