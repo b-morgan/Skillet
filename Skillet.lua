@@ -20,7 +20,7 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
 ]]--
 
-local MAJOR_VERSION = "2.56"
+local MAJOR_VERSION = "2.57"
 local MINOR_VERSION = ("$Revision$"):match("%d+") or 1
 local DATE = string.gsub("$Date$", "^.-(%d%d%d%d%-%d%d%-%d%d).-$", "%1")
 
@@ -374,39 +374,7 @@ Skillet.options =
 				},
 			},
 		},
- --[[
-		inventory = {
-			type = "group",
-			name = L["Inventory"],
-			desc = L["INVENTORYDESC"],
-			order = 13,
-			args = {
-				addons = {
-					type = 'execute',
-					name = L["Supported Addons"],
-					desc = L["SUPPORTEDADDONSDESC"],
-					func = function()
-						Skillet:ShowInventoryInfoPopup()
-					end,
-					order = 1,
-				},
-				show_bank_alt_counts = {
-					type = "toggle",
-					name = L["SHOWBANKALTCOUNTSNAME"],
-					desc = L["SHOWBANKALTCOUNTSDESC"],
-					get = function()
-						return Skillet.db.profile.show_bank_alt_counts
-					end,
-					set = function(value)
-						Skillet.db.profile.show_bank_alt_counts = value
-						Skillet:UpdateTradeSkillWindow()
-					end,
-					order = 2,
-				},
-			},
-		},
-]]
-		config = {
+ 		config = {
 			type = 'execute',
 			name = L["Config"],
 			desc = L["CONFIGDESC"],
@@ -691,6 +659,33 @@ function Skillet:InitializeDatabase(player, clean)
 	if not self.db.realm.skillDB then
 		self.db.realm.skillDB = {}
 	end
+	if not self.db.realm.skillDB[player] then
+		self.db.realm.skillDB[player] = {}
+	end
+	if not self.db.realm.tradeSkills then
+		self.db.realm.tradeSkills = {}
+	end
+	if not self.db.realm.queueData then
+		self.db.realm.queueData = {}
+	end
+	if not self.db.realm.queueData[player] then
+		self.db.realm.queueData[player] = {}
+	end
+	if not self.db.profile.SavedQueues then
+		self.db.profile.SavedQueues = {}
+	end
+	if not self.db.global.recipeDB then
+		self.db.global.recipeDB = {}
+	end
+	if not self.db.global.itemRecipeSource then
+		self.db.global.itemRecipeSource = {}
+	end
+	if not self.db.global.itemRecipeUsedIn then
+		self.db.global.itemRecipeUsedIn = {}
+	end
+	if not self.db.global.cachedGuildbank then
+		self.db.global.cachedGuildbank = {}
+	end
 	if not self.data then
 		self.data = {}
 	end
@@ -700,38 +695,17 @@ function Skillet:InitializeDatabase(player, clean)
 	if not self.data.skillList then
 		self.data.skillList = {}
 	end
-	if not self.db.realm.tradeSkills then
-		self.db.realm.tradeSkills = {}
-	end
 	if not self.data.groupList then
 		self.data.groupList = {}
 	end
 	if not self.data.groupList[player] then
 		self.data.groupList[player] = {}
 	end
-	if not self.db.global.recipeDB then
-		self.db.global.recipeDB = {}
-	end
-	if not self.db.realm.queueData then
-		self.db.realm.queueData = {}
-	end
-	if not self.db.realm.queueData[player] then
-		self.db.realm.queueData[player] = {}
-	end
 	if not self.data.skillIndexLookup then
 		self.data.skillIndexLookup = {}
 	end
 	if not self.data.skillIndexLookup[player] then
 		self.data.skillIndexLookup[player] = {}
-	end
-	if not self.db.global.itemRecipeSource then
-		self.db.global.itemRecipeSource = {}
-	end
-	if not self.db.global.cachedGuildbank then
-		self.db.global.cachedGuildbank = {}
-	end
-	if not self.db.profile.SavedQueues then
-		self.db.profile.SavedQueues = {}
 	end
 	if not self.dataGatheringModules then
 		self.dataGatheringModules = {}
@@ -743,7 +717,6 @@ function Skillet:InitializeDatabase(player, clean)
 		DA.DEBUG(0,"data gather module is nil")
 	end
 	self:CollectRecipeInformation()
---	self:RecipeGroupDeconstructDBStrings()
 end
 
 function Skillet:RegisterRecipeFilter(name, namespace, initMethod, filterMethod)
@@ -780,14 +753,10 @@ function Skillet:OnEnable()
 	-- Trade skill window changes
 	self:RegisterEvent("TRADE_SKILL_CLOSE", "SkilletClose")
 	self:RegisterEvent("TRADE_SKILL_SHOW", "SkilletShow")
-	-- self:RegisterEvent("TRADE_SKILL_UPDATE")
 	self:RegisterEvent("GUILD_RECIPE_KNOWN_BY_MEMBERS", "SkilletShowGuildCrafters")
 	-- TODO: Tracks when the number of items on hand changes
-	-- self:RegisterEvent("BAG_OPEN") -- Fires when a non-inventory container is opened.
 	self:RegisterEvent("BAG_UPDATE") -- Fires for both bag and bank updates.
 	self:RegisterEvent("BAG_UPDATE_DELAYED") -- Fires after all applicable BAG_UPADTE events for a specific action have been fired.
-	-- self:RegisterEvent("BAG_CLOSED") -- Fires when the whole bag is removed.
-	-- self:RegisterEvent("TRADE_CLOSED")
 	-- MERCHANT_SHOW, MERCHANT_HIDE, MERCHANT_UPDATE events needed for auto buying.
 	self:RegisterEvent("MERCHANT_SHOW")
 	self:RegisterEvent("MERCHANT_UPDATE")
@@ -802,7 +771,6 @@ function Skillet:OnEnable()
 	self:RegisterEvent("AUCTION_HOUSE_SHOW")
 	-- Since we don't interact with the auction house, we don't need an "update" event
 	self:RegisterEvent("AUCTION_HOUSE_CLOSED")
-	-- self:RegisterEvent("CURSOR_UPDATE") -- Cursor is used to transfer items from/to bags and banks
 	--
 	-- Messages from the Stitch libary
 	-- These need to update the tradeskill window, not just the queue
@@ -859,10 +827,6 @@ function Skillet:SkilletShow()
 	TradeSkillFrame_Update();
 	self.linkedSkill, self.currentPlayer = Skillet:IsTradeSkillLinked()
 	if self.linkedSkill then
---		if (self.currentPlayer == UnitName("player")) then
---		self.currentPlayer = "All Data"
---		end
---		DA.DEBUG(1,"SkilletShow ".." player "..self.currentPlayer)
 		self:RegisterPlayerDataGathering(self.currentPlayer,SkilletLink,"sk")
 	else
 		self:InitializeAllDataLinks("All Data")
@@ -981,13 +945,6 @@ DA.DEBUG(0,"setting tradeskill to "..player.." "..tradeID.." "..(skillIndex or "
 		self.db.realm.queueData[player] = {}
 	end
 	if player ~= self.currentPlayer or tradeID ~= self.currentTrade then
---		local kbA = collectgarbage("count")
---		self.data.recipeList = {}
---		self.data.skillList = {}
---		self.data.groupList = {}
---		collectgarbage("collect")
---		local kbB = collectgarbage("count")
---		DA.DEBUG(1,"free'd " .. math.floor((kbA - kbB)*100+.5)/100 .. " Kb")
 		collectgarbage("collect")
 	 	self.currentPlayer = player
 		local oldTradeID = self.currentTrade
@@ -1047,7 +1004,6 @@ function Skillet:UpdateTradeSkill()
 		self.sortedRecipeList = {}
 		-- And start the update sequence through the rest of the mod
 		self:SetSelectedTrade(new_trade)
---		self:RescanTrade()
 		-- remove any filters currently in place
 		local filterbox = _G["SkilletFilterBox"];
 		local filtertext = self:GetTradeSkillOption("filtertext", self.currentPlayer, new_trade)
@@ -1122,14 +1078,6 @@ end
 function Skillet:SetSelectedTrade(newTrade)
 	self.currentTrade = newTrade;
 	self:SetSelectedSkill(nil, false)
---	self.headerCollapsedState = {};
---	self:UpdateTradeSkillWindow()
-	-- Stop the stitch queue and nuke anything in it.
-	-- would be nice to allow queuing items from different
-	-- trades, but the Blizzard design does not allow that
---	self:CancelCast();
---	self:StopCast();
---	self:ClearQueue();
 end
 
 -- Sets the specific trade skill that the user wants to see details on.
@@ -1141,12 +1089,6 @@ function Skillet:SetSelectedSkill(skillIndex, wasClicked)
 		-- new skill selected
 		self:HideNotesWindow() -- XXX: should this be an update?
 	end
---	if skillIndex then
---		local recipe = self:GetRecipeDataByProfessionIndex(self.currentTrade, skillIndex)
---		self:ConfigureRecipeControls(recipe.numMade==0)			-- numMade==0 indicates an enchantment
---	else
---		self:ConfigureRecipeControls(false)
---	end
 	self:ConfigureRecipeControls(false)				-- allow ALL trades to queue up items (enchants as well)
 	self.selectedSkill = skillIndex
 	self:ScrollToSkillIndex(skillIndex)
@@ -1171,23 +1113,6 @@ function Skillet:QueueChanged()
 	-- second delay before the real update window method is called. That
 	-- give the rest of the UI (and the API methods called by Stitch) time
 	-- to record any used reagents.
---[[
-	if Skillet.tradeSkillFrame and Skillet.tradeSkillFrame:IsVisible() then
-		if not AceEvent:IsEventScheduled("Skillet_UpdateWindows") then
-			AceEvent:ScheduleEvent("Skillet_UpdateWindows", Skillet.UpdateTradeSkillWindow, 0.5, self)
-		end
-	end
-	if SkilletShoppingList and SkilletShoppingList:IsVisible() then
-		if not AceEvent:IsEventScheduled("Skillet_UpdateShoppingList") then
-			AceEvent:ScheduleEvent("Skillet_UpdateShoppingList", Skillet.UpdateShoppingListWindow, 0.25, self)
-		end
-	end
-	if MerchantFrame and MerchantFrame:IsVisible() then
-		if not AceEvent:IsEventScheduled("Skillet_UpdateMerchantFrame") then
-			AceEvent:ScheduleEvent("Skillet_UpdateMerchantFrame", Skillet.UpdateMerchantFrame, 0.25, self)
-		end
-	end
-]]
 end
 
 -- Gets the note associated with the item, if there is such a note.
@@ -1444,9 +1369,7 @@ function ProfessionPopup_Init(menuFrame, level)
 end
 
 function ProfessionPopup_Show(this)
---	if not ProfessionPopupFrame then
-		ProfessionPopupFrame = CreateFrame("Frame", "ProfessionPopupFrame", _G["UIParent"], "UIDropDownMenuTemplate")
---	end
+	ProfessionPopupFrame = CreateFrame("Frame", "ProfessionPopupFrame", _G["UIParent"], "UIDropDownMenuTemplate")
 	Skillet.professionPopupButton = this
 	UIDropDownMenu_Initialize(ProfessionPopupFrame, ProfessionPopup_Init, "MENU")
 	ToggleDropDownMenu(1, nil, ProfessionPopupFrame, Skillet.professionPopupButton, Skillet.professionPopupButton:GetWidth(), 0)
