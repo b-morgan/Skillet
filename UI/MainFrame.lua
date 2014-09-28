@@ -156,7 +156,7 @@ function Skillet:CreateTradeSkillWindow()
 	SkilletShoppingListButton:SetText(L["Shopping List"])
 	SkilletSortLabel:SetText(L["Sorting"])
 	SkilletGroupLabel:SetText(L["Grouping"])
-	    SkilletViewCraftersButton:SetText(L["View Crafters"])
+	SkilletViewCraftersButton:SetText(L["View Crafters"])
 	SkilletQueueManagementButton:SetText(L["Queues"])
 --	SkilletDetailsManagementButton:SetText("Details")
 	SkilletQueueLoadButton:SetText(L["Load"])
@@ -2164,6 +2164,7 @@ end
 -- this function assures that a recipe that is indirectly selected (via reagent clicks, for example)
 -- will be visible in the skill list (ie, not scrolled off the top/bottom)
 function Skillet:ScrollToSkillIndex(skillIndex)
+	DA.DEBUG(0,"ScrollToSkillIndex("..tostring(skillIndex)..")")
 	if skillIndex == nil then
 		return
 	end
@@ -2172,27 +2173,29 @@ function Skillet:ScrollToSkillIndex(skillIndex)
 	if SkilletSkillList:IsVisible() then
 		local skillListKey = self.currentPlayer..":"..self.currentTrade..":"..self.currentGroupLabel
 		local sortedSkillList = self.data.sortedSkillList[skillListKey]
-		local sortedIndex
-		for i=1,#sortedSkillList,1 do
-			if sortedSkillList[i].skillIndex == skillIndex then
-				sortedIndex = i
-				break
+		if sortedSkillList then
+			local sortedIndex
+			for i=1,#sortedSkillList,1 do
+				if sortedSkillList[i].skillIndex == skillIndex then
+					sortedIndex = i
+					break
+				end
 			end
-		end
-		sortedIndex = sortedIndex or 1
-		local scrollbar = _G["SkilletSkillListScrollBar"]
-		local button_count = SkilletSkillList:GetHeight() / SKILLET_TRADE_SKILL_HEIGHT
-		button_count = math.floor(button_count)
-		local skillOffset = FauxScrollFrame_GetOffset(SkilletSkillList)
-		--DA.DEBUG(0, (skillOffset or "nil").." > "..(sortedIndex or "nil"))
-		if skillOffset > sortedIndex then
-			sortedIndex = sortedIndex - 1
-			FauxScrollFrame_SetOffset(SkilletSkillList, sortedIndex)
-			scrollbar:SetValue(sortedIndex * SKILLET_TRADE_SKILL_HEIGHT)
-		elseif (skillOffset + button_count) < sortedIndex then
-			sortedIndex = sortedIndex - button_count
-			FauxScrollFrame_SetOffset(SkilletSkillList, sortedIndex)
-			scrollbar:SetValue(sortedIndex * SKILLET_TRADE_SKILL_HEIGHT)
+			sortedIndex = sortedIndex or 1
+			local scrollbar = _G["SkilletSkillListScrollBar"]
+			local button_count = SkilletSkillList:GetHeight() / SKILLET_TRADE_SKILL_HEIGHT
+			button_count = math.floor(button_count)
+			local skillOffset = FauxScrollFrame_GetOffset(SkilletSkillList)
+			--DA.DEBUG(0, (skillOffset or "nil").." > "..(sortedIndex or "nil"))
+			if skillOffset > sortedIndex then
+				sortedIndex = sortedIndex - 1
+				FauxScrollFrame_SetOffset(SkilletSkillList, sortedIndex)
+				scrollbar:SetValue(sortedIndex * SKILLET_TRADE_SKILL_HEIGHT)
+			elseif (skillOffset + button_count) < sortedIndex then
+				sortedIndex = sortedIndex - button_count
+				FauxScrollFrame_SetOffset(SkilletSkillList, sortedIndex)
+				scrollbar:SetValue(sortedIndex * SKILLET_TRADE_SKILL_HEIGHT)
+			end
 		end
 	end
 	self:UpdateTradeSkillWindow()
@@ -2265,6 +2268,7 @@ end
 
 -- Called when then mouse enters a reagent button
 function Skillet:ReagentButtonOnEnter(button, skillIndex, reagentIndex)
+	DA.DEBUG(1,"Skillet:ReagentButtonOnEnter("..tostring(button)..", "..tostring(skillIndex)..", "..tostring(reagentIndex)..")")
 	GameTooltip:SetOwner(button, "ANCHOR_TOPLEFT")
 	local skill = self:GetSkill(self.currentPlayer, self.currentTrade, skillIndex)
 	local recipe = self:GetRecipe(skill.id)
@@ -2293,17 +2297,23 @@ function Skillet:ReagentButtonOnLeave(button, skillIndex, reagentIndex)
 end
 
 function Skillet:ReagentButtonSkillSelect(player, id)
-	local skillIndexLookup = self.data.skillIndexLookup[player]
-	gearTexture:Hide()
-	GameTooltip:Hide()
---	button:Hide()		-- hide the button so that if a new button is shown in this slot, a new "OnEnter" event will fire
-	local newRecipe = self:GetRecipe(id)
-	self:PushSkill(self.currentPlayer, self.currentTrade, self.selectedSkill)
-	self:SetTradeSkill(player, newRecipe.tradeID, skillIndexLookup[id])
+	DA.DEBUG(0,"Skillet:ReagentButtonSkillSelect("..tostring(player)..", "..tostring(id)..")")
+	if player == UnitName("player") then -- Blizzard's 5.4 update prevents us from changing away from the current player
+		local skillIndexLookup = Skillet.data.skillIndexLookup[player]
+		gearTexture:Hide()
+		GameTooltip:Hide()
+		local newRecipe = Skillet:GetRecipe(id)
+		DA.DEBUG(0,"newRecipe= "..DA.DUMP1(newRecipe))
+		if newRecipe then
+			Skillet:PushSkill(Skillet.currentPlayer, Skillet.currentTrade, Skillet.selectedSkill)
+			Skillet:SetTradeSkill(player, newRecipe.tradeID, skillIndexLookup[id])
+		end
+	end
 end
 
 -- Called when the reagent button is clicked
 function Skillet:ReagentButtonOnClick(button, skillIndex, reagentIndex)
+	DA.DEBUG(0,"Skillet:ReagentButtonOnClick("..tostring(button)..", "..tostring(skillIndex)..", "..tostring(reagentIndex)..")")
 	if not self.db.profile.link_craftable_reagents then
 		return
 	end
@@ -2312,6 +2322,7 @@ function Skillet:ReagentButtonOnClick(button, skillIndex, reagentIndex)
 	local newRecipeTable = self.db.global.itemRecipeSource[reagent.id]
 	local skillIndexLookup = self.data.skillIndexLookup
 	local player = self.currentPlayer
+	local myRecipeID
 	local newRecipeID
 	local newPlayer
 	if newRecipeTable then
@@ -2321,20 +2332,21 @@ function Skillet:ReagentButtonOnClick(button, skillIndex, reagentIndex)
 		if not self.recipeMenu then
 			self.recipeMenu = CreateFrame("Frame", "SkilletRecipeMenu", _G["UIParent"], "UIDropDownMenuTemplate")
 		end
-		-- TODO: popup with selection if there is more than 1 potential recipe source for the reagent (small prismatic shards, for example)
-		for player in pairs(skillIndexLookup) do
+		-- popup with selection if there is more than 1 potential recipe source for the reagent (small prismatic shards, for example)
+		for p in pairs(skillIndexLookup) do
 			for id in pairs(newRecipeTable) do
-				if skillIndexLookup[player][id] then
+				if skillIndexLookup[p][id] then
 					recipeCount = recipeCount + 1
-					local skillID = skillIndexLookup[player][id]
-					local newRecipe = self:GetRecipe(id)
-					local newSkill = self:GetSkill(player, newRecipe.tradeID, skillID)
+					newRecipe = self:GetRecipe(id)
+					local skillID = skillIndexLookup[p][id]
+					local newSkill = self:GetSkill(p, newRecipe.tradeID, skillID)
 					self.data.recipeMenuTable[recipeCount] = {}
-					self.data.recipeMenuTable[recipeCount].text = player .." : " .. newSkill.color.cstring .. newRecipe.name
-					self.data.recipeMenuTable[recipeCount].arg1 = player
+					self.data.recipeMenuTable[recipeCount].text = p .." : " .. newRecipe.name or "Unknown"
+					self.data.recipeMenuTable[recipeCount].arg1 = p
 					self.data.recipeMenuTable[recipeCount].arg2 = id
-					self.data.recipeMenuTable[recipeCount].func = function(arg1,arg2) Skillet:ReagentButtonSkillSelect(arg1,arg2) end
-					if player == self.currentPlayer then
+					self.data.recipeMenuTable[recipeCount].func = function(arg1,arg2) Skillet.ReagentButtonSkillSelect(arg1,arg2) end
+					if p == self.currentPlayer then
+						myRecipeID = id
 						self.data.recipeMenuTable[recipeCount].textr = 1.0
 						self.data.recipeMenuTable[recipeCount].textg = 1.0
 						self.data.recipeMenuTable[recipeCount].textb = 1.0
@@ -2343,12 +2355,17 @@ function Skillet:ReagentButtonOnClick(button, skillIndex, reagentIndex)
 						self.data.recipeMenuTable[recipeCount].textG = .7
 						self.data.recipeMenuTable[recipeCount].textB = .7
 					end
-					newPlayer = player
+					newPlayer = p
 					newRecipeID = id
 				end
 			end
 		end
-		if recipeCount == 1 then
+--		DA.DEBUG(0,"recipeMenuTable= "..DA.DUMP1(self.data.recipeMenuTable))
+		if myRecipeID then
+			newPlayer = player
+			newRecipeID = myRecipeID
+		end
+		if recipeCount == 1 or myRecipeID then
 			gearTexture:Hide()
 			GameTooltip:Hide()
 			button:Hide()					-- hide the button so that if a new button is shown in this slot, a new "OnEnter" event will fire

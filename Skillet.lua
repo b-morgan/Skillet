@@ -584,6 +584,9 @@ function Skillet:OnInitialize()
 		SkilletDBPC = {}
 	end
 	DA.DebugLog = SkilletDBPC
+	if not SkilletMemory then
+		SkilletMemory = {}
+	end
 	self.db = AceDB:New("SkilletDB", defaults)
 	local _,_,_,wowVersion = GetBuildInfo();
 	self.wowVersion = wowVersion
@@ -695,6 +698,9 @@ function Skillet:InitializeDatabase(player, clean)
 	if not self.data.skillList then
 		self.data.skillList = {}
 	end
+	if not self.data.skillList[player] then
+		self.data.skillList[player] = {}
+	end
 	if not self.data.groupList then
 		self.data.groupList = {}
 	end
@@ -749,6 +755,7 @@ end
 
 -- Called when the addon is enabled
 function Skillet:OnEnable()
+	DA.DEBUG(0,"Skillet:OnEnable()");
 	-- Hook into the events that we care about
 	-- Trade skill window changes
 	self:RegisterEvent("TRADE_SKILL_CLOSE", "SkilletClose")
@@ -771,6 +778,7 @@ function Skillet:OnEnable()
 	self:RegisterEvent("AUCTION_HOUSE_SHOW")
 	-- Since we don't interact with the auction house, we don't need an "update" event
 	self:RegisterEvent("AUCTION_HOUSE_CLOSED")
+	self:RegisterEvent("PLAYER_LOGOUT")
 	--
 	-- Messages from the Stitch libary
 	-- These need to update the tradeskill window, not just the queue
@@ -792,12 +800,23 @@ function Skillet:OnEnable()
 	self:EnableDataGathering("Skillet")
 	Skillet:UpdateAutoTradeButtons()
 	self:DisableBlizzardFrame()
-	
 	Skillet:EnablePlugins()
+end
+
+function Skillet:PLAYER_LOGOUT()
+	DA.DEBUG(0,"PLAYER_LOGOUT")
+--[[
+--
+-- Make a copy of the in memory data for debugging. Note: DeepCopy.lua needs to be added to the .toc
+--
+	self.data.sortedSkillList = {"Removed"} -- This table is huge so don't save it unless needed.
+	SkilletMemory = DA.deepcopy(self.data)
+]]
 end
 
 -- Called when the addon is disabled
 function Skillet:OnDisable()
+	DA.DEBUG(0,"Skillet:OnDisable()");
 	self:UnregisterAllEvents()
 	self:EnableBlizzardFrame()
 end
@@ -896,7 +915,7 @@ end
 
 -- So we can track when the players inventory changes and update craftable counts
 function Skillet:BAG_UPDATE(event, bagID)
-	DA.DEBUG(2,"BAG_UPDATE( "..bagID.." )")
+--	DA.DEBUG(2,"BAG_UPDATE( "..bagID.." )")
 	if not self.rescan_auto_targets_timer then
 		self.rescan_auto_targets_timer = self:ScheduleTimer("UpdateAutoTradeButtons", 0.3)
 	end
@@ -940,7 +959,7 @@ function Skillet:TRADE_CLOSED()
 end
 
 function Skillet:SetTradeSkill(player, tradeID, skillIndex)
-DA.DEBUG(0,"setting tradeskill to "..player.." "..tradeID.." "..(skillIndex or "nil"))
+	DA.DEBUG(0,"SetTradeSkill("..tostring(player)..", "..tostring(tradeID)..", "..tostring(skillIndex)..")")
 	if not self.db.realm.queueData[player] then
 		self.db.realm.queueData[player] = {}
 	end
@@ -984,7 +1003,6 @@ DA.DEBUG(0,"setting tradeskill to "..player.." "..tradeID.." "..(skillIndex or "
 				self:UpdateTradeSkillWindow()
 			end
 		end
-		DA.DEBUG(0,"Tradeskill is set to "..(self.currentPlayer or "nil").." "..(self.currentTrade or "nil"))
 	end
 	self:SetSelectedSkill(skillIndex, false)
 end
@@ -1076,12 +1094,14 @@ end
 
 -- Notes when a new trade has been selected
 function Skillet:SetSelectedTrade(newTrade)
+	DA.DEBUG(0,"SetSelectedTrade("..tostring(newTrade)..")")
 	self.currentTrade = newTrade;
 	self:SetSelectedSkill(nil, false)
 end
 
 -- Sets the specific trade skill that the user wants to see details on.
 function Skillet:SetSelectedSkill(skillIndex, wasClicked)
+	DA.DEBUG(0,"SetSelectedSkill("..tostring(skillIndex)..", "..tostring(wasClicked)..")")
 	if not skillIndex then
 		-- no skill selected
 		self:HideNotesWindow()
