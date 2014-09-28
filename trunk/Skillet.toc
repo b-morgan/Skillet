@@ -16,7 +16,7 @@
 ## X-RelSite-Curse: http://wow.curse.com/downloads/wow-addons/details/skillet.aspx
 #### X-RelSite-UI.WoW:
 ## SavedVariables: SkilletDB
-## SavedVariablesPerCharacter: SkilletDBPC
+## SavedVariablesPerCharacter: SkilletDBPC, SkilletMemory
 ## OptionalDeps: Ace3, LibAbacus-3.0, LibDialog-1.0, LibWindow-1.1, LibPeriodicTable-3.1, GFW_ReagentCost, TradeSkillInfo, TradeSkillMaster
 ## X-Embeds: Ace3, LibStub, CallbackHandler-1.0, LibAbacus-3.0, LibDialog-1.0, LibWindow-1.1, LibPeriodicTable-3.1
 ## X-Revision: $Rev$
@@ -76,6 +76,7 @@ RecipeGroups.lua
 Inventory.lua
 SkilletPlugin.lua
 DebugAids.lua
+## DeepCopy.lua ## Only needed for serious debugging.
 
 #### Plugins
 Plugins\AckisRecipeList.lua

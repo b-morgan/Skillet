@@ -383,13 +383,6 @@ function Skillet:RecipeGroupFlatten(group, depth, list, index)
 					inSub = self:RecipeGroupFlatten(entry.subGroup, depth+1, list, num+index)
 				end
 				num = num + inSub
---[[
-				if inSub == 0 and entry.subGroup.expanded then			-- if no items are added in a sub-group, then don't add the sub-group header
-					num = num - 1
-				else
-					num = num + inSub
-				end
-]]
 			else
 				local skillData = self:GetSkill(self.currentPlayer, self.currentTrade, entry.skillIndex)
 				local recipe = self:GetRecipe(entry.recipeID)
@@ -415,7 +408,6 @@ function Skillet:RecipeGroupFlatten(group, depth, list, index)
 					newSkill.depth = depth
 					newSkill.skillData = skillData
 					newSkill.spellID = recipe.spellID
-					DA.DEBUG(2,"id: "..newSkill.spellID)
 					if (index>0) then
 						newSkill.parentIndex = index
 					else
