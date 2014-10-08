@@ -957,6 +957,7 @@ function Skillet:internal_UpdateTradeSkillWindow()
 	end
 	local text, color, skillIndex
 	local max_text_width = width
+	local showOwned = self:GetTradeSkillOption("filterInventory-owned") -- count from Altoholic
 	local showBag = self:GetTradeSkillOption("filterInventory-bag")
 	local showVendor = self:GetTradeSkillOption("filterInventory-vendor")
 	local showBank = self:GetTradeSkillOption("filterInventory-bank")
@@ -1087,7 +1088,6 @@ function Skillet:internal_UpdateTradeSkillWindow()
 					local cbank =  "|cffffa050"
 					local calts = "|cffff80ff"
 					if (num > 0 and showBag) or (numwvendor > 0 and showVendor) or (numwbank > 0 and showBank) or (numwalts > 0 and showAlts) then
---					if num > 0 or numwvendor > 0 or numwbank > 0 or numwalts > 0 then
 						local c = 1
 						if showBag then
 							if num >= 1000 then
@@ -1149,11 +1149,8 @@ function Skillet:internal_UpdateTradeSkillWindow()
 				if showAlts then
 					countWidth = countWidth + 20
 				end
-				if countWidth > 0 then
-					countWidth = countWidth + 20
-				end
 				-- check for Altoholic, then show the count of the item currently owned that the recipe will produce
-				if Altoholic then
+				if showOwned and Altoholic then
 					local numowned = (Altoholic:GetItemCount(recipe.itemID) or 0)
 					if numowned > 0 then
 						local count = "|cff95fcff("..numowned..") "..(countText:GetText() or "")
@@ -1170,6 +1167,9 @@ function Skillet:internal_UpdateTradeSkillWindow()
 						countText:SetText(count)
 						countText:Show()
 					end
+				end
+				if countWidth > 0 then
+					countWidth = countWidth + 20
 				end
 				countText:SetWidth(countWidth)
 				Skillet:CustomizeCountsColumn(recipe, countText)
@@ -2483,6 +2483,9 @@ function Skillet:InventoryFilterButtons_Show()
 	SkilletInventoryFilterVendor:Show()
 	SkilletInventoryFilterBank:Show()
 	SkilletInventoryFilterAlts:Show()
+	if Altoholic then 
+		SkilletInventoryFilterOwned:Show()
+	end
 end
 
 function Skillet:InventoryFilterButtons_Hide()
@@ -2490,6 +2493,7 @@ function Skillet:InventoryFilterButtons_Hide()
 	SkilletInventoryFilterVendor:Hide()
 	SkilletInventoryFilterBank:Hide()
 	SkilletInventoryFilterAlts:Hide()
+	SkilletInventoryFilterOwned:Hide()
 end
 
 local skillMenuSelection = {

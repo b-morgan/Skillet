@@ -1472,6 +1472,23 @@
 					</OnLoad>
 				</Scripts>
 			</CheckButton>
+			<CheckButton name="SkilletInventoryFilterOwned" inherits="SkilletInvFilterButtonTemplate" hidden="true">
+				<Anchors>
+					<Anchor point="LEFT" relativeTo="SkilletInventoryFilterAlts" relativePoint="RIGHT">
+						<Offset>
+							<AbsDimension x="0" y="0"/>
+						</Offset>
+					</Anchor>
+				</Anchors>
+				<NormalTexture name="$parentIcon" file="Interface\Icons\INV_Drink_13"/>
+				<Scripts>
+					<OnLoad>
+						self:SetFrameLevel(self:GetFrameLevel()+5)
+						self.slot = "owned"
+						_G[self:GetName().."Checked"]:SetGradient("vertical",1,.5,1, 1,.5,1)
+					</OnLoad>
+				</Scripts>
+			</CheckButton>
 			<Button name="SkilletRecipeDifficultyButton">
 				<Size>
 					<AbsDimension x="20" y="20"/>
