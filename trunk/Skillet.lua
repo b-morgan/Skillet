@@ -20,7 +20,7 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
 ]]--
 
-local MAJOR_VERSION = "2.57"
+local MAJOR_VERSION = "2.58"
 local MINOR_VERSION = ("$Revision$"):match("%d+") or 1
 local DATE = string.gsub("$Date$", "^.-(%d%d%d%d%-%d%d%-%d%d).-$", "%1")
 
@@ -82,6 +82,7 @@ Skillet.defaultOptions = {
 	["filterInventory-vendor"] = true,
 	["filterInventory-bank"] = true,
 	["filterInventory-alts"] = false,
+	["filterInventory-owned"] = true,
 	["filterLevel"] = 1,
 	["hideuncraftable"] = false,
 }
