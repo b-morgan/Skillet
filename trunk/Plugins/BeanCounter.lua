@@ -103,11 +103,7 @@ plugin.options =
 function plugin.OnInitialize()
 	if not Skillet.db.profile.plugins.beancounter then
 		Skillet.db.profile.plugins.beancounter = {}
-	end
-	if not Skillet.db.profile.plugins.beancounter.enabled then
 		Skillet.db.profile.plugins.beancounter.enabled = true
-	end
-	if not Skillet.db.profile.plugins.beancounter.days then
 		Skillet.db.profile.plugins.beancounter.days = 30
 	end
 	local acecfg = LibStub("AceConfig-3.0")
