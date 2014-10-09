@@ -20,10 +20,6 @@
 ## OptionalDeps: Ace3, LibAbacus-3.0, LibDialog-1.0, LibWindow-1.1, LibPeriodicTable-3.1, GFW_ReagentCost, TradeSkillInfo, TradeSkillMaster
 ## X-Embeds: Ace3, LibStub, CallbackHandler-1.0, LibAbacus-3.0, LibDialog-1.0, LibWindow-1.1, LibPeriodicTable-3.1
 ## X-Revision: $Rev$
-## X-Curse-Packaged-Version: 2.57
-## X-Curse-Project-Name: Skillet
-## X-Curse-Project-ID: skillet
-## X-Curse-Repository-ID: wow/skillet/mainline
 
 ## LoadManagers: AddonLoader
 ## X-LoadOn-Always: delayed
