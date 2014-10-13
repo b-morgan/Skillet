@@ -210,6 +210,7 @@ local skill_style_type = {
 local lastAutoTarget = {}
 local SkilletDataScanTooltip = CreateFrame("GameTooltip", "SkilletDataScanTooltip", nil, "GameTooltipTemplate")
 SkilletDataScanTooltip:SetOwner(WorldFrame, "ANCHOR_NONE")
+
 local function FixedGetTradeSkillReagentItemLink(i,j)
 	local tooltip = SkilletDataScanTooltip
 	tooltip:ClearLines()
@@ -522,12 +523,15 @@ function SkilletData:GetRecipe(id)
 end
 
 function Skillet:GetNumSkills(player, trade)
-	DA.DEBUG(2,"Skillet:GetNumSkills("..tostring(player)..", "..tostring(trade)..")")
+	local r
 	local skillModule = self.dataGatheringModules[player]
 	if skillModule then
-		return skillModule.GetNumSkills(skillModule, player, trade)
+		r = skillModule.GetNumSkills(skillModule, player, trade)
+	else
+		r = 0
 	end
-	return 0
+	DA.DEBUG(2,"Skillet:GetNumSkills("..tostring(player)..", "..tostring(trade)..")= "..tostring(r))
+	return r
 end
 
 function Skillet:GetSkillRanks(player, trade)
@@ -558,17 +562,20 @@ function SkilletLink:GetSkillRanks(player, trade)
 end
 
 function SkilletLink:GetNumSkills(player, trade)
---	DA.DEBUG(3,"SkilletLink:GetNumSkills("..tostring(player)..", "..tostring(trade)..")")
+	local r
 	local linkedSkill, linkedPlayer = Skillet:IsTradeSkillLinked()
 	if linkedSkill then
 --		if linkedPlayer == player then
 			local skill, rank, max = GetTradeSkillLine()
 			if GetSpellInfo(trade) == skill then
-				return GetNumTradeSkills()
+				r = GetNumTradeSkills()
 			end
 --		end
+	else
+		r = 0
 	end
-	return 0
+	DA.DEBUG(2,"SkilletLink:GetNumSkills("..tostring(player)..", "..tostring(trade)..")= "..tostring(r))
+	return r
 end
 
 function SkilletData:GetSkillRanks(player, trade)
@@ -580,10 +587,16 @@ function SkilletData:GetSkillRanks(player, trade)
 end
 
 function SkilletData:GetNumSkills(player, trade)
---	DA.DEBUG(3,"SkilletData:GetNumSkills("..tostring(player)..", "..tostring(trade)..")")
-	if not Skillet.db.realm.skillDB[player] then return 0 end
-	if not Skillet.db.realm.skillDB[player][trade] then return 0 end
-	return #Skillet.db.realm.skillDB[player][trade]
+	local r
+	if not Skillet.db.realm.skillDB[player] then
+		r = 0
+	elseif not Skillet.db.realm.skillDB[player][trade] then
+		r = 0
+	else
+		r = #Skillet.db.realm.skillDB[player][trade]
+	end
+	DA.DEBUG(2,"SkilletData:GetNumSkills("..tostring(player)..", "..tostring(trade)..")= "..tostring(r))
+	return r
 end
 
 function Skillet:GetSkill(player,trade,index)
@@ -629,7 +642,7 @@ function SkilletLink:GetRecipe(id)
 end
 
 function SkilletLink:ScanTrade()
-	DA.DEBUG(0,"ScanTrade")
+	DA.DEBUG(0,"SkilletLink:ScanTrade()")
 	if self.scanInProgress == true then
 		--DA.DEBUG(0,"SCAN BUSY!")
 		return
@@ -660,7 +673,9 @@ function SkilletLink:ScanTrade()
 	self:ResetTradeSkillFilter() -- verify the search filter is blank (so we get all skills)
 	local numSkills = GetNumTradeSkills()
 	for i = 1, numSkills do
-		local _, skillType, _, isExpanded = GetTradeSkillInfo(i)
+		local skillName, skillType, _, isExpanded = GetTradeSkillInfo(i)
+		DA.DEBUG(3,"i= "..tostring(i)..", skillName= "..tostring(skillName)..", skillType="..tostring(skillType)..", isExpanded= "..tostring(isExpanded))
+		if skillName == "Draenor Engineering" and skillType == "subheader" then skillType = "header" end --**-- workaround for Blizzard bug in 6.02
 		if skillType == "header" or skillType == "subheader" then
 			if not isExpanded then
 				ExpandTradeSkillSubClass(i)
@@ -692,10 +707,10 @@ function SkilletLink:ScanTrade()
 	local parentGroup=nil
 	for i = 1, numSkills, 1 do
 		repeat
---			DA.DEBUG(0,"scanning index "..i)
 			local subSpell, extra
 			local skillName, skillType, _, isExpanded = GetTradeSkillInfo(i)
---			DA.DEBUG(0,("**** skill: "..(skillName or "nil").." "..i)
+			DA.DEBUG(3,"i= "..tostring(i)..", skillName= "..tostring(skillName)..", skillType="..tostring(skillType)..", isExpanded= "..tostring(isExpanded))
+			if skillName == "Draenor Engineering" and skillType == "subheader" then skillType = "header" end --**-- workaround for Blizzard bug in 6.02
 			gotNil = false
 			if skillName then
 				if skillType == "header" or skillType == "subheader" then
@@ -849,7 +864,7 @@ function SkilletLink:ScanTrade()
 			end
 		end
 	end
-	DA.DEBUG(0,"Scan Complete")
+	DA.DEBUG(0,"SkilletLink:ScanTrade Complete")
 	Skillet:InventoryScan()
 	Skillet:CalculateCraftableCounts()
 	Skillet:SortAndFilterRecipes()
@@ -1138,10 +1153,9 @@ function Skillet:CHAT_MSG_SYSTEM(event,msg)
 end
 
 function Skillet:CalculateCraftableCounts(playerOverride)
-	DA.DEBUG(0,"CalculateCraftableCounts Start")
+	DA.DEBUG(0,"CalculateCraftableCounts("..tostring(playerOverride)..")")
 	local player = playerOverride or self.currentPlayer
-	DA.DEBUG(0,(player or "nil").." "..(self.currentTrade or "nil"))
-	DA.DEBUG(0,"recalculating crafting counts")
+	DA.DEBUG(0,tostring(player).." "..tostring(self.currentTrade))
 	self.visited = {}
 	for i=1,self:GetNumSkills(player, self.currentTrade) do
 		local skill = self:GetSkill(player, self.currentTrade, i)
@@ -1153,7 +1167,7 @@ function Skillet:CalculateCraftableCounts(playerOverride)
 end
 
 function Skillet:RescanTrade(force)
-	DA.DEBUG(0,"RescanTrade")
+	DA.DEBUG(0,"Skillet:RescanTrade("..tostring(force)..")")
 	if not self.currentPlayer or not self.currentTrade then return end
 	local dataModule = self.dataGatheringModules[self.currentPlayer]
 	local val = true
@@ -1166,8 +1180,10 @@ function Skillet:RescanTrade(force)
 	end
 	return val
 end
+
 -- Triggers a rescan of the currently selected tradeskill
 function SkilletLink:RescanTrade(force)
+	DA.DEBUG(0,"SkilletLink:RescanTrade("..tostring(force)..")")
 	if not Skillet.currentPlayer or not Skillet.currentTrade then return end
 	local player, tradeID = Skillet.currentPlayer, Skillet.currentTrade
 	if not Skillet.data.skillList[player] then
@@ -1177,18 +1193,19 @@ function SkilletLink:RescanTrade(force)
 		Skillet.data.skillList[player][tradeID]={}
 	end
 	if force then
-		DA.DEBUG(0,"Forced Rescan")
 		Skillet.data.skillList[player]={}
 		Skillet:InitializeDatabase(player, true)
 	end
 	Skillet:ScanQueuedReagents()
 	Skillet.dataScanned = self:ScanTrade()
-	DA.DEBUG(0,"TRADESKILL HAS BEEN SCANNED")
+	DA.DEBUG(0,"SkilletLink:RescanTrade Complete")
 	self:RecipeGroupGenerateAutoGroups()
 	return Skillet.dataScanned
 end
+
 -- Triggers a rescan of the currently selected tradeskill
 function SkilletData:RescanTrade(force)
+	DA.DEBUG(0,"SkilletData:RescanTrade("..tostring(force)..")")
 	if not Skillet.currentPlayer or not Skillet.currentTrade then return end
 	local player, tradeID = Skillet.currentPlayer, Skillet.currentTrade
 	-- self:InitializeDatabase(self.currentPlayer, false)
@@ -1206,7 +1223,6 @@ function SkilletData:RescanTrade(force)
 			Skillet.db.realm.skillDB[player][tradeID] = {}
 		end
 		if force then
-			DA.DEBUG(0,"Forced Rescan")
 			Skillet.data.skillList[player]={}
 			Skillet:InitializeDatabase(player, true)
 			local firstSkill
@@ -1230,12 +1246,12 @@ function SkilletData:RescanTrade(force)
 		Skillet.dataScanned = true
 	end
 	self:RecipeGroupGenerateAutoGroups()
-	DA.DEBUG(0,"TRADESKILL HAS BEEN SCANNED")
+	DA.DEBUG(0,"SkilletData:RescanTrade Complete")
 	return Skillet.dataScanned
 end
 
 function SkilletData:ScanTrade()
-	DA.DEBUG(0,"ScanTrade")
+	DA.DEBUG(0,"SkilletData:ScanTrade()")
 	if self.scanInProgress == true then
 		DA.DEBUG(0,"SCAN BUSY!")
 		return
@@ -1287,7 +1303,9 @@ function SkilletData:ScanTrade()
 		self:ResetTradeSkillFilter() -- verify the search filter is blank (so we get all skills)
 	local numSkills = API.GetNumSkills()
 	for i = 1, numSkills do
-		local _, skillType, _, isExpanded = GetTradeSkillInfo(i)
+		local skillName, skillType, _, isExpanded = GetTradeSkillInfo(i)
+		DA.DEBUG(3,"i= "..tostring(i)..", skillName= "..tostring(skillName)..", skillType="..tostring(skillType)..", isExpanded= "..tostring(isExpanded))
+		if skillName == "Draenor Engineering" and skillType == "subheader" then skillType = "header" end --**-- workaround for Blizzard bug in 6.02
 		if skillType == "header" or skillType == "subheader" then
 			if not isExpanded then
 				ExpandTradeSkillSubClass(i)
@@ -1329,10 +1347,10 @@ function SkilletData:ScanTrade()
 	local alreadyScannedThisRun = 0
 	for i = 1, numSkills, 1 do
 		repeat
-			--DA.DEBUG(0,"scanning index "..i)
 			local skillName, skillType, isExpanded, subSpell, extra
 			local skillName, skillType, _, isExpanded = GetTradeSkillInfo(i)
-			--DA.DEBUG(0,"**** skill: "..(skillName or "nil"))
+			DA.DEBUG(3,"i= "..tostring(i)..", skillName= "..tostring(skillName)..", skillType="..tostring(skillType)..", isExpanded= "..tostring(isExpanded))
+			if skillName == "Draenor Engineering" and skillType == "subheader" then skillType = "header" end --**-- workaround for Blizzard bug in 6.02
 			gotNil = false
 			if skillName then
 				if skillType == "header" or skillType == "subheader" then
@@ -1509,8 +1527,13 @@ function SkilletData:ScanTrade()
 		end
 	end
 	-- Skillet:RecipeGroupConstructDBString(mainGroup)
-	DA.DEBUG(0,"Scan Complete")
-	--DA.DEBUG(0,"Scan Complete "..numHeaders)
+	DA.DEBUG(0,"SkilletData:ScanTrade Complete, numSkills= "..tostring(numSkills)..", numHeaders= "..tostring(numHeaders))
+
+	if DA.deepcopy then
+		SkilletMemory.groupList1 = {}
+		SkilletMemory.groupList1 = DA.deepcopy(Skillet.data.groupList)
+	end
+
 	Skillet:InventoryScan()
 	Skillet:CalculateCraftableCounts()
 	Skillet:SortAndFilterRecipes()
@@ -1592,6 +1615,7 @@ function SkilletData:ScanEnchantingGroups(mainGroup)
 end
 
 function Skillet:GenerateAltKnowledgeBase()
+	DA.DEBUG(0,"GenerateAltKnowledgeBase()")
 	local tradeID = Skillet.currentTrade
 	local player = Skillet.currentPlayer
 	local knownRecipes = {}
@@ -1660,19 +1684,25 @@ function Skillet:GenerateAltKnowledgeBase()
 	end
 	knownRecipes = nil
 	unknownRecipes = nil
-	DA.DEBUG(0,"done making groups")
+	DA.DEBUG(0,"GenerateAltKnowledgeBase Complete")
 end
 
 function SkilletData:RecipeGroupGenerateAutoGroups()
+	DA.DEBUG(0,"SkilletData:RecipeGroupGenerateAutoGroups()")
 	Skillet:GenerateAltKnowledgeBase()
 end
 
 function SkilletLink:RecipeGroupGenerateAutoGroups()
+	DA.DEBUG(0,"SkilletLink:RecipeGroupGenerateAutoGroups()")
 	Skillet:GenerateAltKnowledgeBase()
 end
 
--- arl hooks
+--[[
+	Hooks for Ackis Recipe List (ARL)
+]]--
 SkilletARL = {}
+local ARLProfessionInitialized = {}
+
 local function initFilterButton(name, icon, parent, slot)
 	local b = CreateFrame("CheckButton", name)
 	b:SetWidth(20)
@@ -1755,7 +1785,7 @@ end
 
 function SkilletARL:RecipeFilterToggleButton_OnShow(button)
 	local filter = Skillet:GetTradeSkillOption("recipeSourceFilter")
-DA.CHAT("show filter toggle")
+--	DA.DEBUG(0,"RecipeFilterToggleButton_OnShow("..tostring(button)..")")
 	if filter then
 		button:SetChecked(1)
 	else
@@ -1843,7 +1873,6 @@ function SkilletARL:RecipeSourceButtonInit()
 	return self.arlRecipeSourceButton
 end
 
-local ARLProfessionInitialized = {}
 -- return true if the skill needs to be filtered out
 function SkilletARL:RecipeFilterOperator(skillIndex)
 	return false
@@ -1890,7 +1919,7 @@ function SkilletARL:RecipeFilterOperatorOLD(skillIndex)
 end
 
 function SkilletARL:Enable()
-	-- if AckisRecipeList then
+--	if AckisRecipeList then
 	if false then
 		Skillet:RegisterRecipeFilter("arlRecipeSource", self, self.RecipeSourceButtonInit, self.RecipeFilterOperator)
 		Skillet.defaultOptions["recipeSourceFilter"] = false
