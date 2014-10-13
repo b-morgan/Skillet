@@ -138,10 +138,12 @@ local function NOSORT(tradeskill, a, b)
 end
 
 local function SkillIsFilteredOut(skillIndex)
+	DA.DEBUG(0,"SkillIsFilteredOut("..tostring(skillIndex)..")")
 --	if skillIndex == Skillet.selectedSkill then
 --		return false								-- never hide the currently selected skill
 --	end
 	local skill = Skillet:GetSkill(Skillet.currentPlayer, Skillet.currentTrade, skillIndex)
+	DA.DEBUG(1,"skill = "..DA.DUMP1(skill,1))
 	local recipe = Skillet:GetRecipe(skill.id)
 	local recipeID = recipe.spellID or 0
 	if recipeID == 0 then
@@ -282,27 +284,32 @@ end
 -- if no sorting, then headers will be included
 
 local function SortAndFilterRecipes()
+	DA.DEBUG(0,"SortAndFilterRecipes()")
 --	if not (Skillet.db.realm.skillDB[Skillet.currentPlayer] and Skillet.db.realm.skillDB[Skillet.currentPlayer][Skillet.currentTrade]) then
 --		DA.DEBUG(0,"No Data")
 --		return 0
 --	end
 	local skillListKey = Skillet.currentPlayer..":"..Skillet.currentTrade..":"..Skillet.currentGroupLabel
-	DA.DEBUG(0,"Sorting...");
 --	local skillDB = Skillet.db.realm.skillDB[Skillet.currentPlayer][Skillet.currentTrade]
 	local numSkills = Skillet:GetNumSkills(Skillet.currentPlayer, Skillet.currentTrade)
 --	local recipeData = Skillet.db.global.recipeData
 	if not Skillet.data.sortedSkillList then
+		DA.DEBUG(1,"Skillet.data.sortedSkillList = {}")
 		Skillet.data.sortedSkillList = {}
 	end
 	if not Skillet.data.sortedSkillList[skillListKey] then
+		DA.DEBUG(1,"Skillet.data.sortedSkillList[skillListKey] = {}")
 		Skillet.data.sortedSkillList[skillListKey] = {}
 	end
 	local sortedSkillList = Skillet.data.sortedSkillList[skillListKey]
 	local oldLength = #sortedSkillList
+	DA.DEBUG(0,"oldLength= ",tostring(oldLength))
 	local button_index = 0
 	local filtertext = Skillet:GetTradeSkillOption("filtertext")
 	local groupLabel = Skillet.currentGroupLabel
+	DA.DEBUG(0,"filtertext="..tostring(filtertext)..", groupLabel="..tostring(groupLabel))
 	if filtertext and filtertext ~= "" or groupLabel == "Flat" then
+		DA.DEBUG(1,"SortAndFilterRecipes Flat")
 		for i=1, numSkills, 1 do
 			local skill = Skillet:GetSkill(Skillet.currentPlayer, Skillet.currentTrade, i)
 			if skill then

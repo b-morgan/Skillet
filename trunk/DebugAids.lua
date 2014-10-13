@@ -110,7 +110,7 @@ function DA.DEBUG(...)
 		return
 	end
 	if (t ~= "number" or level < 0 or level > 10) then
-		level = 0 -- assume this is a deprecated call and
+		level = 0  -- assume this is a deprecated call and
 		j = 1      -- process it as the first parameter.
 	end
 	for i = j, k, 1 do
@@ -199,47 +199,58 @@ function DA.TRACE(...)
 end
 
 -- Convert a table into a string with line breaks and indents.
-function DA.DUMP(o,n)
-    if type(o) == 'table' then
-        local s
+--   if specified, m is the maximum recursion depth.
+function DA.DUMP(o,m,n)
+	if type(o) == 'table' then
+		local s
 		local i = ""
-		if (n) then
+		if n then
 			i = string.rep(" ",n)
 		else
 			n = 0
 		end
 		s = i..'{\n'
-        for k,v in pairs(o) do
+		for k,v in pairs(o) do
 			if type(k) ~= 'number' then 
 				k = "'"..k.."'" 
 			end
-			s = s..i..'['..k..'] = '..DA.DUMP(v,n+1)..'\n'
-        end
-        return s..i..'}\n'
-    else
-        return tostring(o)
-    end
+			if m and n > m then
+				s = s..i..'['..k..'] = {table}\n'
+			else
+				s = s..i..'['..k..'] = '..DA.DUMP(v,m,n+1)..'\n'
+			end
+		end
+		return s..i..'}\n'
+	else
+		return tostring(o)
+	end
 end
 
 -- Convert a table into a one line string.
-function DA.DUMP1(o)
-    if type(o) == 'table' then
-        local s
+--   if specified, m is the maximum recursion depth.
+function DA.DUMP1(o,m,n)
+	if type(o) == 'table' then
+		local s
+		if not n then n = 0 end
 		s = '{ '
-        for k,v in pairs(o) do
+		for k,v in pairs(o) do
 			if type(k) ~= 'number' then 
 				k = "'"..k.."'"
 			end
-			s = s..'['..k..'] = '..DA.DUMP1(v)..', '
-        end
-        if strlen(s) > 2 then
+			if m and n > m then
+				s = s..'['..k..'] = {table}, '
+			else
+				s = s..'['..k..'] = '..DA.DUMP1(v,m,n+1)..', '
+			end
+		end
+		if strlen(s) > 2 then
 			return strsub(s,1,strlen(s)-2)..' }'
 		else
 			return s..'}'
 		end
-    else
-        return tostring(o)
-    end
+	else
+		return tostring(o)
+	end
 end
 
 --
@@ -286,18 +297,18 @@ end
 function DA.Warn()
    DA.WarnShow = not DA.WarnShow
    if (DA.WarnShow) then
-      DA.WARN("Warning output enabled.")
+	  DA.WARN("Warning output enabled.")
    else
-      DA.CHAT("Warning output disabled.")
+	  DA.CHAT("Warning output disabled.")
    end
 end
 
 function DA.Debug()
    DA.DebugShow = not DA.DebugShow
    if (DA.DebugShow) then
-      DA.DEBUG(0,"Debug output enabled.")
+	  DA.DEBUG(0,"Debug output enabled.")
    else
-      DA.CHAT("Debug output disabled.")
+	  DA.CHAT("Debug output disabled.")
    end
 end
 

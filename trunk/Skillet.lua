@@ -20,7 +20,7 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
 ]]--
 
-local MAJOR_VERSION = "2.58"
+local MAJOR_VERSION = "2.60"
 local MINOR_VERSION = ("$Revision$"):match("%d+") or 1
 local DATE = string.gsub("$Date$", "^.-(%d%d%d%d%-%d%d%-%d%d).-$", "%1")
 
@@ -584,10 +584,14 @@ function Skillet:OnInitialize()
 	if not SkilletDBPC then
 		SkilletDBPC = {}
 	end
-	DA.DebugLog = SkilletDBPC
 	if not SkilletMemory then
 		SkilletMemory = {}
 	end
+	if DA.deepcopy then			-- For serious debugging, start with a clean slate
+		SkilletMemory = {}
+		SkilletDBPC = {}
+	end
+	DA.DebugLog = SkilletDBPC
 	self.db = AceDB:New("SkilletDB", defaults)
 	local _,_,_,wowVersion = GetBuildInfo();
 	self.wowVersion = wowVersion
@@ -806,13 +810,13 @@ end
 
 function Skillet:PLAYER_LOGOUT()
 	DA.DEBUG(0,"PLAYER_LOGOUT")
---[[
 --
 -- Make a copy of the in memory data for debugging. Note: DeepCopy.lua needs to be added to the .toc
 --
-	self.data.sortedSkillList = {"Removed"} -- This table is huge so don't save it unless needed.
-	SkilletMemory = DA.deepcopy(self.data)
-]]
+	if DA.deepcopy then
+		self.data.sortedSkillList = {"Removed"} -- This table is huge so don't save it unless needed.
+		SkilletMemory = DA.deepcopy(self.data)
+	end
 end
 
 -- Called when the addon is disabled
@@ -1257,16 +1261,19 @@ end
 
 -- Returns the state of a craft specific option
 function Skillet:GetTradeSkillOption(option, playerOverride, tradeOverride)
+	local r
 	local player = playerOverride or self.currentPlayer
 	local trade = tradeOverride or self.currentTrade
 	local options = self.db.realm.options
 	if not options or not options[player] or not options[player][trade] then
-	   return Skillet.defaultOptions[option]
+		r = Skillet.defaultOptions[option]
+	elseif options[player][trade][option] == nil then
+		r =  Skillet.defaultOptions[option]
+	else
+		r = options[player][trade][option]
 	end
-	if options[player][trade][option] == nil then
-		return Skillet.defaultOptions[option]
-	end
-	return options[player][trade][option]
+	DA.DEBUG(0,"GetTradeSkillOption("..tostring(option)..", "..tostring(playerOverride)..", "..tostring(tradeOverride)..")= "..tostring(r)..", player= "..tostring(player)..", trade= "..tostring(trade))
+	return r
 end
 
 -- sets the state of a craft specific option
