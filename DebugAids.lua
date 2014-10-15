@@ -54,11 +54,14 @@ DA.DEBUG_COLOR  = "|c0000FF00"
 DA.TRACE_COLOR  = "|c0000FFA0"
 DA.WARN_COLOR   = "|c0000FFE0"
 
+DA.DISABLED = 1
+
 function DA.CHAT(text)
-	print(DA.STATUS_COLOR..text)
+	print( ""..debugprofilestop().." - "..DA.STATUS_COLOR..text)
 end
 
 function DA.WARN(...)
+	if DA.DISABLED then return "" end
 	local text = ""
 	local comma = ""
 	for i = 1, select("#", ...), 1 do
@@ -100,6 +103,7 @@ function DA.WARN(...)
 end
 
 function DA.DEBUG(...)
+	if DA.DISABLED then return "" end
 	local k = select("#",...)
 	local level = select(1, ...)
 	local text = ""
@@ -156,6 +160,7 @@ function DA.DEBUG(...)
 end
 
 function DA.TRACE(...)
+	if DA.DISABLED then return "" end
 	local text = ""
 	local comma = ""
 	for i = 1, select("#", ...), 1 do
@@ -201,6 +206,7 @@ end
 -- Convert a table into a string with line breaks and indents.
 --   if specified, m is the maximum recursion depth.
 function DA.DUMP(o,m,n)
+	if DA.DISABLED then return "" end
 	if type(o) == 'table' then
 		local s
 		local i = ""
@@ -229,6 +235,7 @@ end
 -- Convert a table into a one line string.
 --   if specified, m is the maximum recursion depth.
 function DA.DUMP1(o,m,n)
+	if DA.DISABLED then return "" end
 	if type(o) == 'table' then
 		local s
 		if not n then n = 0 end

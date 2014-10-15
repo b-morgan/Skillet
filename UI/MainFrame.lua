@@ -868,7 +868,7 @@ function Skillet:internal_UpdateTradeSkillWindow()
 		button:SetWidth(width)
 		if rawSkillIndex <= numTradeSkills then
 			local skill = sortedSkillList[rawSkillIndex]
-			DA.DEBUG(0,"rawSkillIndex= "..tostring(rawSkillIndex)..", skill= "..DA.DUMP1(skill,1))
+			--DA.DEBUG(0,"rawSkillIndex= "..tostring(rawSkillIndex)..", skill= "..DA.DUMP1(skill,1))
 			local skillIndex = skill.skillIndex
 			local buttonText = _G[button:GetName() .. "Name"]
 			local levelText = _G[button:GetName() .. "Level"]
