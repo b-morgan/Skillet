@@ -111,7 +111,7 @@ function Skillet:RecipeGroupNew(player, tradeID, label, name)
 end
 
 function Skillet:RecipeGroupClearEntries(group)
-	DA.DEBUG("RecipeGroupClearEntries("..DA.DUMP1(group or "nil",1))
+	--DA.DEBUG("RecipeGroupClearEntries("..DA.DUMP1(group or "nil",1))
 	if group then
 		for i=1,#group.entries do
 			if group.entries[i].subGroup then
@@ -141,7 +141,7 @@ function Skillet:RecipeGroupCopy(s, d, noDB)
 end
 
 function Skillet:RecipeGroupAddRecipe(group, recipeID, skillIndex, noDB)
-	DA.DEBUG(0,"RecipeGroupAddRecipe("..tostring(group)..", "..tostring(recipeID)..", "..tostring(skillIndex)..", "..tostring(noDB)..")")
+	--DA.DEBUG(0,"RecipeGroupAddRecipe("..tostring(group)..", "..tostring(recipeID)..", "..tostring(skillIndex)..", "..tostring(noDB)..")")
 	recipeID = tonumber(recipeID)
 	if group and recipeID then
 		local currentEntry
@@ -173,7 +173,7 @@ function Skillet:RecipeGroupAddRecipe(group, recipeID, skillIndex, noDB)
 end
 
 function Skillet:RecipeGroupAddSubGroup(group, subGroup, skillIndex, noDB)
-	DA.DEBUG(0,"RecipeGroupAddSubGroup("..tostring(group)..", "..tostring(subGroup)..", "..tostring(skillIndex)..", "..tostring(noDB)..")")
+	--DA.DEBUG(0,"RecipeGroupAddSubGroup("..tostring(group)..", "..tostring(subGroup)..", "..tostring(skillIndex)..", "..tostring(noDB)..")")
 	if group and subGroup then
 		local currentEntry
 		for i=1,#group.entries do
@@ -371,9 +371,9 @@ function Skillet:RecipeGroupInitFlatten(group, list)
 end
 
 function Skillet:RecipeGroupFlatten(group, depth, list, index)
-	DA.DEBUG(0,"RecipeGroupFlatten("..type(group)..", "..tostring(depth)..", "..type(list)..", "..tostring(index)..")")
-	DA.DEBUG(0,"group= "..DA.DUMP1(group,2))
-	DA.DEBUG(0,"list= "..DA.DUMP1(list,2))
+	--DA.DEBUG(0,"RecipeGroupFlatten("..type(group)..", "..tostring(depth)..", "..type(list)..", "..tostring(index)..")")
+	--DA.DEBUG(0,"group= "..DA.DUMP1(group,2))
+	--DA.DEBUG(0,"list= "..DA.DUMP1(list,2))
 	local num = 0
 	if group and list then
 		for v, entry in pairs(group.entries) do
@@ -539,7 +539,7 @@ function Skillet:RecipeGroupDeconstructDBStrings()
 				if not group.initialized then
 					group.initialized = true
 					local groupContents = { string.split(":",list) }
-					DA.DEBUG(0,groupContents)
+--					DA.DEBUG(0,groupContents)
 					for j=2,#groupContents do
 						local recipeID = groupContents[j]
 						if not tonumber(recipeID) then
@@ -555,8 +555,10 @@ function Skillet:RecipeGroupDeconstructDBStrings()
 							recipeID = tonumber(recipeID)
 							DA.DEBUG(0,recipeID)
 							local skillIndex = self.data.skillIndexLookup[player][recipeID]
-							DA.DEBUG(0,"adding recipe "..recipeID.." to "..group.name.."/"..player..":"..skillIndex)
-							self:RecipeGroupAddRecipe(group, recipeID, skillIndex, true)
+							if skillIndex then 
+--								DA.DEBUG(0,"adding recipe "..recipeID.." to "..group.name.."/"..player..":"..skillIndex)
+								self:RecipeGroupAddRecipe(group, recipeID, skillIndex, true)
+							end
 						end
 					end
 				end

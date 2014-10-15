@@ -4,7 +4,7 @@
 ## Notes-esES: Una sustitucion de la ventana de Habilidades de Comercio
 ## Notes-ruRU: Заменяет окно профессий на более функциональное.
 ## Author: yossa, lilsparky
-## Version 2.60
+## Version 2.61
 ## X-Category: Tradeskill
 ## X-eMail: yossa.addons@googlemail.com
 ## X-License GPL v3 or later
