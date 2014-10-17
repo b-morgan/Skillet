@@ -128,8 +128,8 @@ function Skillet:CreateTradeSkillWindow()
 	titletext:SetShadowColor(0,0,0)
 	titletext:SetShadowOffset(1,-1)
 	titletext:SetTextColor(1,1,1)
-	titletext:SetText(L["Skillet Trade Skills"]);
-
+	local mv = string.sub(Skillet.version,1,(string.find(Skillet.version,"-")-1))
+	titletext:SetText(L["Skillet Trade Skills"].." "..mv);
 	local label = _G["SkilletFilterLabel"];
 	label:SetText(L["Filter"]);
 	SkilletCreateAllButton:SetText(L["Create All"])
@@ -814,7 +814,8 @@ function Skillet:internal_UpdateTradeSkillWindow()
 	local tradeName = self:GetTradeName(self.currentTrade)
 	local title = _G["SkilletTitleText"];
 	if title then
-		title:SetText(L["Skillet Trade Skills"] .. ": " .. self.currentPlayer .. "/" .. tradeName)
+		local mv = string.sub(Skillet.version,1,(string.find(Skillet.version,"-")-1))
+		title:SetText(L["Skillet Trade Skills"] .. " "..mv..": " .. self.currentPlayer .. "/" .. tradeName)
 	end
 	local sortedSkillList = self.data.sortedSkillList[skillListKey]
 	local rank,maxRank = 0,0

@@ -20,7 +20,7 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
 ]]--
 
-local MAJOR_VERSION = "2.61"
+local MAJOR_VERSION = "2.62"
 local MINOR_VERSION = ("$Revision$"):match("%d+") or 1
 local DATE = string.gsub("$Date$", "^.-(%d%d%d%d%-%d%d%-%d%d).-$", "%1")
 
@@ -445,8 +445,25 @@ Skillet.options =
 			set = function(self,value)
 				Skillet.db.profile.WarnShow = value
 				Skillet.WarnShow = value
+				if value then
+					Skillet.db.profile.WarnLog = value
+					Skillet.WarnLog = value
+				end
 			end,
 			order = 81
+		},
+		WarnLog = {
+			type = "toggle",
+			name = "WarnLog",
+			desc = "Option for debugging",
+			get = function()
+				return Skillet.db.profile.WarnLog
+			end,
+			set = function(self,value)
+				Skillet.db.profile.WarnLog = value
+				Skillet.WarnLog = value
+			end,
+			order = 82
 		},
 		DebugShow = {
 			type = "toggle",
@@ -458,8 +475,25 @@ Skillet.options =
 			set = function(self,value)
 				Skillet.db.profile.DebugShow = value
 				Skillet.DebugShow = value
+				if value then
+					Skillet.db.profile.DebugLogging = value
+					Skillet.DebugLogging = value
+				end
 			end,
-			order = 82
+			order = 83
+		},
+		DebugLogging = {
+			type = "toggle",
+			name = "DebugLoggibg",
+			desc = "Option for debugging",
+			get = function()
+				return Skillet.db.profile.DebugLogging
+			end,
+			set = function(self,value)
+				Skillet.db.profile.DebugLogging = value
+				Skillet.DebugLogging = value
+			end,
+			order = 84
 		},
 		DebugLevel = {
 			type = "input",
@@ -476,7 +510,20 @@ Skillet.options =
 				Skillet.db.profile.DebugLevel = value
 				Skillet.DebugLevel = value
 			end,
-			order = 83
+			order = 85
+		},
+		TableDump = {
+			type = "toggle",
+			name = "TableDump",
+			desc = "Option for debugging",
+			get = function()
+				return Skillet.db.profile.TableDump
+			end,
+			set = function(self,value)
+				Skillet.db.profile.TableDump = value
+				Skillet.TableDump = value
+			end,
+			order = 86
 		},
 		TraceShow = {
 			type = "toggle",
@@ -488,8 +535,12 @@ Skillet.options =
 			set = function(self,value)
 				Skillet.db.profile.TraceShow = value
 				Skillet.TraceShow = value
+				if value then
+					Skillet.db.profile.TraceLog = value
+					Skillet.TraceLog = value
+				end
 			end,
-			order = 84
+			order = 87
 		},
 		TraceLog = {
 			type = "toggle",
@@ -502,7 +553,7 @@ Skillet.options =
 				Skillet.db.profile.TraceLog = value
 				Skillet.TraceLog = value
 			end,
-			order = 85
+			order = 88
 		},
 		ClearDebugLog = {
 			type = "execute",
@@ -510,8 +561,9 @@ Skillet.options =
 			desc = "Option for debugging",
 			func = function()
 				SkilletDBPC = {}
+				DA.DebugLog = SkilletDBPC
 			end,
-			order = 86
+			order = 89
 		},
 
 		reset = {
@@ -622,10 +674,24 @@ function Skillet:OnInitialize()
 	acedia:AddToBlizOptions("Skillet Features", "Skillet")
 	acedia:AddToBlizOptions("Skillet Appearance", "Appearance", "Skillet")
 	acedia:AddToBlizOptions("Skillet Profiles", "Profiles", "Skillet")
-	-- DebugAids.lua wants these higher up the chain.
+
+--
+-- Copy the profile debugging variables to the "addon name" global table 
+-- where DebugAids.lua is looking for them.
+--
+-- Warning:	Setting TableDump can be a performance hog, use caution.
+--			Setting DebugLogging (without DebugShow) is a minor performance hit.
+--			WarnLog (with or without WarnShow) can remain on as warning messages are rare.
+--
+	if Skillet.db.profile.WarnLog == nil then
+		Skillet.db.profile.WarnLog = true
+	end
 	Skillet.WarnShow = Skillet.db.profile.WarnShow
+	Skillet.WarnLog = Skillet.db.profile.WarnLog
 	Skillet.DebugShow = Skillet.db.profile.DebugShow
+	Skillet.DebugLogging = Skillet.db.profile.DebugLogging
 	Skillet.DebugLevel = Skillet.db.profile.DebugLevel
+	Skillet.TableDump = Skillet.db.profile.TableDump
 	Skillet.TraceShow = Skillet.db.profile.TraceShow
 	Skillet.TraceLog = Skillet.db.profile.TraceLog
 	--
@@ -641,6 +707,7 @@ function Skillet:FlushAllData()
 	Skillet.db.realm.queueData = {}
 	Skillet.db.realm.reagentsInQueue = {}
 	Skillet.db.realm.inventoryData = {}
+	Skillet.db.realm.reagentBank = {}
 	Skillet:InitializeDatabase((UnitName("player")))
 end
 
@@ -660,6 +727,12 @@ function Skillet:InitializeDatabase(player, clean)
 	end
 	if not self.db.realm.inventoryData[player] then
 		self.db.realm.inventoryData[player] = {}
+	end
+	if not self.db.realm.reagentBank then
+		self.db.realm.reagentBank = {}
+	end
+	if not self.db.realm.reagentBank[player] then
+		self.db.realm.reagentBank[player] = {}
 	end
 	if not self.db.realm.reagentsInQueue then
 		self.db.realm.reagentsInQueue = {}
@@ -776,6 +849,7 @@ function Skillet:OnEnable()
 	-- May need to show a shopping list when at the bank/guildbank/auction house
 	self:RegisterEvent("BANKFRAME_OPENED")
 	self:RegisterEvent("PLAYERBANKSLOTS_CHANGED")
+	self:RegisterEvent("PLAYERREAGENTBANKSLOTS_CHANGED")
 	self:RegisterEvent("BANKFRAME_CLOSED")
 	self:RegisterEvent("GUILDBANKFRAME_OPENED")
 	self:RegisterEvent("GUILDBANKBAGSLOTS_CHANGED")
