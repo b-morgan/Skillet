@@ -2126,20 +2126,11 @@ function Skillet:getLvlUpChance()
 	local yellow = tonumber(SkilletRankFrame.subRanks.orange:GetValue())
 	if (currentLevel > gray) then
 		return 0
-	end
-	if (gray - yellow) == 0 then
+	elseif (gray - yellow) == 0 then
 		return 0
+	else
+		return ((gray - currentLevel) / ( gray - yellow )) * 100
 	end
-	local bonus = 1
-	if IsSpellKnown(83949) then -- Working Overtime, Rank 1
-		bonus = 1.1
-	elseif IsSpellKnown(118021) then -- Working Overtime, Rank 2
-		bonus = 1.2
-	end
-	local chance = ((gray - currentLevel) / ( gray - yellow ))
-	chance = chance * bonus
-	chance = chance * 100
-	return chance
 end
 
 -- Called when then mouse enters the rank status bar
