@@ -201,13 +201,13 @@ end
 
 -- ripped from bilzzard GameTooltip_ShowCompareItem() function
 function Skillet:Tooltip_ShowCompareItem(tip, link, sideOverride)
---
+--[[
 --	SetHyperlinkCompareItem has been removed from 6.0.2
 --
 --	local item, link = tip:GetItem();
---	if ( not link ) then
+	if ( not link ) then
 		return; 
---	end
+	end
 
 	local item1 = nil;
 	local item2 = nil;
@@ -281,6 +281,7 @@ function Skillet:Tooltip_ShowCompareItem(tip, link, sideOverride)
 			ShoppingTooltip2:Show();
 		end
 	end
+]]--
 end
 
 Dialog:Register("SKILLETMSG", {
