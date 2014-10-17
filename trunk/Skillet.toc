@@ -3,12 +3,12 @@
 ## Notes: A replacement tradeskill window
 ## Notes-esES: Una sustitucion de la ventana de Habilidades de Comercio
 ## Notes-ruRU: Заменяет окно профессий на более функциональное.
-## Author: yossa, lilsparky
-## Version 2.61
+## Author: yossa, bsmorgan
+## Version 2.62
 ## X-Category: Tradeskill
 ## X-eMail: yossa.addons@googlemail.com
 ## X-License GPL v3 or later
-## X-Credits nogudnik (creator of Skillet), Slartie (for ASTW)
+## X-Credits lilsparky, nogudnik (creator of Skillet), Slartie (for ASTW)
 ## X-RelSite-WoWI: 7571
 #### X-AceForum: 9179
 ## X-WoWIPortal: yossa

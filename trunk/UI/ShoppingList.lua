@@ -273,10 +273,34 @@ local function cache_list(self)
 	self.cachedShoppingList = self:GetShoppingList(name, false, Skillet.db.char.include_guild)
 end
 
+local function indexReagentBank()
+	DA.DEBUG(0,"indexReagentBank()")
+	-- reagentbank contains detailed contents of each slot (which 
+	-- is only needed while the reagentbank is open?).
+	local player = Skillet.currentPlayer
+	local reagentbank = Skillet.db.realm.reagentBank[player]
+	local bankBags = {-3}
+	for _, container in pairs(bankBags) do
+		for i = 1, GetContainerNumSlots(container), 1 do
+			local item = GetContainerItemLink(container, i)
+			if item then
+				local _,count = GetContainerItemInfo(container, i)
+				table.insert(reagentbank, {
+					["bag"]   = container,
+					["slot"]  = i,
+					["id"]  = Skillet:GetItemIDFromLink(item),
+					["count"] = count,
+				})
+			end
+		end
+	end
+end
+
 -- Called when the bank frame is opened
 function Skillet:BANKFRAME_OPENED()
 	DA.DEBUG(0,"BANKFRAME_OPENED")
 	bankFrameOpen = true
+	indexReagentBank() -- temporary so the data also gets collected
 	if not self.db.profile.display_shopping_list_at_bank then
 		return
 	end
@@ -353,8 +377,9 @@ local function indexBank()
 	DA.DEBUG(0,"indexBank()")
 	-- bank contains detailed contents of each tab,slot which 
 	-- is only needed while the bank is open.
+	-- Include the reagentbank (-3) here for now.
 	bank = {}
-	local bankBags = {-1,5,6,7,8,9,10,11}
+	local bankBags = {-1,5,6,7,8,9,10,11,-3}
 	for _, container in pairs(bankBags) do
 		for i = 1, GetContainerNumSlots(container), 1 do
 			local item = GetContainerItemLink(container, i)
@@ -591,8 +616,8 @@ local function processGuildQueue(where)
 end
 
 -- Event is fired when the guild bank contents change.
-function Skillet:GUILDBANKBAGSLOTS_CHANGED(event)
-	DA.DEBUG(2,"GUILDBANKBAGSLOTS_CHANGED")
+function Skillet:GUILDBANKBAGSLOTS_CHANGED(event,tab,slot)
+	DA.DEBUG(2,"GUILDBANKBAGSLOTS_CHANGED"..", tab="..tostring(tab)..", slot="..tostring(slot))
 	guildbankQuery = guildbankQuery + 1
 	if guildbankQuery == GetNumGuildBankTabs() and guildbankOnce then
 		indexGuildBank()
@@ -608,10 +633,22 @@ function Skillet:GUILDBANKBAGSLOTS_CHANGED(event)
 end
 
 -- Event is fired when the main bank (bagID == -1) contents change.
-function Skillet:PLAYERBANKSLOTS_CHANGED(event)
-	DA.DEBUG(2,"PLAYERBANKSLOTS_CHANGED")
+function Skillet:PLAYERBANKSLOTS_CHANGED(event,slot)
+	DA.DEBUG(2,"PLAYERBANKSLOTS_CHANGED"..", slot="..tostring(slot))
 	if Skillet.bankBusy then
 		DA.DEBUG(1,"PLAYERBANKSLOTS_CHANGED and bankBusy")
+		Skillet.gotBankEvent = true
+		if Skillet.gotBankEvent and Skillet.gotBagUpdateEvent then
+			processBankQueue("bag update")
+		end
+	end
+end
+
+-- Event is fired when the reagent bank (bagID == -3) contents change.
+function Skillet:PLAYERREAGENTBANKSLOTS_CHANGED(event,slot)
+	DA.DEBUG(2,"PLAYERREAGENTBANKSLOTS_CHANGED"..", slot="..tostring(slot))
+	if Skillet.bankBusy then
+		DA.DEBUG(1,"PLAYERREAGENTBANKSLOTS_CHANGED and bankBusy")
 		Skillet.gotBankEvent = true
 		if Skillet.gotBankEvent and Skillet.gotBagUpdateEvent then
 			processBankQueue("bag update")

@@ -19,6 +19,12 @@ local DA = _G[addonName]
 -- of this file (or the equivalent) into your addon 
 -- for run time control of these debugging functions.
 --
+-- DA.DebugLog is a circular table which has DA.MAXDEBUG entries.
+--
+-- Setting DA.WarnLog, DA.DebugLogging, or DA.TraceLog
+-- will add the respective text to the circular table
+-- without printing to the default chat frame. 
+-- 
 -- Setting DA.WarnShow or DA.TraceShow will cause 
 -- DA.WARN or DA.TRACE to print their argument(s)
 -- to the default chat frame.
@@ -33,20 +39,15 @@ local DA = _G[addonName]
 -- DA.DebugLevel should constrained to be a 
 -- number between 1 and 10.
 --
--- DA.WARN and DA.DEBUG always add their text to
--- DA.DebugLog, a circular table which has DA.MAXDEBUG
--- entries. DA.TRACE optionally adds its text to the 
--- same circular table. 
 --
--- Setting DA.TraceLog will add the DA.TRACE 
--- text to the circular table without printing to 
--- the default chat frame. 
--- 
 DA.WarnShow = false
+DA.WarnLog = true
 DA.DebugShow = false
+DA.DebugLogging = true
+DA.DebugLevel = 1
+DA.TableDump = false
 DA.TraceShow = false
 DA.TraceLog = false
-DA.DebugLevel = 1
 DA.DebugLog = {} -- Add to SavedVariables for debugging
 DA.MAXDEBUG = 2000
 DA.STATUS_COLOR = "|c0033CCFF"
@@ -54,14 +55,12 @@ DA.DEBUG_COLOR  = "|c0000FF00"
 DA.TRACE_COLOR  = "|c0000FFA0"
 DA.WARN_COLOR   = "|c0000FFE0"
 
-DA.DISABLED = 1
-
 function DA.CHAT(text)
-	print( ""..debugprofilestop().." - "..DA.STATUS_COLOR..text)
+	print(DA.STATUS_COLOR..text)
 end
 
 function DA.WARN(...)
-	if DA.DISABLED then return "" end
+	if not DA.WarnLogging then return "" end
 	local text = ""
 	local comma = ""
 	for i = 1, select("#", ...), 1 do
@@ -103,7 +102,7 @@ function DA.WARN(...)
 end
 
 function DA.DEBUG(...)
-	if DA.DISABLED then return "" end
+	if not DA.DebugLogging then return "" end
 	local k = select("#",...)
 	local level = select(1, ...)
 	local text = ""
@@ -160,7 +159,7 @@ function DA.DEBUG(...)
 end
 
 function DA.TRACE(...)
-	if DA.DISABLED then return "" end
+	if not DA.TraceLog then return "" end
 	local text = ""
 	local comma = ""
 	for i = 1, select("#", ...), 1 do
@@ -195,18 +194,16 @@ function DA.TRACE(...)
 	if (DA.TraceShow) then
 		DA.CHAT(DA.TRACE_COLOR..addonName..": "..text)
 	end
-	if (DA.TraceShow or DA.TraceLog) then
-		table.insert(DA.DebugLog,date().."(T): "..text)
-		if (table.getn(DA.DebugLog) > DA.MAXDEBUG) then
-			table.remove(DA.DebugLog,1)
-		end
+	table.insert(DA.DebugLog,date().."(T): "..text)
+	if (table.getn(DA.DebugLog) > DA.MAXDEBUG) then
+		table.remove(DA.DebugLog,1)
 	end
 end
 
 -- Convert a table into a string with line breaks and indents.
 --   if specified, m is the maximum recursion depth.
 function DA.DUMP(o,m,n)
-	if DA.DISABLED then return "" end
+	if not DA.TableDump then return "" end
 	if type(o) == 'table' then
 		local s
 		local i = ""
@@ -235,7 +232,7 @@ end
 -- Convert a table into a one line string.
 --   if specified, m is the maximum recursion depth.
 function DA.DUMP1(o,m,n)
-	if DA.DISABLED then return "" end
+	if not DA.TableDump then return "" end
 	if type(o) == 'table' then
 		local s
 		if not n then n = 0 end
@@ -272,16 +269,22 @@ function DA.Command(msg)
 	options = string.lower(options)
 	if(command == "warn") then  
 		DA.Warn()                         -- Undocumented: Enable warning output
+	elseif(command == "wlog") then
+		DA.WarnL()                        -- Undocumented: Enable warning logging
 	elseif(command == "debug") then
 		DA.Debug()                        -- Undocumented: Enable debug output
+	elseif(command == "dlog") then
+		DA.DebugL()                       -- Undocumented: Enable debug logging
 	elseif(command == "dlevel") then
-		DA.DLevel(options)                 -- Undocumented: Set debug level
+		DA.DLevel(options)                -- Undocumented: Set debug level
+	elseif(command == "tdump") then
+		DA.TDump(options)                 -- Undocumented: Enable table dumps (recursive functions)
 	elseif(command == "trace") then
 		DA.Trace()                        -- Undocumented: Enable trace output
+	elseif(command == "tlog") then
+		DA.TraceL()                       -- Undocumented: Clear debug storage
 	elseif(command == "clear") then
 		DA.ClearDebugLog()                -- Undocumented: Clear debug storage
-	elseif(command == "tlog") then
-		DA.TLog()                         -- Undocumented: Clear debug storage
 	end
 end
 
@@ -304,9 +307,18 @@ end
 function DA.Warn()
    DA.WarnShow = not DA.WarnShow
    if (DA.WarnShow) then
-	  DA.WARN("Warning output enabled.")
+		DA.WARN("Warning output enabled.")
    else
-	  DA.CHAT("Warning output disabled.")
+		DA.CHAT("Warning output disabled.")
+   end
+end
+
+function DA.WarnL()
+   DA.WarnLog = not DA.WarnLog
+   if (DA.WarnLog) then
+		DA.CHAT("Warning logging enabled.")
+   else
+		DA.CHAT("Warning logging disabled.")
    end
 end
 
@@ -319,9 +331,30 @@ function DA.Debug()
    end
 end
 
-function DA.ClearDebugLog()
-	DA.CHAT("DebugLog initialized.")
-	DA.DebugLog = {}
+function DA.DebugL()
+   DA.DebugLogging = not DA.DebugLogging
+   if (DA.DebugLogging) then
+		DA.CHAT(0,"Debug logging enabled.")
+   else
+		DA.CHAT("Debug logging disabled.")
+   end
+end
+
+function DA.DLevel(options)
+	local dl = tonumber(options)
+	if not dl then dl = 1
+	elseif dl < 1 then dl = 1
+	elseif dl > 9 then dl = 10 end
+	DA.DebugLevel = dl
+end
+
+function DA.TDump()
+	DA.TableDump= not DA.TableDump
+	if (DA.TableDump) then
+		DA.CHAT("Table dump enabled.")
+	else
+		DA.CHAT("Table dump disabled.")
+	end
 end
 
 function DA.Trace()
@@ -333,20 +366,17 @@ function DA.Trace()
 	end
 end
 
-function DA.DLevel(options)
-	local dl = tonumber(options)
-	if not dl then dl = 1
-	elseif dl < 1 then dl = 1
-	elseif dl > 9 then dl = 10 end
-	DA.DebugLevel = dl
-end
-
-function DA.TLog()
+function DA.TraceL()
 	DA.TraceLog = not DA.TraceLog
 	if (DA.TraceLog) then
 		DA.CHAT("Trace logging enabled.")
 	else
 		DA.CHAT("Trace logging disabled.")
 	end
+end
+
+function DA.ClearDebugLog()
+	DA.CHAT("DebugLog initialized.")
+	DA.DebugLog = {}
 end
 ]]--
