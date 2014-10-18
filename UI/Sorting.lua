@@ -139,9 +139,6 @@ end
 
 local function SkillIsFilteredOut(skillIndex)
 	DA.DEBUG(0,"SkillIsFilteredOut("..tostring(skillIndex)..")")
---	if skillIndex == Skillet.selectedSkill then
---		return false								-- never hide the currently selected skill
---	end
 	local skill = Skillet:GetSkill(Skillet.currentPlayer, Skillet.currentTrade, skillIndex)
 	DA.DEBUG(1,"skill = "..DA.DUMP1(skill,1))
 	local recipe = Skillet:GetRecipe(skill.id)
@@ -206,11 +203,13 @@ local function SkillIsFilteredOut(skillIndex)
 				searchText = Skillet.data.tooltipCache[recipeID]
 			end
 		end
-		searchText = string.lower(searchText)
-		local wordList = { string.split(" ",filter) }
-		for v,word in pairs(wordList) do
-			if string.find(searchText, word, 1, true) == nil then
-				return true
+		if searchText then 
+			searchText = string.lower(searchText)
+			local wordList = { string.split(" ",filter) }
+			for v,word in pairs(wordList) do
+				if string.find(searchText, word, 1, true) == nil then
+					return true
+				end
 			end
 		end
 	end
