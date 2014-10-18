@@ -268,7 +268,7 @@ end
 local function cache_list(self)
 	local name = nil
 	if not Skillet.db.char.include_alts then
-		name = UnitName("player")
+		name = Skillet.currentPlayer
 	end
 	self.cachedShoppingList = self:GetShoppingList(name, false, Skillet.db.char.include_guild)
 end
@@ -278,20 +278,18 @@ local function indexReagentBank()
 	-- reagentbank contains detailed contents of each slot (which 
 	-- is only needed while the reagentbank is open?).
 	local player = Skillet.currentPlayer
+	Skillet.db.realm.reagentBank[player] = {}
 	local reagentbank = Skillet.db.realm.reagentBank[player]
-	local bankBags = {-3}
-	for _, container in pairs(bankBags) do
-		for i = 1, GetContainerNumSlots(container), 1 do
-			local item = GetContainerItemLink(container, i)
-			if item then
-				local _,count = GetContainerItemInfo(container, i)
-				table.insert(reagentbank, {
-					["bag"]   = container,
-					["slot"]  = i,
-					["id"]  = Skillet:GetItemIDFromLink(item),
-					["count"] = count,
-				})
+	local container = -3
+	for i = 1, GetContainerNumSlots(container) do
+		local item = GetContainerItemLink(container, i)
+		if item then
+			local _,count = GetContainerItemInfo(container, i)
+			local id = Skillet:GetItemIDFromLink(item)
+			if not reagentbank[id] then
+				reagentbank[id] = 0
 			end
+			reagentbank[id] = reagentbank[id] + count
 		end
 	end
 end
