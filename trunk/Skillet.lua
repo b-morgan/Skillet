@@ -390,22 +390,6 @@ Skillet.options =
 			guiHidden = true,
 			order = 51
 		},
-		standby = {
-			type = 'execute',
-			name = L["STANDBYNAME"],
-			desc = L["STANDBYDESC"],
-			func = function()
-				if Skillet:IsEnabled() then
-					Skillet:Disable()
-					Skillet:Print(RED_FONT_COLOR_CODE..L["is now disabled"]..FONT_COLOR_CODE_CLOSE)
-				else
-					Skillet:Enable()
-					Skillet:Print(GREEN_FONT_COLOR_CODE..L["is now enabled"]..FONT_COLOR_CODE_CLOSE)
-				end
-			end,
-			guiHidden = true,
-			order = 55
-		},
 		shoppinglist = {
 			type = 'execute',
 			name = L["Shopping List"],
@@ -433,6 +417,36 @@ Skillet.options =
 				end
 			end,
 			order = 53
+		},
+		flushalldata = {
+			type = 'execute',
+			name = L["Flush All Data"],
+			desc = L["FLUSHALLDATADESC"],
+			func = function()
+				if not (UnitAffectingCombat("player")) then
+					Skillet:ClearShoppingList()
+				else
+					DA.DEBUG(0,"|cff8888ffSkillet|r: Combat lockdown restriction." ..
+												  " Leave combat and try again.")
+				end
+			end,
+			order = 54
+		},
+		standby = {
+			type = 'execute',
+			name = L["STANDBYNAME"],
+			desc = L["STANDBYDESC"],
+			func = function()
+				if Skillet:IsEnabled() then
+					Skillet:Disable()
+					Skillet:Print(RED_FONT_COLOR_CODE..L["is now disabled"]..FONT_COLOR_CODE_CLOSE)
+				else
+					Skillet:Enable()
+					Skillet:Print(GREEN_FONT_COLOR_CODE..L["is now enabled"]..FONT_COLOR_CODE_CLOSE)
+				end
+			end,
+			guiHidden = true,
+			order = 55
 		},
 
 		WarnShow = {
