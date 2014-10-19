@@ -202,6 +202,7 @@ end
 function Skillet:ProcessQueue(altMode)
 	DA.DEBUG(0,"ProcessQueue");
 	local queue = self.db.realm.queueData[self.currentPlayer]
+	local reagentbank = self.db.realm.reagentBank[self.currentPlayer]
 	local qpos = 1
 	local skillIndexLookup = self.data.skillIndexLookup[self.currentPlayer]
 	self.processingPosition = nil
@@ -222,9 +223,15 @@ function Skillet:ProcessQueue(altMode)
 				local numInBags, bagsCraft, numInBank, bankCraft = self:GetInventory(self.currentPlayer, reagent.id)
 				if numInBags < reagent.numNeeded then
 					local reagentName = GetItemInfo(reagent.id) or reagent.id
-					Skillet:Print(L["Skipping"],recipe.name,"-",L["need"],reagent.numNeeded,"x",reagentName,"("..L["have"],numInBags..")")
-					craftable = false
-					break
+					local fromRB = reagent.numNeeded - numInBags
+					if reagentbank[reagent.id] >= fromRB then
+						reagentbank[reagent.id] = reagentbank[reagent.id] - fromRB
+						Skillet:Print(L["Using Reagent Bank for"],recipe.name,"-",fromRB,"x",reagentName)
+					else
+						Skillet:Print(L["Skipping"],recipe.name,"-",L["need"],reagent.numNeeded,"x",reagentName,"("..L["have"],numInBags..")")
+						craftable = false
+						break
+					end
 				end
 			end
 			if craftable then break end
