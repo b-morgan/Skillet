@@ -458,7 +458,7 @@ function Skillet:GetRecipeName(id)
 end
 
 function Skillet:GetRecipe(id)
---	DA.DEBUG(2,"Skillet:GetRecipe "..tostring(id))
+	--DA.DEBUG(2,"Skillet:GetRecipe "..tostring(id))
 	if not id or id == 0 then return self.unknownRecipe end
 	local recipe = self.unknownRecipe
 	id = tonumber(id)
@@ -472,17 +472,17 @@ end
 
 -- reconstruct a recipe from a recipeString and cache it into our system for this session
 function SkilletData:GetRecipe(id)
---	DA.DEBUG(3,"SkilletData:GetRecipe "..tostring(id))
+	--DA.DEBUG(3,"SkilletData:GetRecipe "..tostring(id))
 	if not id or id == 0 then return self.unknownRecipe end
 	if (not Skillet.data.recipeList[id]) and Skillet.db.global.recipeDB[id] then
 		local recipeString = Skillet.db.global.recipeDB[id]
---		DA.DEBUG(3,"recipeString= "..tostring(recipeString))
+		--DA.DEBUG(3,"recipeString= "..tostring(recipeString))
 		local tradeID, itemString, reagentString, toolString = string.split(" ",recipeString)
 		local itemID, numMade = 0, 1
 		local slot = nil
 		if itemString ~= "0" then
 			local a, b = string.split(":",itemString)
---			DA.DEBUG(3,"itemString a= "..tostring(a)..", b= "..tostring(b))
+			--DA.DEBUG(3,"itemString a= "..tostring(a)..", b= "..tostring(b))
 			if a ~= "0" then
 				itemID, numMade = a,b
 			else
@@ -530,7 +530,7 @@ function Skillet:GetNumSkills(player, trade)
 	else
 		r = 0
 	end
-	DA.DEBUG(2,"Skillet:GetNumSkills("..tostring(player)..", "..tostring(trade)..")= "..tostring(r))
+	--DA.DEBUG(2,"Skillet:GetNumSkills("..tostring(player)..", "..tostring(trade)..")= "..tostring(r))
 	return r
 end
 
@@ -574,7 +574,7 @@ function SkilletLink:GetNumSkills(player, trade)
 	else
 		r = 0
 	end
-	DA.DEBUG(2,"SkilletLink:GetNumSkills("..tostring(player)..", "..tostring(trade)..")= "..tostring(r))
+	--DA.DEBUG(2,"SkilletLink:GetNumSkills("..tostring(player)..", "..tostring(trade)..")= "..tostring(r))
 	return r
 end
 
@@ -595,12 +595,12 @@ function SkilletData:GetNumSkills(player, trade)
 	else
 		r = #Skillet.db.realm.skillDB[player][trade]
 	end
-	DA.DEBUG(2,"SkilletData:GetNumSkills("..tostring(player)..", "..tostring(trade)..")= "..tostring(r))
+	--DA.DEBUG(2,"SkilletData:GetNumSkills("..tostring(player)..", "..tostring(trade)..")= "..tostring(r))
 	return r
 end
 
 function Skillet:GetSkill(player,trade,index)
---	DA.DEBUG(2,"Skillet:GetSkill("..tostring(player)..", "..tostring(trade)..", "..tostring(index)..")")
+	--DA.DEBUG(2,"Skillet:GetSkill("..tostring(player)..", "..tostring(trade)..", "..tostring(index)..")")
 	local skillModule = self.dataGatheringModules[player]
 	if skillModule then
 		return skillModule.GetSkill(skillModule, player,trade,index)
@@ -610,7 +610,7 @@ function Skillet:GetSkill(player,trade,index)
 end
 
 function SkilletLink:GetSkill(player,trade,index)
---	DA.DEBUG(3,"SkilletLink:GetSkill("..tostring(player)..", "..tostring(trade)..", "..tostring(index)..")")
+	--DA.DEBUG(3,"SkilletLink:GetSkill("..tostring(player)..", "..tostring(trade)..", "..tostring(index)..")")
 	if player and trade and index then
 		local scanned = true
 		if not Skillet.data.skillList[player] or not Skillet.data.skillList[player][trade] then
@@ -632,7 +632,7 @@ function SkilletLink:GetSkill(player,trade,index)
 end
 
 function SkilletLink:GetRecipe(id)
---	DA.DEBUG(3,"SkilletLink:GetRecipe "..tostring(id))
+	--DA.DEBUG(3,"SkilletLink:GetRecipe "..tostring(id))
 	if not id or id == 0 then return self.unknownRecipe end
 	if (not Skillet.data.recipeList[id]) then
 		self:RescanTrade()
@@ -644,7 +644,7 @@ end
 function SkilletLink:ScanTrade()
 	DA.DEBUG(0,"SkilletLink:ScanTrade()")
 	if self.scanInProgress == true then
-		--DA.DEBUG(0,"SCAN BUSY!")
+		DA.DEBUG(0,"SCAN BUSY!")
 		return
 	end
 	self.scanInProgress = true
@@ -674,7 +674,7 @@ function SkilletLink:ScanTrade()
 	local numSkills = GetNumTradeSkills()
 	for i = 1, numSkills do
 		local skillName, skillType, _, isExpanded = GetTradeSkillInfo(i)
-		DA.DEBUG(3,"i= "..tostring(i)..", skillName= "..tostring(skillName)..", skillType="..tostring(skillType)..", isExpanded= "..tostring(isExpanded))
+		--DA.DEBUG(3,"i= "..tostring(i)..", skillName= "..tostring(skillName)..", skillType="..tostring(skillType)..", isExpanded= "..tostring(isExpanded))
 		if skillName == "Draenor Engineering" and skillType == "subheader" then skillType = "header" end --**-- workaround for Blizzard bug in 6.02
 		if skillType == "header" or skillType == "subheader" then
 			if not isExpanded then
@@ -709,7 +709,7 @@ function SkilletLink:ScanTrade()
 		repeat
 			local subSpell, extra
 			local skillName, skillType, _, isExpanded = GetTradeSkillInfo(i)
-			DA.DEBUG(3,"i= "..tostring(i)..", skillName= "..tostring(skillName)..", skillType="..tostring(skillType)..", isExpanded= "..tostring(isExpanded))
+			--DA.DEBUG(3,"i= "..tostring(i)..", skillName= "..tostring(skillName)..", skillType="..tostring(skillType)..", isExpanded= "..tostring(isExpanded))
 			if skillName == "Draenor Engineering" and skillType == "subheader" then skillType = "header" end --**-- workaround for Blizzard bug in 6.02
 			gotNil = false
 			if skillName then
@@ -883,7 +883,7 @@ end
 
 -- reconstruct a skill from a skillString and cache it into our system for this session
 function SkilletData:GetSkill(player,trade,index)
---	DA.DEBUG(0,"SkilletData:GetSkill("..tostring(player)..", "..tostring(trade)..", "..tostring(index)..")")
+	--DA.DEBUG(0,"SkilletData:GetSkill("..tostring(player)..", "..tostring(trade)..", "..tostring(index)..")")
 	if player and trade and index then
 		if not Skillet.data.skillList[player] then
 			Skillet.data.skillList[player] = {}
@@ -1009,7 +1009,7 @@ function Skillet:InitializeAllDataLinks(name)
 		else
 			link = "|cffffd00|Htrade:"..tradeID..":375:450:"..(uid or "23F381A")..":"..encodedString.."|h["..spellName.."]|h|r"
 		end
-		DA.DEBUG(0,"AllData Link "..tradeID.." "..(uid or "nil").." "..(spellName or "nil").." "..link)
+		--DA.DEBUG(0,"AllData Link "..tradeID.." "..(uid or "nil").." "..(spellName or "nil").." "..link)
 		self.db.realm.tradeSkills[name][tradeID] = {}
 		self.db.realm.tradeSkills[name][tradeID].link = link
 		self.db.realm.tradeSkills[name][tradeID].rank = 600
@@ -1097,7 +1097,7 @@ local rescan_time = 1
 function Skillet:Skillet_AutoRescan()
 	Skillet.scheduleRescan = false
 	local start = GetTime()
-	DA.DEBUG(0,"AUTO RESCAN START")
+	DA.DEBUG(0,"Skillet_AutoRescan Start")
 	if InCombatLockdown() or not SkilletFrame:IsVisible() then
 		self.auto_rescan_timer = nil
 		return
@@ -1117,12 +1117,11 @@ function Skillet:Skillet_AutoRescan()
 		self:UpdateTradeSkillWindow()
 	end
 	local elapsed = GetTime() - start
-	DA.DEBUG(0,"AUTO RESCAN COMPLETE")
-	DA.DEBUG(0,"Skillet Auto-Rescan: "..(math.floor(elapsed*100+.5)/100).." seconds")
+	DA.DEBUG(1,"Skillet_AutoRescan complete in "..(math.floor(elapsed*100+.5)/100).." seconds")
 end
 
 function Skillet:TRADE_SKILL_UPDATE()
-	DA.DEBUG(0,"TRADE_SKILL_UPDATE "..(event or "nil").." "..(arg1 or "nil"))
+	--DA.DEBUG(0,"TRADE_SKILL_UPDATE "..(event or "nil").." "..(arg1 or "nil"))
 	if not Skillet.scanInProgress and not self.auto_rescan_timer then
 		self.auto_rescan_timer = self:ScheduleTimer("Skillet_AutoRescan", 0.5)
 	else
@@ -1155,7 +1154,7 @@ end
 function Skillet:CalculateCraftableCounts(playerOverride)
 	DA.DEBUG(0,"CalculateCraftableCounts("..tostring(playerOverride)..")")
 	local player = playerOverride or self.currentPlayer
-	DA.DEBUG(0,tostring(player).." "..tostring(self.currentTrade))
+	--DA.DEBUG(0,tostring(player).." "..tostring(self.currentTrade))
 	self.visited = {}
 	for i=1,self:GetNumSkills(player, self.currentTrade) do
 		local skill = self:GetSkill(player, self.currentTrade, i)
@@ -1163,7 +1162,7 @@ function Skillet:CalculateCraftableCounts(playerOverride)
 			skill.numCraftable, skill.numCraftableVendor, skill.numCraftableBank, skill.numCraftableAlts = self:InventorySkillIterations(self.currentTrade, i, player)
 		end
 	end
-	DA.DEBUG(0,"CalculateCraftableCounts Complete")
+	--DA.DEBUG(0,"CalculateCraftableCounts Complete")
 end
 
 function Skillet:RescanTrade(force)
@@ -1262,9 +1261,9 @@ function SkilletData:ScanTrade()
 	local link = GetTradeSkillListLink()
 	local profession, rank, maxRank = GetTradeSkillLine()
 	if link then
-		DA.DEBUG(0,"GetTradeSkill: "..(profession or "nil").." link="..link.." "..string.gsub(link, "\124", "\124\124"))
+		--DA.DEBUG(0,"GetTradeSkill: "..(profession or "nil").." link="..link.." "..string.gsub(link, "\124", "\124\124"))
 	else
-		DA.DEBUG(0,"GetTradeSkill: "..(profession or "nil").." non linkable")
+		--DA.DEBUG(0,"GetTradeSkill: "..(profession or "nil").." non linkable")
 	end
 	API.GetNumSkills = GetNumTradeSkills
 	API.ExpandLine = ExpandTradeSkillSubClass
@@ -1605,7 +1604,7 @@ function SkilletData:ScanEnchantingGroups(mainGroup)
 					invSlot = GetInventorySlotInfo(invSlotLookup[craftSlots[i]])
 					self:EnchantingRecipeSlotAssign(recipeID, invSlot)
 				end
-				DA.DEBUG(0,"adding "..(recipeLink or "nil").." to "..groupName)
+				--DA.DEBUG(0,"adding "..(recipeLink or "nil").." to "..groupName)
 				Skillet:RecipeGroupAddRecipe(currentGroup, recipeID, Skillet.data.skillIndexLookup[Skillet.currentPlayer][recipeID])
 			end
 			Skillet:RecipeGroupAddSubGroup(mainGroup, currentGroup, i)
@@ -1615,7 +1614,7 @@ function SkilletData:ScanEnchantingGroups(mainGroup)
 end
 
 function Skillet:GenerateAltKnowledgeBase()
-	DA.DEBUG(0,"GenerateAltKnowledgeBase()")
+	--DA.DEBUG(0,"GenerateAltKnowledgeBase()")
 	local tradeID = Skillet.currentTrade
 	local player = Skillet.currentPlayer
 	local knownRecipes = {}
@@ -1684,16 +1683,16 @@ function Skillet:GenerateAltKnowledgeBase()
 	end
 	knownRecipes = nil
 	unknownRecipes = nil
-	DA.DEBUG(0,"GenerateAltKnowledgeBase Complete")
+	--DA.DEBUG(0,"GenerateAltKnowledgeBase Complete")
 end
 
 function SkilletData:RecipeGroupGenerateAutoGroups()
-	DA.DEBUG(0,"SkilletData:RecipeGroupGenerateAutoGroups()")
+	--DA.DEBUG(0,"SkilletData:RecipeGroupGenerateAutoGroups()")
 	Skillet:GenerateAltKnowledgeBase()
 end
 
 function SkilletLink:RecipeGroupGenerateAutoGroups()
-	DA.DEBUG(0,"SkilletLink:RecipeGroupGenerateAutoGroups()")
+	--DA.DEBUG(0,"SkilletLink:RecipeGroupGenerateAutoGroups()")
 	Skillet:GenerateAltKnowledgeBase()
 end
 
@@ -1785,7 +1784,7 @@ end
 
 function SkilletARL:RecipeFilterToggleButton_OnShow(button)
 	local filter = Skillet:GetTradeSkillOption("recipeSourceFilter")
---	DA.DEBUG(0,"RecipeFilterToggleButton_OnShow("..tostring(button)..")")
+	--DA.DEBUG(0,"RecipeFilterToggleButton_OnShow("..tostring(button)..")")
 	if filter then
 		button:SetChecked(1)
 	else
