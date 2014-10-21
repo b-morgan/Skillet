@@ -273,23 +273,78 @@ local function cache_list(self)
 	self.cachedShoppingList = self:GetShoppingList(name, false, Skillet.db.char.include_guild)
 end
 
-local function indexReagentBank()
-	DA.DEBUG(0,"indexReagentBank()")
-	-- reagentbank contains detailed contents of each slot (which 
-	-- is only needed while the reagentbank is open?).
+local function indexBank()
+	DA.DEBUG(0,"indexBank()")
+-- bank contains detailed contents of each tab,slot which 
+-- is only needed while the bank is open.
+--
+-- reagentbank contains a count by item, usable (and adjustable)
+-- when the bank is closed.
+--
+	bank = {}
 	local player = Skillet.currentPlayer
 	Skillet.db.realm.reagentBank[player] = {}
 	local reagentbank = Skillet.db.realm.reagentBank[player]
-	local container = -3
-	for i = 1, GetContainerNumSlots(container) do
-		local item = GetContainerItemLink(container, i)
-		if item then
-			local _,count = GetContainerItemInfo(container, i)
-			local id = Skillet:GetItemIDFromLink(item)
-			if not reagentbank[id] then
-				reagentbank[id] = 0
+	local bankBags = {-1,5,6,7,8,9,10,11,-3}
+	for _, container in pairs(bankBags) do
+		for i = 1, GetContainerNumSlots(container), 1 do
+			local item = GetContainerItemLink(container, i)
+			if item then
+				local _,count = GetContainerItemInfo(container, i)
+				local id = Skillet:GetItemIDFromLink(item)
+				table.insert(bank, {
+					["bag"]   = container,
+					["slot"]  = i,
+					["id"]  = id,
+					["count"] = count,
+				})
+				if not reagentbank[id] then
+					reagentbank[id] = 0
+				end
+				reagentbank[id] = reagentbank[id] + count
 			end
-			reagentbank[id] = reagentbank[id] + count
+		end
+	end
+end
+
+local function indexGuildBank()
+	DA.DEBUG(0,"indexGuildBank()")
+	-- guildbank contains detailed contents of each tab,slot which 
+	-- is only needed while the guildbank is open.
+	guildbank = {}
+	--
+	-- Build a current view of the contents of the Guildbank.
+	--
+	-- cachedGuildbank is a count by item, usable (but not necessarily 
+	-- accurate) when the Guildbank is closed.
+	-- It is in db.global instead of db.realm because of connected realms 
+	-- This means it is broken if this account is in guilds on 
+	-- different realms (not connected) with the same name.
+	--
+	local guildName = GetGuildInfo("player")
+	Skillet.db.global.cachedGuildbank[guildName] = {}
+	local cachedGuildbank = Skillet.db.global.cachedGuildbank
+	local numTabs = GetNumGuildBankTabs()
+	for tab=1, numTabs, 1 do
+		local name, icon, isViewable, canDeposit, numWithdrawals, remainingWithdrawals = GetGuildBankTabInfo(tab);
+		if(isViewable and numWithdrawals~=0) then
+			for slot=1, MAX_GUILDBANK_SLOTS_PER_TAB or 98, 1 do
+				local item = GetGuildBankItemLink(tab, slot)
+				if item then
+					local _,count = GetGuildBankItemInfo(tab, slot)
+					local id = Skillet:GetItemIDFromLink(item)
+					table.insert(guildbank, {
+						["bag"]   = tab,
+						["slot"]  = slot,
+						["id"]  = id,
+						["count"] = count,
+					})
+					if not cachedGuildbank[guildName][id] then
+						cachedGuildbank[guildName][id] = 0
+					end
+					cachedGuildbank[guildName][id] = cachedGuildbank[guildName][id] + count
+				end
+			end
 		end
 	end
 end
@@ -298,7 +353,7 @@ end
 function Skillet:BANKFRAME_OPENED()
 	DA.DEBUG(0,"BANKFRAME_OPENED")
 	bankFrameOpen = true
-	indexReagentBank() -- temporary so the data also gets collected
+	indexBank()
 	if not self.db.profile.display_shopping_list_at_bank then
 		return
 	end
@@ -369,71 +424,6 @@ end
 -- Called when the auction frame is closed
 function Skillet:AUCTION_HOUSE_CLOSED()
 	self:HideShoppingList()
-end
-
-local function indexBank()
-	DA.DEBUG(0,"indexBank()")
-	-- bank contains detailed contents of each tab,slot which 
-	-- is only needed while the bank is open.
-	-- Include the reagentbank (-3) here for now.
-	bank = {}
-	local bankBags = {-1,5,6,7,8,9,10,11,-3}
-	for _, container in pairs(bankBags) do
-		for i = 1, GetContainerNumSlots(container), 1 do
-			local item = GetContainerItemLink(container, i)
-			if item then
-				local _,count = GetContainerItemInfo(container, i)
-				table.insert(bank, {
-					["bag"]   = container,
-					["slot"]  = i,
-					["id"]  = Skillet:GetItemIDFromLink(item),
-					["count"] = count,
-				})
-			end
-		end
-	end
-end
-
-local function indexGuildBank()
-	DA.DEBUG(0,"indexGuildBank()")
-	-- guildbank contains detailed contents of each tab,slot which 
-	-- is only needed while the guildbank is open.
-	guildbank = {}
-	--
-	-- Build a current view of the contents of the Guildbank.
-	--
-	-- cachedGuildbank is a count by item, usable (but not necessarily 
-	-- accurate) when the Guildbank is closed.
-	-- It is in db.global instead of db.realm because of connected realms 
-	-- This means it is broken if this account is in guilds on 
-	-- different realms (not connected) with the same name.
-	--
-	local guildName = GetGuildInfo("player")
-	Skillet.db.global.cachedGuildbank[guildName] = {}
-	local cachedGuildbank = Skillet.db.global.cachedGuildbank
-	local numTabs = GetNumGuildBankTabs()
-	for tab=1, numTabs, 1 do
-		local name, icon, isViewable, canDeposit, numWithdrawals, remainingWithdrawals = GetGuildBankTabInfo(tab);
-		if(isViewable and numWithdrawals~=0) then
-			for slot=1, MAX_GUILDBANK_SLOTS_PER_TAB or 98, 1 do
-				local item = GetGuildBankItemLink(tab, slot)
-				if item then
-					local _,count = GetGuildBankItemInfo(tab, slot)
-					local id = Skillet:GetItemIDFromLink(item)
-					table.insert(guildbank, {
-						["bag"]   = tab,
-						["slot"]  = slot,
-						["id"]  = id,
-						["count"] = count,
-					})
-					if not cachedGuildbank[guildName][id] then
-						cachedGuildbank[guildName][id] = 0
-					end
-					cachedGuildbank[guildName][id] = cachedGuildbank[guildName][id] + count
-				end
-			end
-		end
-	end
 end
 
 -- checks to see if this is a normal bag (not ammo, herb, enchanting, etc)
