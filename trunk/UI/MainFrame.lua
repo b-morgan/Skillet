@@ -1045,9 +1045,14 @@ function Skillet:internal_UpdateTradeSkillWindow()
 				if showAlts then
 					countWidth = countWidth + 20
 				end
+--[[
 				-- check for Altoholic, then show the count of the item currently owned that the recipe will produce
 				if showOwned and Altoholic then
 					local numowned = (Altoholic:GetItemCount(recipe.itemID) or 0)
+]]--
+				-- show the count of the item currently owned that the recipe will produce
+				if showOwned then
+					local numowned = (self.db.realm.auctionData[Skillet.currentPlayer][recipe.itemID] or 0) + GetItemCount(recipe.itemID,true)
 					if numowned > 0 then
 						local count = "|cff95fcff("..numowned..") "..(countText:GetText() or "")
 						countWidth = countWidth + 20

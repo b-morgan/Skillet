@@ -411,6 +411,8 @@ end
 
 -- Called when the auction frame is opened
 function Skillet:AUCTION_HOUSE_SHOW()
+	self:AuctionScan()
+	self:RegisterEvent("AUCTION_OWNED_LIST_UPDATE")
 	if not self.db.profile.display_shopping_list_at_auction then
 		return
 	end
@@ -423,8 +425,14 @@ end
 
 -- Called when the auction frame is closed
 function Skillet:AUCTION_HOUSE_CLOSED()
+	self:UnregisterEvent("AUCTION_OWNED_LIST_UPDATE")
 	self:HideShoppingList()
 end
+
+--	Called when the auction list updates and the auction frame is opened.
+function Skillet:AUCTION_OWNED_LIST_UPDATE()
+	self:AuctionScan()
+ end
 
 -- checks to see if this is a normal bag (not ammo, herb, enchanting, etc)
 -- I borrowed this code from ClosetGnome.
