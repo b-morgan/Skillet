@@ -233,3 +233,15 @@ function Skillet:GetInventory(player, reagentID)
 	end
 	return 0, 0, 0, 0			-- bags, bagsCraftable, bank, bankCraftable
 end
+
+function Skillet:AuctionScan()
+	local player = Skillet.currentPlayer
+	local auctionData = {}
+	for i = 1, GetNumAuctionItems("owner") do
+		local _, _, count, _, _, _, _, _, _, _, _, _, _, _, _, saleStatus, itemID, _ =  GetAuctionItemInfo("owner", i);
+		if saleStatus ~= 1 then
+			auctionData[itemID] = (auctionData[itemID] or 0) + count
+		end
+	end
+	self.db.realm.auctionData[player] = auctionData
+end

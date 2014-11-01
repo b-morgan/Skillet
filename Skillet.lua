@@ -20,7 +20,7 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
 ]]--
 
-local MAJOR_VERSION = "2.63"
+local MAJOR_VERSION = "2.64"
 local MINOR_VERSION = ("$Revision$"):match("%d+") or 1
 local DATE = string.gsub("$Date$", "^.-(%d%d%d%d%-%d%d%-%d%d).-$", "%1")
 
@@ -721,6 +721,7 @@ function Skillet:FlushAllData()
 	Skillet.db.realm.tradeSkills = {}
 	Skillet.db.realm.groupDB = {}
 	Skillet.db.realm.queueData = {}
+	Skillet.db.realm.auctionData = {}
 	Skillet.db.realm.reagentsInQueue = {}
 	Skillet.db.realm.inventoryData = {}
 	Skillet.db.realm.reagentBank = {}
@@ -765,6 +766,12 @@ function Skillet:InitializeDatabase(player, clean)
 	end
 	if not self.db.realm.queueData[player] then
 		self.db.realm.queueData[player] = {}
+	end
+	if not self.db.realm.auctionData then
+		self.db.realm.auctionData = {}
+	end
+	if not self.db.realm.auctionData[player] then
+		self.db.realm.auctionData[player] = {}
 	end
 	if not self.db.profile.SavedQueues then
 		self.db.profile.SavedQueues = {}
@@ -869,7 +876,7 @@ function Skillet:OnEnable()
 	self:RegisterEvent("GUILDBANKBAGSLOTS_CHANGED")
 	self:RegisterEvent("GUILDBANKFRAME_CLOSED")
 	self:RegisterEvent("AUCTION_HOUSE_SHOW")
-	-- Since we don't interact with the auction house, we don't need an "update" event
+	-- self:RegisterEvent("AUCTION_OWNED_LIST_UPDATE") -- Update event only when the AH is open
 	self:RegisterEvent("AUCTION_HOUSE_CLOSED")
 	self:RegisterEvent("PLAYER_LOGOUT")
 	--
