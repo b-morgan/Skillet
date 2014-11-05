@@ -296,7 +296,7 @@ function Skillet:QueueItems(count)
 			count = skill.numCraftableAlts / (recipe.numMade or 1)
 		end
 	end
-	count = math.min(count, 999)
+	count = math.min(count, 9999)
 	self.visited = {}
 	if count > 0 then
 		if self.currentTrade and self.selectedSkill then
