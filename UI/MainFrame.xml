@@ -536,13 +536,13 @@
 	-->
 	<Frame name="SkilletQueueItemButtonTemplate_Count" hidden="false" virtual="true">
 		<Size>
-			<AbsDimension x="30" y="16"/>
+			<AbsDimension x="36" y="16"/>
 		</Size>
 		<Layers>
 			<Layer level="OVERLAY">
 				<FontString name="$parentText" inherits="GameFontNormalSmall" justifyH="LEFT">
 					<Size>
-						<AbsDimension x="30" y="0"/>
+						<AbsDimension x="36" y="0"/>
 					</Size>
 					<Anchors>
 						<Anchor point="LEFT">
@@ -555,7 +555,7 @@
 	</Frame>
 	<Frame name="SkilletQueueItemButtonTemplate_Name" hidden="false" virtual="true">
 		<Size>
-			<AbsDimension x="280" y="16"/>
+			<AbsDimension x="274" y="16"/>
 		</Size>
 		<Layers>
 			<Layer level="OVERLAY">
@@ -2539,9 +2539,9 @@
 			# The text box where they can enter the number of items to craft.
 			#
 			-->
-			<EditBox name="SkilletItemCountInputBox" letters="3" historyLines="0" numeric="true" autoFocus="false">
+			<EditBox name="SkilletItemCountInputBox" letters="4" historyLines="0" numeric="true" autoFocus="false">
 				<Size>
-					<AbsDimension x="30" y="20"/>
+					<AbsDimension x="36" y="20"/>
 				</Size>
 				<Anchors>
 					<Anchor point="BOTTOM" relativeTo="SkilletCreateCountSlider" relativePoint="TOP">
