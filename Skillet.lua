@@ -1326,7 +1326,7 @@ function Skillet:AddItemNotesToTooltip(tooltip)
 				if player ~= UnitName("player") then
 					note = GRAY_FONT_COLOR_CODE .. player .. ": " .. FONT_COLOR_CODE_CLOSE .. note
 				end
-				tooltip:AddLine(" " .. note, 1, 1, 1, 1) -- r,g,b, wrap
+				tooltip:AddLine(" " .. note, 1, 1, 1, true) -- r,g,b, wrap
 			end
 		end
 	end

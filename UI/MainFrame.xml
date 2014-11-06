@@ -897,7 +897,7 @@
 					</OnClick>
 					<OnEnter>
 						GameTooltip:SetOwner(self,"ANCHOR_TOPLEFT");
-						GameTooltip:SetText(LINK_TRADESKILL_TOOLTIP, nil, nil, nil, nil, 1);
+						GameTooltip:SetText(LINK_TRADESKILL_TOOLTIP, nil, nil, nil, nil, true);
 						GameTooltip:Show();
 					</OnEnter>
 					<OnLeave>
@@ -1358,9 +1358,9 @@
 					<OnShow>
 						local hideUncraftable = Skillet:GetTradeSkillOption("hideuncraftable")
 						if hideUncraftable then
-							self:SetChecked(1)
+							self:SetChecked(true)
 						else
-							self:SetChecked(0)
+							self:SetChecked(false)
 						end
 					</OnShow>
 					<OnLoad>
@@ -1383,15 +1383,15 @@
 								Skillet:InventoryFilterButtons_Show()
 							end
 							if Skillet:GetTradeSkillOption("hideuncraftable") then
-								self:SetChecked(1)
+								self:SetChecked(true)
 							else
-								self:SetChecked(0)
+								self:SetChecked(false)
 							end
 						end
 					</OnClick>
 					<OnEnter>
 						GameTooltip:SetOwner(self, "ANCHOR_TOPLEFT")
-						GameTooltip:SetText(CRAFT_IS_MAKEABLE_TOOLTIP, nil, nil, nil, nil, 1)
+						GameTooltip:SetText(CRAFT_IS_MAKEABLE_TOOLTIP, nil, nil, nil, nil, true)
 						GameTooltip:AddLine("Left-Click to toggle", .7, .7, .7)
 						GameTooltip:AddLine("Right-Click for filtering options", .7, .7, .7)
 						GameTooltip:Show()
@@ -1514,7 +1514,7 @@
 					</OnClick>
 					<OnEnter>
 						GameTooltip:SetOwner(self, "ANCHOR_TOPLEFT")
-						GameTooltip:SetText(Skillet.L["Select skill difficulty threshold"], nil, nil, nil, nil, 1)
+						GameTooltip:SetText(Skillet.L["Select skill difficulty threshold"], nil, nil, nil, nil, true)
 						GameTooltip:Show()
 					</OnEnter>
 					<OnLeave>
@@ -1576,7 +1576,7 @@
 					</OnClick>
 					<OnEnter>
 						GameTooltip:SetOwner(self, "ANCHOR_TOPLEFT")
-						GameTooltip:SetText(Skillet.L["Collapse all groups"], nil, nil, nil, nil, 1)
+						GameTooltip:SetText(Skillet.L["Collapse all groups"], nil, nil, nil, nil, true)
 						GameTooltip:Show()
 					</OnEnter>
 					<OnLeave>
@@ -1602,7 +1602,7 @@
 					</OnClick>
 					<OnEnter>
 						GameTooltip:SetOwner(self, "ANCHOR_TOPLEFT")
-						GameTooltip:SetText(Skillet.L["Expand all groups"], nil, nil, nil, nil, 1)
+						GameTooltip:SetText(Skillet.L["Expand all groups"], nil, nil, nil, nil, true)
 						GameTooltip:Show()
 					</OnEnter>
 					<OnLeave>
