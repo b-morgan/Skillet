@@ -539,9 +539,9 @@ function Skillet:TradeButton_OnClick(this,button)
 					SetItemRef(tradeString,link,"LeftButton")
 				end
 			end
-			this:SetChecked(1)
+			this:SetChecked(true)
 		else
-			this:SetChecked(0)
+			this:SetChecked(false)
 		end
 	else
 		if this:GetChecked() then
@@ -566,7 +566,7 @@ function Skillet:UpdateTradeButtons(player)
 		local frame = _G[frameName]
 		if frame then
 			frame:Hide()
---			frame.checked:SetChecked(0)
+--			frame.checked:SetChecked(false)
 		end
 	end
 	local frameName = "SkilletFrameTradeButtons-"..player
@@ -608,14 +608,14 @@ function Skillet:UpdateTradeButtons(player)
 			buttonIcon:SetTexture(spellIcon)
 			position = position + button:GetWidth()
 			if tradeID == self.currentTrade then
-				button:SetChecked(1)
+				button:SetChecked(true)
 				if Skillet.data.skillList[player][tradeID].scanned then
 					buttonIcon:SetVertexColor(1,1,1)
 				else
 					buttonIcon:SetVertexColor(1,0,0)
 				end
 			else
-				button:SetChecked(0)
+				button:SetChecked(false)
 			end
 			button:Show()
 		end
@@ -1224,16 +1224,16 @@ function Skillet:SkillButton_OnEnter(button)
 		-- Name of the recipe
 		local color = Skillet.skill_style_type[skill.difficulty]
 		if (color) then
-			tip:AddLine(skill.name, color.r, color.g, color.b, 0);
+			tip:AddLine(skill.name, color.r, color.g, color.b, false);
 		else
-			tip:AddLine(skill.name, NORMAL_FONT_COLOR.r, NORMAL_FONT_COLOR.g, NORMAL_FONT_COLOR.b, 0);
+			tip:AddLine(skill.name, NORMAL_FONT_COLOR.r, NORMAL_FONT_COLOR.g, NORMAL_FONT_COLOR.b, false);
 		end
 	end
 	local num, numwvendor, numwbank, numwalts = get_craftable_counts(skill)
 	-- how many can be created with the reagents in the inventory
 	if num > 0 then
 		local text = "\n" .. num .. " " .. L["can be created from reagents in your inventory"];
-		tip:AddLine(text, 1, 1, 1, 0); -- (text, r, g, b, wrap)
+		tip:AddLine(text, 1, 1, 1, false); -- (text, r, g, b, wrap)
 	end
 	-- how many can be created with the reagent in your inv + bank
 	if self.db.profile.show_bank_alt_counts and numwbank > 0 and numwbank ~= num then
@@ -1241,7 +1241,7 @@ function Skillet:SkillButton_OnEnter(button)
 		if num == 0 then
 			text = "\n" .. text;
 		end
-		tip:AddLine(text, 1, 1, 1, 0);	-- (text, r, g, b, wrap)
+		tip:AddLine(text, 1, 1, 1, false);	-- (text, r, g, b, wrap)
 	end
 	-- how many can be crafted with reagents on *all* alts, including this one.
 	if self.db.profile.show_bank_alt_counts and numwalts and numwalts > 0 and numwalts ~= num then
@@ -1249,7 +1249,7 @@ function Skillet:SkillButton_OnEnter(button)
 		if num and numwbank == 0 then
 			text = "\n" .. text;
 		end
-		tip:AddLine(text, 1, 1, 1, 0);	-- (text, r, g, b, wrap)
+		tip:AddLine(text, 1, 1, 1, false);	-- (text, r, g, b, wrap)
 	end
 	Skillet:AddCustomTooltipInfo(tip, recipe)
 	tip:AddLine("\n" .. self:GetReagentLabel(self.currentTrade, id));
@@ -2366,9 +2366,9 @@ function Skillet:InventoryFilterButton_OnShow(button)
 	local option = "filterInventory-"..slot
 	local value = self:GetTradeSkillOption(option)
 	if value then
-		button:SetChecked(1)
+		button:SetChecked(true)
 	else
-		button:SetChecked(0)
+		button:SetChecked(false)
 	end
 end
 

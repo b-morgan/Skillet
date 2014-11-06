@@ -1776,9 +1776,9 @@ function SkilletARL:RecipeFilterButton_OnShow(button)
 	local option = "recipeSourceFilter-"..slot
 	local value = Skillet:GetTradeSkillOption(option)
 	if value then
-		button:SetChecked(1)
+		button:SetChecked(true)
 	else
-		button:SetChecked(0)
+		button:SetChecked(false)
 	end
 end
 
@@ -1786,15 +1786,15 @@ function SkilletARL:RecipeFilterToggleButton_OnShow(button)
 	local filter = Skillet:GetTradeSkillOption("recipeSourceFilter")
 	--DA.DEBUG(0,"RecipeFilterToggleButton_OnShow("..tostring(button)..")")
 	if filter then
-		button:SetChecked(1)
+		button:SetChecked(true)
 	else
-		button:SetChecked(0)
+		button:SetChecked(false)
 	end
 end
 
 function SkilletARL:RecipeFilterToggleButton_OnEnter(button)
 	GameTooltip:SetOwner(button, "ANCHOR_TOPLEFT")
-	GameTooltip:SetText("Filter recipes by source", nil, nil, nil, nil, 1)
+	GameTooltip:SetText("Filter recipes by source", nil, nil, nil, nil, true)
 	GameTooltip:AddLine("Left-Click to toggle", .7, .7, .7)
 	GameTooltip:AddLine("Right-Click for filtering options", .7, .7, .7)
 	GameTooltip:Show()
@@ -1822,9 +1822,9 @@ function SkilletARL:RecipeFilterToggleButton_OnClick(button, mouse)
 			SkilletARL:RecipeFilterButtons_Show()
 		end
 		if Skillet:GetTradeSkillOption("recipeSourceFilter") then
-			button:SetChecked(1)
+			button:SetChecked(true)
 		else
-			button:SetChecked(0)
+			button:SetChecked(false)
 		end
 	end
 end
