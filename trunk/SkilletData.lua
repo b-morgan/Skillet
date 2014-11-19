@@ -678,7 +678,7 @@ function SkilletLink:ScanTrade()
 	for i = 1, numSkills do
 		local skillName, skillType, _, isExpanded = GetTradeSkillInfo(i)
 		--DA.DEBUG(3,"i= "..tostring(i)..", skillName= "..tostring(skillName)..", skillType="..tostring(skillType)..", isExpanded= "..tostring(isExpanded))
-		if skillName == L["Draenor Engineering"] and skillType == "subheader" then skillType = "header" end --**-- workaround for Blizzard bug in 6.02
+		if i == 1 and skillType == "subheader" then skillType = "header" end --**-- workaround for Blizzard bug in 6.02
 		if skillType == "header" or skillType == "subheader" then
 			if not isExpanded then
 				ExpandTradeSkillSubClass(i)
@@ -713,7 +713,7 @@ function SkilletLink:ScanTrade()
 			local subSpell, extra
 			local skillName, skillType, _, isExpanded, _, _, _, _, _, _, _, displayAsUnavailable, _ = GetTradeSkillInfo(i);
 			--DA.DEBUG(3,"i= "..tostring(i)..", skillName= "..tostring(skillName)..", skillType="..tostring(skillType)..", isExpanded= "..tostring(isExpanded))
-			if skillName == L["Draenor Engineering"] and skillType == "subheader" then skillType = "header" end --**-- workaround for Blizzard bug in 6.02
+			if i == 1 and skillType == "subheader" then skillType = "header" end --**-- workaround for Blizzard bug in 6.02
 			if displayAsUnavailable then skillType = "unavailable" end
 			gotNil = false
 			if skillName then
@@ -1308,7 +1308,7 @@ function SkilletData:ScanTrade()
 	for i = 1, numSkills do
 		local skillName, skillType, _, isExpanded = GetTradeSkillInfo(i)
 		DA.DEBUG(3,"i= "..tostring(i)..", skillName= "..tostring(skillName)..", skillType="..tostring(skillType)..", isExpanded= "..tostring(isExpanded))
-		if skillName == L["Draenor Engineering"] and skillType == "subheader" then skillType = "header" end --**-- workaround for Blizzard bug in 6.02
+		if i == 1 and skillType == "subheader" then skillType = "header" end --**-- workaround for Blizzard bug in 6.02
 		if skillType == "header" or skillType == "subheader" then
 			if not isExpanded then
 				ExpandTradeSkillSubClass(i)
@@ -1353,7 +1353,7 @@ function SkilletData:ScanTrade()
 			local skillName, skillType, isExpanded, subSpell, extra
 			local skillName, skillType, _, isExpanded, _, _, _, _, _, _, _, displayAsUnavailable, _ = GetTradeSkillInfo(i);
 			DA.DEBUG(3,"i= "..tostring(i)..", skillName= "..tostring(skillName)..", skillType="..tostring(skillType)..", isExpanded= "..tostring(isExpanded))
-			if skillName == L["Draenor Engineering"] and skillType == "subheader" then skillType = "header" end --**-- workaround for Blizzard bug in 6.02
+			if i == 1 and skillType == "subheader" then skillType = "header" end --**-- workaround for Blizzard bug in 6.02
 			if displayAsUnavailable then skillType = "unavailable" end
 			gotNil = false
 			if skillName then
