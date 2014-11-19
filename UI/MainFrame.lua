@@ -1468,10 +1468,13 @@ function Skillet:UpdateDetailsWindow(skillIndex)
 			end
 		end
 		-- Whether or not it is in cooldown.
+		local _, _, _, _, _, _, _, _, _, _, _, displayAsUnavailable, unavailableString = GetTradeSkillInfo(skillIndex);
 		local cooldown = 0
 		cooldown = (skill.cooldown or 0) - time()
 		if cooldown > 0 then
 			SkilletSkillCooldown:SetText(COOLDOWN_REMAINING.." "..SecondsToTime(cooldown))
+		elseif displayAsUnavailable then
+			SkilletSkillCooldown:SetText(unavailableString)
 		else
 			SkilletSkillCooldown:SetText("")
 		end

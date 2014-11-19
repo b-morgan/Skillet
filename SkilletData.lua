@@ -191,6 +191,7 @@ local DifficultyText = {
 	m = "medium",
 	e = "easy",
 	t = "trivial",
+	u = "unavailable",
 }
 local DifficultyChar = {
 	unknown = "x",
@@ -198,6 +199,7 @@ local DifficultyChar = {
 	medium = "m",
 	easy = "e",
 	trivial = "t",
+	unavailable = "u", 
 }
 local skill_style_type = {
 	["unknown"]			= { r = 1.00, g = 0.00, b = 0.00, level = 5, alttext="???", cstring = "|cffff0000"},
@@ -206,6 +208,7 @@ local skill_style_type = {
 	["easy"]            = { r = 0.25, g = 0.75, b = 0.25, level = 2, alttext="+",   cstring = "|cff40c000"},
 	["trivial"]	        = { r = 0.50, g = 0.50, b = 0.50, level = 1, alttext="",    cstring = "|cff808080"},
 	["header"]          = { r = 1.00, g = 0.82, b = 0,    level = 0, alttext="",    cstring = "|cffffc800"},
+	["unavailable"]          = { r = 0.90, g = 0.9, b = 0.9,    level = 6, alttext="",    cstring = "|ceeeeee00"},
 }
 local lastAutoTarget = {}
 local SkilletDataScanTooltip = CreateFrame("GameTooltip", "SkilletDataScanTooltip", nil, "GameTooltipTemplate")
@@ -708,9 +711,10 @@ function SkilletLink:ScanTrade()
 	for i = 1, numSkills, 1 do
 		repeat
 			local subSpell, extra
-			local skillName, skillType, _, isExpanded = GetTradeSkillInfo(i)
+			local skillName, skillType, _, isExpanded, _, _, _, _, _, _, _, displayAsUnavailable, _ = GetTradeSkillInfo(i);
 			--DA.DEBUG(3,"i= "..tostring(i)..", skillName= "..tostring(skillName)..", skillType="..tostring(skillType)..", isExpanded= "..tostring(isExpanded))
 			if skillName == L["Draenor Engineering"] and skillType == "subheader" then skillType = "header" end --**-- workaround for Blizzard bug in 6.02
+			if displayAsUnavailable then skillType = "unavailable" end
 			gotNil = false
 			if skillName then
 				if skillType == "header" or skillType == "subheader" then
@@ -1347,9 +1351,10 @@ function SkilletData:ScanTrade()
 	for i = 1, numSkills, 1 do
 		repeat
 			local skillName, skillType, isExpanded, subSpell, extra
-			local skillName, skillType, _, isExpanded = GetTradeSkillInfo(i)
+			local skillName, skillType, _, isExpanded, _, _, _, _, _, _, _, displayAsUnavailable, _ = GetTradeSkillInfo(i);
 			DA.DEBUG(3,"i= "..tostring(i)..", skillName= "..tostring(skillName)..", skillType="..tostring(skillType)..", isExpanded= "..tostring(isExpanded))
 			if skillName == L["Draenor Engineering"] and skillType == "subheader" then skillType = "header" end --**-- workaround for Blizzard bug in 6.02
+			if displayAsUnavailable then skillType = "unavailable" end
 			gotNil = false
 			if skillName then
 				if skillType == "header" or skillType == "subheader" then
