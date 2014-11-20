@@ -227,7 +227,7 @@ function Skillet:ProcessQueue(altMode)
 					local fromBank = reagent.numNeeded - numInBags
 					if reagentbank[reagent.id] and reagentbank[reagent.id] >= fromBank then 
 						reagentbank[reagent.id] = reagentbank[reagent.id] - fromBank
-						Skillet:Print(L["Using Bank for"],recipe.name,"-",fromBank,"x",reagentName)
+						DA.WARN(L["Using Bank for"],recipe.name,"-",fromBank,"x",reagentName)
 					else
 						Skillet:Print(L["Skipping"],recipe.name,"-",L["need"],reagent.numNeeded,"x",reagentName,"("..L["have"],numInBags..")")
 						craftable = false
