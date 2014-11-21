@@ -953,18 +953,39 @@ function Skillet:SkilletShow()
 	end
 	self.currentTrade = self.tradeSkillIDsByName[(GetTradeSkillLine())] or 2656      -- smelting caveat
 	self:InitializeDatabase(self.currentPlayer)
-	if self:IsSupportedTradeskill(self.currentTrade) then
-		self:InventoryScan()
-		self.tradeSkillOpen = true
-		DA.DEBUG(1,"SkilletShow: "..self.currentTrade)
-		self.selectedSkill = nil
-		self.dataScanned = false
-		self:ScheduleTimer("SkilletShowWindow", 0.5)
-	else
-		self:HideAllWindows()
-		self:BlizzardTradeSkillFrame_Show()
-		Skillet.TSMPlugin.TSMShow()
+	
+	local showBlizzUI = false
+	
+	-- workaround for enchant illusions which are only supported in the Blizzard UI
+	if self.currentTrade == 7411 then
+		local numSkills = GetNumTradeSkills()
+		for i = 1, numSkills, 1 do
+			local _, skillType = GetTradeSkillInfo(i);			
+			if skillType ~= "header" and skillType ~= "subheader" then
+				if GetTradeSkillRecipeLink(i) == nil then
+					showBlizzUI = true
+				end		
+			end
+		end
 	end
+	if showBlizzUI then
+			self:HideAllWindows()
+			self:BlizzardTradeSkillFrame_Show()	
+	else
+		if self:IsSupportedTradeskill(self.currentTrade) then
+			self:InventoryScan()
+			self.tradeSkillOpen = true
+			DA.DEBUG(1,"SkilletShow: "..self.currentTrade)
+			self.selectedSkill = nil
+			self.dataScanned = false
+			self:ScheduleTimer("SkilletShowWindow", 0.5)
+		else
+			self:HideAllWindows()
+			self:BlizzardTradeSkillFrame_Show()
+			Skillet.TSMPlugin.TSMShow()
+		end	
+	end
+
 end
 
 function Skillet:SkilletShowWindow()
