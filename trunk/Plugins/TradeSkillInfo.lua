@@ -37,8 +37,6 @@ function plugin.GetExtraText(skill, recipe)
 
 	if tsiRecipeID == 0 and recipe.spellID then
 		tsiRecipeID = -recipe.spellID
-	elseif tsiRecipeID then
-		tsiRecipeID = TradeskillInfo:MakeSpecialCase(tsiRecipeID, recipe.spellID)
 	end
 
 	if tsiRecipeID then
