@@ -31,13 +31,7 @@ function plugin.GetExtraText(skill, recipe)
 	local _, bop, extra_text
 	local label = GRAY_FONT_COLOR_CODE..L["Source:"]..FONT_COLOR_CODE_CLOSE
 
-	-- tsi uses itemIDs for skill indices instead of enchantID numbers
-	-- for enchants, the enchantID is negated to avoid overlaps
-	local tsiRecipeID = recipe.itemID
-
-	if tsiRecipeID == 0 and recipe.spellID then
-		tsiRecipeID = -recipe.spellID
-	end
+	local tsiRecipeID = recipe.spellID
 
 	if tsiRecipeID then
 		local combineID = TradeskillInfo:GetCombineRecipe(tsiRecipeID)
@@ -55,20 +49,20 @@ function plugin.GetExtraText(skill, recipe)
 			if TradeskillInfo:ShowingSkillAuctioneerProfit() then -- insert item value and reagent costs from Auctioneer
 				local value, cost, profit = TradeskillInfo:GetCombineAuctioneerCost(tsiRecipeID)
 
-				extra_text = extra_text.."\n"..("%s - %s = %s"):format( TradeskillInfo:GetMoneyString(value), TradeskillInfo:GetMoneyString(cost), TradeskillInfo:GetMoneyString(profit) )
 				label = label.."\n"..GRAY_FONT_COLOR_CODE.."Auction Profit:"..FONT_COLOR_CODE_CLOSE
+				extra_text = extra_text.."\n"..("%s - %s = %s"):format( TradeskillInfo:GetMoneyString(value), TradeskillInfo:GetMoneyString(cost), TradeskillInfo:GetMoneyString(profit) )
 			end
 
 			if TradeskillInfo:ShowingSkillProfit() then -- insert item value and reagent costs
 				local value, cost, profit = TradeskillInfo:GetCombineCost(tsiRecipeID)
 
-				extra_text = extra_text.."\n"..("%s - %s = %s"):format( TradeskillInfo:GetMoneyString(value), TradeskillInfo:GetMoneyString(cost), TradeskillInfo:GetMoneyString(profit) )
 				label = label.."\n"..GRAY_FONT_COLOR_CODE.."Vendor Profit:"..FONT_COLOR_CODE_CLOSE
+				extra_text = extra_text.."\n"..("%s - %s = %s"):format( TradeskillInfo:GetMoneyString(value), TradeskillInfo:GetMoneyString(cost), TradeskillInfo:GetMoneyString(profit) )
 			end
 
 			if TradeskillInfo:ShowingSkillLevel() then
-				extra_text = extra_text.."\n"..TradeskillInfo:GetColoredDifficulty(tsiRecipeID)
 				label = label.."\n"..GRAY_FONT_COLOR_CODE.."Skill Levels:"..FONT_COLOR_CODE_CLOSE
+				extra_text = extra_text.."\n"..TradeskillInfo:GetColoredDifficulty(tsiRecipeID)
 			end
 
 			if Skillet:bopCheck(combineID) then
@@ -78,8 +72,6 @@ function plugin.GetExtraText(skill, recipe)
 		else
 			extra_text = "|cffff0000"..L["Unknown"].."|r"
 		end
-	else
-		extra_text = "TradeSkillInfo can't find recipeID for item "..recipe.itemID
 	end
 
 	if bop then
