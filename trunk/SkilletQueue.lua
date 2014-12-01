@@ -220,11 +220,13 @@ function Skillet:ProcessQueue(altMode)
 			local craftable = true
 			for i=1,#recipe.reagentData,1 do
 				local reagent = recipe.reagentData[i]
+				local reagentName = GetItemInfo(reagent.id) or reagent.id
+				DA.DEBUG(0,"id= "..tostring(reagent.id)..", reagentName="..tostring(reagentName)..", numNeeded="..tostring(reagent.numNeeded))
 				local numInBags, bagsCraft, numInBank, bankCraft = self:GetInventory(self.currentPlayer, reagent.id)
 				DA.DEBUG(0,"numInBags= "..tostring(numInBags)..", numInBank="..tostring(numInBank)..", bagsCraft= "..tostring(bagsCraft)..", bankCraft= "..tostring(bankCraft))
 				if numInBags < reagent.numNeeded then
-					local reagentName = GetItemInfo(reagent.id) or reagent.id
 					local fromBank = reagent.numNeeded - numInBags
+					DA.DEBUG(0,"fromBank= "..tostring(fromBank)..", reagentbank= "..tostring(reagentbank[reagent.id]))
 					if reagentbank[reagent.id] and reagentbank[reagent.id] >= fromBank then 
 						reagentbank[reagent.id] = reagentbank[reagent.id] - fromBank
 						DA.WARN(L["Using Bank for"],recipe.name,"-",fromBank,"x",reagentName)
