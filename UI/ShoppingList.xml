@@ -269,13 +269,29 @@
 			<Anchors>
 				<Anchor point="BOTTOMRIGHT" relativeTo="SkilletShoppingList" relativePoint="BOTTOMRIGHT">
 					<Offset>
-						<AbsDimension x="-10" y="30"/>
+						<AbsDimension x="-10" y="50"/>
 					</Offset>
 				</Anchor>
 			</Anchors>
 			<Scripts>
 				<OnClick>
 					Skillet:ShoppingListToggleShowAlts()
+					Skillet:UpdateShoppingListWindow(false)
+				</OnClick>
+			</Scripts>
+		</CheckButton>
+
+		<CheckButton name="SkilletShowQueuesIncludeBank" inherits="SkilletShoppingListCheckButtonTemplate">
+			<Anchors>
+				<Anchor point="BOTTOMRIGHT" relativeTo="SkilletShoppingList" relativePoint="BOTTOMRIGHT">
+					<Offset>
+						<AbsDimension x="-10" y="30"/>
+					</Offset>
+				</Anchor>
+			</Anchors>
+			<Scripts>
+				<OnClick>
+					Skillet:ShoppingListToggleIncludeBank()
 					Skillet:UpdateShoppingListWindow(false)
 				</OnClick>
 			</Scripts>
