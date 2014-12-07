@@ -298,7 +298,7 @@ function Skillet:CollectRecipeInformation()
 		if itemID ~= 0 then
 			self:ItemDataAddRecipeSource(itemID, recipeID)
 		end
-		if reagengString ~= "-" then
+		if reagentString ~= "-" then
 			local reagentList = { string.split(":",reagentString) }
 			local numReagents = #reagentList / 2
 			for i=1,numReagents do
