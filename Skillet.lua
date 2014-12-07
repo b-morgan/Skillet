@@ -20,7 +20,7 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
 ]]--
 
-local MAJOR_VERSION = "2.69"
+local MAJOR_VERSION = "2.70"
 local MINOR_VERSION = ("$Revision$"):match("%d+") or 1
 local DATE = string.gsub("$Date$", "^.-(%d%d%d%d%-%d%d%-%d%d).-$", "%1")
 
@@ -425,13 +425,27 @@ Skillet.options =
 			desc = L["FLUSHALLDATADESC"],
 			func = function()
 				if not (UnitAffectingCombat("player")) then
-					Skillet:ClearShoppingList()
+					Skillet:FlushAllData()
 				else
 					DA.DEBUG(0,"|cff8888ffSkillet|r: Combat lockdown restriction." ..
 												  " Leave combat and try again.")
 				end
 			end,
 			order = 54
+		},
+		flushrecipedata = {
+			type = 'execute',
+			name = L["Flush Recipe Data"],
+			desc = L["FLUSHRECIPEDATADESC"],
+			func = function()
+				if not (UnitAffectingCombat("player")) then
+					Skillet:FlushRecipeData()
+				else
+					DA.DEBUG(0,"|cff8888ffSkillet|r: Combat lockdown restriction." ..
+												  " Leave combat and try again.")
+				end
+			end,
+			order = 55
 		},
 		standby = {
 			type = 'execute',
@@ -447,7 +461,7 @@ Skillet.options =
 				end
 			end,
 			guiHidden = true,
-			order = 55
+			order = 56
 		},
 
 		WarnShow = {
@@ -660,7 +674,8 @@ function Skillet:OnInitialize()
 	end
 	DA.DebugLog = SkilletDBPC
 	self.db = AceDB:New("SkilletDB", defaults)
-	local _,_,_,wowVersion = GetBuildInfo();
+	local _,wowBuild,_,wowVersion = GetBuildInfo();
+	self.wowBuild = wowBuild
 	self.wowVersion = wowVersion
 	self:InitializeDatabase((UnitName("player")), false)  --- force clean rescan for now
 	-- hook default tooltips
@@ -729,11 +744,29 @@ function Skillet:FlushAllData()
 	Skillet:InitializeDatabase((UnitName("player")))
 end
 
+function Skillet:FlushRecipeData()
+--	Skillet.data = {}
+	Skillet.db.global.recipeDB = {}
+	Skillet.db.global.itemRecipeUsedIn = {}
+	Skillet.db.global.itemRecipeSource = {}
+	Skillet.db.realm.skillDB = {}
+	Skillet:InitializeDatabase((UnitName("player")))
+end
+
 function Skillet:InitializeDatabase(player, clean)
 	DA.DEBUG(0,"initialize database for "..player)
-	if not self.db.realm.dataVersion or self.db.realm.dataVersion < 4 then
-		self.db.realm.dataVersion = 4
+	if self.db.realm.dataVersion then
+		self.db.global.dataVersion = self.db.realm.dataVersion
+		self.db.realm.dataVersion = nil
+	end
+	if not self.db.global.dataVersion or self.db.global.dataVersion < 4 then
+		self.db.global.dataVersion = 4
 		self:FlushAllData()
+	end
+	if not self.db.global.wowBuild or self.db.global.wowBuild ~= self.wowBuild then
+		self.db.global.wowBuild = self.wowBuild
+		self.db.global.wowVersion = self.wowVersion -- actually TOC version
+		self:FlushRecipeData()
 	end
 	if not self.db.realm.groupDB then
 		self.db.realm.groupDB = {}
