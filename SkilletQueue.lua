@@ -218,22 +218,28 @@ function Skillet:ProcessQueue(altMode)
 		if command and command.op == "iterate" then
 			local recipe = self:GetRecipe(command.recipeID)
 			local craftable = true
-			for i=1,#recipe.reagentData,1 do
-				local reagent = recipe.reagentData[i]
-				local reagentName = GetItemInfo(reagent.id) or reagent.id
-				DA.DEBUG(0,"id= "..tostring(reagent.id)..", reagentName="..tostring(reagentName)..", numNeeded="..tostring(reagent.numNeeded))
-				local numInBags, bagsCraft, numInBank, bankCraft = self:GetInventory(self.currentPlayer, reagent.id)
-				DA.DEBUG(0,"numInBags= "..tostring(numInBags)..", numInBank="..tostring(numInBank)..", bagsCraft= "..tostring(bagsCraft)..", bankCraft= "..tostring(bankCraft))
-				if numInBags < reagent.numNeeded then
-					local fromBank = reagent.numNeeded - numInBags
-					DA.DEBUG(0,"fromBank= "..tostring(fromBank)..", reagentbank= "..tostring(reagentbank[reagent.id]))
-					if reagentbank[reagent.id] and reagentbank[reagent.id] >= fromBank then 
-						reagentbank[reagent.id] = reagentbank[reagent.id] - fromBank
-						DA.WARN(L["Using Bank for"],recipe.name,"-",fromBank,"x",reagentName)
-					else
-						Skillet:Print(L["Skipping"],recipe.name,"-",L["need"],reagent.numNeeded,"x",reagentName,"("..L["have"],numInBags..")")
-						craftable = false
-						break
+			local cooldown = GetTradeSkillCooldown(skillIndexLookup[command.recipeID])
+			if cooldown then
+				Skillet:Print(L["Skipping"],recipe.name,"-",L["has cooldown of"],SecondsToTime(cooldown))
+				craftable = false
+			else
+				for i=1,#recipe.reagentData,1 do
+					local reagent = recipe.reagentData[i]
+					local reagentName = GetItemInfo(reagent.id) or reagent.id
+					DA.DEBUG(0,"id= "..tostring(reagent.id)..", reagentName="..tostring(reagentName)..", numNeeded="..tostring(reagent.numNeeded))
+					local numInBags, bagsCraft, numInBank, bankCraft = self:GetInventory(self.currentPlayer, reagent.id)
+					DA.DEBUG(0,"numInBags= "..tostring(numInBags)..", numInBank="..tostring(numInBank)..", bagsCraft= "..tostring(bagsCraft)..", bankCraft= "..tostring(bankCraft))
+					if numInBags < reagent.numNeeded then
+						local fromBank = reagent.numNeeded - numInBags
+						DA.DEBUG(0,"fromBank= "..tostring(fromBank)..", reagentbank= "..tostring(reagentbank[reagent.id]))
+						if reagentbank[reagent.id] and reagentbank[reagent.id] >= fromBank then 
+							reagentbank[reagent.id] = reagentbank[reagent.id] - fromBank
+							DA.WARN(L["Using Bank for"],recipe.name,"-",fromBank,"x",reagentName)
+						else
+							Skillet:Print(L["Skipping"],recipe.name,"-",L["need"],reagent.numNeeded,"x",reagentName,"("..L["have"],numInBags..")")
+							craftable = false
+							break
+						end
 					end
 				end
 			end
