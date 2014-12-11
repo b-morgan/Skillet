@@ -33,7 +33,7 @@ local TradeSkillList = {
 	3273,       -- first aid
 	-- 2842,    -- poisons
 	53428,      -- runeforging
-	-- 5149,    -- beast training (not supported, but I think I need the number)
+	-- 5149,    -- beast training (not supported)
 }
 Skillet.TradeSkillAdditionalAbilities = {
 	[7411]  = {13262,"Disenchant"},     -- enchanting = disenchant
@@ -94,7 +94,8 @@ Skillet.TradeSkillAutoTarget = {
 		[13465] = 5, -- Mountain Silversage
 		[13466] = 5, -- Sorrowmoss
 		[13467] = 5, -- Icecap
-		[39969] = 5, -- Fire Seed
+		[39969] = 5, -- Fire Seed (no longer in game)
+-- Added in the Burning Crusade
 		[22789] = 5, -- Terocone
 		[22786] = 5, -- Dreaming Glory
 		[22787] = 5, -- Ragveil
@@ -103,6 +104,7 @@ Skillet.TradeSkillAutoTarget = {
 		[22792] = 5, -- Nightmare Vine
 		[22793] = 5, -- Mana Thistle
 		[22791] = 5, -- Netherbloom
+--Added in Wrath of the Lich King
 		[36901] = 5, -- Goldclover
 		[36907] = 5, -- Talandra\'s Rose
 		[37921] = 5, -- Deadnettle
@@ -111,6 +113,7 @@ Skillet.TradeSkillAutoTarget = {
 		[36906] = 5, -- Icethorn
 		[36903] = 5, -- Adder\'s Tongue
 		[39970] = 5, -- Fire Leaf
+-- Added in Cataclysm
 		[52983] = 5, -- Cinderbloom
 		[52984] = 5, -- Stormvine
 		[52985] = 5, -- Azshara\'s Veil
@@ -118,13 +121,24 @@ Skillet.TradeSkillAutoTarget = {
 		[52987] = 5, -- Twilight Jasmine
 		[52988] = 5, -- Whiptail
 		[52989] = 5, -- Deathspore Pod
+-- Added in Mists of Pandaria
 		[79011] = 5, -- Fool's Cap
 		[79010] = 5, -- Snow Lily
 		[72235] = 5, -- Silkweed
 		[72234] = 5, -- Green Tea Leaf
 		[72237] = 5, -- Rain Poppy
+-- Added in Warlords of Draenor
+		[109124] = 5, -- Frostweed
+		[109125] = 5, -- Fireweed
+		[109126] = 5, -- Gorgrond Flytrap
+		[109127] = 5, -- Starflower
+		[109128] = 5, -- Nagrand Arrowbloom
+		[109129] = 5, -- Talador Orchid
+		[109130] = 5, -- Chameleon Lotus
 	}
 }
+
+-- No longer needed as of version 50400
 local TradeSkillRecipeCounts = {
 	[3908] = 438,
 	[7411] = 306,
@@ -139,6 +153,8 @@ local TradeSkillRecipeCounts = {
 	[2259] = 264,
 	[53428] = 0,		-- can't link [Runeforging]
 }
+
+-- Items in this list are ignored because they can cause infinite loops.
 local TradeSkillIgnoredMats  = {
 	[11479] = 1 , -- Transmute: Iron to Gold
 	[11480] = 1 , -- Transmute: Mithril to Truesilver
@@ -180,8 +196,8 @@ local TradeSkillIgnoredMats  = {
 	[118238] = 1 , -- ethereal shard shatter
 	[118237] = 1 , -- mysterious diffusion
 }
-
 Skillet.TradeSkillIgnoredMats = TradeSkillIgnoredMats
+
 SkilletData = {}				-- skillet data scanner
 SkilletLink = {}
 local TradeSkillIDsByName = {}		-- filled in with ids and names for reverse matching (since the same name has multiple id's based on level)
@@ -208,7 +224,7 @@ local skill_style_type = {
 	["easy"]            = { r = 0.25, g = 0.75, b = 0.25, level = 2, alttext="+",   cstring = "|cff40c000"},
 	["trivial"]	        = { r = 0.60, g = 0.60, b = 0.60, level = 1, alttext="",    cstring = "|cff909090"},
 	["header"]          = { r = 1.00, g = 0.82, b = 0,    level = 0, alttext="",    cstring = "|cffffc800"},
-	["unavailable"]          = { r = 0.3, g = 0.3, b = 0.3,    level = 6, alttext="",    cstring = "|cff606060"},
+	["unavailable"]     = { r = 0.3, g = 0.3, b = 0.3,    level = 6, alttext="",    cstring = "|cff606060"},
 }
 local lastAutoTarget = {}
 local SkilletDataScanTooltip = CreateFrame("GameTooltip", "SkilletDataScanTooltip", nil, "GameTooltipTemplate")

@@ -37,7 +37,8 @@ function Skillet:InventoryReagentCraftability(reagentID, playerOverride)
 		for childRecipeID in pairs(recipeSource) do
 			local childRecipe = self:GetRecipe(childRecipeID)
 			local childSkillIndex = skillIndexLookup[childRecipeID]    				-- only interested in current player for now
-			if childSkillIndex and childRecipe then
+			if childSkillIndex and childRecipe and 
+			  not Skillet.TradeSkillIgnoredMats[childRecipeID] and not Skillet.userIgnoredMats[player][childRecipeID] then
 				local numCraftable = 100000
 				local numCraftableBank = 100000
 				for i=1,#childRecipe.reagentData,1 do
