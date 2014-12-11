@@ -463,6 +463,34 @@ Skillet.options =
 			guiHidden = true,
 			order = 56
 		},
+		ignoreadd = {
+			type = "input",
+			name = "IgnoreAdd",
+			desc = "Add to userIgnoredMats",
+			get = function()
+				value = tonumber(value)
+				return Skillet.db.realm.userIgnoredMats[UnitName("player")][value]
+			end,
+			set = function(self,value)
+				value = tonumber(value)
+				Skillet.db.realm.userIgnoredMats[UnitName("player")][value] = 1
+			end,
+			order = 57
+		},
+		ignoredel = {
+			type = "input",
+			name = "IgnoreDel",
+			desc = "Delete from userIgnoredMats",
+			get = function()
+				value = tonumber(value)
+				return Skillet.db.realm.userIgnoredMats[UnitName("player")][value]
+			end,
+			set = function(self,value)
+				value = tonumber(value)
+				Skillet.db.realm.userIgnoredMats[UnitName("player")][value] = nil
+			end,
+			order = 58
+		},
 
 		WarnShow = {
 			type = "toggle",
@@ -741,6 +769,7 @@ function Skillet:FlushAllData()
 	Skillet.db.realm.reagentsInQueue = {}
 	Skillet.db.realm.inventoryData = {}
 	Skillet.db.realm.reagentBank = {}
+	Skillet.db.realm.userIgnoredMats = {}
 	Skillet:InitializeDatabase((UnitName("player")))
 end
 
@@ -786,6 +815,15 @@ function Skillet:InitializeDatabase(player, clean)
 	if not self.db.realm.reagentsInQueue then
 		self.db.realm.reagentsInQueue = {}
 	end
+	if not self.db.realm.reagentsInQueue[player] then
+		self.db.realm.reagentsInQueue[player] = {}
+	end
+	if not self.db.realm.userIgnoredMats then
+		self.db.realm.userIgnoredMats = {}
+	end
+	if not self.db.realm.userIgnoredMats[player] then
+		self.db.realm.userIgnoredMats[player] = {}
+	end
 	if not self.db.realm.skillDB then
 		self.db.realm.skillDB = {}
 	end
@@ -794,6 +832,9 @@ function Skillet:InitializeDatabase(player, clean)
 	end
 	if not self.db.realm.tradeSkills then
 		self.db.realm.tradeSkills = {}
+	end
+	if not self.db.realm.tradeSkills[player] then
+		self.db.realm.tradeSkills[player] = {}
 	end
 	if not self.db.realm.queueData then
 		self.db.realm.queueData = {}
