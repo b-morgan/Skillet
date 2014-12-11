@@ -113,7 +113,8 @@ function Skillet:QueueAppendCommand(command, queueCraftables, noWindowRefresh)
 							local newCommand = self:QueueCommandIterate(recipeSourceID, newCount)
 							newCommand.level = (command.level or 0) + 1
 							-- do not add items from transmutation - this can create weird loops
-							if not Skillet.TradeSkillIgnoredMats[recipeSourceID] and not Skillet.userIgnoredMats[Skillet.currentPlayer][recipeSourceID] then
+							if not Skillet.TradeSkillIgnoredMats[recipeSourceID] and 
+							  not Skillet.db.realm.userIgnoredMats[Skillet.currentPlayer][recipeSourceID] then
 								self:QueueAppendCommand(newCommand, queueCraftables, true)
 							end
 						end
