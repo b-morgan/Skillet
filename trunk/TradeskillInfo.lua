@@ -33,13 +33,20 @@ function Skillet:GetLevelRequiredToUse(item)
 	return level
 end
 
-function Skillet:GetItemIDFromLink(link)				-- works with items or enchants
+function Skillet:GetItemIDFromLink(link)	-- works with items or enchants
 	if (link) then
-		local found, _, string = string.find(link, "^|c%x+|H(.+)|h%[.+%]")
+--[[
+		local found, _, str = string.find(link, "^|c%x+|H(.+)|h%[.+%]")
 		if found then
-			local _, id = strsplit(":", string)
+			local _, id = strsplit(":", str)
 			return tonumber(id);
 		else
+]]--
+		local linktype, id = string.match(link, "|H([^:]+):(%d+)")
+		if id then
+			return tonumber(id);
+		else
+			DA.WARN("Can't find id from link="..tostring(link))
 			return nil
 		end
 	end
