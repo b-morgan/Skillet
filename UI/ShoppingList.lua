@@ -287,16 +287,18 @@ local function indexBank()
 			if item then
 				local _,count = GetContainerItemInfo(container, i)
 				local id = Skillet:GetItemIDFromLink(item)
-				table.insert(bank, {
-					["bag"]   = container,
-					["slot"]  = i,
-					["id"]  = id,
-					["count"] = count,
-				})
-				if not reagentbank[id] then
-					reagentbank[id] = 0
+				if id then
+					table.insert(bank, {
+						["bag"]   = container,
+						["slot"]  = i,
+						["id"]  = id,
+						["count"] = count,
+					})
+					if not reagentbank[id] then
+						reagentbank[id] = 0
+					end
+					reagentbank[id] = reagentbank[id] + count
 				end
-				reagentbank[id] = reagentbank[id] + count
 			end
 		end
 	end
@@ -328,16 +330,18 @@ local function indexGuildBank()
 				if item then
 					local _,count = GetGuildBankItemInfo(tab, slot)
 					local id = Skillet:GetItemIDFromLink(item)
-					table.insert(guildbank, {
-						["bag"]   = tab,
-						["slot"]  = slot,
-						["id"]  = id,
-						["count"] = count,
-					})
-					if not cachedGuildbank[guildName][id] then
-						cachedGuildbank[guildName][id] = 0
+					if id then
+						table.insert(guildbank, {
+							["bag"]   = tab,
+							["slot"]  = slot,
+							["id"]  = id,
+							["count"] = count,
+						})
+						if not cachedGuildbank[guildName][id] then
+							cachedGuildbank[guildName][id] = 0
+						end
+						cachedGuildbank[guildName][id] = cachedGuildbank[guildName][id] + count
 					end
-					cachedGuildbank[guildName][id] = cachedGuildbank[guildName][id] + count
 				end
 			end
 		end
