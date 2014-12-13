@@ -463,33 +463,61 @@ Skillet.options =
 			guiHidden = true,
 			order = 56
 		},
+		ignorelist = {
+			type = 'execute',
+			name = L["Ignored Materials List"],
+			desc = L["IGNORELISTDESC"],
+			func = function()
+				if not (UnitAffectingCombat("player")) then
+					Skillet:DisplayIgnoreList()
+				else
+					DA.DEBUG(0,"|cff8888ffSkillet|r: Combat lockdown restriction." ..
+												  " Leave combat and try again.")
+				end
+			end,
+			order = 57
+		},
+		ignoreclear = {
+			type = 'execute',
+			name = L["Ignored Materials Clear"],
+			desc = L["IGNORECLEARDESC"],
+			func = function()
+				if not (UnitAffectingCombat("player")) then
+					Skillet:ClearIgnoreList()
+				else
+					DA.DEBUG(0,"|cff8888ffSkillet|r: Combat lockdown restriction." ..
+												  " Leave combat and try again.")
+				end
+			end,
+			order = 58
+		},
 		ignoreadd = {
 			type = "input",
 			name = "IgnoreAdd",
 			desc = "Add to userIgnoredMats",
 			get = function()
-				value = tonumber(value)
+				local value = tonumber(value)
 				return Skillet.db.realm.userIgnoredMats[UnitName("player")][value]
 			end,
 			set = function(self,value)
-				value = tonumber(value)
+				local value = tonumber(value)
 				Skillet.db.realm.userIgnoredMats[UnitName("player")][value] = 1
 			end,
-			order = 57
+			order = 59
 		},
 		ignoredel = {
 			type = "input",
 			name = "IgnoreDel",
 			desc = "Delete from userIgnoredMats",
 			get = function()
-				value = tonumber(value)
+				local value = tonumber(value)
 				return Skillet.db.realm.userIgnoredMats[UnitName("player")][value]
 			end,
 			set = function(self,value)
-				value = tonumber(value)
+				local value = tonumber(value)
 				Skillet.db.realm.userIgnoredMats[UnitName("player")][value] = nil
 			end,
-			order = 58
+			order = 60
 		},
 
 		WarnShow = {
@@ -1587,9 +1615,9 @@ function ProfessionPopup_Init(menuFrame, level)
 	end
 end
 
-function ProfessionPopup_Show(this)
+function ProfessionPopup_Show(self)
 	ProfessionPopupFrame = CreateFrame("Frame", "ProfessionPopupFrame", _G["UIParent"], "UIDropDownMenuTemplate")
-	Skillet.professionPopupButton = this
+	Skillet.professionPopupButton = self
 	UIDropDownMenu_Initialize(ProfessionPopupFrame, ProfessionPopup_Init, "MENU")
 	ToggleDropDownMenu(1, nil, ProfessionPopupFrame, Skillet.professionPopupButton, Skillet.professionPopupButton:GetWidth(), 0)
 end

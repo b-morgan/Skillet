@@ -147,7 +147,7 @@ function Skillet:CreateTradeSkillWindow()
 	SkilletShoppingListButton:SetText(L["Shopping List"])
 	SkilletSortLabel:SetText(L["Sorting"])
 	SkilletGroupLabel:SetText(L["Grouping"])
-	SkilletViewCraftersButton:SetText(L["View Crafters"])
+	SkilletIgnoredMatsButton:SetText(L["Ignored List"])
 	SkilletQueueManagementButton:SetText(L["Queues"])
 --	SkilletDetailsManagementButton:SetText("Details")
 	SkilletQueueLoadButton:SetText(L["Load"])
@@ -767,17 +767,7 @@ function Skillet:internal_UpdateTradeSkillWindow()
 	end
 	self:UpdateDetailsWindow(self.selectedSkill)
 	self:UpdateTradeButtons(self.currentPlayer)
-	local _, _, isGuildView = Skillet:IsTradeSkillLinked()
-		if isGuildView and self.selectedSkill then
-		if not SkilletViewCraftersButton:IsVisible() then
-			SkilletViewCraftersButton:Show()
-		end
-	else
-		if SkilletViewCraftersButton:IsVisible() then
-			SkilletViewCraftersButton:Hide()
-			Skillet:ViewCraftersToggle(true)
-		end
-	end
+	SkilletIgnoredMatsButton:Show()
 	if not self.currentTrade then
 		-- nothing to see, nothing to update
 		self:SetSelectedSkill(nil)
@@ -2351,7 +2341,6 @@ function Skillet:InventoryFilterButton_OnEnter(button)
 	else
 		GameTooltip:SetText(slot.." off")
 	end
---	GameTooltip:AddLine(player,1,1,1)
 	GameTooltip:Show()
 end
 
@@ -2409,11 +2398,23 @@ local skillMenuSelection = {
 		text = "Link Recipe",
 		func = function()
 					local spellLink = GetTradeSkillRecipeLink(Skillet.menuButton:GetID())
-
 					if (ChatEdit_GetLastActiveWindow():IsVisible() or WIM_EditBoxInFocus ~= nil) then
 						ChatEdit_InsertLink(spellLink)
 					else
 						DA.DEBUG(0, spellLink)
+					end
+				end,
+	},
+	{
+		text = "Add to Ignore Materials",
+		func = function()
+					local index = Skillet.menuButton:GetID()
+					local spellLink = GetTradeSkillRecipeLink(index)
+					local recipeID = Skillet:GetItemIDFromLink(spellLink)
+					DA.DEBUG(0, tostring(index)..", "..tostring(spellLink)..", "..tostring(recipeID))
+					Skillet.db.realm.userIgnoredMats[Skillet.currentPlayer][recipeID] = spellLink
+					if Skillet.ignoreList and Skillet.ignoreList:IsVisible() then
+						Skillet:UpdateIgnoreListWindow()
 					end
 				end,
 	},

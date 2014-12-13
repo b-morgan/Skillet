@@ -93,3 +93,5 @@ UI\MerchantWindow.lua
 UI\MerchantWindow.xml
 UI\ShoppingList.lua
 UI\ShoppingList.xml
+UI\IgnoreList.lua
+UI\IgnoreList.xml

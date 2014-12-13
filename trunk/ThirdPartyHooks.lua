@@ -32,33 +32,33 @@ Hooking a Method Using AceHook
 
 To hook this routine with an Ace2 mod, use (for example):
 
-    self:Hook(Skillet, "GetExtraItemDetailText")
+	self:Hook(Skillet, "GetExtraItemDetailText")
 
 and write your method:
 
-    function MyMod:GetExtraItemDetailText(obj, tradeskill, skill_index)
-        -- get the previous value from the hook chain
-        local before = self.hooks["GetExtraItemDetailText"](obj, tradeskill, skill_index)
-        local myvalue = "samplething"
-        if before then
-            return before .. "\n" .. myvalue
-        else
-            return myvalue
-        end
-    end
+	function MyMod:GetExtraItemDetailText(obj, tradeskill, skill_index)
+		-- get the previous value from the hook chain
+		local before = self.hooks["GetExtraItemDetailText"](obj, tradeskill, skill_index)
+		local myvalue = "samplething"
+		if before then
+			return before .. "\n" .. myvalue
+		else
+			return myvalue
+		end
+	end
 
 Hooking a Method Without Using AceHook
 --------------------------------------
 
 local orig_get_extra = Skillet.GetExtraItemDetailText
 Skillet.GetExtraItemDetailText = function(obj, tradeskill, skill_index)
-    local before = orig_get_extra(obj, tradeskill, skill_index)
-    local myvalue = "samplething"
-    if before then
-        return before .. "\n" .. myvalue
-    else
-        return myvalue
-    end
+	local before = orig_get_extra(obj, tradeskill, skill_index)
+	local myvalue = "samplething"
+	if before then
+		return before .. "\n" .. myvalue
+	else
+		return myvalue
+	end
 end
 
 In both methods, the 'obj' passed in will be a copy of the 'Skillet' main object.
@@ -75,27 +75,26 @@ your own in as sane a fashion as possible.
 ]]
 
 local function tradejunkie_custom_add()
-    if TradeJunkieMain and TJ_OpenButtonTradeSkill then
-        -- Override the default action of the button to attach it
-        -- to our window, rather than the Blizzard trade skill window
-        TJ_OpenButtonTradeSkill:SetScript("OnClick", function()
-           TradeJunkie_Attach("SkilletFrame")
-           TradeJunkieMain:SetPoint("TOPLEFT", "SkilletFrame", "TOPRIGHT", 0, 0)
-        end)
-
-    end
+	if TradeJunkieMain and TJ_OpenButtonTradeSkill then
+		-- Override the default action of the button to attach it
+		-- to our window, rather than the Blizzard trade skill window
+		TJ_OpenButtonTradeSkill:SetScript("OnClick", function()
+			TradeJunkie_Attach("SkilletFrame")
+			TradeJunkieMain:SetPoint("TOPLEFT", "SkilletFrame", "TOPRIGHT", 0, 0)
+		end)
+	end
 end
 
 local function armorcraft_custom_add()
-    if AC_Craft and AC_UseButton and AC_ToggleButton then
-        AC_Craft:SetParent("SkilletFrame")
-        AC_Craft:SetPoint("TOPLEFT","SkilletFrame","TOPRIGHT", 0, 0)
-        AC_Craft:SetAlpha(1.0)
-    end
+	if AC_Craft and AC_UseButton and AC_ToggleButton then
+		AC_Craft:SetParent("SkilletFrame")
+		AC_Craft:SetPoint("TOPLEFT","SkilletFrame","TOPRIGHT", 0, 0)
+		AC_Craft:SetAlpha(1.0)
+	end
 end
 
 local function Skillet_NOP()
-    -- do nothing!
+	-- do nothing!
 end
 
 --=================================================================================
@@ -110,31 +109,25 @@ end
 -- The frame representing the main tradeskill window will be
 -- returned in case you need to pop up a frame attached to it.
 function Skillet:AddButtonToTradeskillWindow(button)
-
-    if not SkilletFrame.added_buttons then
-        SkilletFrame.added_buttons = {}
-    end
-
-    if TJ_OpenButtonTradeSkill and button == TJ_OpenButtonTradeSkill then
-        tradejunkie_custom_add()
-    elseif AC_UseButton and button == AC_UseButton then
-        armorcraft_custom_add()
-    end
-	
-	button:Hide()
-	
-    -- See if this button has already been added ....
-    for i=1, #SkilletFrame.added_buttons, 1 do
-        if SkilletFrame.added_buttons[i] == button then
-            -- ... yup
-            return SkilletFrame
-        end
-    end
-
-    -- ... nope
-    table.insert(SkilletFrame.added_buttons, button)
-    return SkilletFrame
-
+	if not SkilletFrame.added_buttons then
+		SkilletFrame.added_buttons = {}
+	end
+	if TJ_OpenButtonTradeSkill and button == TJ_OpenButtonTradeSkill then
+		tradejunkie_custom_add()
+	elseif AC_UseButton and button == AC_UseButton then
+		armorcraft_custom_add()
+	end
+		button:Hide()
+		-- See if this button has already been added ....
+	for i=1, #SkilletFrame.added_buttons, 1 do
+		if SkilletFrame.added_buttons[i] == button then
+			-- ... yup
+			return SkilletFrame
+		end
+	end
+	-- ... nope
+	table.insert(SkilletFrame.added_buttons, button)
+	return SkilletFrame
 end
 
 --
@@ -162,7 +155,7 @@ end
 -- if a should be after b.
 --
 function Skillet:AddRecipeSorter(text, sorter)
-    self:internal_AddRecipeSorter(text, sorter)
+	self:internal_AddRecipeSorter(text, sorter)
 end
 
 --
@@ -174,25 +167,25 @@ end
 -- @param skill_index the index of the currently selected recipe
 --
 function Skillet:GetReagentLabel(tradeskill, skill_index)
-    if (FRC_PriceSource ~= nil and FRC_CraftFrame_SetSelection and FRC_TradeSkillFrame_SetSelection) then
-        -- Support for Fizzwidget's Reagent Cost
-        if self:IsCraft() then
-            local Orig_CraftFrame_SetSelection = FRC_Orig_CraftFrame_SetSelection;
-            FRC_Orig_CraftFrame_SetSelection = Skillet_NOP;
-            FRC_CraftFrame_SetSelection(skill_index);
-            FRC_Orig_CraftFrame_SetSelection = Orig_CraftFrame_SetSelection;
-            return CraftReagentLabel:GetText();
-        else
-            local Orig_TradeSkillFrame_SetSelection = FRC_Orig_TradeSkillFrame_SetSelection
-            FRC_Orig_TradeSkillFrame_SetSelection = Skillet_NOP
-            FRC_TradeSkillFrame_SetSelection(skill_index)
-            FRC_Orig_TradeSkillFrame_SetSelection = Orig_TradeSkillFrame_SetSelection
-            return TradeSkillReagentLabel:GetText()
-        end
-    else
-        -- boring
-        return SPELL_REAGENTS;
-    end
+	if (FRC_PriceSource ~= nil and FRC_CraftFrame_SetSelection and FRC_TradeSkillFrame_SetSelection) then
+		-- Support for Fizzwidget's Reagent Cost
+		if self:IsCraft() then
+			local Orig_CraftFrame_SetSelection = FRC_Orig_CraftFrame_SetSelection;
+			FRC_Orig_CraftFrame_SetSelection = Skillet_NOP;
+			FRC_CraftFrame_SetSelection(skill_index);
+			FRC_Orig_CraftFrame_SetSelection = Orig_CraftFrame_SetSelection;
+			return CraftReagentLabel:GetText();
+		else
+			local Orig_TradeSkillFrame_SetSelection = FRC_Orig_TradeSkillFrame_SetSelection
+			FRC_Orig_TradeSkillFrame_SetSelection = Skillet_NOP
+			FRC_TradeSkillFrame_SetSelection(skill_index)
+			FRC_Orig_TradeSkillFrame_SetSelection = Orig_TradeSkillFrame_SetSelection
+			return TradeSkillReagentLabel:GetText()
+		end
+	else
+		-- boring
+		return SPELL_REAGENTS;
+	end
 end
 
 --
@@ -288,14 +281,13 @@ end
 --         the default button used.
 --
 function Skillet:BeforeRecipeButtonShow(button, tradeskill, skill_index, list_offset)
-    -- these tests are in here to make sure that I don't
-    -- accidentally break the hooking code.
-    assert(button, "Button cannot be nil")
-    assert(tradeskill  and tostring(tradeskill), "Tradeskill cannot be nil")
-    assert(skill_index and tonumber(skill_index) and skill_index > 0, "Recipe index cannot be nil")
-    assert(list_offset and tonumber(list_offset) and list_offset > 0, "List offset cannot be nil")
-
-    return button
+	-- these tests are in here to make sure that I don't
+	-- accidentally break the hooking code.
+	assert(button, "Button cannot be nil")
+	assert(tradeskill  and tostring(tradeskill), "Tradeskill cannot be nil")
+	assert(skill_index and tonumber(skill_index) and skill_index > 0, "Recipe index cannot be nil")
+	assert(list_offset and tonumber(list_offset) and list_offset > 0, "List offset cannot be nil")
+	return button
 end
 
 --
@@ -324,14 +316,13 @@ end
 --         the default button used.
 --
 function Skillet:BeforeRecipeButtonHide(button, tradeskill, skill_index, list_offset)
-    -- these tests are in here to make sure that I don't
-    -- accidentally break the hooking code.
-    assert(button, "Button cannot be nil")
-    assert(tradeskill  and tostring(tradeskill), "Tradeskill cannot be nil")
-    assert(skill_index and tonumber(skill_index) and skill_index >= 0, "Recipe index cannot be nil")
-    assert(list_offset and tonumber(list_offset) and list_offset >= 0, "List offset cannot be nil")
-
-    return button
+	-- these tests are in here to make sure that I don't
+	-- accidentally break the hooking code.
+	assert(button, "Button cannot be nil")
+	assert(tradeskill  and tostring(tradeskill), "Tradeskill cannot be nil")
+	assert(skill_index and tonumber(skill_index) and skill_index >= 0, "Recipe index cannot be nil")
+	assert(list_offset and tonumber(list_offset) and list_offset >= 0, "List offset cannot be nil")
+	return button
 end
 
 --
@@ -360,9 +351,9 @@ end
 -- of the button immediately before this one in the list and attach to it.
 --
 function Skillet:AddPreButtonShowCallback(method)
-    assert(method and type(method) == "function",
-           "Usage: Skillet:AddPreButtonShowCallback(method). method must be a non-nil function")
-    self:internal_AddPreButtonShowCallback(method)
+	assert(method and type(method) == "function",
+		"Usage: Skillet:AddPreButtonShowCallback(method). method must be a non-nil function")
+	self:internal_AddPreButtonShowCallback(method)
 end
 
 --
@@ -391,9 +382,9 @@ end
 -- of the button immediately before this one in the list and attach to it.
 --
 function Skillet:AddPreButtonHideCallback(method)
-    assert(method and type(method) == "function",
-           "Usage: Skillet:AddPreButtonShowCallback(method). method must be a non-nil function")
-    self:internal_AddPreButtonHideCallback(method)
+	assert(method and type(method) == "function",
+		"Usage: Skillet:AddPreButtonShowCallback(method). method must be a non-nil function")
+	self:internal_AddPreButtonHideCallback(method)
 end
 
 --
@@ -404,7 +395,7 @@ end
 -- window will not be shown.
 --
 function Skillet:ShowTradeSkillWindow()
-    return self:internal_ShowTradeSkillWindow()
+	return self:internal_ShowTradeSkillWindow()
 end
 
 --
@@ -416,7 +407,7 @@ end
 --
 --
 function Skillet:HideTradeSkillWindow()
-    return self:internal_HideTradeSkillWindow()
+	return self:internal_HideTradeSkillWindow()
 end
 
 --
@@ -440,7 +431,7 @@ end
 --
 --
 function Skillet:HideAllWindows()
-    return self:internal_HideAllWindows()
+	return self:internal_HideAllWindows()
 end
 
 --
@@ -453,7 +444,7 @@ end
 -- @param atBank whether or not we are displaying the shopping list at a bank
 --
 function Skillet:DisplayShoppingList(atBank)
-    return self:internal_DisplayShoppingList(atBank)
+	return self:internal_DisplayShoppingList(atBank)
 end
 
 --
@@ -464,7 +455,29 @@ end
 -- window will not be hidden.
 --
 function Skillet:HideShoppingList()
-    return self:internal_HideShoppingList()
+	return self:internal_HideShoppingList()
+end
+
+--
+-- Fills out and displays the ignored materials list frame
+--
+-- Refer to the notes at the top of this file for how to hook this method.
+-- If you do not (eventually) call the hooked method from your method, the
+-- window will not be shown.
+--
+function Skillet:DisplayIgnoreList()
+	return self:internal_DisplayIgnoreList()
+end
+
+--
+-- Hides the ignored materials list window
+--
+-- Refer to the notes at the top of this file for how to hook this method.
+-- If you do not (eventually) call the hooked method from your method, the
+-- window will not be hidden.
+--
+function Skillet:HideIgnoreList()
+	return self:internal_HideIgnoreList()
 end
 
 --
@@ -476,9 +489,8 @@ end
 --
 -- returns the number of trade skills in the sorted and filtered list
 function Skillet:SortAndFilterRecipes()
-    return self:internal_SortAndFilterRecipes()
+	return self:internal_SortAndFilterRecipes()
 end
-
 
 --
 -- Can be hooked to add custom text to the tooltip
@@ -504,54 +516,54 @@ Data Formats
 ============
 
 Reagent = {
-    ["name"] = name,
-    ["link"] = link,
-    ["needed"] = number,
-    ["texture"] = texture
+	["name"] = name,
+	["link"] = link,
+	["needed"] = number,
+	["texture"] = texture
 }
 
 Recipe = {
-    ["name"] = name,
-    ["link"] = link,
-    ["texture"] = texture
-    ["difficulty"] = "optimal", "medium", "easy", trivial" (non-localized)
-    ["nummade"] = number made, (how many this recipe make)
-    ["tools"] = "tools", (tools required, nil for no requirements)
-    ["count"] = number of reagents for this recipe
-    [index 1] = Reagent,
-    [index 2] = Reagent,
-    ....
+	["name"] = name,
+	["link"] = link,
+	["texture"] = texture
+	["difficulty"] = "optimal", "medium", "easy", trivial" (non-localized)
+	["nummade"] = number made, (how many this recipe make)
+	["tools"] = "tools", (tools required, nil for no requirements)
+	["count"] = number of reagents for this recipe
+	[index 1] = Reagent,
+	[index 2] = Reagent,
+	....
 }
 
 So, recipe.name is the name of the recipe, recipe[1].name is the name of
 the first required reagent.
 
 Profession = {
-    ["name"] = trade skill name
-    ["count"] = number of recipes for this profession
-    [recipe 1] = Recipe,
-    [recipe 2] = Recipe,
-    ....
+	["name"] = trade skill name
+	["count"] = number of recipes for this profession
+	[recipe 1] = Recipe,
+	[recipe 2] = Recipe,
+	....
 }
 
 So, profession.name is the name of the profession, profession[1].name is the
 name of the first recipe in the profession.
 
 Character = {
-    ["name"] = name of the character
-    ["count"] = number of professions for this character
-    [profession 1] = Profession,
-    [profession 2] = Profession,
-    ...
+	["name"] = name of the character
+	["count"] = number of professions for this character
+	[profession 1] = Profession,
+	[profession 2] = Profession,
+	...
 }
 
 So, character.name is the name of the character, character[1].name is the
 name of the first profession known by that character.
 
 Characters = {
-    ["count"] = number of characters
-    [character 1] = Character,
-    [character 2] = Character,
+	["count"] = number of characters
+	[character 1] = Character,
+	[character 2] = Character,
 }
 
 So, characters.count is the number of characters, characters[1].name is the
@@ -570,7 +582,7 @@ name of the first character.
 -- @return A list of characters for which Skillet has data
 --
 function Skillet:GetCharacters()
-    return self:internal_GetCharacters()
+	return self:internal_GetCharacters()
 end
 
 --
@@ -587,7 +599,7 @@ end
 --            if the character has no professions known to Skillet.
 --
 function Skillet:GetCharacterProfessions(character_name)
-    return self:internal_GetCharacterProfessions(character_name)
+	return self:internal_GetCharacterProfessions(character_name)
 end
 
 --
@@ -607,9 +619,9 @@ end
 --           the table's format.
 --
 function Skillet:GetCharacterTradeskills(character_name, profession)
-    return self:internal_GetCharacterTradeskills(character_name, profession)
+	return self:internal_GetCharacterTradeskills(character_name, profession)
 end
 
 function Skillet:GetCraftersForItem(itemId)
-    return self:internal_GetCraftersForItem(itemId)
+	return self:internal_GetCraftersForItem(itemId)
 end
