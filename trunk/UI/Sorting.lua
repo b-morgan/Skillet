@@ -16,12 +16,13 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
 ]]--
 local L = LibStub("AceLocale-3.0"):GetLocale("Skillet")
 local skill_style_type = {
-	["unknown"]         = { r = 1.00, g = 0.00, b = 0.00, level = 5},
-	["optimal"]         = { r = 1.00, g = 0.50, b = 0.25, level = 4},
-	["medium"]          = { r = 1.00, g = 1.00, b = 0.00, level = 3},
-	["easy"]            = { r = 0.25, g = 0.75, b = 0.25, level = 2},
-	["trivial"]         = { r = 0.50, g = 0.50, b = 0.50, level = 1},
-	["header"]          = { r = 1.00, g = 0.82, b = 0,    level = 0},
+	["unavailable"]		= { r = 1.00, g = 0.00, b = 0.00, level = 6},
+	["unknown"]			= { r = 1.00, g = 0.00, b = 0.00, level = 5},
+	["optimal"]			= { r = 1.00, g = 0.50, b = 0.25, level = 4},
+	["medium"]			= { r = 1.00, g = 1.00, b = 0.00, level = 3},
+	["easy"]			= { r = 0.25, g = 0.75, b = 0.25, level = 2},
+	["trivial"]			= { r = 0.50, g = 0.50, b = 0.50, level = 1},
+	["header"]			= { r = 1.00, g = 0.82, b = 0,    level = 0},
 }
 Skillet.skill_style_type = skill_style_type
 -- list of possible sorting methods
@@ -45,10 +46,10 @@ local function sort_recipe_by_skill_level(tradeskill, a, b)
 	end
 	local leftDifficulty = 0
 	local rightDifficulty = 0
-	if a.skillData and a.skillData.difficulty then
+	if a.skillData and a.skillData.difficulty and skill_style_type[a.skillData.difficulty] then
 		leftDifficulty = skill_style_type[a.skillData.difficulty].level
 	end
-	if b.skillData and b.skillData.difficulty then
+	if b.skillData and b.skillData.difficulty and skill_style_type[b.skillData.difficulty] then
 		rightDifficulty = skill_style_type[b.skillData.difficulty].level
 	end
 	if leftDifficulty == rightDifficulty then
@@ -148,8 +149,10 @@ local function SkillIsFilteredOut(skillIndex)
 		return false
 	end
 		-- are we hiding anything that is trivial (has no chance of giving a skill point)
-	if skill_style_type[skill.difficulty].level < (Skillet:GetTradeSkillOption("filterLevel") or 4) then
-		return true
+	if skill_style_type[skill.difficulty] then
+		if skill_style_type[skill.difficulty].level < (Skillet:GetTradeSkillOption("filterLevel") or 4) then
+			return true
+		end
 	end
 	-- are we hiding anything that can't be created with the mats on this character?
 	if Skillet:GetTradeSkillOption("hideuncraftable") then
