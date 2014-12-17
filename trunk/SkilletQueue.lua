@@ -79,7 +79,7 @@ end
 function Skillet:QueueAppendCommand(command, queueCraftables, noWindowRefresh)
 	DA.DEBUG(0,"QueueAppendCommand("..DA.DUMP1(command)..", "..tostring(queueCraftables)..", "..tostring(noWindowRefresh)..")")
 	local recipe = Skillet:GetRecipe(command.recipeID)
-	--DA.DEBUG(1,"recipe= "..DA.DUMP1(recipe)..", visited= "..tostring(self.visited[command.recipeID]))
+	DA.DEBUG(0,"recipe= "..DA.DUMP1(recipe)..", visited= "..tostring(self.visited[command.recipeID]))
 	if recipe and not self.visited[command.recipeID] then
 		self.visited[command.recipeID] = true
 		local count = command.count
@@ -88,24 +88,21 @@ function Skillet:QueueAppendCommand(command, queueCraftables, noWindowRefresh)
 		local skillIndexLookup = self.data.skillIndexLookup[Skillet.currentPlayer]
 		for i=1,#recipe.reagentData,1 do
 			local reagent = recipe.reagentData[i]
-			--DA.DEBUG(1,"reagent= "..DA.DUMP1(reagent))
+			DA.DEBUG(1,"reagent= "..DA.DUMP1(reagent))
 			local need = count * reagent.numNeeded
 			local numInBags, bagsCraft, numInBank, bankCraft = Skillet:GetInventory(Skillet.currentPlayer, reagent.id)
-			--DA.DEBUG(1,"numBags= "..numInBags..", craftBags= "..bagsCraft..", numInBank= "..numInBank..", craftBank= "..bankCraft)
+			DA.DEBUG(1,"numBags= "..numInBags..", craftBags= "..bagsCraft..", numInBank= "..numInBank..", craftBank= "..bankCraft)
 			local have = numInBags + numInBank + (reagentsInQueue[reagent.id] or 0);
-			if queueCraftables and bagsCraft >= need then
-				have = numInBags + (reagentsInQueue[reagent.id] or 0)
-			end
 			reagentsInQueue[reagent.id] = (reagentsInQueue[reagent.id] or 0) - need;
 			reagentsChanged[reagent.id] = true
-			--DA.DEBUG(1,"queueCraftables= "..tostring(queueCraftables)..", need= "..tostring(need)..", have= "..tostring(have))
+			DA.DEBUG(1,"queueCraftables= "..tostring(queueCraftables)..", need= "..tostring(need)..", have= "..tostring(have))
 			if queueCraftables and need > have and (Skillet.db.profile.queue_glyph_reagents or not recipe.name:match(Skillet.L["Glyph "])) then
 				local recipeSource = self.db.global.itemRecipeSource[reagent.id]
-				--DA.DEBUG(1,"recipeSource= "..DA.DUMP1(recipeSource))
+				DA.DEBUG(1,"recipeSource= "..DA.DUMP1(recipeSource))
 				if recipeSource then
 					for recipeSourceID in pairs(recipeSource) do
 						local skillIndex = skillIndexLookup[recipeSourceID]
-						--DA.DEBUG("skillIndex= "..tostring(skillIndex))
+						DA.DEBUG(1,"skillIndex= "..tostring(skillIndex))
 						if skillIndex then
 							command.complex = true						-- identify that this queue has craftable reagent requirements
 							local recipeSource = Skillet:GetRecipe(recipeSourceID)
@@ -133,7 +130,7 @@ end
 -- we can't just increase the # of the first command if it happens to be the same recipe without making sure
 -- the additional queue entry doesn't require some additional craftable reagents
 function Skillet:AddToQueue(command, noWindowRefresh)
-	--DA.DEBUG(0,"AddToQueue("..DA.DUMP1(command)..", "..tostring(noWindowRefresh)..")")
+	DA.DEBUG(0,"AddToQueue("..DA.DUMP1(command)..", "..tostring(noWindowRefresh)..")")
 	local queue = self.db.realm.queueData[self.currentPlayer]
 	-- if self.linkedSkill then return end
 	if (not command.complex) then		-- we can add this queue entry to any of the other entries
@@ -215,7 +212,7 @@ function Skillet:ProcessQueue(altMode)
 	local command
 	repeat
 		command = queue[qpos]
-		--DA.DEBUG(1,DA.DUMP1(command))
+		DA.DEBUG(1,DA.DUMP1(command))
 		if command and command.op == "iterate" then
 			local recipe = self:GetRecipe(command.recipeID)
 			local craftable = true
@@ -227,12 +224,12 @@ function Skillet:ProcessQueue(altMode)
 				for i=1,#recipe.reagentData,1 do
 					local reagent = recipe.reagentData[i]
 					local reagentName = GetItemInfo(reagent.id) or reagent.id
-					DA.DEBUG(0,"id= "..tostring(reagent.id)..", reagentName="..tostring(reagentName)..", numNeeded="..tostring(reagent.numNeeded))
+					DA.DEBUG(1,"id= "..tostring(reagent.id)..", reagentName="..tostring(reagentName)..", numNeeded="..tostring(reagent.numNeeded))
 					local numInBags, bagsCraft, numInBank, bankCraft = self:GetInventory(self.currentPlayer, reagent.id)
-					DA.DEBUG(0,"numInBags= "..tostring(numInBags)..", numInBank="..tostring(numInBank)..", bagsCraft= "..tostring(bagsCraft)..", bankCraft= "..tostring(bankCraft))
+					DA.DEBUG(1,"numInBags= "..tostring(numInBags)..", numInBank="..tostring(numInBank)..", bagsCraft= "..tostring(bagsCraft)..", bankCraft= "..tostring(bankCraft))
 					if numInBags < reagent.numNeeded then
 						local fromBank = reagent.numNeeded - numInBags
-						DA.DEBUG(0,"fromBank= "..tostring(fromBank)..", reagentbank= "..tostring(reagentbank[reagent.id]))
+						DA.DEBUG(1,"fromBank= "..tostring(fromBank)..", reagentbank= "..tostring(reagentbank[reagent.id]))
 						if reagentbank[reagent.id] and reagentbank[reagent.id] >= fromBank then 
 							reagentbank[reagent.id] = reagentbank[reagent.id] - fromBank
 							DA.WARN(L["Using Bank for"],recipe.name,"-",fromBank,"x",reagentName)
