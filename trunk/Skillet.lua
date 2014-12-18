@@ -1057,21 +1057,9 @@ function Skillet:SkilletShow()
 	self.currentTrade = self.tradeSkillIDsByName[(GetTradeSkillLine())] or 2656      -- smelting caveat
 	self:InitializeDatabase(self.currentPlayer)
 	
-	local showBlizzUI = false
-	
-	-- workaround for enchant illusions which are only supported in the Blizzard UI
-	if self.currentTrade == 7411 then
-		local numSkills = GetNumTradeSkills()
-		for i = 1, numSkills, 1 do
-			local _, skillType = GetTradeSkillInfo(i);			
-			if skillType ~= "header" and skillType ~= "subheader" then
-				if GetTradeSkillRecipeLink(i) == nil then
-					showBlizzUI = true
-				end		
-			end
-		end
-	end
-	if showBlizzUI then
+	-- Workaround for enchant illusions which are only supported in the Blizzard UI
+	-- Actually, use the Blizzard UI for any garrison NPC crafting just in case.
+	if IsNPCCrafting() then
 			self:HideAllWindows()
 			self:BlizzardTradeSkillFrame_Show()	
 	else
@@ -1086,7 +1074,7 @@ function Skillet:SkilletShow()
 			self:HideAllWindows()
 			self:BlizzardTradeSkillFrame_Show()
 			Skillet.TSMPlugin.TSMShow()
-		end	
+		end
 	end
 
 end
@@ -1197,7 +1185,7 @@ function Skillet:SetTradeSkill(player, tradeID, skillIndex)
 			self.currentGroup = nil
 			self.currentGroupLabel = self:GetTradeSkillOption("grouping")
 			self:RecipeGroupDropdown_OnShow()
-			--DA.DEBUG(1,"cast: "..self:GetTradeName(tradeID))
+			DA.DEBUG(0,"cast: "..self:GetTradeName(tradeID))
 			CastSpellByName(self:GetTradeName(tradeID)) -- this will trigger the whole rescan process via a TRADE_SKILL_SHOW/CRAFT_SHOW event
 		else
 			self.dataSource = "cache"
