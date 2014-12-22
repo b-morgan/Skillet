@@ -711,6 +711,17 @@ function Skillet:IsSupportedTradeskill(tradeID)
 	return true
 end
 
+-- Checks to see if this trade follower can not use Skillet frame.
+function Skillet:IsNotSupportedFollower(tradeID)
+	if not tradeID or tradeID == 7411 then
+		return true
+	end
+	if Skillet.db.profile.use_blizzard_for_followers then
+		return true
+	end
+	return false
+end
+
 local missingVendorItems = {
 	[30817] = true,				-- simple flour
 	[4539] = true,				-- Goldenbark Apple

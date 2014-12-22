@@ -20,7 +20,7 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
 ]]--
 
-local MAJOR_VERSION = "2.73"
+local MAJOR_VERSION = "2.74"
 local MINOR_VERSION = ("$Revision$"):match("%d+") or 1
 local DATE = string.gsub("$Date$", "^.-(%d%d%d%d%-%d%d%-%d%d).-$", "%1")
 
@@ -53,6 +53,7 @@ local defaults = {
 		display_shopping_list_at_bank = false,
 		display_shopping_list_at_guildbank = false,
 		display_shopping_list_at_auction = false,
+		use_blizzard_for_followers = false,
 		transparency = 1.0,
 		scale = 1.0,
 		plugins = {},
@@ -303,6 +304,19 @@ Skillet.options =
 					end,
 					width = "double",
 					order = 25,
+				},
+				use_blizzard_for_followers = {
+					type = "toggle",
+					name = L["USEBLIZZARDFORFOLLOWERSNAME"],
+					desc = L["USEBLIZZARDFORFOLLOWERSDESC"],
+					get = function()
+						return Skillet.db.profile.use_blizzard_for_followers;
+					end,
+					set = function(self,value)
+						Skillet.db.profile.use_blizzard_for_followers = value;
+					end,
+					width = "double",
+					order = 26
 				},
 			}
 		},
@@ -1056,12 +1070,11 @@ function Skillet:SkilletShow()
 	end
 	self.currentTrade = self.tradeSkillIDsByName[(GetTradeSkillLine())] or 2656      -- smelting caveat
 	self:InitializeDatabase(self.currentPlayer)
-	
-	-- Workaround for enchant illusions which are only supported in the Blizzard UI
-	-- Actually, use the Blizzard UI for any garrison NPC crafting just in case.
-	if IsNPCCrafting() then
-			self:HideAllWindows()
-			self:BlizzardTradeSkillFrame_Show()	
+
+	-- Use the Blizzard UI for any garrison follower that can't use ours.
+	if IsNPCCrafting() and self:IsNotSupportedFollower(self.currentTrade) then
+		self:HideAllWindows()
+		self:BlizzardTradeSkillFrame_Show()
 	else
 		if self:IsSupportedTradeskill(self.currentTrade) then
 			self:InventoryScan()
@@ -1076,7 +1089,6 @@ function Skillet:SkilletShow()
 			Skillet.TSMPlugin.TSMShow()
 		end
 	end
-
 end
 
 function Skillet:SkilletShowWindow()
