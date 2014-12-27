@@ -479,29 +479,32 @@ local function getItemFromBank(itemID, bag, slot, count)
 	ClearCursor()
 	local _, available = GetContainerItemInfo(bag, slot)
 	local num_moved = 0
-	if available and available == 1 or count >= available then
-		DA.DEBUG(1,"PickupContainerItem(",bag,", ", slot,")")
-		PickupContainerItem(bag, slot)
-		num_moved = available
-	else
-		DA.DEBUG(1,"SplitContainerItem(",bag, slot, count,")")
-		SplitContainerItem(bag, slot, count)
-		num_moved = count
+	if available then
+		if available == 1 or count >= available then
+			DA.DEBUG(1,"PickupContainerItem(",bag,", ", slot,")")
+			PickupContainerItem(bag, slot)
+			num_moved = available
+		else
+			DA.DEBUG(1,"SplitContainerItem(",bag, slot, count,")")
+			SplitContainerItem(bag, slot, count)
+			num_moved = count
+		end
+		local tobag, toslot = findBagForItem(itemID, num_moved)
+		DA.DEBUG(1,"tobag=", tobag, " toslot=", toslot, " findBagForItem(", itemID, num_moved,")")
+		if not tobag then
+			Skillet:Print(L["Could not find bag space for"]..": "..GetContainerItemLink(bag, slot))
+			ClearCursor()
+			return 0
+		end
+		if tobag == 0 then
+			DA.DEBUG(1,"PutItemInBackpack()")
+			PutItemInBackpack()
+		else
+			DA.DEBUG(1,"PutItemInBag(",ContainerIDToInventoryID(tobag),")")
+			PutItemInBag(ContainerIDToInventoryID(tobag))
+		end
 	end
-	local tobag, toslot = findBagForItem(itemID, num_moved)
-	DA.DEBUG(1,"tobag=", tobag, " toslot=", toslot, " findBagForItem(", itemID, num_moved,")")
-	if not tobag then
-		Skillet:Print(L["Could not find bag space for"]..": "..GetContainerItemLink(bag, slot))
-		ClearCursor()
-		return 0
-	end
-	if tobag == 0 then
-		DA.DEBUG(1,"PutItemInBackpack()")
-		PutItemInBackpack()
-	else
-		DA.DEBUG(1,"PutItemInBag(",ContainerIDToInventoryID(tobag),")")
-		PutItemInBag(ContainerIDToInventoryID(tobag))
-	end
+	ClearCursor()
 	return num_moved
 end
 
@@ -510,26 +513,29 @@ local function getItemFromGuildBank(itemID, bag, slot, count)
 	ClearCursor()
 	local _, available = GetGuildBankItemInfo(bag, slot)
 	local num_moved = 0
-	if available == 1 or count >= available then
-		DA.DEBUG(1,"PickupGuildBankItem(",bag, slot,")")
-		PickupGuildBankItem(bag, slot)
-		num_moved = available
-	else
-		DA.DEBUG(1,"SplitGuildBankItem(",bag, slot, count,")")
-		SplitGuildBankItem(bag, slot, count)
-		num_moved = count
+	if available then
+		if available == 1 or count >= available then
+			DA.DEBUG(1,"PickupGuildBankItem(",bag, slot,")")
+			PickupGuildBankItem(bag, slot)
+			num_moved = available
+		else
+			DA.DEBUG(1,"SplitGuildBankItem(",bag, slot, count,")")
+			SplitGuildBankItem(bag, slot, count)
+			num_moved = count
+		end
+		local tobag, toslot = findBagForItem(itemID, num_moved)
+		DA.DEBUG(1,"tobag=", tobag, " toslot=", toslot, " findBagForItem(", itemID, num_moved,")")
+		if not tobag then
+			Skillet:Print(L["Could not find bag space for"]..": "..GetGuildBankItemLink(bag, slot))
+			ClearCursor()
+			return 0
+		else
+			DA.DEBUG(1,"PickupContainerItem(",tobag, toslot,")")
+			PickupContainerItem(tobag, toslot) -- actually puts the item in the bag
+		end
 	end
-	local tobag, toslot = findBagForItem(itemID, num_moved)
-	DA.DEBUG(1,"tobag=", tobag, " toslot=", toslot, " findBagForItem(", itemID, num_moved,")")
-	if not tobag then
-		Skillet:Print(L["Could not find bag space for"]..": "..GetGuildBankItemLink(bag, slot))
-		ClearCursor()
-		return 0
-	else
-		DA.DEBUG(1,"PickupContainerItem(",tobag, toslot,")")
-		PickupContainerItem(tobag, toslot) -- actually puts the item in the bag
-		return num_moved
-	end
+	ClearCursor()
+	return num_moved
 end
 
 -- Called once to get things started and then is called after both

@@ -35,12 +35,17 @@ local TradeSkillList = {
 	53428,      -- runeforging
 	-- 5149,    -- beast training (not supported)
 }
+-- a table of follower tradeskills that should use the Blizzard frame
+Skillet.FollowerSkillList = {
+	[7411] = false,		-- follower enchanting was broken in initial WoD release but seems fixed now.
+}
 Skillet.TradeSkillAdditionalAbilities = {
 	[7411]  = {13262,"Disenchant"},     -- enchanting = disenchant
 	[2550]  = {818,"Basic_Campfire"},   -- cooking = basic campfire
 	[45357] = {51005,"Milling"},        -- inscription = milling
 	[25229] = {31252,"Prospecting"},    -- jewelcrafting = prospecting
-	[2018]  = {87216,"Thermal Anvil"},  -- blacksmithing = thermal anvil
+	[2018]  = {126462,"Thermal Anvil"},  -- blacksmithing = thermal anvil (item:87216)
+	[4036]  = {126462,"Thermal Anvil"},  -- engineering = thermal anvil (item:87216)
 }
 Skillet.AutoButtonsList = {}
 Skillet.TradeSkillAutoTarget = {
@@ -713,7 +718,7 @@ end
 
 -- Checks to see if this trade follower can not use Skillet frame.
 function Skillet:IsNotSupportedFollower(tradeID)
-	if not tradeID or tradeID == 7411 then
+	if not tradeID or Skillet.FollowerSkillList[tradeID] then
 		return true
 	end
 	if Skillet.db.profile.use_blizzard_for_followers then
