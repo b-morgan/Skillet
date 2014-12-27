@@ -37,7 +37,7 @@ local TradeSkillList = {
 }
 -- a table of follower tradeskills that should use the Blizzard frame
 Skillet.FollowerSkillList = {
-	[7411] = false,		-- follower enchanting was broken in initial WoD release but seems fixed now.
+	[7411] = true,		-- follower (Illusion) enchanting is broken in WoD release.
 }
 Skillet.TradeSkillAdditionalAbilities = {
 	[7411]  = {13262,"Disenchant"},     -- enchanting = disenchant
