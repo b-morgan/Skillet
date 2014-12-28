@@ -1072,7 +1072,7 @@ function Skillet:SkilletShow()
 	self:InitializeDatabase(self.currentPlayer)
 
 	-- Use the Blizzard UI for any garrison follower that can't use ours.
-	if IsNPCCrafting() and self:IsNotSupportedFollower(self.currentTrade) then
+	if self:IsNotSupportedFollower(self.currentTrade) then
 		self:HideAllWindows()
 		self:BlizzardTradeSkillFrame_Show()
 	else
