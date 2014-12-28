@@ -35,9 +35,14 @@ local TradeSkillList = {
 	53428,      -- runeforging
 	-- 5149,    -- beast training (not supported)
 }
--- a table of follower tradeskills that should use the Blizzard frame
+-- Table of follower tradeskills that should use the Blizzard frame
 Skillet.FollowerSkillList = {
-	[7411] = true,		-- follower (Illusion) enchanting is broken in WoD release.
+	[7411] = false,				-- enchanting follower for Illusions is broken in WoD release.
+}
+-- Table of follower tradeskill headers that should use the Blizzard frame
+-- Note: A true entry in Skillet.FollowerSkillList above will override this table
+Skillet.FollowerSkillHeader = {
+	[7411] = L["Illusions"],	-- enchanting follower for Illusions is broken in WoD release.
 }
 Skillet.TradeSkillAdditionalAbilities = {
 	[7411]  = {13262,"Disenchant"},     -- enchanting = disenchant
@@ -718,11 +723,23 @@ end
 
 -- Checks to see if this trade follower can not use Skillet frame.
 function Skillet:IsNotSupportedFollower(tradeID)
-	if not tradeID or Skillet.FollowerSkillList[tradeID] then
-		return true
-	end
-	if Skillet.db.profile.use_blizzard_for_followers then
-		return true
+	if IsNPCCrafting() then
+		if not tradeID then
+			return true -- Unknown tradeskill, play it safe.
+		end
+		if Skillet.db.profile.use_blizzard_for_followers then
+			return true -- Option makes this easy.
+		end
+		if Skillet.FollowerSkillList[tradeID] then
+			return true -- Doesn't matter what they craft.
+		end
+		if Skillet.FollowerSkillHeader[tradeID] then
+			local skillName, skillType, _, isExpanded = GetTradeSkillInfo(1)
+			DA.DEBUG(0,"tradeID= "..tostring(tradeID)..", skillName= "..tostring(skillName)..", skillType="..tostring(skillType)..", isExpanded= "..tostring(isExpanded))
+			if skillType == "header" and skillName == Skillet.FollowerSkillHeader[tradeID] then
+				return true -- If they craft things Skillet can't process
+			end
+		end
 	end
 	return false
 end
