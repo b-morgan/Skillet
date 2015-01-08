@@ -1156,12 +1156,12 @@ local allDataInitialized = false
 function Skillet:InitializeAllDataLinks(name)
 	if allDataInitialized then return end
 	allDataInitialized = true
+	if not self.db.realm.tradeSkills then
+		self.db.realm.tradeSkills = {}
+	end
 	if Skillet.wowVersion >= 50400 then -- patch 5.4 issue
 		self.db.realm.tradeSkills[name] = nil
 		return
-	end
-	if not self.db.realm.tradeSkills then
-		self.db.realm.tradeSkills = {}
 	end
 	self.db.realm.tradeSkills[name] = {}
 	local link = GetTradeSkillListLink()
