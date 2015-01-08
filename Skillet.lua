@@ -20,7 +20,7 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
 ]]--
 
-local MAJOR_VERSION = "2.75"
+local MAJOR_VERSION = "2.76"
 local MINOR_VERSION = ("$Revision$"):match("%d+") or 1
 local DATE = string.gsub("$Date$", "^.-(%d%d%d%d%-%d%d%-%d%d).-$", "%1")
 
@@ -1530,7 +1530,7 @@ end
 ]]
 
 function ProfessionPopup_SelectTradeLink(menuFrame,player,tradeSkill)
-	if player ~= (UnitName("player")) then  -- patch 5.4 issue
+	if player ~= Skillet.currentPlayer then  -- patch 5.4 issue
 		DA.CHAT("Patch 5.4 issue: can't show tradeskill for "..player)
 		return 
 	end
@@ -1553,6 +1553,7 @@ function ProfessionPopup_Init(menuFrame, level)
 		local title = {}
 		local playerMenu = {}
 		title.text = "Select Player and Tradeskill"
+		title.notCheckable = true
 		title.isTitle = true
 		UIDropDownMenu_AddButton(title)
 		local i=1
@@ -1560,15 +1561,21 @@ function ProfessionPopup_Init(menuFrame, level)
 			local skillData = gatherModule.ScanPlayerTradeSkills(gatherModule, player)
 			if skillData then
 				playerMenu.text = player
+				playerMenu.notCheckable = true
 				playerMenu.hasArrow = true
 				playerMenu.value = player
-				playerMenu.disabled = false
+				if player == Skillet.currentPlayer then  -- Blizzard removed functionality in 5.4
+					playerMenu.disabled = false
+				else
+					playerMenu.disabled = true
+				end
 				UIDropDownMenu_AddButton(playerMenu)
 				i = i + 1
 			end
 		end
 		if (i == 1) then
 			playerMenu.text = "[no players scanned]";
+			playerMenu.notCheckable = true
 			playerMenu.disabled = true;
 			playerMenu.arg1 = "";
 			playerMenu.arg2 = "";
@@ -1598,15 +1605,16 @@ function ProfessionPopup_Init(menuFrame, level)
 						skillButton.arg2 = tradeID
 						skillButton.func = ProfessionPopup_SelectPlayerTrade
 					end
-					if tradeID == Skillet.currentTrade and UIDROPDOWNMENU_MENU_VALUE == Skillet.currentPlayer then
-						skillButton.checked = true
-					else
-						skillButton.checked = false
-					end
-					if UIDROPDOWNMENU_MENU_VALUE ~= (UnitName("player")) and not list then
-						skillButton.disabled = true
-					else
+					if UIDROPDOWNMENU_MENU_VALUE == Skillet.currentPlayer then
 						skillButton.disabled = false
+						if tradeID == Skillet.currentTrade then
+							skillButton.checked = true
+						else
+							skillButton.checked = false
+						end
+					else
+						skillButton.disabled = true
+						skillButton.checked = false
 					end
 					UIDropDownMenu_AddButton(skillButton, level)
 				end
@@ -1616,10 +1624,12 @@ function ProfessionPopup_Init(menuFrame, level)
 end
 
 function ProfessionPopup_Show(self)
+--[[ (Blizzard removed required functionality in 5.4)
 	ProfessionPopupFrame = CreateFrame("Frame", "ProfessionPopupFrame", _G["UIParent"], "UIDropDownMenuTemplate")
 	Skillet.professionPopupButton = self
 	UIDropDownMenu_Initialize(ProfessionPopupFrame, ProfessionPopup_Init, "MENU")
 	ToggleDropDownMenu(1, nil, ProfessionPopupFrame, Skillet.professionPopupButton, Skillet.professionPopupButton:GetWidth(), 0)
+]]--
 end
 
 -- workaround for Ace2
