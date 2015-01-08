@@ -800,7 +800,7 @@ function Skillet:VendorItemAvailable(itemID)
 	end
 end
 
--- queries periodic table for vendor info for a particual itemID
+-- queries periodic table for vendor info for a particular itemID
 function Skillet:VendorSellsReagent(itemID)
 	if PT then
 		if Skillet.wowVersion>50000 then
@@ -2054,7 +2054,6 @@ function Skillet:GenerateAltKnowledgeBase()
 					-- first, accumulate all skill data
 					for id, skill in pairs(Skillet.data.skillList[player][tradeID]) do
 						if type(id) == "number" and type(skill) == "table" then
-							local recipeID = skill.id
 							if skill.id then
 								local spellID = skill.id
 								unknownRecipes[spellID] = spellID
