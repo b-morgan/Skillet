@@ -452,12 +452,14 @@ function Skillet:ConfigureRecipeControls(enchant)
 end
 
 function Skillet:PlayerSelect_OnEnter(button)
+--[[ (Blizzard removed required functionality in 5.4)
 	GameTooltip:SetOwner(button, "ANCHOR_TOPLEFT")
 	GameTooltip:ClearLines()
 	local player = _G[button:GetName().."Text"]:GetText()
 	GameTooltip:AddLine(player,1,1,1)
 	GameTooltip:AddLine("Click to select a different character",.7,.7,.7)
 	GameTooltip:Show()
+]]--
 end
 
 function Skillet:RecipeDifficultyButton_OnShow()
@@ -2180,7 +2182,7 @@ end
 
 function Skillet:ReagentButtonSkillSelect(player, id)
 	DA.DEBUG(0,"Skillet:ReagentButtonSkillSelect("..tostring(player)..", "..tostring(id)..")")
-	if player == UnitName("player") then -- Blizzard's 5.4 update prevents us from changing away from the current player
+	if player == Skillet.currentPlayer then -- Blizzard's 5.4 update prevents us from changing away from the current player
 		local skillIndexLookup = Skillet.data.skillIndexLookup[player]
 		gearTexture:Hide()
 		GameTooltip:Hide()
