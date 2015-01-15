@@ -18,13 +18,18 @@ function Skillet:GetTradeSkillLevels(spellID)
 -- TradeskillInfo seems to be more accurate than LibPeriodicTable-3.1
 			if TradeskillInfo then
 				local recipeSource = Skillet.db.global.itemRecipeSource[spellID]
-				for recipeID in pairs(recipeSource) do
-					local TSILevels = TradeskillInfo:GetCombineDifficulty(recipeID)
-					DA.DEBUG(0,"recipeID= "..tostring(recipeID))
-					if type(TSILevels) == 'table' then
-						DA.DEBUG(0,"TSILevels="..DA.DUMP1(TSILevels))
-						return TSILevels[1], TSILevels[2], TSILevels[3], TSILevels[4] 
+				if type(recipeSource) == 'table' then
+					DA.DEBUG(0,"recipeSource= "..DA.DUMP1(recipeSource))
+					for recipeID in pairs(recipeSource) do
+						DA.DEBUG(1,"recipeID= "..tostring(recipeID))
+						local TSILevels = TradeskillInfo:GetCombineDifficulty(recipeID)
+						if type(TSILevels) == 'table' then
+							DA.DEBUG(1,"TSILevels="..DA.DUMP1(TSILevels))
+							return TSILevels[1], TSILevels[2], TSILevels[3], TSILevels[4] 
+						end
 					end
+				else
+					DA.DEBUG(0,"recipeSource= "..tostring(recipeSource))
 				end
 			end
 			if PT then

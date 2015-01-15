@@ -2113,18 +2113,23 @@ function Skillet:getLvlUpChance()
 	-- % to level up with this receipt is calculated by: (greySkill - yourSkill) / (greySkill - yellowSkill
 	-- Lets add this information to skillet :)
 	local skilRanks = self:GetSkillRanks(self.currentPlayer, self.currentTrade)
-	local currentLevel, maxlevel = 0, 0
+	local currentLevel, maxLevel = 0, 0
 	if skilRanks then
-		currentLevel, maxlevel = skilRanks.rank, skilRanks.maxRank
+		currentLevel, maxLevel = skilRanks.rank, skilRanks.maxRank
 	end
 	local gray = tonumber(SkilletRankFrame.subRanks.green:GetValue())
 	local yellow = tonumber(SkilletRankFrame.subRanks.orange:GetValue())
+	--DA.DEBUG(0,"currentLevel= "..tostring(currentLevel)..", gray= "..tostring(gray)..", yellow= "..tostring(yellow))
 	if (currentLevel > gray) then
 		return 0
 	elseif (gray - yellow) == 0 then
-		return 0
+		return 100
 	else
-		return ((gray - currentLevel) / ( gray - yellow )) * 100
+		local percent = ((gray - currentLevel) / ( gray - yellow )) * 100
+		if percent > 100 then
+			percent = 100
+		end
+		return percent
 	end
 end
 
