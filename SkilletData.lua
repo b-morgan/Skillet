@@ -1009,10 +1009,10 @@ function SkilletLink:GetSkillRanks(player, trade)
 	local linkedSkill, linkedPlayer = Skillet:IsTradeSkillLinked()
 	if linkedSkill then
 		if linkedPlayer == player then
-			local skill, rank, max = GetTradeSkillLine()
+			local skill, rank, maxRank = GetTradeSkillLine()
 			if GetSpellInfo(trade) == skill then
 				skillRanks.rank = rank
-				skillRanks.maxRank = max
+				skillRanks.maxRank = maxRank
 				return skillRanks
 			end
 		end
