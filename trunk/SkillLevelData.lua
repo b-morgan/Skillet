@@ -12,31 +12,36 @@ local skillColors = {
 }
 
 function Skillet:GetTradeSkillLevels(spellID)
-	DA.DEBUG(0,"Skillet:GetTradeSkillLevels("..tostring(spellID)..")")
+	local a,b,c,d
+	--DA.DEBUG(0,"Skillet:GetTradeSkillLevels("..tostring(spellID)..")")
 	if spellID then 
 		if spellID ~= 0 then
 -- TradeskillInfo seems to be more accurate than LibPeriodicTable-3.1
 			if TradeskillInfo then
 				local recipeSource = Skillet.db.global.itemRecipeSource[spellID]
 				if type(recipeSource) == 'table' then
-					DA.DEBUG(0,"recipeSource= "..DA.DUMP1(recipeSource))
+					--DA.DEBUG(0,"recipeSource= "..DA.DUMP1(recipeSource))
 					for recipeID in pairs(recipeSource) do
-						DA.DEBUG(1,"recipeID= "..tostring(recipeID))
+						--DA.DEBUG(1,"recipeID= "..tostring(recipeID))
 						local TSILevels = TradeskillInfo:GetCombineDifficulty(recipeID)
 						if type(TSILevels) == 'table' then
-							DA.DEBUG(1,"TSILevels="..DA.DUMP1(TSILevels))
-							return TSILevels[1], TSILevels[2], TSILevels[3], TSILevels[4] 
+							--DA.DEBUG(1,"TSILevels="..DA.DUMP1(TSILevels))
+							a = tonumber(TSILevels[1]) or 0
+							b = tonumber(TSILevels[2]) or 0
+							c = tonumber(TSILevels[3]) or 0
+							d = tonumber(TSILevels[4]) or 0
+							return a, b, c, d
 						end
 					end
 				else
-					DA.DEBUG(0,"recipeSource= "..tostring(recipeSource))
+					--DA.DEBUG(0,"recipeSource= "..tostring(recipeSource))
 				end
 			end
 			if PT then
 				local levels = PT:ItemInSet(spellID,"TradeskillLevels")
 				if levels then
 					DA.DEBUG(0,"levels= "..tostring(levels))
-					local a,b,c,d = string.split("/",levels)
+					a,b,c,d = string.split("/",levels)
 					a = tonumber(a) or 0
 					b = tonumber(b) or 0
 					c = tonumber(c) or 0
@@ -46,7 +51,7 @@ function Skillet:GetTradeSkillLevels(spellID)
 			end
 		end
 	end
-	return 0,0,0,0 
+	return 0, 0, 0, 0 
 end
 
 function Skillet:GetTradeSkillLevelColor(spellID, rank)
