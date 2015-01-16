@@ -1023,10 +1023,12 @@ function Skillet:GetSkill(player,trade,index)
 	--DA.DEBUG(2,"Skillet:GetSkill("..tostring(player)..", "..tostring(trade)..", "..tostring(index)..")")
 	local skillModule = self.dataGatheringModules[player]
 	if skillModule then
-		return skillModule.GetSkill(skillModule, player,trade,index)
-	else
-		return self.unknownRecipe
+		local skill = skillModule.GetSkill(skillModule, player,trade,index)
+		if skill then
+			return skill
+		end
 	end
+	return self.unknownRecipe
 end
 
 -- reconstruct a skill from a skillString and cache it into our system for this session
@@ -1090,9 +1092,6 @@ function SkilletLink:GetSkill(player,trade,index)
 					return trade[index]
 				end
 			end
-			return nil
-		else
-			return nil
 		end
 	end
 end
