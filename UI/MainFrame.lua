@@ -2160,21 +2160,25 @@ function Skillet:ReagentButtonOnEnter(button, skillIndex, reagentIndex)
 	DA.DEBUG(1,"Skillet:ReagentButtonOnEnter("..tostring(button)..", "..tostring(skillIndex)..", "..tostring(reagentIndex)..")")
 	GameTooltip:SetOwner(button, "ANCHOR_TOPLEFT")
 	local skill = self:GetSkill(self.currentPlayer, self.currentTrade, skillIndex)
-	local recipe = self:GetRecipe(skill.id)
-	local reagent = recipe.reagentData[reagentIndex]
-	if reagent then
-		Skillet:SetReagentToolTip(reagent.id, reagent.numNeeded, skill.numCraftableBank or 0)
-		if self.db.profile.link_craftable_reagents then
-			if self.db.global.itemRecipeSource[reagent.id] then
-				local icon = _G[button:GetName() .. "Icon"]
-				gearTexture:SetParent(icon)
-				gearTexture:ClearAllPoints()
-				gearTexture:SetPoint("TOPLEFT", icon)
-				gearTexture:Show()
+	if skill then
+		local recipe = self:GetRecipe(skill.id)
+		if recipe then
+			local reagent = recipe.reagentData[reagentIndex]
+			if reagent then
+				Skillet:SetReagentToolTip(reagent.id, reagent.numNeeded, skill.numCraftableBank or 0)
+				if self.db.profile.link_craftable_reagents then
+					if self.db.global.itemRecipeSource[reagent.id] then
+						local icon = _G[button:GetName() .. "Icon"]
+						gearTexture:SetParent(icon)
+						gearTexture:ClearAllPoints()
+						gearTexture:SetPoint("TOPLEFT", icon)
+						gearTexture:Show()
+					end
+				end
+			else
+				GameTooltip:AddLine("unknown", 1,0,0)
 			end
 		end
-	else
-		GameTooltip:AddLine("unknown", 1,0,0)
 	end
 	GameTooltip:Show()
 	CursorUpdate(button)
