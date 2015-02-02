@@ -50,6 +50,8 @@ DA.TraceShow = false
 DA.TraceLog = false
 DA.DebugLog = {} -- Add to SavedVariables for debugging
 DA.MAXDEBUG = 2000
+DA.DebugProfile = {} -- Add to SavedVariables for debugging
+DA.MAXPROFILE = 2000
 DA.STATUS_COLOR = "|c0033CCFF"
 DA.DEBUG_COLOR  = "|c0000FF00"
 DA.TRACE_COLOR  = "|c0000FFA0"
@@ -255,6 +257,30 @@ function DA.DUMP1(o,m,n)
 	else
 		return tostring(o)
 	end
+end
+
+function DA.PROFILE(text)
+	local stackstring = debugstack(2, 5, 0) -- start, countTop, countBot
+	local now = date()
+	table.insert(DA.DebugProfile, now..": "..tostring(text).."\n"..stackstring)
+	if (table.getn(DA.DebugProfile) > DA.MAXPROFILE) then
+		table.remove(DA.DebugProfile, 1)
+	end
+	if DA.DebugLogging then
+		table.insert(DA.DebugLog, now.."(P): "..tostring(text))
+		if (table.getn(DA.DebugLog) > DA.MAXDEBUG) then
+			table.remove(DA.DebugLog, 1)
+		end
+	end
+end
+
+function DA.DebugAidsStatus()
+	print("WarnShow= "..tostring(DA.WarnShow)..", WarnLog= "..tostring(DA.WarnLog))
+	print("DebugShow= "..tostring(DA.DebugShow)..", DebugLogging= "..tostring(DA.DebugLogging)..", DebugLevel= "..tostring(DA.DebugLevel))
+	print("TraceShow= "..tostring(DA.TraceShow)..", TraceLog= "..tostring(DA.TraceLog))
+	print("TableDump= "..tostring(DA.TableDump))
+	print("#DebugLog= "..tostring(#DA.DebugLog))
+	print("#DebugProfile= "..tostring(#DA.DebugProfile))
 end
 
 --

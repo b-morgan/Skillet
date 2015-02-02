@@ -1969,72 +1969,9 @@ function SkilletLink:ScanTrade()
 	-- Skillet:SendMessage("Skillet_Scan_Complete", profession)
 end
 
-function SkilletData:EnchantingRecipeSlotAssign(recipeID, slot)
-	local recipeString = Skillet.db.global.recipeDB[recipeID]
-	local tradeID, itemString, reagentString, toolString = string.split(" ",recipeString)
-	if itemString == "0" then
-		itemString = "0:"..slot
-		Skillet.db.global.recipeDB[recipeID] = tradeID.." 0:"..slot.." "..reagentString.." "..toolString
-		Skillet:GetRecipe(recipeID)
-		--DA.DEBUG(0,(Skillet.data.recipeList[recipeID].name or "noName")
-		Skillet.data.recipeList[recipeID].slot = slot
-	end
-end
-
-local invSlotLookup = {
-	["HEADSLOT"] = "HeadSlot",
-	["NECKSLOT"] = "NeckSlot",
-	["SHOULDERSLOT"] = "ShoulderSlot",
-	["CHESTSLOT"] = "ChestSlot",
-	["WAISTSLOT"] = "WaistSlot",
-	["LEGSSLOT"] = "LegsSlot",
-	["FEETSLOT"] = "FeetSlot",
-	["WRISTSLOT"] = "WristSlot",
-	["HANDSSLOT"] = "HandsSlot",
-	["FINGER0SLOT"] = "Finger0Slot",
-	["TRINKET0SLOT"] = "Trinket0Slot",
-	["BACKSLOT"] =	"BackSlot",
-	["ENCHSLOT_WEAPON"] = "MainHandSlot",
-	["ENCHSLOT_2HWEAPON"] = "MainHandSlot",
-	["SHIELDSLOT"] = "SecondaryHandSlot",
-}
-
-function SkilletData:ScanEnchantingGroups(mainGroup)
-	local groupList = {}
-	if mainGroup then
-		local craftSlots = { GetCraftSlots() }
-		Skillet:RecipeGroupClearEntries(mainGroup)
-		for i=1,#craftSlots do
-			local groupName
-			local slotName = _G[craftSlots[i]]
-			local invSlot
-			if groupList[slotName] then
-				groupList[slotName] = groupList[slotName]+1
-				groupName = slotName.." "..groupList[slotName]
-			else
-				groupList[slotName] = 1
-				groupName = slotName
-			end
-			local currentGroup = Skillet:RecipeGroupNew(Skillet.currentPlayer, 7411, "Blizzard", groupName)			-- 7411 = enchanting
-			SetCraftFilter(i+1)
-			for s=1,GetNumCrafts() do
-				local recipeLink = GetCraftRecipeLink(s)
-				local recipeID = Skillet:GetItemIDFromLink(recipeLink)
-				if craftSlots[i] ~= "NONEQUIPSLOT" then
-					invSlot = GetInventorySlotInfo(invSlotLookup[craftSlots[i]])
-					self:EnchantingRecipeSlotAssign(recipeID, invSlot)
-				end
-				--DA.DEBUG(0,"adding "..(recipeLink or "nil").." to "..groupName)
-				Skillet:RecipeGroupAddRecipe(currentGroup, recipeID, Skillet.data.skillIndexLookup[Skillet.currentPlayer][recipeID])
-			end
-			Skillet:RecipeGroupAddSubGroup(mainGroup, currentGroup, i)
-		end
-	end
-	SetCraftFilter(1)
-end
-
 function Skillet:GenerateAltKnowledgeBase()
 	--DA.DEBUG(0,"GenerateAltKnowledgeBase()")
+	if true then return end
 	local tradeID = Skillet.currentTrade
 	local player = Skillet.currentPlayer
 	local knownRecipes = {}
