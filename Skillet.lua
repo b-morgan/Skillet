@@ -20,7 +20,7 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
 ]]--
 
-local MAJOR_VERSION = "2.77"
+local MAJOR_VERSION = "2.78"
 local MINOR_VERSION = ("$Revision$"):match("%d+") or 1
 local DATE = string.gsub("$Date$", "^.-(%d%d%d%d%-%d%d%-%d%d).-$", "%1")
 
@@ -830,7 +830,7 @@ function Skillet:InitializeDatabase(player, clean)
 		self.db.global.dataVersion = self.db.realm.dataVersion
 		self.db.realm.dataVersion = nil
 	end
-	if not self.db.global.dataVersion or self.db.global.dataVersion < 4 then
+	if not self.db.global.dataVersion or self.db.global.dataVersion ~= 4 then
 		self.db.global.dataVersion = 4
 		self:FlushAllData()
 	end
