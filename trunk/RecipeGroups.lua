@@ -601,20 +601,17 @@ function SkilletRecipeGroupDropdown_Initialize(menuFrame,level)
 	DA.DEBUG(0,"SkilletRecipeGroupDropdown_Initialize("..tostring(menuFrame)..", "..tostring(level)..")")
 	if level == 1 then  -- group labels
 		local entry = {}
-		local null = {}
-		null.text = ""
-		null.disabled = true
 		entry.text = "Flat"
 		entry.value = "Flat"
 		entry.func = Skillet.RecipeGroupSelect
 		entry.arg1 = Skillet
 		entry.arg2 = "Flat"
+		entry.icon = "Interface\\Addons\\Skillet\\Icons\\locked.tga"
 		if Skillet.currentGroupLabel == "Flat" then
 			entry.checked = true
 		else
 			entry.checked = false
 		end
-		entry.icon = "Interface\\Addons\\Skillet\\Icons\\locked.tga"
 		UIDropDownMenu_AddButton(entry)
 		if Skillet.data.groupList[Skillet.currentPlayer] then
 			local numGroupsAdded = 0
@@ -625,7 +622,7 @@ function SkilletRecipeGroupDropdown_Initialize(menuFrame,level)
 					entry.func = Skillet.RecipeGroupSelect
 					entry.arg1 = Skillet
 					entry.arg2 = labelName
-					if Skillet.currentGroupLabel == "Blizzard" or Skillet:GetTradeSkillOption(labelName.."-locked") then
+					if labelName == "Blizzard" or Skillet:GetTradeSkillOption(labelName.."-locked") then
 						entry.icon = "Interface\\Addons\\Skillet\\Icons\\locked.tga"
 					else
 						entry.icon = nil -- "Interface\\Addons\\Skillet\\Icons\\unlocked.tga"

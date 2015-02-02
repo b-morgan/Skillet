@@ -1472,7 +1472,7 @@ function SkilletData:ScanTrade()
 	local numSkills = API.GetNumSkills()
 	for i = 1, numSkills do
 		local skillName, skillType, _, isExpanded = GetTradeSkillInfo(i)
-		DA.DEBUG(3,"i= "..tostring(i)..", skillName= "..tostring(skillName)..", skillType="..tostring(skillType)..", isExpanded= "..tostring(isExpanded))
+		--DA.DEBUG(3,"i= "..tostring(i)..", skillName= "..tostring(skillName)..", skillType="..tostring(skillType)..", isExpanded= "..tostring(isExpanded))
 		if i == 1 and skillType == "subheader" then skillType = "header" end --**-- workaround for Blizzard bug in 6.02
 		if skillType == "header" or skillType == "subheader" then
 			if not isExpanded then
@@ -1519,7 +1519,7 @@ function SkilletData:ScanTrade()
 			local skillName, skillType, isExpanded, subSpell, extra
 			local skillName, skillType, _, isExpanded, _, _, _, _, _, _, _, displayAsUnavailable, _ = GetTradeSkillInfo(i);
 			--DA.DEBUG(0,i.." "..skillName)
-			DA.DEBUG(3,"i= "..tostring(i)..", skillName= "..tostring(skillName)..", skillType="..tostring(skillType)..", isExpanded= "..tostring(isExpanded))
+			--DA.DEBUG(3,"i= "..tostring(i)..", skillName= "..tostring(skillName)..", skillType="..tostring(skillType)..", isExpanded= "..tostring(isExpanded))
 			if i == 1 and skillType == "subheader" then skillType = "header" end --**-- workaround for Blizzard bug in 6.02
 			if displayAsUnavailable then skillType = "unavailable" end
 			gotNil = false
@@ -1969,86 +1969,11 @@ function SkilletLink:ScanTrade()
 	-- Skillet:SendMessage("Skillet_Scan_Complete", profession)
 end
 
-function Skillet:GenerateAltKnowledgeBase()
-	--DA.DEBUG(0,"GenerateAltKnowledgeBase()")
-	if true then return end
-	local tradeID = Skillet.currentTrade
-	local player = Skillet.currentPlayer
-	local knownRecipes = {}
-	local unknownRecipes = {}
-	for label in pairs(Skillet.dataGatheringModules) do
-		local rankData = Skillet:GetSkillRanks(label, tradeID)
-		if label ~= "All Data" and rankData then
-			Skillet:InitGroupList(player, tradeID, label, true)
-			if label == Skillet.currentGroupLabel then
-				local mainGroup =  Skillet:RecipeGroupNew(player, tradeID, label)
-				if not mainGroup.initialized then
-					local unknownCount = 0
-					local knownCount = 0
-					mainGroup.initialized = true
-					local rank = rankData.rank
-					-- first, accumulate all skill data
-					for id, skill in pairs(Skillet.data.skillList[player][tradeID]) do
-						if type(id) == "number" and type(skill) == "table" then
-							if skill.id then
-								local spellID = skill.id
-								unknownRecipes[spellID] = spellID
-								unknownCount = unknownCount + 1
-							end
-						end
-					end
-					-- then, move over all known recipes for this toon
-					local numSkills = #Skillet.db.realm.skillDB[label][tradeID]
-					for i=1, numSkills do
-						local skill = Skillet:GetSkill(label, tradeID, i)
-						if skill and skill.id ~= 0 then
-							local spellID = skill.id
-							knownRecipes[spellID] = spellID
-							unknownRecipes[spellID] = nil
-							unknownCount = unknownCount - 1
-							knownCount = knownCount + 1
-						end
-					end
-					if knownCount > 0 then
-						local knownGroup = Skillet:RecipeGroupNew(player, tradeID, label, "Known Recipes")
-						Skillet:RecipeGroupAddSubGroup(mainGroup, knownGroup, 1)
-						for spellID,recipeID in pairs(knownRecipes) do
-							local index = Skillet.data.skillIndexLookup[player][recipeID]
-							local entry = Skillet:RecipeGroupAddRecipe(knownGroup, recipeID, index)
-							entry.color = Skillet:GetTradeSkillLevelColor(spellID, rank)
-							if entry.color then
-								entry.difficulty = entry.color.level
-							end
-						end
-					end
-					if unknownCount > 0 then
-						local unknownGroup = Skillet:RecipeGroupNew(player, tradeID, label, "Unknown Recipes")
-						Skillet:RecipeGroupAddSubGroup(mainGroup, unknownGroup, 2)
-						for spellID,recipeID in pairs(unknownRecipes) do
-							local index = Skillet.data.skillIndexLookup[player][recipeID]
-							local entry = Skillet:RecipeGroupAddRecipe(unknownGroup, recipeID, index)
-							entry.color = Skillet:GetTradeSkillLevelColor(spellID, rank)
-							if entry.color then
-								entry.difficulty = entry.color.level
-							end
-						end
-					end
-				end
-			end
-		end
-	end
-	knownRecipes = nil
-	unknownRecipes = nil
-	--DA.DEBUG(0,"GenerateAltKnowledgeBase Complete")
-end
-
 function SkilletData:RecipeGroupGenerateAutoGroups()
 	--DA.DEBUG(0,"SkilletData:RecipeGroupGenerateAutoGroups()")
-	Skillet:GenerateAltKnowledgeBase()
 end
 
 function SkilletLink:RecipeGroupGenerateAutoGroups()
 	--DA.DEBUG(0,"SkilletLink:RecipeGroupGenerateAutoGroups()")
-	Skillet:GenerateAltKnowledgeBase()
 end
 

@@ -1120,7 +1120,7 @@ function Skillet:internal_UpdateTradeSkillWindow()
 	end
 	SkilletFrameEmptySpace:SetPoint("BOTTOMRIGHT",SkilletSkillListParent,"BOTTOMRIGHT")
 	updateWindowBusy = false
-	DA.DEBUG(0,"UPDATE OVER")
+	DA.DEBUG(0,"internal_UpdateTradeSkillWindow Complete")
 end
 
 -- Display an action packed tooltip when we are over
@@ -1847,34 +1847,37 @@ function Skillet:SkillButton_OnReceiveDrag(button, mouse)
 	end
 end
 
-local skillListCopyBuffer = {}
 function Skillet:SkillButton_CopySelected()
+	DA.DEBUG(0,"SkillButton_CopySelected()")
 	local skillListKey = self.currentPlayer..":"..self.currentTrade..":"..self.currentGroupLabel
 	local sortedSkillList = self.data.sortedSkillList[skillListKey]
-	skillListCopyBuffer[self.currentTrade] = {}
+	if not self.skillListCopyBuffer then
+		self.skillListCopyBuffer = {}
+	end
+	self.skillListCopyBuffer[self.currentTrade] = {}
 	local d = 1
 	for i=1,sortedSkillList.count do
 		if sortedSkillList[i].selected and not (sortedSkillList[i].parentIndex and sortedSkillList[sortedSkillList[i].parentIndex].selected) then
-			skillListCopyBuffer[self.currentTrade][d] = sortedSkillList[i]
-			--DA.DEBUG(0,"copying "..(sortedSkillList[i].name or "nil"))
+			self.skillListCopyBuffer[self.currentTrade][d] = sortedSkillList[i]
+			--DA.DEBUG(1,"copying "..(sortedSkillList[i].name or "nil"))
 			d = d + 1
 		end
 	end
 end
 
 function Skillet:SkillButton_PasteSelected(button)
+	DA.DEBUG(0,"SkillButton_PasteSelected("..tostring(button)..")")
 	if not self:RecipeGroupIsLocked() then
---		local parentGroup = self:RecipeGroupFind(self.currentPlayer, self.currentTrade, self.currentGroupLabel, self.currentGroup)
 		local parentGroup
 		if button then
 			parentGroup = button.skill.subGroup or button.skill.parent
 		else
 			parentGroup = self:RecipeGroupFind(self.currentPlayer, self.currentTrade, self.currentGroupLabel, self.currentGroup)
 		end
-		if skillListCopyBuffer[self.currentTrade] then
-			for d=1,#skillListCopyBuffer[self.currentTrade] do
-				--DA.DEBUG(0,"pasting "..(skillListCopyBuffer[self.currentTrade][d].name or "nil").." to "..parentGroup.name)
-				self:RecipeGroupPasteEntry(skillListCopyBuffer[self.currentTrade][d], parentGroup)
+		if self.skillListCopyBuffer and self.skillListCopyBuffer[self.currentTrade] then
+			for d=1,#self.skillListCopyBuffer[self.currentTrade] do
+				--DA.DEBUG(1,"pasting "..(self.skillListCopyBuffer[self.currentTrade][d].name or "nil").." to "..parentGroup.name)
+				self:RecipeGroupPasteEntry(self.skillListCopyBuffer[self.currentTrade][d], parentGroup)
 			end
 		end
 		self:SortAndFilterRecipes()
@@ -1883,22 +1886,29 @@ function Skillet:SkillButton_PasteSelected(button)
 end
 
 function Skillet:SkillButton_DeleteSelected()
+	DA.DEBUG(0,"SkillButton_DeleteSelected()")
 	if not self:RecipeGroupIsLocked() then
 		local skillListKey = self.currentPlayer..":"..self.currentTrade..":"..self.currentGroupLabel
 		local sortedSkillList = self.data.sortedSkillList[skillListKey]
 		for i=1,sortedSkillList.count do
 			if sortedSkillList[i].selected and not (sortedSkillList[i].parent and sortedSkillList[i].parent.selected) then
-				self:RecipeGroupDeleteEntry(sortedSkillList[i], newGroup)
+				self:RecipeGroupDeleteEntry(sortedSkillList[i])
 			end
 		end
 		self.selectedSkill = nil
-		self:RecipeGroupAddSubGroup(parentGroup, newGroup, index)
 		self:SortAndFilterRecipes()
 		self:UpdateTradeSkillWindow()
 	end
 end
 
+function Skillet:SkillButton_CutSelected()
+	DA.DEBUG(0,"SkillButton_CutSelected()")
+	Skillet:SkillButton_CopySelected()
+	Skillet:SkillButton_DeleteSelected()
+end
+
 function Skillet:SkillButton_NewGroup()
+	DA.DEBUG(0,"SkillButton_NewGroup()")
 	if not self:RecipeGroupIsLocked() then
 		local player = self.currentPlayer
 		local tradeID = self.currentTrade
@@ -1913,6 +1923,7 @@ function Skillet:SkillButton_NewGroup()
 end
 
 function Skillet:SkillButton_MakeGroup()
+	DA.DEBUG(0,"SkillButton_MakeGroup()")
 	if not self:RecipeGroupIsLocked() then
 		local player = self.currentPlayer
 		local tradeID = self.currentTrade
@@ -1942,8 +1953,7 @@ function Skillet:SkillButton_OnKeyDown(button, key)
 	elseif key == "C" then
 		self:SkillButton_CopySelected()
 	elseif key == "X" then
-		self:SkillButton_CopySelected()
-		self:SkillButton_DeleteSelected()
+		self:SkillButton_CutSelected()
 	elseif key == "V" then
 		self:SkillButton_PasteSelected(self.mouseOver)
 	elseif key == "DELETE" or key == "BACKSPACE" then
@@ -2453,7 +2463,7 @@ local skillMenuSelection = {
 	},
 	{
 		text = "Cut",
-		func = function() Skillet:SkillButton_DeleteSelected() end,
+		func = function() Skillet:SkillButton_CutSelected() end,
 	},
 	{
 		text = "Paste",
@@ -2488,7 +2498,7 @@ local skillMenuSelection = {
 	},
 	{
 		text = "Cut",
-		func = function() Skillet:SkillButton_DeleteSelected() end,
+		func = function() Skillet:SkillButton_CutSelected() end,
 	},
 	{
 		text = "Paste",
@@ -2515,7 +2525,7 @@ local skillMenuSelection = {
 	},
 	{
 		text = "Cut",
-		func = function() Skillet:SkillButton_DeleteSelected() end,
+		func = function() Skillet:SkillButton_CutSelected() end,
 	},
 	{
 		text = "Paste",
@@ -2541,7 +2551,7 @@ local skillMenuSelection = {
 	},
 	{
 		text = "Cut",
-		func = function() Skillet:SkillButton_DeleteSelected() end,
+		func = function() Skillet:SkillButton_CutSelected() end,
 	},
 	{
 		text = "Paste",
