@@ -1,7 +1,7 @@
+local addonName,addonTable = ...
+local DA = _G[addonName] -- for DebugAids.lua
 --[[
-
 Skillet: A tradeskill window replacement.
-Copyright (c) 2007 Robert Clark <nogudnik@gmail.com>
 
 This program is free software: you can redistribute it and/or modify
 it under the terms of the GNU General Public License as published by
@@ -15,7 +15,6 @@ GNU General Public License for more details.
 
 You should have received a copy of the GNU General Public License
 along with this program.  If not, see <http://www.gnu.org/licenses/>.
-
 ]]--
 
 -- Localization
@@ -28,11 +27,11 @@ local merchant_inventory = {}
 local function get_merchant_item_name(slot)
 	local link = GetMerchantItemLink(slot);
 	if link then
-    	local _,_,name = string.find(link, "^.*%[(.*)%].*$");
-    	return name;
- 	else
-    	return nil;
-    end
+		local _,_,name = string.find(link, "^.*%[(.*)%].*$");
+		return name;
+	else
+		return nil;
+	end
 end
 
 -- Checks to see if the cached list of items for this merchant
@@ -40,12 +39,10 @@ end
 local function does_merchant_sell_required_items(list)
 	for i=1,#list,1 do
 		local id  = list[i].id
-
 		if merchant_inventory[id] then
 			return true
 		end
 	end
-
 	return false
 end
 
@@ -54,18 +51,13 @@ end
 local function update_merchant_inventory()
 	if MerchantFrame and MerchantFrame:IsVisible() then
 		local count = GetMerchantNumItems()
-
-		if count == 148 then				-- ??
-			count = 0
-		end
 		for i=1, count, 1 do
 			local link = GetMerchantItemLink(i)
-
 			if link then
 				local name, texture, price, quantity, numAvailable, isUsable = GetMerchantItemInfo(i)
 				if numAvailable == -1  then
 					local id = Skillet:GetItemIDFromLink(link)
-					merchant_inventory[id] = {}										-- TODO: record this info if PT doesn't already have it
+					merchant_inventory[id] = {}					-- TODO: record this info if PT doesn't already have it
 					merchant_inventory[id].price = price
 					merchant_inventory[id].stack = quantity
 				end
@@ -78,28 +70,24 @@ end
 -- you to automatically buy reagents.
 local function update_merchant_buy_button()
 	Skillet:InventoryScan()
-    local list = Skillet:GetShoppingList(UnitName("player"), Skillet.db.char.include_bank)
-
+	local list = Skillet:GetShoppingList(UnitName("player"), Skillet.db.char.include_bank)
 	if not list or #list == 0 then
-        SkilletMerchantBuyFrame:Hide()
+		SkilletMerchantBuyFrame:Hide()
 		return
 	elseif does_merchant_sell_required_items(list) == false then
-        SkilletMerchantBuyFrame:Hide()
+		SkilletMerchantBuyFrame:Hide()
 		return
 	end
-
-    if SkilletMerchantBuyFrame:IsVisible() then
-        -- already inserted the button
-        return
-    end
-
+	if SkilletMerchantBuyFrame:IsVisible() then
+		-- already inserted the button
+		return
+	end
 	SkilletMerchantBuyFrameButton:SetText(L["Reagents"]);
 	if Skillet.wowVersion > 50000 then
 		SkilletMerchantBuyFrame:SetPoint("TOPLEFT", "MerchantFrame", "TOPLEFT" , 55, -5);
 	else
 		SkilletMerchantBuyFrame:SetPoint("TOPLEFT", "MerchantFrame", "TOPLEFT" , 60, -28);
 	end
-	
 	SkilletMerchantBuyFrame:SetFrameStrata("HIGH");
 	SkilletMerchantBuyFrame:Show();
 end
@@ -112,27 +100,24 @@ end
 -- Updates the merchant frame, it is it visible, this method can be called
 -- many times
 function Skillet:UpdateMerchantFrame()
-    Skillet:MERCHANT_SHOW()
+	Skillet:MERCHANT_SHOW()
 end
 
 -- Merchant window opened. This method can be called multiple
 -- times if needed, and it can be called even if a merchant window
 -- is not open.
 function Skillet:MERCHANT_SHOW()
- 	if MerchantFrame and not MerchantFrame:IsVisible() then
-        -- called when the merchant frame is not visible, this is a no-op
-        return
-    end
-
+	if MerchantFrame and not MerchantFrame:IsVisible() then
+		-- called when the merchant frame is not visible, this is a no-op
+		return
+	end
 	merchant_inventory = {}
-
 	if Skillet.db.profile.vendor_buy_button or Skillet.db.profile.vendor_auto_buy then
 		update_merchant_inventory()
 	end
-
 	if Skillet.db.profile.vendor_auto_buy then
 		if not self.autoPurchaseComplete then
-			self.autoPurchaseComplete = true				-- annoying lag causes multiple purchases because merchant frame shows again before our bags update
+			self.autoPurchaseComplete = true		-- annoying lag causes multiple purchases because merchant frame shows again before our bags update
 			self:BuyRequiredReagents()
 		else
 			update_merchant_buy_button()
@@ -162,7 +147,6 @@ end
 -- sell that is required by any queued reciped.
 function Skillet:BuyRequiredReagents()
 	local list = Skillet:GetShoppingList(UnitName("player"), Skillet.db.char.include_bank)
-
 	if #list == 0 then
 		return
 	elseif does_merchant_sell_required_items(list) == false then
@@ -170,18 +154,12 @@ function Skillet:BuyRequiredReagents()
 	elseif not MerchantFrame or MerchantFrame:IsVisible() == false then
 		return
 	end
-
 	local totalspent = 0;
 	local abacus = LibStub("LibAbacus-3.0")
-
 	local items_purchased = 0;
-
 	-- for each item they sell, see if we need it
 	-- ... if we do, buy the hell out of it.
 	local count = GetMerchantNumItems()
-	if count == 148 then
-		count = 0
-	end
 	for i=1, count, 1 do
 		local link = GetMerchantItemLink(i)
 		if link then
@@ -190,18 +168,15 @@ function Skillet:BuyRequiredReagents()
 				local id = self:GetItemIDFromLink(link)
 				-- OK, lets see if we need it.
 				local count = 0;
-
 				for j=1,#list,1 do
 					if list[j].id == id then
 						count = list[j].count
 						break
 					end
 				end
-
 				if count > 0 then
 					local sName, sLink, iQuality, iLevel, iMinLevel, sType, sSubType, stackSize = GetItemInfo(link);
 					local itemstobuy = math.ceil(count/quantity);
-
 					if(stackSize == nil) then
 						for l=1, count, 1 do
 							-- XXX: need some error checking here in case the
@@ -225,7 +200,6 @@ function Skillet:BuyRequiredReagents()
 							BuyMerchantItem(i,resttobuy);
 						end
 					end
-
 					items_purchased = items_purchased + 1
 					local itemspent = price * itemstobuy -- spent on this type of item
 					totalspent = totalspent + itemspent  -- spent on all items from this merchant
@@ -237,50 +211,37 @@ function Skillet:BuyRequiredReagents()
 			end
 		end
 	end
-
 	if totalspent > 0 and items_purchased > 1 then
 		local message = L["Total spent"]
 		local cash = abacus:FormatMoneyFull(totalspent, true)
 		message = message .. ": " .. cash
 		self:Print(message)
 	end
-
 	self:InventoryScan()
 	update_merchant_buy_button()
 end
 
-
-
 function Skillet:MerchantBuyButton_OnEnter(button)
 	local abacus = LibStub("LibAbacus-3.0")
-
 	GameTooltip:SetOwner(button, "ANCHOR_BOTTOMRIGHT")
 	GameTooltip:ClearLines()
 	GameTooltip:AddLine(L["Buy Reagents"])
-
 	local needList = Skillet:GetShoppingList(UnitName("player"), Skillet.db.char.include_bank)
 	local totalCost = 0
-
 	for i=1,#needList,1 do
 		local itemID = needList[i].id
-
 		if merchant_inventory[itemID] then
 			local cost = merchant_inventory[itemID].price * math.ceil(needList[i].count/merchant_inventory[itemID].stack)
-
 			totalCost = totalCost + cost
 			GameTooltip:AddDoubleLine((GetItemInfo(itemID)).." x "..needList[i].count, abacus:FormatMoneyFull(cost, true),1,1,0)
 		end
 	end
-
 	if #needList > 1 then
 		GameTooltip:AddDoubleLine(L["Total Cost:"], abacus:FormatMoneyFull(totalCost, true),0,1,0)
 	end
-
 	GameTooltip:Show()
 end
-
 
 function Skillet:MerchantBuyButton_OnLeave(button)
 	GameTooltip:Hide()
 end
-
