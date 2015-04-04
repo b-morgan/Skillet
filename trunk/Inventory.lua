@@ -1,9 +1,7 @@
 local addonName,addonTable = ...
 local DA = _G[addonName] -- for DebugAids.lua
 --[[
-
 Skillet: A tradeskill window replacement.
-Copyright (c) 2007 Robert Clark <nogudnik@gmail.com>
 
 This program is free software: you can redistribute it and/or modify
 it under the terms of the GNU General Public License as published by
@@ -17,8 +15,7 @@ GNU General Public License for more details.
 
 You should have received a copy of the GNU General Public License
 along with this program.  If not, see <http://www.gnu.org/licenses/>.
-
-]]
+]]--
 
 -- recursive reagent craftability check
 -- not considering alts at the moment
@@ -168,19 +165,6 @@ function Skillet:InventorySkillIterations(tradeID, skillIndex, playerOverride)
 				local reagentAvailabilityAlts = 0
 				local a,b
 				a, reagentAvailability, b, reagentAvailabilityBank = self:GetInventory(player, reagentID)
---[[
-				if self:VendorSellsReagent(reagentID) then	-- maybe should be an option, but if the item is available at vendors then assume the player could easily get some
-					local _,_,_,_,_,_,_,stackSize = GetItemInfo(reagentID)
-					local _,_,_,_,_,_,_,stackSizeMade = GetItemInfo(recipe.itemID)
-					reagentAvailabilityBank = math.max((stackSize or 1), math.floor((stackSizeMade or 1)/recipe.numMade)*numNeeded)
-					reagentAvailabilityAlts = reagentAvailabilityBank
-				else
-					for player in pairs(self.db.realm.inventoryData) do
-						local _,_,_, altBank = self:GetInventory(player, reagentID)
-						reagentAvailabilityAlts = reagentAvailabilityAlts + (altBank or 0)
-					end
-				end
-]]
 				for player in pairs(self.db.realm.inventoryData) do
 					local _,_,_, altBank = self:GetInventory(player, reagentID)
 					reagentAvailabilityAlts = reagentAvailabilityAlts + (altBank or 0)
