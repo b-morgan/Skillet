@@ -1,9 +1,7 @@
 local addonName,addonTable = ...
 local DA = _G[addonName] -- for DebugAids.lua
 --[[
-
 Skillet: A tradeskill window replacement.
-Copyright (c) 2007 Robert Clark <nogudnik@gmail.com>
 
 This program is free software: you can redistribute it and/or modify
 it under the terms of the GNU General Public License as published by
@@ -17,7 +15,6 @@ GNU General Public License for more details.
 
 You should have received a copy of the GNU General Public License
 along with this program.  If not, see <http://www.gnu.org/licenses/>.
-
 ]]--
 
 local L = Skillet.L
@@ -159,7 +156,6 @@ function Skillet:AddToQueue(command, noWindowRefresh)
 	if not noWindowRefresh then
 		self:AdjustInventory()
 	end
-	self:SendMessage("Skillet_Queue_Add")
 end
 
 function Skillet:RemoveFromQueue(index)
@@ -194,17 +190,16 @@ function Skillet:ClearQueue()
 		self:UpdateTradeSkillWindow()
 	end
 	--DA.DEBUG(0,"ClearQueue Complete")
-	self:SendMessage("Skillet_Queue_Complete")
 end
 
 function Skillet:ProcessQueue(altMode)
 	DA.DEBUG(0,"ProcessQueue");
 	local queue = self.db.realm.queueData[self.currentPlayer]
-	local reagentbank = self.db.realm.reagentBank[self.currentPlayer]
 	local qpos = 1
 	local skillIndexLookup = self.data.skillIndexLookup[self.currentPlayer]
 	self.processingPosition = nil
 	self.processingCommand = nil
+	self.processingCount = nil
 	if self.currentPlayer ~= (UnitName("player")) then
 		DA.DEBUG(0,"trying to process from an alt!")
 		return
@@ -225,26 +220,21 @@ function Skillet:ProcessQueue(altMode)
 					local reagent = recipe.reagentData[i]
 					local reagentName = GetItemInfo(reagent.id) or reagent.id
 					DA.DEBUG(1,"id= "..tostring(reagent.id)..", reagentName="..tostring(reagentName)..", numNeeded="..tostring(reagent.numNeeded))
-					local numInBags, bagsCraft, numInBank, bankCraft = self:GetInventory(self.currentPlayer, reagent.id)
-					DA.DEBUG(1,"numInBags= "..tostring(numInBags)..", numInBank="..tostring(numInBank)..", bagsCraft= "..tostring(bagsCraft)..", bankCraft= "..tostring(bankCraft))
-					if numInBags < reagent.numNeeded then
-						local fromBank = reagent.numNeeded - numInBags
-						DA.DEBUG(1,"fromBank= "..tostring(fromBank)..", reagentbank= "..tostring(reagentbank[reagent.id]))
-						if reagentbank[reagent.id] and reagentbank[reagent.id] >= fromBank then 
-							reagentbank[reagent.id] = reagentbank[reagent.id] - fromBank
-							DA.WARN(L["Using Bank for"],recipe.name,"-",fromBank,"x",reagentName)
-						else
-							Skillet:Print(L["Skipping"],recipe.name,"-",L["need"],reagent.numNeeded,"x",reagentName,"("..L["have"],numInBags..")")
-							craftable = false
-							break
-						end
+					local numInBoth = GetItemCount(reagent.id,true)
+					local numInBags = GetItemCount(reagent.id)
+					local numInBank =  numInBoth - numInBags
+					DA.DEBUG(1,"numInBoth= "..tostring(numInBoth)..", numInBags="..tostring(numInBags)..", numInBank="..tostring(numInBank))
+					if numInBoth < reagent.numNeeded then
+						Skillet:Print(L["Skipping"],recipe.name,"-",L["need"],reagent.numNeeded,"x",reagentName,"("..L["have"],numInBoth..")")
+						craftable = false
+						break
 					end
-				end
+				end -- for
 			end
 			if craftable then break end
 		end
 		qpos = qpos + 1
-	until qpos>#queue
+	until qpos > #queue
 	-- if we can't craft anything, show error from first item in queue
 	if qpos > #queue then
 		qpos = 1
@@ -260,10 +250,12 @@ function Skillet:ProcessQueue(altMode)
 			self.processingSpell = self:GetRecipeName(command.recipeID)
 			self.processingPosition = qpos
 			self.processingCommand = command
+			self.processingCount = command.count
 			-- if alt down/right click - auto use items / like vellums
 			if altMode then
 				local itemID = Skillet:GetAutoTargetItem(recipe.tradeID)
 				if itemID then
+					self.processingCount = 1
 					DoTradeSkill(skillIndexLookup[command.recipeID],1)
 					UseItemByName(itemID)
 					self.queuecasting = false
@@ -279,7 +271,6 @@ function Skillet:ProcessQueue(altMode)
 		end
 	else
 		self.db.realm.queueData[self.currentPlayer] = {}
-		self:SendMessage("Skillet_Queue_Complete")
 	end
 end
 
@@ -345,11 +336,6 @@ end
 
 function Skillet:StopCast(spell, success)
 	local spellBeingCast = UnitCastingInfo("player")
-if SkilletFrame:IsVisible() then
---	DA.CHAT("StopCast "..(event or "nil"))
---	DA.CHAT("StopCast "..(spellBeingCast or "nocast").." "..(spell or "nopass").." "..(self.processingSpell or "noproc"))
-end
-
 	if not self.db.realm.queueData then
 		self.db.realm.queueData = {}
 	end
@@ -371,7 +357,6 @@ end
 			end
 			-- empty queue or command not found (removed?)
 			if not queue[1] or not command then
---				self:SendMessage("Skillet_Queue_Complete")
 				self.queuecasting = false
 				self.processingSpell = nil
 				self.processingPosition = nil
@@ -389,7 +374,7 @@ end
 					self.reagentsChanged = {}
 					self:RemoveFromQueue(qpos)		-- implied queued reagent inventory adjustment in remove routine
 					self:RescanTrade()
---					DA.CHAT("removed queue command")
+					DA.DEBUG(0,"removed queue command")
 				end
 			end
 		else
@@ -398,7 +383,7 @@ end
 			self.processingCommand = nil
 			self.queuecasting = false
 		end
---		DA.CHAT("STOP CAST IS UPDATING WINDOW")
+		DA.DEBUG(0,"STOP CAST IS UPDATING WINDOW")
 		self:InventoryScan()
 		self:UpdateTradeSkillWindow()
 	end

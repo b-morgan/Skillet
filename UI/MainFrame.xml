@@ -2,9 +2,7 @@
 ..\..\FrameXML\UI.xsd">
 
 	<!--
-
 	Skillet: A tradeskill window replacement.
-	Copyright (c) 2007 Robert Clark <nogudnik@gmail.com>
 
 	This program is free software: you can redistribute it and/or modify
 	it under the terms of the GNU General Public License as published by
@@ -18,7 +16,6 @@
 
 	You should have received a copy of the GNU General Public License
 	along with this program.  If not, see <http://www.gnu.org/licenses/>.
-
 	-->
 
 	<Button name="SkilletGuildCrafterButtonTemplate" hidden="false" virtual="true">
@@ -809,19 +806,6 @@
 		<Size>
 			<AbsDimension x="660" y="512"/>
 		</Size>
-		<Layers>
-			<Layer level="ARTWORK">
-				<FontString name="$parentScanningText" inherits="GameTooltipTextSmall" hidden="true">
-					<Anchors>
-						<Anchor point="TOPLEFT">
-							<Offset>
-								<AbsDimension x="80" y="-10"/>
-							</Offset>
-						</Anchor>
-					</Anchors>
-				</FontString>
-			</Layer>
-		</Layers>
 		<Frames>
 			<!--
 			#
@@ -965,8 +949,6 @@
 				<BarTexture name="$parentBar">
 					<Color r="0.8" g="0.8" b="0.8" a="1.0"/>
 				</BarTexture>
-<!--				<BarTexture name="$parentBar" file="Interface\PaperDollInfoFrame\UI-Character-Skills-Bar" /> -->
-				<!-- <BarColor r="0.35" g="0.35" b="1" a="1.0"/> -->
 			</StatusBar>
 			<!--
 			#
@@ -1080,7 +1062,6 @@
 					</OnLeave>
 					<OnClick>
 						Skillet:InventoryFilterButtons_Hide()
-						ProfessionPopup_Show(self)
 					</OnClick>
 				</Scripts>
 			</Button>
@@ -1331,24 +1312,6 @@
 				<Size>
 					<AbsDimension x="20" y="20"/>
 				</Size>
-				<Layers>
-<!--
-					<Layer level="ARTWORK">
-						<Texture name="$parentIcon" file="Interface\Addons\Skillet\Icons\bag.tga">
-							<Size>
-								<AbsDimension x="16" y="16"/>
-							</Size>
-							<Anchors>
-								<Anchor point="LEFT" relativePoint="RIGHT">
-									<Offset>
-										<AbsDimension x="-20" y="1"/>
-									</Offset>
-								</Anchor>
-							</Anchors>
-						</Texture>
-					</Layer>
--->
-				</Layers>
 				<NormalTexture file="Interface\Addons\Skillet\Icons\bag.tga"/>
 				<PushedTexture file="Interface\Addons\Skillet\Icons\bag.tga"/>
 				<CheckedTexture alphaMode="ADD" file="Interface\Buttons\CheckButtonHilight"/>
@@ -1610,78 +1573,6 @@
 					</OnLeave>
 				</Scripts>
 			</Button>
-<!--
-			<CheckButton name="SkilletHideTrivialRecipes" inherits="SkilletCheckButtonTemplate" hidden="true">
-				<Anchors>
-					<Anchor point="BOTTOMLEFT" relativeTo="SkilletSkillListParent" relativePoint="TOPLEFT">
-						<Offset>
-							<AbsDimension x="160" y="0"/>
-						</Offset>
-					</Anchor>
-				</Anchors>
-				<Scripts>
-					<OnClick>
-						if self:GetChecked() then
-							PlaySound("igMainMenuOptionCheckBoxOn");
-						end
-						local before = Skillet:GetTradeSkillOption("hidetrivial")
-						Skillet:SetTradeSkillOption("hidetrivial", not before)
-						Skillet:SortAndFilterRecipes()
-						Skillet:UpdateTradeSkillWindow()
-					</OnClick>
-				</Scripts>
-			</CheckButton>
-			#
-			# A button that displays the options dialog
-			#
-			<Button name="SkilletShowOptionsButton" inherits="UIPanelButtonTemplate" text="?" parent="SkilletFrame">
-				<Size>
-					<AbsDimension x="20" y="18"/>
-				</Size>
-				<Anchors>
-					<Anchor point="LEFT" relativeTo="SkilletRankFrame" relativePoint="RIGHT">
-						<Offset>
-							<AbsDimension x="5" y="0"/>
-						</Offset>
-					</Anchor>
-				</Anchors>
-				<Scripts>
-					<OnClick>
-						Skillet:InventoryFilterButtons_Hide()
-						Skillet:ShowOptions();
-					</OnClick>
-				</Scripts>
-			</Button>
--->
-<!--
-			#
-			# A button that triggers a rescan of the tradeskill
-			#
-			<Button name="SkilletRescanButton" inherits="UIPanelButtonTemplate" text="S" parent="SkilletFrame">
-				<Size>
-					<AbsDimension x="20" y="18"/>
-				</Size>
-				<Anchors>
-					<Anchor point="LEFT" relativeTo="SkilletShowOptionsButton" relativePoint="RIGHT">
-						<Offset>
-							<AbsDimension x="5" y="0"/>
-						</Offset>
-					</Anchor>
-				</Anchors>
-				<Scripts>
-					<OnClick>
-						Skillet:InventoryFilterButtons_Hide()
-						if IsShiftKeyDown() then
-							Skillet:FlushAllData()
-							Skillet:RescanTrade(true)
-						else
-							Skillet:RescanTrade(true)
-						end
-						Skillet:UpdateTradeSkillWindow()
-					</OnClick>
-				</Scripts>
-			</Button>
--->
 			<!--
 			#
 			# A button that shows plugin buttons

@@ -2,18 +2,21 @@ local addonName,addonTable = ...
 local DA = _G[addonName] -- for DebugAids.lua
 --[[
 Skillet: A tradeskill window replacement.
-Copyright (c) 2007 Robert Clark <nogudnik@gmail.com>
+
 This program is free software: you can redistribute it and/or modify
 it under the terms of the GNU General Public License as published by
 the Free Software Foundation, either version 3 of the License, or
 (at your option) any later version.
+
 This program is distributed in the hope that it will be useful,
 but WITHOUT ANY WARRANTY; without even the implied warranty of
 MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
 GNU General Public License for more details.
+
 You should have received a copy of the GNU General Public License
 along with this program.  If not, see <http://www.gnu.org/licenses/>.
 ]]--
+
 local L = LibStub("AceLocale-3.0"):GetLocale("Skillet")
 local skill_style_type = {
 	["unavailable"]		= { r = 1.00, g = 0.00, b = 0.00, level = 6},
@@ -287,31 +290,25 @@ end
 
 local function SortAndFilterRecipes()
 	DA.DEBUG(0,"SortAndFilterRecipes()")
---	if not (Skillet.db.realm.skillDB[Skillet.currentPlayer] and Skillet.db.realm.skillDB[Skillet.currentPlayer][Skillet.currentTrade]) then
---		DA.DEBUG(0,"No Data")
---		return 0
---	end
 	local skillListKey = Skillet.currentPlayer..":"..Skillet.currentTrade..":"..Skillet.currentGroupLabel
---	local skillDB = Skillet.db.realm.skillDB[Skillet.currentPlayer][Skillet.currentTrade]
 	local numSkills = Skillet:GetNumSkills(Skillet.currentPlayer, Skillet.currentTrade)
---	local recipeData = Skillet.db.global.recipeData
 	if not Skillet.data.sortedSkillList then
 		--DA.DEBUG(1,"Skillet.data.sortedSkillList = {}")
 		Skillet.data.sortedSkillList = {}
 	end
 	if not Skillet.data.sortedSkillList[skillListKey] then
-		--DA.DEBUg(1,"Skillet.data.sortedSkillList[skillListKey] = {}")
+		--DA.DEBUG(1,"Skillet.data.sortedSkillList[skillListKey] = {}")
 		Skillet.data.sortedSkillList[skillListKey] = {}
 	end
 	local sortedSkillList = Skillet.data.sortedSkillList[skillListKey]
 	local oldLength = #sortedSkillList
-	--DA.DEBUg(0,"oldLength= ",tostring(oldLength))
+	--DA.DEBUG(0,"oldLength= ",tostring(oldLength))
 	local button_index = 0
 	local filtertext = Skillet:GetTradeSkillOption("filtertext")
 	local groupLabel = Skillet.currentGroupLabel
-	--DA.DEBUg(0,"filtertext="..tostring(filtertext)..", groupLabel="..tostring(groupLabel))
+	--DA.DEBUG(0,"filtertext="..tostring(filtertext)..", groupLabel="..tostring(groupLabel))
 	if filtertext and filtertext ~= "" or groupLabel == "Flat" then
-		--DA.DEBUg(1,"SortAndFilterRecipes Flat")
+		--DA.DEBUG(1,"SortAndFilterRecipes Flat")
 		for i=1, numSkills, 1 do
 			local skill = Skillet:GetSkill(Skillet.currentPlayer, Skillet.currentTrade, i)
 			if skill then
@@ -344,7 +341,7 @@ local function SortAndFilterRecipes()
 		end
 	else
 		local group = Skillet:RecipeGroupFind(Skillet.currentPlayer, Skillet.currentTrade, Skillet.currentGroupLabel, Skillet.currentGroup)
-		--DA.DEBUg(0,"current grouping "..Skillet.currentGroupLabel.." "..(Skillet.currentGroup or "nil"))
+		--DA.DEBUG(0,"current grouping "..Skillet.currentGroupLabel.." "..(Skillet.currentGroup or "nil"))
 		if recipe_sort_method ~= NOSORT then
 			Skillet:RecipeGroupSort(group, recipe_sort_method, is_sort_desc())
 		end
@@ -355,7 +352,7 @@ local function SortAndFilterRecipes()
 			button_index = Skillet:RecipeGroupFlatten(group, 0, sortedSkillList, 0)
 		end
 	end
-	--DA.DEBUg(0,"sorted "..button_index.." skills")
+	--DA.DEBUG(0,"sorted "..button_index.." skills")
 	sortedSkillList.count = button_index
 	return button_index
 end
@@ -378,7 +375,6 @@ function Skillet:InitializeSorting()
 	table.insert(sorters, 1, {["name"]=L["None"], ["sorter"]=sort_recipe_by_index})
 	table.insert(sorters, 2, {["name"]=L["By Name"], ["sorter"]=sort_recipe_by_name})
 	table.insert(sorters, 3, {["name"]=L["By Difficulty"], ["sorter"]=sort_recipe_by_skill_level})
---	table.insert(sorters, 4, {["name"]=L["By Skill Level"], ["sorter"]=sort_recipe_by_skill_level})
 	table.insert(sorters, 4, {["name"]=L["By Item Level"], ["sorter"]=sort_recipe_by_item_level})
 	table.insert(sorters, 5, {["name"]=L["By Quality"], ["sorter"]=sort_recipe_by_item_quality})
 	recipe_sort_method = sort_recipe_by_index
@@ -411,33 +407,12 @@ function Skillet:InitializeSorting()
 		GameTooltip:Hide()
 	end)
 end
+
 --
 -- Causes the list of recipes to be resorted
 --
 function Skillet:internal_SortAndFilterRecipes()
 	return SortAndFilterRecipes()
-end
---[[
---
--- True if the list of recipes is sorted and false if it is not.
---
-function Skillet:AreRecipesSorted()
-	return recipe_sort_method and recipe_sort_method ~= NOSORT
-end
---
--- If the recipe list is sorted, maps from the provided index to
--- the sorted index.
---
-function Skillet:GetSortedRecipeIndex(index)
-	if self:AreRecipesSorted() then
-		if not is_sort_desc() then
-			-- +1 is becuse lua arrays are 1-based, not 0-based.
-			index = #sorted_recipes + 1 - index
-		end
-		return sorted_recipes[index]
-	else
-		return sorted_recipes[index]
-	end
 end
 
 --
@@ -446,7 +421,6 @@ end
 function Skillet:GetSortedRecipes()
 	return sorted_recipes
 end
-]]
 
 -- called when the sort drop down is first loaded
 function Skillet:SortDropdown_OnLoad()
@@ -495,8 +469,6 @@ function Skillet:SortDropdown_Initialize()
 		end
 		UIDropDownMenu_AddButton(info)
 	end
-	-- can't calls show_sort_toggle() here as the sort
-	-- buttons have not been created yet
 end
 
 -- Called when the user selects an item in the sorting drop down
