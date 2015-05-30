@@ -409,7 +409,7 @@ end
 
 -- Rebuilds reagentsInQueue list
 function Skillet:ScanQueuedReagents()
-DA.DEBUG(0,"ScanQueuedReagents")
+	DA.DEBUG(0,"ScanQueuedReagents")
 	local reagentsInQueue = {}
 	for i,command in pairs(self.db.realm.queueData[self.currentPlayer]) do
 		if command.op == "iterate" then
