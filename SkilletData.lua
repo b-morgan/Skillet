@@ -29,24 +29,23 @@ local TradeSkillList = {
 	45357,      -- inscription
 	25229,      -- jewelcrafting
 	2108,       -- leatherworking
-	-- 2575,    -- mining (or smelting?)
-	2656,       -- smelting (from mining)
+	2656,       -- smelting (from mining, 2575)
 	3908,       -- tailoring
 	2550,       -- cooking
 	3273,       -- first aid
-	-- 2842,    -- poisons
 	53428,      -- runeforging
-	-- 5149,    -- beast training (not supported)
 }
--- Table of follower tradeskills that should use the Blizzard frame
+-- Table of follower (IsNPCCrafting) tradeskills that should use the Blizzard frame
 Skillet.FollowerSkillList = {
-	[7411] = false,				-- enchanting follower for Illusions is broken in WoD release.
+	[7411] = false,     -- enchanting follower for Illusions is broken in WoD release.
+	[25229] = false,    -- jewelcrafting Apexis Gemcutter is fubar in 6.2
 }
--- Table of follower tradeskill headers that should use the Blizzard frame
--- Note: A true entry in Skillet.FollowerSkillList above will override this table
-Skillet.FollowerSkillHeader = {
-	[7411] = L["Illusions"],	-- enchanting follower for Illusions is broken in WoD release.
+--[[
+-- In case the previous table is too broad
+-- Table of follower (IsNPCCrafting) NPC IDs (from GUID) that should use the Blizzard frame 
+Skillet.FollowerNPC = {
 }
+]]--
 Skillet.TradeSkillAdditionalAbilities = {
 	[7411]  = {13262,"Disenchant"},     -- enchanting = disenchant
 	[2550]  = {818,"Basic_Campfire"},   -- cooking = basic campfire
@@ -209,7 +208,8 @@ Skillet.TradeSkillIgnoredMats = TradeSkillIgnoredMats
 
 Skillet.scrollData = {
 	-- Scraped from WoWhead using the following javascript:
-	-- for (i=0; i<listviewitems.length; i++) console.log("["+listviewitems[i].sourcemore[0].ti+"] = "+listviewitems[i].id+", -- "+listviewitems[i].name.substr(1));
+	-- for (i=0; i<listviewitems.length; i++) console.log("["+listviewitems[i].sourcemore[0].ti+"] = "+listviewitems[i].id+", 
+	-- "+listviewitems[i].name.substr(1));
 	[158914] = 110638, -- Enchant Ring - Gift of Critical Strike
 	[158915] = 110639, -- Enchant Ring - Gift of Haste
 	[158916] = 110640, -- Enchant Ring - Gift of Mastery
@@ -709,10 +709,7 @@ end
 
 -- Checks to see if the current trade is one that we support.
 function Skillet:IsSupportedTradeskill(tradeID)
-	if not tradeID or tradeID == 5419 or tradeID == 53428 then
-		return false				-- beast training, runeforging
-	end
-	if IsShiftKeyDown() then
+	if IsShiftKeyDown() or not tradeID or tradeID == 5419 or tradeID == 53428 then
 		return false
 	end
 	return true
@@ -721,6 +718,9 @@ end
 -- Checks to see if this trade follower can not use Skillet frame.
 function Skillet:IsNotSupportedFollower(tradeID)
 	if IsNPCCrafting() then
+		if IsShiftKeyDown() then
+			return true -- mostly for debugging
+		end
 		if not tradeID then
 			return true -- Unknown tradeskill, play it safe.
 		end
@@ -730,13 +730,15 @@ function Skillet:IsNotSupportedFollower(tradeID)
 		if Skillet.FollowerSkillList[tradeID] then
 			return true -- Doesn't matter what they craft.
 		end
-		if Skillet.FollowerSkillHeader[tradeID] then
-			local skillName, skillType, _, isExpanded = GetTradeSkillInfo(1)
-			DA.DEBUG(0,"tradeID= "..tostring(tradeID)..", skillName= "..tostring(skillName)..", skillType="..tostring(skillType)..", isExpanded= "..tostring(isExpanded))
-			if skillType == "header" and skillName == Skillet.FollowerSkillHeader[tradeID] then
-				return true -- If they craft things Skillet can't process
+--[[ 
+		local guid = UnitGUID("target")
+		if guid then
+			local gtype, zero, server_id, instance_id, zone_uid, npc_id, spawn_uid = strsplit("-",guid);
+			if gtype == "Creature" and Skillet.FollowerNPC[npc_id] then
+				return true -- If this NPC crafts things Skillet can't process
 			end
 		end
+]]--
 	end
 	return false
 end
@@ -752,19 +754,6 @@ local missingVendorItems = {
 	[3857]  = true,   			-- Coal
 }
 local specialVendorItems = {
-	[37101] = {1, 61978}, 			--Ivory Ink
-	[39469] = {1, 61978}, 			--Moonglow Ink
-	[39774] = {1, 61978}, 			--Midnight Ink
-	[43116] = {1, 61978}, 			--Lions Ink
-	[43118] = {1, 61978}, 			--Jadefire Ink
-	[43120] = {1, 61978}, 			--Celestial Ink
-	[43122] = {1, 61978}, 			--Shimmering Ink
-	[43124] = {1, 61978},  			--Ethereal Ink
-	[43126] = {1, 61978},  			--Ink of the Sea
-	[43127] = {10, 61978},  		--Snowfall Ink
-	[61981] = {10, 61978},  		--Inferno Ink
-}
-local specialVendorItemsMoP	 = {
 	[37101] = {1, 79254}, 			--Ivory Ink
 	[39469] = {1, 79254}, 			--Moonglow Ink
 	[39774] = {1, 79254}, 			--Midnight Ink
@@ -779,9 +768,6 @@ local specialVendorItemsMoP	 = {
 	[79255] = {10, 79254},  		--Starlight Ink
 }
 function Skillet:VendorItemAvailable(itemID)
-	if Skillet.wowVersion>50000 then
-		specialVendorItems = specialVendorItemsMoP
-	end
 	if specialVendorItems[itemID] then
 		local divider = specialVendorItems[itemID][1]
 		local currency = specialVendorItems[itemID][2]
@@ -800,9 +786,6 @@ end
 -- queries periodic table for vendor info for a particular itemID
 function Skillet:VendorSellsReagent(itemID)
 	if PT then
-		if Skillet.wowVersion>50000 then
-			specialVendorItems = specialVendorItemsMoP
-		end
 		if missingVendorItems[itemID] or specialVendorItems[itemID] then
 			return true
 		end
@@ -815,14 +798,8 @@ end
 -- resets the blizzard tradeskill search filters just to make sure no other addon has monkeyed with them
 function Skillet:ResetTradeSkillFilter()
 	DA.PROFILE("Skillet:ResetTradeSkillFilter()")
-	if (Skillet.wowVersion>50000) then
-		if not GetTradeSkillCategoryFilter(0) then
-			SetTradeSkillCategoryFilter(0, 1, 1)
-		end
-	else
-		if not GetTradeSkillSubClassFilter(0) then
-			SetTradeSkillSubClassFilter(0, 1, 1)
-		end
+	if not GetTradeSkillCategoryFilter(0) then
+		SetTradeSkillCategoryFilter(0, 1, 1)
 	end
 	SetTradeSkillItemNameFilter("")
 	SetTradeSkillItemLevelFilter(0,0)
@@ -1181,7 +1158,6 @@ end
 
 function Skillet:ScanTrade()
 	local tradeID
-	local API = {}
 	local link = GetTradeSkillListLink()
 	local profession, rank, maxRank = GetTradeSkillLine()
 	if link then
@@ -1189,17 +1165,6 @@ function Skillet:ScanTrade()
 	else
 		--DA.DEBUG(0,"GetTradeSkill: "..(profession or "nil").." non linkable")
 	end
-	API.GetNumSkills = GetNumTradeSkills
-	API.ExpandLine = ExpandTradeSkillSubClass
-	API.GetRecipeLink = GetTradeSkillRecipeLink
-	API.GetTools = GetTradeSkillTools
-	API.GetCooldown = GetTradeSkillCooldown
-	API.GetItemLink = GetTradeSkillItemLink
-	API.GetNumMade = GetTradeSkillNumMade
-	API.GetNumReagents = GetTradeSkillNumReagents
-	API.GetReagentInfo = GetTradeSkillReagentInfo
-	-- API.GetReagentLink = GetTradeSkillReagentItemLink
-	API.GetReagentLink = FixedGetTradeSkillReagentItemLink
 	-- get the tradeID from the profession name (data collected earlier).
 	tradeID = TradeSkillIDsByName[profession] or 2656	-- "mining" doesn't exist as a spell, so instead use smelting (id 2656)
 	if tradeID ~= Skillet.currentTrade then
@@ -1221,7 +1186,7 @@ function Skillet:ScanTrade()
 		Skillet.db.realm.tradeSkills[player][tradeID].maxRank = maxRank
 	end
 		self:ResetTradeSkillFilter() -- verify the search filter is blank (so we get all skills)
-	local numSkills = API.GetNumSkills()
+	local numSkills = GetNumTradeSkills()
 	DA.DEBUG(0,"Skillet:ScanTrade Expanding, "..tostring(profession)..":"..tostring(tradeID).." "..tostring(numSkills).." recipes")
 	for i = 1, numSkills do
 		local skillName, skillType, _, isExpanded = GetTradeSkillInfo(i)
@@ -1261,7 +1226,7 @@ function Skillet:ScanTrade()
 	Skillet.db.realm.tradeSkills[player][tradeID].maxRank = maxRank
 	local numHeaders = 0
 	local parentGroup
-	numSkills = API.GetNumSkills()
+	numSkills = GetNumTradeSkills()
 	DA.DEBUG(0,"Skillet:ScanTrade Scanning, "..tostring(profession)..":"..tostring(tradeID).." "..tostring(numSkills).." recipes")
 	for i = 1, numSkills, 1 do
 		repeat
@@ -1274,7 +1239,7 @@ function Skillet:ScanTrade()
 				if skillType == "header" or skillType == "subheader" then
 					numHeaders = numHeaders + 1
 					if not isExpanded then
-						API.ExpandLine(i)
+						ExpandTradeSkillSubClass(i)
 					end
 					local groupName
 					if groupList[skillName] then
@@ -1295,11 +1260,11 @@ function Skillet:ScanTrade()
 						Skillet:RecipeGroupAddSubGroup(parentGroup, currentGroup, i)
 					end
 				else
-					local recipeLink = API.GetRecipeLink(i)
+					local recipeLink = GetTradeSkillRecipeLink(i)
 					local recipeID = Skillet:GetItemIDFromLink(recipeLink)
 					local noRecipe = false
 					if not recipeID then
-						recipeLink = API.GetItemLink(i)
+						recipeLink = GetTradeSkillItemLink(i)
 						recipeID = Skillet:GetItemIDFromLink(recipeLink)
 						if not recipeID then
 							gotNil = true
@@ -1321,14 +1286,14 @@ function Skillet:ScanTrade()
 					skillData[i].color = skill_style_type[skillType]
 					skillData[i].category = lastHeader
 					local skillDBString = DifficultyChar[skillType]..recipeID
-					local tools = { API.GetTools(i) }
+					local tools = { GetTradeSkillTools(i) }
 					skillData[i].tools = {}
 					local slot = 1
 					for t=2,#tools,2 do
 						skillData[i].tools[slot] = (tools[t] or 0)
 						slot = slot + 1
 					end
-					local cd = API.GetCooldown(i)
+					local cd = GetTradeSkillCooldown(i)
 					if cd then
 						skillData[i].cooldown = cd + time()		-- this is when your cooldown will be up
 						skillDBString = skillDBString.." cd=" .. cd + time()
@@ -1368,7 +1333,7 @@ function Skillet:ScanTrade()
 								toolString = toolString..":"..string.gsub(tools[t]," ", "_")
 							end
 						end
-						local itemLink = API.GetItemLink(i)
+						local itemLink = GetTradeSkillItemLink(i)
 						if not itemLink then
 							gotNil = true
 							break
@@ -1376,7 +1341,7 @@ function Skillet:ScanTrade()
 						local itemString = "0"
 						if GetItemInfo(itemLink) then
 							local itemID = Skillet:GetItemIDFromLink(itemLink)
-							local minMade,maxMade = API.GetNumMade(i)
+							local minMade,maxMade = GetTradeSkillNumMade(i)
 							recipe.itemID = itemID
 							recipe.numMade = (minMade + maxMade)/2
 							if recipe.numMade > 1 then
@@ -1398,11 +1363,11 @@ function Skillet:ScanTrade()
 						end
 						local reagentString = "-"
 						local reagentData = {}
-						for j=1, API.GetNumReagents(i), 1 do
-							local reagentName, _, numNeeded = API.GetReagentInfo(i,j)
+						for j=1, GetTradeSkillNumReagents(i), 1 do
+							local reagentName, _, numNeeded = GetTradeSkillReagentInfo(i,j)
 							local reagentID = 0
 							if reagentName then
-								local reagentLink = API.GetReagentLink(i,j)
+								local reagentLink = GetTradeSkillReagentItemLink(i,j)
 								reagentID = Skillet:GetItemIDFromLink(reagentLink)
 							else
 								gotNil = true
