@@ -48,6 +48,7 @@ DA.DebugLevel = 1
 DA.TableDump = false
 DA.TraceShow = false
 DA.TraceLog = false
+DA.ProfileShow = false
 DA.DebugLog = {} -- Add to SavedVariables for debugging
 DA.MAXDEBUG = 2000
 DA.DebugProfile = {} -- Add to SavedVariables for debugging
@@ -266,6 +267,9 @@ function DA.PROFILE(text)
 	if (table.getn(DA.DebugProfile) > DA.MAXPROFILE) then
 		table.remove(DA.DebugProfile, 1)
 	end
+	if (DA.ProfileShow) then
+		DA.CHAT(DA.DEBUG_COLOR..addonName..": "..text)
+	end
 	if DA.DebugLogging then
 		table.insert(DA.DebugLog, now.."(P): "..tostring(text))
 		if (table.getn(DA.DebugLog) > DA.MAXDEBUG) then
@@ -274,10 +278,16 @@ function DA.PROFILE(text)
 	end
 end
 
+-- Convert a link into a printable string
+function DA.PLINK(text)
+	return text:gsub('\124','\124\124')
+end
+
 function DA.DebugAidsStatus()
 	print("WarnShow= "..tostring(DA.WarnShow)..", WarnLog= "..tostring(DA.WarnLog))
 	print("DebugShow= "..tostring(DA.DebugShow)..", DebugLogging= "..tostring(DA.DebugLogging)..", DebugLevel= "..tostring(DA.DebugLevel))
 	print("TraceShow= "..tostring(DA.TraceShow)..", TraceLog= "..tostring(DA.TraceLog))
+	print("ProfileShow= "..tostring(DA.ProfileShow))
 	print("TableDump= "..tostring(DA.TableDump))
 	print("#DebugLog= "..tostring(#DA.DebugLog))
 	print("#DebugProfile= "..tostring(#DA.DebugProfile))

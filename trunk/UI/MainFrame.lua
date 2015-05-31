@@ -2541,13 +2541,13 @@ function Skillet:ReAnchorButtons(newFrame)
 end
 
 function Skillet:ShowReagentDetails()
-		SkilletQueueManagementParent:Hide();
-		SkilletViewCraftersParent:Hide()
-		SkilletReagentParent:Show()
-		SkilletReagentParent:SetHeight(260)
-		SkilletQueueManagementParent:SetHeight(260)
-		SkilletViewCraftersParent:SetHeight(260)
-		Skillet:ReAnchorButtons(SkilletReagentParent)
+	SkilletQueueManagementParent:Hide();
+	SkilletViewCraftersParent:Hide()
+	SkilletReagentParent:Show()
+	SkilletReagentParent:SetHeight(260)
+	SkilletQueueManagementParent:SetHeight(260)
+	SkilletViewCraftersParent:SetHeight(260)
+	Skillet:ReAnchorButtons(SkilletReagentParent)
 end
 
 function Skillet:QueueManagementToggle(showDetails)
@@ -2575,24 +2575,27 @@ function Skillet:ViewCraftersClicked()
 end
 
 function Skillet:SkilletShowGuildCrafters()
+	DA.DEBUG(0,"SkilletShowGuildCrafters()")
 	if ( self.queriedSkill == self.selectedSkill ) then
 		Skillet:ShowViewCrafters()
 	end
 end
 
 function Skillet:ShowViewCrafters()
-		SkilletQueueManagementParent:SetHeight(260)
-		SkilletQueueManagementParent:Hide();
-		SkilletViewCraftersParent:SetHeight(260)
-		SkilletViewCraftersParent:Show()
-		SkilletReagentParent:SetHeight(260)
-		SkilletReagentParent:Hide()
-		Skillet:ReAnchorButtons(SkilletViewCraftersParent)
-		SkilletViewCraftersScrollFrameScrollBar:SetValue(0);
-		Skillet.ViewCraftersUpdate()
+	--DA.DEBUG(0,"ShowViewCrafters()")
+	SkilletQueueManagementParent:SetHeight(260)
+	SkilletQueueManagementParent:Hide();
+	SkilletViewCraftersParent:SetHeight(260)
+	SkilletViewCraftersParent:Show()
+	SkilletReagentParent:SetHeight(260)
+	SkilletReagentParent:Hide()
+	Skillet:ReAnchorButtons(SkilletViewCraftersParent)
+	SkilletViewCraftersScrollFrameScrollBar:SetValue(0);
+	Skillet.ViewCraftersUpdate()
 end
 
 function Skillet:ViewCraftersToggle(showDetails)
+	--DA.DEBUG(0,"ViewCraftersToggle("..tostring(showDetails)..")")
 	if SkilletViewCraftersParent:IsVisible() or showDetails then
 		Skillet:ShowReagentDetails()
 	else
@@ -2605,8 +2608,8 @@ function Skillet.ViewCraftersUpdate()
 	local offset = FauxScrollFrame_GetOffset(SkilletViewCraftersScrollFrame);
 	local index, button, name, online;
 	local SKILLET_CRAFTERS_DISPLAYED = 15
-		--DA.DEBUG(0, "Skillet.ViewCraftersUpdate "..numMembers.." - "..offset)
-		for i = 1, SKILLET_CRAFTERS_DISPLAYED, 1 do
+	--DA.DEBUG(0, "Skillet.ViewCraftersUpdate "..numMembers.." - "..offset)
+	for i = 1, SKILLET_CRAFTERS_DISPLAYED, 1 do
 		index = i + offset;
 		button = _G["SkilletGuildCrafter"..i];
 		if ( index > numMembers ) then

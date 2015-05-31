@@ -651,6 +651,19 @@ Skillet.options =
 			end,
 			order = 88
 		},
+		ProfileShow = {
+			type = "toggle",
+			name = "ProfileShow",
+			desc = "Option for debugging",
+			get = function()
+				return Skillet.db.profile.ProfileShow
+			end,
+			set = function(self,value)
+				Skillet.db.profile.ProfileShow = value
+				Skillet.ProfileShow = value
+			end,
+			order = 89
+		},
 		ClearDebugLog = {
 			type = "execute",
 			name = "ClearDebugLog",
@@ -659,7 +672,16 @@ Skillet.options =
 				SkilletDBPC = {}
 				DA.DebugLog = SkilletDBPC
 			end,
-			order = 89
+			order = 90
+		},
+		DebugStatus = {
+			type = 'execute',
+			name = "DebugStatus",
+			desc = "Print Debug Status",
+			func = function()
+				DA.DebugAidsStatus()
+			end,
+			order = 91
 		},
 
 		reset = {
@@ -810,6 +832,7 @@ function Skillet:OnInitialize()
 	Skillet.TableDump = Skillet.db.profile.TableDump
 	Skillet.TraceShow = Skillet.db.profile.TraceShow
 	Skillet.TraceLog = Skillet.db.profile.TraceLog
+	Skillet.ProfileShow = Skillet.db.profile.ProfileShow
 	--
 	Skillet:InitializePlugins()
 end
@@ -958,6 +981,7 @@ function Skillet:OnEnable()
 	-- Trade skill window changes
 	self:RegisterEvent("TRADE_SKILL_CLOSE", "SkilletClose")
 	self:RegisterEvent("TRADE_SKILL_SHOW", "SkilletShow")
+	self:RegisterEvent("TRADE_SKILL_NAME_UPDATE")
 	self:RegisterEvent("GUILD_RECIPE_KNOWN_BY_MEMBERS", "SkilletShowGuildCrafters")
 	-- TODO: Tracks when the number of items on hand changes
 	self:RegisterEvent("BAG_UPDATE") -- Fires for both bag and bank updates.
@@ -1010,6 +1034,13 @@ function Skillet:PLAYER_LOGOUT()
 	end
 end
 
+function Skillet:TRADE_SKILL_NAME_UPDATE()
+	DA.DEBUG(0,"TRADE_SKILL_NAME_UPDATE")
+	if Skillet.linkedSkill then
+		Skillet:SkilletShow()
+	end
+end
+
 -- Called when the addon is disabled
 function Skillet:OnDisable()
 	DA.DEBUG(0,"Skillet:OnDisable()");
@@ -1018,30 +1049,37 @@ function Skillet:OnDisable()
 end
 
 function Skillet:IsTradeSkillLinked()
-	if IsTradeSkillLinked() or (IsTradeSkillGuild and IsTradeSkillGuild()) then
-		local guildSkills = IsTradeSkillGuild and IsTradeSkillGuild()
-		local _, linkedPlayer = IsTradeSkillLinked()
+	local isGuild = IsTradeSkillGuild()
+	local isLinked, linkedPlayer = IsTradeSkillLinked()
+	DA.DEBUG(0,"IsTradeSkillLinked, isGuild="..tostring(isGuild)..", isLinked="..tostring(isLinked)..", linkedPlayer="..tostring(linkedPlayer))
+	if isLinked or isGuild then
 		if not linkedPlayer then
-			if guildSkills then
+			if isGuild then
 				linkedPlayer = "Guild Recipes"
-			else
-				return
 			end
 		end
-		--DA.DEBUG(0,"IsTradeSkillLinked Player "..linkedPlayer);
-		return true, linkedPlayer, (IsTradeSkillGuild and IsTradeSkillGuild())
+		return true, linkedPlayer, isGuild
 	end
-	return false, nil
+	return false, nil, false
 end
 
 -- show the tradeskill window
--- only gets called from TRADE_SKILL_SHOW and CRAFT_SHOW events
+-- only gets called from TRADE_SKILL_SHOW event
 -- this means, the skill being shown is for the main toon (not an alt)
 function Skillet:SkilletShow()
-	DA.DEBUG(1,"SHOW WINDOW (was showing "..(self.currentTrade or "nil")..")");
+	DA.DEBUG(0,"SkilletShow, (was showing "..(self.currentTrade or "nil")..")");
+	if PandaPanel and PandaPanel:IsShown() then
+		return
+	end
 	TradeSkillFrame_Update();
-	self.linkedSkill, self.currentPlayer = Skillet:IsTradeSkillLinked()
-	if not self.linkedSkill then
+	self.linkedSkill, self.currentPlayer, self.isGuild = Skillet:IsTradeSkillLinked()
+	if self.linkedSkill then
+		if not self.isGuild then
+			if not self.currentPlayer then
+				return -- Wait for TRADE_SKILL_NAME_UPDATE
+			end
+		end
+	else
 		self.currentPlayer = (UnitName("player"))
 	end
 	self.currentTrade = self.tradeSkillIDsByName[(GetTradeSkillLine())] or 2656      -- smelting caveat
@@ -1054,7 +1092,6 @@ function Skillet:SkilletShow()
 	else
 		if self:IsSupportedTradeskill(self.currentTrade) then
 			self:InventoryScan()
-			DA.DEBUG(1,"SkilletShow: "..self.currentTrade)
 			self.selectedSkill = nil
 			self.dataScanned = false
 			self:ScheduleTimer("SkilletShowWindow", 0.5)
@@ -1067,24 +1104,28 @@ function Skillet:SkilletShow()
 end
 
 function Skillet:SkilletShowWindow()
-		if IsControlKeyDown() then
-			self.db.realm.skillDB[self.currentPlayer][self.currentTrade] = {}
-		end
-		self:RescanTrade()
-		self.currentGroup = nil
-		self.currentGroupLabel = self:GetTradeSkillOption("grouping")
-		self:RecipeGroupDropdown_OnShow()
-		self:ShowTradeSkillWindow()
-		local filterbox = _G["SkilletFilterBox"]
-		local oldtext = filterbox:GetText()
-		local filterText = self:GetTradeSkillOption("filtertext")
-		-- if the text is changed, set the new text (which fires off an update) otherwise just do the update
-		if filterText ~= oldtext then
-			filterbox:SetText(filterText)
-		else
-			self:UpdateTradeSkillWindow()
-		end
-		self.dataSource = "api"
+	DA.DEBUG(0,"SkilletShowWindow, (was showing "..(self.currentTrade or "nil")..")");
+	if IsControlKeyDown() then
+		self.db.realm.skillDB[self.currentPlayer][self.currentTrade] = {}
+	end
+	if not self:RescanTrade() then
+		DA.CHAT("No headers, try again");
+		return
+	end
+	self.currentGroup = nil
+	self.currentGroupLabel = self:GetTradeSkillOption("grouping")
+	self:RecipeGroupDropdown_OnShow()
+	self:ShowTradeSkillWindow()
+	local filterbox = _G["SkilletFilterBox"]
+	local oldtext = filterbox:GetText()
+	local filterText = self:GetTradeSkillOption("filtertext")
+	-- if the text is changed, set the new text (which fires off an update) otherwise just do the update
+	if filterText ~= oldtext then
+		filterbox:SetText(filterText)
+	else
+		self:UpdateTradeSkillWindow()
+	end
+	self.dataSource = "api"
 end
 
 function Skillet:SkilletClose()
@@ -1172,7 +1213,7 @@ function Skillet:SetTradeSkill(player, tradeID, skillIndex)
 			self.currentGroupLabel = self:GetTradeSkillOption("grouping")
 			self:RecipeGroupDropdown_OnShow()
 			DA.DEBUG(0,"cast: "..self:GetTradeName(tradeID))
-			CastSpellByName(self:GetTradeName(tradeID)) -- this will trigger the whole rescan process via a TRADE_SKILL_SHOW/CRAFT_SHOW event
+			CastSpellByName(self:GetTradeName(tradeID)) -- this will trigger the whole rescan process via a TRADE_SKILL_SHOW event
 		else
 			self.dataSource = "cache"
 			CloseTradeSkill()

@@ -1077,6 +1077,7 @@ function Skillet:Skillet_AutoRescan()
 end
 
 function Skillet:TRADE_SKILL_UPDATE()
+	DA.DEBUG(0,"TRADE_SKILL_UPDATE")
 	if not Skillet.scanInProgress and not self.auto_rescan_timer then
 		self.auto_rescan_timer = self:ScheduleTimer("Skillet_AutoRescan", 0.5)
 	end
@@ -1161,9 +1162,9 @@ function Skillet:ScanTrade()
 	local link = GetTradeSkillListLink()
 	local profession, rank, maxRank = GetTradeSkillLine()
 	if link then
-		--DA.DEBUG(0,"GetTradeSkill: "..(profession or "nil").." link="..link.." "..string.gsub(link, "\124", "\124\124"))
+		DA.DEBUG(0,"GetTradeSkill: "..tostring(profession).." link="..link.." "..DA.PLINK(link))
 	else
-		--DA.DEBUG(0,"GetTradeSkill: "..(profession or "nil").." non linkable")
+		DA.DEBUG(0,"GetTradeSkill: "..tostring(profession).." non linkable")
 	end
 	-- get the tradeID from the profession name (data collected earlier).
 	tradeID = TradeSkillIDsByName[profession] or 2656	-- "mining" doesn't exist as a spell, so instead use smelting (id 2656)
@@ -1185,7 +1186,7 @@ function Skillet:ScanTrade()
 		Skillet.db.realm.tradeSkills[player][tradeID].rank = rank
 		Skillet.db.realm.tradeSkills[player][tradeID].maxRank = maxRank
 	end
-		self:ResetTradeSkillFilter() -- verify the search filter is blank (so we get all skills)
+	self:ResetTradeSkillFilter() -- verify the search filter is blank (so we get all skills)
 	local numSkills = GetNumTradeSkills()
 	DA.DEBUG(0,"Skillet:ScanTrade Expanding, "..tostring(profession)..":"..tostring(tradeID).." "..tostring(numSkills).." recipes")
 	for i = 1, numSkills do
@@ -1229,7 +1230,10 @@ function Skillet:ScanTrade()
 	numSkills = GetNumTradeSkills()
 	DA.DEBUG(0,"Skillet:ScanTrade Scanning, "..tostring(profession)..":"..tostring(tradeID).." "..tostring(numSkills).." recipes")
 	for i = 1, numSkills, 1 do
+		local repeatcount = 0
 		repeat
+			repeatcount = repeatcount + 1
+			DA.DEBUG(1,"Skillet:ScanTrade Repeating, "..tostring(repeatcount))
 			local skillName, skillType, isExpanded, subSpell, extra
 			local skillName, skillType, _, isExpanded, _, _, _, _, _, _, _, displayAsUnavailable, _ = GetTradeSkillInfo(i);
 			if i == 1 and skillType == "subheader" then skillType = "header" end --**-- workaround for Blizzard bug in 6.02
