@@ -59,7 +59,7 @@ DA.TRACE_COLOR  = "|c0000FFA0"
 DA.WARN_COLOR   = "|c0000FFE0"
 
 function DA.CHAT(text)
-	print(DA.STATUS_COLOR..text)
+	print(DA.STATUS_COLOR..addonName..": "..text)
 end
 
 function DA.WARN(...)
@@ -96,7 +96,7 @@ function DA.WARN(...)
 		end
 	end
 	if (DA.WarnShow) then
-		DA.CHAT(DA.WARN_COLOR..addonName..": "..text)
+		print(DA.WARN_COLOR..addonName..": "..text)
 	end
 	table.insert(DA.DebugLog,date().."(W): "..text)
 	if (table.getn(DA.DebugLog) > DA.MAXDEBUG) then
@@ -153,7 +153,7 @@ function DA.DEBUG(...)
 	elseif dlevel < 1 then dlevel = 1
 	elseif dlevel > 9 then dlevel = 10 end
 	if (DA.DebugShow and level < dlevel) then
-		DA.CHAT(DA.DEBUG_COLOR..addonName..": "..text)
+		print(DA.DEBUG_COLOR..addonName..": "..text)
 	end
 	table.insert(DA.DebugLog,date().."(D"..level.."): "..text)
 	if (table.getn(DA.DebugLog) > DA.MAXDEBUG) then
@@ -195,7 +195,7 @@ function DA.TRACE(...)
 		end
 	end
 	if (DA.TraceShow) then
-		DA.CHAT(DA.TRACE_COLOR..addonName..": "..text)
+		print(DA.TRACE_COLOR..addonName..": "..text)
 	end
 	table.insert(DA.DebugLog,date().."(T): "..text)
 	if (table.getn(DA.DebugLog) > DA.MAXDEBUG) then
@@ -268,7 +268,7 @@ function DA.PROFILE(text)
 		table.remove(DA.DebugProfile, 1)
 	end
 	if (DA.ProfileShow) then
-		DA.CHAT(DA.DEBUG_COLOR..addonName..": "..text)
+		print(DA.DEBUG_COLOR..addonName..": "..text)
 	end
 	if DA.DebugLogging then
 		table.insert(DA.DebugLog, now.."(P): "..tostring(text))
@@ -319,6 +319,8 @@ function DA.Command(msg)
 		DA.Trace()                        -- Undocumented: Enable trace output
 	elseif(command == "tlog") then
 		DA.TraceL()                       -- Undocumented: Clear debug storage
+	elseif(command == "profile") then
+		DA.Profile()                        -- Undocumented: Enable trace output
 	elseif(command == "clear") then
 		DA.ClearDebugLog()                -- Undocumented: Clear debug storage
 	end
@@ -408,6 +410,15 @@ function DA.TraceL()
 		DA.CHAT("Trace logging enabled.")
 	else
 		DA.CHAT("Trace logging disabled.")
+	end
+end
+
+function DA.Profile()
+	DA.ProfileShow = not DA.ProfileShow
+	if (DA.ProfileShow) then
+		DA.CHAT("Profile output enabled.")
+	else
+		DA.CHAT("Profile output disabled.")
 	end
 end
 
