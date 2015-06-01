@@ -1233,7 +1233,9 @@ function Skillet:ScanTrade()
 		local repeatcount = 0
 		repeat
 			repeatcount = repeatcount + 1
-			DA.DEBUG(1,"Skillet:ScanTrade Repeating, "..tostring(repeatcount))
+			if repeatcount > 1 then
+				DA.DEBUG(0,"Skillet:ScanTrade Repeating, "..tostring(repeatcount))
+			end
 			local skillName, skillType, isExpanded, subSpell, extra
 			local skillName, skillType, _, isExpanded, _, _, _, _, _, _, _, displayAsUnavailable, _ = GetTradeSkillInfo(i);
 			if i == 1 and skillType == "subheader" then skillType = "header" end --**-- workaround for Blizzard bug in 6.02
