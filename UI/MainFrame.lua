@@ -1237,7 +1237,7 @@ function Skillet:SkillButton_OnEnter(button)
 		if not reagent then
 			break
 		end
-		local numInBags, numCraftable, numInBank, numCraftableBank = self:GetInventory(self.currentPlayer, reagent.id)
+		local numInBags, numInBank, numCraftable, numCraftableBank = self:GetInventory(self.currentPlayer, reagent.id)
 		local itemName = GetItemInfo(reagent.id) or reagent.id
 		local text
 		if self:VendorSellsReagent(reagent.id) then
@@ -1307,7 +1307,7 @@ function Skillet:SetReagentToolTip(reagentID, numNeeded, numCraftable)
 			end
 		end
 	end
-	local _, inBags, _, inBank = self:GetInventory(self.currentPlayer, reagentID)
+	local inBags, inBank = self:GetInventory(self.currentPlayer, reagentID)
 	local surplus = inBank - numNeeded * numCraftable
 	if inBank < 0 then
 		GameTooltip:AddDoubleLine("in shopping list:",(-inBank),1,1,0)
@@ -1495,7 +1495,7 @@ function Skillet:UpdateDetailsWindow(skillIndex)
 			else
 				reagentName = "unknown"
 			end
-			local _, num, _, numBank = self:GetInventory(self.currentPlayer, reagent.id)
+			local num, numBank = self:GetInventory(self.currentPlayer, reagent.id)
 			local count_text = string.format("[%d/%d]", num, numBank)
 			if numBank < reagent.numNeeded then
 				-- grey it out if we don't have it

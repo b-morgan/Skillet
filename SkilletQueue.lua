@@ -87,9 +87,11 @@ function Skillet:QueueAppendCommand(command, queueCraftables, noWindowRefresh)
 			local reagent = recipe.reagentData[i]
 			DA.DEBUG(1,"reagent= "..DA.DUMP1(reagent))
 			local need = count * reagent.numNeeded
-			local numInBags, bagsCraft, numInBank, bankCraft = Skillet:GetInventory(Skillet.currentPlayer, reagent.id)
-			DA.DEBUG(1,"numBags= "..numInBags..", craftBags= "..bagsCraft..", numInBank= "..numInBank..", craftBank= "..bankCraft)
-			local have = numInBags + numInBank + (reagentsInQueue[reagent.id] or 0);
+			local numInBoth = GetItemCount(reagent.id,true)
+			local numInBags = GetItemCount(reagent.id)
+			local numInBank =  numInBoth - numInBags
+			DA.DEBUG(1,"numInBoth= "..tostring(numInBoth)..", numInBags="..tostring(numInBags)..", numInBank="..tostring(numInBank))
+			local have = numInBoth + (reagentsInQueue[reagent.id] or 0);
 			reagentsInQueue[reagent.id] = (reagentsInQueue[reagent.id] or 0) - need;
 			reagentsChanged[reagent.id] = true
 			DA.DEBUG(1,"queueCraftables= "..tostring(queueCraftables)..", need= "..tostring(need)..", have= "..tostring(have))

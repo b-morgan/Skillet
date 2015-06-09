@@ -772,10 +772,10 @@ function Skillet:VendorItemAvailable(itemID)
 	if specialVendorItems[itemID] then
 		local divider = specialVendorItems[itemID][1]
 		local currency = specialVendorItems[itemID][2]
-		local reagentAvailability, _, reagentAvailabilityBank = self:GetInventory(self.currentPlayer, currency)
+		local reagentAvailability, reagentAvailabilityBank = self:GetInventory(self.currentPlayer, currency)
 		local reagentAvailabilityAlts = 0
 		for player in pairs(self.db.realm.inventoryData) do
-			local _,_, altBank = self:GetInventory(player, currency)
+			local _, altBank = self:GetInventory(player, currency)
 			reagentAvailabilityAlts = reagentAvailabilityAlts + (altBank or 0)
 		end
 		return math.floor(reagentAvailability / divider), math.floor(reagentAvailabilityBank / divider), math.floor(reagentAvailabilityAlts / divider)
