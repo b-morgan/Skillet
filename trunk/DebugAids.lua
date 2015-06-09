@@ -280,7 +280,10 @@ end
 
 -- Convert a link into a printable string
 function DA.PLINK(text)
-	return text:gsub('\124','\124\124')
+	if text then
+		return text:gsub('\124','\124\124')
+	end
+	return nil
 end
 
 function DA.DebugAidsStatus()
