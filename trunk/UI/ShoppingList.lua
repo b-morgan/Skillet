@@ -210,7 +210,7 @@ function Skillet:GetShoppingList(player, includeBank, includeGuildbank)
 				local numInBags, numInBank, numInBagsCurrent, numInBankCurrent, numGuildbank = 0,0,0,0,0
 				local _
 				if not usedInventory[player][id] then
-					numInBags, _, numInBank = self:GetInventory(player, id)
+					numInBags, numInBank = self:GetInventory(player, id)
 				end
 				DA.DEBUG(2,"numInBags= "..numInBags..", numInBank= "..numInBank)
 				if numInBags + numInBank > 0 then
@@ -218,7 +218,7 @@ function Skillet:GetShoppingList(player, includeBank, includeGuildbank)
 				end
 				if player ~= self.currentPlayer then
 					if not usedInventory[curPlayer] then
-						numInBagsCurrent, _, numInBankCurrent = self:GetInventory(curPlayer, id)
+						numInBagsCurrent, numInBankCurrent = self:GetInventory(curPlayer, id)
 					end
 					DA.DEBUG(2,"numInBagsCurrent= "..numInBagsCurrent..", numInBankCurrent= "..numInBankCurrent)
 					if numInBagsCurrent + numInBankCurrent > 0 then

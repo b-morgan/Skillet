@@ -155,7 +155,8 @@ function Skillet:GetTradeSkillReagentInfo(skillIndex, reagentIndex)
 		local reagentName = GetItemInfo(reagentID)
 		local reagentTexture = GetItemIcon(reagentID)
 		local reagentCount = recipe.reagentData[reagentIndex].numNeeded
-		local _,playerReagentCount = self:GetInventory(reagentID)
+		local playerInBags, playerInBank = self:GetInventory(reagentID)
+		local playerReagentCount = playerReagentCount + playerReagentCount
 		return reagentName, reagentTexture, reagentCount, playerReagentCount
 	end
 end
