@@ -191,18 +191,19 @@ local TradeSkillIgnoredMats  = {
 	[118239] = 1 , -- sha shatter
 	[118238] = 1 , -- ethereal shard shatter
 	[118237] = 1 , -- mysterious diffusion
-	[181637] = 1 , -- transmute-sorcerous-air-to-earth
-	[181633] = 1 , -- transmute-sorcerous-air-to-fire
-	[181636] = 1 , -- transmute-sorcerous-air-to-water
-	[181631] = 1 , -- transmute-sorcerous-earth-to-air
-	[181632] = 1 , -- transmute-sorcerous-earth-to-fire
-	[181635] = 1 , -- transmute-sorcerous-earth-to-water
-	[181627] = 1 , -- transmute-sorcerous-fire-to-air
-	[181625] = 1 , -- transmute-sorcerous-fire-to-earth
-	[181628] = 1 , -- transmute-sorcerous-fire-to-water
-	[181630] = 1 , -- transmute-sorcerous-water-to-air
-	[181629] = 1 , -- transmute-sorcerous-water-to-earth
-	[181634] = 1 , -- transmute-sorcerous-water-to-fire
+	[181637] = 1 , -- Transmute: Sorcerous-air-to-earth
+	[181633] = 1 , -- Transmute: Sorcerous-air-to-fire
+	[181636] = 1 , -- Transmute: Sorcerous-air-to-water
+	[181631] = 1 , -- Transmute: Sorcerous-earth-to-air
+	[181632] = 1 , -- Transmute: Sorcerous-earth-to-fire
+	[181635] = 1 , -- Transmute: Sorcerous-earth-to-water
+	[181627] = 1 , -- Transmute: Sorcerous-fire-to-air
+	[181625] = 1 , -- Transmute: Sorcerous-fire-to-earth
+	[181628] = 1 , -- Transmute: Sorcerous-fire-to-water
+	[181630] = 1 , -- Transmute: Sorcerous-water-to-air
+	[181629] = 1 , -- Transmute: Sorcerous-water-to-earth
+	[181634] = 1 , -- Transmute: Sorcerous-water-to-fire
+	[181643] = 1 , -- Transmute: Savage Blood
 }
 Skillet.TradeSkillIgnoredMats = TradeSkillIgnoredMats
 
@@ -1357,6 +1358,7 @@ function Skillet:ScanTrade()
 							end
 							Skillet:ItemDataAddRecipeSource(itemID,recipeID) -- add a cross reference for the source of particular items
 						else
+							-- DA.DEBUG(2,"recipeID= "..tostring(recipeID)..", itemLink="..tostring(DA.PLINK(itemLink)))
 							recipe.numMade = 1
 							if Skillet.scrollData[recipeID] then
 								local itemID = Skillet.scrollData[recipeID]
