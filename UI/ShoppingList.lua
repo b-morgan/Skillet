@@ -1,7 +1,9 @@
 local addonName,addonTable = ...
 local DA = _G[addonName] -- for DebugAids.lua
 --[[
+
 Skillet: A tradeskill window replacement.
+Copyright (c) 2007 Robert Clark <nogudnik@gmail.com>
 
 This program is free software: you can redistribute it and/or modify
 it under the terms of the GNU General Public License as published by
@@ -15,6 +17,7 @@ GNU General Public License for more details.
 
 You should have received a copy of the GNU General Public License
 along with this program.  If not, see <http://www.gnu.org/licenses/>.
+
 ]]--
 
 --[[
@@ -123,7 +126,7 @@ local function createShoppingListFrame(self)
 	local shoppingListLocation = {
 		prefix = "shoppingListLocation_"
 	}
-	windowManger.RegisterConfig(frame, self.db.profile, shoppingListLocation)
+	windowManger.RegisterConfig(frame, self.db.char, shoppingListLocation)
 	windowManger.RestorePosition(frame)  -- restores scale also
 	windowManger.MakeDraggable(frame)
 	-- lets play the resize me game!
@@ -169,7 +172,7 @@ function Skillet:ClearShoppingList(player)
 end
 
 function Skillet:GetShoppingList(player, includeBank, includeGuildbank)
-	DA.DEBUG(0,"GetShoppingList("..tostring(player)..", "..tostring(includeBank)..", "..tostring(includeGuildbank)..")")
+	DA.DEBUG(0,"GetShoppingList(",player,includeBank,includeGuildbank,")")
 	self:InventoryScan()
 	if not Skillet.db.global.cachedGuildbank then
 		Skillet.db.global.cachedGuildbank = {}
@@ -210,7 +213,7 @@ function Skillet:GetShoppingList(player, includeBank, includeGuildbank)
 				local numInBags, numInBank, numInBagsCurrent, numInBankCurrent, numGuildbank = 0,0,0,0,0
 				local _
 				if not usedInventory[player][id] then
-					numInBags, numInBank = self:GetInventory(player, id)
+					numInBags, _, numInBank = self:GetInventory(player, id)
 				end
 				DA.DEBUG(2,"numInBags= "..numInBags..", numInBank= "..numInBank)
 				if numInBags + numInBank > 0 then
@@ -218,7 +221,7 @@ function Skillet:GetShoppingList(player, includeBank, includeGuildbank)
 				end
 				if player ~= self.currentPlayer then
 					if not usedInventory[curPlayer] then
-						numInBagsCurrent, numInBankCurrent = self:GetInventory(curPlayer, id)
+						numInBagsCurrent, _, numInBankCurrent = self:GetInventory(curPlayer, id)
 					end
 					DA.DEBUG(2,"numInBagsCurrent= "..numInBagsCurrent..", numInBankCurrent= "..numInBankCurrent)
 					if numInBagsCurrent + numInBankCurrent > 0 then
@@ -270,8 +273,13 @@ local function indexBank()
 -- bank contains detailed contents of each tab,slot which 
 -- is only needed while the bank is open.
 --
+-- reagentbank contains a count by item, usable (and adjustable)
+-- when the bank is closed.
+--
 	bank = {}
 	local player = Skillet.currentPlayer
+	Skillet.db.realm.reagentBank[player] = {}
+	local reagentbank = Skillet.db.realm.reagentBank[player]
 	local bankBags = {-1,5,6,7,8,9,10,11,-3}
 	for _, container in pairs(bankBags) do
 		for i = 1, GetContainerNumSlots(container), 1 do
@@ -286,6 +294,10 @@ local function indexBank()
 						["id"]  = id,
 						["count"] = count,
 					})
+					if not reagentbank[id] then
+						reagentbank[id] = 0
+					end
+					reagentbank[id] = reagentbank[id] + count
 				end
 			end
 		end
@@ -541,8 +553,8 @@ local function processBankQueue(where)
 				local v = queueitem["list"]
 				local i = queueitem["i"]
 				local item = queueitem["item"]
-				--DA.DEBUG(3,"j=",j,", v=",DA.DUMP1(v))
-				--DA.DEBUG(3,"i=",i,", item=",DA.DUMP1(item))
+--				DA.DEBUG(3,"j=",j,", v=",DA.DUMP1(v))
+--				DA.DEBUG(3,"i=",i,", item=",DA.DUMP1(item))
 				Skillet.gotBankEvent = false
 				Skillet.gotBagUpdateEvent = false
 				local moved = getItemFromBank(id, item.bag, item.slot, v.count)
@@ -661,13 +673,6 @@ function Skillet:BAG_UPDATE_DELAYED(event)
 		Skillet.gotBagUpdateEvent = true
 		if Skillet.gotGuildbankEvent and Skillet.gotBagUpdateEvent then
 			processGuildQueue("bag update")
-		end
-	end
-	if Skillet.processingCount then
-		Skillet.processingCount = Skillet.processingCount - 1
-		if Skillet.processingCount == 0 then
-			Skillet:AdjustInventory()
-			Skillet.processingCount = nil
 		end
 	end
 end

@@ -2,21 +2,18 @@ local addonName,addonTable = ...
 local DA = _G[addonName] -- for DebugAids.lua
 --[[
 Skillet: A tradeskill window replacement.
-
+Copyright (c) 2007 Robert Clark <nogudnik@gmail.com>
 This program is free software: you can redistribute it and/or modify
 it under the terms of the GNU General Public License as published by
 the Free Software Foundation, either version 3 of the License, or
 (at your option) any later version.
-
 This program is distributed in the hope that it will be useful,
 but WITHOUT ANY WARRANTY; without even the implied warranty of
 MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
 GNU General Public License for more details.
-
 You should have received a copy of the GNU General Public License
 along with this program.  If not, see <http://www.gnu.org/licenses/>.
-]]--
-
+]]
 local PT = LibStub("LibPeriodicTable-3.1")
 local L = Skillet.L
 
@@ -242,14 +239,15 @@ function SkilletARL:RecipeFilterOperatorOLD(skillIndex)
 end
 
 function SkilletARL:Enable()
---[[
-	Skillet:RegisterRecipeFilter("arlRecipeSource", self, self.RecipeSourceButtonInit, self.RecipeFilterOperator)
-	Skillet.defaultOptions["recipeSourceFilter"] = false
-	Skillet.defaultOptions["recipeSourceFilter-drop"] = true
-	Skillet.defaultOptions["recipeSourceFilter-vendor"] = true
-	Skillet.defaultOptions["recipeSourceFilter-trainer"] = true
-	Skillet.defaultOptions["recipeSourceFilter-quest"] = true
-	Skillet.defaultOptions["recipeSourceFilter-mob"] = true
-	Skillet.defaultOptions["recipeSourceFilter-unknown"] = true
-]]--
+--	if AckisRecipeList then
+	if false then
+		Skillet:RegisterRecipeFilter("arlRecipeSource", self, self.RecipeSourceButtonInit, self.RecipeFilterOperator)
+		Skillet.defaultOptions["recipeSourceFilter"] = false
+		Skillet.defaultOptions["recipeSourceFilter-drop"] = true
+		Skillet.defaultOptions["recipeSourceFilter-vendor"] = true
+		Skillet.defaultOptions["recipeSourceFilter-trainer"] = true
+		Skillet.defaultOptions["recipeSourceFilter-quest"] = true
+		Skillet.defaultOptions["recipeSourceFilter-mob"] = true
+		Skillet.defaultOptions["recipeSourceFilter-unknown"] = true
+	end
 end
