@@ -34,21 +34,18 @@ function Skillet:InventoryReagentCraftability(reagentID, playerOverride)
 		for childRecipeID in pairs(recipeSource) do
 			local childRecipe = self:GetRecipe(childRecipeID)
 			local childSkillIndex = skillIndexLookup[childRecipeID]		-- only interested in current player for now
-			if childSkillIndex and childRecipe and #childRecipe.reagentData > 0 and
+			if childSkillIndex and childRecipe and 
 			  not Skillet.TradeSkillIgnoredMats[childRecipeID] and not Skillet.db.realm.userIgnoredMats[player][childRecipeID] then
 				local numCraftable = 100000
 				local numCraftableBank = 100000
 				for i=1,#childRecipe.reagentData,1 do
 					local childReagent = childRecipe.reagentData[i]
-					local numReagentCraftable, numReagentCraftableBank = self:InventoryReagentCraftability(childReagent.id, player)
-					DA.DEBUG(2,"id="..childReagent.id..", numReagentCraftable="..numReagentCraftable..", numReagentCraftableBank="..numReagentCraftableBank)
+					local numReagentCraftable, numReagentCraftableBank = self:InventoryReagentCraftability(childReagent.id)
 					numCraftable = math.min(numCraftable, math.floor(numReagentCraftable/childReagent.numNeeded))
 					numCraftableBank = math.min(numCraftableBank, math.floor(numReagentCraftableBank/childReagent.numNeeded))
-					DA.DEBUG(2,"numCraftable="..numCraftable..", numCraftableBank="..numCraftableBank)
 				end
 				numReagentsCrafted = numReagentsCrafted + numCraftable * childRecipe.numMade
 				numReagentsCraftedBank = numReagentsCraftedBank + numCraftableBank * childRecipe.numMade
-				DA.DEBUG(2,"numReagentsCrafted="..numReagentsCrafted..", numReagentsCraftedBank="..numReagentsCraftedBank)
 			end
 		end
 	end
@@ -56,14 +53,27 @@ function Skillet:InventoryReagentCraftability(reagentID, playerOverride)
 	if self.db.realm.reagentsInQueue[player] then
 		queued = self.db.realm.reagentsInQueue[player][reagentID] or 0
 	end
-	local numInBags, numInBank = self:GetInventory(player, reagentID)
-	local numCraftable = numReagentsCrafted + queued
-	local numCraftableBank = numReagentsCraftedBank
-	local invCount = 4			-- number of records to keep (1 = bag, 2 = bag/bank, 4 = bag/bank/craftBag/craftBank)
-	if numCraftable + numCraftableBank == 0 then
+	local numInBags, _, numInBank = self:GetInventory(player, reagentID)
+	local numCraftable = numReagentsCrafted + numInBags + queued
+	local numCraftableBank = numReagentsCraftedBank + numInBank + queued
+	local invCount = 4			-- number of records to keep (1 = bag, 2 = bag/bank, 4 = bag/craftBag/bank/craftBank)
+	if numInBank == numInBags then
+		if numCraftable == numCraftableBank then
+			if numCraftable == numInBags then
+				invCount = 1
+			end
+		end
+	else
+		if numCraftable == numInBags and numCraftableBank == numInBank then
+			invCount = 2
+		end
+	end
+	if invCount == 1 then
+		Skillet.db.realm.inventoryData[player][reagentID] = tostring(numInBags)
+	elseif invCount == 2 then
 		Skillet.db.realm.inventoryData[player][reagentID] = numInBags.." "..numInBank
 	else
-		Skillet.db.realm.inventoryData[player][reagentID] = numInBags.." "..numInBank.." "..numCraftable.." "..numCraftableBank
+		Skillet.db.realm.inventoryData[player][reagentID] = numInBags.." "..numCraftable.." "..numInBank.." "..numCraftableBank
 	end
 	self.visited[reagentID] = false -- okay to calculate this reagent again
 	return numCraftable, numCraftableBank
@@ -86,20 +96,31 @@ function Skillet:InventoryScan(playerOverride)
 			if reagentID and not inventoryData[reagentID] then				-- have we calculated this one yet?
 				if self.currentPlayer == (UnitName("player")) then			-- if this is the current player, use the API
 					DA.TRACE("Using API")
-					numInBoth = GetItemCount(reagentID,true)				-- both bank and bags, actually
 					numInBags = GetItemCount(reagentID)
-					numInBank = numInBoth - numInBags
+					numInBank = GetItemCount(reagentID,true)				-- both bank and bags, actually
 				elseif cachedInventory and cachedInventory[reagentID] then	-- otherwise, use what cached data is available
 					DA.TRACE("Using cachedInventory")
 					local a,b,c,d = string.split(" ", cachedInventory[reagentID])
-					numInBags = a
-					numInBank = b
+					if not b then
+						numInBags = a
+						numInBank = a
+					elseif not c then
+						numInBags = a
+						numInBank = b
+					else
+						numInBags = a
+						numInBank = c
+					end
 				else
 					DA.TRACE("Using Zero")
 					numInBags = 0
 					numInBank = 0
 				end
-				inventoryData[reagentID] = numInBags.." "..numInBank	-- only setting the bags and bank for now (no craftability info)
+				if numInBags == numInBank then
+					inventoryData[reagentID] = tostring(numInBags)			-- if items are all in bags, then leave off bank
+				else
+					inventoryData[reagentID] = numInBags.." "..numInBank	-- only setting the bags and bank for now (no craftability info)
+				end
 				DA.TRACE("inventoryData["..reagentID.."]="..inventoryData[reagentID])
 			end
 		end
@@ -186,21 +207,16 @@ function Skillet:GetInventory(player, reagentID)
 		if self.db.realm.inventoryData[player] and self.db.realm.inventoryData[player][reagentID] and 
 		  type(self.db.realm.inventoryData[player][reagentID]) == "string" then
 			local data = { string.split(" ", self.db.realm.inventoryData[player][reagentID]) }
-			if #data == 1 then
-				return tonumber(data[1]) or 0, 0, 0, 0
-			elseif #data == 2 then											-- no craftability info yet
-				return tonumber(data[1]) or 0, tonumber(data[2]) or 0, 0, 0
+			if #data == 2 then											-- no craftability info yet
+				return tonumber(data[1]) or 0, tonumber(data[1]) or 0, tonumber(data[2]) or 0, tonumber(data[2]) or 0
+			elseif #data == 1 then
+				return tonumber(data[1]) or 0, tonumber(data[1]) or 0, tonumber(data[1]) or 0, tonumber(data[1]) or 0
 			else
 				return tonumber(data[1]) or 0, tonumber(data[2]) or 0, tonumber(data[3]) or 0, tonumber(data[4]) or 0
 			end
-		elseif player == self.currentPlayer then
-			local numInBoth = GetItemCount(reagentID,true)				-- both bank and bags, actually
-			local numInBags = GetItemCount(reagentID)
-			local numInBank = numInBoth - numInBags
-			return tonumber(numInBags) or 0, tonumber(numInBank) or 0, 0, 0
 		end
 	end
-	return 0, 0, 0, 0			-- bags, bank, bagsCraftable, bankCraftable
+	return 0, 0, 0, 0			-- bags, bagsCraftable, bank, bankCraftable
 end
 
 function Skillet:AuctionScan()
