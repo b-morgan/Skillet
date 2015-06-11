@@ -2,7 +2,7 @@ local addonName,addonTable = ...
 local DA = _G[addonName] -- for DebugAids.lua
 --[[
 Skillet: A tradeskill window replacement.
-Copyright (c) 2007 Robert Clark <nogudnik@gmail.com>
+
 This program is free software: you can redistribute it and/or modify
 it under the terms of the GNU General Public License as published by
 the Free Software Foundation, either version 3 of the License, or
@@ -13,7 +13,8 @@ MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
 GNU General Public License for more details.
 You should have received a copy of the GNU General Public License
 along with this program.  If not, see <http://www.gnu.org/licenses/>.
-]]
+]]--
+
 local PT = LibStub("LibPeriodicTable-3.1")
 local L = Skillet.L
 
@@ -26,14 +27,11 @@ local TradeSkillList = {
 	45357,      -- inscription
 	25229,      -- jewelcrafting
 	2108,       -- leatherworking
-	-- 2575,    -- mining (or smelting?)
-	2656,       -- smelting (from mining)
+	2656,       -- smelting (from mining, 2575)
 	3908,       -- tailoring
 	2550,       -- cooking
 	3273,       -- first aid
-	-- 2842,    -- poisons
 	53428,      -- runeforging
-	-- 5149,    -- beast training (not supported)
 }
 -- Table of follower tradeskills that should use the Blizzard frame
 Skillet.FollowerSkillList = {
@@ -148,22 +146,6 @@ Skillet.TradeSkillAutoTarget = {
 	}
 }
 
--- No longer needed as of version 50400
-local TradeSkillRecipeCounts = {
-	[3908] = 438,
-	[7411] = 306,
-	[2108] = 540,
-	[2550] = 186,
-	[25229] = 570,
-	[3273] = 36,
-	[45357] = 450,
-	[4036] = 324,
-	[2656] = 0,			-- can't link [Smelting]
-	[2018] = 522,
-	[2259] = 264,
-	[53428] = 0,		-- can't link [Runeforging]
-}
-
 -- Items in this list are ignored because they can cause infinite loops.
 local TradeSkillIgnoredMats  = {
 	[11479] = 1 , -- Transmute: Iron to Gold
@@ -205,12 +187,26 @@ local TradeSkillIgnoredMats  = {
 	[118239] = 1 , -- sha shatter
 	[118238] = 1 , -- ethereal shard shatter
 	[118237] = 1 , -- mysterious diffusion
+	[181637] = 1 , -- Transmute: Sorcerous-air-to-earth
+	[181633] = 1 , -- Transmute: Sorcerous-air-to-fire
+	[181636] = 1 , -- Transmute: Sorcerous-air-to-water
+	[181631] = 1 , -- Transmute: Sorcerous-earth-to-air
+	[181632] = 1 , -- Transmute: Sorcerous-earth-to-fire
+	[181635] = 1 , -- Transmute: Sorcerous-earth-to-water
+	[181627] = 1 , -- Transmute: Sorcerous-fire-to-air
+	[181625] = 1 , -- Transmute: Sorcerous-fire-to-earth
+	[181628] = 1 , -- Transmute: Sorcerous-fire-to-water
+	[181630] = 1 , -- Transmute: Sorcerous-water-to-air
+	[181629] = 1 , -- Transmute: Sorcerous-water-to-earth
+	[181634] = 1 , -- Transmute: Sorcerous-water-to-fire
+	[181643] = 1 , -- Transmute: Savage Blood
 }
 Skillet.TradeSkillIgnoredMats = TradeSkillIgnoredMats
 
 Skillet.scrollData = {
 	-- Scraped from WoWhead using the following javascript:
-	-- for (i=0; i<listviewitems.length; i++) console.log("["+listviewitems[i].sourcemore[0].ti+"] = "+listviewitems[i].id+", -- "+listviewitems[i].name.substr(1));
+	-- for (i=0; i<listviewitems.length; i++) console.log("["+listviewitems[i].sourcemore[0].ti+"] = "+listviewitems[i].id+", 
+	-- "+listviewitems[i].name.substr(1));
 	[158914] = 110638, -- Enchant Ring - Gift of Critical Strike
 	[158915] = 110639, -- Enchant Ring - Gift of Haste
 	[158916] = 110640, -- Enchant Ring - Gift of Mastery
@@ -712,10 +708,7 @@ end
 
 -- Checks to see if the current trade is one that we support.
 function Skillet:IsSupportedTradeskill(tradeID)
-	if not tradeID or tradeID == 5419 or tradeID == 53428 then
-		return false				-- beast training, runeforging
-	end
-	if IsShiftKeyDown() then
+	if IsShiftKeyDown() or not tradeID or tradeID == 5419 or tradeID == 53428 then
 		return false
 	end
 	return true
@@ -724,6 +717,9 @@ end
 -- Checks to see if this trade follower can not use Skillet frame.
 function Skillet:IsNotSupportedFollower(tradeID)
 	if IsNPCCrafting() then
+		if IsShiftKeyDown() then
+			return true -- mostly for debugging
+		end
 		if not tradeID then
 			return true -- Unknown tradeskill, play it safe.
 		end
@@ -755,19 +751,6 @@ local missingVendorItems = {
 	[3857]  = true,   			-- Coal
 }
 local specialVendorItems = {
-	[37101] = {1, 61978}, 			--Ivory Ink
-	[39469] = {1, 61978}, 			--Moonglow Ink
-	[39774] = {1, 61978}, 			--Midnight Ink
-	[43116] = {1, 61978}, 			--Lions Ink
-	[43118] = {1, 61978}, 			--Jadefire Ink
-	[43120] = {1, 61978}, 			--Celestial Ink
-	[43122] = {1, 61978}, 			--Shimmering Ink
-	[43124] = {1, 61978},  			--Ethereal Ink
-	[43126] = {1, 61978},  			--Ink of the Sea
-	[43127] = {10, 61978},  		--Snowfall Ink
-	[61981] = {10, 61978},  		--Inferno Ink
-}
-local specialVendorItemsMoP	 = {
 	[37101] = {1, 79254}, 			--Ivory Ink
 	[39469] = {1, 79254}, 			--Moonglow Ink
 	[39774] = {1, 79254}, 			--Midnight Ink
@@ -782,9 +765,6 @@ local specialVendorItemsMoP	 = {
 	[79255] = {10, 79254},  		--Starlight Ink
 }
 function Skillet:VendorItemAvailable(itemID)
-	if Skillet.wowVersion>50000 then
-		specialVendorItems = specialVendorItemsMoP
-	end
 	if specialVendorItems[itemID] then
 		local divider = specialVendorItems[itemID][1]
 		local currency = specialVendorItems[itemID][2]
@@ -803,9 +783,6 @@ end
 -- queries periodic table for vendor info for a particular itemID
 function Skillet:VendorSellsReagent(itemID)
 	if PT then
-		if Skillet.wowVersion>50000 then
-			specialVendorItems = specialVendorItemsMoP
-		end
 		if missingVendorItems[itemID] or specialVendorItems[itemID] then
 			return true
 		end
