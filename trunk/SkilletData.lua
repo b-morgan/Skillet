@@ -7,10 +7,12 @@ This program is free software: you can redistribute it and/or modify
 it under the terms of the GNU General Public License as published by
 the Free Software Foundation, either version 3 of the License, or
 (at your option) any later version.
+
 This program is distributed in the hope that it will be useful,
 but WITHOUT ANY WARRANTY; without even the implied warranty of
 MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
 GNU General Public License for more details.
+
 You should have received a copy of the GNU General Public License
 along with this program.  If not, see <http://www.gnu.org/licenses/>.
 ]]--
@@ -768,54 +770,45 @@ function Skillet:VendorItemAvailable(itemID)
 	if specialVendorItems[itemID] then
 		local divider = specialVendorItems[itemID][1]
 		local currency = specialVendorItems[itemID][2]
-		local reagentAvailability, _, reagentAvailabilityBank = self:GetInventory(self.currentPlayer, currency)
+		local reagentAvailability = self:GetInventory(self.currentPlayer, currency)
 		local reagentAvailabilityAlts = 0
 		for player in pairs(self.db.realm.inventoryData) do
-			local _,_, altBank = self:GetInventory(player, currency)
-			reagentAvailabilityAlts = reagentAvailabilityAlts + (altBank or 0)
+			local altBoth = self:GetInventory(player, currency)
+			reagentAvailabilityAlts = reagentAvailabilityAlts + (altBoth or 0)
 		end
-		return math.floor(reagentAvailability / divider), math.floor(reagentAvailabilityBank / divider), math.floor(reagentAvailabilityAlts / divider)
+		return math.floor(reagentAvailability / divider), math.floor(reagentAvailabilityAlts / divider)
 	else
-		return 100000, 100000, 100000
+		return 100000, 100000
 	end
 end
 
--- queries periodic table for vendor info for a particular itemID
+-- queries for vendor info for a particular itemID
 function Skillet:VendorSellsReagent(itemID)
+-- Check our local data first
+	if missingVendorItems[itemID] or specialVendorItems[itemID] then
+		return true
+	end
+-- Check the LibPeriodicTable data next
 	if PT then
-		if missingVendorItems[itemID] or specialVendorItems[itemID] then
-			return true
-		end
 		if itemID~=0 and PT:ItemInSet(itemID,"Tradeskill.Mat.BySource.Vendor") then
 			return true
 		end
 	end
+	return false
 end
 
 -- resets the blizzard tradeskill search filters just to make sure no other addon has monkeyed with them
 function SkilletData:ResetTradeSkillFilter()
-	if (Skillet.wowVersion>50000) then
-		if not GetTradeSkillCategoryFilter(0) then
-			SetTradeSkillCategoryFilter(0, 1, 1)
-		end
-	else
-		if not GetTradeSkillSubClassFilter(0) then
-			SetTradeSkillSubClassFilter(0, 1, 1)
-		end
+	if not GetTradeSkillCategoryFilter(0) then
+		SetTradeSkillCategoryFilter(0, 1, 1)
 	end
 	SetTradeSkillItemNameFilter("")
 	SetTradeSkillItemLevelFilter(0,0)
 end
 
 function SkilletLink:ResetTradeSkillFilter()
-	if (Skillet.wowVersion>50000) then
-		if not GetTradeSkillCategoryFilter(0) then
-			SetTradeSkillCategoryFilter(0, 1, 1)
-		end
-	else
-		if not GetTradeSkillSubClassFilter(0) then
-			SetTradeSkillSubClassFilter(0, 1, 1)
-		end
+	if not GetTradeSkillCategoryFilter(0) then
+		SetTradeSkillCategoryFilter(0, 1, 1)
 	end
 	SetTradeSkillItemNameFilter("")
 	SetTradeSkillItemLevelFilter(0,0)
@@ -1305,7 +1298,7 @@ function Skillet:CalculateCraftableCounts(playerOverride)
 	for i=1,self:GetNumSkills(player, self.currentTrade) do
 		local skill = self:GetSkill(player, self.currentTrade, i)
 		if skill then -- skip headers
-			skill.numCraftable, skill.numCraftableVendor, skill.numCraftableBank, skill.numCraftableAlts = self:InventorySkillIterations(self.currentTrade, i, player)
+			skill.numCraftable, skill.numCraftableVendor, skill.numCraftableAlts = self:InventorySkillIterations(self.currentTrade, i, player)
 		end
 	end
 	--DA.DEBUG(0,"CalculateCraftableCounts Complete")
