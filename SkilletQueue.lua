@@ -1,9 +1,7 @@
 local addonName,addonTable = ...
 local DA = _G[addonName] -- for DebugAids.lua
 --[[
-
 Skillet: A tradeskill window replacement.
-Copyright (c) 2007 Robert Clark <nogudnik@gmail.com>
 
 This program is free software: you can redistribute it and/or modify
 it under the terms of the GNU General Public License as published by
@@ -17,7 +15,6 @@ GNU General Public License for more details.
 
 You should have received a copy of the GNU General Public License
 along with this program.  If not, see <http://www.gnu.org/licenses/>.
-
 ]]--
 
 local L = Skillet.L
@@ -90,9 +87,11 @@ function Skillet:QueueAppendCommand(command, queueCraftables, noWindowRefresh)
 			local reagent = recipe.reagentData[i]
 			DA.DEBUG(1,"reagent= "..DA.DUMP1(reagent))
 			local need = count * reagent.numNeeded
-			local numInBags, bagsCraft, numInBank, bankCraft = Skillet:GetInventory(Skillet.currentPlayer, reagent.id)
-			DA.DEBUG(1,"numBags= "..numInBags..", craftBags= "..bagsCraft..", numInBank= "..numInBank..", craftBank= "..bankCraft)
-			local have = numInBags + numInBank + (reagentsInQueue[reagent.id] or 0);
+			local numInBoth = GetItemCount(reagent.id,true)
+			local numInBags = GetItemCount(reagent.id)
+			local numInBank =  numInBoth - numInBags
+			DA.DEBUG(1,"numInBoth= "..tostring(numInBoth)..", numInBags="..tostring(numInBags)..", numInBank="..tostring(numInBank))
+			local have = numInBoth + (reagentsInQueue[reagent.id] or 0);
 			reagentsInQueue[reagent.id] = (reagentsInQueue[reagent.id] or 0) - need;
 			reagentsChanged[reagent.id] = true
 			DA.DEBUG(1,"queueCraftables= "..tostring(queueCraftables)..", need= "..tostring(need)..", have= "..tostring(have))
@@ -200,7 +199,6 @@ end
 function Skillet:ProcessQueue(altMode)
 	DA.DEBUG(0,"ProcessQueue");
 	local queue = self.db.realm.queueData[self.currentPlayer]
-	local reagentbank = self.db.realm.reagentBank[self.currentPlayer]
 	local qpos = 1
 	local skillIndexLookup = self.data.skillIndexLookup[self.currentPlayer]
 	self.processingPosition = nil
@@ -225,21 +223,16 @@ function Skillet:ProcessQueue(altMode)
 					local reagent = recipe.reagentData[i]
 					local reagentName = GetItemInfo(reagent.id) or reagent.id
 					DA.DEBUG(1,"id= "..tostring(reagent.id)..", reagentName="..tostring(reagentName)..", numNeeded="..tostring(reagent.numNeeded))
-					local numInBags, bagsCraft, numInBank, bankCraft = self:GetInventory(self.currentPlayer, reagent.id)
-					DA.DEBUG(1,"numInBags= "..tostring(numInBags)..", numInBank="..tostring(numInBank)..", bagsCraft= "..tostring(bagsCraft)..", bankCraft= "..tostring(bankCraft))
-					if numInBags < reagent.numNeeded then
-						local fromBank = reagent.numNeeded - numInBags
-						DA.DEBUG(1,"fromBank= "..tostring(fromBank)..", reagentbank= "..tostring(reagentbank[reagent.id]))
-						if reagentbank[reagent.id] and reagentbank[reagent.id] >= fromBank then 
-							reagentbank[reagent.id] = reagentbank[reagent.id] - fromBank
-							DA.WARN(L["Using Bank for"],recipe.name,"-",fromBank,"x",reagentName)
-						else
-							Skillet:Print(L["Skipping"],recipe.name,"-",L["need"],reagent.numNeeded,"x",reagentName,"("..L["have"],numInBags..")")
-							craftable = false
-							break
-						end
+					local numInBoth = GetItemCount(reagent.id,true)
+					local numInBags = GetItemCount(reagent.id)
+					local numInBank =  numInBoth - numInBags
+					DA.DEBUG(1,"numInBoth= "..tostring(numInBoth)..", numInBags="..tostring(numInBags)..", numInBank="..tostring(numInBank))
+					if numInBoth < reagent.numNeeded then
+						Skillet:Print(L["Skipping"],recipe.name,"-",L["need"],reagent.numNeeded,"x",reagentName,"("..L["have"],numInBoth..")")
+						craftable = false
+						break
 					end
-				end
+				end -- for
 			end
 			if craftable then break end
 		end
@@ -345,11 +338,6 @@ end
 
 function Skillet:StopCast(spell, success)
 	local spellBeingCast = UnitCastingInfo("player")
-if SkilletFrame:IsVisible() then
---	DA.CHAT("StopCast "..(event or "nil"))
---	DA.CHAT("StopCast "..(spellBeingCast or "nocast").." "..(spell or "nopass").." "..(self.processingSpell or "noproc"))
-end
-
 	if not self.db.realm.queueData then
 		self.db.realm.queueData = {}
 	end

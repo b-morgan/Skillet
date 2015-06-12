@@ -1,9 +1,7 @@
 local addonName,addonTable = ...
 local DA = _G[addonName] -- for DebugAids.lua
 --[[
-
 Skillet: A tradeskill window replacement.
-Copyright (c) 2007 Robert Clark <nogudnik@gmail.com>
 
 This program is free software: you can redistribute it and/or modify
 it under the terms of the GNU General Public License as published by
@@ -17,7 +15,6 @@ GNU General Public License for more details.
 
 You should have received a copy of the GNU General Public License
 along with this program.  If not, see <http://www.gnu.org/licenses/>.
-
 ]]--
 
 --[[
@@ -126,7 +123,7 @@ local function createShoppingListFrame(self)
 	local shoppingListLocation = {
 		prefix = "shoppingListLocation_"
 	}
-	windowManger.RegisterConfig(frame, self.db.char, shoppingListLocation)
+	windowManger.RegisterConfig(frame, self.db.profile, shoppingListLocation)
 	windowManger.RestorePosition(frame)  -- restores scale also
 	windowManger.MakeDraggable(frame)
 	-- lets play the resize me game!
@@ -210,29 +207,25 @@ function Skillet:GetShoppingList(player, includeBank, includeGuildbank)
 			for id,count in pairs(reagentsInQueue) do
 			DA.DEBUG(2,"reagent: "..id.." x "..count)
 				local deficit = count -- deficit is usually negative
-				local numInBags, numInBank, numInBagsCurrent, numInBankCurrent, numGuildbank = 0,0,0,0,0
+				local numInBoth, numInBothCurrent, numGuildbank = 0,0,0
 				local _
 				if not usedInventory[player][id] then
-					numInBags, _, numInBank = self:GetInventory(player, id)
+					numInBoth = self:GetInventory(player, id)
 				end
-				DA.DEBUG(2,"numInBags= "..numInBags..", numInBank= "..numInBank)
-				if numInBags + numInBank > 0 then
+				DA.DEBUG(2,"numInBoth= "..numInBoth)
+				if numInBoth > 0 then
 					usedInventory[player][id] = true
 				end
 				if player ~= self.currentPlayer then
 					if not usedInventory[curPlayer] then
-						numInBagsCurrent, _, numInBankCurrent = self:GetInventory(curPlayer, id)
+						numInBothCurrent = self:GetInventory(curPlayer, id)
 					end
-					DA.DEBUG(2,"numInBagsCurrent= "..numInBagsCurrent..", numInBankCurrent= "..numInBankCurrent)
-					if numInBagsCurrent + numInBankCurrent > 0 then
+					DA.DEBUG(2,"numInBothCurrent= "..numInBothCurrent)
+					if numInBothCurrent > 0 then
 						usedInventory[curPlayer][id] = true
 					end
 				end
-				if includeBank then
-					deficit = deficit + numInBank + numInBankCurrent
-				else
-					deficit = deficit + numInBags + numInBagsCurrent
-				end
+				deficit = deficit + numInBoth + numInBothCurrent
 				if curGuild and not cachedGuildbank[curGuild][id] then
 					cachedGuildbank[curGuild][id] = 0
 				end
@@ -273,13 +266,8 @@ local function indexBank()
 -- bank contains detailed contents of each tab,slot which 
 -- is only needed while the bank is open.
 --
--- reagentbank contains a count by item, usable (and adjustable)
--- when the bank is closed.
---
 	bank = {}
 	local player = Skillet.currentPlayer
-	Skillet.db.realm.reagentBank[player] = {}
-	local reagentbank = Skillet.db.realm.reagentBank[player]
 	local bankBags = {-1,5,6,7,8,9,10,11,-3}
 	for _, container in pairs(bankBags) do
 		for i = 1, GetContainerNumSlots(container), 1 do
@@ -294,10 +282,6 @@ local function indexBank()
 						["id"]  = id,
 						["count"] = count,
 					})
-					if not reagentbank[id] then
-						reagentbank[id] = 0
-					end
-					reagentbank[id] = reagentbank[id] + count
 				end
 			end
 		end

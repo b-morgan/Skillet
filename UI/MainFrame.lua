@@ -1,7 +1,7 @@
 local addonName,addonTable = ...
 local DA = _G[addonName] -- for DebugAids.lua
---[[ Skillet: A tradeskill window replacement.
-Copyright (c) 2007 Robert Clark <nogudnik@gmail.com>
+--[[
+Skillet: A tradeskill window replacement.
 
 This program is free software: you can redistribute it and/or modify
 it under the terms of the GNU General Public License as published by
@@ -15,7 +15,6 @@ GNU General Public License for more details.
 
 You should have received a copy of the GNU General Public License
 along with this program.  If not, see <http://www.gnu.org/licenses/>.
-
 ]]--
 
 local L = LibStub("AceLocale-3.0"):GetLocale("Skillet")
@@ -242,7 +241,7 @@ function Skillet:CreateTradeSkillWindow()
 	local tradeSkillLocation = {
 		prefix = "tradeSkillLocation_"
 	}
-	windowManger.RegisterConfig(frame, self.db.char, tradeSkillLocation)
+	windowManger.RegisterConfig(frame, self.db.profile, tradeSkillLocation)
 	windowManger.RestorePosition(frame)  -- restores scale also
 	windowManger.MakeDraggable(frame)
 	-- lets play the resize me game!
@@ -847,7 +846,6 @@ function Skillet:internal_UpdateTradeSkillWindow()
 	local showOwned = self:GetTradeSkillOption("filterInventory-owned") -- count from Altoholic
 	local showBag = self:GetTradeSkillOption("filterInventory-bag")
 	local showVendor = self:GetTradeSkillOption("filterInventory-vendor")
-	local showBank = self:GetTradeSkillOption("filterInventory-bank")
 	local showAlts = self:GetTradeSkillOption("filterInventory-alts")
 	local catstring = {}
 	SkilletFrameEmptySpace.skill.subGroup = self:RecipeGroupFind(self.currentPlayer,self.currentTrade,self.currentGroupLabel,self.currentGroup)
@@ -970,12 +968,12 @@ function Skillet:internal_UpdateTradeSkillWindow()
 				end
 				text = (self:GetRecipeNamePrefix(self.currentTrade, skillIndex) or "") .. (skill.name or "")
 				if #recipe.reagentData > 0 then
-					local num, numwvendor, numwbank, numwalts = get_craftable_counts(skill.skillData, recipe.numMade)
+					local num, numwvendor, numwalts = get_craftable_counts(skill.skillData, recipe.numMade)
 					local cbag = "|cffffff80"
 					local cvendor = "|cff80ff80"
 					local cbank =  "|cffffa050"
 					local calts = "|cffff80ff"
-					if (num > 0 and showBag) or (numwvendor > 0 and showVendor) or (numwbank > 0 and showBank) or (numwalts > 0 and showAlts) then
+					if (num > 0 and showBag) or (numwvendor > 0 and showVendor) or (numwalts > 0 and showAlts) then
 						local c = 1
 						if showBag then
 							if num >= 1000 then
@@ -989,13 +987,6 @@ function Skillet:internal_UpdateTradeSkillWindow()
 								numwvendor = "##"
 							end
 							catstring[c] = cvendor .. numwvendor
-							c = c + 1
-						end
-						if showBank then
-							if numwbank >= 1000 then
-								numwbank = "##"
-							end
-							catstring[c] =  cbank .. numwbank
 							c = c + 1
 						end
 						if showAlts then
@@ -1026,23 +1017,20 @@ function Skillet:internal_UpdateTradeSkillWindow()
 				end
 				local countWidth = 0
 				if showBag then
-					countWidth = countWidth + 20
-				end
-				if showBank then
-					countWidth = countWidth + 20
+					countWidth = countWidth + 25
 				end
 				if showVendor then
-					countWidth = countWidth + 20
+					countWidth = countWidth + 25
 				end
 				if showAlts then
-					countWidth = countWidth + 20
+					countWidth = countWidth + 25
 				end
 				-- show the count of the item currently owned that the recipe will produce
 				if showOwned then
 					local numowned = (self.db.realm.auctionData[Skillet.currentPlayer][recipe.itemID] or 0) + GetItemCount(recipe.itemID,true)
 					if numowned > 0 then
 						local count = "|cff95fcff("..numowned..") "..(countText:GetText() or "")
-						countWidth = countWidth + 20
+						countWidth = countWidth + 25
 						countText:SetText(count)
 						countText:Show()
 					end
@@ -1216,7 +1204,7 @@ function Skillet:SkillButton_OnEnter(button)
 			tip:AddLine(skill.name, NORMAL_FONT_COLOR.r, NORMAL_FONT_COLOR.g, NORMAL_FONT_COLOR.b, false);
 		end
 	end
-	local num, numwvendor, numwbank, numwalts = get_craftable_counts(skill)
+	local num, numwvendor, numwalts = get_craftable_counts(skill)
 	-- how many can be created with the reagents in the inventory
 	if num > 0 then
 		local text = "\n" .. num .. " " .. L["can be created from reagents in your inventory"];
@@ -1240,38 +1228,24 @@ function Skillet:SkillButton_OnEnter(button)
 	end
 	Skillet:AddCustomTooltipInfo(tip, recipe)
 	tip:AddLine("\n" .. self:GetReagentLabel(self.currentTrade, id));
---	local inventoryData = self.db.realm.inventoryData[self.currentPlayer]
 	-- now the list of regents for this recipe and some info about them
 	for i=1, #recipe.reagentData, 1 do
 		local reagent = recipe.reagentData[i]
 		if not reagent then
 			break
 		end
-		local numInBags, numCraftable, numInBank, numCraftableBank = self:GetInventory(self.currentPlayer, reagent.id)
+		local numInBoth, numCraftable = self:GetInventory(self.currentPlayer, reagent.id)
 		local itemName = GetItemInfo(reagent.id) or reagent.id
---		local itemName = "xxxxxxx"
 		local text
 		if self:VendorSellsReagent(reagent.id) then
 			text = string.format("  %d x %s  |cff808080(%s)|r", reagent.numNeeded, itemName, L["buyable"])
 		else
 			text = string.format("  %d x %s", reagent.numNeeded, itemName)
 		end
-		local counts = string.format("|cff808080[%d/%d]|r", numCraftable, numCraftableBank)
---[[
-		local text = "  " .. reagent.numNeeded .. " x " .. (GetItemInfo("item:"..reagent.id) or reagent.id)
-		local reagent_counts = GRAY_FONT_COLOR_CODE .. " (" .. numCraftable .. " / " .. numCraftableBank
---		if reagent.numwalts then
-			-- numwalts includes this character, we want only alts
---			reagent_counts = reagent_counts .. " / " .. math.max(0, reagent.numwalts - reagent.numwbank)
---		end
-		reagent_counts = reagent_counts .. ")" .. FONT_COLOR_CODE_CLOSE
-		if self:VendorSellsReagent(reagent.id) then
-			text = text .. GRAY_FONT_COLOR_CODE .. "  (" .. L["buyable"] .. ")" .. FONT_COLOR_CODE_CLOSE;
-		end
-]]
+		local counts = string.format("|cff808080[%d/%d]|r", numInBoth, numCraftable)
 		tip:AddDoubleLine(text, counts, 1, 1, 1);
 	end
-	local text = string.format("[%s/%s]", L["reagents in inventory"], L["bank"])
+	local text = string.format("[%s/%s]", L["Inventory"], L["craftable"]) -- match the case sometime
 	tip:AddDoubleLine("\n", text)
 	tip:Show()
 	button.locked = false
@@ -1331,12 +1305,10 @@ function Skillet:SetReagentToolTip(reagentID, numNeeded, numCraftable)
 			end
 		end
 	end
---	local recipe = self:GetRecipe(recipeID)
-	local _, inBags, _, inBank = self:GetInventory(self.currentPlayer, reagentID)
---	self.db.realm.inventoryData[self.currentPlayer][reagentID].numCraftableBank
-	local surplus = inBank - numNeeded * numCraftable
-	if inBank < 0 then
-		GameTooltip:AddDoubleLine("in shopping list:",(-inBank),1,1,0)
+	local inBoth = self:GetInventory(self.currentPlayer, reagentID)
+	local surplus = inBoth - numNeeded * numCraftable
+	if inBoth < 0 then
+		GameTooltip:AddDoubleLine("in shopping list:",(-inBoth),1,1,0)
 	end
 	if surplus < 0 then
 		GameTooltip:AddDoubleLine("to craft "..numCraftable.." you need:",(-surplus),1,0,0)
@@ -1415,7 +1387,6 @@ function Skillet:HideDetailWindow()
 		end
 end
 
-local lastDetailUpdate = 0
 local lastUpdateSpellID = nil
 local ARLProfessionInitialized = {}
 -- Updates the details window with information about the currently selected skill
@@ -1534,27 +1505,14 @@ function Skillet:UpdateDetailsWindow(skillIndex)
 				reagentName = "unknown"
 			end
 			local numAlts = nil
-			local _, num, _, numBank = self:GetInventory(self.currentPlayer, reagent.id)
---[[
-			local num = 0
-			local numBank = 0
-			local invData = self.db.realm.inventoryData[Skillet.currentPlayer]
-			if invData then
-				invData = invData[reagent.id]
-				if invData then
-					num = invData.numCraftable
-					numBank = invData.numCraftableBank
-					numAlts = invData.numCraftableAlts
-				end
-			end
-]]
+			local num = self:GetInventory(self.currentPlayer, reagent.id)
 			local count_text
 			if numAlts then
-				count_text = string.format("[%d/%d/%d]", num, numBank, numAlts)
+				count_text = string.format("[%d/%d]", num, numAlts)
 			else
-				count_text = string.format("[%d/%d]", num, numBank)
+				count_text = string.format("[%d]", num)
 			end
-			if numBank < reagent.numNeeded then
+			if num < reagent.numNeeded then
 				-- grey it out if we don't have it
 				count:SetText(GRAY_FONT_COLOR_CODE .. count_text .. FONT_COLOR_CODE_CLOSE)
 				text:SetText(GRAY_FONT_COLOR_CODE .. reagentName .. FONT_COLOR_CODE_CLOSE)
@@ -1576,10 +1534,8 @@ function Skillet:UpdateDetailsWindow(skillIndex)
 			button:Show()
 			lastReagentButton = button
 		else
---			icon:SetNormalTexture(texture)
---			button:Show()
 			-- out of necessary reagents, don't need to show the button,
-			-- or any or the text.
+			-- or any of the text.
 			button:Hide()
 		end
 	end
@@ -1602,8 +1558,6 @@ function Skillet:UpdateDetailsWindow(skillIndex)
 		SkilletExtraDetailTextRight:Hide()
 		SkilletExtraDetailTextLeft:Hide()
 	end
-	--DA.DEBUG(0,"?")
-	lastDetailUpdate = GetTime()
 end
 
 local num_queue_buttons = 0
@@ -2881,7 +2835,7 @@ function Skillet:CreateStandaloneQueueFrame()
 	local standaloneQueueLocation = {
 		prefix = "standaloneQueueLocation_"
 	}
-	windowManger.RegisterConfig(frame, self.db.char, standaloneQueueLocation)
+	windowManger.RegisterConfig(frame, self.db.profile, standaloneQueueLocation)
 	windowManger.RestorePosition(frame)  -- restores scale also
 	windowManger.MakeDraggable(frame)
 	-- lets play the resize me game!
