@@ -67,7 +67,6 @@ local defaults = {
 		item_order =  false,	-- Order shopping list by item
 		merge_items = false,	-- Merge same shopping list items together
 		include_guild = false,	-- Use the contents of the Guild Bank
-		include_bank = true,	-- Use the contents of the Bank
 	},
 }
 
@@ -79,7 +78,6 @@ Skillet.defaultOptions = {
 	["filtertext"] = "",
 	["filterInventory-bag"] = true,
 	["filterInventory-vendor"] = true,
-	["filterInventory-bank"] = false, -- obsolete, should be removed
 	["filterInventory-alts"] = false,
 	["filterInventory-owned"] = true,
 	["filterLevel"] = 1,
@@ -1094,13 +1092,19 @@ function Skillet:SkilletShow()
 	TradeSkillFrame_Update();
 	self.linkedSkill, self.currentPlayer, self.isGuild = Skillet:IsTradeSkillLinked()
 	if self.linkedSkill then
+		if not self.currentPlayer then
+			return -- Wait for TRADE_SKILL_NAME_UPDATE
+		end
 		self:RegisterPlayerDataGathering(self.currentPlayer,SkilletLink,"sk")
 	else
-		self:InitializeAllDataLinks("All Data")
 		self.currentPlayer = (UnitName("player"))
 	end
 	self.currentTrade = self.tradeSkillIDsByName[(GetTradeSkillLine())] or 2656      -- smelting caveat
-	self:InitializeDatabase(self.currentPlayer)
+	if not self.linkedSkill and not self.isGuild then
+		self:InitializeDatabase(self.currentPlayer)
+	else
+		self:InitializeDatabase(self.currentPlayer)  -- Need to skip this but who knows what will blow up.
+	end 
 
 	-- Use the Blizzard UI for any garrison follower that can't use ours.
 	if self:IsNotSupportedFollower(self.currentTrade) then
@@ -1108,7 +1112,9 @@ function Skillet:SkilletShow()
 		self:BlizzardTradeSkillFrame_Show()
 	else
 		if self:IsSupportedTradeskill(self.currentTrade) then
-			self:InventoryScan()
+			if not self.linkedSkill and not self.isGuild then
+				self:InventoryScan()
+			end
 			self.tradeSkillOpen = true
 			DA.DEBUG(1,"SkilletShow: "..self.currentTrade)
 			self.selectedSkill = nil

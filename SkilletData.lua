@@ -1087,16 +1087,17 @@ function SkilletData:ScanPlayerTradeSkills(player, clean)
 		local skillRanksData = Skillet.db.realm.tradeSkills[player]
 		for i=1,#TradeSkillList,1 do
 			local id = TradeSkillList[i]
-			local name = GetSpellInfo(id)									-- always returns data
-			local _, rankName, icon = GetSpellInfo(name)					-- only returns data if you have this spell in your spellbook
-			DA.DEBUG(0,"collecting tradeskill data for "..name.." "..(rank or "nil"))
+			local name = GetSpellInfo(id)					-- always returns data
+			local _, rankName, icon = GetSpellInfo(name)	-- only returns data if you have this spell in your spellbook
 			if rankName then
+				DA.DEBUG(0,"Collecting tradeskill data for: "..tostring(name))
 				if not skillRanksData[id] then
 					skillRanksData[id] = {}
 					skillRanksData[id].rank = 0
 					skillRanksData[id].maxRank = 0
 				end
 			else
+				--DA.DEBUG(0,"Skipping tradeskill data for: "..tostring(name))
 				skillRanksData[id] = nil
 			end
 		end
@@ -1118,43 +1119,6 @@ function SkilletLink:ScanPlayerTradeSkills(player, clean)
 	if isLinked and player == playerLinked then
 		return true
 	end
-end
-
--- [3273] = "|cffffd000|Htrade:3274:148:150:23F381A:zD<<t=|h[First Aid]|h|r",  -- >>
-local allDataInitialized = false
-function Skillet:InitializeAllDataLinks(name)
-	if allDataInitialized then return end
-	allDataInitialized = true
-	if not self.db.realm.tradeSkills then
-		self.db.realm.tradeSkills = {}
-	end
-	if Skillet.wowVersion >= 50400 then -- patch 5.4 issue
-		self.db.realm.tradeSkills[name] = nil
-		return
-	end
-	self.db.realm.tradeSkills[name] = {}
-	local link = GetTradeSkillListLink()
-	if not link then allDataInitialized = false return end
-	local uid = UnitGUID("player"):gsub("0x0+","")
-	for tradeID, bitmapLength in pairs(TradeSkillRecipeCounts) do
-		local spellName = GetSpellInfo(tradeID)
-		local link
-		local encodingLength = floor((bitmapLength+5) / 6)
-		local encodedString = string.rep("/",encodingLength)
-		if Skillet.wowVersion >= 50400 then
-			link = "|cffffd000|Htrade:"..(uid or "23F381A")..":"..tradeID..":333|h["..spellName.."]|h|r"
-		elseif Skillet.wowVersion >= 50300 then
-			link = "|cffffd00|Htrade:"..(uid or "23F381A")..":"..tradeID..":600:600:"..encodedString.."|h["..spellName.."]|h|r"
-		else
-			link = "|cffffd00|Htrade:"..tradeID..":375:450:"..(uid or "23F381A")..":"..encodedString.."|h["..spellName.."]|h|r"
-		end
-		--DA.DEBUG(0,"AllData Link "..tradeID.." "..(uid or "nil").." "..(spellName or "nil").." "..link)
-		self.db.realm.tradeSkills[name][tradeID] = {}
-		self.db.realm.tradeSkills[name][tradeID].link = link
-		self.db.realm.tradeSkills[name][tradeID].rank = 600
-		self.db.realm.tradeSkills[name][tradeID].maxRank = 600
-	end
-	self:RegisterPlayerDataGathering(name,SkilletLink,"sk")
 end
 
 function Skillet:EnableUpdateEvents()
@@ -1295,10 +1259,13 @@ function Skillet:CalculateCraftableCounts(playerOverride)
 	local player = playerOverride or self.currentPlayer
 	--DA.DEBUG(0,tostring(player).." "..tostring(self.currentTrade))
 	self.visited = {}
-	for i=1,self:GetNumSkills(player, self.currentTrade) do
-		local skill = self:GetSkill(player, self.currentTrade, i)
-		if skill then -- skip headers
-			skill.numCraftable, skill.numCraftableVendor, skill.numCraftableAlts = self:InventorySkillIterations(self.currentTrade, i, player)
+	local n = self:GetNumSkills(player, self.currentTrade)
+	if n then
+		for i=1,n do
+			local skill = self:GetSkill(player, self.currentTrade, i)
+			if skill then -- skip headers
+				skill.numCraftable, skill.numCraftableVendor, skill.numCraftableAlts = self:InventorySkillIterations(self.currentTrade, i, player)
+			end
 		end
 	end
 	--DA.DEBUG(0,"CalculateCraftableCounts Complete")

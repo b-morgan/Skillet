@@ -1401,26 +1401,9 @@
 					</OnLoad>
 				</Scripts>
 			</CheckButton>
-			<CheckButton name="SkilletInventoryFilterBank" inherits="SkilletInvFilterButtonTemplate" hidden="true">
-				<Anchors>
-					<Anchor point="LEFT" relativeTo="SkilletInventoryFilterVendor" relativePoint="RIGHT">
-						<Offset>
-							<AbsDimension x="0" y="0"/>
-						</Offset>
-					</Anchor>
-				</Anchors>
-				<NormalTexture name="$parentIcon" file="Interface\Addons\Skillet\Icons\bank_icon.tga"/>
-				<Scripts>
-					<OnLoad>
-						self:SetFrameLevel(self:GetFrameLevel()+5)
-						self.slot = "bank"
-						_G[self:GetName().."Checked"]:SetGradient("vertical",1,.5,.25, 1,.5,.25)
-					</OnLoad>
-				</Scripts>
-			</CheckButton>
 			<CheckButton name="SkilletInventoryFilterAlts" inherits="SkilletInvFilterButtonTemplate" hidden="true">
 				<Anchors>
-					<Anchor point="LEFT" relativeTo="SkilletInventoryFilterBank" relativePoint="RIGHT">
+					<Anchor point="LEFT" relativeTo="SkilletInventoryFilterVendor" relativePoint="RIGHT">
 						<Offset>
 							<AbsDimension x="0" y="0"/>
 						</Offset>
