@@ -653,7 +653,7 @@ function Skillet:UpdateTradeButtons(player)
 end
 
 function Skillet:UpdateAutoTradeButtons()
-	DA.DEBUG(0,"UpdateAutoTradeButtons started")
+	--DA.DEBUG(0,"UpdateAutoTradeButtons started")
 	if InCombatLockdown() then
 		self.rescan_auto_targets_timer = nil
 		return
@@ -689,7 +689,7 @@ function Skillet:UpdateAutoTradeButtons()
 		end
 	end
 	self.rescan_auto_targets_timer = nil
-	DA.DEBUG(0,"UpdateAutoTradeButtons complete")
+	--DA.DEBUG(0,"UpdateAutoTradeButtons complete")
 end
 
 function SkilletPluginDropdown_OnClick(this)
@@ -2337,7 +2337,6 @@ end
 function Skillet:InventoryFilterButtons_Show()
 	SkilletInventoryFilterBag:Show()
 	SkilletInventoryFilterVendor:Show()
-	SkilletInventoryFilterBank:Show()
 	SkilletInventoryFilterAlts:Show()
 	SkilletInventoryFilterOwned:Show()
 end
@@ -2345,7 +2344,6 @@ end
 function Skillet:InventoryFilterButtons_Hide()
 	SkilletInventoryFilterBag:Hide()
 	SkilletInventoryFilterVendor:Hide()
-	SkilletInventoryFilterBank:Hide()
 	SkilletInventoryFilterAlts:Hide()
 	SkilletInventoryFilterOwned:Hide()
 end
@@ -2359,7 +2357,8 @@ local skillMenuSelection = {
 		text = "Select None",
 		func = function() Skillet:SkillButton_SetAllSelections(false) Skillet:UpdateTradeSkillWindow() end,
 	},
-}local skillMenuGroup = {
+}
+local skillMenuGroup = {
 	{
 		text = "Empty Group",
 		func = function() Skillet:SkillButton_NewGroup() end,
@@ -2368,7 +2367,8 @@ local skillMenuSelection = {
 		text = "From Selection",
 		func = function() Skillet:SkillButton_MakeGroup() end,
 	},
-}local skillMenuList = {
+}
+local skillMenuList = {
 	{
 		text = "Link Recipe",
 		func = function()
@@ -2423,7 +2423,8 @@ local skillMenuSelection = {
 		text = "Paste",
 		func = function() Skillet:SkillButton_PasteSelected(Skillet.menuButton) end,
 	},
-}local headerMenuList = {
+}
+local headerMenuList = {
 	{
 		text = "Rename Group",
 		func = function() Skillet:SkillButton_NameEditEnable(Skillet.menuButton) end,
@@ -2458,7 +2459,8 @@ local skillMenuSelection = {
 		text = "Paste",
 		func = function() Skillet:SkillButton_PasteSelected(Skillet.menuButton) end,
 	},
-}local headerMenuListMainGroup = {
+}
+local headerMenuListMainGroup = {
 	{
 		text = "New Group",
 		hasArrow = true,
@@ -2485,7 +2487,8 @@ local skillMenuSelection = {
 		text = "Paste",
 		func = function() Skillet:SkillButton_PasteSelected(Skillet.menuButton) end,
 	},
-}local skillMenuListHidden = {
+}
+local skillMenuListHidden = {
 {		text = "New Group",
 		hasArrow = true,
 		menuList = skillMenuGroup,
@@ -2511,7 +2514,8 @@ local skillMenuSelection = {
 		text = "Paste",
 		func = function() Skillet:SkillButton_PasteSelected(Skillet.menuButton) end,
 	},
-}local queueMenuList = {
+}
+local queueMenuList = {
 	{
 		text = L["Move to Top"],
 		func = function()
@@ -2571,86 +2575,6 @@ function Skillet:SkilletQueueMenu_Show(button)
 	local uiScale = UIParent:GetEffectiveScale()
 	self.queueMenuButton = button
 	EasyMenu(queueMenuList, SkilletQueueMenu, _G["UIParent"], x/uiScale,y/uiScale, "MENU", 5)
-end
-
---- tsi hooks
-
-local TSISourceColor = {
-	V = "|cff00ff00",
-	Q = "|cffffff00",
-	D = "|cffff0000",
-}
-function Skillet:TSIGetRecipeSources(recipe, opposing)
-	if not TradeskillInfo then return 0, "No TradeskillInfo" end
-	if not TradeskillInfo.vars.recipes[recipe] then
-		return nil
-	end
-	local found, _, sources, price, level = string.find(TradeskillInfo.vars.recipes[recipe],"[^|]+|(%w+)[|]?(%d*)[|]?(%d*)");
-	if not found then return end
-	local c = TradeskillInfo.db.profile.ColorRecipeSource;
-	local Ltext, Rtext = "";
-	if price == "" then
-		price = nil
-	else
-		price = tonumber(price)
-	end
-	local uf = UnitFactionGroup("player")
-	local res = ""
-	local number_found = 0;
-	opposing = true
-	for s,n in string.gmatch(sources,"(%u%l*)(%d*)") do
-		if (s=="V" or s=="Q" or s=="D") and n~="" then
-			local found,_,vname,znr,fnr,pos,note = string.find(TradeskillInfo.vars.vendors[tonumber(n)],"([^|]+)|(%d+)|(%d+)[|]?([^|]*)[|]?([^|]*)");
-			if found then
-				if opposing or (uf=="Horde" and fnr~="1") or (uf=="Alliance" and fnr~="2") then
-					number_found = number_found + 1;
-					local zone = TradeskillInfo.vars.zones[tonumber(znr)];
-					local faction = TradeskillInfo.vars.factions[tonumber(fnr)];
-					if res ~= "" then
-						res = res.."\n";
-					end
-					if note ~= "" then
-						note = " "..note
-					end
-					if pos ~= "" then
-						local found, _, x, y = string.find(pos,"([%d%.]+),([%d%.]+)");
-						if found then
-							zone = zone or ""
-							pos = " |cFF0066FF|Htsicoord:"..zone..":"..x..":"..y..":"..vname.."|h("..x..", "..y..")|h|r"
-						else
-							pos = " ("..pos..")"
-						end
-					end
---					Rtext = TradeskillInfo.vars.sources[s]..": "..vname..", "..zone..pos..note
-					Rtext = TSISourceColor[s]..vname.."|r: "..zone..pos.."|cff808080"..note.."|r"
-					if level ~= "" then
-						local rep = _G["FACTION_STANDING_LABEL"..level];
-						Rtext = Rtext.."\n(|cff60a0f0"..faction.."|r-"..rep.."|r)";
-					end
-					res = res .. Rtext;
-				end
-			else
-				TradeskillInfo:Print(TradeskillInfo_UnknownNPC_Text,s);
-			end
-		elseif TradeskillInfo.vars.sources[s] then
-			local _,_,f = string.find(s,"%u(%l*)")
-			if opposing or (uf=="Horde" and f~="a") or (uf=="Alliance" and f~="h") then
-				number_found = number_found + 1;
-				if res ~= "" then
-					res = res.."\n"
-				end
-				Rtext = TradeskillInfo.vars.sources[s];
-				res = res..Rtext;
-			end
-		else
-			TradeskillInfo:Print(TradeskillInfo_UnknownSource_Text,s);
-		end
-	end
-	if res == "" or not res then
---		res = "No Data (TradeskillInfo version "..TradeskillInfo.version..")"
-		res = nil
-	end
-	return number_found,res
 end
 
 function Skillet:ReAnchorButtons(newFrame)

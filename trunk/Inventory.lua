@@ -127,7 +127,8 @@ function Skillet:InventoryScan(playerOverride)
 	local reagent
 	if self.db.global.itemRecipeUsedIn then
 		for reagentID in pairs(self.db.global.itemRecipeUsedIn) do
-			local i = GetItemInfo(reagentID) 								-- force the item into local cache
+			local a = GetItemInfo(reagentID)
+			local b = inventoryData[reagentID]
 			DA.TRACE("reagent "..tostring(a).." "..tostring(b))
 			if reagentID and not inventoryData[reagentID] then				-- have we calculated this one yet?
 				if self.currentPlayer == (UnitName("player")) then			-- if this is the current player, use the API
@@ -146,9 +147,9 @@ function Skillet:InventoryScan(playerOverride)
 			end
 		end
 	end
-	self.db.realm.inventoryData[player] = inventoryData
 	self.visited = {} -- this is a simple infinite loop avoidance scheme: basically, don't visit the same node twice
 	if inventoryData then
+		self.db.realm.inventoryData[player] = inventoryData
 		-- now calculate the craftability of these same reagents
 		for reagentID,inventory in pairs(inventoryData) do
 			self:InventoryReagentCraftability(reagentID, player)

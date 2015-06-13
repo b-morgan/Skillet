@@ -104,9 +104,6 @@ local function createShoppingListFrame(self)
 	SkilletShowQueuesIncludeGuildText:SetText(L["Include guild"])
 	SkilletShowQueuesIncludeGuild:SetChecked(Skillet.db.char.include_guild)
 
-	SkilletShowQueuesIncludeBankText:SetText(L["Include bank"])
-	SkilletShowQueuesIncludeBank:SetChecked(Skillet.db.char.include_bank)
-
 	-- The frame enclosing the scroll list needs a border and a background .....
 	local backdrop = SkilletShoppingListParent
 	backdrop:SetBackdrop(ControlBackdrop)
@@ -168,8 +165,8 @@ function Skillet:ClearShoppingList(player)
 	self:UpdateTradeSkillWindow()
 end
 
-function Skillet:GetShoppingList(player, includeBank, includeGuildbank)
-	DA.DEBUG(0,"GetShoppingList(",player,includeBank,includeGuildbank,")")
+function Skillet:GetShoppingList(player, includeGuildbank)
+	DA.DEBUG(0,"GetShoppingList("..tostring(player)..", "..tostring(includeGuildbank)..")")
 	self:InventoryScan()
 	if not Skillet.db.global.cachedGuildbank then
 		Skillet.db.global.cachedGuildbank = {}
@@ -258,7 +255,7 @@ local function cache_list(self)
 	if not Skillet.db.char.include_alts then
 		name = Skillet.currentPlayer
 	end
-	self.cachedShoppingList = self:GetShoppingList(name, Skillet.db.char.include_bank, Skillet.db.char.include_guild)
+	self.cachedShoppingList = self:GetShoppingList(name, Skillet.db.char.include_guild)
 end
 
 local function indexBank()
@@ -759,10 +756,6 @@ end
 
 function Skillet:ShoppingListToggleIncludeGuild()
 	Skillet.db.char.include_guild = not Skillet.db.char.include_guild
-end
-
-function Skillet:ShoppingListToggleIncludeBank()
-	Skillet.db.char.include_bank = not Skillet.db.char.include_bank
 end
 
 local function get_button(i)
