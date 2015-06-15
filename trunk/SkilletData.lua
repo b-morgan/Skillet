@@ -1078,10 +1078,9 @@ function Skillet:CollectTradeSkillData()
 end
 
 -- this routine collects the basic data (which tradeskills a player has)
--- clean = true means wipe the old data
-function SkilletData:ScanPlayerTradeSkills(player, clean)
+function SkilletData:ScanPlayerTradeSkills(player)
 	if player == (UnitName("player")) then -- only for active player
-		if clean or not Skillet.db.realm.tradeSkills[player] then
+		if not Skillet.db.realm.tradeSkills[player] then
 			Skillet.db.realm.tradeSkills[player] = {}
 		end
 		local skillRanksData = Skillet.db.realm.tradeSkills[player]
@@ -1110,8 +1109,7 @@ function SkilletData:ScanPlayerTradeSkills(player, clean)
 end
 
 -- this routine collects the basic data (which tradeskills a player has)
--- clean = true means wipe the old data
-function SkilletLink:ScanPlayerTradeSkills(player, clean)
+function SkilletLink:ScanPlayerTradeSkills(player)
 	if Skillet.db.realm.tradeSkills[player] then
 		return true
 	end
@@ -1291,7 +1289,6 @@ function SkilletData:RescanTrade(force)
 	DA.DEBUG(0,"SkilletData:RescanTrade("..tostring(force)..")")
 	if not Skillet.currentPlayer or not Skillet.currentTrade then return end
 	local player, tradeID = Skillet.currentPlayer, Skillet.currentTrade
-	-- self:InitializeDatabase(self.currentPlayer, false)
 	if player == (UnitName("player")) then -- only allow actual skill rescans of current player data
 		if not Skillet.data.skillList[player] then
 			Skillet.data.skillList[player] = {}
@@ -1307,7 +1304,7 @@ function SkilletData:RescanTrade(force)
 		end
 		if force then
 			Skillet.data.skillList[player]={}
-			Skillet:InitializeDatabase(player, true)
+			Skillet:InitializeDatabase(player)
 			local firstSkill
 			for id,list in pairs(Skillet.db.realm.tradeSkills[player]) do
 				if not firstSkill then
@@ -1346,7 +1343,7 @@ function SkilletLink:RescanTrade(force)
 	end
 	if force then
 		Skillet.data.skillList[player]={}
-		Skillet:InitializeDatabase(player, true)
+		Skillet:InitializeDatabase(player)
 	end
 	Skillet:ScanQueuedReagents()
 	Skillet.dataScanned = self:ScanTrade()

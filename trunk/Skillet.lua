@@ -435,6 +435,7 @@ Skillet.options =
 			func = function()
 				if not (UnitAffectingCombat("player")) then
 					Skillet:FlushAllData()
+					Skillet:InitializeDatabase(UnitName("player"))
 				else
 					DA.DEBUG(0,"|cff8888ffSkillet|r: Combat lockdown restriction." ..
 												  " Leave combat and try again.")
@@ -449,6 +450,7 @@ Skillet.options =
 			func = function()
 				if not (UnitAffectingCombat("player")) then
 					Skillet:FlushRecipeData()
+					Skillet:InitializeDatabase(UnitName("player"))
 				else
 					DA.DEBUG(0,"|cff8888ffSkillet|r: Combat lockdown restriction." ..
 												  " Leave combat and try again.")
@@ -765,11 +767,45 @@ function Skillet:OnInitialize()
 	DA.DebugLog = SkilletDBPC
 	DA.DebugProfile = SkilletProfile
 	self.db = AceDB:New("SkilletDB", defaults)
+
+-- Clean up obsolete data
+	if self.db.realm.dataVersion then
+		self.db.global.dataVersion = self.db.realm.dataVersion
+		self.db.realm.dataVersion = nil
+	end
+	if self.db.realm.reagentBank then
+		self.db.realm.reagentBank = nil
+	end
+
+-- Clean up if database is stale 
 	local _,wowBuild,_,wowVersion = GetBuildInfo();
 	self.wowBuild = wowBuild
 	self.wowVersion = wowVersion
-	self:InitializeDatabase((UnitName("player")), false)  --- force clean rescan for now
-	-- hook default tooltips
+	if not self.db.global.dataVersion or self.db.global.dataVersion ~= 5 then
+		self.db.global.dataVersion = 5
+		self:FlushAllData()
+	elseif not self.db.global.wowBuild or self.db.global.wowBuild ~= self.wowBuild then
+		self.db.global.wowBuild = self.wowBuild
+		self.db.global.wowVersion = self.wowVersion -- actually TOC version
+		self:FlushRecipeData()
+	end
+
+-- Initialize global data
+	if not self.db.global.recipeDB then
+		self.db.global.recipeDB = {}
+	end
+	if not self.db.global.itemRecipeSource then
+		self.db.global.itemRecipeSource = {}
+	end
+	if not self.db.global.itemRecipeUsedIn then
+		self.db.global.itemRecipeUsedIn = {}
+	end
+	if not self.db.global.cachedGuildbank then
+		self.db.global.cachedGuildbank = {}
+	end
+	self:InitializeDatabase(UnitName("player"))
+
+-- Hook default tooltips
 	local tooltipsToHook = { ItemRefTooltip, GameTooltip, ShoppingTooltip1, ShoppingTooltip2 };
 	for _, tooltip in pairs(tooltipsToHook) do
 		if tooltip and tooltip:HasScript("OnTooltipSetItem") then
@@ -816,7 +852,6 @@ function Skillet:OnInitialize()
 	Skillet.TraceShow = Skillet.db.profile.TraceShow
 	Skillet.TraceLog = Skillet.db.profile.TraceLog
 	Skillet.ProfileShow = Skillet.db.profile.ProfileShow
-	--
 	Skillet:InitializePlugins()
 end
 
@@ -833,55 +868,23 @@ function Skillet:FlushAllData()
 	Skillet.db.realm.reagentsInQueue = {}
 	Skillet.db.realm.inventoryData = {}
 	Skillet.db.realm.userIgnoredMats = {}
-	Skillet:InitializeDatabase((UnitName("player")))
 end
 
 function Skillet:FlushRecipeData()
---	Skillet.data = {}
 	Skillet.db.global.recipeDB = {}
 	Skillet.db.global.itemRecipeUsedIn = {}
 	Skillet.db.global.itemRecipeSource = {}
 	Skillet.db.realm.skillDB = {}
-	Skillet:InitializeDatabase((UnitName("player")))
 end
 
-function Skillet:InitializeDatabase(player, clean)
+function Skillet:InitializeDatabase(player)
 	DA.DEBUG(0,"initialize database for "..tostring(player))
+	if self.linkedSkill or self.isGuild then  -- Avoid adding unnecessary data to savedvariables
+		return
+	end
 	if player then
-		if self.db.realm.dataVersion then
-			self.db.global.dataVersion = self.db.realm.dataVersion
-			self.db.realm.dataVersion = nil
-		end
-		if not self.db.global.dataVersion or self.db.global.dataVersion ~= 5 then
-			self.db.global.dataVersion = 5
-			self:FlushAllData()
-			self.db.realm.reagentBank = nil -- No longer used.
-		end
-		if not self.db.global.wowBuild or self.db.global.wowBuild ~= self.wowBuild then
-			self.db.global.wowBuild = self.wowBuild
-			self.db.global.wowVersion = self.wowVersion -- actually TOC version
-			self:FlushRecipeData()
-		end
 		if not self.db.realm.groupDB then
 			self.db.realm.groupDB = {}
-		end
-		if not self.db.realm.inventoryData then
-			self.db.realm.inventoryData = {}
-		end
-		if not self.db.realm.inventoryData[player] then
-			self.db.realm.inventoryData[player] = {}
-		end
-		if not self.db.realm.reagentsInQueue then
-			self.db.realm.reagentsInQueue = {}
-		end
-		if not self.db.realm.reagentsInQueue[player] then
-			self.db.realm.reagentsInQueue[player] = {}
-		end
-		if not self.db.realm.userIgnoredMats then
-			self.db.realm.userIgnoredMats = {}
-		end
-		if not self.db.realm.userIgnoredMats[player] then
-			self.db.realm.userIgnoredMats[player] = {}
 		end
 		if not self.db.realm.skillDB then
 			self.db.realm.skillDB = {}
@@ -906,21 +909,6 @@ function Skillet:InitializeDatabase(player, clean)
 		end
 		if not self.db.realm.auctionData[player] then
 			self.db.realm.auctionData[player] = {}
-		end
-		if not self.db.profile.SavedQueues then
-			self.db.profile.SavedQueues = {}
-		end
-		if not self.db.global.recipeDB then
-			self.db.global.recipeDB = {}
-		end
-		if not self.db.global.itemRecipeSource then
-			self.db.global.itemRecipeSource = {}
-		end
-		if not self.db.global.itemRecipeUsedIn then
-			self.db.global.itemRecipeUsedIn = {}
-		end
-		if not self.db.global.cachedGuildbank then
-			self.db.global.cachedGuildbank = {}
 		end
 		if not self.data then
 			self.data = {}
@@ -951,9 +939,32 @@ function Skillet:InitializeDatabase(player, clean)
 		end
 		if self.dataGatheringModules[player] then
 			local mod = self.dataGatheringModules[player]
-			mod.ScanPlayerTradeSkills(mod, player, clean)
+			mod.ScanPlayerTradeSkills(mod, player)
 		else
 			DA.DEBUG(0,"data gather module is nil")
+		end
+		if player == UnitName("player") then
+			if not self.db.realm.inventoryData then
+				self.db.realm.inventoryData = {}
+			end
+			if not self.db.realm.inventoryData[player] then
+				self.db.realm.inventoryData[player] = {}
+			end
+			if not self.db.realm.reagentsInQueue then
+				self.db.realm.reagentsInQueue = {}
+			end
+			if not self.db.realm.reagentsInQueue[player] then
+				self.db.realm.reagentsInQueue[player] = {}
+			end
+			if not self.db.realm.userIgnoredMats then
+				self.db.realm.userIgnoredMats = {}
+			end
+			if not self.db.realm.userIgnoredMats[player] then
+				self.db.realm.userIgnoredMats[player] = {}
+			end
+			if not self.db.profile.SavedQueues then
+				self.db.profile.SavedQueues = {}
+			end
 		end
 		self:CollectRecipeInformation()
 	end
@@ -1073,7 +1084,7 @@ function Skillet:IsTradeSkillLinked()
 	if isLinked or isGuild then
 		if not linkedPlayer then
 			if isGuild then
-				linkedPlayer = "Guild Recipes"
+				linkedPlayer = "Guild Recipes" -- This can be removed when InitializeDatabase gets smarter.
 			end
 		end
 		return true, linkedPlayer, isGuild
@@ -1081,9 +1092,7 @@ function Skillet:IsTradeSkillLinked()
 	return false, nil, false
 end
 
--- show the tradeskill window
--- only gets called from TRADE_SKILL_SHOW event
--- this means, the skill being shown is for the main toon (not an alt)
+-- Show the tradeskill window, called from TRADE_SKILL_SHOW event, clicking on links, or clicking on guild professions
 function Skillet:SkilletShow()
 	DA.DEBUG(1,"SHOW WINDOW (was showing "..(self.currentTrade or "nil")..")");
 	if PandaPanel and PandaPanel:IsShown() then
@@ -1112,9 +1121,7 @@ function Skillet:SkilletShow()
 		self:BlizzardTradeSkillFrame_Show()
 	else
 		if self:IsSupportedTradeskill(self.currentTrade) then
-			if not self.linkedSkill and not self.isGuild then
-				self:InventoryScan()
-			end
+			self:InventoryScan()
 			self.tradeSkillOpen = true
 			DA.DEBUG(1,"SkilletShow: "..self.currentTrade)
 			self.selectedSkill = nil
@@ -1536,18 +1543,20 @@ end
 
 -- sets the state of a craft specific option
 function Skillet:SetTradeSkillOption(option, value, playerOverride, tradeOverride)
-	local player = playerOverride or self.currentPlayer
-	local trade = tradeOverride or self.currentTrade
-	if not self.db.realm.options then
-		self.db.realm.options = {}
+	if not self.linkedSkill and not self.isGuild then
+		local player = playerOverride or self.currentPlayer
+		local trade = tradeOverride or self.currentTrade
+		if not self.db.realm.options then
+			self.db.realm.options = {}
+		end
+		if not self.db.realm.options[player] then
+			self.db.realm.options[player] = {}
+		end
+		if not self.db.realm.options[player][trade] then
+			self.db.realm.options[player][trade] = {}
+		end
+		self.db.realm.options[player][trade][option] = value
 	end
-	if not self.db.realm.options[player] then
-		self.db.realm.options[player] = {}
-	end
-	if not self.db.realm.options[player][trade] then
-		self.db.realm.options[player][trade] = {}
-	end
-	self.db.realm.options[player][trade][option] = value
 end
 
 -- workaround for Ace2
