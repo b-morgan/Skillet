@@ -413,6 +413,9 @@ end
 -- Rebuilds reagentsInQueue list
 function Skillet:ScanQueuedReagents()
 DA.DEBUG(0,"ScanQueuedReagents")
+	if self.linkedSkill or self.isGuild then
+		return
+	end
 	local reagentsInQueue = {}
 	for i,command in pairs(self.db.realm.queueData[self.currentPlayer]) do
 		if command.op == "iterate" then

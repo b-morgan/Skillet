@@ -117,10 +117,11 @@ function Skillet:InventorySkillIterations(tradeID, skillIndex, playerOverride)
 	return 0, 0, 0
 end
 
-local invscan = 1
 function Skillet:InventoryScan(playerOverride)
-	DA.DEBUG(0,"InventoryScan "..invscan..", "..tostring(playerOverride))
-	invscan = invscan + 1
+	DA.DEBUG(0,"InventoryScan("..tostring(playerOverride)..")")
+	if self.linkedSkill or self.isGuild then
+		return
+	end
 	local player = playerOverride or self.currentPlayer
 	local cachedInventory = self.db.realm.inventoryData[player]
 	local inventoryData = {}
@@ -162,13 +163,11 @@ function Skillet:InventoryScan(playerOverride)
 			end
 		end
 	end
-		DA.DEBUG(0,"InventoryScan Complete")
+		DA.DEBUG(0,"InventoryScan complete for "..tostring(player))
 end
 
 function Skillet:GetInventory(player, reagentID)
 	if player and reagentID then
---		if self.db.realm.inventoryData[player] and self.db.realm.inventoryData[player][reagentID] and 
---		  type(self.db.realm.inventoryData[player][reagentID]) == "string" then
 		if self.db.realm.inventoryData[player] and self.db.realm.inventoryData[player][reagentID] then 
 			local data = { string.split(" ", self.db.realm.inventoryData[player][reagentID]) }
 			if #data == 1 then			-- no craftability info yet
@@ -178,7 +177,7 @@ function Skillet:GetInventory(player, reagentID)
 			else
 				return tonumber(data[1]) or 0, tonumber(data[2]) or 0, tonumber(data[3]) or 0, tonumber(data[4]) or 0
 			end
-		elseif player == self.currentPlayer then
+		elseif player == UnitName("player") then
 			local numInBoth = GetItemCount(reagentID,true)				-- both bank and bags
 			return tonumber(numInBoth) or 0, 0, 0, 0
 		end
