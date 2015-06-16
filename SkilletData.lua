@@ -592,17 +592,8 @@ local skill_style_type = {
 	["header"]          = { r = 1.00, g = 0.82, b = 0,    level = 0, alttext="",    cstring = "|cffffc800"},
 	["unavailable"]     = { r = 0.3, g = 0.3, b = 0.3,    level = 6, alttext="",    cstring = "|cff606060"},
 }
+
 local lastAutoTarget = {}
-local SkilletDataScanTooltip = CreateFrame("GameTooltip", "SkilletDataScanTooltip", nil, "GameTooltipTemplate")
-SkilletDataScanTooltip:SetOwner(WorldFrame, "ANCHOR_NONE")
-
-local function FixedGetTradeSkillReagentItemLink(i,j)
-	local tooltip = SkilletDataScanTooltip
-	tooltip:ClearLines()
-	tooltip:SetTradeSkillItem(i,j)
-	return select(2,tooltip:GetItem())
-end
-
 function Skillet:GetAutoTargetItem(tradeID)
 	if Skillet.TradeSkillAutoTarget[tradeID] then
 		local itemID = lastAutoTarget[tradeID]
@@ -1360,7 +1351,6 @@ function SkilletData:ScanTrade()
 	end
 	self.scanInProgress = true
 	local tradeID
-	local API = {}
 	local link = GetTradeSkillListLink()
 	local profession, rank, maxRank = GetTradeSkillLine()
 	if link then
@@ -1368,17 +1358,6 @@ function SkilletData:ScanTrade()
 	else
 		--DA.DEBUG(0,"GetTradeSkill: "..(profession or "nil").." non linkable")
 	end
-	API.GetNumSkills = GetNumTradeSkills
-	API.ExpandLine = ExpandTradeSkillSubClass
-	API.GetRecipeLink = GetTradeSkillRecipeLink
-	API.GetTools = GetTradeSkillTools
-	API.GetCooldown = GetTradeSkillCooldown
-	API.GetItemLink = GetTradeSkillItemLink
-	API.GetNumMade = GetTradeSkillNumMade
-	API.GetNumReagents = GetTradeSkillNumReagents
-	API.GetReagentInfo = GetTradeSkillReagentInfo
-	-- API.GetReagentLink = GetTradeSkillReagentItemLink
-	API.GetReagentLink = FixedGetTradeSkillReagentItemLink
 	-- get the tradeID from the profession name (data collected earlier).
 	tradeID = TradeSkillIDsByName[profession] or 2656	-- "mining" doesn't exist as a spell, so instead use smelting (id 2656)
 	if tradeID ~= Skillet.currentTrade then
@@ -1403,7 +1382,7 @@ function SkilletData:ScanTrade()
 		Skillet.db.realm.tradeSkills[player][tradeID].maxRank = maxRank
 	end
 		self:ResetTradeSkillFilter() -- verify the search filter is blank (so we get all skills)
-	local numSkills = API.GetNumSkills()
+	local numSkills = GetNumTradeSkills()
 	for i = 1, numSkills do
 		local skillName, skillType, _, isExpanded = GetTradeSkillInfo(i)
 		--DA.DEBUG(3,"i= "..tostring(i)..", skillName= "..tostring(skillName)..", skillType="..tostring(skillType)..", isExpanded= "..tostring(isExpanded))
@@ -1414,7 +1393,7 @@ function SkilletData:ScanTrade()
 			end
 		end
 	end
-	numSkills = API.GetNumSkills()
+	numSkills = GetNumTradeSkills()
 	DA.DEBUG(0,"Scanning Trade "..(profession or "nil")..":"..(tradeID or "nil").." "..numSkills.." recipes")
 	if not Skillet.data.skillIndexLookup[player] then
 		Skillet.data.skillIndexLookup[player] = {}
@@ -1461,7 +1440,7 @@ function SkilletData:ScanTrade()
 				if skillType == "header" or skillType == "subheader" then
 					numHeaders = numHeaders + 1
 					if not isExpanded then
-						API.ExpandLine(i)
+						ExpandTradeSkillSubClass(i)
 					end
 					local groupName
 					if groupList[skillName] then
@@ -1482,11 +1461,11 @@ function SkilletData:ScanTrade()
 						Skillet:RecipeGroupAddSubGroup(parentGroup, currentGroup, i)
 					end
 				else
-					local recipeLink = API.GetRecipeLink(i)
+					local recipeLink = GetTradeSkillRecipeLink(i)
 					local recipeID = Skillet:GetItemIDFromLink(recipeLink)
 					local noRecipe = false
 					if not recipeID then
-						recipeLink = API.GetItemLink(i)
+						recipeLink = GetTradeSkillItemLink(i)
 						recipeID = Skillet:GetItemIDFromLink(recipeLink)
 						if not recipeID then
 							gotNil = true
@@ -1508,14 +1487,14 @@ function SkilletData:ScanTrade()
 					skillData[i].color = skill_style_type[skillType]
 					skillData[i].category = lastHeader
 					local skillDBString = DifficultyChar[skillType]..recipeID
-					local tools = { API.GetTools(i) }
+					local tools = { GetTradeSkillTools(i) }
 					skillData[i].tools = {}
 					local slot = 1
 					for t=2,#tools,2 do
 						skillData[i].tools[slot] = (tools[t] or 0)
 						slot = slot + 1
 					end
-					local cd = API.GetCooldown(i)
+					local cd = GetTradeSkillCooldown(i)
 					if cd then
 						skillData[i].cooldown = cd + time()		-- this is when your cooldown will be up
 						skillDBString = skillDBString.." cd=" .. cd + time()
@@ -1559,7 +1538,7 @@ function SkilletData:ScanTrade()
 								toolString = toolString..":"..string.gsub(tools[t]," ", "_")
 							end
 						end
-						local itemLink = API.GetItemLink(i)
+						local itemLink = GetTradeSkillItemLink(i)
 						if not itemLink then
 							gotNil = true
 							break
@@ -1567,7 +1546,7 @@ function SkilletData:ScanTrade()
 						local itemString = "0"
 						if GetItemInfo(itemLink) then
 							local itemID = Skillet:GetItemIDFromLink(itemLink)
-							local minMade,maxMade = API.GetNumMade(i)
+							local minMade,maxMade = GetTradeSkillNumMade(i)
 							recipe.itemID = itemID
 							recipe.numMade = (minMade + maxMade)/2
 							if recipe.numMade > 1 then
@@ -1589,11 +1568,11 @@ function SkilletData:ScanTrade()
 						end
 						local reagentString = "-"
 						local reagentData = {}
-						for j=1, API.GetNumReagents(i), 1 do
-							local reagentName, _, numNeeded = API.GetReagentInfo(i,j)
+						for j=1, GetTradeSkillNumReagents(i), 1 do
+							local reagentName, _, numNeeded = GetTradeSkillReagentInfo(i,j)
 							local reagentID = 0
 							if reagentName then
-								local reagentLink = API.GetReagentLink(i,j)
+								local reagentLink = GetTradeSkillReagentItemLink(i,j)
 								reagentID = Skillet:GetItemIDFromLink(reagentLink)
 							else
 								gotNil = true
@@ -1852,7 +1831,7 @@ function SkilletLink:ScanTrade()
 						local reagentName, _, numNeeded = GetTradeSkillReagentInfo(i,j)
 						local reagentID = 0
 						if reagentName then
-							local reagentLink = FixedGetTradeSkillReagentItemLink(i,j)
+							local reagentLink = GetTradeSkillReagentItemLink(i,j)
 							reagentID = Skillet:GetItemIDFromLink(reagentLink)
 						else
 							gotNil = true
