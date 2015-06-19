@@ -17,14 +17,15 @@ You should have received a copy of the GNU General Public License
 along with this program.  If not, see <http://www.gnu.org/licenses/>.
 ]]--
 
-local MAJOR_VERSION = "2.82"
+local MAJOR_VERSION = "2.83"
 local MINOR_VERSION = ("$Revision$"):match("%d+") or 1
 local DATE = string.gsub("$Date$", "^.-(%d%d%d%d%-%d%d%-%d%d).-$", "%1")
 
 Skillet = LibStub("AceAddon-3.0"):NewAddon("Skillet", "AceConsole-3.0", "AceEvent-3.0", "AceHook-3.0", "AceTimer-3.0")
 Skillet.title   = "Skillet"
-Skillet.version = MAJOR_VERSION .. "-" .. MINOR_VERSION .. "LS"
+Skillet.version = MAJOR_VERSION .. "-" .. MINOR_VERSION
 Skillet.date    = DATE
+Skillet.package = GetAddOnMetadata("Skillet", "X-Curse-Packaged-Version");
 local AceDB = LibStub("AceDB-3.0")
 
 -- Pull it into the local namespace, it's faster to access that way
@@ -1009,6 +1010,7 @@ function Skillet:OnEnable()
 	self:RegisterEvent("TRADE_SKILL_SHOW", "SkilletShow")
 	self:RegisterEvent("TRADE_SKILL_NAME_UPDATE")
 	self:RegisterEvent("GUILD_RECIPE_KNOWN_BY_MEMBERS", "SkilletShowGuildCrafters")
+	self:RegisterEvent("GARRISON_TRADESKILL_NPC_CLOSED")
 	-- TODO: Tracks when the number of items on hand changes
 	self:RegisterEvent("BAG_UPDATE") -- Fires for both bag and bank updates.
 	self:RegisterEvent("BAG_UPDATE_DELAYED") -- Fires after all applicable BAG_UPADTE events for a specific action have been fired.
@@ -1068,6 +1070,10 @@ function Skillet:TRADE_SKILL_NAME_UPDATE()
 	if Skillet.linkedSkill then
 		Skillet:SkilletShow()
 	end
+end
+
+function Skillet:GARRISON_TRADESKILL_NPC_CLOSED()
+	DA.DEBUG(0,"GARRISON_TRADESKILL_NPC_CLOSED")
 end
 
 -- Called when the addon is disabled
@@ -1163,6 +1169,11 @@ function Skillet:SkilletClose()
 	DA.DEBUG(0,"SKILLET CLOSE")
 	if self.dataSource == "api" then -- if the skillet system is using the api for data access, then close the skillet window
 		self:HideAllWindows()
+		if Skillet.wasNPCCrafting then
+			DA.DEBUG(0,"wasNPCCrafting")
+			C_Garrison.CloseGarrisonTradeskillNPC()
+			C_Garrison.CloseTradeskillCrafter()
+		end
 	end
 end
 
