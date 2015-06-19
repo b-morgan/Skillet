@@ -35,15 +35,18 @@ local TradeSkillList = {
 	3273,       -- first aid
 	53428,      -- runeforging
 }
--- Table of follower tradeskills that should use the Blizzard frame
+
+-- Table of follower (IsNPCCrafting) tradeskills that should use the Blizzard frame
 Skillet.FollowerSkillList = {
-	[7411] = false,				-- enchanting follower for Illusions is broken in WoD release.
+	[7411] = false,     -- Enchanting follower for Illusions is broken in 6.0
+	[25229] = false,    -- Jewelcrafting Apexis Gemcutter is broken in 6.2
 }
--- Table of follower tradeskill headers that should use the Blizzard frame
--- Note: A true entry in Skillet.FollowerSkillList above will override this table
-Skillet.FollowerSkillHeader = {
-	[7411] = L["Illusions"],	-- enchanting follower for Illusions is broken in WoD release.
+
+-- In case the previous table is too broad
+-- Table of follower (IsNPCCrafting) NPC IDs (from GUID) that should use the Blizzard frame 
+Skillet.FollowerNPC = {
 }
+
 Skillet.TradeSkillAdditionalAbilities = {
 	[7411]  = {13262,"Disenchant"},     -- enchanting = disenchant
 	[2550]  = {818,"Basic_Campfire"},   -- cooking = basic campfire
@@ -57,7 +60,7 @@ Skillet.TradeSkillAutoTarget = {
 	[7411] =  {   -- Enchanting
 		[38682] = 1, -- Enchanting Vellum
 	},
-	[31252] = {
+	[31252] = {   -- Prospecting
 		[2770]  = 5, --Copper Ore
 		[2771]  = 5, --Tin Ore
 		[2772]  = 5, --Iron Ore
@@ -709,28 +712,38 @@ end
 
 -- Checks to see if this trade follower can not use Skillet frame.
 function Skillet:IsNotSupportedFollower(tradeID)
+	DA.DEBUG(0,"IsNotSupportedFollower("..tostring(tradeID)..")")
+	Skillet.wasNPCCrafting = false
 	if IsNPCCrafting() then
+		local guid = UnitGUID("target")
+		local gtype, zero, server_id, instance_id, zone_uid, npc_id, spawn_uid
+		if guid then
+			gtype, zero, server_id, instance_id, zone_uid, npc_id, spawn_uid = strsplit("-",guid);
+		end
+		DA.DEBUG(0,"IsNPCCrafting, gtype="..tostring(gtype)..", npc_id="..tostring(npc_id))
 		if IsShiftKeyDown() then
-			return true -- mostly for debugging
+			return true -- Use Blizzard frame
+		end
+		if IsControlKeyDown() then
+			DA.DEBUG(0,"npc_id="..tostring(npc_id))
+			Skillet.wasNPCCrafting = true
+			return false -- Use Skillet frame (mostly for debugging)
 		end
 		if not tradeID then
-			return true -- Unknown tradeskill, play it safe.
+			return true -- Unknown tradeskill, play it safe and use Blizzard frame
 		end
 		if Skillet.db.profile.use_blizzard_for_followers then
-			return true -- Option makes this easy.
+			return true -- Option makes this easy, use Blizzard frame
 		end
 		if Skillet.FollowerSkillList[tradeID] then
-			return true -- Doesn't matter what they craft.
+			return true -- Any NPC for this tradeskill uses Blizzard Frame
 		end
-		if Skillet.FollowerSkillHeader[tradeID] then
-			local skillName, skillType, _, isExpanded = GetTradeSkillInfo(1)
-			DA.DEBUG(0,"tradeID= "..tostring(tradeID)..", skillName= "..tostring(skillName)..", skillType="..tostring(skillType)..", isExpanded= "..tostring(isExpanded))
-			if skillType == "header" and skillName == Skillet.FollowerSkillHeader[tradeID] then
-				return true -- If they craft things Skillet can't process
-			end
+		if gtype and gtype == "Creature" and Skillet.FollowerNPC[npc_id] then
+			return true -- This specific NPC crafts things Skillet can't process, use Blizzard frame
 		end
+		Skillet.wasNPCCrafting = true
 	end
-	return false
+	return false -- Use Skillet frame
 end
 
 local missingVendorItems = {

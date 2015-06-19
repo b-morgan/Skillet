@@ -127,8 +127,7 @@ function Skillet:CreateTradeSkillWindow()
 	titletext:SetShadowColor(0,0,0)
 	titletext:SetShadowOffset(1,-1)
 	titletext:SetTextColor(1,1,1)
-	local mv = string.sub(Skillet.version,1,(string.find(Skillet.version,"-")-1))
-	titletext:SetText(L["Skillet Trade Skills"].." "..mv);
+	titletext:SetText(L["Skillet Trade Skills"].." "..Skillet.version);
 	local label = _G["SkilletFilterLabel"];
 	label:SetText(L["Filter"]);
 	SkilletCreateAllButton:SetText(L["Create All"])
@@ -138,23 +137,17 @@ function Skillet:CreateTradeSkillWindow()
 	SkilletStartQueueButton:SetText(L["Process"])
 	SkilletEmptyQueueButton:SetText(L["Clear"])
 	SkilletEnchantButton:SetText(L["Enchant"])
---	SkilletShowOptionsButton:SetText(L["Options"])
---	SkilletRescanButton:SetText(L["Rescan"])
 	SkilletRecipeNotesButton:SetText(L["Notes"])
---	SkilletRecipeNotesButton:SetTextFontObject("GameFontNormalSmall")
 	SkilletRecipeNotesFrameLabel:SetText(L["Notes"])
 	SkilletShoppingListButton:SetText(L["Shopping List"])
 	SkilletSortLabel:SetText(L["Sorting"])
 	SkilletGroupLabel:SetText(L["Grouping"])
 	SkilletIgnoredMatsButton:SetText(L["Ignored List"])
 	SkilletQueueManagementButton:SetText(L["Queues"])
---	SkilletDetailsManagementButton:SetText("Details")
 	SkilletQueueLoadButton:SetText(L["Load"])
 	SkilletQueueDeleteButton:SetText(L["Delete"])
 	SkilletQueueSaveButton:SetText(L["Save"])
 	SkilletQueueOnlyButton:SetText(">")
---	SkilletHideUncraftableRecipesText:SetText(L["Hide uncraftable"])
---	SkilletHideTrivialRecipesText:SetText(L["Hide trivial"])
 
 	-- Always want these visible.
 	SkilletItemCountInputBox:SetText("1");
@@ -185,9 +178,6 @@ function Skillet:CreateTradeSkillWindow()
 		SkilletRankFrame.subRanks.gray:SetFrameLevel(SkilletFrame:GetFrameLevel()+4)
 	end
 	SkilletFrameEmptySpace = CreateFrame("Button", nil, SkilletSkillListParent, "SkilletEmptySpaceTemplate")
---	SkilletFrameEmptySpace.texture = SkilletFrameEmptySpace:CreateTexture()
---	SkilletFrameEmptySpace.texture:SetAllPoints(SkilletFrameEmptySpace)
---	SkilletFrameEmptySpace.texture:SetTexture(.5,.5,.5,.5)
 	SkilletFrameEmptySpace.skill = { ["mainGroup"] = true, }
 	SkilletFrameEmptySpace:SetPoint("TOPLEFT",SkilletSkillListParent,"TOPLEFT")
 	SkilletFrameEmptySpace:SetPoint("BOTTOMRIGHT",SkilletSkillListParent,"BOTTOMRIGHT")
@@ -465,7 +455,6 @@ function Skillet:RecipeDifficultyButton_OnShow()
 	local level = self:GetTradeSkillOption("filterLevel")
 	local v = 1-level/4
 	SkilletRecipeDifficultyButtonTexture:SetTexCoord(0,1,v,v+.25)
---	SkilletRecipeDifficultySelector:SetPoint("BOTTOMLEFT", "SkilletRecipeDifficultyButton", "BOTTOMLEFT", 0, -(level-1)*16)
 end
 
 function Skillet:TradeButton_OnEnter(button)
@@ -570,7 +559,6 @@ function Skillet:UpdateTradeButtons(player)
 		local frame = _G[frameName]
 		if frame then
 			frame:Hide()
---			frame.checked:SetChecked(false)
 		end
 	end
 	local frameName = "SkilletFrameTradeButtons-"..player
@@ -794,22 +782,17 @@ function Skillet:internal_UpdateTradeSkillWindow()
 	SkilletReagentParent:SetWidth(reagent_width)
 	SkilletQueueManagementParent:SetWidth(reagent_width)
 	SkilletViewCraftersParent:SetWidth(reagent_width)
-	--SkilletQueueParent:SetWidth(reagent_width)
 	local width = SkilletFrame:GetWidth() - reagent_width - 20 -- padding
 	SkilletSkillListParent:SetWidth(width)
 	-- Set the state of any craft specific options
---	SkilletHideTrivialRecipes:SetChecked(self:GetTradeSkillOption("hidetrivial"))
 	self:RecipeDifficultyButton_OnShow()
 	SkilletHideUncraftableRecipes:SetChecked(self:GetTradeSkillOption("hideuncraftable"))
---	self:SortDropdown_OnShow()
---	self:RecipeGroupDropdown_OnShow()
 	self:UpdateQueueWindow()
 	-- Window Title
 	local tradeName = self:GetTradeName(self.currentTrade)
 	local title = _G["SkilletTitleText"];
 	if title then
-		local mv = string.sub(Skillet.version,1,(string.find(Skillet.version,"-")-1))
-		title:SetText(L["Skillet Trade Skills"] .. " "..mv..": " .. self.currentPlayer .. "/" .. tradeName)
+		title:SetText(L["Skillet Trade Skills"] .. " "..self.version..": " .. self.currentPlayer .. "/" .. tradeName)
 	end
 	local sortedSkillList = self.data.sortedSkillList[skillListKey]
 	local rank,maxRank = 0,0
@@ -875,7 +858,6 @@ function Skillet:internal_UpdateTradeSkillWindow()
 			countText:Hide()
 			countText:SetWidth(10)
 			skillRankBar:Hide()
---			buttonText:SetPoint("LEFT", levelText, "RIGHT", skill.depth*8-8, 0)
 			levelText:SetWidth(skill.depth*8+20)
 			local textAlpha = 1
 			if self.dragEngaged then
@@ -901,14 +883,6 @@ function Skillet:internal_UpdateTradeSkillWindow()
 					button.highlight:Hide()
 				end
 			end
---[[
-			buttonExpand:SetPoint("RIGHT", levelText, "RIGHT", skill.depth*8-8, 0)
-			buttonExpand:SetPoint("LEFT", levelText, "RIGHT", skill.depth*8-24, 0)
-			_G[button:GetName() .. "ExpandNormal"]:SetPoint("RIGHT", levelText, "RIGHT", skill.depth*8-8, 0)
-			_G[button:GetName() .. "ExpandNormal"]:SetPoint("LEFT", levelText, "RIGHT", skill.depth*8-24, 0)
-			_G[button:GetName() .. "ExpandHighlight"]:SetPoint("RIGHT", levelText, "RIGHT", skill.depth*8-8, 0)
-			_G[button:GetName() .. "ExpandHighlight"]:SetPoint("LEFT", levelText, "RIGHT", skill.depth*8-24, 0)
-]]
 			if skill.subGroup then
 				if SkillButtonNameEdit.originalButton ~= buttonText then
 					local _, _, _, _, _, _,_,showProgressBar, currentRank,maxRank,startingRank  = GetTradeSkillInfo(skillIndex)
@@ -940,11 +914,6 @@ function Skillet:internal_UpdateTradeSkillWindow()
 						rankBarWidth = 60;
 					end
 					local button_width = button:GetTextWidth()
---					while button_width > max_text_width - skill.depth*8 - rankBarWidth do
---						text = string.sub(text, 0, -2)
---						buttonText:SetText(text .. "..")
---						button_width = button:GetTextWidth()
---					end
 					show_button(button, self.currentTrade, skillIndex, i)
 				end
 			else
@@ -955,8 +924,6 @@ function Skillet:internal_UpdateTradeSkillWindow()
 				buttonText:SetTextColor(skill_color.r, skill_color.g, skill_color.b, textAlpha)
 				countText:SetTextColor(skill_color.r, skill_color.g, skill_color.b, textAlpha)
 				buttonExpand:Hide()
---				button:SetNormalTexture("")
---				_G[button:GetName() .. "Highlight"]:SetTexture("")
 				-- if the item has a minimum level requirement, then print that here
 				if self.db.profile.display_required_level then
 					local level = self:GetLevelRequiredToUse(recipe.itemID)
@@ -1285,7 +1252,6 @@ function Skillet:SetReagentToolTip(reagentID, numNeeded, numCraftable)
 		GameTooltip:AppendText(GRAY_FONT_COLOR_CODE .. " (" .. L["craftable"] .. ")" .. FONT_COLOR_CODE_CLOSE)
 		for recipeID in pairs(self.db.global.itemRecipeSource[reagentID]) do
 			local recipe = self:GetRecipe(recipeID)
-			--self.db.global.recipeData[self.db.global.itemRecipeSource[reagentID][i]]
 			GameTooltip:AddDoubleLine("Source: ",(self:GetTradeName(recipe.tradeID) or recipe.tradeID)..":"..self:GetRecipeName(recipeID),0,1,0,1,1,1)
 			for player,lookupTable in pairs(self.data.skillIndexLookup) do
 				if lookupTable[recipeID] then
@@ -1397,7 +1363,6 @@ function Skillet:UpdateDetailsWindow(skillIndex)
 		Skillet:HideDetailWindow()
 		return
 	end
---	if skill.id == lastUpdateSpellID then return end
 	lastUpdateSpellID = skill.id
 	local recipe = skilletUnknownRecipe
 	if skill then
@@ -1469,8 +1434,6 @@ function Skillet:UpdateDetailsWindow(skillIndex)
 		SkilletSkillIconCount:Hide()
 	end
 	-- How many can we queue/create?
-	--SkilletCreateCountSlider:SetMinMaxValues(1, math.max(20, (skill.numCraftableBank or 0))) -- s.numcraftablewbank));
-	--SkilletCreateCountSlider:SetMinMaxValues(1, math.min(20, (skill.numCraftableBank or 0))) -- s.numcraftablewbank));
 	SkilletCreateCountSlider:SetValue(self.numItemsToCraft);
 	SkilletItemCountInputBox:SetText("" .. self.numItemsToCraft);
 	SkilletItemCountInputBox:HighlightText()
@@ -1535,7 +1498,6 @@ function Skillet:UpdateDetailsWindow(skillIndex)
 		SkilletPreviousItemButton:Hide()
 	end
 	-- Do any mods want to add extra info to the details window?
---	local extra_text = self:GetExtraItemDetailText(self.currentTrade, skillIndex)
 	local label, extra_text = Skillet:GetExtraText(skill, recipe)
 	if extra_text then
 		SkilletExtraDetailTextLeft:SetPoint("TOPLEFT",lastReagentButton,"BOTTOMLEFT",0,-10)
@@ -1569,11 +1531,9 @@ function Skillet:QueueItemButton_OnClick(this, button)
 		Skillet:QueueManagementToggle(true)
 		local recipeID = queue[index].recipeID
 		local recipe = self:GetRecipe(recipeID)
---		self.db.global.recipeData[recipeID]
 		local tradeID = recipe.tradeID
 		local newSkillIndex = self.data.skillIndexLookup[self.currentPlayer][recipeID]
 		DA.DEBUG(0,"selecting new skill "..tradeID..":"..(newSkillIndex or "nil"))
---		self:PushSkill(Skillet.currentPlayer, self.currentTrade, self.selectedSkill)			-- push the current skill or no?
 		self:SetTradeSkill(self.currentPlayer, tradeID, newSkillIndex)
 		DA.DEBUG(0,"done selecting new skill")
 	elseif button == "RightButton" then
@@ -1712,10 +1672,7 @@ function Skillet:SkillButton_DragUpdate()
 end
 
 function Skillet:SkillButton_OnDragStop(button, mouse)
---	self.dragSkill = nil
---	if Skillet.mouseOver then
-		Skillet:SkillButton_OnReceiveDrag(Skillet.mouseOver, mouse)
---	end
+	Skillet:SkillButton_OnReceiveDrag(Skillet.mouseOver, mouse)
 	for i=1,num_recipe_buttons do
 		local button, buttonDrag = get_recipe_button(i)
 		buttonDrag:Hide()
@@ -1729,8 +1686,6 @@ function Skillet:SkillButton_OnDragStart(button, mouse)
 	local skill = button.skill
 	if skill.selected and skill then
 		if not self:RecipeGroupIsLocked() then
---			self.dragStartXY = { GetCursorPosition() }
---			self.selectedTextOffsetXY = { 0, 0 }
 			for i=1,self.visibleSkillButtons do
 				local button, buttonDrag = get_recipe_button(i)
 				local buttonText = _G[button:GetName().."Name"]
@@ -1993,7 +1948,6 @@ function Skillet:SkillButton_OnClick(button, mouse)
 		self:UpdateTradeSkillWindow()
 	elseif (mouse=="RightButton") then
 		self:SkilletSkillMenu_Show(button)
---		self:UpdateTradeSkillWindow()
 	end
 end
 
@@ -2015,7 +1969,6 @@ function Skillet:ScrollToSkillIndex(skillIndex)
 	if skillIndex == nil then
 		return
 	end
---	self:SortAndFilterRecipes()
 	-- scroll the skill list to make sure the new skill is revealed
 	if SkilletSkillList:IsVisible() then
 		local skillListKey = self.currentPlayer..":"..self.currentTrade..":"..self.currentGroupLabel
@@ -2089,7 +2042,6 @@ end
 
 -- Called when then mouse enters the rank status bar
 function Skillet:RankFrame_OnEnter(button)
---	 if button ~= SkilletRankFrame then
 	GameTooltip:SetOwner(button, "ANCHOR_BOTTOMLEFT")
 	local r,g,b = SkilletSkillName:GetTextColor()
 	GameTooltip:AddLine(SkilletSkillName:GetText(),r,g,b)
@@ -2101,7 +2053,6 @@ function Skillet:RankFrame_OnEnter(button)
 	local chance = Skillet:getLvlUpChance()
 	GameTooltip:AddLine(COLORORANGE..orange.."|r/"..COLORYELLOW..yellow.."|r/"..COLORGREEN..green.."|r/"..COLORGRAY..gray.."|r/ Chance:"..chance.."|r%")
 	GameTooltip:Show()
---	end
 end
 
 -- Called when then mouse enters the rank status bar
@@ -2553,8 +2504,6 @@ function Skillet:SkilletSkillMenu_Show(button)
 			EasyMenu(skillMenuList, SkilletSkillMenu, _G["UIParent"], x/uiScale,y/uiScale, "MENU", 5)
 		end
 	end
---	UIDropDownMenu_Initialize(SkilletSkillMenu, SkilletSkillMenu_Init, "MENU")
---	ToggleDropDownMenu(1, nil, SkilletSkillMenu, button, 0, 0)
 end
 
 function Skillet:SkilletQueueMenu_Show(button)
