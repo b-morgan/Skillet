@@ -17,15 +17,16 @@ You should have received a copy of the GNU General Public License
 along with this program.  If not, see <http://www.gnu.org/licenses/>.
 ]]--
 
-local MAJOR_VERSION = "2.83"
+local MAJOR_VERSION = GetAddOnMetadata("Skillet", "Version");
+local PACKAGE_VERSION = GetAddOnMetadata("Skillet", "X-Curse-Packaged-Version");
 local MINOR_VERSION = ("$Revision$"):match("%d+") or 1
 local DATE = string.gsub("$Date$", "^.-(%d%d%d%d%-%d%d%-%d%d).-$", "%1")
 
 Skillet = LibStub("AceAddon-3.0"):NewAddon("Skillet", "AceConsole-3.0", "AceEvent-3.0", "AceHook-3.0", "AceTimer-3.0")
 Skillet.title   = "Skillet"
 Skillet.version = MAJOR_VERSION .. "-" .. MINOR_VERSION
+Skillet.package = PACKAGE_VERSION
 Skillet.date    = DATE
-Skillet.package = GetAddOnMetadata("Skillet", "X-Curse-Packaged-Version");
 local AceDB = LibStub("AceDB-3.0")
 
 -- Pull it into the local namespace, it's faster to access that way
