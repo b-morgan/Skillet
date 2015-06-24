@@ -1619,7 +1619,7 @@
 			-->
 			<Frame name="SkilletReagentParent" parent="SkilletFrame">
 				<Size>
-					<AbsDimension x="280" y="260"/>
+					<AbsDimension x="280" y="280"/>
 				</Size>
 				<Anchors>
 					<Anchor point="TOPRIGHT" relativeTo="SkilletFrame" relativePoint="TOPRIGHT">
@@ -1642,12 +1642,24 @@
 								</Anchor>
 							</Anchors>
 						</FontString>
+						<FontString name="SkilletDescriptionText" inherits="GameFontHighlightSmall" wordwrap="true" justifyH="LEFT">
+							<Size>
+								<AbsDimension x="244" y="0"/>
+							</Size>
+							<Anchors>
+								<Anchor point="TOPLEFT" relativeTo="SkilletSkillName" relativePoint="BOTTOMLEFT" >
+									<Offset>
+										<AbsDimension x="4" y="0"/>
+									</Offset>
+								</Anchor>
+							</Anchors>
+						</FontString>
 						<!-- If the skill requires a special tool, this is the "Requires: " label for it -->
 						<FontString name="SkilletRequirementLabel" inherits="GameFontHighlightSmall" text="REQUIRES_LABEL">
 							<Anchors>
-								<Anchor point="TOPLEFT" relativeTo="SkilletSkillName" relativePoint="BOTTOMLEFT">
+								<Anchor point="TOPLEFT" relativeTo="SkilletDescriptionText" relativePoint="BOTTOMLEFT">
 									<Offset>
-										<AbsDimension x="0" y="-3"/>
+										<AbsDimension x="0" y="0"/>
 									</Offset>
 								</Anchor>
 							</Anchors>
@@ -1661,6 +1673,24 @@
 								<Anchor point="TOPLEFT" relativeTo="SkilletRequirementLabel" relativePoint="TOPRIGHT" >
 									<Offset>
 										<AbsDimension x="4" y="0"/>
+									</Offset>
+								</Anchor>
+							</Anchors>
+						</FontString>
+						<FontString name="SkilletSkillCooldown" inherits="GameFontRedSmall" wordwrap="true" justifyH="LEFT" justifyV="TOP">
+							<Anchors>
+								<Anchor point="TOPLEFT" relativeTo="SkilletRequirementLabel" relativePoint="BOTTOMLEFT">
+									<Offset>
+										<AbsDimension x="0" y="10"/>
+									</Offset>
+								</Anchor>
+							</Anchors>
+						</FontString>
+						<FontString name="SkilletReagentLabel" inherits="GameFontNormalSmall" justifyH="LEFT" text="SPELL_REAGENTS">
+							<Anchors>
+								<Anchor point="TOPLEFT" relative="SkilletReagentParent" relativePoint="TOPLEFT">
+									<Offset>
+										<AbsDimension x="10" y="-80"/>
 									</Offset>
 								</Anchor>
 							</Anchors>
@@ -1691,24 +1721,6 @@
 								<Anchor point="BOTTOMRIGHT" relativeTo="SkilletReagentParent" relativePoint="BOTTOMRIGHT" >
 									<Offset>
 										<AbsDimension x="-5" y="5"/>
-									</Offset>
-								</Anchor>
-							</Anchors>
-						</FontString>
-						<FontString name="SkilletSkillCooldown" inherits="GameFontRedSmall">
-							<Anchors>
-								<Anchor point="TOPLEFT" relativeTo="SkilletRequirementLabel" relativePoint="BOTTOMLEFT">
-									<Offset>
-										<AbsDimension x="0" y="0"/>
-									</Offset>
-								</Anchor>
-							</Anchors>
-						</FontString>
-						<FontString name="SkilletReagentLabel" inherits="GameFontNormalSmall" justifyH="LEFT" text="SPELL_REAGENTS">
-							<Anchors>
-								<Anchor point="TOPLEFT" relative="SkilletReagentParent" relativePoint="TOPLEFT">
-									<Offset>
-										<AbsDimension x="10" y="-50"/>
 									</Offset>
 								</Anchor>
 							</Anchors>

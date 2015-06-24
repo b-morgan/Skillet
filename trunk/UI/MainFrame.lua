@@ -1319,6 +1319,7 @@ end
 function Skillet:HideDetailWindow()
 	SkilletSkillName:SetText("")
 	SkilletSkillCooldown:SetText("")
+	SkilletDescriptionText:SetText("")
 	SkilletRequirementLabel:Hide()
 	SkilletRequirementText:SetText("")
 	SkilletSkillIcon:Hide()
@@ -1380,13 +1381,28 @@ function Skillet:UpdateDetailsWindow(skillIndex)
 				s:Show()
 			end
 		end
-		-- Whether or not it is in cooldown.
-		local _, _, _, _, _, _, _, _, _, _, _, displayAsUnavailable, unavailableString = GetTradeSkillInfo(skillIndex);
+		local description = GetTradeSkillDescription(skillIndex)
+		--DA.DEBUG(0,"description="..tostring(description))
+		if description then
+			description = description:gsub("\r","")	-- Skillet frame has less space than Blizzard frame, so
+			description = description:gsub("\n","")	-- remove any extra blank lines, but
+			SkilletDescriptionText:SetMaxLines(4)	-- don't let the text get too big.
+			SkilletDescriptionText:SetText(description)
+		else
+			SkilletDescriptionText:SetText("")
+		end
+		-- Whether or not it is on cooldown.
+		local _, _, _, _, _, _, _, _, _, _, _, displayAsUnavailable, unavailableString = GetTradeSkillInfo(skillIndex)
+		--DA.DEBUG(0,"displayAsUnavailable="..tostring(displayAsUnavailable)..", unavailableString="..tostring(unavailableString))
 		local cooldown = 0
 		cooldown = (skill.cooldown or 0) - time()
 		if cooldown > 0 then
 			SkilletSkillCooldown:SetText(COOLDOWN_REMAINING.." "..SecondsToTime(cooldown))
 		elseif displayAsUnavailable then
+			local width = SkilletReagentParent:GetWidth()
+			local iconw = SkilletSkillIcon:GetWidth()
+			SkilletSkillCooldown:SetWidth(width - iconw - 15)
+			SkilletSkillCooldown:SetMaxLines(3)
 			SkilletSkillCooldown:SetText(unavailableString)
 		else
 			SkilletSkillCooldown:SetText("")
