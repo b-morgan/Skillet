@@ -1043,7 +1043,7 @@ function Skillet:OnEnable()
 	self.hideTrivialRecipes = false
 	self.currentTrade = nil
 	self.selectedSkill = nil
-	self.currentPlayer = (UnitName("player"))
+	self.currentPlayer = UnitName("player")
 	self.currentGroupLabel = "Blizzard"
 	self.currentGroup = nil
 	-- run the upgrade code to convert any old settings
