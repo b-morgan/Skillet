@@ -1681,7 +1681,7 @@
 							<Anchors>
 								<Anchor point="TOPLEFT" relativeTo="SkilletRequirementLabel" relativePoint="BOTTOMLEFT">
 									<Offset>
-										<AbsDimension x="0" y="10"/>
+										<AbsDimension x="0" y="0"/>
 									</Offset>
 								</Anchor>
 							</Anchors>
@@ -1690,7 +1690,7 @@
 							<Anchors>
 								<Anchor point="TOPLEFT" relative="SkilletReagentParent" relativePoint="TOPLEFT">
 									<Offset>
-										<AbsDimension x="10" y="-80"/>
+										<AbsDimension x="10" y="-90"/>
 									</Offset>
 								</Anchor>
 							</Anchors>
