@@ -851,7 +851,7 @@ function Skillet:GetRecipe(id)
 			recipe = m.GetRecipe(m, id)
 		end
 	end
-	return recipe, id
+	return recipe
 end
 
 -- reconstruct a recipe from a recipeString and cache it into our system for this session
@@ -1270,7 +1270,7 @@ function Skillet:CalculateCraftableCounts(playerOverride)
 			end
 		end
 	end
-	--DA.DEBUG(0,"CalculateCraftableCounts Complete")
+	DA.DEBUG(0,"CalculateCraftableCounts Complete")
 end
 
 function Skillet:RescanTrade(force)
@@ -1643,7 +1643,6 @@ function SkilletData:ScanTrade()
 	Skillet:SortAndFilterRecipes()
 	DA.DEBUG(0,"all sorted")
 	self.scanInProgress = false
-	collectgarbage("collect")
 	if numHeaders == 0 then
 		skillData.scanned = false
 		return false
@@ -1884,7 +1883,6 @@ function SkilletLink:ScanTrade()
 	Skillet:SortAndFilterRecipes()
 	--DA.DEBUG(0,"all sorted")
 	self.scanInProgress = false
-	collectgarbage("collect")
 	if numHeaders == 0 then
 		skillData.scanned = false
 		return false

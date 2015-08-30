@@ -286,13 +286,10 @@ function Skillet:QueueItems(count)
 	if not count then
 		count = skill.numCraftable / (recipe.numMade or 1)
 		if count == 0 then
-			count = skill.numCraftableVendor / (recipe.numMade or 1)
+			count = (skill.numCraftableVendor or 0)/ (recipe.numMade or 1)
 		end
 		if count == 0 then
-			count = skill.numCraftableBank / (recipe.numMade or 1)
-		end
-		if count == 0 then
-			count = skill.numCraftableAlts / (recipe.numMade or 1)
+			count = (skill.numCraftableAlts or 0) / (recipe.numMade or 1)
 		end
 	end
 	count = math.min(count, 9999)

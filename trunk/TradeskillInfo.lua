@@ -71,7 +71,7 @@ function Skillet:GetTradeSkillInfo(skillIndex)
 		local difficulty = skill.difficulty
 		if id and id ~= 0 then
 			local recipe = self:GetRecipe(id)
-			local numAvailable = (skill.numCraftableBank or 0) / (recipe.numMade or 1)
+			local numAvailable = (skill.numCraftable or 0) / (recipe.numMade or 1)
 			return skillName, difficulty, numAvailable, 0	
 		else
 			return skillName, "header", 0, 1
