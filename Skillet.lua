@@ -1247,8 +1247,7 @@ function Skillet:SetTradeSkill(player, tradeID, skillIndex)
 		self.db.realm.queueData[player] = {}
 	end
 	if player ~= self.currentPlayer or tradeID ~= self.currentTrade then
-		collectgarbage("collect")
-	 	self.currentPlayer = player
+		self.currentPlayer = player
 		local oldTradeID = self.currentTrade
 		if player == (UnitName("player")) then	-- we can update the tradeskills if this toon is the current one
 			self.dataSource = "api"

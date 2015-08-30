@@ -785,7 +785,6 @@ function Skillet:RecipeGroupOpDelete()
 		local label = Skillet.currentGroupLabel
 		Skillet.data.groupList[player][tradeID][label] = nil
 		Skillet.db.realm.groupDB[player..":"..tradeID..":"..label] = nil
-		collectgarbage("collect")
 		label = "Blizzard"
 		Skillet:SetTradeSkillOption("grouping", label)
 		Skillet.currentGroupLabel = label

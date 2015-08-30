@@ -72,7 +72,7 @@ function Skillet:internal_AddPreButtonHideCallback(method)
 end
 
 -- Figures out how to display the craftable counts for a recipe.
--- Returns: num, num_with_bank, num_with_alts
+-- Returns: num, num_with_vendor, num_with_alts
 local function get_craftable_counts(skill, numMade)
 	local factor = 1
 	if Skillet.db.profile.show_craft_counts then
@@ -80,9 +80,8 @@ local function get_craftable_counts(skill, numMade)
 	end
 	local num        = math.floor((skill.numCraftable or 0) / factor)
 	local numwvendor = math.floor((skill.numCraftableVendor or 0) / factor)
-	local numwbank   = math.floor((skill.numCraftableBank or 0) / factor)
 	local numwalts   = math.floor((skill.numCraftableAlts or 0) / factor)
-	return num, numwvendor, numwbank, numwalts
+	return num, numwvendor, numwalts
 end
 
 function Skillet:CreateTradeSkillWindow()
@@ -1110,7 +1109,7 @@ function Skillet:SkillButton_OnEnter(button)
 		return
 	end
 	buttonName:SetTextColor(HIGHLIGHT_FONT_COLOR.r, HIGHLIGHT_FONT_COLOR.g, HIGHLIGHT_FONT_COLOR.b)
-	local recipe = self:GetRecipe(skill.recipeID) or skilletUnknownRecipe
+	local recipe = self:GetRecipe(skill.recipeID) or Skillet.UnknownRecipe
 	if not self.db.profile.show_detailed_recipe_tooltip then
 		-- user does not want the tooltip displayed, it can get a bit big after all
 		button.locked = false
@@ -1365,9 +1364,9 @@ function Skillet:UpdateDetailsWindow(skillIndex)
 		return
 	end
 	lastUpdateSpellID = skill.id
-	local recipe = skilletUnknownRecipe
+	local recipe = Skillet.UnknownRecipe
 	if skill then
-		recipe = self:GetRecipe(skill.id) or skilletUnknownRecipe
+		recipe = self:GetRecipe(skill.id) or Skillet.UnknownRecipe
 		-- Name of the skill
 		SkilletSkillName:SetText(recipe.name)
 		SkilletRecipeNotesButton:Show()
@@ -1408,7 +1407,7 @@ function Skillet:UpdateDetailsWindow(skillIndex)
 			SkilletSkillCooldown:SetText("")
 		end
 	else
-		recipe = skilletUnknownRecipe
+		recipe = Skillet.UnknownRecipe
 		SkilletSkillName:SetText("unknown")
 	end
 	-- Are special tools needed for this skill?
@@ -2086,7 +2085,7 @@ function Skillet:ReagentButtonOnEnter(button, skillIndex, reagentIndex)
 		if recipe then
 			local reagent = recipe.reagentData[reagentIndex]
 			if reagent then
-				Skillet:SetReagentToolTip(reagent.id, reagent.numNeeded, skill.numCraftableBank or 0)
+				Skillet:SetReagentToolTip(reagent.id, reagent.numNeeded, skill.numCraftable or 0)
 				if self.db.profile.link_craftable_reagents then
 					if self.db.global.itemRecipeSource[reagent.id] then
 						local icon = _G[button:GetName() .. "Icon"]
