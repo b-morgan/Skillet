@@ -74,14 +74,18 @@ end
 -- Figures out how to display the craftable counts for a recipe.
 -- Returns: num, num_with_vendor, num_with_alts
 local function get_craftable_counts(skill, numMade)
+	DA.DEBUG(2,"get_craftable_counts, name= "..tostring(skill.name)..", numMade= "..tostring(numMade))
+	DA.DEBUG(3,"get_craftable_counts, skill= "..DA.DUMP1(skill,1))
 	local factor = 1
 	if Skillet.db.profile.show_craft_counts then
 		factor = numMade or 1
 	end
-	local num        = math.floor((skill.numCraftable or 0) / factor)
-	local numwvendor = math.floor((skill.numCraftableVendor or 0) / factor)
-	local numwalts   = math.floor((skill.numCraftableAlts or 0) / factor)
-	return num, numwvendor, numwalts
+	local num          = math.floor((skill.numCraftable or 0) / factor)
+	local numrecursive = math.floor((skill.numRecursive or 0) / factor)
+	local numwvendor   = math.floor((skill.numCraftableVendor or 0) / factor)
+	local numwalts     = math.floor((skill.numCraftableAlts or 0) / factor)
+	DA.DEBUG(2,"get_craftable_counts = "..tostring(num)..", "..tostring(numrecursive)..", "..tostring(numwvendor)..", "..tostring(numwalts))
+	return num, numrecursive, numwvendor, numwalts
 end
 
 function Skillet:CreateTradeSkillWindow()
@@ -830,6 +834,7 @@ function Skillet:internal_UpdateTradeSkillWindow()
 	local max_text_width = width
 	local showOwned = self:GetTradeSkillOption("filterInventory-owned") -- count from Altoholic
 	local showBag = self:GetTradeSkillOption("filterInventory-bag")
+	local showCraft = self:GetTradeSkillOption("filterInventory-crafted")
 	local showVendor = self:GetTradeSkillOption("filterInventory-vendor")
 	local showAlts = self:GetTradeSkillOption("filterInventory-alts")
 	local catstring = {}
@@ -844,7 +849,8 @@ function Skillet:internal_UpdateTradeSkillWindow()
 		button:SetWidth(width)
 		if rawSkillIndex <= numTradeSkills then
 			local skill = sortedSkillList[rawSkillIndex]
-			--DA.DEBUG(0,"rawSkillIndex= "..tostring(rawSkillIndex)..", skill= "..DA.DUMP1(skill,1))
+			DA.DEBUG(2,"rawSkillIndex= "..tostring(rawSkillIndex)..", name= "..tostring(skill.name))
+			DA.DEBUG(3,"skill= "..DA.DUMP1(skill,1))
 			local skillIndex = skill.skillIndex
 			local buttonText = _G[button:GetName() .. "Name"]
 			local levelText = _G[button:GetName() .. "Level"]
@@ -937,11 +943,11 @@ function Skillet:internal_UpdateTradeSkillWindow()
 				end
 				text = (self:GetRecipeNamePrefix(self.currentTrade, skillIndex) or "") .. (skill.name or "")
 				if #recipe.reagentData > 0 then
-					local num, numwvendor, numwalts = get_craftable_counts(skill.skillData, recipe.numMade)
-					local cbag = "|cffffff80"
-					local cvendor = "|cff80ff80"
-					local cbank =  "|cffffa050"
-					local calts = "|cffff80ff"
+					local num, numrecursive, numwvendor, numwalts = get_craftable_counts(skill.skillData, recipe.numMade)
+					local cbag = "|cff80ff80" -- green
+					local ccraft =  "|cffffff80" -- yellow
+					local cvendor = "|cffffa050" -- orange
+					local calts = "|cffff80ff" -- purple
 					if (num > 0 and showBag) or (numwvendor > 0 and showVendor) or (numwalts > 0 and showAlts) then
 						local c = 1
 						if showBag then
@@ -949,6 +955,13 @@ function Skillet:internal_UpdateTradeSkillWindow()
 								num = "##"
 							end
 							catstring[c] = cbag .. num
+							c = c + 1
+						end
+						if showCraft then
+							if numrecursive >= 1000 then
+								numrecursive = "##"
+							end
+							catstring[c] = ccraft .. numrecursive
 							c = c + 1
 						end
 						if showVendor then
@@ -967,7 +980,7 @@ function Skillet:internal_UpdateTradeSkillWindow()
 						end
 						local count = ""
 						if c > 1 then
-							count = "|cffa0a0a0["
+							count = "|cffa0a0a0[" -- blue
 							for b=1,c-1 do
 								count = count .. catstring[b]
 								if b+1 < c then
@@ -986,6 +999,9 @@ function Skillet:internal_UpdateTradeSkillWindow()
 				end
 				local countWidth = 0
 				if showBag then
+					countWidth = countWidth + 25
+				end
+				if showCraft then
 					countWidth = countWidth + 25
 				end
 				if showVendor then
@@ -1165,24 +1181,30 @@ function Skillet:SkillButton_OnEnter(button)
 			tip:AddLine(skill.name, NORMAL_FONT_COLOR.r, NORMAL_FONT_COLOR.g, NORMAL_FONT_COLOR.b, false);
 		end
 	end
-	local num, numwvendor, numwalts = get_craftable_counts(skill)
+	local num, numrecursive, numwvendor, numwalts
+	if skill.skillData then
+		num, numrecursive, numwvendor, numwalts = get_craftable_counts(skill.skillData, recipe.numMade)
+	else
+		DA.DEBUG(2,"no skillData")
+		num, numrecursive, numwvendor, numwalts = get_craftable_counts(skill, recipe.numMade)
+	end
 	-- how many can be created with the reagents in the inventory
 	if num > 0 then
 		local text = "\n" .. num .. " " .. L["can be created from reagents in your inventory"];
 		tip:AddLine(text, 1, 1, 1, false); -- (text, r, g, b, wrap)
 	end
-	-- how many can be created with the reagent in your inv + bank
-	if self.db.profile.show_bank_alt_counts and numwbank > 0 and numwbank ~= num then
-		local text = numwbank .. " " .. L["can be created from reagents in your inventory and bank"];
-		if num == 0 then
+	-- how many can be created by crafting the reagents
+	if numrecursive > 0 then
+		local text = "\n" .. numrecursive .. " " .. L["can be created by crafting reagents"];
+		if num > 0 then
 			text = "\n" .. text;
 		end
-		tip:AddLine(text, 1, 1, 1, false);	-- (text, r, g, b, wrap)
+		tip:AddLine(text, 1, 1, 1, false); -- (text, r, g, b, wrap)
 	end
 	-- how many can be crafted with reagents on *all* alts, including this one.
 	if self.db.profile.show_bank_alt_counts and numwalts and numwalts > 0 and numwalts ~= num then
 		local text = numwalts .. " " .. L["can be created from reagents on all characters"];
-		if num and numwbank == 0 then
+		if num > 0 or numrecursive > 0 then
 			text = "\n" .. text;
 		end
 		tip:AddLine(text, 1, 1, 1, false);	-- (text, r, g, b, wrap)
@@ -1214,6 +1236,7 @@ end
 
 -- Sets the game tooltip item to the selected skill
 function Skillet:SetTradeSkillToolTip(skillIndex)
+	DA.DEBUG(2,"SetTradeSkillToolTip("..tostring(skillIndex)..")")
 	GameTooltip:ClearLines()
 	local recipe, recipeID = self:GetRecipeDataByTradeIndex(self.currentTrade, skillIndex)
 	if recipe then
@@ -1238,6 +1261,7 @@ function Skillet:SetTradeSkillToolTip(skillIndex)
 end
 
 function Skillet:SetReagentToolTip(reagentID, numNeeded, numCraftable)
+	DA.DEBUG(2,"SetReagentToolTip("..tostring(reagentID)..", "..tostring(numNeeded)..", "..tostring(numCraftable)..")")
 	GameTooltip:ClearLines()
 	GameTooltip:SetHyperlink("item:"..reagentID)
 	if EnhTooltip and EnhTooltip.TooltipCall then
@@ -1472,11 +1496,10 @@ function Skillet:UpdateDetailsWindow(skillIndex)
 			else
 				reagentName = "unknown"
 			end
-			local numAlts = nil
-			local num = self:GetInventory(self.currentPlayer, reagent.id)
+			local num, craftable = self:GetInventory(self.currentPlayer, reagent.id)
 			local count_text
-			if numAlts then
-				count_text = string.format("[%d/%d]", num, numAlts)
+			if craftable > 0 then
+				count_text = string.format("[%d/%d]", num, craftable)
 			else
 				count_text = string.format("[%d]", num)
 			end
@@ -2077,7 +2100,7 @@ end
 
 -- Called when then mouse enters a reagent button
 function Skillet:ReagentButtonOnEnter(button, skillIndex, reagentIndex)
-	DA.DEBUG(1,"Skillet:ReagentButtonOnEnter("..tostring(button)..", "..tostring(skillIndex)..", "..tostring(reagentIndex)..")")
+	DA.DEBUG(3,"Skillet:ReagentButtonOnEnter("..tostring(button)..", "..tostring(skillIndex)..", "..tostring(reagentIndex)..")")
 	GameTooltip:SetOwner(button, "ANCHOR_TOPLEFT")
 	local skill = self:GetSkill(self.currentPlayer, self.currentTrade, skillIndex)
 	if skill then
@@ -2292,6 +2315,7 @@ end
 
 function Skillet:InventoryFilterButtons_Show()
 	SkilletInventoryFilterBag:Show()
+	SkilletInventoryFilterCraft:Show()
 	SkilletInventoryFilterVendor:Show()
 	SkilletInventoryFilterAlts:Show()
 	SkilletInventoryFilterOwned:Show()
@@ -2299,6 +2323,7 @@ end
 
 function Skillet:InventoryFilterButtons_Hide()
 	SkilletInventoryFilterBag:Hide()
+	SkilletInventoryFilterCraft:Hide()
 	SkilletInventoryFilterVendor:Hide()
 	SkilletInventoryFilterAlts:Hide()
 	SkilletInventoryFilterOwned:Hide()

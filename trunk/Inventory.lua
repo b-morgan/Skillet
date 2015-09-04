@@ -80,6 +80,7 @@ function Skillet:InventorySkillIterations(tradeID, skillIndex, playerOverride)
 	local recipe = self:GetRecipe(skill.id)
 	if recipe and recipe.reagentData and #recipe.reagentData > 0 then	-- make sure that recipe is in the database before continuing
 		local numCraft = 100000
+		local numCraftable = 100000
 		local numCraftVendor = 100000
 		local numCraftAlts = 100000
 		local vendorOnly = true
@@ -87,40 +88,42 @@ function Skillet:InventorySkillIterations(tradeID, skillIndex, playerOverride)
 			if recipe.reagentData[i].id then
 				local reagentID = recipe.reagentData[i].id
 				local numNeeded = recipe.reagentData[i].numNeeded
-				local reagentAvailability = 0
+				local reagentAvailable = 0
+				local reagentCraftable = 0
 				local reagentAvailabilityAlts = 0
-				reagentAvailability = self:GetInventory(player, reagentID)
+				reagentAvailable, reagentCraftable = self:GetInventory(player, reagentID)
 				for player in pairs(self.db.realm.inventoryData) do
 					local altBoth = self:GetInventory(player, reagentID)
 					reagentAvailabilityAlts = reagentAvailabilityAlts + (altBoth or 0)
 				end
+				numCraft = math.min(numCraft, math.floor(reagentAvailable/numNeeded))
+				numCraftable = math.min(numCraftable, math.floor(reagentCraftable/numNeeded))
 				if self:VendorSellsReagent(reagentID) then	-- if it's available from a vendor, then only worry about bag inventory
-					numCraft = math.min(numCraft, math.floor(reagentAvailability/numNeeded))
 					local vendorAvailable, vendorAvailableAlt = Skillet:VendorItemAvailable(reagentID)
 					numCraftVendor = math.min(numCraftVendor, vendorAvailable)
 					numCraftAlts = math.min(numCraftAlts, vendorAvailableAlt)
 				else
 					vendorOnly = false
-					numCraft = math.min(numCraft, math.floor(reagentAvailability/numNeeded))
-					numCraftVendor = math.min(numCraftVendor, math.floor(reagentAvailability/numNeeded))
+					numCraftVendor = math.min(numCraftVendor, math.floor(reagentAvailable/numNeeded))
 					numCraftAlts = math.min(numCraftAlts, math.floor(reagentAvailabilityAlts/numNeeded))
 				end
 			else								-- no data means no craftability
 				DA.CHAT("reagent id seems corrupt!")
 				numCraft = 0
+				numCraftable = 0
 				numCraftVendor = 0
 				numCraftAlts = 0
 				self.dataScanned = false		-- mark the data as needing to be rescanned since a reagent id seems corrupt
 			end
 		end --for
 		recipe.vendorOnly = vendorOnly
-		if numCraft > 0 or numCraftVendor > 0 or numCraftAlts > 0 then
+		if numCraft > 0 or numCraftable > 0 or numCraftVendor > 0 or numCraftAlts > 0 then
 			DA.DEBUG(1,"recipe="..DA.DUMP1(recipe))
-			DA.DEBUG(1,"numCraft="..tostring(numCraft)..", numCraftVendor="..tostring(numCraftVendor)..", numCraftAlts="..tostring(numCraftAlts))
+			DA.DEBUG(1,"numCraft="..tostring(numCraft)..", numCraftable="..tostring(numCraftable)..", numCraftVendor="..tostring(numCraftVendor)..", numCraftAlts="..tostring(numCraftAlts))
 		end
-		return math.max(0,numCraft * recipe.numMade), math.max(0,numCraftVendor * recipe.numMade), math.max(0,numCraftAlts * recipe.numMade)
+		return math.max(0,numCraft * recipe.numMade), math.max(0,numCraftable * recipe.numMade), math.max(0,numCraftVendor * recipe.numMade), math.max(0,numCraftAlts * recipe.numMade)
 	end
-	return 0, 0, 0
+	return 0, 0, 0, 0
 end
 
 function Skillet:InventoryScan(playerOverride)
