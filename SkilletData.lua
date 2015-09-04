@@ -1266,7 +1266,7 @@ function Skillet:CalculateCraftableCounts(playerOverride)
 		for i=1,n do
 			local skill = self:GetSkill(player, self.currentTrade, i)
 			if skill then -- skip headers
-				skill.numCraftable, skill.numCraftableVendor, skill.numCraftableAlts = self:InventorySkillIterations(self.currentTrade, i, player)
+				skill.numCraftable, skill.numRecursive, skill.numCraftableVendor, skill.numCraftableAlts = self:InventorySkillIterations(self.currentTrade, i, player)
 			end
 		end
 	end

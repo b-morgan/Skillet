@@ -1384,9 +1384,26 @@
 					</OnLoad>
 				</Scripts>
 			</CheckButton>
-			<CheckButton name="SkilletInventoryFilterVendor" inherits="SkilletInvFilterButtonTemplate" hidden="true">
+			<CheckButton name="SkilletInventoryFilterCraft" inherits="SkilletInvFilterButtonTemplate" hidden="true">
 				<Anchors>
 					<Anchor point="LEFT" relativeTo="SkilletInventoryFilterBag" relativePoint="RIGHT">
+						<Offset>
+							<AbsDimension x="0" y="0"/>
+						</Offset>
+					</Anchor>
+				</Anchors>
+				<NormalTexture name="$parentIcon" file="Interface\Addons\Skillet\Icons\crafted.tga"/>
+				<Scripts>
+					<OnLoad>
+						self:SetFrameLevel(self:GetFrameLevel()+5)
+						self.slot = "crafted"
+						_G[self:GetName().."Checked"]:SetGradient("vertical",.5,1,.5, .5,1,.5)
+					</OnLoad>
+				</Scripts>
+			</CheckButton>
+			<CheckButton name="SkilletInventoryFilterVendor" inherits="SkilletInvFilterButtonTemplate" hidden="true">
+				<Anchors>
+					<Anchor point="LEFT" relativeTo="SkilletInventoryFilterCraft" relativePoint="RIGHT">
 						<Offset>
 							<AbsDimension x="0" y="0"/>
 						</Offset>
