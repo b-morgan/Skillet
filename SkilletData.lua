@@ -775,12 +775,12 @@ function Skillet:VendorItemAvailable(itemID)
 		local divider = specialVendorItems[itemID][1]
 		local currency = specialVendorItems[itemID][2]
 		local reagentAvailability = self:GetInventory(self.currentPlayer, currency)
-		local reagentAvailabilityAlts = 0
+		local reagentAvailableAlts = 0
 		for player in pairs(self.db.realm.inventoryData) do
 			local altBoth = self:GetInventory(player, currency)
-			reagentAvailabilityAlts = reagentAvailabilityAlts + (altBoth or 0)
+			reagentAvailableAlts = reagentAvailableAlts + (altBoth or 0)
 		end
-		return math.floor(reagentAvailability / divider), math.floor(reagentAvailabilityAlts / divider)
+		return math.floor(reagentAvailability / divider), math.floor(reagentAvailableAlts / divider)
 	else
 		return 100000, 100000
 	end
@@ -1267,6 +1267,7 @@ function Skillet:CalculateCraftableCounts(playerOverride)
 			local skill = self:GetSkill(player, self.currentTrade, i)
 			if skill then -- skip headers
 				skill.numCraftable, skill.numRecursive, skill.numCraftableVendor, skill.numCraftableAlts = self:InventorySkillIterations(self.currentTrade, i, player)
+				--DA.DEBUG(2,"name= "..tostring(skill.name)..", numCraftable= "..tostring(skill.numCraftable)..", numRecursive= "..tostring(skill.numRecursive)..", numCraftableVendor= "..tostring(skill.numCraftableVendor)..", numCraftableAlts= "..tostring(skill.numCraftableAlts))
 			end
 		end
 	end

@@ -74,8 +74,8 @@ end
 -- Figures out how to display the craftable counts for a recipe.
 -- Returns: num, num_with_vendor, num_with_alts
 local function get_craftable_counts(skill, numMade)
-	DA.DEBUG(2,"get_craftable_counts, name= "..tostring(skill.name)..", numMade= "..tostring(numMade))
-	DA.DEBUG(3,"get_craftable_counts, skill= "..DA.DUMP1(skill,1))
+	--DA.DEBUG(2,"get_craftable_counts, name= "..tostring(skill.name)..", numMade= "..tostring(numMade))
+	--DA.DEBUG(3,"get_craftable_counts, skill= "..DA.DUMP1(skill,1))
 	local factor = 1
 	if Skillet.db.profile.show_craft_counts then
 		factor = numMade or 1
@@ -84,7 +84,7 @@ local function get_craftable_counts(skill, numMade)
 	local numrecursive = math.floor((skill.numRecursive or 0) / factor)
 	local numwvendor   = math.floor((skill.numCraftableVendor or 0) / factor)
 	local numwalts     = math.floor((skill.numCraftableAlts or 0) / factor)
-	DA.DEBUG(2,"get_craftable_counts = "..tostring(num)..", "..tostring(numrecursive)..", "..tostring(numwvendor)..", "..tostring(numwalts))
+	--DA.DEBUG(2,"get_craftable_counts = "..tostring(num)..", "..tostring(numrecursive)..", "..tostring(numwvendor)..", "..tostring(numwalts))
 	return num, numrecursive, numwvendor, numwalts
 end
 
@@ -849,8 +849,8 @@ function Skillet:internal_UpdateTradeSkillWindow()
 		button:SetWidth(width)
 		if rawSkillIndex <= numTradeSkills then
 			local skill = sortedSkillList[rawSkillIndex]
-			DA.DEBUG(2,"rawSkillIndex= "..tostring(rawSkillIndex)..", name= "..tostring(skill.name))
-			DA.DEBUG(3,"skill= "..DA.DUMP1(skill,1))
+			--DA.DEBUG(2,"rawSkillIndex= "..tostring(rawSkillIndex)..", name= "..tostring(skill.name))
+			--DA.DEBUG(3,"skill= "..DA.DUMP1(skill,1))
 			local skillIndex = skill.skillIndex
 			local buttonText = _G[button:GetName() .. "Name"]
 			local levelText = _G[button:GetName() .. "Level"]
@@ -1181,12 +1181,9 @@ function Skillet:SkillButton_OnEnter(button)
 			tip:AddLine(skill.name, NORMAL_FONT_COLOR.r, NORMAL_FONT_COLOR.g, NORMAL_FONT_COLOR.b, false);
 		end
 	end
-	local num, numrecursive, numwvendor, numwalts
+	local num, numrecursive, numwvendor, numwalts = 0, 0, 0, 0
 	if skill.skillData then
 		num, numrecursive, numwvendor, numwalts = get_craftable_counts(skill.skillData, recipe.numMade)
-	else
-		DA.DEBUG(2,"no skillData")
-		num, numrecursive, numwvendor, numwalts = get_craftable_counts(skill, recipe.numMade)
 	end
 	-- how many can be created with the reagents in the inventory
 	if num > 0 then
@@ -1236,7 +1233,7 @@ end
 
 -- Sets the game tooltip item to the selected skill
 function Skillet:SetTradeSkillToolTip(skillIndex)
-	DA.DEBUG(2,"SetTradeSkillToolTip("..tostring(skillIndex)..")")
+	--DA.DEBUG(2,"SetTradeSkillToolTip("..tostring(skillIndex)..")")
 	GameTooltip:ClearLines()
 	local recipe, recipeID = self:GetRecipeDataByTradeIndex(self.currentTrade, skillIndex)
 	if recipe then
@@ -1261,7 +1258,7 @@ function Skillet:SetTradeSkillToolTip(skillIndex)
 end
 
 function Skillet:SetReagentToolTip(reagentID, numNeeded, numCraftable)
-	DA.DEBUG(2,"SetReagentToolTip("..tostring(reagentID)..", "..tostring(numNeeded)..", "..tostring(numCraftable)..")")
+	--DA.DEBUG(2,"SetReagentToolTip("..tostring(reagentID)..", "..tostring(numNeeded)..", "..tostring(numCraftable)..")")
 	GameTooltip:ClearLines()
 	GameTooltip:SetHyperlink("item:"..reagentID)
 	if EnhTooltip and EnhTooltip.TooltipCall then
@@ -2100,7 +2097,7 @@ end
 
 -- Called when then mouse enters a reagent button
 function Skillet:ReagentButtonOnEnter(button, skillIndex, reagentIndex)
-	DA.DEBUG(3,"Skillet:ReagentButtonOnEnter("..tostring(button)..", "..tostring(skillIndex)..", "..tostring(reagentIndex)..")")
+	--DA.DEBUG(3,"Skillet:ReagentButtonOnEnter("..tostring(button)..", "..tostring(skillIndex)..", "..tostring(reagentIndex)..")")
 	GameTooltip:SetOwner(button, "ANCHOR_TOPLEFT")
 	local skill = self:GetSkill(self.currentPlayer, self.currentTrade, skillIndex)
 	if skill then
@@ -2139,7 +2136,7 @@ function Skillet:ReagentButtonSkillSelect(player, id)
 		gearTexture:Hide()
 		GameTooltip:Hide()
 		local newRecipe = Skillet:GetRecipe(id)
-		DA.DEBUG(0,"newRecipe= "..DA.DUMP1(newRecipe))
+		--DA.DEBUG(0,"newRecipe= "..DA.DUMP1(newRecipe))
 		if newRecipe then
 			Skillet:PushSkill(Skillet.currentPlayer, Skillet.currentTrade, Skillet.selectedSkill)
 			Skillet:SetTradeSkill(player, newRecipe.tradeID, skillIndexLookup[id])
@@ -2196,7 +2193,7 @@ function Skillet:ReagentButtonOnClick(button, skillIndex, reagentIndex)
 				end
 			end
 		end
---		DA.DEBUG(0,"recipeMenuTable= "..DA.DUMP1(self.data.recipeMenuTable))
+		--DA.DEBUG(0,"recipeMenuTable= "..DA.DUMP1(self.data.recipeMenuTable))
 		if myRecipeID then
 			newPlayer = player
 			newRecipeID = myRecipeID
