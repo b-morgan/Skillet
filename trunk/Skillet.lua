@@ -976,7 +976,7 @@ function Skillet:RegisterRecipeFilter(name, namespace, initMethod, filterMethod)
 	if not self.recipeFilters then
 		self.recipeFilters = {}
 	end
---	DA.DEBUG(0,"add recipe filter "..name)
+	--DA.DEBUG(0,"add recipe filter "..name)
 	self.recipeFilters[name] = { namespace = namespace, initMethod = initMethod, filterMethod = filterMethod }
 end
 
@@ -1198,7 +1198,7 @@ end
 
 -- So we can track when the players inventory changes and update craftable counts
 function Skillet:BAG_UPDATE(event, bagID)
---	DA.DEBUG(2,"BAG_UPDATE( "..bagID.." )")
+	--DA.DEBUG(2,"BAG_UPDATE( "..bagID.." )")
 	if not self.rescan_auto_targets_timer then
 		self.rescan_auto_targets_timer = self:ScheduleTimer("UpdateAutoTradeButtons", 0.3)
 	end
@@ -1420,7 +1420,7 @@ end
 -- If there is no user supplied note, then return nil
 -- The item can be either a recipe or reagent name
 function Skillet:GetItemNote(key)
---	DA.DEBUG(0,"GetItemNote("..tostring(key)..")")
+	--DA.DEBUG(0,"GetItemNote("..tostring(key)..")")
 	local result
 	if not self.db.realm.notes[self.currentPlayer] then
 		return
@@ -1433,7 +1433,7 @@ function Skillet:GetItemNote(key)
 			id = self.data.recipeList[id].itemID or 0
 		end
 	end
---	DA.DEBUG(0,"GetItemNote itemID="..tostring(id))
+	--DA.DEBUG(0,"GetItemNote itemID="..tostring(id))
 	if id then
 		result = self.db.realm.notes[self.currentPlayer][id]
 	else
@@ -1449,7 +1449,7 @@ end
 -- Sets the note for the specified object, if there is already a note
 -- then it is overwritten
 function Skillet:SetItemNote(key, note)
---	DA.DEBUG(0,"SetItemNote("..tostring(key)..", "..tostring(note)..")")
+	--DA.DEBUG(0,"SetItemNote("..tostring(key)..", "..tostring(note)..")")
 --	local id = self:GetItemIDFromLink(link);
 	local kind, id = string.split(":", key)
 	id = tonumber(id) or 0
@@ -1458,7 +1458,7 @@ function Skillet:SetItemNote(key, note)
 			id = self.data.recipeList[id].itemID or 0
 		end
 	end
---	DA.DEBUG(0,"SetItemNote itemID="..tostring(id))
+	--DA.DEBUG(0,"SetItemNote itemID="..tostring(id))
 	if not self.db.realm.notes[self.currentPlayer] then
 		self.db.realm.notes[self.currentPlayer] = {}
 	end
@@ -1493,12 +1493,12 @@ function Skillet:AddItemNotesToTooltip(tooltip)
 		DA.DEBUG(0,"Error: Skillet:AddItemNotesToTooltip() could not determine id");
 		return
 	end
---	DA.DEBUG(1,"link= "..tostring(link)..", id= "..tostring(id)..", notes= "..tostring(notes_enabled)..", crafters= "..tostring(crafters_enabled))
+	--DA.DEBUG(1,"link= "..tostring(link)..", id= "..tostring(id)..", notes= "..tostring(notes_enabled)..", crafters= "..tostring(crafters_enabled))
 	if notes_enabled then
 		local header_added = false
 		for player,notes_table in pairs(self.db.realm.notes) do
 			local note = notes_table[id]
---			DA.DEBUG(1,"player= "..tostring(player)..", table= "..DA.DUMP1(notes_table)..", note= '"..tostring(note).."'")
+			--DA.DEBUG(1,"player= "..tostring(player)..", table= "..DA.DUMP1(notes_table)..", note= '"..tostring(note).."'")
 			if note then
 				if not header_added then
 					tooltip:AddLine("Skillet " .. L["Notes"] .. ":")
