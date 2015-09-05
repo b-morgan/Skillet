@@ -1367,11 +1367,28 @@
 			<!--
 				inventory filter selector
 			-->
-			<CheckButton name="SkilletInventoryFilterBag" inherits="SkilletInvFilterButtonTemplate" hidden="true">
+			<CheckButton name="SkilletInventoryFilterOwned" inherits="SkilletInvFilterButtonTemplate" hidden="true">
 				<Anchors>
 					<Anchor point="TOPLEFT" relativeTo="SkilletHideUncraftableRecipes" relativePoint="BOTTOMLEFT">
 						<Offset>
 							<AbsDimension x="-30" y="0"/>
+						</Offset>
+					</Anchor>
+				</Anchors>
+				<NormalTexture name="$parentIcon" file="Interface\Icons\INV_Drink_13"/>
+				<Scripts>
+					<OnLoad>
+						self:SetFrameLevel(self:GetFrameLevel()+5)
+						self.slot = "owned"
+						_G[self:GetName().."Checked"]:SetGradient("vertical",1,.5,1, 1,.5,1)
+					</OnLoad>
+				</Scripts>
+			</CheckButton>
+			<CheckButton name="SkilletInventoryFilterBag" inherits="SkilletInvFilterButtonTemplate" hidden="true">
+				<Anchors>
+					<Anchor point="LEFT" relativeTo="SkilletInventoryFilterOwned" relativePoint="RIGHT">
+						<Offset>
+							<AbsDimension x="0" y="0"/>
 						</Offset>
 					</Anchor>
 				</Anchors>
@@ -1431,23 +1448,6 @@
 					<OnLoad>
 						self:SetFrameLevel(self:GetFrameLevel()+5)
 						self.slot = "alts"
-						_G[self:GetName().."Checked"]:SetGradient("vertical",1,.5,1, 1,.5,1)
-					</OnLoad>
-				</Scripts>
-			</CheckButton>
-			<CheckButton name="SkilletInventoryFilterOwned" inherits="SkilletInvFilterButtonTemplate" hidden="true">
-				<Anchors>
-					<Anchor point="LEFT" relativeTo="SkilletInventoryFilterAlts" relativePoint="RIGHT">
-						<Offset>
-							<AbsDimension x="0" y="0"/>
-						</Offset>
-					</Anchor>
-				</Anchors>
-				<NormalTexture name="$parentIcon" file="Interface\Icons\INV_Drink_13"/>
-				<Scripts>
-					<OnLoad>
-						self:SetFrameLevel(self:GetFrameLevel()+5)
-						self.slot = "owned"
 						_G[self:GetName().."Checked"]:SetGradient("vertical",1,.5,1, 1,.5,1)
 					</OnLoad>
 				</Scripts>

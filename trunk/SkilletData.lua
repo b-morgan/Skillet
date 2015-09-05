@@ -22,24 +22,24 @@ local L = Skillet.L
 
 -- a table of tradeskills by id
 local TradeSkillList = {
-	2259,       -- alchemy
-	2018,       -- blacksmithing
-	7411,       -- enchanting
-	4036,       -- engineering
-	45357,      -- inscription
-	25229,      -- jewelcrafting
-	2108,       -- leatherworking
-	2656,       -- smelting (from mining, 2575)
-	3908,       -- tailoring
-	2550,       -- cooking
-	3273,       -- first aid
-	53428,      -- runeforging
+	2259,		-- alchemy
+	2018,		-- blacksmithing
+	7411,		-- enchanting
+	4036,		-- engineering
+	45357,		-- inscription
+	25229,		-- jewelcrafting
+	2108,		-- leatherworking
+	2656,		-- smelting (from mining, 2575)
+	3908,		-- tailoring
+	2550,		-- cooking
+	3273,		-- first aid
+	53428,		-- runeforging
 }
 
 -- Table of follower (IsNPCCrafting) tradeskills that should use the Blizzard frame
 Skillet.FollowerSkillList = {
-	[7411] = false,     -- Enchanting follower for Illusions is broken in 6.0
-	[25229] = false,    -- Jewelcrafting Apexis Gemcutter is broken in 6.2
+	[7411] = false,		-- Enchanting follower for Illusions is broken in 6.0
+	[25229] = false,	-- Jewelcrafting Apexis Gemcutter is broken in 6.2
 }
 
 -- In case the previous table is too broad
@@ -48,23 +48,23 @@ Skillet.FollowerNPC = {
 }
 
 Skillet.TradeSkillAdditionalAbilities = {
-	[7411]  = {13262,"Disenchant"},     -- enchanting = disenchant
-	[2550]  = {818,"Basic_Campfire"},   -- cooking = basic campfire
-	[45357] = {51005,"Milling"},        -- inscription = milling
-	[25229] = {31252,"Prospecting"},    -- jewelcrafting = prospecting
-	[2018]  = {126462,"Thermal Anvil"},  -- blacksmithing = thermal anvil (item:87216)
-	[4036]  = {126462,"Thermal Anvil"},  -- engineering = thermal anvil (item:87216)
+	[7411]	= {13262,"Disenchant"},		-- enchanting = disenchant
+	[2550]	= {818,"Basic_Campfire"},	-- cooking = basic campfire
+	[45357] = {51005,"Milling"},		-- inscription = milling
+	[25229] = {31252,"Prospecting"},	-- jewelcrafting = prospecting
+	[2018]	= {126462,"Thermal Anvil"},	 -- blacksmithing = thermal anvil (item:87216)
+	[4036]	= {126462,"Thermal Anvil"},	 -- engineering = thermal anvil (item:87216)
 }
 Skillet.AutoButtonsList = {}
 Skillet.TradeSkillAutoTarget = {
-	[7411] =  {   -- Enchanting
+	[7411] =  {	  -- Enchanting
 		[38682] = 1, -- Enchanting Vellum
 	},
-	[31252] = {   -- Prospecting
-		[2770]  = 5, --Copper Ore
-		[2771]  = 5, --Tin Ore
-		[2772]  = 5, --Iron Ore
-		[3858]  = 5, --Mithril Ore
+	[31252] = {	  -- Prospecting
+		[2770]	= 5, --Copper Ore
+		[2771]	= 5, --Tin Ore
+		[2772]	= 5, --Iron Ore
+		[3858]	= 5, --Mithril Ore
 		[10620] = 5, --Thorium Ore
 		[23424] = 5, --Fel Iron Ore
 		[23425] = 5, --Adamantite Ore
@@ -78,7 +78,7 @@ Skillet.TradeSkillAutoTarget = {
 		[72103] = 5, -- White Trillium Ore
 		[72094] = 5, -- Black Trillium Ore
 	},
-	[51005] = {   -- Milling
+	[51005] = {	  -- Milling
 		[765]  = 5, -- Silverleaf
 		[2449] = 5, -- Earthroot
 		[2447] = 5, -- Peacebloom
@@ -152,7 +152,7 @@ Skillet.TradeSkillAutoTarget = {
 }
 
 -- Items in this list are ignored because they can cause infinite loops.
-local TradeSkillIgnoredMats  = {
+local TradeSkillIgnoredMats	 = {
 	[11479] = 1 , -- Transmute: Iron to Gold
 	[11480] = 1 , -- Transmute: Mithril to Truesilver
 	[60350] = 1 , -- Transmute: Titanium
@@ -588,12 +588,12 @@ local DifficultyChar = {
 }
 local skill_style_type = {
 	["unknown"]			= { r = 1.00, g = 0.00, b = 0.00, level = 5, alttext="???", cstring = "|cffff0000"},
-	["optimal"]	        = { r = 1.00, g = 0.50, b = 0.25, level = 4, alttext="+++", cstring = "|cffff8040"},
-	["medium"]          = { r = 1.00, g = 1.00, b = 0.00, level = 3, alttext="++",  cstring = "|cffffff00"},
-	["easy"]            = { r = 0.25, g = 0.75, b = 0.25, level = 2, alttext="+",   cstring = "|cff40c000"},
-	["trivial"]	        = { r = 0.60, g = 0.60, b = 0.60, level = 1, alttext="",    cstring = "|cff909090"},
-	["header"]          = { r = 1.00, g = 0.82, b = 0,    level = 0, alttext="",    cstring = "|cffffc800"},
-	["unavailable"]     = { r = 0.3, g = 0.3, b = 0.3,    level = 6, alttext="",    cstring = "|cff606060"},
+	["optimal"]			= { r = 1.00, g = 0.50, b = 0.25, level = 4, alttext="+++", cstring = "|cffff8040"},
+	["medium"]			= { r = 1.00, g = 1.00, b = 0.00, level = 3, alttext="++",	cstring = "|cffffff00"},
+	["easy"]			= { r = 0.25, g = 0.75, b = 0.25, level = 2, alttext="+",	cstring = "|cff40c000"},
+	["trivial"]			= { r = 0.60, g = 0.60, b = 0.60, level = 1, alttext="",	cstring = "|cff909090"},
+	["header"]			= { r = 1.00, g = 0.82, b = 0,	  level = 0, alttext="",	cstring = "|cffffc800"},
+	["unavailable"]		= { r = 0.3, g = 0.3, b = 0.3,	  level = 6, alttext="",	cstring = "|cff606060"},
 }
 
 local lastAutoTarget = {}
@@ -601,7 +601,7 @@ function Skillet:GetAutoTargetItem(tradeID)
 	if Skillet.TradeSkillAutoTarget[tradeID] then
 		local itemID = lastAutoTarget[tradeID]
 		if itemID then
-			local limit  = Skillet.TradeSkillAutoTarget[tradeID][itemID]
+			local limit	 = Skillet.TradeSkillAutoTarget[tradeID][itemID]
 			local count = GetItemCount(itemID)
 			if count >= limit then
 				return itemID
@@ -750,35 +750,43 @@ local missingVendorItems = {
 	[30817] = true,				-- simple flour
 	[4539] = true,				-- Goldenbark Apple
 	[17035] = true,				-- Stranglethorn seed
-	[17034] = true, 			-- Maple seed
-	[52188] = true,             -- Jeweler's Setting
-	[4399]  = true,             -- Wooden Stock
-	[38682] = true,             -- Enchanting Vellum
-	[3857]  = true,   			-- Coal
+	[17034] = true,				-- Maple seed
+	[52188] = true,				-- Jeweler's Setting
+	[4399]	= true,				-- Wooden Stock
+	[38682] = true,				-- Enchanting Vellum
+	[3857]	= true,				-- Coal
 }
+
+local topink = 113111				-- Warbinder's Ink
 local specialVendorItems = {
-	[37101] = {1, 79254}, 			--Ivory Ink
-	[39469] = {1, 79254}, 			--Moonglow Ink
-	[39774] = {1, 79254}, 			--Midnight Ink
-	[43116] = {1, 79254}, 			--Lions Ink
-	[43118] = {1, 79254}, 			--Jadefire Ink
-	[43120] = {1, 79254}, 			--Celestial Ink
-	[43122] = {1, 79254}, 			--Shimmering Ink
-	[43124] = {1, 79254},  			--Ethereal Ink
-	[43126] = {1, 79254},  			--Ink of the Sea
-	[43127] = {10, 79254},  		--Snowfall Ink
-	[61981] = {10, 79254},  		--Inferno Ink
-	[79255] = {10, 79254},  		--Starlight Ink
+	[37101] = {1, topink},			--Ivory Ink
+	[39469] = {1, topink},			--Moonglow Ink
+	[39774] = {1, topink},			--Midnight Ink
+	[43116] = {1, topink},			--Lions Ink
+	[43118] = {1, topink},			--Jadefire Ink
+	[43120] = {1, topink},			--Celestial Ink
+	[43122] = {1, topink},			--Shimmering Ink
+	[43124] = {1, topink},			--Ethereal Ink
+	[43126] = {1, topink},			--Ink of the Sea
+	[61978] = {1, topink},			--Blackfallow Ink
+	[79254] = {1, topink},			--Ink of Dreams
+
+	[43127] = {10, topink},			--Snowfall Ink
+	[61981] = {10, topink},			--Inferno Ink
+	[79255] = {10, topink},			--Starlight Ink
 }
+
 function Skillet:VendorItemAvailable(itemID)
 	if specialVendorItems[itemID] then
 		local divider = specialVendorItems[itemID][1]
 		local currency = specialVendorItems[itemID][2]
 		local reagentAvailability = self:GetInventory(self.currentPlayer, currency)
 		local reagentAvailableAlts = 0
-		for player in pairs(self.db.realm.inventoryData) do
-			local altBoth = self:GetInventory(player, currency)
-			reagentAvailableAlts = reagentAvailableAlts + (altBoth or 0)
+		for alt in pairs(self.db.realm.inventoryData) do
+			if alt ~= self.currentPlayer then
+				local altBoth = self:GetInventory(alt, currency)
+				reagentAvailableAlts = reagentAvailableAlts + (altBoth or 0)
+			end
 		end
 		return math.floor(reagentAvailability / divider), math.floor(reagentAvailableAlts / divider)
 	else
@@ -1151,10 +1159,10 @@ end
 
 function Skillet:EnableQueue(addon)
 	assert(tostring(addon),"Usage: EnableDataGathering('addon')")
-	self:RegisterEvent("UNIT_SPELLCAST_SUCCEEDED",   "ContinueCastCheckUnit")
-	self:RegisterEvent("UNIT_SPELLCAST_FAILED",      "StopCastCheckUnit")
+	self:RegisterEvent("UNIT_SPELLCAST_SUCCEEDED",	 "ContinueCastCheckUnit")
+	self:RegisterEvent("UNIT_SPELLCAST_FAILED",		 "StopCastCheckUnit")
 	self:RegisterEvent("UNIT_SPELLCAST_INTERRUPTED", "StopCastCheckUnit")
-	self:RegisterEvent("UNIT_SPELLCAST_STOPPED",     "StopCastCheckUnit")
+	self:RegisterEvent("UNIT_SPELLCAST_STOPPED",	 "StopCastCheckUnit")
 end
 
 function Skillet:DisableQueue(addon)
@@ -1668,7 +1676,7 @@ function SkilletLink:ScanTrade()
 	-- get the tradeID from the profession name (data collected earlier).
 	tradeID = TradeSkillIDsByName[profession] or 2656				-- "mining" doesn't exist as a spell, so instead use smelting (id 2656)
 	if tradeID ~= Skillet.currentTrade then
-		--DA.DEBUG(0,"TRADE MISMATCH for player "..(Skillet.currentPlayer or "nil").."!  "..(tradeID or "nil").." vs "..(Skillet.currentTrade or "nil"));
+		--DA.DEBUG(0,"TRADE MISMATCH for player "..(Skillet.currentPlayer or "nil").."!	 "..(tradeID or "nil").." vs "..(Skillet.currentTrade or "nil"));
 	end
 	local player = Skillet.currentPlayer
 	if not self.recacheRecipe then
