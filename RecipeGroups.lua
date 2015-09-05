@@ -407,6 +407,7 @@ function Skillet:RecipeGroupFlatten(group, depth, list, index)
 					local filterCraftable = false
 					if Skillet:GetTradeSkillOption("hideuncraftable") then
 						if not (skillData.numCraftable > 0 and Skillet:GetTradeSkillOption("filterInventory-bag")) and
+						   not (skillData.numRecursive > 0 and Skillet:GetTradeSkillOption("filterInventory-crafted")) and
 						   not (skillData.numCraftableVendor > 0 and Skillet:GetTradeSkillOption("filterInventory-vendor")) and
 						   not (skillData.numCraftableAlts > 0 and Skillet:GetTradeSkillOption("filterInventory-alts")) then
 							filterCraftable = true

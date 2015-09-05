@@ -160,6 +160,7 @@ local function SkillIsFilteredOut(skillIndex)
 	-- are we hiding anything that can't be created with the mats on this character?
 	if Skillet:GetTradeSkillOption("hideuncraftable") then
 		if not (skill.numCraftable > 0 and Skillet:GetTradeSkillOption("filterInventory-bag")) and
+		   not (skill.numRecursive > 0 and Skillet:GetTradeSkillOption("filterInventory-crafted")) and
 		   not (skill.numCraftableVendor > 0 and Skillet:GetTradeSkillOption("filterInventory-vendor")) and
 		   not (skill.numCraftableAlts > 0 and Skillet:GetTradeSkillOption("filterInventory-alts")) then
 			return true

@@ -63,7 +63,7 @@ function Skillet:InventoryReagentCraftability(reagentID, playerOverride)
 	if numCrafted == 0 then
 		Skillet.db.realm.inventoryData[player][reagentID] = numInBoth
 	else
-		DA.DEBUG(0,"player="..player..", numCrafted="..tostring(numCrafted)..", reagentID="..tostring(reagentID).."("..tostring((GetItemInfo(reagentID)))..")")
+		--DA.DEBUG(0,"player="..player..", numCrafted="..tostring(numCrafted)..", reagentID="..tostring(reagentID).."("..tostring((GetItemInfo(reagentID)))..")")
 		Skillet.db.realm.inventoryData[player][reagentID] = numInBoth.." "..numCrafted
 	end
 	self.visited[reagentID] = false -- okay to calculate this reagent again
@@ -93,14 +93,14 @@ function Skillet:InventorySkillIterations(tradeID, skillIndex, playerOverride)
 				local reagentAvailableAlts = 0
 				reagentAvailable, reagentCraftable = self:GetInventory(player, reagentID)
 				for alt in pairs(self.db.realm.inventoryData) do
-					local altBoth = self:GetInventory(alt, reagentID)
-					reagentAvailableAlts = reagentAvailableAlts + altBoth
+					if alt ~= player then
+						local altBoth = self:GetInventory(alt, reagentID)
+						reagentAvailableAlts = reagentAvailableAlts + altBoth
+					end
 				end
 				numCraft = math.min(numCraft, math.floor(reagentAvailable/numNeeded))
 				if reagentCraftable > 0 and reagentCraftable > reagentAvailable then
-					local before = numCraftable
 					numCraftable = math.min(numCraftable, math.floor(reagentCraftable/numNeeded))
-					DA.DEBUG(2,tostring(skill.name)..", "..tostring(reagentID)..", before= "..tostring(before)..", after = "..tostring(numCraftable)..", reagentCraftable= "..tostring(reagentCraftable)..", numNeeded= "..tostring(numNeeded))
 				end
 				if self:VendorSellsReagent(reagentID) then	-- if it's available from a vendor, then only worry about bag inventory
 					local vendorAvailable, vendorAvailableAlt = Skillet:VendorItemAvailable(reagentID)
@@ -121,13 +121,16 @@ function Skillet:InventorySkillIterations(tradeID, skillIndex, playerOverride)
 			end
 		end --for
 		recipe.vendorOnly = vendorOnly
-		if numCraft > 0 or numCraftable > 0 or numCraftVendor > 0 or numCraftAlts > 0 then
-			--DA.DEBUG(1,"recipe="..DA.DUMP1(recipe))
-			DA.DEBUG(1,"numCraft="..tostring(numCraft)..", numCraftable="..tostring(numCraftable)..", numCraftVendor="..tostring(numCraftVendor)..", numCraftAlts="..tostring(numCraftAlts))
+		if numCraft == numCraftVendor then
+			numCraftVendor = 0					-- only keep vendor count if different
 		end
 		if numCraftable == 100000 then
-			numCraftable = 0
+			numCraftable = 0					-- there were no craftable reagents
 		end
+--		if numCraft > 0 or numCraftable > 0 or numCraftVendor > 0 or numCraftAlts > 0 then
+			--DA.DEBUG(1,"recipe="..DA.DUMP1(recipe))
+			--DA.DEBUG(1,"numCraft="..tostring(numCraft)..", numCraftable="..tostring(numCraftable)..", numCraftVendor="..tostring(numCraftVendor)..", numCraftAlts="..tostring(numCraftAlts))
+--		end
 		return math.max(0,numCraft * recipe.numMade), math.max(0,numCraftable * recipe.numMade), math.max(0,numCraftVendor * recipe.numMade), math.max(0,numCraftAlts * recipe.numMade)
 	end
 	return 0, 0, 0, 0

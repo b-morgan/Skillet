@@ -79,6 +79,7 @@ Skillet.defaultOptions = {
 	["grouping"] = "Blizzard",
 	["filtertext"] = "",
 	["filterInventory-bag"] = true,
+	["filterInventory-crafted"] = true,
 	["filterInventory-vendor"] = true,
 	["filterInventory-alts"] = false,
 	["filterInventory-owned"] = true,
