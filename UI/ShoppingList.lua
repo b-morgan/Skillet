@@ -285,13 +285,13 @@ local function indexBank()
 	end
 end
 
-local function indexGuildBank()
-	DA.DEBUG(0,"indexGuildBank()")
+local function indexGuildBank(tab)
+	DA.DEBUG(0,"indexGuildBank("..tostring(tab)..")")
+	--
+	-- Build a current view of the contents of the Guildbank (one tab at a time).
+	--
 	-- guildbank contains detailed contents of each tab,slot which 
 	-- is only needed while the guildbank is open.
-	guildbank = {}
-	--
-	-- Build a current view of the contents of the Guildbank.
 	--
 	-- cachedGuildbank is a count by item, usable (but not necessarily 
 	-- accurate) when the Guildbank is closed.
@@ -300,33 +300,38 @@ local function indexGuildBank()
 	-- different realms (not connected) with the same name.
 	--
 	local guildName = GetGuildInfo("player")
-	Skillet.db.global.cachedGuildbank[guildName] = {}
 	local cachedGuildbank = Skillet.db.global.cachedGuildbank
-	local numTabs = GetNumGuildBankTabs()
-	for tab=1, numTabs, 1 do
-		local name, icon, isViewable, canDeposit, numWithdrawals, remainingWithdrawals = GetGuildBankTabInfo(tab);
-		if(isViewable and numWithdrawals~=0) then
-			for slot=1, MAX_GUILDBANK_SLOTS_PER_TAB or 98, 1 do
-				local item = GetGuildBankItemLink(tab, slot)
-				if item then
-					local _,count = GetGuildBankItemInfo(tab, slot)
-					local id = Skillet:GetItemIDFromLink(item)
-					if id then
-						table.insert(guildbank, {
-							["bag"]   = tab,
-							["slot"]  = slot,
-							["id"]  = id,
-							["count"] = count,
-						})
-						if not cachedGuildbank[guildName][id] then
-							cachedGuildbank[guildName][id] = 0
-						end
-						cachedGuildbank[guildName][id] = cachedGuildbank[guildName][id] + count
+	local name, icon, isViewable, canDeposit, numWithdrawals, remainingWithdrawals = GetGuildBankTabInfo(tab);
+	DA.DEBUG(1,"indexGuildBank tab="..tab..", isViewable="..tostring(isViewable)..", numWithdrawals="..numWithdrawals)
+	if(isViewable and numWithdrawals~=0) then
+		for slot=1, MAX_GUILDBANK_SLOTS_PER_TAB or 98, 1 do
+			local item = GetGuildBankItemLink(tab, slot)
+			if item then
+				local _,count = GetGuildBankItemInfo(tab, slot)
+				local id = Skillet:GetItemIDFromLink(item)
+				if id then
+					table.insert(guildbank, {
+						["bag"]   = tab,
+						["slot"]  = slot,
+						["id"]  = id,
+						["count"] = count,
+					})
+					if not cachedGuildbank[guildName][id] then
+						cachedGuildbank[guildName][id] = 0
 					end
+					cachedGuildbank[guildName][id] = cachedGuildbank[guildName][id] + count
 				end
 			end
 		end
 	end
+end
+
+function Skillet:indexAllGuildBankTabs()
+	local numTabs = GetNumGuildBankTabs()
+	for tab=1, numTabs, 1 do
+		indexGuildBank(tab)
+	end
+	guildbankFrameOpen = true
 end
 
 -- Called when the bank frame is opened
@@ -358,16 +363,17 @@ function Skillet:GUILDBANKFRAME_OPENED()
 	DA.DEBUG(0,"GUILDBANKFRAME_OPENED")
 	guildbankQuery = 0
 	guildbankOnce = true
-	guildbankFrameOpen = true
-	if not self.db.profile.display_shopping_list_at_guildbank then
-		return
-	end
 	Skillet.guildBusy = false
 	Skillet.guildQueue = {}
 	guildbank = {}
+	local guildName = GetGuildInfo("player")
+	Skillet.db.global.cachedGuildbank[guildName] = {}
 	local numTabs = GetNumGuildBankTabs()
 	for tab=1, numTabs, 1 do
-		QueryGuildBankTab(tab)
+		QueryGuildBankTab(tab)  -- event GUILDBANKBAGSLOTS_CHANGED will fire when the data is available
+	end
+	if not self.db.profile.display_shopping_list_at_guildbank then
+		return
 	end
 	cache_list(self)
 	if #self.cachedShoppingList == 0 then
@@ -598,12 +604,15 @@ local function processGuildQueue(where)
 end
 
 -- Event is fired when the guild bank contents change.
-function Skillet:GUILDBANKBAGSLOTS_CHANGED(event,tab,slot)
-	DA.DEBUG(2,"GUILDBANKBAGSLOTS_CHANGED"..", tab="..tostring(tab)..", slot="..tostring(slot))
-	guildbankQuery = guildbankQuery + 1
-	if guildbankQuery == GetNumGuildBankTabs() and guildbankOnce then
-		indexGuildBank()
-		guildbankOnce = false
+-- Called as a result of a QueryGuildBankTab call or as a result of a change in the guildbank's contents.
+function Skillet:GUILDBANKBAGSLOTS_CHANGED(event)
+	DA.DEBUG(2,"GUILDBANKBAGSLOTS_CHANGED")
+	if guildbankOnce then
+		guildbankQuery = guildbankQuery + 1
+		if guildbankQuery == GetNumGuildBankTabs() then
+			guildbankOnce = false
+			self:ScheduleTimer("indexAllGuildBankTabs", 0.5)
+		end
 	end
 	if Skillet.guildBusy then
 		DA.DEBUG(1," GUILDBANKBAGSLOTS_CHANGED and guildBusy")
@@ -667,12 +676,6 @@ function Skillet:GetReagentsFromBanks()
 
 	-- Do things using a queue and events.
 	if bankFrameOpen then
-		if #bank == 0 then
-			indexBank()
-			DA.DEBUG(0,"#bank= ",#bank)
-		else
-			DA.DEBUG(0,"Skipped, #bank= ",#bank)
-		end
 		DA.DEBUG(0,"#list=",#list)
 		local bankQueue = Skillet.bankQueue
 		for j,v in pairs(list) do
@@ -705,12 +708,6 @@ function Skillet:GetReagentsFromBanks()
 
 	-- Do things using a queue and events.
 	if guildbankFrameOpen then
-		if #guildbank == 0 then
-			indexGuildBank()
-			DA.DEBUG(0,"#guildbank= ",#guildbank)
-		else
-			DA.DEBUG(0,"Skipped, #guildbank= ",#guildbank)
-		end
 		DA.DEBUG(0,"#list=",#list)
 		local guildQueue = Skillet.guildQueue
 		for j,v in pairs(list) do
