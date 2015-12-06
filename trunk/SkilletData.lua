@@ -54,6 +54,7 @@ Skillet.TradeSkillAdditionalAbilities = {
 	[25229] = {31252,"Prospecting"},	-- jewelcrafting = prospecting
 	[2018]	= {126462,"Thermal Anvil"},	 -- blacksmithing = thermal anvil (item:87216)
 	[4036]	= {126462,"Thermal Anvil"},	 -- engineering = thermal anvil (item:87216)
+	[2656]	= {126462,"Thermal Anvil"},	 -- smelting = thermal anvil (item:87216)
 }
 Skillet.AutoButtonsList = {}
 Skillet.TradeSkillAutoTarget = {
