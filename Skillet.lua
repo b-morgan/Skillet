@@ -20,7 +20,12 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
 local MAJOR_VERSION = GetAddOnMetadata("Skillet", "Version");
 local PACKAGE_VERSION = GetAddOnMetadata("Skillet", "X-Curse-Packaged-Version");
-local MINOR_VERSION = ("$Revision$"):match("%d+") or 1
+local MINOR_VERSION
+if MAJOR_VERSION == PACKAGE_VERSION then
+	MINOR_VERSION = ("$Revision$"):match("%d+") or 1
+else
+	MINOR_VERSION = PACKAGE_VERSION:match("%d+") or 1
+end
 local DATE = string.gsub("$Date$", "^.-(%d%d%d%d%-%d%d%-%d%d).-$", "%1")
 
 Skillet = LibStub("AceAddon-3.0"):NewAddon("Skillet", "AceConsole-3.0", "AceEvent-3.0", "AceHook-3.0", "AceTimer-3.0")

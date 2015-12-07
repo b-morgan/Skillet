@@ -18,7 +18,7 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
 ]]--
 
 -- recursive reagent craftability check
--- not considering alts at the moment
+-- not considering alts
 -- does consider queued recipes
 function Skillet:InventoryReagentCraftability(reagentID, playerOverride)
 	DA.DEBUG(0,"InventoryReagentCraftability("..tostring(reagentID)..", "..tostring(playerOverride)..") -- "..tostring((GetItemInfo(reagentID))))
@@ -92,15 +92,13 @@ function Skillet:InventorySkillIterations(tradeID, skillIndex, playerOverride)
 				local reagentCraftable = 0
 				local reagentAvailableAlts = 0
 				reagentAvailable, reagentCraftable = self:GetInventory(player, reagentID)
+				numCraft = math.min(numCraft, math.floor(reagentAvailable/numNeeded))
+				numCraftable = math.min(numCraftable, math.floor(reagentCraftable/numNeeded))
 				for alt in pairs(self.db.realm.inventoryData) do
 					if alt ~= player then
 						local altBoth = self:GetInventory(alt, reagentID)
 						reagentAvailableAlts = reagentAvailableAlts + altBoth
 					end
-				end
-				numCraft = math.min(numCraft, math.floor(reagentAvailable/numNeeded))
-				if reagentCraftable > 0 and reagentCraftable > reagentAvailable then
-					numCraftable = math.min(numCraftable, math.floor(reagentCraftable/numNeeded))
 				end
 				if self:VendorSellsReagent(reagentID) then	-- if it's available from a vendor, then only worry about bag inventory
 					local vendorAvailable, vendorAvailableAlt = Skillet:VendorItemAvailable(reagentID)
@@ -131,7 +129,8 @@ function Skillet:InventorySkillIterations(tradeID, skillIndex, playerOverride)
 			--DA.DEBUG(1,"recipe="..DA.DUMP1(recipe))
 			--DA.DEBUG(1,"numCraft="..tostring(numCraft)..", numCraftable="..tostring(numCraftable)..", numCraftVendor="..tostring(numCraftVendor)..", numCraftAlts="..tostring(numCraftAlts))
 --		end
-		return math.max(0,numCraft * recipe.numMade), math.max(0,numCraftable * recipe.numMade), math.max(0,numCraftVendor * recipe.numMade), math.max(0,numCraftAlts * recipe.numMade)
+		local numMade = recipe.numMade
+		return numCraft * numMade, numCraftable * numMade, numCraftVendor * numMade, numCraftAlts * numMade
 	end
 	return 0, 0, 0, 0
 end
