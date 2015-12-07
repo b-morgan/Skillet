@@ -142,9 +142,9 @@ local function NOSORT(tradeskill, a, b)
 end
 
 local function SkillIsFilteredOut(skillIndex)
-	--DA.DEBUG(0,"SkillIsFilteredOut("..tostring(skillIndex)..")")
+	DA.DEBUG(0,"SkillIsFilteredOut("..tostring(skillIndex)..")")
 	local skill = Skillet:GetSkill(Skillet.currentPlayer, Skillet.currentTrade, skillIndex)
-	--DA.DEBUG(1,"skill = "..DA.DUMP1(skill,1))
+	DA.DEBUG(1,"skill = "..DA.DUMP1(skill,1))
 	local recipe = Skillet:GetRecipe(skill.id)
 	local recipeID = recipe.spellID or 0
 	if recipeID == 0 then
@@ -290,31 +290,25 @@ end
 
 local function SortAndFilterRecipes()
 	DA.DEBUG(0,"SortAndFilterRecipes()")
---	if not (Skillet.db.realm.skillDB[Skillet.currentPlayer] and Skillet.db.realm.skillDB[Skillet.currentPlayer][Skillet.currentTrade]) then
---		DA.DEBUG(0,"No Data")
---		return 0
---	end
 	local skillListKey = Skillet.currentPlayer..":"..Skillet.currentTrade..":"..Skillet.currentGroupLabel
---	local skillDB = Skillet.db.realm.skillDB[Skillet.currentPlayer][Skillet.currentTrade]
 	local numSkills = Skillet:GetNumSkills(Skillet.currentPlayer, Skillet.currentTrade)
---	local recipeData = Skillet.db.global.recipeData
 	if not Skillet.data.sortedSkillList then
 		--DA.DEBUG(1,"Skillet.data.sortedSkillList = {}")
 		Skillet.data.sortedSkillList = {}
 	end
 	if not Skillet.data.sortedSkillList[skillListKey] then
-		--DA.DEBUg(1,"Skillet.data.sortedSkillList[skillListKey] = {}")
+		--DA.DEBUG(1,"Skillet.data.sortedSkillList[skillListKey] = {}")
 		Skillet.data.sortedSkillList[skillListKey] = {}
 	end
 	local sortedSkillList = Skillet.data.sortedSkillList[skillListKey]
 	local oldLength = #sortedSkillList
-	--DA.DEBUg(0,"oldLength= ",tostring(oldLength))
+	--DA.DEBUG(1,"oldLength= ",tostring(oldLength))
 	local button_index = 0
 	local filtertext = Skillet:GetTradeSkillOption("filtertext")
 	local groupLabel = Skillet.currentGroupLabel
-	--DA.DEBUg(0,"filtertext="..tostring(filtertext)..", groupLabel="..tostring(groupLabel))
+	--DA.DEBUG(1,"filtertext="..tostring(filtertext)..", groupLabel="..tostring(groupLabel))
 	if filtertext and filtertext ~= "" or groupLabel == "Flat" then
-		--DA.DEBUg(1,"SortAndFilterRecipes Flat")
+		DA.DEBUG(1,"SortAndFilterRecipes Flat")
 		for i=1, numSkills, 1 do
 			local skill = Skillet:GetSkill(Skillet.currentPlayer, Skillet.currentTrade, i)
 			if skill then
@@ -347,7 +341,7 @@ local function SortAndFilterRecipes()
 		end
 	else
 		local group = Skillet:RecipeGroupFind(Skillet.currentPlayer, Skillet.currentTrade, Skillet.currentGroupLabel, Skillet.currentGroup)
-		--DA.DEBUg(0,"current grouping "..Skillet.currentGroupLabel.." "..(Skillet.currentGroup or "nil"))
+		DA.DEBUG(1,"current grouping "..Skillet.currentGroupLabel.." "..(Skillet.currentGroup or "nil"))
 		if recipe_sort_method ~= NOSORT then
 			Skillet:RecipeGroupSort(group, recipe_sort_method, is_sort_desc())
 		end
@@ -358,7 +352,7 @@ local function SortAndFilterRecipes()
 			button_index = Skillet:RecipeGroupFlatten(group, 0, sortedSkillList, 0)
 		end
 	end
-	--DA.DEBUg(0,"sorted "..button_index.." skills")
+	DA.DEBUG(0,"sorted "..button_index.." skills")
 	sortedSkillList.count = button_index
 	return button_index
 end
@@ -420,36 +414,6 @@ end
 function Skillet:internal_SortAndFilterRecipes()
 	return SortAndFilterRecipes()
 end
---[[
---
--- True if the list of recipes is sorted and false if it is not.
---
-function Skillet:AreRecipesSorted()
-	return recipe_sort_method and recipe_sort_method ~= NOSORT
-end
---
--- If the recipe list is sorted, maps from the provided index to
--- the sorted index.
---
-function Skillet:GetSortedRecipeIndex(index)
-	if self:AreRecipesSorted() then
-		if not is_sort_desc() then
-			-- +1 is becuse lua arrays are 1-based, not 0-based.
-			index = #sorted_recipes + 1 - index
-		end
-		return sorted_recipes[index]
-	else
-		return sorted_recipes[index]
-	end
-end
-
---
--- Returns the list of sorted recipes for the current trade skill
---
-function Skillet:GetSortedRecipes()
-	return sorted_recipes
-end
-]]
 
 -- called when the sort drop down is first loaded
 function Skillet:SortDropdown_OnLoad()
