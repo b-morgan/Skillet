@@ -342,6 +342,7 @@ function Skillet:RecipeGroupRenameEntry(entry, name)
 end
 
 function Skillet:RecipeGroupSort(group, sortMethod, reverse)
+	DA.DEBUG(0,"RecipeGroupSort()")
 	if group then
 		for v, entry in pairs(group.entries) do
 			if entry.subGroup and entry.subGroup ~= group then
@@ -363,7 +364,7 @@ function Skillet:RecipeGroupSort(group, sortMethod, reverse)
 end
 
 function Skillet:RecipeGroupInitFlatten(group, list)
-	--DA.DEBUG(0,"RecipeGroupInitFlatten("..DA.DUMP1(group,1)..", "..DA.DUMP1(list,1)..")")
+	DA.DEBUG(0,"RecipeGroupInitFlatten("..DA.DUMP1(group,1)..", "..DA.DUMP1(list,1)..")")
 	if group and list then
 		local newSkill = {}
 		newSkill.name = group.name
@@ -372,13 +373,13 @@ function Skillet:RecipeGroupInitFlatten(group, list)
 		newSkill.expanded = true
 		newSkill.depth = 0
 		newSkill.parent = group.parent
-		--DA.DEBUG(0,"newSkill= "..DA.DUMP1(newSkill,1))
+		DA.DEBUG(1,"newSkill= "..DA.DUMP1(newSkill,1))
 		list[1] = newSkill
 	end
 end
 
 function Skillet:RecipeGroupFlatten(group, depth, list, index)
-	--DA.DEBUG(0,"RecipeGroupFlatten("..DA.DUMP1(entry,1)..", "..tostring(depth)..", "..DA.DUMP1(list,1)..", "..tostring(index)..")")
+	DA.DEBUG(0,"RecipeGroupFlatten("..DA.DUMP1(entry,1)..", "..tostring(depth)..", "..DA.DUMP1(list,1)..", "..tostring(index)..")")
 	--DA.DEBUG(0,"group= "..DA.DUMP1(group,2))
 	--DA.DEBUG(0,"list= "..DA.DUMP1(list,2))
 	local num = 0
@@ -403,9 +404,10 @@ function Skillet:RecipeGroupFlatten(group, depth, list, index)
 				local skillData = self:GetSkill(self.currentPlayer, self.currentTrade, entry.skillIndex)
 				local recipe = self:GetRecipe(entry.recipeID)
 				if skillData then
-					local filterLevel = ((skillLevel[entry.difficulty] or skillLevel[skillData.difficulty] or 4) < (self:GetTradeSkillOption("filterLevel")))
+					local filterLevel = ((skillLevel[entry.difficulty] or skillLevel[skillData.difficulty]) < (self:GetTradeSkillOption("filterLevel")))
 					local filterCraftable = false
 					if Skillet:GetTradeSkillOption("hideuncraftable") then
+						DA.DEBUG(1,"name="..tostring(skillData.name)..", numCraftable="..tostring(skillData.numCraftable)..", numRecursive="..tostring(skillData.numRecursive)..", numCraftableVendor="..tostring(skillData.numCraftableVendor)..", numCraftableAlts="..tostring(skillData.numCraftableAlts))
 						if not (skillData.numCraftable > 0 and Skillet:GetTradeSkillOption("filterInventory-bag")) and
 						   not (skillData.numRecursive > 0 and Skillet:GetTradeSkillOption("filterInventory-crafted")) and
 						   not (skillData.numCraftableVendor > 0 and Skillet:GetTradeSkillOption("filterInventory-vendor")) and

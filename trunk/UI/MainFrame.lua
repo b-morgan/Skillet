@@ -948,7 +948,7 @@ function Skillet:internal_UpdateTradeSkillWindow()
 					local ccraft =  "|cffffff80" -- yellow
 					local cvendor = "|cffffa050" -- orange
 					local calts = "|cffff80ff" -- purple
-					if (num > 0 and showBag) or (numwvendor > 0 and showVendor) or (numwalts > 0 and showAlts) then
+					if (num > 0 and showBag) or (numrecursive > 0 and showCraft) or (numwvendor > 0 and showVendor) or (numwalts > 0 and showAlts) then
 						local c = 1
 						if showBag then
 							if num >= 1000 then
