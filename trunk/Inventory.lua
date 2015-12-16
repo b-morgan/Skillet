@@ -21,7 +21,7 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
 -- not considering alts
 -- does consider queued recipes
 function Skillet:InventoryReagentCraftability(reagentID, playerOverride)
-	DA.DEBUG(0,"InventoryReagentCraftability("..tostring(reagentID)..", "..tostring(playerOverride)..") -- "..tostring((GetItemInfo(reagentID))))
+	--DA.DEBUG(0,"InventoryReagentCraftability("..tostring(reagentID)..", "..tostring(playerOverride)..") -- "..tostring((GetItemInfo(reagentID))))
 	if self.visited[reagentID] then
 		DA.DEBUG(0,"Been Here Before")
 		return 0			-- we've been here before, so bail out to avoid infinite loop
@@ -74,7 +74,7 @@ end
 -- (not to be confused with the reagent craftability which is designed to determine how many 
 -- craftable reagents are available for recipe iterations)
 function Skillet:InventorySkillIterations(tradeID, skillIndex, playerOverride)
-	DA.DEBUG(1,"InventorySkillIterations("..tostring(tradeID)..", "..tostring(skillIndex)..", "..tostring(playerOverride)..")")
+	--DA.DEBUG(1,"InventorySkillIterations("..tostring(tradeID)..", "..tostring(skillIndex)..", "..tostring(playerOverride)..")")
 	local player = playerOverride or Skillet.currentPlayer
 	local skill = self:GetSkill(player, tradeID, skillIndex)
 	local recipe = self:GetRecipe(skill.id)
