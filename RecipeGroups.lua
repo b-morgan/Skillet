@@ -404,7 +404,7 @@ function Skillet:RecipeGroupFlatten(group, depth, list, index)
 				local skillData = self:GetSkill(self.currentPlayer, self.currentTrade, entry.skillIndex)
 				local recipe = self:GetRecipe(entry.recipeID)
 				if skillData then
-					local filterLevel = ((skillLevel[entry.difficulty] or skillLevel[skillData.difficulty]) < (self:GetTradeSkillOption("filterLevel")))
+					local filterLevel = ((skillLevel[entry.difficulty] or skillLevel[skillData.difficulty] or 0) < (self:GetTradeSkillOption("filterLevel")))
 					local filterCraftable = false
 					if Skillet:GetTradeSkillOption("hideuncraftable") then
 						DA.DEBUG(1,"name="..tostring(skillData.name)..", numCraftable="..tostring(skillData.numCraftable)..", numRecursive="..tostring(skillData.numRecursive)..", numCraftableVendor="..tostring(skillData.numCraftableVendor)..", numCraftableAlts="..tostring(skillData.numCraftableAlts))
