@@ -18,22 +18,16 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
 ]]--
 
+Skillet = LibStub("AceAddon-3.0"):NewAddon("Skillet", "AceConsole-3.0", "AceEvent-3.0", "AceHook-3.0", "AceTimer-3.0")
+local AceDB = LibStub("AceDB-3.0")
+
+-- Get version info from the .toc file
 local MAJOR_VERSION = GetAddOnMetadata("Skillet", "Version");
 local PACKAGE_VERSION = GetAddOnMetadata("Skillet", "X-Curse-Packaged-Version");
-local MINOR_VERSION
-if MAJOR_VERSION == PACKAGE_VERSION then
-	MINOR_VERSION = ("$Revision$"):match("%d+") or 1
-else
-	MINOR_VERSION = PACKAGE_VERSION:match("%d+") or 1
+Skillet.version = MAJOR_VERSION
+if PACKAGE_VERSION then
+	Skillet.version = PACKAGE_VERSION
 end
-local DATE = string.gsub("$Date$", "^.-(%d%d%d%d%-%d%d%-%d%d).-$", "%1")
-
-Skillet = LibStub("AceAddon-3.0"):NewAddon("Skillet", "AceConsole-3.0", "AceEvent-3.0", "AceHook-3.0", "AceTimer-3.0")
-Skillet.title   = "Skillet"
-Skillet.version = MAJOR_VERSION .. "-" .. MINOR_VERSION
-Skillet.package = PACKAGE_VERSION
-Skillet.date    = DATE
-local AceDB = LibStub("AceDB-3.0")
 
 -- Pull it into the local namespace, it's faster to access that way
 local Skillet = Skillet
