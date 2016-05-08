@@ -28,7 +28,7 @@ local COLORGREEN =  "|cff40c040"
 local COLORGRAY =   "|cff808080"
 
 -- min width for skill list window
-local SKILLET_SKILLLIST_MIN_WIDTH = 200				-- was 165
+local SKILLET_SKILLLIST_MIN_WIDTH = 380
 
 -- min/max width for the reagent window
 local SKILLET_REAGENT_MIN_WIDTH = 240
@@ -239,7 +239,7 @@ function Skillet:CreateTradeSkillWindow()
 	windowManger.MakeDraggable(frame)
 	-- lets play the resize me game!
 	local minwidth = self:GetMinSkillButtonWidth()
-	if not minwidth or minwidth < SKILLET_SKILLLIST_MIN_WIDTH then					-- upped from 165
+	if not minwidth or minwidth < SKILLET_SKILLLIST_MIN_WIDTH then
 		minwidth = SKILLET_SKILLLIST_MIN_WIDTH
 	end
 	minwidth = minwidth +                  -- minwidth of scroll button
