@@ -359,7 +359,7 @@ Skillet.options =
 					type = "range",
 					name = L["Scale"],
 					desc = L["SCALEDESC"],
-					min = 0.1, max = 1.25, step = 0.05, isPercent = true,
+					min = 0.1, max = 1.50, step = 0.05, isPercent = true,
 					get = function()
 						return Skillet.db.profile.scale
 					end,
