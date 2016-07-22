@@ -618,7 +618,3 @@ end
 function Skillet:GetCharacterTradeskills(character_name, profession)
 	return self:internal_GetCharacterTradeskills(character_name, profession)
 end
-
-function Skillet:GetCraftersForItem(itemId)
-	return self:internal_GetCraftersForItem(itemId)
-end

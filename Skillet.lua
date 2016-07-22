@@ -729,14 +729,30 @@ function Skillet:GetIDFromLink(link)	-- works with items or enchants
 	end
 end
 
+--[[
+function Skillet:SetBlizzardProfessionFrameVisible(visible)
+	if visible and not (TradeSkillFrame and TradeSkillFrame:IsVisible()) then
+		TradeSkillFrame_LoadUI()
+		TradeSkillFrame:SetScript("OnHide", private.BlizzardProfessionFrameOnHide)
+		ShowUIPanel(TradeSkillFrame)
+		private:CreateSwitchButton()
+		private.switchBtn:Show()
+		private.switchBtn:Update()
+	elseif not visible and TradeSkillFrame then
+		private.noHide = true
+		HideUIPanel(TradeSkillFrame)
+		private.noHide = nil
+	end
+end
+]]--
+
 function Skillet:DisableBlizzardFrame()
 	if self.BlizzardTradeSkillFrame == nil then
 		if (not IsAddOnLoaded("Blizzard_TradeSkillUI")) then
 			LoadAddOn("Blizzard_TradeSkillUI");
 		end
 		self.BlizzardTradeSkillFrame = TradeSkillFrame
-		self.BlizzardTradeSkillFrame_Show = TradeSkillFrame_Show
-		TradeSkillFrame_Show = DoNothing
+		HideUIPanel(TradeSkillFrame)
 	end
 end
 
@@ -745,10 +761,8 @@ function Skillet:EnableBlizzardFrame()
 		if (not IsAddOnLoaded("Blizzard_TradeSkillUI")) then
 			LoadAddOn("Blizzard_TradeSkillUI");
 		end
-		TradeSkillFrame = self.BlizzardTradeSkillFrame
-		TradeSkillFrame_Show = self.BlizzardTradeSkillFrame_Show
 		self.BlizzardTradeSkillFrame = nil
-		self.BlizzardTradeSkillFrame_Show = nil
+		ShowUIPanel(TradeSkillFrame)
 	end
 end
 
@@ -1086,8 +1100,8 @@ function Skillet:OnDisable()
 end
 
 function Skillet:IsTradeSkillLinked()
-	local isGuild = IsTradeSkillGuild()
-	local isLinked, linkedPlayer = IsTradeSkillLinked()
+	local isGuild = C_TradeSkillUI.IsTradeSkillGuild()
+	local isLinked, linkedPlayer = C_TradeSkillUI.IsTradeSkillLinked()
 	DA.DEBUG(0,"IsTradeSkillLinked, isGuild="..tostring(isGuild)..", isLinked="..tostring(isLinked)..", linkedPlayer="..tostring(linkedPlayer))
 	if isLinked or isGuild then
 		if not linkedPlayer then
@@ -1106,8 +1120,7 @@ function Skillet:SkilletShow()
 	if PandaPanel and PandaPanel:IsShown() then
 		return
 	end
-	TradeSkillFrame_Update();
-	self.linkedSkill, self.currentPlayer, self.isGuild = Skillet:IsTradeSkillLinked()
+	self.linkedSkill, self.currentPlayer, self.isGuild = self:IsTradeSkillLinked()
 	if self.linkedSkill then
 		if not self.currentPlayer then
 			return -- Wait for TRADE_SKILL_NAME_UPDATE
@@ -1116,19 +1129,17 @@ function Skillet:SkilletShow()
 	else
 		self.currentPlayer = (UnitName("player"))
 	end
-	self.currentTrade = self.tradeSkillIDsByName[(GetTradeSkillLine())] or 2656      -- smelting caveat
-	if not self.linkedSkill and not self.isGuild then
-		self:InitializeDatabase(self.currentPlayer)
-	else
-		self:InitializeDatabase(self.currentPlayer)  -- Need to skip this but who knows what will blow up.
-	end 
+-- local tradeSkillID, skillLineName, skillLineRank, skillLineMaxRank, skillLineModifier = C_TradeSkillUI.GetTradeSkillLine();
+	self.currentTrade = self.tradeSkillIDsByName[select(2,C_TradeSkillUI.GetTradeSkillLine())]
+	self:InitializeDatabase(self.currentPlayer)
 
 	-- Use the Blizzard UI for any garrison follower that can't use ours.
 	if self:IsNotSupportedFollower(self.currentTrade) then
 		self:HideAllWindows()
-		self:BlizzardTradeSkillFrame_Show()
+		ShowUIPanel(TradeSkillFrame)
 	else
 		if self:IsSupportedTradeskill(self.currentTrade) then
+			HideUIPanel(TradeSkillFrame)
 			self:InventoryScan()
 			self.tradeSkillOpen = true
 			DA.DEBUG(1,"SkilletShow: "..self.currentTrade)
@@ -1137,7 +1148,7 @@ function Skillet:SkilletShow()
 			self:ScheduleTimer("SkilletShowWindow", 0.5)
 		else
 			self:HideAllWindows()
-			self:BlizzardTradeSkillFrame_Show()
+			ShowUIPanel(TradeSkillFrame)
 			Skillet.TSMPlugin.TSMShow()
 		end
 	end
@@ -1509,22 +1520,6 @@ function Skillet:AddItemNotesToTooltip(tooltip)
 					note = GRAY_FONT_COLOR_CODE .. player .. ": " .. FONT_COLOR_CODE_CLOSE .. note
 				end
 				tooltip:AddLine(" " .. note, 1, 1, 1, true) -- r,g,b, wrap
-			end
-		end
-	end
--- Blizzard's changes to trade links in 5.4 broke this code.
-	if crafters_enabled then
-		local crafters = self:GetCraftersForItem(id); -- current implementation always returns nil
-		if crafters then
-			local header_added = true
-			local title_added = false
-			for i,name in ipairs(crafters) do
-				if not title_added then
-					title_added = true
-					tooltip:AddDoubleLine(L["Crafted By"], name)
-				end
-				DA.DEBUG(1,"name= '"..name.."'")
-				tooltip:AddDoubleLine(" ", name)
 			end
 		end
 	end
