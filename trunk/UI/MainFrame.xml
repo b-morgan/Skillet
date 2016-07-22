@@ -717,7 +717,7 @@
 			</OnUpdate>
 			<OnClick>
 				Skillet:InventoryFilterButtons_Hide()
-				local link = Skillet:GetTradeSkillReagentItemLink(Skillet.selectedSkill, self:GetID())
+				local link = Skillet:GetRecipeReagentItemLink(Skillet.selectedSkill, self:GetID())
 				if ( IsControlKeyDown() ) then
 				<!-- This opens up the dressing room window and display the character
 					 wearing the item (if that is possible) -->
@@ -871,7 +871,7 @@
 					<OnClick>
 						local activeEditBox =  ChatEdit_GetActiveWindow();
 						if activeEditBox then
-							local link=GetTradeSkillListLink();
+							local link=C_TradeSkillUI.GetTradeSkillListLink();
 							if (not ChatEdit_InsertLink(link) ) then
 								assert(activeEditBox:GetName(), "Failed to add tradeskill link")
 							end
@@ -2127,7 +2127,7 @@
 					</OnLoad>
 					<OnClick>
 						Skillet:InventoryFilterButtons_Hide()
-						local link = Skillet:GetTradeSkillItemLink(Skillet.selectedSkill);
+						local link = Skillet:GetRecipeItemLink(Skillet.selectedSkill);
 						if ( IsControlKeyDown() ) then
 							<!-- This opens up the dressing room window and display the character
 								 wearing the item (if that is possible) -->

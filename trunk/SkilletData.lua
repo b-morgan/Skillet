@@ -36,14 +36,12 @@ local TradeSkillList = {
 	53428,		-- runeforging
 }
 
--- Table of follower (IsNPCCrafting) tradeskills that should use the Blizzard frame
+-- Table of follower (C_TradeSkillUI.IsNPCCrafting) tradeskills that should use the Blizzard frame
 Skillet.FollowerSkillList = {
-	[7411] = false,		-- Enchanting follower for Illusions is broken in 6.0
-	[25229] = false,	-- Jewelcrafting Apexis Gemcutter is broken in 6.2
 }
 
 -- In case the previous table is too broad
--- Table of follower (IsNPCCrafting) NPC IDs (from GUID) that should use the Blizzard frame 
+-- Table of follower (C_TradeSkillUI.IsNPCCrafting) NPC IDs (from GUID) that should use the Blizzard frame 
 Skillet.FollowerNPC = {
 }
 
@@ -597,6 +595,14 @@ local skill_style_type = {
 	["unavailable"]		= { r = 0.3, g = 0.3, b = 0.3,	  level = 6, alttext="",	cstring = "|cff606060"},
 }
 
+function Skillet:GetTradeSkillInfo(index)
+    local info = C_TradeSkillUI.GetRecipeInfo(index)
+    -- skillName, skillType, numAvailable, isExpanded, altVerb, numSkillUps, indentLevel, showProgressBar, currentRank, maxRank, startingRank
+    if info then
+        return info.name, info.difficulty, info.numAvailable, false, info.alternateVerb, info.numSkillUps, info.numIndents, false, nil, nil, nil
+    end
+end
+
 local lastAutoTarget = {}
 function Skillet:GetAutoTargetItem(tradeID)
 	if Skillet.TradeSkillAutoTarget[tradeID] then
@@ -715,7 +721,7 @@ end
 function Skillet:IsNotSupportedFollower(tradeID)
 	DA.DEBUG(0,"IsNotSupportedFollower("..tostring(tradeID)..")")
 	Skillet.wasNPCCrafting = false
-	if IsNPCCrafting() then
+	if C_TradeSkillUI.IsNPCCrafting() then
 		local guid = UnitGUID("target")
 		local gtype, zero, server_id, instance_id, zone_uid, npc_id, spawn_uid
 		if guid then
@@ -812,19 +818,19 @@ end
 
 -- resets the blizzard tradeskill search filters just to make sure no other addon has monkeyed with them
 function SkilletData:ResetTradeSkillFilter()
-	if not GetTradeSkillCategoryFilter(0) then
-		SetTradeSkillCategoryFilter(0, 1, 1)
-	end
-	SetTradeSkillItemNameFilter("")
-	SetTradeSkillItemLevelFilter(0,0)
+	C_TradeSkillUI.ClearInventorySlotFilter()
+	C_TradeSkillUI.ClearRecipeCategoryFilter()
+	C_TradeSkillUI.ClearRecipeSourceTypeFilter()
 end
 
 function SkilletLink:ResetTradeSkillFilter()
-	if not GetTradeSkillCategoryFilter(0) then
-		SetTradeSkillCategoryFilter(0, 1, 1)
-	end
-	SetTradeSkillItemNameFilter("")
-	SetTradeSkillItemLevelFilter(0,0)
+	C_TradeSkillUI.ClearInventorySlotFilter()
+	C_TradeSkillUI.ClearRecipeCategoryFilter()
+	C_TradeSkillUI.ClearRecipeSourceTypeFilter()
+end
+
+function Skillet:ExpandTradeSkillSubClass(i)
+	DA.DEBUG(0,"Skillet:ExpandTradeSkillSubClass "..tostring(i))
 end
 
 function Skillet:GetRecipeName(id)
@@ -955,9 +961,9 @@ function SkilletLink:GetNumSkills(player, trade)
 	local linkedSkill, linkedPlayer = Skillet:IsTradeSkillLinked()
 	if linkedSkill then
 --		if linkedPlayer == player then
-			local skill, rank, max = GetTradeSkillLine()
+			local id, skill, rank, max = C_TradeSkillUI.GetTradeSkillLine()
 			if GetSpellInfo(trade) == skill then
-				r = GetNumTradeSkills()
+				r = #C_TradeSkillUI.GetFilteredRecipeIDs()
 			end
 --		end
 	else
@@ -992,7 +998,7 @@ function SkilletLink:GetSkillRanks(player, trade)
 	local linkedSkill, linkedPlayer = Skillet:IsTradeSkillLinked()
 	if linkedSkill then
 		if linkedPlayer == player then
-			local skill, rank, maxRank = GetTradeSkillLine()
+			local id, skill, rank, maxRank = C_TradeSkillUI.GetTradeSkillLine()
 			if GetSpellInfo(trade) == skill then
 				skillRanks.rank = rank
 				skillRanks.maxRank = maxRank
@@ -1374,8 +1380,8 @@ function SkilletData:ScanTrade()
 	end
 	self.scanInProgress = true
 	local tradeID
-	local link = GetTradeSkillListLink()
-	local profession, rank, maxRank = GetTradeSkillLine()
+	local link = C_TradeSkillUI.GetTradeSkillListLink()
+	local id, profession, rank, maxRank = C_TradeSkillUI.GetTradeSkillLine()
 	if link then
 		--DA.DEBUG(0,"GetTradeSkill: "..(profession or "nil").." link="..link.." "..string.gsub(link, "\124", "\124\124"))
 	else
@@ -1405,18 +1411,18 @@ function SkilletData:ScanTrade()
 		Skillet.db.realm.tradeSkills[player][tradeID].maxRank = maxRank
 	end
 		self:ResetTradeSkillFilter() -- verify the search filter is blank (so we get all skills)
-	local numSkills = GetNumTradeSkills()
+	local numSkills = #C_TradeSkillUI.GetFilteredRecipeIDs()
 	for i = 1, numSkills do
-		local skillName, skillType, _, isExpanded = GetTradeSkillInfo(i)
+		local skillName, skillType, _, isExpanded = self:GetTradeSkillInfo(i)
 		--DA.DEBUG(3,"i= "..tostring(i)..", skillName= "..tostring(skillName)..", skillType="..tostring(skillType)..", isExpanded= "..tostring(isExpanded))
 		if i == 1 and skillType == "subheader" then skillType = "header" end --**-- workaround for Blizzard bug in 6.02
 		if skillType == "header" or skillType == "subheader" then
 			if not isExpanded then
-				ExpandTradeSkillSubClass(i)
+				self:ExpandTradeSkillSubClass(i)
 			end
 		end
 	end
-	numSkills = GetNumTradeSkills()
+	numSkills = #C_TradeSkillUI.GetFilteredRecipeIDs()
 	DA.DEBUG(0,"Scanning Trade "..(profession or "nil")..":"..(tradeID or "nil").." "..numSkills.." recipes")
 	if not Skillet.data.skillIndexLookup[player] then
 		Skillet.data.skillIndexLookup[player] = {}
@@ -1442,7 +1448,7 @@ function SkilletData:ScanTrade()
 	if not Skillet.db.realm.tradeSkills[player][tradeID] then
 		Skillet.db.realm.tradeSkills[player][tradeID] = {}
 	end
-	local skillName, rank, maxRank = GetTradeSkillLine()
+	local id, skillName, rank, maxRank = C_TradeSkillUI.GetTradeSkillLine()
 	Skillet.db.realm.tradeSkills[player][tradeID].link = link
 	Skillet.db.realm.tradeSkills[player][tradeID].rank = rank
 	Skillet.db.realm.tradeSkills[player][tradeID].maxRank = maxRank
@@ -1453,7 +1459,7 @@ function SkilletData:ScanTrade()
 	for i = 1, numSkills, 1 do
 		repeat
 			local skillName, skillType, isExpanded, subSpell, extra
-			local skillName, skillType, _, isExpanded, _, _, _, _, _, _, _, displayAsUnavailable, _ = GetTradeSkillInfo(i);
+			local skillName, skillType, _, isExpanded, _, _, _, _, _, _, _, displayAsUnavailable, _ = self:GetTradeSkillInfo(i);
 			--DA.DEBUG(0,i.." "..skillName)
 			--DA.DEBUG(3,"i= "..tostring(i)..", skillName= "..tostring(skillName)..", skillType="..tostring(skillType)..", isExpanded= "..tostring(isExpanded))
 			if i == 1 and skillType == "subheader" then skillType = "header" end --**-- workaround for Blizzard bug in 6.02
@@ -1463,7 +1469,7 @@ function SkilletData:ScanTrade()
 				if skillType == "header" or skillType == "subheader" then
 					numHeaders = numHeaders + 1
 					if not isExpanded then
-						ExpandTradeSkillSubClass(i)
+						self:ExpandTradeSkillSubClass(i)
 					end
 					local groupName
 					if groupList[skillName] then
@@ -1484,11 +1490,11 @@ function SkilletData:ScanTrade()
 						Skillet:RecipeGroupAddSubGroup(parentGroup, currentGroup, i)
 					end
 				else
-					local recipeLink = GetTradeSkillRecipeLink(i)
+					local recipeLink = C_TradeSkillUI.GetRecipeLink(i)
 					local recipeID = Skillet:GetItemIDFromLink(recipeLink)
 					local noRecipe = false
 					if not recipeID then
-						recipeLink = GetTradeSkillItemLink(i)
+						recipeLink = C_TradeSkillUI.GetRecipeItemLink(i)
 						recipeID = Skillet:GetItemIDFromLink(recipeLink)
 						if not recipeID then
 							gotNil = true
@@ -1510,14 +1516,14 @@ function SkilletData:ScanTrade()
 					skillData[i].color = skill_style_type[skillType]
 					skillData[i].category = lastHeader
 					local skillDBString = DifficultyChar[skillType]..recipeID
-					local tools = { GetTradeSkillTools(i) }
+					local tools = { C_TradeSkillUI.GetRecipeTools(i) }
 					skillData[i].tools = {}
 					local slot = 1
 					for t=2,#tools,2 do
 						skillData[i].tools[slot] = (tools[t] or 0)
 						slot = slot + 1
 					end
-					local cd = GetTradeSkillCooldown(i)
+					local cd = C_TradeSkillUI.GetRecipeCooldown(i)
 					if cd then
 						skillData[i].cooldown = cd + time()		-- this is when your cooldown will be up
 						skillDBString = skillDBString.." cd=" .. cd + time()
@@ -1561,7 +1567,7 @@ function SkilletData:ScanTrade()
 								toolString = toolString..":"..string.gsub(tools[t]," ", "_")
 							end
 						end
-						local itemLink = GetTradeSkillItemLink(i)
+						local itemLink = C_TradeSkillUI.GetRecipeItemLink(i)
 						if not itemLink then
 							gotNil = true
 							break
@@ -1569,7 +1575,7 @@ function SkilletData:ScanTrade()
 						local itemString = "0"
 						if GetItemInfo(itemLink) then
 							local itemID = Skillet:GetItemIDFromLink(itemLink)
-							local minMade,maxMade = GetTradeSkillNumMade(i)
+							local minMade,maxMade = C_TradeSkillUI.GetRecipeNumItemsProduced(i)
 							recipe.itemID = itemID
 							recipe.numMade = (minMade + maxMade)/2
 							if recipe.numMade > 1 then
@@ -1592,10 +1598,10 @@ function SkilletData:ScanTrade()
 						local reagentString = "-"
 						local reagentData = {}
 						for j=1, GetTradeSkillNumReagents(i), 1 do
-							local reagentName, _, numNeeded = GetTradeSkillReagentInfo(i,j)
+							local reagentName, _, numNeeded = C_TradeSkillUI.GetRecipeReagentInfo(i,j)
 							local reagentID = 0
 							if reagentName then
-								local reagentLink = GetTradeSkillReagentItemLink(i,j)
+								local reagentLink = C_TradeSkillUI.GetRecipeReagentItemLink(i,j)
 								reagentID = Skillet:GetItemIDFromLink(reagentLink)
 							else
 								gotNil = true
@@ -1672,12 +1678,12 @@ function SkilletLink:ScanTrade()
 	self.scanInProgress = true
 	local tradeID
 	local API = {}
-	local profession, rank, maxRank = GetTradeSkillLine()
-	--DA.DEBUG(0,"GetTradeSkill: "..(profession or "nil"))
+	local id, profession, rank, maxRank = C_TradeSkillUI.GetTradeSkillLine()
+	DA.DEBUG(0,"GetTradeSkill: "..tostring(profession))
 	-- get the tradeID from the profession name (data collected earlier).
 	tradeID = TradeSkillIDsByName[profession] or 2656				-- "mining" doesn't exist as a spell, so instead use smelting (id 2656)
 	if tradeID ~= Skillet.currentTrade then
-		--DA.DEBUG(0,"TRADE MISMATCH for player "..(Skillet.currentPlayer or "nil").."!	 "..(tradeID or "nil").." vs "..(Skillet.currentTrade or "nil"));
+		DA.DEBUG(0,"TRADE MISMATCH for player "..(Skillet.currentPlayer or "nil").."!	 "..(tradeID or "nil").." vs "..(Skillet.currentTrade or "nil"));
 	end
 	local player = Skillet.currentPlayer
 	if not self.recacheRecipe then
@@ -1693,18 +1699,18 @@ function SkilletLink:ScanTrade()
 		self.alreadyScanned[player][tradeID] = 0
 	end
 	self:ResetTradeSkillFilter() -- verify the search filter is blank (so we get all skills)
-	local numSkills = GetNumTradeSkills()
+	local numSkills = #C_TradeSkillUI.GetFilteredRecipeIDs()
 	for i = 1, numSkills do
-		local skillName, skillType, _, isExpanded = GetTradeSkillInfo(i)
+		local skillName, skillType, _, isExpanded = self:GetTradeSkillInfo(i)
 		--DA.DEBUG(3,"i= "..tostring(i)..", skillName= "..tostring(skillName)..", skillType="..tostring(skillType)..", isExpanded= "..tostring(isExpanded))
 		if i == 1 and skillType == "subheader" then skillType = "header" end --**-- workaround for Blizzard bug in 6.02
 		if skillType == "header" or skillType == "subheader" then
 			if not isExpanded then
-				ExpandTradeSkillSubClass(i)
+				self:ExpandTradeSkillSubClass(i)
 			end
 		end
 	end
-	numSkills = GetNumTradeSkills()
+	numSkills = #C_TradeSkillUI.GetFilteredRecipeIDs()
 	DA.DEBUG(0,"Scanning Trade "..tostring(profession)..":"..tostring(tradeID).." "..tostring(numSkills).." recipes")
 	if not Skillet.data.skillIndexLookup[player] then
 		Skillet.data.skillIndexLookup[player] = {}
@@ -1730,8 +1736,8 @@ function SkilletLink:ScanTrade()
 	for i = 1, numSkills, 1 do
 		repeat
 			local subSpell, extra
-			local skillName, skillType, _, isExpanded, _, _, _, _, _, _, _, displayAsUnavailable, _ = GetTradeSkillInfo(i);
-			--DA.DEBUG(3,"i= "..tostring(i)..", skillName= "..tostring(skillName)..", skillType="..tostring(skillType)..", isExpanded= "..tostring(isExpanded))
+			local skillName, skillType, _, isExpanded, _, _, _, _, _, _, _, displayAsUnavailable, _ = self:GetTradeSkillInfo(i);
+			DA.DEBUG(3,"i= "..tostring(i)..", skillName= "..tostring(skillName)..", skillType="..tostring(skillType)..", isExpanded= "..tostring(isExpanded))
 			if i == 1 and skillType == "subheader" then skillType = "header" end --**-- workaround for Blizzard bug in 6.02
 			if displayAsUnavailable then skillType = "unavailable" end
 			gotNil = false
@@ -1739,7 +1745,7 @@ function SkilletLink:ScanTrade()
 				if skillType == "header" or skillType == "subheader" then
 					numHeaders = numHeaders + 1
 					if not isExpanded then
-						ExpandTradeSkillSubClass(i)
+						self:ExpandTradeSkillSubClass(i)
 					end
 					local groupName
 					if groupList[skillName] then
@@ -1761,7 +1767,7 @@ function SkilletLink:ScanTrade()
 						Skillet:RecipeGroupAddSubGroup(parentGroup, currentGroup, i)
 					end
 				else
-					local recipeLink = GetTradeSkillRecipeLink(i)
+					local recipeLink = C_TradeSkillUI.GetRecipeLink(i)
 					local recipeID = Skillet:GetItemIDFromLink(recipeLink)
 					if not recipeID then
 						gotNil = true
@@ -1779,14 +1785,14 @@ function SkilletLink:ScanTrade()
 					skillData[i].difficulty = skillType
 					skillData[i].color = skill_style_type[skillType]
 					skillData[i].category = lastHeader
-					local tools = { GetTradeSkillTools(i) }
+					local tools = { C_TradeSkillUI.GetRecipeTools(i) }
 					skillData[i].tools = {}
 					local slot = 1
 					for t=2,#tools,2 do
 						skillData[i].tools[slot] = (tools[t] or 0)
 						slot = slot + 1
 					end
-					local cd = GetTradeSkillCooldown(i)
+					local cd = C_TradeSkillUI.GetRecipeCooldown(i)
 					if cd then
 						skillData[i].cooldown = cd + time()						-- this is when your cooldown will be up
 					end
@@ -1819,7 +1825,7 @@ function SkilletLink:ScanTrade()
 							toolString = toolString..":"..string.gsub(tools[t]," ", "_")
 						end
 					end
-					local itemLink = GetTradeSkillItemLink(i)
+					local itemLink = C_TradeSkillUI.GetRecipeItemLink(i)
 					if not itemLink then
 						gotNil = true
 						break
@@ -1827,7 +1833,7 @@ function SkilletLink:ScanTrade()
 					local itemString = "0"
 					if GetItemInfo(itemLink) then
 						local itemID = Skillet:GetItemIDFromLink(itemLink)
-						local minMade,maxMade = GetTradeSkillNumMade(i)
+						local minMade,maxMade = C_TradeSkillUI.GetRecipeNumItemsProduced(i)
 						recipe.itemID = itemID
 						recipe.numMade = (minMade + maxMade)/2
 						if recipe.numMade > 1 then
@@ -1850,10 +1856,10 @@ function SkilletLink:ScanTrade()
 					local reagentString = nil
 					local reagentData = {}
 					for j=1, GetTradeSkillNumReagents(i), 1 do
-						local reagentName, _, numNeeded = GetTradeSkillReagentInfo(i,j)
+						local reagentName, _, numNeeded = C_TradeSkillUI.GetRecipeReagentInfo(i,j)
 						local reagentID = 0
 						if reagentName then
-							local reagentLink = GetTradeSkillReagentItemLink(i,j)
+							local reagentLink = C_TradeSkillUI.GetRecipeReagentItemLink(i,j)
 							reagentID = Skillet:GetItemIDFromLink(reagentLink)
 						else
 							gotNil = true

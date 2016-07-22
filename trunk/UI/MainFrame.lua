@@ -471,7 +471,7 @@ function Skillet:TradeButton_OnEnter(button)
 		GameTooltip:AddLine(L["No Data"],1,0,0)
 	else
 		local rank, maxRank = data.rank, data.maxRank
-		GameTooltip:AddLine("["..rank.."/"..maxRank.."]",0,1,0)
+		GameTooltip:AddLine("["..tostring(rank).."/"..tostring(maxRank).."]",0,1,0)
 		if tradeID == self.currentTrade then
 			GameTooltip:AddLine("shift-click to link")
 		end
@@ -508,7 +508,7 @@ function Skillet:TradeButton_OnClick(this,button)
 	if button == "LeftButton" then
 		if player == UnitName("player") or (data and data ~= nil) then
 			if self.currentTrade == tradeID and IsShiftKeyDown() then
-				local link=GetTradeSkillListLink();
+				local link=C_TradeSkillUI.GetTradeSkillListLink();
 				local activeEditBox =  ChatEdit_GetActiveWindow();
 				if activeEditBox or WIM_EditBoxInFocus ~= nil then
 					ChatEdit_InsertLink(link)
@@ -1401,7 +1401,7 @@ function Skillet:UpdateDetailsWindow(skillIndex)
 				s:Show()
 			end
 		end
-		local description = GetTradeSkillDescription(skillIndex)
+		local description = C_TradeSkillUI.GetRecipeDescription(skillIndex)
 		--DA.DEBUG(0,"description="..tostring(description))
 		if description then
 			description = description:gsub("\r","")	-- Skillet frame has less space than Blizzard frame, so
@@ -1945,7 +1945,7 @@ function Skillet:SkillButton_OnClick(button, mouse)
 				self:SortAndFilterRecipes()
 			else
 				local id = button:GetID()
-				local spellLink = GetTradeSkillRecipeLink(id)
+				local spellLink = C_TradeSkillUI.GetRecipeLink(id)
 				if (ChatEdit_GetLastActiveWindow():IsVisible() or WIM_EditBoxInFocus ~= nil) then
 					ChatEdit_InsertLink(spellLink)
 				else
@@ -2215,12 +2215,12 @@ end
 
 function Skillet:SkilletFrameForceClose()
 	if self.dataSource == "api" then
-		CloseTradeSkill()
+		C_TradeSkillUI.CloseTradeSkill()
 		self.dataSource = "none"
 		self:HideAllWindows()
 		return true
 	else
-		CloseTradeSkill()
+		C_TradeSkillUI.CloseTradeSkill()
 		local x = self:HideAllWindows()
 		return x
 	end
@@ -2350,7 +2350,7 @@ local skillMenuList = {
 	{
 		text = "Link Recipe",
 		func = function()
-					local spellLink = GetTradeSkillRecipeLink(Skillet.menuButton:GetID())
+					local spellLink = C_TradeSkillUI.GetRecipeLink(Skillet.menuButton:GetID())
 					if (ChatEdit_GetLastActiveWindow():IsVisible() or WIM_EditBoxInFocus ~= nil) then
 						ChatEdit_InsertLink(spellLink)
 					else
@@ -2362,7 +2362,7 @@ local skillMenuList = {
 		text = "Add to Ignore Materials",
 		func = function()
 					local index = Skillet.menuButton:GetID()
-					local spellLink = GetTradeSkillRecipeLink(index)
+					local spellLink = C_TradeSkillUI.GetRecipeLink(index)
 					local recipeID = Skillet:GetItemIDFromLink(spellLink)
 					DA.DEBUG(0, tostring(index)..", "..tostring(spellLink)..", "..tostring(recipeID))
 					Skillet.db.realm.userIgnoredMats[Skillet.currentPlayer][recipeID] = spellLink
