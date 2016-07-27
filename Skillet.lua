@@ -21,17 +21,42 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
 Skillet = LibStub("AceAddon-3.0"):NewAddon("Skillet", "AceConsole-3.0", "AceEvent-3.0", "AceHook-3.0", "AceTimer-3.0")
 local AceDB = LibStub("AceDB-3.0")
 
+-- Pull it into the local namespace, it's faster to access that way
+local Skillet = Skillet
+local DA = Skillet -- needed because LibStub changed the definition of Skillet
+
+-- Localization
+local L = LibStub("AceLocale-3.0"):GetLocale("Skillet")
+Skillet.L = L
+
 -- Get version info from the .toc file
 local MAJOR_VERSION = GetAddOnMetadata("Skillet", "Version");
 local PACKAGE_VERSION = GetAddOnMetadata("Skillet", "X-Curse-Packaged-Version");
 Skillet.version = MAJOR_VERSION
+Skillet.alpha = 2 -- Assume this is a released version of Skillet
 if PACKAGE_VERSION then
 	Skillet.version = PACKAGE_VERSION
+	if PACKAGE_VERSION ~= MAJOR_VERSION then
+		Skillet.alpha = 0 -- This is most likely an alpha version of Skillet
+	end
 end
 
--- Pull it into the local namespace, it's faster to access that way
-local Skillet = Skillet
-local DA = Skillet -- needed because LibStub changed the definition of Skillet
+StaticPopupDialogs["Skillet_Alpha"] = {
+	text = "You are using an alpha build of Skillet.\nThis build does not work.\nDo you wish to continue?\n",
+	button1 = TEXT(ACCEPT),
+	button2 = TEXT(CANCEL),
+	OnAccept = function(this)
+		Skillet.alpha = 2
+	end,
+	OnCancel = function(this, data, reason)
+		Skillet.alpha = 1
+	end,
+	timeout = 0,
+	hideOnEscape = 1,
+	exclusive = 1,
+	whileDead = 1,
+	preferredIndex = 3,
+}
 
 local nonLinkingTrade = { [2656] = true, [53428] = true }				-- smelting, runeforging
 
@@ -97,10 +122,6 @@ Skillet.unknownRecipe = {
 	numMade = 0,
 	spellID = 0,
 }
-
--- Localization
-local L = LibStub("AceLocale-3.0"):GetLocale("Skillet")
-Skillet.L = L
 
 -- All the options that we allow the user to control.
 Skillet.options =
@@ -1025,11 +1046,17 @@ function Skillet:OnEnable()
 	self:RegisterEvent("TRADE_SKILL_CLOSE", "SkilletClose")
 	self:RegisterEvent("TRADE_SKILL_SHOW", "SkilletShow")
 	self:RegisterEvent("TRADE_SKILL_NAME_UPDATE")
+-- Not sure what these events are for yet.
+	self:RegisterEvent("TRADE_SKILL_DATA_SOURCE_CHANGED")
+	self:RegisterEvent("TRADE_SKILL_DATA_SOURCE_CHANGING")
+	self:RegisterEvent("TRADE_SKILL_DETAILS_UPDATE")
+	self:RegisterEvent("TRADE_SKILL_FILTER_UPDATE")
+	self:RegisterEvent("TRADE_SKILL_LIST_UPDATE")
+-- End of not sure.
 	self:RegisterEvent("GUILD_RECIPE_KNOWN_BY_MEMBERS", "SkilletShowGuildCrafters")
 	self:RegisterEvent("GARRISON_TRADESKILL_NPC_CLOSED")
-	-- TODO: Tracks when the number of items on hand changes
 	self:RegisterEvent("BAG_UPDATE") -- Fires for both bag and bank updates.
-	self:RegisterEvent("BAG_UPDATE_DELAYED") -- Fires after all applicable BAG_UPADTE events for a specific action have been fired.
+	self:RegisterEvent("BAG_UPDATE_DELAYED") -- Fires after all applicable BAG_UPDATE events for a specific action have been fired.
 	-- MERCHANT_SHOW, MERCHANT_HIDE, MERCHANT_UPDATE events needed for auto buying.
 	self:RegisterEvent("MERCHANT_SHOW")
 	self:RegisterEvent("MERCHANT_UPDATE")
@@ -1081,6 +1108,26 @@ function Skillet:PLAYER_LOGOUT()
 	end
 end
 
+function Skillet:TRADE_SKILL_DATA_SOURCE_CHANGED()
+	DA.DEBUG(0,"TRADE_SKILL_DATA_SOURCE_CHANGED")
+end
+
+function Skillet:TRADE_SKILL_DATA_SOURCE_CHANGING()
+	DA.DEBUG(0,"TRADE_SKILL_DATA_SOURCE_CHANGING")
+end
+
+function Skillet:TRADE_SKILL_DETAILS_UPDATE()
+	DA.DEBUG(0,"TRADE_SKILL_DETAILS_UPDATE")
+end
+
+function Skillet:TRADE_SKILL_FILTER_UPDATE()
+	DA.DEBUG(0,"TRADE_SKILL_FILTER_UPDATE")
+end
+
+function Skillet:TRADE_SKILL_LIST_UPDATE()
+	DA.DEBUG(0,"TRADE_SKILL_LIST_UPDATE")
+end
+
 function Skillet:TRADE_SKILL_NAME_UPDATE()
 	DA.DEBUG(0,"TRADE_SKILL_NAME_UPDATE")
 	if Skillet.linkedSkill then
@@ -1102,7 +1149,8 @@ end
 function Skillet:IsTradeSkillLinked()
 	local isGuild = C_TradeSkillUI.IsTradeSkillGuild()
 	local isLinked, linkedPlayer = C_TradeSkillUI.IsTradeSkillLinked()
-	DA.DEBUG(0,"IsTradeSkillLinked, isGuild="..tostring(isGuild)..", isLinked="..tostring(isLinked)..", linkedPlayer="..tostring(linkedPlayer))
+	DA.DEBUG(0,"IsTradeSkillLinked, isGuild="..tostring(isGuild)..", isLinked="..tostring(isLinked)..
+		", linkedPlayer="..tostring(linkedPlayer))
 	if isLinked or isGuild then
 		if not linkedPlayer then
 			if isGuild then
@@ -1133,6 +1181,17 @@ function Skillet:SkilletShow()
 	self.currentTrade = self.tradeSkillIDsByName[select(2,C_TradeSkillUI.GetTradeSkillLine())]
 	self:InitializeDatabase(self.currentPlayer)
 
+	-- Verify that the user understands this is an alpha build. 
+	-- Skillet.alpha is 0 for ask the question, 1 for use Blizzard UI, and 2 for use the Skillet UI (if appropriate)
+	if self.alpha == 0 then
+--		HideUIPanel(TradeSkillFrame)
+		StaticPopup_Show("Skillet_Alpha");
+	end
+	if self.alpha < 2 then
+		self:HideAllWindows()
+		ShowUIPanel(TradeSkillFrame)
+		return
+	end
 	-- Use the Blizzard UI for any garrison follower that can't use ours.
 	if self:IsNotSupportedFollower(self.currentTrade) then
 		self:HideAllWindows()
