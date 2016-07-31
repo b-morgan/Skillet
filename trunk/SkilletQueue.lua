@@ -87,16 +87,16 @@ function Skillet:QueueAppendCommand(command, queueCraftables, noWindowRefresh)
 			local reagent = recipe.reagentData[i]
 			DA.DEBUG(1,"reagent= "..DA.DUMP1(reagent))
 			local need = count * reagent.numNeeded
-			local numInBoth = GetItemCount(reagent.id,true)
-			local numInBags = GetItemCount(reagent.id)
+			local numInBoth = GetItemCount(reagent.reagentID,true)
+			local numInBags = GetItemCount(reagent.reagentID)
 			local numInBank =  numInBoth - numInBags
 			DA.DEBUG(1,"numInBoth= "..tostring(numInBoth)..", numInBags="..tostring(numInBags)..", numInBank="..tostring(numInBank))
-			local have = numInBoth + (reagentsInQueue[reagent.id] or 0);
-			reagentsInQueue[reagent.id] = (reagentsInQueue[reagent.id] or 0) - need;
-			reagentsChanged[reagent.id] = true
+			local have = numInBoth + (reagentsInQueue[reagent.reagentID] or 0);
+			reagentsInQueue[reagent.reagentID] = (reagentsInQueue[reagent.reagentID] or 0) - need;
+			reagentsChanged[reagent.reagentID] = true
 			DA.DEBUG(1,"queueCraftables= "..tostring(queueCraftables)..", need= "..tostring(need)..", have= "..tostring(have))
 			if queueCraftables and need > have and (Skillet.db.profile.queue_glyph_reagents or not recipe.name:match(Skillet.L["Glyph "])) then
-				local recipeSource = self.db.global.itemRecipeSource[reagent.id]
+				local recipeSource = self.db.global.itemRecipeSource[reagent.reagentID]
 				DA.DEBUG(1,"recipeSource= "..DA.DUMP1(recipeSource))
 				if recipeSource then
 					for recipeSourceID in pairs(recipeSource) do
@@ -158,7 +158,6 @@ function Skillet:AddToQueue(command, noWindowRefresh)
 	if not noWindowRefresh then
 		self:AdjustInventory()
 	end
-	self:SendMessage("Skillet_Queue_Add")
 end
 
 function Skillet:RemoveFromQueue(index)
@@ -176,8 +175,8 @@ function Skillet:RemoveFromQueue(index)
 		reagentsChanged[recipe.itemID] = true
 		for i=1,#recipe.reagentData,1 do
 			local reagent = recipe.reagentData[i]
-			reagentsInQueue[reagent.id] = (reagentsInQueue[reagent.id] or 0) + reagent.numNeeded * command.count
-			reagentsChanged[reagent.id] = true
+			reagentsInQueue[reagent.reagentID] = (reagentsInQueue[reagent.reagentID] or 0) + reagent.numNeeded * command.count
+			reagentsChanged[reagent.reagentID] = true
 		end
 	end
 	table.remove(queue, index)
@@ -193,7 +192,6 @@ function Skillet:ClearQueue()
 		self:UpdateTradeSkillWindow()
 	end
 	--DA.DEBUG(0,"ClearQueue Complete")
-	self:SendMessage("Skillet_Queue_Complete")
 end
 
 function Skillet:ProcessQueue(altMode)
@@ -203,6 +201,7 @@ function Skillet:ProcessQueue(altMode)
 	local skillIndexLookup = self.data.skillIndexLookup[self.currentPlayer]
 	self.processingPosition = nil
 	self.processingCommand = nil
+	self.processingCount = nil
 	if self.currentPlayer ~= (UnitName("player")) then
 		DA.DEBUG(0,"trying to process from an alt!")
 		return
@@ -221,10 +220,10 @@ function Skillet:ProcessQueue(altMode)
 			else
 				for i=1,#recipe.reagentData,1 do
 					local reagent = recipe.reagentData[i]
-					local reagentName = GetItemInfo(reagent.id) or reagent.id
-					DA.DEBUG(1,"id= "..tostring(reagent.id)..", reagentName="..tostring(reagentName)..", numNeeded="..tostring(reagent.numNeeded))
-					local numInBoth = GetItemCount(reagent.id,true)
-					local numInBags = GetItemCount(reagent.id)
+					local reagentName = GetItemInfo(reagent.reagentID) or reagent.reagentID
+					DA.DEBUG(1,"id= "..tostring(reagent.reagentID)..", reagentName="..tostring(reagentName)..", numNeeded="..tostring(reagent.numNeeded))
+					local numInBoth = GetItemCount(reagent.reagentID,true)
+					local numInBags = GetItemCount(reagent.reagentID)
 					local numInBank =  numInBoth - numInBags
 					DA.DEBUG(1,"numInBoth= "..tostring(numInBoth)..", numInBags="..tostring(numInBags)..", numInBank="..tostring(numInBank))
 					if numInBoth < reagent.numNeeded then
@@ -237,7 +236,7 @@ function Skillet:ProcessQueue(altMode)
 			if craftable then break end
 		end
 		qpos = qpos + 1
-	until qpos>#queue
+	until qpos > #queue
 	-- if we can't craft anything, show error from first item in queue
 	if qpos > #queue then
 		qpos = 1
@@ -253,10 +252,12 @@ function Skillet:ProcessQueue(altMode)
 			self.processingSpell = self:GetRecipeName(command.recipeID)
 			self.processingPosition = qpos
 			self.processingCommand = command
+			self.processingCount = command.count
 			-- if alt down/right click - auto use items / like vellums
 			if altMode then
 				local itemID = Skillet:GetAutoTargetItem(recipe.tradeID)
 				if itemID then
+					self.processingCount = 1
 					DoTradeSkill(skillIndexLookup[command.recipeID],1)
 					UseItemByName(itemID)
 					self.queuecasting = false
@@ -272,7 +273,6 @@ function Skillet:ProcessQueue(altMode)
 		end
 	else
 		self.db.realm.queueData[self.currentPlayer] = {}
-		self:SendMessage("Skillet_Queue_Complete")
 	end
 end
 
@@ -356,7 +356,6 @@ function Skillet:StopCast(spell, success)
 			end
 			-- empty queue or command not found (removed?)
 			if not queue[1] or not command then
---				self:SendMessage("Skillet_Queue_Complete")
 				self.queuecasting = false
 				self.processingSpell = nil
 				self.processingPosition = nil
@@ -374,7 +373,7 @@ function Skillet:StopCast(spell, success)
 					self.reagentsChanged = {}
 					self:RemoveFromQueue(qpos)		-- implied queued reagent inventory adjustment in remove routine
 					self:RescanTrade()
---					DA.CHAT("removed queue command")
+					DA.DEBUG(0,"removed queue command")
 				end
 			end
 		else
@@ -383,7 +382,7 @@ function Skillet:StopCast(spell, success)
 			self.processingCommand = nil
 			self.queuecasting = false
 		end
---		DA.CHAT("STOP CAST IS UPDATING WINDOW")
+		DA.DEBUG(0,"STOP CAST IS UPDATING WINDOW")
 		self:InventoryScan()
 		self:UpdateTradeSkillWindow()
 	end
@@ -425,7 +424,7 @@ DA.DEBUG(0,"ScanQueuedReagents")
 			end
 			for i=1,#recipe.reagentData,1 do
 				local reagent = recipe.reagentData[i]
-				reagentsInQueue[reagent.id] = (reagentsInQueue[reagent.id] or 0) - reagent.numNeeded * command.count
+				reagentsInQueue[reagent.reagentID] = (reagentsInQueue[reagent.reagentID] or 0) - reagent.numNeeded * command.count
 			end
 		end
 	end

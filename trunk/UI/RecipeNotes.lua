@@ -159,11 +159,11 @@ function Skillet:UpdateNotesWindow()
 				icon:SetNormalTexture(texture)
 				key = "enchant:"..recipeID
 			else
-				local name, link, _,_,_,_,_,_,_,texture = GetItemInfo(recipe.reagentData[index-1].id)
+				local name, link, _,_,_,_,_,_,_,texture = GetItemInfo(recipe.reagentData[index-1].reagentID)
 				-- notes for a reagent
 				text:SetText(name)
 				icon:SetNormalTexture(texture)
-				key = "item:"..recipe.reagentData[index-1].id
+				key = "item:"..recipe.reagentData[index-1].reagentID
 			end
 			button:SetAttribute("notes_key", key)
 			local notes_text = self:GetItemNote(key)
