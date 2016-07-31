@@ -213,7 +213,7 @@ function Skillet:ProcessQueue(altMode)
 		if command and command.op == "iterate" then
 			local recipe = self:GetRecipe(command.recipeID)
 			local craftable = true
-			local cooldown = C_TradeSkillUI.GetRecipeCooldown(skillIndexLookup[command.recipeID])
+			local cooldown = C_TradeSkillUI.GetRecipeCooldown(command.recipeID)
 			if cooldown then
 				Skillet:Print(L["Skipping"],recipe.name,"-",L["has cooldown of"],SecondsToTime(cooldown))
 				craftable = false
@@ -247,6 +247,7 @@ function Skillet:ProcessQueue(altMode)
 			self.queuecasting = true
 			local recipe = self:GetRecipe(command.recipeID)
 			if self.currentTrade ~= recipe.tradeID and self:GetTradeName(recipe.tradeID) then
+				DA.DEBUG(0,"Changing professions")
 				CastSpellByName(self:GetTradeName(recipe.tradeID))					-- switch professions
 			end
 			self.processingSpell = self:GetRecipeName(command.recipeID)
@@ -258,14 +259,17 @@ function Skillet:ProcessQueue(altMode)
 				local itemID = Skillet:GetAutoTargetItem(recipe.tradeID)
 				if itemID then
 					self.processingCount = 1
-					DoTradeSkill(skillIndexLookup[command.recipeID],1)
+					DA.DEBUG(0,"altMode Crafting: "..tostring(command.recipeID).." and using "..tostring(itemID))
+					C_TradeSkillUI.CraftRecipe(command.recipeID,1)
 					UseItemByName(itemID)
 					self.queuecasting = false
 				else
-					DoTradeSkill(skillIndexLookup[command.recipeID],command.count)
+					DA.DEBUG(0,"altMode Crafting: "..tostring(command.count).." of "..tostring(command.recipeID))
+					C_TradeSkillUI.CraftRecipe(command.recipeID,command.count)
 				end
 			else
-				DoTradeSkill(skillIndexLookup[command.recipeID],command.count)
+				--DA.DEBUG(0,"Crafting: "..tostring(command.count).." of "..tostring(command.recipeID))
+				C_TradeSkillUI.CraftRecipe(command.recipeID,command.count)
 			end
 			return
 		else
@@ -392,7 +396,7 @@ end
 -- item as that requires a "SpellStopCasting" call which can only be
 -- made from secure code. All this does is stop repeating after the current item
 function Skillet:CancelCast()
-	StopTradeSkillRepeat()
+	C_TradeSkillUI.StopRecipeRepeat()
 end
 
 -- Removes an item from the queue
