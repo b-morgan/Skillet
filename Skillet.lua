@@ -1021,13 +1021,11 @@ function Skillet:OnEnable()
 	self:RegisterEvent("TRADE_SKILL_CLOSE")
 	self:RegisterEvent("TRADE_SKILL_SHOW")
 	self:RegisterEvent("TRADE_SKILL_NAME_UPDATE")
--- Not sure which of these events are needed.
 	self:RegisterEvent("TRADE_SKILL_DATA_SOURCE_CHANGED")
 	self:RegisterEvent("TRADE_SKILL_DATA_SOURCE_CHANGING")
 	self:RegisterEvent("TRADE_SKILL_DETAILS_UPDATE")
 	self:RegisterEvent("TRADE_SKILL_FILTER_UPDATE")
 	self:RegisterEvent("TRADE_SKILL_LIST_UPDATE")
--- End of not sure.
 	self:RegisterEvent("GUILD_RECIPE_KNOWN_BY_MEMBERS", "SkilletShowGuildCrafters")
 	self:RegisterEvent("GARRISON_TRADESKILL_NPC_CLOSED")
 	self:RegisterEvent("BAG_UPDATE") -- Fires for both bag and bank updates.
@@ -1045,7 +1043,6 @@ function Skillet:OnEnable()
 	self:RegisterEvent("GUILDBANKBAGSLOTS_CHANGED")
 	self:RegisterEvent("GUILDBANKFRAME_CLOSED")
 	self:RegisterEvent("AUCTION_HOUSE_SHOW")
-	-- self:RegisterEvent("AUCTION_OWNED_LIST_UPDATE") -- Update event only when the AH is open
 	self:RegisterEvent("AUCTION_HOUSE_CLOSED")
 	self:RegisterEvent("PLAYER_LOGOUT")
 
@@ -1096,6 +1093,10 @@ end
 
 function Skillet:TRADE_SKILL_DATA_SOURCE_CHANGING()
 	DA.DEBUG(0,"TRADE_SKILL_DATA_SOURCE_CHANGING")
+	DA.DEBUG(0,"tradeSkillOpen= "..tostring(Skillet.tradeSkillOpen))
+	if Skillet.tradeSkillOpen then
+		Skillet:SkilletShow()
+	end
 end
 
 function Skillet:TRADE_SKILL_DETAILS_UPDATE()
@@ -1109,9 +1110,6 @@ end
 function Skillet:TRADE_SKILL_LIST_UPDATE()
 	DA.DEBUG(0,"TRADE_SKILL_LIST_UPDATE")
 	DA.DEBUG(0,"tradeSkillOpen= "..tostring(Skillet.tradeSkillOpen))
---	if Skillet.tradeSkillOpen then
---		Skillet:SkilletShowWindow()
---	end
 end
 
 function Skillet:TRADE_SKILL_NAME_UPDATE()

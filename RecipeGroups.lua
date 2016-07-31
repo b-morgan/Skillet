@@ -336,13 +336,12 @@ function Skillet:RecipeGroupRenameEntry(entry, name)
 				entry.name = name
 			end
 		end
-
 		self:RecipeGroupConstructDBString(entry.parent)
 	end
 end
 
 function Skillet:RecipeGroupSort(group, sortMethod, reverse)
-	DA.DEBUG(0,"RecipeGroupSort()")
+	--DA.DEBUG(0,"RecipeGroupSort("..tostring(group.skillIndex)..", "..tostring(sortMethod)..","..tostring(reverse)..")")
 	if group then
 		for v, entry in pairs(group.entries) do
 			if entry.subGroup and entry.subGroup ~= group then

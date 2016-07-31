@@ -595,7 +595,7 @@ local skill_style_type = {
 }
 
 function Skillet:GetTradeSkillInfo(index)
-	DA.PROFILE("Skillet:GetTradeSkillInfo("..tostring(index)..")")
+	--DA.PROFILE("Skillet:GetTradeSkillInfo("..tostring(index)..")")
 -- index is now a recipeID
 -- GetTradeSkillInfo returned:
 -- skillName, skillType, numAvailable, isExpanded, altVerb, numSkillUps, indentLevel, showProgressBar, currentRank, maxRank, startingRank
@@ -920,7 +920,7 @@ function Skillet:GetSkillRanks(player, trade)
 end
 
 function Skillet:GetSkill(player,trade,index)
-	DA.PROFILE("Skillet:GetSkill("..tostring(player)..", "..tostring(trade)..", "..tostring(index)..")")
+	--DA.PROFILE("Skillet:GetSkill("..tostring(player)..", "..tostring(trade)..", "..tostring(index)..")")
 	if player and trade and index then
 		if not Skillet.data.skillList[player] then
 			Skillet.data.skillList[player] = {}
@@ -1301,9 +1301,9 @@ function Skillet:ScanTrade()
 		skillDB[i] = skillDBString
 		Skillet.data.skillIndexLookup[player][recipeID] = i
 		if recipeDB[recipeID] then
-			DA.DEBUG(2,"(old) recipeDB["..tostring(recipeID).."]= "..tostring(recipeDB[recipeID]))
+			--DA.DEBUG(2,"(old) recipeDB["..tostring(recipeID).."]= "..tostring(recipeDB[recipeID]))
 		else
-			DA.DEBUG(2,"recipeID= "..tostring(recipeID))
+			--DA.DEBUG(2,"recipeID= "..tostring(recipeID))
 			Skillet.data.recipeList[recipeID] = {}
 			local recipe = Skillet.data.recipeList[recipeID]
 			local recipeString = "-"
@@ -1322,10 +1322,10 @@ function Skillet:ScanTrade()
 
 			local itemString = "-"
 			local itemLink = C_TradeSkillUI.GetRecipeItemLink(recipeID)
-			DA.DEBUG(2,"itemLink = "..DA.PLINK(itemLink))
+			--DA.DEBUG(2,"itemLink = "..DA.PLINK(itemLink))
 			if itemLink then
 				local itemID = Skillet:GetItemIDFromLink(itemLink)
-				DA.DEBUG(2,"itemID= "..tostring(itemID))
+				--DA.DEBUG(2,"itemID= "..tostring(itemID))
 				local minMade,maxMade = C_TradeSkillUI.GetRecipeNumItemsProduced(recipeID)
 				recipe.itemID = itemID
 				recipe.numMade = (minMade + maxMade)/2
@@ -1364,7 +1364,7 @@ function Skillet:ScanTrade()
 				recipeString = recipeString.." "..toolString
 			end
 			recipeDB[recipeID] = recipeString
-			DA.DEBUG(2,"(new) recipeDB["..tostring(recipeID).."]= "..tostring(recipeDB[recipeID]))
+			--DA.DEBUG(2,"(new) recipeDB["..tostring(recipeID).."]= "..tostring(recipeDB[recipeID]))
 		end
 		i = i + 1
 	end
