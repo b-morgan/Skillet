@@ -543,9 +543,9 @@ function Skillet:TradeButton_OnClick(this,button)
 				if player == UnitName("player") then
 					Skillet:InitializeDatabase(player)
 				end
-				Skillet:RescanTrade(true)
+				Skillet:RescanTrade()
 			else
-				Skillet:RescanTrade(true)
+				Skillet:RescanTrade()
 			end
 			Skillet:UpdateTradeSkillWindow()
 		end
@@ -557,13 +557,6 @@ function Skillet:UpdateTradeButtons(player)
 	DA.DEBUG(0,"UpdateTradeButtons started")
 	local position = 0 -- pixels
 	local tradeSkillList = self.tradeSkillList
-	for playerAlt in pairs(self.dataGatheringModules) do
-		local frameName = "SkilletFrameTradeButtons-"..playerAlt
-		local frame = _G[frameName]
-		if frame then
-			frame:Hide()
-		end
-	end
 	local frameName = "SkilletFrameTradeButtons-"..player
 	local frame = _G[frameName]
 	if not frame then
@@ -744,7 +737,7 @@ function Skillet:internal_UpdateTradeSkillWindow()
 	updateWindowBusy = true
 	local numTradeSkills = 0
 	if not self.dataScanned then
-		self.dataScanned = self:RescanTrade()
+--		self.dataScanned = self:RescanTrade()
 		self:SortAndFilterRecipes()
 	end
 	if not self.data.sortedSkillList[skillListKey] then
@@ -890,7 +883,7 @@ function Skillet:internal_UpdateTradeSkillWindow()
 			end
 			if skill.subGroup then
 				if SkillButtonNameEdit.originalButton ~= buttonText then
-					local _, _, _, _, _, _,_,showProgressBar, currentRank,maxRank,startingRank  = GetTradeSkillInfo(skillIndex)
+					local _, _, _, _, _, _,_,showProgressBar, currentRank,maxRank,startingRank  = Skillet:GetTradeSkillInfo(skill.id)
 					buttonText:SetTextColor(NORMAL_FONT_COLOR.r, NORMAL_FONT_COLOR.g, NORMAL_FONT_COLOR.b, textAlpha)
 					countText:SetTextColor(NORMAL_FONT_COLOR.r, NORMAL_FONT_COLOR.g, NORMAL_FONT_COLOR.b, textAlpha)
 					local expanded = skill.subGroup.expanded
@@ -1021,7 +1014,7 @@ function Skillet:internal_UpdateTradeSkillWindow()
 					end
 				end
 				if skill_color.alttext == "+++" then
-					local _, _, _, _, _, numSkillUps  = GetTradeSkillInfo(skillIndex)
+					local _, _, _, _, _, numSkillUps  = Skillet:GetTradeSkillInfo(skill.id)
 					if numSkillUps and numSkillUps>1 then
 						local count = "{++"..numSkillUps.."} "..(countText:GetText() or "")
 						countWidth = countWidth + 20
@@ -1214,10 +1207,10 @@ function Skillet:SkillButton_OnEnter(button)
 		if not reagent then
 			break
 		end
-		local numInBoth, numCraftable = self:GetInventory(self.currentPlayer, reagent.id)
-		local itemName = GetItemInfo(reagent.id) or reagent.id
+		local numInBoth, numCraftable = self:GetInventory(self.currentPlayer, reagent.reagentID)
+		local itemName = GetItemInfo(reagent.reagentID) or reagent.reagentID
 		local text
-		if self:VendorSellsReagent(reagent.id) then
+		if self:VendorSellsReagent(reagent.reagentID) then
 			text = string.format("  %d x %s  |cff808080(%s)|r", reagent.numNeeded, itemName, L["buyable"])
 		else
 			text = string.format("  %d x %s", reagent.numNeeded, itemName)
@@ -1238,8 +1231,7 @@ function Skillet:SetTradeSkillToolTip(skillIndex)
 	local recipe, recipeID = self:GetRecipeDataByTradeIndex(self.currentTrade, skillIndex)
 	if recipe then
 		if recipe.itemID ~= 0 then
---			GameTooltip:SetHyperlink("item:"..recipe.itemID)			-- creates an item, that's more interesting than the recipe
-			GameTooltip:SetTradeSkillItem(skillIndex)
+--			GameTooltip:SetTradeSkillItem(skillIndex)
 			if EnhTooltip and EnhTooltip.TooltipCall then
 				local name, link, quality = GetItemInfo("item:"..recipe.itemID)
 				local quantity = recipe.numMade
@@ -1258,7 +1250,6 @@ function Skillet:SetTradeSkillToolTip(skillIndex)
 end
 
 function Skillet:SetReagentToolTip(reagentID, numNeeded, numCraftable)
-	--DA.DEBUG(2,"SetReagentToolTip("..tostring(reagentID)..", "..tostring(numNeeded)..", "..tostring(numCraftable)..")")
 	GameTooltip:ClearLines()
 	GameTooltip:SetHyperlink("item:"..reagentID)
 	if EnhTooltip and EnhTooltip.TooltipCall then
@@ -1412,8 +1403,8 @@ function Skillet:UpdateDetailsWindow(skillIndex)
 			SkilletDescriptionText:SetText("")
 		end
 		-- Whether or not it is on cooldown.
-		local _, _, _, _, _, _, _, _, _, _, _, displayAsUnavailable, unavailableString = GetTradeSkillInfo(skillIndex)
-		--DA.DEBUG(0,"displayAsUnavailable="..tostring(displayAsUnavailable)..", unavailableString="..tostring(unavailableString))
+		local _, _, _, _, _, _, _, _, _, _, _, displayAsUnavailable, unavailableString = Skillet:GetTradeSkillInfo(skill.id)
+		DA.DEBUG(0,"displayAsUnavailable="..tostring(displayAsUnavailable)..", unavailableString="..tostring(unavailableString))
 		local cooldown = 0
 		cooldown = (skill.cooldown or 0) - time()
 		if cooldown > 0 then
@@ -1488,12 +1479,12 @@ function Skillet:UpdateDetailsWindow(skillIndex)
 		local reagent = recipe.reagentData[i]
 		if reagent then
 			local reagentName
-			if reagent.id then
-				reagentName	= GetItemInfo("item:"..reagent.id) or reagent.id
+			if reagent.reagentID then
+				reagentName	= GetItemInfo("item:"..reagent.reagentID) or reagent.reagentID
 			else
 				reagentName = "unknown"
 			end
-			local num, craftable = self:GetInventory(self.currentPlayer, reagent.id)
+			local num, craftable = self:GetInventory(self.currentPlayer, reagent.reagentID)
 			local count_text
 			if craftable > 0 then
 				count_text = string.format("[%d/%d]", num, craftable)
@@ -1504,7 +1495,7 @@ function Skillet:UpdateDetailsWindow(skillIndex)
 				-- grey it out if we don't have it
 				count:SetText(GRAY_FONT_COLOR_CODE .. count_text .. FONT_COLOR_CODE_CLOSE)
 				text:SetText(GRAY_FONT_COLOR_CODE .. reagentName .. FONT_COLOR_CODE_CLOSE)
-				if self:VendorSellsReagent(reagent.id) then
+				if self:VendorSellsReagent(reagent.reagentID) then
 					needed:SetTextColor(0,1,0)
 				else
 					needed:SetTextColor(1,0,0)
@@ -1515,15 +1506,13 @@ function Skillet:UpdateDetailsWindow(skillIndex)
 				text:SetText(reagentName)
 				needed:SetTextColor(1,1,1)
 			end
-			texture = GetItemIcon(reagent.id)
+			texture = GetItemIcon(reagent.reagentID)
 			icon:SetNormalTexture(texture)
 			needed:SetText(reagent.numNeeded.."x")
 			button:SetWidth(width - 20)
 			button:Show()
 			lastReagentButton = button
 		else
-			-- out of necessary reagents, don't need to show the button,
-			-- or any of the text.
 			button:Hide()
 		end
 	end
@@ -1633,7 +1622,6 @@ function Skillet:UpdateQueueWindow()
 			local queueCommand = queue[itemIndex]
 			if queueCommand then
 				local recipe = self:GetRecipe(queueCommand.recipeID)
-				--self.db.global.recipeData[queueCommand.recipeID]
 				queueName:SetText((self:GetTradeName(recipe.tradeID) or recipe.tradeID)..":"..(recipe.name or recipeID))
 				queueCount:SetText(queueCommand.count)
 			end
@@ -2097,7 +2085,7 @@ end
 
 -- Called when then mouse enters a reagent button
 function Skillet:ReagentButtonOnEnter(button, skillIndex, reagentIndex)
-	--DA.DEBUG(3,"Skillet:ReagentButtonOnEnter("..tostring(button)..", "..tostring(skillIndex)..", "..tostring(reagentIndex)..")")
+	--DA.DEBUG(1,"Skillet:ReagentButtonOnEnter("..tostring(button)..", "..tostring(skillIndex)..", "..tostring(reagentIndex)..")")
 	GameTooltip:SetOwner(button, "ANCHOR_TOPLEFT")
 	local skill = self:GetSkill(self.currentPlayer, self.currentTrade, skillIndex)
 	if skill then
@@ -2105,9 +2093,9 @@ function Skillet:ReagentButtonOnEnter(button, skillIndex, reagentIndex)
 		if recipe then
 			local reagent = recipe.reagentData[reagentIndex]
 			if reagent then
-				Skillet:SetReagentToolTip(reagent.id, reagent.numNeeded, skill.numCraftable or 0)
+				Skillet:SetReagentToolTip(reagent.reagentID, reagent.numNeeded, skill.numCraftable or 0)
 				if self.db.profile.link_craftable_reagents then
-					if self.db.global.itemRecipeSource[reagent.id] then
+					if self.db.global.itemRecipeSource[reagent.reagentID] then
 						local icon = _G[button:GetName() .. "Icon"]
 						gearTexture:SetParent(icon)
 						gearTexture:ClearAllPoints()
@@ -2152,7 +2140,7 @@ function Skillet:ReagentButtonOnClick(button, skillIndex, reagentIndex)
 	end
 	local recipe = self:GetRecipeDataByTradeIndex(self.currentTrade, skillIndex)
 	local reagent = recipe.reagentData[reagentIndex]
-	local newRecipeTable = self.db.global.itemRecipeSource[reagent.id]
+	local newRecipeTable = self.db.global.itemRecipeSource[reagent.reagentID]
 	local skillIndexLookup = self.data.skillIndexLookup
 	local player = self.currentPlayer
 	local myRecipeID
@@ -2237,20 +2225,6 @@ function Skillet:StartQueue_OnClick(button,mouse)
 		self:ProcessQueue(mouse == "RightButton" or IsAltKeyDown())
 	end
 	self:UpdateQueueWindow()
-end
-
--- Updates the "Scanning tradeskill" text area with provided text
--- Set nil/empty text to hide the area
-function Skillet:UpdateScanningText(text)
-	local area = _G["SkilletFrameScanningText"]
-	if area then
-		if text and string.len(text) > 0 then
-			area:SetText(text)
-			area:Show()
-		else
-			area:Hide()
-		end
-	end
 end
 
 local old_CloseSpecialWindows
@@ -2625,8 +2599,8 @@ function Skillet.ViewCraftersUpdate()
 	local offset = FauxScrollFrame_GetOffset(SkilletViewCraftersScrollFrame);
 	local index, button, name, online;
 	local SKILLET_CRAFTERS_DISPLAYED = 15
-		--DA.DEBUG(0, "Skillet.ViewCraftersUpdate "..numMembers.." - "..offset)
-		for i = 1, SKILLET_CRAFTERS_DISPLAYED, 1 do
+	--DA.DEBUG(0, "Skillet.ViewCraftersUpdate "..numMembers.." - "..offset)
+	for i = 1, SKILLET_CRAFTERS_DISPLAYED, 1 do
 		index = i + offset;
 		button = _G["SkilletGuildCrafter"..i];
 		if ( index > numMembers ) then

@@ -42,9 +42,9 @@ function Skillet:InventoryReagentCraftability(reagentID, playerOverride)
 				for i=1,#childRecipe.reagentData,1 do
 					local childReagent = childRecipe.reagentData[i]
 					--DA.DEBUG(2,"childReagent="..DA.DUMP1(childReagent))
-					local numReagentOnHand = GetItemCount(childReagent.id,true)
-					local numReagentCraftable = self:InventoryReagentCraftability(childReagent.id, player)
-					--DA.DEBUG(2,"id="..childReagent.id.." ("..tostring((GetItemInfo(childReagent.id))).."), numReagentCraftable="..numReagentCraftable..", numReagentOnHand= "..tostring(numReagentOnHand))
+					local numReagentOnHand = GetItemCount(childReagent.reagentID,true)
+					local numReagentCraftable = self:InventoryReagentCraftability(childReagent.reagentID, player)
+					--DA.DEBUG(2,"id="..childReagent.reagentID.." ("..tostring((GetItemInfo(childReagent.reagentID))).."), numReagentCraftable="..numReagentCraftable..", numReagentOnHand= "..tostring(numReagentOnHand))
 					numReagentCraftable = numReagentCraftable + numReagentOnHand
 					numCraftable = math.min(numCraftable, math.floor(numReagentCraftable/childReagent.numNeeded))
 					--DA.DEBUG(2,"numCraftable="..numCraftable)
@@ -85,8 +85,8 @@ function Skillet:InventorySkillIterations(tradeID, skillIndex, playerOverride)
 		local numCraftAlts = 100000
 		local vendorOnly = true
 		for i=1,#recipe.reagentData do
-			if recipe.reagentData[i].id then
-				local reagentID = recipe.reagentData[i].id
+			if recipe.reagentData[i].reagentID then
+				local reagentID = recipe.reagentData[i].reagentID
 				local numNeeded = recipe.reagentData[i].numNeeded
 				local reagentAvailable = 0
 				local reagentCraftable = 0
@@ -111,6 +111,7 @@ function Skillet:InventorySkillIterations(tradeID, skillIndex, playerOverride)
 				end
 			else								-- no data means no craftability
 				DA.CHAT("reagent id seems corrupt!")
+				DA.DEBUG(0,"recipe= "..DA.DUMP1(recipe))
 				numCraft = 0
 				numCraftable = 0
 				numCraftVendor = 0

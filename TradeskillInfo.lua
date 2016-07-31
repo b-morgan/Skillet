@@ -84,7 +84,7 @@ function Skillet:GetRecipeReagentItemLink(skillIndex, index)
 	if skillIndex and index then
 		local recipe = self:GetRecipeDataByTradeIndex(self.currentTrade, skillIndex)
 		if recipe and recipe.reagentData[index] then
-			local _, link = GetItemInfo(recipe.reagentData[index].id)
+			local _, link = GetItemInfo(recipe.reagentData[index].reagentID)
 			return link;
 		end
 	end
@@ -105,4 +105,3 @@ function Skillet:GetTradeSkillLine()
 	DA.DEBUG(0,"GetTradeSkillLine "..(tradeName or "nil").." "..(rank or "nil").." "..(maxRank or "nil"))	
 	return tradeName, rank, maxRank
 end
-
