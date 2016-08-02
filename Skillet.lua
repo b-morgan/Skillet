@@ -42,11 +42,11 @@ if PACKAGE_VERSION then
 end
 
 StaticPopupDialogs["Skillet_Alpha"] = {
-	text = "You are using an alpha build of Skillet.\nThis build does not work.\nDo you wish to continue?\n",
+	text = "You are using an alpha build of Skillet.\nThis build may not work.\nDo you wish to continue?\n",
 	button1 = TEXT(ACCEPT),
 	button2 = TEXT(CANCEL),
 	OnAccept = function(this)
-		Skillet.alpha = 1
+		Skillet.alpha = 2
 	end,
 	OnCancel = function(this, data, reason)
 		Skillet.alpha = 1
@@ -1174,7 +1174,11 @@ function Skillet:SkilletShow()
 	end
 	self:InitializeDatabase(self.currentPlayer)
 	-- Verify that the user understands this is an alpha build. 
-	-- Skillet.alpha is 0 for ask the question, 1 to use Blizzard UI, and 2 to use the Skillet UI (if appropriate)
+	-- Skillet.alpha is 0 for ask the question, 1 to use Blizzard UI, and 2 to use the Skillet UI (if appropriate).
+	-- If the user is smart enough to turn on debugging, skip the question.
+	if self.DebugShow then
+		self.alpha = 2
+	end
 	if self.alpha == 0 then
 		StaticPopup_Show("Skillet_Alpha");
 	end
