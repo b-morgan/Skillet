@@ -1220,6 +1220,9 @@ function Skillet:SkillButton_OnEnter(button)
 	end
 	local text = string.format("[%s/%s]", L["Inventory"], L["craftable"]) -- match the case sometime
 	tip:AddDoubleLine("\n", text)
+	local text1 = string.format("recipeID= %d",skill.recipeID)
+	local text = string.format("itemID= %d",recipe.itemID)
+	tip:AddDoubleLine(text1, text)
 	tip:Show()
 	button.locked = false
 end
