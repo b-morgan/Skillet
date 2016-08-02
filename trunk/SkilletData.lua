@@ -1269,12 +1269,6 @@ function Skillet:ScanTrade()
 		skillData[i].color = skill_style_type[skillType]
 		local skillDBString = DifficultyChar[skillType]..tostring(recipeID)
 
-		local cd, isDayCooldown, charges, maxCharges = C_TradeSkillUI.GetRecipeCooldown(recipeID)
-		if cd then
-			skillData[i].cooldown = cd + time()		-- this is when your cooldown will be up
-			skillDBString = skillDBString.." cd=" .. cd + time()
-		end
-
 		local tools = { C_TradeSkillUI.GetRecipeTools(recipeID) }
 		skillData[i].tools = {}
 		local slot = 1

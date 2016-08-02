@@ -756,7 +756,7 @@ function Skillet:DisableBlizzardFrame()
 			LoadAddOn("Blizzard_TradeSkillUI");
 		end
 		self.BlizzardTradeSkillFrame = TradeSkillFrame
-		Skillet.tradeSkillHide = TradeSkillFrame:GetScript("OnHide")
+		self.tradeSkillHide = TradeSkillFrame:GetScript("OnHide")
 		TradeSkillFrame:SetScript("OnHide", nil)
 		HideUIPanel(TradeSkillFrame)
 	end
@@ -1058,7 +1058,6 @@ function Skillet:OnEnable()
 	self:EnableQueue("Skillet")
 	self:EnableDataGathering("Skillet")
 	self:UpdateAutoTradeButtons()
-	self:DisableBlizzardFrame()
 	self:EnablePlugins()
 end
 
@@ -1181,25 +1180,28 @@ function Skillet:SkilletShow()
 	end
 	if self.alpha == 0 then
 		StaticPopup_Show("Skillet_Alpha");
+		return
 	end
 	if self.alpha < 2 then
 		self:HideAllWindows()
-		ShowUIPanel(TradeSkillFrame)
+		self:OnDisable()
 		return
 	end
 	-- Use the Blizzard UI for any garrison follower that can't use ours.
 	if self:IsNotSupportedFollower(self.currentTrade) then
 		self:HideAllWindows()
+		self:EnableBlizzardFrame()
 		ShowUIPanel(TradeSkillFrame)
 	else
 		if self:IsSupportedTradeskill(self.currentTrade) then
---			self:InventoryScan()
+			self:DisableBlizzardFrame()
 			self.tradeSkillOpen = true
 			self.selectedSkill = nil
 			self.dataScanned = false
---			self:SkilletShowWindow() -- Should happen on TRADE_SKILL_DATA_SOURCE_CHANGED
+--			self:SkilletShowWindow() -- Need to wait until TRADE_SKILL_DATA_SOURCE_CHANGED
 		else
 			self:HideAllWindows()
+			self:EnableBlizzardFrame()
 			ShowUIPanel(TradeSkillFrame)
 			Skillet.TSMPlugin.TSMShow()
 		end
@@ -1209,8 +1211,6 @@ end
 function Skillet:SkilletShowWindow()
 	DA.DEBUG(0,"SkilletShowWindow: (was showing "..tostring(self.currentTrade)..")");
 	if Skillet.tradeSkillOpen then
---		Skillet.tradeSkillHide = TradeSkillFrame:GetScript("OnHide")
---		TradeSkillFrame:SetScript("OnHide", nil)
 		HideUIPanel(TradeSkillFrame)
 	end
 	if IsControlKeyDown() then

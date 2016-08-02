@@ -1234,7 +1234,7 @@ function Skillet:SetTradeSkillToolTip(skillIndex)
 	local recipe, recipeID = self:GetRecipeDataByTradeIndex(self.currentTrade, skillIndex)
 	if recipe then
 		if recipe.itemID ~= 0 then
---			GameTooltip:SetTradeSkillItem(skillIndex)
+			GameTooltip:SetHyperlink("item:"..recipe.itemID)
 			if EnhTooltip and EnhTooltip.TooltipCall then
 				local name, link, quality = GetItemInfo("item:"..recipe.itemID)
 				local quantity = recipe.numMade
@@ -1374,19 +1374,17 @@ function Skillet:UpdateDetailsWindow(skillIndex)
 		self.recipeNotesFrame:Hide()
 	end
 	local skill = self:GetSkill(self.currentPlayer, self.currentTrade, skillIndex)
-	if not skill then
-		Skillet:HideDetailWindow()
-		return
-	end
-	lastUpdateSpellID = skill.id
 	local recipe = Skillet.UnknownRecipe
 	if skill then
+		lastUpdateSpellID = skill.id
 		recipe = self:GetRecipe(skill.id) or Skillet.UnknownRecipe
+		DA.DEBUG(0,"skill= "..DA.DUMP1(skill))
+		DA.DEBUG(0,"recipe= "..DA.DUMP1(recipe))
 		-- Name of the skill
 		SkilletSkillName:SetText(recipe.name)
 		SkilletRecipeNotesButton:Show()
 		if recipe.spellID then
-			local orange,yellow,green,gray = self:GetTradeSkillLevels((recipe.itemID>0 and recipe.itemID) or -recipe.spellID)			-- was spellID now is itemID or -spellID
+			local orange,yellow,green,gray = self:GetTradeSkillLevels((recipe.itemID>0 and recipe.itemID))
 			SkilletRankFrame.subRanks.green:SetValue(gray)
 			SkilletRankFrame.subRanks.yellow:SetValue(green)
 			SkilletRankFrame.subRanks.orange:SetValue(yellow)
@@ -1395,7 +1393,7 @@ function Skillet:UpdateDetailsWindow(skillIndex)
 				s:Show()
 			end
 		end
-		local description = C_TradeSkillUI.GetRecipeDescription(skillIndex)
+		local description = C_TradeSkillUI.GetRecipeDescription(skill.id)
 		--DA.DEBUG(0,"description="..tostring(description))
 		if description then
 			description = description:gsub("\r","")	-- Skillet frame has less space than Blizzard frame, so
@@ -1408,8 +1406,9 @@ function Skillet:UpdateDetailsWindow(skillIndex)
 		-- Whether or not it is on cooldown.
 		local _, _, _, _, _, _, _, _, _, _, _, displayAsUnavailable, unavailableString = Skillet:GetTradeSkillInfo(skill.id)
 		DA.DEBUG(0,"displayAsUnavailable="..tostring(displayAsUnavailable)..", unavailableString="..tostring(unavailableString))
-		local cooldown = 0
-		cooldown = (skill.cooldown or 0) - time()
+		local cd, isDayCooldown, charges, maxCharges = C_TradeSkillUI.GetRecipeCooldown(skill.id)
+		DA.DEBUG(0,"cd= "..tostring(cd))
+		local cooldown = (cd or 0)
 		if cooldown > 0 then
 			SkilletSkillCooldown:SetText(COOLDOWN_REMAINING.." "..SecondsToTime(cooldown))
 		elseif displayAsUnavailable then
