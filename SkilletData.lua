@@ -843,20 +843,20 @@ function Skillet:GetRecipeName(id)
 end
 
 function Skillet:GetRecipe(id)
-	--DA.PROFILE("Skillet:GetRecipe("..tostring(id)..")")
+	--DA.DEBUG(0,"Skillet:GetRecipe("..tostring(id)..")")
 	if id and id ~= 0 then 
 		if Skillet.data.recipeList[id] then
 			return Skillet.data.recipeList[id]
 		end
 		if Skillet.db.global.recipeDB[id] then
 			local recipeString = Skillet.db.global.recipeDB[id]
-			--DA.DEBUG(3,"recipeString= "..tostring(recipeString))
+			--DA.DEBUG(0,"recipeString= "..tostring(recipeString))
 			local tradeID, itemString, reagentString, toolString = string.split(" ",recipeString)
 			local itemID, numMade = 0, 1
 			local slot = nil
 			if itemString ~= "0" then
 				local a, b = string.split(":",itemString)
-				--DA.DEBUG(3,"itemString a= "..tostring(a)..", b= "..tostring(b))
+				--DA.DEBUG(0,"itemString a= "..tostring(a)..", b= "..tostring(b))
 				if a ~= "0" then
 					itemID, numMade = a,b
 				else
@@ -1371,8 +1371,8 @@ function Skillet:ScanTrade()
 				table.insert(recipe.tools, tools[t])
 				toolString = toolString..":"..string.gsub(tools[t]," ", "_")
 			end
-			recipeString = recipeString.." "..toolString
 		end
+		recipeString = recipeString.." "..toolString
 
 		recipeDB[recipeID] = recipeString
 		--DA.DEBUG(2,"recipeDB["..tostring(recipeID).."]= "..tostring(recipeDB[recipeID]))
