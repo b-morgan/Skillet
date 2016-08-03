@@ -132,7 +132,8 @@ function Skillet:CreateTradeSkillWindow()
 	titletext:SetTextColor(1,1,1)
 	titletext:SetText(L["Skillet Trade Skills"].." "..Skillet.version);
 	local label = _G["SkilletFilterLabel"];
-	label:SetText(L["Filter"]);
+--	label:SetText(L["Filter"]);
+	label:SetText(L["Search"]);
 	SkilletCreateAllButton:SetText(L["Create All"])
 	SkilletQueueAllButton:SetText(L["Queue All"])
 	SkilletCreateButton:SetText(L["Create"])
@@ -554,7 +555,7 @@ function Skillet:TradeButton_OnClick(this,button)
 end
 
 function Skillet:UpdateTradeButtons(player)
-	DA.DEBUG(0,"UpdateTradeButtons started")
+	--DA.DEBUG(0,"UpdateTradeButtons started")
 	local position = 0 -- pixels
 	local tradeSkillList = self.tradeSkillList
 	local frameName = "SkilletFrameTradeButtons-"..player
@@ -636,7 +637,7 @@ function Skillet:UpdateTradeButtons(player)
 		button:Show()
 	end
 	Skillet:UpdateAutoTradeButtons()
-	DA.DEBUG(0,"UpdateTradeButtons complete")
+	--DA.DEBUG(0,"UpdateTradeButtons complete")
 end
 
 function Skillet:UpdateAutoTradeButtons()
@@ -727,7 +728,7 @@ local updateWindowCount = 1
 -- Updates the trade skill window whenever anything has changed,
 -- number of skills, skill type, skill level, etc
 function Skillet:internal_UpdateTradeSkillWindow()
-	DA.DEBUG(0,"internal_UpdateTradeSkillWindow()")
+	--DA.DEBUG(0,"internal_UpdateTradeSkillWindow()")
 	self:NameEditSave()
 	if not self.currentPlayer or not self.currentTrade then return end
 	local skillListKey = self.currentPlayer..":"..self.currentTrade..":"..self.currentGroupLabel
@@ -1078,7 +1079,7 @@ function Skillet:internal_UpdateTradeSkillWindow()
 	end
 	SkilletFrameEmptySpace:SetPoint("BOTTOMRIGHT",SkilletSkillListParent,"BOTTOMRIGHT")
 	updateWindowBusy = false
-	DA.DEBUG(0,"internal_UpdateTradeSkillWindow Complete")
+	--DA.DEBUG(0,"internal_UpdateTradeSkillWindow Complete")
 end
 
 -- Display an action packed tooltip when we are over

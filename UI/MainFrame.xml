@@ -1707,7 +1707,7 @@
 							<Anchors>
 								<Anchor point="TOPLEFT" relative="SkilletReagentParent" relativePoint="TOPLEFT">
 									<Offset>
-										<AbsDimension x="10" y="-90"/>
+										<AbsDimension x="10" y="-100"/>
 									</Offset>
 								</Anchor>
 							</Anchors>

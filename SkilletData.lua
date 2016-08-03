@@ -825,6 +825,8 @@ function Skillet:ResetTradeSkillFilter()
 	C_TradeSkillUI.ClearInventorySlotFilter()
 	C_TradeSkillUI.ClearRecipeCategoryFilter()
 	C_TradeSkillUI.ClearRecipeSourceTypeFilter()
+	C_TradeSkillUI.SetRecipeItemNameFilter(nil)
+	C_TradeSkillUI.SetRecipeItemLevelFilter(0, 0)
 end
 
 function Skillet:ExpandTradeSkillSubClass(i)
@@ -1158,20 +1160,24 @@ function Skillet:ScanTrade()
 	Skillet.db.realm.tradeSkills[player][tradeID].rank = rank
 	Skillet.db.realm.tradeSkills[player][tradeID].maxRank = maxRank
 
-	Skillet.db.global.AllRecipe[tradeID] = C_TradeSkillUI.GetAllRecipeIDs()
-	Skillet.db.global.AllRecipe[tradeID] = C_TradeSkillUI.GetAllRecipeIDs()
-	local categories = { C_TradeSkillUI.GetCategories() }
-	for i, categoryID in ipairs(categories) do
-		Skillet.db.global.Categories[tradeID][categoryID] = C_TradeSkillUI.GetCategoryInfo(categoryID)
-		local subCategories = { C_TradeSkillUI.GetSubCategories(categoryID) }
-		for j, subCategory in ipairs(subCategories) do
-			Skillet.db.global.Categories[tradeID][subCategory] = C_TradeSkillUI.GetCategoryInfo(subCategory)
-			local subsubCategories = { C_TradeSkillUI.GetSubCategories(subCategory) }
-			for k, subsubCategory in ipairs(subsubCategories) do
-				Skillet.db.global.Categories[tradeID][subsubCategory] = C_TradeSkillUI.GetCategoryInfo(subsubCategory)
-				local subsubsubCategories = { C_TradeSkillUI.GetSubCategories(subsubCategory) }
-				if #subsubsubCategories > 0 then
-					DA.DEBUG(0,"ScanTrade: too many subCategory levels")
+	if #Skillet.db.global.AllRecipe[tradeID] == 0 then
+		Skillet.db.global.AllRecipe[tradeID] = C_TradeSkillUI.GetAllRecipeIDs()
+	end
+
+	if #Skillet.db.global.Categories[tradeID] == 0 then
+		local categories = { C_TradeSkillUI.GetCategories() }
+		for i, categoryID in ipairs(categories) do
+			Skillet.db.global.Categories[tradeID][categoryID] = C_TradeSkillUI.GetCategoryInfo(categoryID)
+			local subCategories = { C_TradeSkillUI.GetSubCategories(categoryID) }
+			for j, subCategory in ipairs(subCategories) do
+				Skillet.db.global.Categories[tradeID][subCategory] = C_TradeSkillUI.GetCategoryInfo(subCategory)
+				local subsubCategories = { C_TradeSkillUI.GetSubCategories(subCategory) }
+				for k, subsubCategory in ipairs(subsubCategories) do
+					Skillet.db.global.Categories[tradeID][subsubCategory] = C_TradeSkillUI.GetCategoryInfo(subsubCategory)
+					local subsubsubCategories = { C_TradeSkillUI.GetSubCategories(subsubCategory) }
+					if #subsubsubCategories > 0 then
+						DA.DEBUG(0,"ScanTrade: too many subCategory levels")
+					end
 				end
 			end
 		end
@@ -1181,6 +1187,8 @@ function Skillet:ScanTrade()
 	Skillet.db.realm.Filtered[player][tradeID] = C_TradeSkillUI.GetFilteredRecipeIDs()
 	local numSkills = #C_TradeSkillUI.GetFilteredRecipeIDs()
 	DA.DEBUG(0,"ScanTrade: Expanding, "..tostring(profession)..":"..tostring(tradeID).." "..tostring(numSkills).." recipes")
+
+-- Build a list of categories (headers) used for this set of filtered recipes
 	local headerUsed = {}
 	for i = 1, numSkills do
 		local id = Skillet.db.realm.Filtered[player][tradeID][i]
@@ -1212,6 +1220,7 @@ function Skillet:ScanTrade()
 		local skillName, skillType, _, isExpanded, _, _, _, _, _, _, _, displayAsUnavailable, _ = Skillet:GetTradeSkillInfo(recipeID);
 		if displayAsUnavailable then skillType = "unavailable" end
 		if not headerUsed[recipeInfo.categoryID] then
+-- This category (header) hasn't been seen yet. Stack it (and its unseen parents)
 			headerUsed[recipeInfo.categoryID] = true
 			local headerType = Skillet.db.global.Categories[tradeID][recipeInfo.categoryID].type
 			local headerName = Skillet.db.global.Categories[tradeID][recipeInfo.categoryID].name
@@ -1229,6 +1238,7 @@ function Skillet:ScanTrade()
 				headerType = Skillet.db.global.Categories[tradeID][category].type
 			end
 			while numCat > 0 do
+-- We have a stack of headers. Output them to the skillDB.
 				category = catStack[numCat]
 				headerType = Skillet.db.global.Categories[tradeID][category].type
 				headerName = Skillet.db.global.Categories[tradeID][category].name
@@ -1294,72 +1304,78 @@ function Skillet:ScanTrade()
 		end
 		skillDB[i] = skillDBString
 		Skillet.data.skillIndexLookup[player][recipeID] = i
-		if recipeDB[recipeID] then
-			--DA.DEBUG(2,"(old) recipeDB["..tostring(recipeID).."]= "..tostring(recipeDB[recipeID]))
-		else
-			--DA.DEBUG(2,"recipeID= "..tostring(recipeID))
-			Skillet.data.recipeList[recipeID] = {}
-			local recipe = Skillet.data.recipeList[recipeID]
-			local recipeString = "-"
-			local toolString = "-"
-			recipe.tradeID = tradeID
-			recipe.spellID = recipeID
-			recipe.name = skillName
-			if #tools >= 1 then
-				recipe.tools = { tools[1] }
-				toolString = string.gsub(tools[1]," ", "_")
-				for t=3,#tools,2 do
-					table.insert(recipe.tools, tools[t])
-					toolString = toolString..":"..string.gsub(tools[t]," ", "_")
-				end
-			end
 
-			local itemString = "-"
-			local itemLink = C_TradeSkillUI.GetRecipeItemLink(recipeID)
-			--DA.DEBUG(2,"itemLink = "..DA.PLINK(itemLink))
-			if itemLink then
-				local itemID = Skillet:GetItemIDFromLink(itemLink)
-				--DA.DEBUG(2,"itemID= "..tostring(itemID))
-				local minMade,maxMade = C_TradeSkillUI.GetRecipeNumItemsProduced(recipeID)
-				recipe.itemID = itemID
-				recipe.numMade = (minMade + maxMade)/2
-				if recipe.numMade > 1 then
-					itemString = itemID..":"..recipe.numMade
-				else
-					itemString = tostring(itemID)
-				end
-				Skillet:ItemDataAddRecipeSource(itemID,recipeID) -- add a cross reference for the source of particular items
+		--DA.DEBUG(2,"recipeID= "..tostring(recipeID))
+		Skillet.data.recipeList[recipeID] = {}
+		local recipe = Skillet.data.recipeList[recipeID]
+		local itemString = "-"
+		local reagentString = "-"
+		local toolString = "-"
+		local recipeString = "-"
+		recipe.tradeID = tradeID
+		recipe.spellID = recipeID
+		recipe.name = skillName
+
+		local itemLink = C_TradeSkillUI.GetRecipeItemLink(recipeID)
+		--DA.DEBUG(2,"itemLink = "..DA.PLINK(itemLink))
+		if itemLink then
+			local itemID = Skillet:GetItemIDFromLink(itemLink)
+			--DA.DEBUG(2,"itemID= "..tostring(itemID))
+			if (not itemID or tonumber(itemID) == 0) then
+				DA.DEBUG(0,"recipeID= "..tostring(recipeID)..", itemID= "..tostring(itemID))
+			end
+			local minMade,maxMade = C_TradeSkillUI.GetRecipeNumItemsProduced(recipeID)
+			recipe.itemID = itemID
+			recipe.numMade = (minMade + maxMade)/2
+			if recipe.numMade > 1 then
+				itemString = itemID..":"..recipe.numMade
 			else
-				DA.DEBUG(0,"recipeID= "..tostring(recipeID).." has no itemLink")
+				itemString = tostring(itemID)
 			end
-
-			local reagentString = "-"
-			local reagentData = {}
-			for k = 1, C_TradeSkillUI.GetRecipeNumReagents(recipeID), 1 do
-				local reagentName, _, numNeeded = C_TradeSkillUI.GetRecipeReagentInfo(recipeID, k)
-				local reagentID = 0
-				if reagentName then
-					local reagentLink = C_TradeSkillUI.GetRecipeReagentItemLink(recipeID,k)
-					reagentID = Skillet:GetItemIDFromLink(reagentLink)
-				end
-				reagentData[k] = {}
-				reagentData[k].reagentID = reagentID
-				reagentData[k].numNeeded = numNeeded
-				if reagentString ~= "-" then
-					reagentString = reagentString..":"..reagentID..":"..numNeeded
-				else
-					reagentString = reagentID..":"..numNeeded
-				end
-				Skillet:ItemDataAddUsedInRecipe(reagentID, recipeID)	-- add a cross reference for where a particular item is used
-			end
-			recipe.reagentData = reagentData
-			recipeString = tradeID.." "..itemString.." "..reagentString
-			if #tools then
-				recipeString = recipeString.." "..toolString
-			end
-			recipeDB[recipeID] = recipeString
-			--DA.DEBUG(2,"(new) recipeDB["..tostring(recipeID).."]= "..tostring(recipeDB[recipeID]))
+			Skillet:ItemDataAddRecipeSource(itemID,recipeID) -- add a cross reference for the source of particular items
+		else
+			DA.DEBUG(0,"recipeID= "..tostring(recipeID).." has no itemLink")
 		end
+
+		local reagentData = {}
+		for k = 1, C_TradeSkillUI.GetRecipeNumReagents(recipeID), 1 do
+			local reagentName, _, numNeeded = C_TradeSkillUI.GetRecipeReagentInfo(recipeID, k)
+			local reagentID = 0
+			if reagentName then
+				local reagentLink = C_TradeSkillUI.GetRecipeReagentItemLink(recipeID,k)
+				if reagentLink then
+					reagentID = Skillet:GetItemIDFromLink(reagentLink)
+				else
+					DA.DEBUG(0,"recipeID= "..tostring(recipeID)..", reagentName= "..tostring(reagentName).." has no reagentLink")
+				end
+			else
+				--DA.DEBUG(0,"recipeID= "..tostring(recipeID).."("..tostring(k)..") reagentName missing")
+			end
+			reagentData[k] = {}
+			reagentData[k].reagentID = reagentID
+			reagentData[k].numNeeded = numNeeded
+			if reagentString ~= "-" then
+				reagentString = reagentString..":"..reagentID..":"..numNeeded
+			else
+				reagentString = reagentID..":"..numNeeded
+			end
+			Skillet:ItemDataAddUsedInRecipe(reagentID, recipeID)	-- add a cross reference for where a particular item is used
+		end
+		recipe.reagentData = reagentData
+		recipeString = tradeID.." "..itemString.." "..reagentString
+
+		if #tools >= 1 then
+			recipe.tools = { tools[1] }
+			toolString = string.gsub(tools[1]," ", "_")
+			for t=3,#tools,2 do
+				table.insert(recipe.tools, tools[t])
+				toolString = toolString..":"..string.gsub(tools[t]," ", "_")
+			end
+			recipeString = recipeString.." "..toolString
+		end
+
+		recipeDB[recipeID] = recipeString
+		--DA.DEBUG(2,"recipeDB["..tostring(recipeID).."]= "..tostring(recipeDB[recipeID]))
 		i = i + 1
 	end
 

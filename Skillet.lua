@@ -1072,21 +1072,29 @@ function Skillet:PLAYER_LOGOUT()
 	end
 end
 
+-- DA.DEBUG(0, DA.WARN(
 function Skillet:TRADE_SKILL_SHOW()
 	DA.DEBUG(0,"TRADE_SKILL_SHOW")
+	Skillet.dataSourceChanged = false
+	Skillet.detailsUpdate = false
+	Skillet.skillListUpdate = false
 	Skillet:SkilletShow()
 end
 
 function Skillet:TRADE_SKILL_CLOSE()
 	DA.DEBUG(0,"TRADE_SKILL_CLOSE")
 	Skillet:SkilletClose()
+	Skillet.dataSourceChanged = false
+	Skillet.detailsUpdate = false
+	Skillet.skillListUpdate = false
 end
 
 function Skillet:TRADE_SKILL_DATA_SOURCE_CHANGED()
 	DA.DEBUG(0,"TRADE_SKILL_DATA_SOURCE_CHANGED")
 	DA.DEBUG(0,"tradeSkillOpen= "..tostring(Skillet.tradeSkillOpen))
 	if Skillet.tradeSkillOpen then
-		Skillet:SkilletShowWindow()
+		Skillet.dataSourceChanged = true
+--		Skillet:SkilletShowWindow() -- Need to wait until TRADE_SKILL_DETAILS_UPDATE 
 	end
 end
 
@@ -1100,6 +1108,11 @@ end
 
 function Skillet:TRADE_SKILL_DETAILS_UPDATE()
 	DA.DEBUG(0,"TRADE_SKILL_DETAILS_UPDATE")
+	DA.DEBUG(0,"tradeSkillOpen= "..tostring(Skillet.tradeSkillOpen))
+	if Skillet.tradeSkillOpen then
+		Skillet.detailsUpdate = true
+		Skillet:ScanTrade()
+	end
 end
 
 function Skillet:TRADE_SKILL_FILTER_UPDATE()
@@ -1109,6 +1122,11 @@ end
 function Skillet:TRADE_SKILL_LIST_UPDATE()
 	DA.DEBUG(0,"TRADE_SKILL_LIST_UPDATE")
 	DA.DEBUG(0,"tradeSkillOpen= "..tostring(Skillet.tradeSkillOpen))
+	if Skillet.tradeSkillOpen and Skillet.dataSourceChanged then
+		Skillet.dataSourceChanged = false
+		Skillet.skillListUpdate = true
+		Skillet:SkilletShowWindow()
+	end
 end
 
 function Skillet:TRADE_SKILL_NAME_UPDATE()
