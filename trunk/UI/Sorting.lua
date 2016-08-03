@@ -142,9 +142,9 @@ local function NOSORT(tradeskill, a, b)
 end
 
 local function SkillIsFilteredOut(skillIndex)
-	DA.DEBUG(0,"SkillIsFilteredOut("..tostring(skillIndex)..")")
+	--DA.DEBUG(0,"SkillIsFilteredOut("..tostring(skillIndex)..")")
 	local skill = Skillet:GetSkill(Skillet.currentPlayer, Skillet.currentTrade, skillIndex)
-	DA.DEBUG(1,"skill = "..DA.DUMP1(skill,1))
+	--DA.DEBUG(1,"skill = "..DA.DUMP1(skill,1))
 	local recipe = Skillet:GetRecipe(skill.id)
 	local recipeID = recipe.spellID or 0
 	if recipeID == 0 then
