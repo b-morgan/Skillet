@@ -271,6 +271,7 @@ function Skillet:ProcessQueue(altMode)
 				--DA.DEBUG(0,"Crafting: "..tostring(command.count).." of "..tostring(command.recipeID))
 				C_TradeSkillUI.CraftRecipe(command.recipeID,command.count)
 			end
+			self.adjustInventory = true
 			return
 		else
 			DA.DEBUG(0,"unsupported queue op: "..(command.op or "nil"))

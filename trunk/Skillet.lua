@@ -1078,6 +1078,7 @@ function Skillet:TRADE_SKILL_SHOW()
 	Skillet.dataSourceChanged = false
 	Skillet.detailsUpdate = false
 	Skillet.skillListUpdate = false
+	Skillet.adjustInventory = false
 	Skillet:SkilletShow()
 end
 
@@ -1087,6 +1088,7 @@ function Skillet:TRADE_SKILL_CLOSE()
 	Skillet.dataSourceChanged = false
 	Skillet.detailsUpdate = false
 	Skillet.skillListUpdate = false
+	Skillet.adjustInventory = false
 end
 
 function Skillet:TRADE_SKILL_DATA_SOURCE_CHANGED()
@@ -1122,10 +1124,17 @@ end
 function Skillet:TRADE_SKILL_LIST_UPDATE()
 	DA.DEBUG(0,"TRADE_SKILL_LIST_UPDATE")
 	DA.DEBUG(0,"tradeSkillOpen= "..tostring(Skillet.tradeSkillOpen))
+	DA.DEBUG(0,"dataSourceChanged= "..tostring(Skillet.dataSourceChanged))
+	DA.DEBUG(0,"adjustInventory= "..tostring(Skillet.adjustInventory))
 	if Skillet.tradeSkillOpen and Skillet.dataSourceChanged then
 		Skillet.dataSourceChanged = false
+		Skillet.adjustInventory = false
 		Skillet.skillListUpdate = true
 		Skillet:SkilletShowWindow()
+	end
+	if Skillet.tradeSkillOpen and Skillet.adjustInventory then
+		Skillet.skillListUpdate = true
+		Skillet:AdjustInventory()
 	end
 end
 

@@ -804,7 +804,7 @@
 	<!-- Don't change the name 'SkilletFrame' as other mods may depend on it -->
 	<Frame name="SkilletFrame" toplevel="true" movable="true" resizable="true" parent="UIParent" enableMouse="true" hidden="true">
 		<Size>
-			<AbsDimension x="660" y="512"/>
+			<AbsDimension x="660" y="542"/>
 		</Size>
 		<Frames>
 			<!--
@@ -1636,7 +1636,7 @@
 			-->
 			<Frame name="SkilletReagentParent" parent="SkilletFrame">
 				<Size>
-					<AbsDimension x="280" y="280"/>
+					<AbsDimension x="280" y="300"/>
 				</Size>
 				<Anchors>
 					<Anchor point="TOPRIGHT" relativeTo="SkilletFrame" relativePoint="TOPRIGHT">
@@ -1705,9 +1705,9 @@
 						</FontString>
 						<FontString name="SkilletReagentLabel" inherits="GameFontNormalSmall" justifyH="LEFT" text="SPELL_REAGENTS">
 							<Anchors>
-								<Anchor point="TOPLEFT" relative="SkilletReagentParent" relativePoint="TOPLEFT">
+								<Anchor point="TOPLEFT" relativeTo="SkilletSkillCooldown" relativePoint="BOTTOMLEFT">
 									<Offset>
-										<AbsDimension x="10" y="-100"/>
+										<AbsDimension x="-47" y="-20"/>
 									</Offset>
 								</Anchor>
 							</Anchors>
