@@ -738,7 +738,7 @@ function Skillet:internal_UpdateTradeSkillWindow()
 	updateWindowBusy = true
 	local numTradeSkills = 0
 	if not self.dataScanned then
---		self.dataScanned = self:RescanTrade()
+		self.dataScanned = self:RescanTrade()
 		self:SortAndFilterRecipes()
 	end
 	if not self.data.sortedSkillList[skillListKey] then

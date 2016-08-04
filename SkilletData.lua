@@ -1080,14 +1080,18 @@ function Skillet:CHAT_MSG_SYSTEM(event,msg)
 end
 
 function Skillet:CalculateCraftableCounts(playerOverride)
-	DA.DEBUG(0,"CalculateCraftableCounts("..tostring(playerOverride)..")")
+	--DA.DEBUG(0,"CalculateCraftableCounts("..tostring(playerOverride)..")")
 	local player = playerOverride or self.currentPlayer
 	--DA.DEBUG(0,tostring(player).." "..tostring(self.currentTrade))
 	self.visited = {}
-	for i=1,self:GetNumSkills(player, self.currentTrade) do
-		local skill = self:GetSkill(player, self.currentTrade, i)
-		if skill then -- skip headers
-			skill.numCraftable, skill.numCraftableVendor, skill.numCraftableBank, skill.numCraftableAlts = self:InventorySkillIterations(self.currentTrade, i, player)
+	local n = self:GetNumSkills(player, self.currentTrade)
+	if n then
+		for i=1,n do
+			local skill = self:GetSkill(player, self.currentTrade, i)
+			if skill then -- skip headers
+				skill.numCraftable, skill.numRecursive, skill.numCraftableVendor, skill.numCraftableAlts = self:InventorySkillIterations(self.currentTrade, i, player)
+				--DA.DEBUG(2,"name= "..tostring(skill.name)..", numCraftable= "..tostring(skill.numCraftable)..", numRecursive= "..tostring(skill.numRecursive)..", numCraftableVendor= "..tostring(skill.numCraftableVendor)..", numCraftableAlts= "..tostring(skill.numCraftableAlts))
+			end
 		end
 	end
 	--DA.DEBUG(0,"CalculateCraftableCounts Complete")
