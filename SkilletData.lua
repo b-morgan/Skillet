@@ -1040,10 +1040,10 @@ function Skillet:EnableDataGathering(addon)
 end
 
 function Skillet:EnableQueue(addon)
-	self:RegisterEvent("UNIT_SPELLCAST_SUCCEEDED",   "ContinueCastCheckUnit")
-	self:RegisterEvent("UNIT_SPELLCAST_FAILED",      "StopCastCheckUnit")
-	self:RegisterEvent("UNIT_SPELLCAST_INTERRUPTED", "StopCastCheckUnit")
-	self:RegisterEvent("UNIT_SPELLCAST_STOPPED",     "StopCastCheckUnit")
+	self:RegisterEvent("UNIT_SPELLCAST_SUCCEEDED")
+	self:RegisterEvent("UNIT_SPELLCAST_FAILED")
+	self:RegisterEvent("UNIT_SPELLCAST_INTERRUPTED")
+	self:RegisterEvent("UNIT_SPELLCAST_STOPPED")
 end
 
 function Skillet:DisableQueue(addon)
@@ -1069,19 +1069,34 @@ function Skillet:GetRecipeDataByTradeIndex(tradeID, index)
 	return self.unknownRecipe
 end
 
-function Skillet:ContinueCastCheckUnit(event, unit, spell, rank)
-	DA.DEBUG(0,"StopCastCheckUnit("..tostring(event)..", "..tostring(unit)..", "..tostring(spell)..", "..tostring(rank)..")")
+function Skillet:UNIT_SPELLCAST_SUCCEEDED(event, unit, spell)
+	DA.DEBUG(0,"UNIT_SPELLCAST_SUCCEEDED("..tostring(unit)..", "..tostring(spell)..")")
 	if unit == "player" and spell==self.processingSpell then
 		self:ContinueCast(spell)
 	end
 end
 
-function Skillet:StopCastCheckUnit(event, unit, spell, rank)
-	DA.DEBUG(0,"StopCastCheckUnit("..tostring(event)..", "..tostring(unit)..", "..tostring(spell)..", "..tostring(rank)..")")
-	if unit == "player" then
+function Skillet:UNIT_SPELLCAST_FAILED(event, unit, spell)
+	DA.DEBUG(0,"UNIT_SPELLCAST_FAILED("..tostring(unit)..", "..tostring(spell)..")")
+	if unit == "player" and spell==self.processingSpell then
 		self:StopCast(spell)
 	end
 end
+
+function Skillet:UNIT_SPELLCAST_INTERRUPTED(event, unit, spell)
+	DA.DEBUG(0,"UNIT_SPELLCAST_INTERRUPTED("..tostring(unit)..", "..tostring(spell)..")")
+	if unit == "player" and spell==self.processingSpell then
+		self:StopCast(spell)
+	end
+end
+
+function Skillet:UNIT_SPELLCAST_STOPPED(event, unit, spell)
+	DA.DEBUG(0,"UNIT_SPELLCAST_STOPPED("..tostring(unit)..", "..tostring(spell)..")")
+	if unit == "player" and spell==self.processingSpell then
+		self:StopCast(spell)
+	end
+end
+
 
 function Skillet:CHAT_MSG_SKILL()
 	DA.DEBUG(0,"CHAT_MSG_SKILL")
@@ -1161,7 +1176,7 @@ function Skillet:ScanTrade()
 	if link then
 		--DA.DEBUG(0,"ScanTrade: "..tostring(profession).." link="..link.." "..DA.PLINK(link))
 	else
-		DA.DEBUG(0,"ScanTrade: "..tostring(profession).." non linkable")
+		DA.DEBUG(0,"ScanTrade: "..tostring(profession).." not linkable")
 	end
 	local player = Skillet.currentPlayer
 	local tradeID = TradeSkillIDsByName[profession]

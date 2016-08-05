@@ -1096,7 +1096,7 @@ function Skillet:TRADE_SKILL_DATA_SOURCE_CHANGED()
 	DA.DEBUG(0,"tradeSkillOpen= "..tostring(Skillet.tradeSkillOpen))
 	if Skillet.tradeSkillOpen then
 		Skillet.dataSourceChanged = true
---		Skillet:SkilletShowWindow() -- Need to wait until TRADE_SKILL_DETAILS_UPDATE 
+		Skillet:SkilletShowWindow()
 	end
 end
 
@@ -1191,7 +1191,7 @@ function Skillet:SkilletShow()
 		", skillLineRank= "..tostring(skillLineRank)..", skillLineRank= "..tostring(skillLineRank)..
 		", skillLineModifier= "..tostring(skillLineModifier))
 	self.currentTrade = self.tradeSkillIDsByName[select(2,C_TradeSkillUI.GetTradeSkillLine())]
-	DA.DEBUG(1,"SkilletShow: trade= "..self.currentTrade)
+	DA.DEBUG(0,"SkilletShow: trade= "..tostring(self.currentTrade))
 	local link = C_TradeSkillUI.GetTradeSkillListLink()
 	if link then
 		DA.DEBUG(0,"SkilletShow: link= "..link..", "..DA.PLINK(link))
@@ -1236,7 +1236,7 @@ function Skillet:SkilletShow()
 end
 
 function Skillet:SkilletShowWindow()
-	DA.DEBUG(0,"SkilletShowWindow: (was showing "..tostring(self.currentTrade)..")");
+	DA.DEBUG(0,"SkilletShowWindow: "..tostring(self.currentTrade))
 	if Skillet.tradeSkillOpen then
 		HideUIPanel(TradeSkillFrame)
 	end
@@ -1383,7 +1383,7 @@ function Skillet:SetTradeSkill(player, tradeID, skillIndex)
 			end
 		end
 	end
-	self:SetSelectedSkill(skillIndex, false)
+	self:SetSelectedSkill(skillIndex)
 end
 
 -- Updates the tradeskill window, if the current trade has changed.
@@ -1475,20 +1475,14 @@ end
 function Skillet:SetSelectedTrade(newTrade)
 	DA.DEBUG(0,"SetSelectedTrade("..tostring(newTrade)..")")
 	self.currentTrade = newTrade;
-	self:SetSelectedSkill(nil, false)
+	self:SetSelectedSkill(nil)
 end
 
 -- Sets the specific trade skill that the user wants to see details on.
-function Skillet:SetSelectedSkill(skillIndex, wasClicked)
-	--DA.DEBUG(0,"SetSelectedSkill("..tostring(skillIndex)..", "..tostring(wasClicked)..")")
-	if not skillIndex then
-		-- no skill selected
-		self:HideNotesWindow()
-	elseif self.selectedSkill and self.selectedSkill ~= skillIndex then
-		-- new skill selected
-		self:HideNotesWindow() -- XXX: should this be an update?
-	end
-	self:ConfigureRecipeControls(false)				-- allow ALL trades to queue up items (enchants as well)
+function Skillet:SetSelectedSkill(skillIndex)
+	--DA.DEBUG(0,"SetSelectedSkill("..tostring(skillIndex)..")")
+	self:HideNotesWindow()
+	self:ConfigureRecipeControls(false)
 	self.selectedSkill = skillIndex
 	self:ScrollToSkillIndex(skillIndex)
 	self:UpdateDetailsWindow(skillIndex)
@@ -1512,7 +1506,6 @@ function Skillet:GetItemNote(key)
 	if not self.db.realm.notes[self.currentPlayer] then
 		return
 	end
---	local id = self:GetItemIDFromLink(link)
 	local kind, id = string.split(":", key)
 	id = tonumber(id) or 0
 	if kind == "enchant" then 					-- get the note by the itemID, not the recipeID
@@ -1537,7 +1530,6 @@ end
 -- then it is overwritten
 function Skillet:SetItemNote(key, note)
 	--DA.DEBUG(0,"SetItemNote("..tostring(key)..", "..tostring(note)..")")
---	local id = self:GetItemIDFromLink(link);
 	local kind, id = string.split(":", key)
 	id = tonumber(id) or 0
 	if kind == "enchant" then 					-- store the note by the itemID, not the recipeID

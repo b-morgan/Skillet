@@ -36,7 +36,6 @@ function Skillet:GetItemIDFromLink(link)	-- works with items or enchants
 		if id then
 			return tonumber(id);
 		else
-			DA.WARN("Can't find id from link="..tostring(link))
 			return nil
 		end
 	end

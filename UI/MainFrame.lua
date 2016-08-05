@@ -1953,7 +1953,7 @@ function Skillet:SkillButton_OnClick(button, mouse)
 						if not button.skill.selected then
 							self:SkillButton_ClearSelections()
 						end
-						self:SetSelectedSkill(button:GetID(), true)
+						self:SetSelectedSkill(button:GetID())
 						button.skill.selected = true
 					else
 						if button.skill.selected and not self:RecipeGroupIsLocked() then
