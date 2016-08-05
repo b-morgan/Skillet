@@ -57,7 +57,7 @@ function Skillet:GetTradeSkillLevels(spellID)
 			if PT then
 				local levels = PT:ItemInSet(spellID,"TradeskillLevels")
 				if levels then
-					DA.DEBUG(0,"levels= "..tostring(levels))
+					--DA.DEBUG(0,"levels= "..tostring(levels))
 					a,b,c,d = string.split("/",levels)
 					a = tonumber(a) or 0
 					b = tonumber(b) or 0

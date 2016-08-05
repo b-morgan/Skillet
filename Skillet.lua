@@ -1352,6 +1352,7 @@ function Skillet:SetTradeSkill(player, tradeID, skillIndex)
 			self.currentGroup = nil
 			self.currentGroupLabel = self:GetTradeSkillOption("grouping")
 			self:RecipeGroupDropdown_OnShow()
+			if tradeID == 2575 then tradeID = 2656 end -- Ye old Mining vs. Smelting issue
 			DA.DEBUG(0,"cast: "..self:GetTradeName(tradeID))
 			CastSpellByName(self:GetTradeName(tradeID)) -- this will trigger the whole rescan process via a TRADE_SKILL_SHOW event
 		else
@@ -1479,7 +1480,7 @@ end
 
 -- Sets the specific trade skill that the user wants to see details on.
 function Skillet:SetSelectedSkill(skillIndex, wasClicked)
-	DA.DEBUG(0,"SetSelectedSkill("..tostring(skillIndex)..", "..tostring(wasClicked)..")")
+	--DA.DEBUG(0,"SetSelectedSkill("..tostring(skillIndex)..", "..tostring(wasClicked)..")")
 	if not skillIndex then
 		-- no skill selected
 		self:HideNotesWindow()
