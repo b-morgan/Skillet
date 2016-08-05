@@ -334,7 +334,7 @@ function Skillet:CreateAllItems(mouse)
 end
 
 function Skillet:ContinueCast(spell)
-	Skillet:StopCast(spell, true)
+--	Skillet:StopCast(spell, true)
 end
 
 function Skillet:StopCast(spell, success)
