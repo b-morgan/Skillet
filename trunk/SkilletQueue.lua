@@ -161,7 +161,7 @@ function Skillet:AddToQueue(command, noWindowRefresh)
 end
 
 function Skillet:RemoveFromQueue(index)
-	--DA.DEBUG(0,"RemoveFromQueue")
+	DA.DEBUG(0,"RemoveFromQueue("..tostring(index)..")")
 	local queue = self.db.realm.queueData[self.currentPlayer]
 	local command = queue[index]
 	local reagentsInQueue = self.db.realm.reagentsInQueue[Skillet.currentPlayer]
@@ -184,18 +184,17 @@ function Skillet:RemoveFromQueue(index)
 end
 
 function Skillet:ClearQueue()
-	--DA.DEBUG(0,"ClearQueue")
+	--DA.DEBUG(0,"ClearQueue()")
 	if #self.db.realm.queueData[self.currentPlayer]>0 then
 		self.db.realm.queueData[self.currentPlayer] = {}
 		self.db.realm.reagentsInQueue[self.currentPlayer] = {}
 		self.dataScanned = false
 		self:UpdateTradeSkillWindow()
 	end
-	--DA.DEBUG(0,"ClearQueue Complete")
 end
 
 function Skillet:ProcessQueue(altMode)
-	DA.DEBUG(0,"ProcessQueue");
+	DA.DEBUG(0,"ProcessQueue("..tostring(altMode)..")");
 	local queue = self.db.realm.queueData[self.currentPlayer]
 	local qpos = 1
 	local skillIndexLookup = self.data.skillIndexLookup[self.currentPlayer]
@@ -268,7 +267,7 @@ function Skillet:ProcessQueue(altMode)
 					C_TradeSkillUI.CraftRecipe(command.recipeID,command.count)
 				end
 			else
-				--DA.DEBUG(0,"Crafting: "..tostring(command.count).." of "..tostring(command.recipeID))
+				DA.DEBUG(0,"Crafting: "..tostring(command.count).." of "..tostring(command.recipeID))
 				C_TradeSkillUI.CraftRecipe(command.recipeID,command.count)
 			end
 			self.adjustInventory = true
@@ -283,7 +282,7 @@ end
 
 -- Adds the currently selected number of items to the queue
 function Skillet:QueueItems(count)
-	DA.DEBUG(0,"QueueItems");
+	DA.DEBUG(0,"QueueItems("..tostring(count)..")");
 	local skill = self:GetSkill(self.currentPlayer, self.currentTrade, self.selectedSkill)
 	if not skill then return 0 end
 	local recipe = self:GetRecipe(skill.id)
@@ -312,15 +311,15 @@ end
 
 -- Queue the max number of craftable items for the currently selected skill
 function Skillet:QueueAllItems()
-	DA.DEBUG(0,"QueueAllItems");
-	local count = self:QueueItems()						-- no argument means queue em all
+	DA.DEBUG(0,"QueueAllItems()");
+	local count = self:QueueItems()
 	self:UpdateNumItemsSlider(0, false)
 	return count
 end
 
 -- Adds the currently selected number of items to the queue and then starts the queue
 function Skillet:CreateItems(count, mouse)
-	DA.DEBUG(0,"CreateItems");
+	DA.DEBUG(0,"CreateItems("..tostring(count)..", "..tostring(mouse)..")")
 	if self:QueueItems(count) > 0 then
 		self:ProcessQueue(mouse == "RightButton" or IsAltKeyDown())
 	end
@@ -328,7 +327,7 @@ end
 
 -- Queue and create the max number of craftable items for the currently selected skill
 function Skillet:CreateAllItems(mouse)
-	DA.DEBUG(0,"CreateAllItems");
+	DA.DEBUG(0,"CreateAllItems("..tostring(mouse)..")")
 	if self:QueueAllItems() > 0 then
 		self:ProcessQueue(mouse == "RightButton" or IsAltKeyDown())
 	end
@@ -339,7 +338,7 @@ function Skillet:ContinueCast(spell)
 end
 
 function Skillet:StopCast(spell, success)
-	local spellBeingCast = UnitCastingInfo("player")
+	DA.DEBUG(0,"StopCast("..tostring(spell)..", "..tostring(success)..")")
 	if not self.db.realm.queueData then
 		self.db.realm.queueData = {}
 	end
@@ -376,9 +375,7 @@ function Skillet:StopCast(spell, success)
 					self.processingPosition = nil
 					self.processingCommand = nil
 					self.reagentsChanged = {}
-					self:RemoveFromQueue(qpos)		-- implied queued reagent inventory adjustment in remove routine
-					self:RescanTrade()
-					DA.DEBUG(0,"removed queue command")
+					self:RemoveFromQueue(qpos)
 				end
 			end
 		else
@@ -387,9 +384,7 @@ function Skillet:StopCast(spell, success)
 			self.processingCommand = nil
 			self.queuecasting = false
 		end
-		DA.DEBUG(0,"STOP CAST IS UPDATING WINDOW")
-		self:InventoryScan()
-		self:UpdateTradeSkillWindow()
+		self:AdjustInventory()
 	end
 end
 
@@ -397,11 +392,13 @@ end
 -- item as that requires a "SpellStopCasting" call which can only be
 -- made from secure code. All this does is stop repeating after the current item
 function Skillet:CancelCast()
+	DA.DEBUG(0,"CancelCast()")
 	C_TradeSkillUI.StopRecipeRepeat()
 end
 
 -- Removes an item from the queue
 function Skillet:RemoveQueuedCommand(queueIndex)
+	DA.DEBUG(0,"RemoveQueuedCommand("..tostring(queueIndex)..")")
 	if queueIndex == 1 then
 		self:CancelCast()
 	end
@@ -413,7 +410,7 @@ end
 
 -- Rebuilds reagentsInQueue list
 function Skillet:ScanQueuedReagents()
-DA.DEBUG(0,"ScanQueuedReagents")
+	DA.DEBUG(0,"ScanQueuedReagents()")
 	if self.linkedSkill or self.isGuild then
 		return
 	end

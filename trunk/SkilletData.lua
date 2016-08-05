@@ -723,7 +723,7 @@ end
 
 -- Checks to see if this trade follower can not use Skillet frame.
 function Skillet:IsNotSupportedFollower(tradeID)
-	DA.DEBUG(0,"IsNotSupportedFollower("..tostring(tradeID)..")")
+	--DA.DEBUG(0,"IsNotSupportedFollower("..tostring(tradeID)..")")
 	Skillet.wasNPCCrafting = false
 	if C_TradeSkillUI.IsNPCCrafting() then
 		local guid = UnitGUID("target")
@@ -821,7 +821,7 @@ end
 
 -- resets the blizzard tradeskill search filters just to make sure no other addon has monkeyed with them
 function Skillet:ResetTradeSkillFilter()
-	DA.PROFILE("Skillet:ResetTradeSkillFilter()")
+	--DA.PROFILE("Skillet:ResetTradeSkillFilter()")
 	C_TradeSkillUI.ClearInventorySlotFilter()
 	C_TradeSkillUI.ClearRecipeCategoryFilter()
 	C_TradeSkillUI.ClearRecipeSourceTypeFilter()
@@ -830,7 +830,7 @@ function Skillet:ResetTradeSkillFilter()
 end
 
 function Skillet:ExpandTradeSkillSubClass(i)
-	DA.DEBUG(0,"Skillet:ExpandTradeSkillSubClass "..tostring(i))
+	--DA.DEBUG(0,"Skillet:ExpandTradeSkillSubClass "..tostring(i))
 end
 
 function Skillet:GetRecipeName(id)
@@ -854,19 +854,23 @@ function Skillet:GetRecipe(id)
 			local tradeID, itemString, reagentString, toolString = string.split(" ",recipeString)
 			local itemID, numMade = 0, 1
 			local slot = nil
-			if itemString ~= "0" then
-				local a, b = string.split(":",itemString)
-				--DA.DEBUG(0,"itemString a= "..tostring(a)..", b= "..tostring(b))
-				if a ~= "0" then
-					itemID, numMade = a,b
-				else
-					itemID = 0
-					numMade = 1
-					slot = tonumber(b)
+			if itemString then
+				if itemString ~= "0" then
+					local a, b = string.split(":",itemString)
+					--DA.DEBUG(0,"itemString a= "..tostring(a)..", b= "..tostring(b))
+					if a ~= "0" then
+						itemID, numMade = a,b
+					else
+						itemID = 0
+						numMade = 1
+						slot = tonumber(b)
+					end
+					if not numMade then
+						numMade = 1
+					end
 				end
-				if not numMade then
-					numMade = 1
-				end
+			else
+				DA.DEBUG(0,"id= "..tostring(id)..", recipeString= "..tostring(recipeString))
 			end
 			Skillet.data.recipeList[id] = {}
 			Skillet.data.recipeList[id].spellID = tonumber(id)
@@ -876,21 +880,29 @@ function Skillet:GetRecipe(id)
 			Skillet.data.recipeList[id].numMade = tonumber(numMade)
 			Skillet.data.recipeList[id].slot = slot
 			Skillet.data.recipeList[id].reagentData = {}
-			if reagentString ~= "-" then
-				local reagentList = { string.split(":",reagentString) }
-				local numReagents = #reagentList / 2
-				for i=1,numReagents do
-					Skillet.data.recipeList[id].reagentData[i] = {}
-					Skillet.data.recipeList[id].reagentData[i].reagentID = tonumber(reagentList[1 + (i-1)*2])
-					Skillet.data.recipeList[id].reagentData[i].numNeeded = tonumber(reagentList[2 + (i-1)*2])
+			if reagentString then
+				if reagentString ~= "-" then
+					local reagentList = { string.split(":",reagentString) }
+					local numReagents = #reagentList / 2
+					for i=1,numReagents do
+						Skillet.data.recipeList[id].reagentData[i] = {}
+						Skillet.data.recipeList[id].reagentData[i].reagentID = tonumber(reagentList[1 + (i-1)*2])
+						Skillet.data.recipeList[id].reagentData[i].numNeeded = tonumber(reagentList[2 + (i-1)*2])
+					end
 				end
+			else
+				DA.DEBUG(0,"id= "..tostring(id)..", recipeString= "..tostring(recipeString))
 			end
-			if toolString ~= "-" then
-				Skillet.data.recipeList[id].tools = {}
-				local toolList = { string.split(":",toolString) }
-				for i=1,#toolList do
-					Skillet.data.recipeList[id].tools[i] = string.gsub(toolList[i],"_"," ")
+			if toolString then
+				if toolString ~= "-" then
+					Skillet.data.recipeList[id].tools = {}
+					local toolList = { string.split(":",toolString) }
+					for i=1,#toolList do
+						Skillet.data.recipeList[id].tools[i] = string.gsub(toolList[i],"_"," ")
+					end
 				end
+			else
+				DA.DEBUG(0,"id= "..tostring(id)..", recipeString= "..tostring(recipeString))
 			end
 			return Skillet.data.recipeList[id]
 		end
@@ -981,7 +993,7 @@ end
 -- this routine collects the basic data (which tradeskills a player has)
 -- clean = true means wipe the old data
 function Skillet:ScanPlayerTradeSkills(player, clean)
-	DA.PROFILE("Skillet:ScanPlayerTradeSkills("..tostring(player)..", "..tostring(clean)..")")
+	--DA.PROFILE("Skillet:ScanPlayerTradeSkills("..tostring(player)..", "..tostring(clean)..")")
 	if player == (UnitName("player")) then -- only for active player
 		if clean or not Skillet.db.realm.tradeSkills[player] then
 			Skillet.db.realm.tradeSkills[player] = {}
@@ -1028,7 +1040,6 @@ function Skillet:EnableDataGathering(addon)
 end
 
 function Skillet:EnableQueue(addon)
-	assert(tostring(addon),"Usage: EnableDataGathering('addon')")
 	self:RegisterEvent("UNIT_SPELLCAST_SUCCEEDED",   "ContinueCastCheckUnit")
 	self:RegisterEvent("UNIT_SPELLCAST_FAILED",      "StopCastCheckUnit")
 	self:RegisterEvent("UNIT_SPELLCAST_INTERRUPTED", "StopCastCheckUnit")
@@ -1059,13 +1070,14 @@ function Skillet:GetRecipeDataByTradeIndex(tradeID, index)
 end
 
 function Skillet:ContinueCastCheckUnit(event, unit, spell, rank)
-	--DA.DEBUG(0,"ContinueCastCheckUnit "..(unit or "nil"))
+	DA.DEBUG(0,"StopCastCheckUnit("..tostring(event)..", "..tostring(unit)..", "..tostring(spell)..", "..tostring(rank)..")")
 	if unit == "player" and spell==self.processingSpell then
 		self:ContinueCast(spell)
 	end
 end
 
 function Skillet:StopCastCheckUnit(event, unit, spell, rank)
+	DA.DEBUG(0,"StopCastCheckUnit("..tostring(event)..", "..tostring(unit)..", "..tostring(spell)..", "..tostring(rank)..")")
 	if unit == "player" then
 		self:StopCast(spell)
 	end
@@ -1098,7 +1110,7 @@ function Skillet:CalculateCraftableCounts(playerOverride)
 end
 
 function Skillet:RescanTrade()
-	DA.PROFILE("Skillet:RescanTrade()")
+	--DA.PROFILE("Skillet:RescanTrade()")
 	local player, tradeID = Skillet.currentPlayer, Skillet.currentTrade
 	if not player or not tradeID then return end
 	Skillet.scanInProgress = true
@@ -1134,20 +1146,20 @@ function Skillet:RescanTrade()
 		Skillet.db.global.Categories[tradeID] = {}
 	end
 	Skillet.dataScanned = self:ScanTrade()
-	DA.DEBUG(0,"Skillet:RescanTrade Complete")
+	--DA.DEBUG(0,"Skillet:RescanTrade Complete")
 	Skillet:EnableUpdateEvents()
 	Skillet.scanInProgress = false
 	return Skillet.dataScanned
 end
 
 function Skillet:ScanTrade()
-	DA.PROFILE("Skillet:ScanTrade()")
+	--DA.PROFILE("Skillet:ScanTrade()")
 	local link = C_TradeSkillUI.GetTradeSkillListLink()
 	local id, profession, rank, maxRank = C_TradeSkillUI.GetTradeSkillLine()
-	DA.DEBUG(0,"ScanTrade: id= "..tostring(id)..", profession= "..tostring(profession)..
-		", rank= "..tostring(rank)..", maxRank= "..tostring(maxRank))
+	--DA.DEBUG(0,"ScanTrade: id= "..tostring(id)..", profession= "..tostring(profession)..
+		--", rank= "..tostring(rank)..", maxRank= "..tostring(maxRank))
 	if link then
-		DA.DEBUG(0,"ScanTrade: "..tostring(profession).." link="..link.." "..DA.PLINK(link))
+		--DA.DEBUG(0,"ScanTrade: "..tostring(profession).." link="..link.." "..DA.PLINK(link))
 	else
 		DA.DEBUG(0,"ScanTrade: "..tostring(profession).." non linkable")
 	end
@@ -1190,7 +1202,7 @@ function Skillet:ScanTrade()
 	self:ResetTradeSkillFilter() -- verify the search filter is blank (so we get all skills)
 	Skillet.db.realm.Filtered[player][tradeID] = C_TradeSkillUI.GetFilteredRecipeIDs()
 	local numSkills = #C_TradeSkillUI.GetFilteredRecipeIDs()
-	DA.DEBUG(0,"ScanTrade: Expanding, "..tostring(profession)..":"..tostring(tradeID).." "..tostring(numSkills).." recipes")
+	--DA.DEBUG(0,"ScanTrade: Expanding, "..tostring(profession)..":"..tostring(tradeID).." "..tostring(numSkills).." recipes")
 
 -- Build a list of categories (headers) used for this set of filtered recipes
 	local headerUsed = {}
@@ -1216,7 +1228,7 @@ function Skillet:ScanTrade()
 	local groupList = {}
 	local numHeaders = 0
 	local parentGroup
-	DA.DEBUG(0,"ScanTrade: Scanning, "..tostring(profession)..":"..tostring(tradeID).." "..tostring(numSkills).." recipes")
+	--DA.DEBUG(0,"ScanTrade: Scanning, "..tostring(profession)..":"..tostring(tradeID).." "..tostring(numSkills).." recipes")
 	local i = 1
 	for j = 1, numSkills, 1 do
 		local recipeID = Skillet.db.realm.Filtered[player][tradeID][j]
@@ -1246,7 +1258,7 @@ function Skillet:ScanTrade()
 				category = catStack[numCat]
 				headerType = Skillet.db.global.Categories[tradeID][category].type
 				headerName = Skillet.db.global.Categories[tradeID][category].name
-				DA.DEBUG(2,"ScanTrade: headerType= "..tostring(headerType)..", headerName= "..tostring(headerName))
+				--DA.DEBUG(2,"ScanTrade: headerType= "..tostring(headerType)..", headerName= "..tostring(headerName))
 				local groupName
 				if groupList[headerName] then
 					groupList[headerName] = groupList[headerName]+1
@@ -1387,7 +1399,7 @@ function Skillet:ScanTrade()
 	Skillet:InventoryScan()
 	Skillet:CalculateCraftableCounts()
 	Skillet:SortAndFilterRecipes()
-	DA.DEBUG(0,"ScanTrade: Complete, numSkills= "..tostring(numSkills)..", numHeaders= "..tostring(numHeaders))
+	--DA.DEBUG(0,"ScanTrade: Complete, numSkills= "..tostring(numSkills)..", numHeaders= "..tostring(numHeaders))
 	if numHeaders == 0 then
 		skillData.scanned = false
 		return false

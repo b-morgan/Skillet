@@ -1363,7 +1363,7 @@ local lastUpdateSpellID = nil
 local ARLProfessionInitialized = {}
 -- Updates the details window with information about the currently selected skill
 function Skillet:UpdateDetailsWindow(skillIndex)
-	DA.DEBUG(0,"UpdateDetailsWindow("..tostring(skillIndex)..")")
+	--DA.DEBUG(0,"UpdateDetailsWindow("..tostring(skillIndex)..")")
 	if not skillIndex or skillIndex < 0 then
 		Skillet:HideDetailWindow()
 		return
@@ -1379,8 +1379,8 @@ function Skillet:UpdateDetailsWindow(skillIndex)
 	if skill then
 		lastUpdateSpellID = skill.id
 		recipe = self:GetRecipe(skill.id) or Skillet.UnknownRecipe
-		DA.DEBUG(0,"skill= "..DA.DUMP1(skill))
-		DA.DEBUG(0,"recipe= "..DA.DUMP1(recipe))
+		--DA.DEBUG(0,"skill= "..DA.DUMP1(skill))
+		--DA.DEBUG(0,"recipe= "..DA.DUMP1(recipe))
 		-- Name of the skill
 		SkilletSkillName:SetText(recipe.name)
 		SkilletRecipeNotesButton:Show()
@@ -1406,9 +1406,9 @@ function Skillet:UpdateDetailsWindow(skillIndex)
 		end
 		-- Whether or not it is on cooldown.
 		local _, _, _, _, _, _, _, _, _, _, _, displayAsUnavailable, unavailableString = Skillet:GetTradeSkillInfo(skill.id)
-		DA.DEBUG(0,"displayAsUnavailable="..tostring(displayAsUnavailable)..", unavailableString="..tostring(unavailableString))
+		--DA.DEBUG(0,"displayAsUnavailable="..tostring(displayAsUnavailable)..", unavailableString="..tostring(unavailableString))
 		local cd, isDayCooldown, charges, maxCharges = C_TradeSkillUI.GetRecipeCooldown(skill.id)
-		DA.DEBUG(0,"cd= "..tostring(cd))
+		--DA.DEBUG(0,"cd= "..tostring(cd))
 		local cooldown = (cd or 0)
 		if cooldown > 0 then
 			SkilletSkillCooldown:SetText(COOLDOWN_REMAINING.." "..SecondsToTime(cooldown))
@@ -1991,7 +1991,7 @@ end
 -- this function assures that a recipe that is indirectly selected (via reagent clicks, for example)
 -- will be visible in the skill list (ie, not scrolled off the top/bottom)
 function Skillet:ScrollToSkillIndex(skillIndex)
-	DA.DEBUG(0,"ScrollToSkillIndex("..tostring(skillIndex)..")")
+	--DA.DEBUG(0,"ScrollToSkillIndex("..tostring(skillIndex)..")")
 	if skillIndex == nil then
 		return
 	end
