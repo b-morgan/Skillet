@@ -446,7 +446,6 @@ end
 function Skillet:SortDropdown_Initialize()
 	recipe_sort_method = NOSORT
 	local info
-	local i = 0
 	for i=1, #sorters, 1 do
 		local entry = sorters[i]
 		info = UIDropDownMenu_CreateInfo()
@@ -456,7 +455,6 @@ function Skillet:SortDropdown_Initialize()
 		end
 		info.func = Skillet.SortDropdown_OnClick
 		info.value = i
-		i = i + 1
 		if self then
 			info.owner = self:GetParent()
 		end
@@ -473,6 +471,52 @@ function Skillet:SortDropdown_OnClick()
 	Skillet:SetTradeSkillOption("sortmethod", entry.name)
 	recipe_sort_method = entry.sorter
 	show_sort_toggle()
+	Skillet:SortAndFilterRecipes()
+	Skillet:UpdateTradeSkillWindow()
+end
+
+-- called when the new filter drop down is first loaded
+function Skillet:NewFilterDropdown_OnLoad()
+	UIDropDownMenu_Initialize(SkilletNewFilterDropdown, Skillet.NewFilterDropdown_Initialize)
+	SkilletNewFilterDropdown.displayMode = "MENU"  -- changes the pop-up borders to be rounded instead of square
+end
+
+-- Called when the new filter drop down is displayed
+function Skillet:NewFilterDropdown_OnShow()
+	UIDropDownMenu_Initialize(SkilletNewFilterDropdown, Skillet.NewFilterDropdown_Initialize)
+	SkilletNewFilterDropdown.displayMode = "MENU"  -- changes the pop-up borders to be rounded instead of square
+end
+
+-- The method we use the initialize the new filter drop down.
+function Skillet:NewFilterDropdown_Initialize()
+	local info
+	local i = 1
+
+	info = UIDropDownMenu_CreateInfo()
+	info.text = L["Learned"]
+	info.func = Skillet.NewFilterDropdown_OnClick
+	info.value = i
+	if self then
+		info.owner = self:GetParent()
+	end
+	UIDropDownMenu_AddButton(info)
+	i = i + 1
+
+	info = UIDropDownMenu_CreateInfo()
+	info.text = L["Unlearned"]
+	info.func = Skillet.NewFilterDropdown_OnClick
+	info.value = i
+	if self then
+		info.owner = self:GetParent()
+	end
+	UIDropDownMenu_AddButton(info)
+	i = i + 1
+	UIDropDownMenu_SetSelectedID(SkilletNewFilterDropdown, 1)
+end
+
+-- Called when the user selects an item in the new filter drop down
+function Skillet:NewFilterDropdown_OnClick()
+	UIDropDownMenu_SetSelectedID(SkilletNewFilterDropdown, self:GetID())
 	Skillet:SortAndFilterRecipes()
 	Skillet:UpdateTradeSkillWindow()
 end
