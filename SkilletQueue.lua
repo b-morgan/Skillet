@@ -339,6 +339,17 @@ function Skillet:ContinueCast(spell)
 	if Skillet.processingCount == 0 then
 		Skillet:StopCast(spell, true)
 	end
+	if spell == self.processingSpell then
+		local queue = self.db.realm.queueData[self.currentPlayer]
+		local qpos = self.processingPosition
+		if queue[qpos] and queue[qpos] == self.processingCommand then
+			local command = queue[qpos]
+			if command.op == "iterate" then
+				command.count = command.count - 1
+			end
+		end
+		self:AdjustInventory()
+	end
 end
 
 function Skillet:StopCast(spell, success)

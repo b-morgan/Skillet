@@ -1225,6 +1225,7 @@ function Skillet:SkilletShow()
 			self.tradeSkillOpen = true
 			self.selectedSkill = nil
 			self.dataScanned = false
+			self:SetTradeSkillLearned()
 --			self:SkilletShowWindow() -- Need to wait until TRADE_SKILL_DATA_SOURCE_CHANGED
 		else
 			self:HideAllWindows()
