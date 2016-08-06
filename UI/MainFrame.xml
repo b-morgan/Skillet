@@ -1034,7 +1034,7 @@
 				<Anchors>
 					<Anchor point="BOTTOMRIGHT" relativeTo="SkilletRankFrame" relativePoint="TOPLEFT">
 						<Offset>
-							<AbsDimension x="-10" y="5"/>
+							<AbsDimension x="-10" y="10"/>
 						</Offset>
 					</Anchor>
 				</Anchors>
@@ -1185,6 +1185,44 @@
 			</Button>
 			<!--
 			#
+			# Drop down where users can select the new filter they want to use
+			#
+			-->
+			<Frame name="SkilletNewFilterDropdown" inherits="UIDropDownMenuTemplate">
+				<Anchors>
+					<Anchor point="LEFT" relativeTo="SkilletSortDescButton" relativePoint="RIGHT">
+						<Offset>
+							<AbsDimension x="0" y="2"/>
+						</Offset>
+					</Anchor>
+				</Anchors>
+			<!--
+				<Layers>
+					<Layer level="ARTWORK">
+						<FontString name="SkilletNewFilterLabel" inherits="GameFontNormal" text="Filter">
+							<Anchors>
+								<Anchor point="RIGHT" relativeTo="$parent" relativePoint="LEFT">
+									<Offset>
+										<AbsDimension x="15" y="2"/>
+									</Offset>
+								</Anchor>
+							</Anchors>
+							<Color r="1" g="1" b="1" a="1"/>
+						</FontString>
+					</Layer>
+				</Layers>
+			-->
+				<Scripts>
+					<OnLoad>
+						Skillet:NewFilterDropdown_OnLoad()
+					</OnLoad>
+					<OnShow>
+						Skillet:NewFilterDropdown_OnShow()
+					</OnShow>
+				</Scripts>
+			</Frame>
+			<!--
+			#
 			# An edit box where users can type in filter text
 			#
 			-->
@@ -1239,7 +1277,7 @@
 						</Texture>
 					</Layer>
 					<Layer level="ARTWORK">
-						<FontString name="SkilletFilterLabel" inherits="GameFontNormal" text="Filter">
+						<FontString name="SkilletFilterLabel" inherits="GameFontNormal" text="Search">
 							<Anchors>
 								<Anchor point="RIGHT" relativeTo="$parent" relativePoint="LEFT">
 									<Offset>
