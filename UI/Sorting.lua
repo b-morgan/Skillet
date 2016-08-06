@@ -284,7 +284,7 @@ function Skillet:CollapseAll()
 	Skillet:SortAndFilterRecipes()
 	Skillet:UpdateTradeSkillWindow()
 end
--- Builds a sorted and fitlered list of recipes for the
+-- Builds a sorted and filtered list of recipes for the
 -- currently selected tradekskill and sorting method
 -- if no sorting, then headers will be included
 
@@ -477,16 +477,18 @@ end
 
 -- called when the new filter drop down is first loaded
 function Skillet:NewFilterDropdown_OnLoad()
+	--DA.DEBUG(0,"NewFilterDropdown_OnLoad()")
 	UIDropDownMenu_Initialize(SkilletNewFilterDropdown, Skillet.NewFilterDropdown_Initialize)
 	SkilletNewFilterDropdown.displayMode = "MENU"  -- changes the pop-up borders to be rounded instead of square
-	UIDropDownMenu_SetSelectedID(SkilletNewFilterDropdown, 1)
 end
 
 -- Called when the new filter drop down is displayed
 function Skillet:NewFilterDropdown_OnShow()
+	--DA.DEBUG(0,"NewFilterDropdown_OnShow()")
 	UIDropDownMenu_Initialize(SkilletNewFilterDropdown, Skillet.NewFilterDropdown_Initialize)
 	SkilletNewFilterDropdown.displayMode = "MENU"  -- changes the pop-up borders to be rounded instead of square
 	if Skillet.unlearnedRecipes then
+		--DA.DEBUG(1,"unlearnedRecipes= true")
 		UIDropDownMenu_SetSelectedID(SkilletNewFilterDropdown, 2)
 	else
 		UIDropDownMenu_SetSelectedID(SkilletNewFilterDropdown, 1)
@@ -495,6 +497,7 @@ end
 
 -- The method we use the initialize the new filter drop down.
 function Skillet:NewFilterDropdown_Initialize()
+	--DA.DEBUG(0,"NewFilterDropdown_Initialize()")
 	local info
 	local i = 1
 
@@ -517,11 +520,11 @@ function Skillet:NewFilterDropdown_Initialize()
 	end
 	UIDropDownMenu_AddButton(info)
 	i = i + 1
-	UIDropDownMenu_SetSelectedID(SkilletNewFilterDropdown, 1)
 end
 
 -- Called when the user selects an item in the new filter drop down
 function Skillet:NewFilterDropdown_OnClick()
+	--DA.DEBUG(0,"NewFilterDropdown_OnClick()")
 	UIDropDownMenu_SetSelectedID(SkilletNewFilterDropdown, self:GetID())
 	local index = self:GetID()
 	if index == 1 then
@@ -531,4 +534,8 @@ function Skillet:NewFilterDropdown_OnClick()
 	end
 	Skillet:ScanTrade()
 	Skillet:UpdateTradeSkillWindow()
+end
+
+function Skillet:RecipeNewFilterOperations_OnClick(self)
+	DA.DEBUG(0,"RecipeNewFilterOperations_OnClick()")
 end
