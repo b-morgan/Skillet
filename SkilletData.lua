@@ -827,6 +827,8 @@ function Skillet:ResetTradeSkillFilter()
 	C_TradeSkillUI.ClearRecipeSourceTypeFilter()
 	C_TradeSkillUI.SetRecipeItemNameFilter(nil)
 	C_TradeSkillUI.SetRecipeItemLevelFilter(0, 0)
+	C_TradeSkillUI.SetOnlyShowLearnedRecipes(true);
+	C_TradeSkillUI.SetOnlyShowUnlearnedRecipes(false);
 end
 
 function Skillet:ExpandTradeSkillSubClass(i)
