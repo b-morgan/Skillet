@@ -479,12 +479,18 @@ end
 function Skillet:NewFilterDropdown_OnLoad()
 	UIDropDownMenu_Initialize(SkilletNewFilterDropdown, Skillet.NewFilterDropdown_Initialize)
 	SkilletNewFilterDropdown.displayMode = "MENU"  -- changes the pop-up borders to be rounded instead of square
+	UIDropDownMenu_SetSelectedID(SkilletNewFilterDropdown, 1)
 end
 
 -- Called when the new filter drop down is displayed
 function Skillet:NewFilterDropdown_OnShow()
 	UIDropDownMenu_Initialize(SkilletNewFilterDropdown, Skillet.NewFilterDropdown_Initialize)
 	SkilletNewFilterDropdown.displayMode = "MENU"  -- changes the pop-up borders to be rounded instead of square
+	if Skillet.unlearnedRecipes then
+		UIDropDownMenu_SetSelectedID(SkilletNewFilterDropdown, 2)
+	else
+		UIDropDownMenu_SetSelectedID(SkilletNewFilterDropdown, 1)
+	end
 end
 
 -- The method we use the initialize the new filter drop down.
@@ -517,6 +523,12 @@ end
 -- Called when the user selects an item in the new filter drop down
 function Skillet:NewFilterDropdown_OnClick()
 	UIDropDownMenu_SetSelectedID(SkilletNewFilterDropdown, self:GetID())
-	Skillet:SortAndFilterRecipes()
+	local index = self:GetID()
+	if index == 1 then
+		Skillet:SetTradeSkillLearned()
+	elseif index == 2 then
+		Skillet:SetTradeSkillUnlearned()
+	end
+	Skillet:ScanTrade()
 	Skillet:UpdateTradeSkillWindow()
 end

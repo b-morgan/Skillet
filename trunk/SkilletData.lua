@@ -827,8 +827,20 @@ function Skillet:ResetTradeSkillFilter()
 	C_TradeSkillUI.ClearRecipeSourceTypeFilter()
 	C_TradeSkillUI.SetRecipeItemNameFilter(nil)
 	C_TradeSkillUI.SetRecipeItemLevelFilter(0, 0)
+--	C_TradeSkillUI.SetOnlyShowLearnedRecipes(true);		-- remove from here to implement learned/unlearned
+--	C_TradeSkillUI.SetOnlyShowUnlearnedRecipes(false);	-- remove from here to implement learned/unlearned
+end
+
+function Skillet:SetTradeSkillLearned()
 	C_TradeSkillUI.SetOnlyShowLearnedRecipes(true);
 	C_TradeSkillUI.SetOnlyShowUnlearnedRecipes(false);
+	Skillet.unlearnedRecipes = false
+end
+
+function Skillet:SetTradeSkillUnlearned()
+	C_TradeSkillUI.SetOnlyShowLearnedRecipes(false);
+	C_TradeSkillUI.SetOnlyShowUnlearnedRecipes(true);
+	Skillet.unlearnedRecipes = true
 end
 
 function Skillet:ExpandTradeSkillSubClass(i)
