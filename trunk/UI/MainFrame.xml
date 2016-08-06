@@ -1196,22 +1196,6 @@
 						</Offset>
 					</Anchor>
 				</Anchors>
-			<!--
-				<Layers>
-					<Layer level="ARTWORK">
-						<FontString name="SkilletNewFilterLabel" inherits="GameFontNormal" text="Filter">
-							<Anchors>
-								<Anchor point="RIGHT" relativeTo="$parent" relativePoint="LEFT">
-									<Offset>
-										<AbsDimension x="15" y="2"/>
-									</Offset>
-								</Anchor>
-							</Anchors>
-							<Color r="1" g="1" b="1" a="1"/>
-						</FontString>
-					</Layer>
-				</Layers>
-			-->
 				<Scripts>
 					<OnLoad>
 						Skillet:NewFilterDropdown_OnLoad()
@@ -1221,6 +1205,27 @@
 					</OnShow>
 				</Scripts>
 			</Frame>
+			<Button name="SkilletNewFilterOperations">
+				<Size>
+					<AbsDimension x="20" y="20"/>
+				</Size>
+				<Anchors>
+					<Anchor point="LEFT" relativeTo="SkilletNewFilterDropdownButton" relativePoint="RIGHT">
+						<Offset>
+							<AbsDimension x="-2" y="0"/>
+						</Offset>
+					</Anchor>
+				</Anchors>
+				<NormalTexture file="Interface\Buttons\UI-SpellbookIcon-NextPage-Up"/>
+				<PushedTexture file="Interface\Buttons\UI-SpellbookIcon-NextPage-Down"/>
+				<HighlightTexture file="Interface\Buttons\ButtonHilight-Round" alphaMode="ADD"/>
+				<Scripts>
+					<OnClick>
+						Skillet:InventoryFilterButtons_Hide()
+						Skillet:RecipeNewFilterOperations_OnClick(self)
+					</OnClick>
+				</Scripts>
+			</Button>
 			<!--
 			#
 			# An edit box where users can type in filter text
