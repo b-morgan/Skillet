@@ -1000,8 +1000,8 @@ function Skillet:InitializeDatabase(player)
 			if not self.db.profile.SavedQueues then
 				self.db.profile.SavedQueues = {}
 			end
+			self:ScanPlayerTradeSkills(player)
 		end
---		self:CollectRecipeInformation()
 	end
 end
 

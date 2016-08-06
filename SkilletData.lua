@@ -992,17 +992,14 @@ end
 
 -- this routine collects the basic data (which tradeskills a player has)
 -- clean = true means wipe the old data
-function Skillet:ScanPlayerTradeSkills(player, clean)
+function Skillet:ScanPlayerTradeSkills(player)
 	--DA.PROFILE("Skillet:ScanPlayerTradeSkills("..tostring(player)..", "..tostring(clean)..")")
 	if player == (UnitName("player")) then -- only for active player
-		if clean or not Skillet.db.realm.tradeSkills[player] then
-			Skillet.db.realm.tradeSkills[player] = {}
-		end
 		local skillRanksData = Skillet.db.realm.tradeSkills[player]
 		for i=1,#TradeSkillList,1 do
 			local id = TradeSkillList[i]
-			local name = GetSpellInfo(id)									-- always returns data
-			local _, rankName, icon = GetSpellInfo(name)					-- only returns data if you have this spell in your spellbook
+			local name = GetSpellInfo(id)					-- always returns data
+			local _, rankName, icon = GetSpellInfo(name)	-- only returns data if you have this spell in your spellbook
 			if rankName then
 				--DA.DEBUG(0,"collecting tradeskill data for "..name)
 				if not skillRanksData[id] then
@@ -1020,7 +1017,6 @@ function Skillet:ScanPlayerTradeSkills(player, clean)
 		end
 		Skillet.db.realm.faction[player] = UnitFactionGroup("player")
 	end
-	return Skillet.db.realm.tradeSkills[player]
 end
 
 function Skillet:EnableUpdateEvents()

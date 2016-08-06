@@ -334,14 +334,15 @@ function Skillet:CreateAllItems(mouse)
 end
 
 function Skillet:ContinueCast(spell)
---	Skillet:StopCast(spell, true)
+	DA.DEBUG(0,"processingCount= "..tostring(Skillet.processingCount))
+	Skillet.processingCount = Skillet.processingCount - 1
+	if Skillet.processingCount == 0 then
+		Skillet:StopCast(spell, true)
+	end
 end
 
 function Skillet:StopCast(spell, success)
 	DA.DEBUG(0,"StopCast("..tostring(spell)..", "..tostring(success)..")")
-	if not self.db.realm.queueData then
-		self.db.realm.queueData = {}
-	end
 	local queue = self.db.realm.queueData[self.currentPlayer]
 	if spell == self.processingSpell then
 		if success then
@@ -368,15 +369,12 @@ function Skillet:StopCast(spell, success)
 				return
 			end
 			if command.op == "iterate" then
-				command.count = command.count - 1
-				if command.count < 1 then
-					self.queuecasting = false
-					self.processingSpell = nil
-					self.processingPosition = nil
-					self.processingCommand = nil
-					self.reagentsChanged = {}
-					self:RemoveFromQueue(qpos)
-				end
+				self.queuecasting = false
+				self.processingSpell = nil
+				self.processingPosition = nil
+				self.processingCommand = nil
+				self.reagentsChanged = {}
+				self:RemoveFromQueue(qpos)
 			end
 		else
 			self.processingSpell = nil
