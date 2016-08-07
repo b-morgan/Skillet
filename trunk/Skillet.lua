@@ -808,8 +808,8 @@ function Skillet:OnInitialize()
 	local _,wowBuild,_,wowVersion = GetBuildInfo();
 	self.wowBuild = wowBuild
 	self.wowVersion = wowVersion
-	if not self.db.global.dataVersion or self.db.global.dataVersion ~= 6 then
-		self.db.global.dataVersion = 6
+	if not self.db.global.dataVersion or self.db.global.dataVersion ~= 7 then
+		self.db.global.dataVersion = 7
 		self:FlushAllData()
 	elseif not self.db.global.wowBuild or self.db.global.wowBuild ~= self.wowBuild then
 		self.db.global.wowBuild = self.wowBuild
