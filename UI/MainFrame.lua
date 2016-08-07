@@ -97,12 +97,12 @@ function Skillet:CreateTradeSkillWindow()
 	if not frame then
 		return frame
 	end
-	if TradeJunkieMain and TJ_OpenButtonTradeSkill then
-		self:AddButtonToTradeskillWindow(TJ_OpenButtonTradeSkill)
+	--DA.DEBUG(0,"oldWidth= "..tostring(frame:GetWidth())..", oldHeight= "..tostring(frame:GetHeight()))
+	if frame:GetWidth() < 710 then
+		frame:SetWidth(710)		-- Reset the window size to the new minimum
 	end
-	if AC_Craft and AC_UseButton and AC_ToggleButton then
-		self:AddButtonToTradeskillWindow(AC_ToggleButton)
-		self:AddButtonToTradeskillWindow(AC_UseButton)
+	if frame:GetHeight() < 545 then
+		frame:SetHeight(545)
 	end
 	frame:SetBackdrop(FrameBackdrop);
 	frame:SetBackdropColor(0.1, 0.1, 0.1)
