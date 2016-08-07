@@ -1196,6 +1196,12 @@ function Skillet:ScanTrade()
 	end
 	local player = Skillet.currentPlayer
 	local tradeID = TradeSkillIDsByName[profession]
+	if not player or not tradeID then
+		DA.DEBUG(0,"ScanTrade: abort! player= "..tostring(player)..", "..tostring(tradeID))
+		skillData.scanned = false
+		return false
+	end
+	Skillet.currentTrade = tradeID
 	if not Skillet.data.skillIndexLookup[player] then
 		Skillet.data.skillIndexLookup[player] = {}
 	end
