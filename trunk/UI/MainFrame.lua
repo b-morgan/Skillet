@@ -558,7 +558,7 @@ function Skillet:TradeButton_OnClick(this,button)
 end
 
 function Skillet:UpdateTradeButtons(player)
-	--DA.DEBUG(0,"UpdateTradeButtons started")
+	--DA.DEBUG(0,"UpdateTradeButtons()")
 	local position = 0 -- pixels
 	local tradeSkillList = self.tradeSkillList
 	local frameName = "SkilletFrameTradeButtons-"..player
@@ -617,7 +617,7 @@ function Skillet:UpdateTradeButtons(player)
 		if InCombatLockdown() then
 			break
 		end
-			local additionalSpellTab = Skillet.AutoButtonsList[i]
+		local additionalSpellTab = Skillet.AutoButtonsList[i]
 		local additionalSpellId = additionalSpellTab[1]
 		local additionalSpellName = additionalSpellTab[2]
 		local spellName, _, spellIcon = GetSpellInfo(additionalSpellId)
@@ -644,7 +644,7 @@ function Skillet:UpdateTradeButtons(player)
 end
 
 function Skillet:UpdateAutoTradeButtons()
-	--DA.DEBUG(0,"UpdateAutoTradeButtons started")
+	--DA.DEBUG(0,"UpdateAutoTradeButtons()")
 	if InCombatLockdown() then
 		self.rescan_auto_targets_timer = nil
 		return
@@ -660,19 +660,21 @@ function Skillet:UpdateAutoTradeButtons()
 				table.insert(Skillet.AutoButtonsList, additionalSpellTab)
 				local additionalSpellId = additionalSpellTab[1]
 				local additionalSpellName = additionalSpellTab[2]
-				local spellName, _, spellIcon = GetSpellInfo(additionalSpellId)
 				local buttonName = "SkilletDo"..additionalSpellName
 				local buttonAutoName = "SkilletAuto"..additionalSpellName
 				local button = _G[buttonName]
 				local buttonAuto = _G[buttonAutoName]
 				if not buttonAuto then
+					--DA.DEBUG(0,"CreateFrame for "..tostring(buttonAutoName))
 					buttonAuto = CreateFrame("Button", buttonAutoName, UIParent, "SkilletTradeButtonAdditionalTemplate")
 					buttonAuto:SetID(additionalSpellId)
 					buttonAuto:SetAttribute("type*", "macro");
 					buttonAuto:Hide()
 				end
 				local macrotext = Skillet:GetAutoTargetMacro(additionalSpellId)
+				--DA.DEBUG(0,"macrotext= "..tostring(macrotext))
 				if button then
+					--DA.DEBUG(0,"SetAttribute for "..tostring(buttonName))
 					button:SetAttribute("macrotext", macrotext)
 				end
 				buttonAuto:SetAttribute("macrotext", macrotext)
@@ -684,9 +686,9 @@ function Skillet:UpdateAutoTradeButtons()
 end
 
 function SkilletPluginDropdown_OnClick(this)
+	--DA.DEBUG(0,"SkilletPluginDropdown_OnClick()")
 	local oldScript = this.oldButton:GetScript("OnClick")
 	oldScript(this)
-	-- DA.DEBUG(0,"click")
 	for i=1,#SkilletFrame.added_buttons do
 		local buttonName = "SkilletPluginDropdown"..i
 		local button = _G[buttonName]
@@ -2195,7 +2197,7 @@ function Skillet:ReagentButtonOnClick(button, skillIndex, reagentIndex)
 		if recipeCount == 1 or myRecipeID then
 			gearTexture:Hide()
 			GameTooltip:Hide()
-			button:Hide()					-- hide the button so that if a new button is shown in this slot, a new "OnEnter" event will fire
+			button:Hide()	-- hide the button so that if a new button is shown in this slot, a new "OnEnter" event will fire
 			newRecipe = self:GetRecipe(newRecipeID)
 			self:PushSkill(self.currentPlayer, self.currentTrade, self.selectedSkill)
 			self:SetTradeSkill(newPlayer, newRecipe.tradeID, skillIndexLookup[newPlayer][newRecipeID])
@@ -2223,6 +2225,7 @@ end
 -- The start/pause queue button.
 function Skillet:StartQueue_OnClick(button,mouse)
 	if self.queuecasting then
+		DA.CHAT("Cancel incomplete processing")
 		self:CancelCast() -- next update will reset the text
 		button:Disable()
 		self.queuecasting = false

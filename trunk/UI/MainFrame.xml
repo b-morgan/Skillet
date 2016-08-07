@@ -1192,7 +1192,7 @@
 				<Anchors>
 					<Anchor point="LEFT" relativeTo="SkilletSortDescButton" relativePoint="RIGHT">
 						<Offset>
-							<AbsDimension x="0" y="2"/>
+							<AbsDimension x="0" y="0"/>
 						</Offset>
 					</Anchor>
 				</Anchors>
@@ -1205,6 +1205,7 @@
 					</OnShow>
 				</Scripts>
 			</Frame>
+			<!--
 			<Button name="SkilletNewFilterOperations">
 				<Size>
 					<AbsDimension x="20" y="20"/>
@@ -1226,6 +1227,7 @@
 					</OnClick>
 				</Scripts>
 			</Button>
+			-->
 			<!--
 			#
 			# An edit box where users can type in filter text
