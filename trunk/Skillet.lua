@@ -1247,7 +1247,7 @@ function Skillet:SkilletShowWindow()
 	end
 	if not self:RescanTrade() then
 		DA.CHAT("No headers, try again");
---		return
+		return
 	end
 	self.currentGroup = nil
 	self.currentGroupLabel = self:GetTradeSkillOption("grouping")
