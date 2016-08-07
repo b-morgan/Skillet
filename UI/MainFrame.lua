@@ -2212,10 +2212,14 @@ end
 function Skillet:SkilletFrameForceClose()
 	if self.dataSource == "api" then
 		self.dataSource = "none"
+		self:HideAllWindows()
+		C_TradeSkillUI.CloseTradeSkill()
+		return true
+	else
+		local x = self:HideAllWindows()
+		C_TradeSkillUI.CloseTradeSkill()
+		return x
 	end
-	self:HideAllWindows()
-	C_TradeSkillUI.CloseTradeSkill()
-	return true
 end
 
 -- The start/pause queue button.
