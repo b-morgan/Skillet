@@ -27,8 +27,11 @@ local COLORYELLOW = "|cffffff00"
 local COLORGREEN =  "|cff40c040"
 local COLORGRAY =   "|cff808080"
 
+-- min height for Skillet window
+local SKILLET_MIN_HEIGHT = 545
+
 -- min width for skill list window
-local SKILLET_SKILLLIST_MIN_WIDTH = 380
+local SKILLET_SKILLLIST_MIN_WIDTH = 440
 
 -- min/max width for the reagent window
 local SKILLET_REAGENT_MIN_WIDTH = 240
@@ -247,7 +250,7 @@ function Skillet:CreateTradeSkillWindow()
 			   20 +                        -- padding between sroll and detail
 			   SKILLET_REAGENT_MIN_WIDTH + -- reagent window (fixed width)
 			   10                          -- padding about window borders
-	self:EnableResize(frame, minwidth, 480, Skillet.UpdateTradeSkillWindow)
+	self:EnableResize(frame, minwidth, SKILLET_MIN_HEIGHT, Skillet.UpdateTradeSkillWindow)
 	-- Set up the sorting methods here
 	self:InitializeSorting()
 	self:ConfigureRecipeControls(false)				-- initial setting

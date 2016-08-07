@@ -1186,11 +1186,10 @@ function Skillet:SkilletShow()
 	else
 		self.currentPlayer = (UnitName("player"))
 	end
-	local tradeSkillID, skillLineName, skillLineRank, skillLineMaxRank, skillLineModifier = C_TradeSkillUI.GetTradeSkillLine();
-	DA.DEBUG(0,"SkilletShow: tradeSkillID= "..tostring(tradeSkillID)..", skillLineName= "..tostring(skillLineName)..
-		", skillLineRank= "..tostring(skillLineRank)..", skillLineRank= "..tostring(skillLineRank)..
-		", skillLineModifier= "..tostring(skillLineModifier))
-	self.currentTrade = self.tradeSkillIDsByName[select(2,C_TradeSkillUI.GetTradeSkillLine())]
+	local skillLineID, skillLineName, skillLineRank, skillLineMaxRank, skillLineModifier = C_TradeSkillUI.GetTradeSkillLine();
+	DA.DEBUG(0,"SkilletShow: skillLineName= "..tostring(skillLineName)..", skillLineRank= "..tostring(skillLineRank)..
+		", skillLineRank= "..tostring(skillLineRank)..", skillLineModifier= "..tostring(skillLineModifier))
+	self.currentTrade = self.tradeSkillIDsByName[skillLineName]
 	DA.DEBUG(0,"SkilletShow: trade= "..tostring(self.currentTrade))
 	local link = C_TradeSkillUI.GetTradeSkillListLink()
 	if link then
