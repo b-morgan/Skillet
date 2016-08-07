@@ -995,6 +995,7 @@ end
 
 -- collects generic tradeskill data (id to name and name to id)
 function Skillet:CollectTradeSkillData()
+	--DA.DEBUG(0,"CollectTradeSkillData()")
 	for i=1,#TradeSkillList,1 do
 		local id = TradeSkillList[i]
 		local name, _, icon = GetSpellInfo(id)
@@ -1007,7 +1008,7 @@ end
 -- this routine collects the basic data (which tradeskills a player has)
 -- clean = true means wipe the old data
 function Skillet:ScanPlayerTradeSkills(player)
-	--DA.PROFILE("Skillet:ScanPlayerTradeSkills("..tostring(player)..", "..tostring(clean)..")")
+	DA.DEBUG(0,"Skillet:ScanPlayerTradeSkills("..tostring(player)..")")
 	if player == (UnitName("player")) then -- only for active player
 		local skillRanksData = Skillet.db.realm.tradeSkills[player]
 		for i=1,#TradeSkillList,1 do
@@ -1015,15 +1016,14 @@ function Skillet:ScanPlayerTradeSkills(player)
 			local name = GetSpellInfo(id)					-- always returns data
 			local _, rankName, icon = GetSpellInfo(name)	-- only returns data if you have this spell in your spellbook
 			if rankName then
-				--DA.DEBUG(0,"collecting tradeskill data for "..name)
+				if id == 2656 then id = 2575 end -- Ye old Smelting vs. Mining issue
 				if not skillRanksData[id] then
+					DA.DEBUG(0,"adding tradeskill data for "..tostring(name).." ("..tostring(id)..")")
 					skillRanksData[id] = {}
 					skillRanksData[id].rank = 0
 					skillRanksData[id].maxRank = 0
+					skillRanksData[id].name = name
 				end
-			else
-				--DA.DEBUG(0,"no tradeskill data for "..name)
-				skillRanksData[id] = nil
 			end
 		end
 		if not Skillet.db.realm.faction then
@@ -1180,9 +1180,8 @@ end
 function Skillet:ScanTrade()
 	--DA.PROFILE("Skillet:ScanTrade()")
 	local link = C_TradeSkillUI.GetTradeSkillListLink()
-	local id, profession, rank, maxRank = C_TradeSkillUI.GetTradeSkillLine()
-	--DA.DEBUG(0,"ScanTrade: id= "..tostring(id)..", profession= "..tostring(profession)..
-		--", rank= "..tostring(rank)..", maxRank= "..tostring(maxRank))
+	local _, profession, rank, maxRank = C_TradeSkillUI.GetTradeSkillLine()
+	DA.DEBUG(0,"ScanTrade: profession= "..tostring(profession)..", rank= "..tostring(rank)..", maxRank= "..tostring(maxRank))
 	if link then
 		--DA.DEBUG(0,"ScanTrade: "..tostring(profession).." link="..link.." "..DA.PLINK(link))
 	else
@@ -1200,6 +1199,7 @@ function Skillet:ScanTrade()
 	Skillet.db.realm.tradeSkills[player][tradeID].link = link
 	Skillet.db.realm.tradeSkills[player][tradeID].rank = rank
 	Skillet.db.realm.tradeSkills[player][tradeID].maxRank = maxRank
+	Skillet.db.realm.tradeSkills[player][tradeID].name = profession
 
 	if #Skillet.db.global.AllRecipe[tradeID] == 0 then
 		Skillet.db.global.AllRecipe[tradeID] = C_TradeSkillUI.GetAllRecipeIDs()
