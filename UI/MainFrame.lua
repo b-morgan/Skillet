@@ -1630,7 +1630,7 @@ function Skillet:UpdateQueueWindow()
 			local queueCommand = queue[itemIndex]
 			if queueCommand then
 				local recipe = self:GetRecipe(queueCommand.recipeID)
-				queueName:SetText((self:GetTradeName(recipe.tradeID) or recipe.tradeID)..":"..(recipe.name or recipeID))
+				queueName:SetText((self:GetTradeName(recipe.tradeID) or recipe.tradeID)..":"..(recipe.name or recipe.recipeID))
 				queueCount:SetText(queueCommand.count)
 			end
 			nameButton:Show()
@@ -2211,15 +2211,11 @@ end
 
 function Skillet:SkilletFrameForceClose()
 	if self.dataSource == "api" then
-		C_TradeSkillUI.CloseTradeSkill()
 		self.dataSource = "none"
-		self:HideAllWindows()
-		return true
-	else
-		C_TradeSkillUI.CloseTradeSkill()
-		local x = self:HideAllWindows()
-		return x
 	end
+	self:HideAllWindows()
+	C_TradeSkillUI.CloseTradeSkill()
+	return true
 end
 
 -- The start/pause queue button.
@@ -2248,7 +2244,7 @@ function Skillet:Tradeskill_OnShow()
 			return self:SkilletFrameForceClose() or found
 		end
 	end
-	DA.DEBUG(0,"Tradeksill_OnShow END")
+	--DA.DEBUG(0,"Tradeksill_OnShow END")
 end
 
 -- Called when the trade skill window is hidden
