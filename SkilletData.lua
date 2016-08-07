@@ -34,7 +34,7 @@ local TradeSkillList = {
 	3908,		-- tailoring
 	2550,		-- cooking
 	3273,		-- first aid
-	53428,		-- runeforging
+--	53428,		-- runeforging
 }
 
 -- Table of follower (C_TradeSkillUI.IsNPCCrafting) tradeskills that should use the Blizzard frame
@@ -51,9 +51,9 @@ Skillet.TradeSkillAdditionalAbilities = {
 	[2550]	= {818,"Basic_Campfire"},	-- cooking = basic campfire
 	[45357] = {51005,"Milling"},		-- inscription = milling
 	[25229] = {31252,"Prospecting"},	-- jewelcrafting = prospecting
-	[2018]	= {126462,"Thermal Anvil"},	 -- blacksmithing = thermal anvil (item:87216)
-	[4036]	= {126462,"Thermal Anvil"},	 -- engineering = thermal anvil (item:87216)
-	[2656]	= {126462,"Thermal Anvil"},	 -- smelting = thermal anvil (item:87216)
+--	[2018]	= {126462,"Thermal_Anvil"},	 -- blacksmithing = thermal anvil (item:87216)
+--	[4036]	= {126462,"Thermal_Anvil"},	 -- engineering = thermal anvil (item:87216)
+--	[2575]	= {126462,"Thermal_Anvil"},	 -- smelting = thermal anvil (item:87216)
 }
 Skillet.AutoButtonsList = {}
 Skillet.TradeSkillAutoTarget = {
@@ -609,33 +609,37 @@ function Skillet:GetTradeSkillInfo(index)
 end
 
 local lastAutoTarget = {}
-function Skillet:GetAutoTargetItem(tradeID)
-	if Skillet.TradeSkillAutoTarget[tradeID] then
-		local itemID = lastAutoTarget[tradeID]
-		if itemID then
-			local limit	 = Skillet.TradeSkillAutoTarget[tradeID][itemID]
+function Skillet:GetAutoTargetItem(addSpellID)
+	--DA.DEBUG(0,"GetAutoTargetItem("..tostring(addSpellID)..")")
+	if Skillet.TradeSkillAutoTarget[addSpellID] then
+		local itemID = lastAutoTarget[addSpellID]
+		--DA.DEBUG(0,"itemID= "..tostring(itemID))
+		if itemID then 
+			local limit = Skillet.TradeSkillAutoTarget[addSpellID][itemID]
 			local count = GetItemCount(itemID)
 			if count >= limit then
 				return itemID
 			end
 		end
-		for itemID,limit in pairs(Skillet.TradeSkillAutoTarget[tradeID]) do
+		for itemID,limit in pairs(Skillet.TradeSkillAutoTarget[addSpellID]) do
 			local count = GetItemCount(itemID)
+			--DA.DEBUG(0,"itemID= "..tostring(itemID)..", limit= "..tostring(limit)..", count= "..tostring(count))
 			if count >= limit then
-				lastAutoTarget[tradeID] = itemID
+				lastAutoTarget[addSpellID] = itemID
 				return itemID
 			end
 		end
-		lastAutoTarget[tradeID] = nil
+		lastAutoTarget[addSpellID] = nil
 	end
 end
 
-function Skillet:GetAutoTargetMacro(additionalSpellId)
-	local itemID = Skillet:GetAutoTargetItem(additionalSpellId)
+function Skillet:GetAutoTargetMacro(addSpellID)
+	--DA.DEBUG(0,"GetAutoTargetMacro("..tostring(addSpellID)..")")
+	local itemID = Skillet:GetAutoTargetItem(addSpellID)
 	if itemID then
-		return "/cast "..(GetSpellInfo(additionalSpellId) or "").."\n/use "..(GetItemInfo(itemID) or "")
+		return "/cast "..(GetSpellInfo(addSpellID) or "").."\n/use "..(GetItemInfo(itemID) or "")
 	else
-		return "/cast "..(GetSpellInfo(additionalSpellId) or "")
+		return "/cast "..(GetSpellInfo(addSpellID) or "")
 	end
 end
 
@@ -714,6 +718,9 @@ function Skillet:CollectRecipeInformation()
 end
 
 -- Checks to see if the current trade is one that we support.
+-- Shift key say we don't support it (even if we do).
+-- 5419  is ?
+-- 53428 is Runeforging
 function Skillet:IsSupportedTradeskill(tradeID)
 	if IsShiftKeyDown() or not tradeID or tradeID == 5419 or tradeID == 53428 then
 		return false

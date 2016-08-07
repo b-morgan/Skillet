@@ -37,7 +37,9 @@ Skillet.alpha = 2 -- Assume this is a released version of Skillet
 if PACKAGE_VERSION then
 	Skillet.version = PACKAGE_VERSION
 	if PACKAGE_VERSION ~= MAJOR_VERSION then
-		Skillet.alpha = 0 -- 0 = This is most likely an alpha version of Skillet, ask the user. 2 = always use Skillet
+		if not string.find(string.lower(PACKAGE_VERSION), "beta") then
+			Skillet.alpha = 0 -- 0 = This is most likely an alpha version of Skillet, ask the user. 2 = always use Skillet
+		end
 	end
 end
 
@@ -714,8 +716,8 @@ Skillet.options =
 			desc = L["RESETDESC"],
 			func = function()
 				if not (UnitAffectingCombat("player")) then
-					SkilletFrame:SetWidth(700);
-					SkilletFrame:SetHeight(600);
+					SkilletFrame:SetWidth(710);
+					SkilletFrame:SetHeight(545);
 					SkilletFrame:SetPoint("TOPLEFT",200,-100);                    
 					SkilletStandalonQueue:SetWidth(385);
 					SkilletStandalonQueue:SetHeight(240);
@@ -1201,7 +1203,7 @@ function Skillet:SkilletShow()
 	-- Verify that the user understands this is an alpha build. 
 	-- Skillet.alpha is 0 for ask the question, 1 to use Blizzard UI, and 2 to use the Skillet UI (if appropriate).
 	-- If the user is smart enough to turn on debugging, skip the question.
-	if self.DebugShow then
+	if self.DebugLogging then
 		self.alpha = 2
 	end
 	if self.alpha == 0 then
@@ -1564,12 +1566,12 @@ function Skillet:AddItemNotesToTooltip(tooltip)
 	-- get item name
 	local name,link = tooltip:GetItem();
 	if not link then 
-		DA.DEBUG(0,"Error: AddItemNotesToTooltip() could not determine link")
+		--DA.DEBUG(0,"Error: AddItemNotesToTooltip() could not determine link")
 		return;
 	end
 	local id = self:GetItemIDFromLink(link)
 	if not id then
-		DA.DEBUG(0,"Error: AddItemNotesToTooltip() could not determine id from "..DA.PLINK(link))
+		--DA.DEBUG(0,"Error: AddItemNotesToTooltip() could not determine id from "..DA.PLINK(link))
 		return
 	end
 	--DA.DEBUG(1,"link= "..tostring(link)..", id= "..tostring(id)..", notes= "..tostring(notes_enabled)..", crafters= "..tostring(crafters_enabled))
