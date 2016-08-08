@@ -488,7 +488,6 @@ function Skillet:NewFilterDropdown_OnShow()
 	UIDropDownMenu_Initialize(SkilletNewFilterDropdown, Skillet.NewFilterDropdown_Initialize)
 	SkilletNewFilterDropdown.displayMode = "MENU"  -- changes the pop-up borders to be rounded instead of square
 	if Skillet.unlearnedRecipes then
-		--DA.DEBUG(1,"unlearnedRecipes= true")
 		UIDropDownMenu_SetSelectedID(SkilletNewFilterDropdown, 2)
 	else
 		UIDropDownMenu_SetSelectedID(SkilletNewFilterDropdown, 1)
