@@ -834,20 +834,20 @@ function Skillet:ResetTradeSkillFilter()
 	C_TradeSkillUI.ClearRecipeSourceTypeFilter()
 	C_TradeSkillUI.SetRecipeItemNameFilter(nil)
 	C_TradeSkillUI.SetRecipeItemLevelFilter(0, 0)
---	C_TradeSkillUI.SetOnlyShowLearnedRecipes(true);		-- remove from here to implement learned/unlearned
---	C_TradeSkillUI.SetOnlyShowUnlearnedRecipes(false);	-- remove from here to implement learned/unlearned
 end
 
 function Skillet:SetTradeSkillLearned()
 	C_TradeSkillUI.SetOnlyShowLearnedRecipes(true);
 	C_TradeSkillUI.SetOnlyShowUnlearnedRecipes(false);
 	Skillet.unlearnedRecipes = false
+	Skillet:NewFilterDropdown_OnShow()
 end
 
 function Skillet:SetTradeSkillUnlearned()
 	C_TradeSkillUI.SetOnlyShowLearnedRecipes(false);
 	C_TradeSkillUI.SetOnlyShowUnlearnedRecipes(true);
 	Skillet.unlearnedRecipes = true
+	Skillet:NewFilterDropdown_OnShow()
 end
 
 function Skillet:ExpandTradeSkillSubClass(i)
@@ -1198,7 +1198,7 @@ function Skillet:ScanTrade()
 	local tradeID = TradeSkillIDsByName[profession]
 	if not player or not tradeID then
 		DA.DEBUG(0,"ScanTrade: abort! player= "..tostring(player)..", "..tostring(tradeID))
-		skillData.scanned = false
+		Skillet.scanInProgress = false
 		return false
 	end
 	Skillet.currentTrade = tradeID

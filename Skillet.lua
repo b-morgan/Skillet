@@ -1116,6 +1116,7 @@ function Skillet:TRADE_SKILL_DETAILS_UPDATE()
 	if Skillet.tradeSkillOpen then
 		Skillet.detailsUpdate = true
 		Skillet:ScanTrade()
+		Skillet:UpdateTradeSkillWindow()
 	end
 end
 
