@@ -567,7 +567,7 @@ function Skillet:UpdateTradeButtons(player)
 		frame = CreateFrame("Frame", frameName, SkilletFrame)
 	end
 	frame:Show()
-		for i=1,#tradeSkillList,1 do	-- iterate thru all skills in defined order for neatness (professions, secondary, class skills)
+	for i=1,#tradeSkillList,1 do	-- iterate thru all skills in defined order for neatness (professions, secondary, class skills)
 		local tradeID = tradeSkillList[i]
 		local ranks = self:GetSkillRanks(player, tradeID)
 		local tradeLink
@@ -612,8 +612,8 @@ function Skillet:UpdateTradeButtons(player)
 			button:Show()
 		end
 	end
-		position = position + 10
-		for i=1,#Skillet.AutoButtonsList,1 do	-- iterate thru all skills in defined order for neatness (professions, secondary, class skills)
+	position = position + 10
+	for i=1,#Skillet.AutoButtonsList,1 do	-- iterate thru all skills in defined order for neatness (professions, secondary, class skills)
 		if InCombatLockdown() then
 			break
 		end
@@ -625,11 +625,12 @@ function Skillet:UpdateTradeButtons(player)
 		local button = _G[buttonName]
 		if not button then
 			button = CreateFrame("Button", buttonName, frame, "SkilletTradeButtonAdditionalTemplate")
+			--DA.DEBUG(0,"CreateFrame for "..tostring(buttonName))
 			button:SetID(additionalSpellId)
 			-- no modifier - pure spell
-			button:SetAttribute("type1", "spell");
-			button:SetAttribute("type2", "macro");
-			button:SetAttribute("alt-type*", "macro");
+--			button:SetAttribute("type1", "spell");
+--			button:SetAttribute("type2", "macro");
+--			button:SetAttribute("type", "macro");
 			button:SetAttribute("spell", additionalSpellId);
 		end
 		button:ClearAllPoints()
@@ -668,7 +669,7 @@ function Skillet:UpdateAutoTradeButtons()
 					--DA.DEBUG(0,"CreateFrame for "..tostring(buttonAutoName))
 					buttonAuto = CreateFrame("Button", buttonAutoName, UIParent, "SkilletTradeButtonAdditionalTemplate")
 					buttonAuto:SetID(additionalSpellId)
-					buttonAuto:SetAttribute("type*", "macro");
+					buttonAuto:SetAttribute("type", "macro");
 					buttonAuto:Hide()
 				end
 				local macrotext = Skillet:GetAutoTargetMacro(additionalSpellId)
