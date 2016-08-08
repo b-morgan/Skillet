@@ -51,9 +51,9 @@ Skillet.TradeSkillAdditionalAbilities = {
 	[2550]	= {818,"Basic_Campfire"},	-- cooking = basic campfire
 	[45357] = {51005,"Milling"},		-- inscription = milling
 	[25229] = {31252,"Prospecting"},	-- jewelcrafting = prospecting
---	[2018]	= {126462,"Thermal_Anvil"},	 -- blacksmithing = thermal anvil (item:87216)
---	[4036]	= {126462,"Thermal_Anvil"},	 -- engineering = thermal anvil (item:87216)
---	[2575]	= {126462,"Thermal_Anvil"},	 -- smelting = thermal anvil (item:87216)
+	[2018]	= {126462,"Thermal_Anvil"},	 -- blacksmithing = thermal anvil (item:87216)
+	[4036]	= {126462,"Thermal_Anvil"},	 -- engineering = thermal anvil (item:87216)
+	[2575]	= {126462,"Thermal_Anvil"},	 -- smelting = thermal anvil (item:87216)
 }
 Skillet.AutoButtonsList = {}
 Skillet.TradeSkillAutoTarget = {
