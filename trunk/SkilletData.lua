@@ -1778,7 +1778,7 @@ function Skillet:ScanTrade()
 			if (not itemID or tonumber(itemID) == 0) then
 				DA.DEBUG(0,"recipeID= "..tostring(recipeID)..", itemID= "..tostring(itemID))
 			end
-			if not recipeInfo.alternateVerb then
+			if not recipeInfo.alternateVerb or recipeInfo.alternateVerb ~= ENSCRIBE then
 				local minMade,maxMade = C_TradeSkillUI.GetRecipeNumItemsProduced(recipeID)
 				recipeInfo.minMade = minMade	-- save a copy for our records
 				recipeInfo.maxMade = maxMade	-- save a copy for our records
@@ -1790,7 +1790,7 @@ function Skillet:ScanTrade()
 					itemString = tostring(itemID)
 				end
 				Skillet:ItemDataAddRecipeSource(itemID,recipeID) -- add a cross reference for the source of particular items
-			elseif recipeInfo.alternateVerb == ENSCRIBE then
+			else 
 				recipe.numMade = 1
 				recipeInfo.numMade = 1
 -- Sure wish there was a better way to do this. I hate having to maintain this table.
