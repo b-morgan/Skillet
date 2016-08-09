@@ -558,7 +558,7 @@ function Skillet:TradeButton_OnClick(this,button)
 end
 
 function Skillet:UpdateTradeButtons(player)
-	--DA.DEBUG(0,"UpdateTradeButtons()")
+	DA.DEBUG(0,"UpdateTradeButtons()")
 	local position = 0 -- pixels
 	local tradeSkillList = self.tradeSkillList
 	local frameName = "SkilletFrameTradeButtons-"..player
@@ -586,6 +586,7 @@ function Skillet:UpdateTradeButtons(player)
 			local buttonName = "SkilletFrameTradeButton-"..player.."-"..tradeID
 			local button = _G[buttonName]
 			if not button then
+				DA.DEBUG(0,"CreateFrame for "..tostring(buttonName))
 				button = CreateFrame("CheckButton", buttonName, frame, "SkilletTradeButtonTemplate")
 			end
 			if player ~= UnitName("player") and not tradeLink then						-- fade out buttons that don't have data collected
@@ -613,10 +614,8 @@ function Skillet:UpdateTradeButtons(player)
 		end
 	end
 	position = position + 10
+	DA.DEBUG(0,"doing "..tostring(#Skillet.AutoButtonsList).." AutoButtonsList entries")
 	for i=1,#Skillet.AutoButtonsList,1 do	-- iterate thru all skills in defined order for neatness (professions, secondary, class skills)
-		if InCombatLockdown() then
-			break
-		end
 		local additionalSpellTab = Skillet.AutoButtonsList[i]
 		local additionalSpellId = additionalSpellTab[1]
 		local additionalSpellName = additionalSpellTab[2]
@@ -624,14 +623,13 @@ function Skillet:UpdateTradeButtons(player)
 		local buttonName = "SkilletDo"..additionalSpellName
 		local button = _G[buttonName]
 		if not button then
+			DA.DEBUG(0,"CreateFrame for "..tostring(buttonName))
 			button = CreateFrame("Button", buttonName, frame, "SkilletTradeButtonAdditionalTemplate")
-			--DA.DEBUG(0,"CreateFrame for "..tostring(buttonName))
 			button:SetID(additionalSpellId)
-			-- no modifier - pure spell
---			button:SetAttribute("type1", "spell");
---			button:SetAttribute("type2", "macro");
---			button:SetAttribute("type", "macro");
-			button:SetAttribute("spell", additionalSpellId);
+			button:SetAttribute("type", "macro");
+			local macrotext = Skillet:GetAutoTargetMacro(additionalSpellId)
+			--DA.DEBUG(0,"macrotext= "..tostring(macrotext))
+			button:SetAttribute("macrotext", macrotext)
 		end
 		button:ClearAllPoints()
 		button:SetPoint("BOTTOMLEFT", SkilletRankFrame, "TOPLEFT", position, 0)
@@ -640,50 +638,22 @@ function Skillet:UpdateTradeButtons(player)
 		position = position + button:GetWidth()
 		button:Show()
 	end
-	Skillet:UpdateAutoTradeButtons()
-	--DA.DEBUG(0,"UpdateTradeButtons complete")
 end
 
 function Skillet:UpdateAutoTradeButtons()
-	--DA.DEBUG(0,"UpdateAutoTradeButtons()")
-	if InCombatLockdown() then
-		self.rescan_auto_targets_timer = nil
-		return
-	end
+	DA.DEBUG(0,"UpdateAutoTradeButtons()")
 	local tradeSkillList = self.tradeSkillList
 	Skillet.AutoButtonsList = {}
 	for i=1,#tradeSkillList,1 do
 		local tradeID = tradeSkillList[i]
 		local ranks = self:GetSkillRanks(UnitName("player"), tradeID)
-		if ranks then
+		if ranks then	-- this player knows this skill
 			local additionalSpellTab = Skillet.TradeSkillAdditionalAbilities[tradeID]
-			if additionalSpellTab then
+			if additionalSpellTab then -- this skill has additional abilities
 				table.insert(Skillet.AutoButtonsList, additionalSpellTab)
-				local additionalSpellId = additionalSpellTab[1]
-				local additionalSpellName = additionalSpellTab[2]
-				local buttonName = "SkilletDo"..additionalSpellName
-				local buttonAutoName = "SkilletAuto"..additionalSpellName
-				local button = _G[buttonName]
-				local buttonAuto = _G[buttonAutoName]
-				if not buttonAuto then
-					--DA.DEBUG(0,"CreateFrame for "..tostring(buttonAutoName))
-					buttonAuto = CreateFrame("Button", buttonAutoName, UIParent, "SkilletTradeButtonAdditionalTemplate")
-					buttonAuto:SetID(additionalSpellId)
-					buttonAuto:SetAttribute("type", "macro");
-					buttonAuto:Hide()
-				end
-				local macrotext = Skillet:GetAutoTargetMacro(additionalSpellId)
-				--DA.DEBUG(0,"macrotext= "..tostring(macrotext))
-				if button then
-					--DA.DEBUG(0,"SetAttribute for "..tostring(buttonName))
-					button:SetAttribute("macrotext", macrotext)
-				end
-				buttonAuto:SetAttribute("macrotext", macrotext)
 			end
 		end
 	end
-	self.rescan_auto_targets_timer = nil
-	--DA.DEBUG(0,"UpdateAutoTradeButtons complete")
 end
 
 function SkilletPluginDropdown_OnClick(this)

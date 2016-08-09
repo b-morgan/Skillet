@@ -55,7 +55,7 @@ Skillet.TradeSkillAdditionalAbilities = {
 	[4036]	= {126462,"Thermal_Anvil"},	 -- engineering = thermal anvil (item:87216)
 	[2575]	= {126462,"Thermal_Anvil"},	 -- smelting = thermal anvil (item:87216)
 }
-Skillet.AutoButtonsList = {}
+
 Skillet.TradeSkillAutoTarget = {
 	[7411] =  {	  -- Enchanting
 		[38682] = 1, -- Enchanting Vellum
@@ -1334,6 +1334,7 @@ function Skillet:ScanTrade()
 		local skillDBString = DifficultyChar[skillType]..tostring(recipeID)
 
 		local tools = { C_TradeSkillUI.GetRecipeTools(recipeID) }
+		recipeInfo.tools = tools	-- save a copy for our records
 		skillData[i].tools = {}
 		local slot = 1
 		for t=2,#tools,2 do
@@ -1372,21 +1373,38 @@ function Skillet:ScanTrade()
 
 		local itemLink = C_TradeSkillUI.GetRecipeItemLink(recipeID)
 		--DA.DEBUG(2,"itemLink = "..DA.PLINK(itemLink))
+		recipeInfo.itemLink = itemLink	-- save a copy for our records
 		if itemLink then
 			local itemID = Skillet:GetItemIDFromLink(itemLink)
 			--DA.DEBUG(2,"itemID= "..tostring(itemID))
 			if (not itemID or tonumber(itemID) == 0) then
 				DA.DEBUG(0,"recipeID= "..tostring(recipeID)..", itemID= "..tostring(itemID))
 			end
-			local minMade,maxMade = C_TradeSkillUI.GetRecipeNumItemsProduced(recipeID)
-			recipe.itemID = itemID
-			recipe.numMade = (minMade + maxMade)/2
-			if recipe.numMade > 1 then
-				itemString = itemID..":"..recipe.numMade
-			else
-				itemString = tostring(itemID)
+			if not recipeInfo.alternateVerb then
+				local minMade,maxMade = C_TradeSkillUI.GetRecipeNumItemsProduced(recipeID)
+				recipeInfo.minMade = minMade	-- save a copy for our records
+				recipeInfo.maxMade = maxMade	-- save a copy for our records
+				recipe.itemID = itemID
+				recipe.numMade = (minMade + maxMade)/2
+				if recipe.numMade > 1 then
+					itemString = itemID..":"..recipe.numMade
+				else
+					itemString = tostring(itemID)
+				end
+				Skillet:ItemDataAddRecipeSource(itemID,recipeID) -- add a cross reference for the source of particular items
+			elseif recipeInfo.alternateVerb == ENSCRIBE then
+				recipe.numMade = 1
+				recipeInfo.numMade = 1
+-- Sure wish there was a better way to do this. I hate having to maintain this table.
+				if Skillet.scrollData[recipeID] then
+					local itemID = Skillet.scrollData[recipeID]
+					recipe.itemID = itemID
+					itemString = itemID
+					Skillet:ItemDataAddRecipeSource(itemID,recipeID)	-- add a cross reference for the source of particular items
+				else
+					recipe.itemID = 0	-- indicates an enchant
+				end
 			end
-			Skillet:ItemDataAddRecipeSource(itemID,recipeID) -- add a cross reference for the source of particular items
 		else
 			DA.DEBUG(0,"recipeID= "..tostring(recipeID).." has no itemLink")
 		end
