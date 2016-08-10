@@ -558,7 +558,7 @@ function Skillet:TradeButton_OnClick(this,button)
 end
 
 function Skillet:UpdateTradeButtons(player)
-	DA.DEBUG(0,"UpdateTradeButtons()")
+	--DA.DEBUG(0,"UpdateTradeButtons()")
 	local position = 0 -- pixels
 	local tradeSkillList = self.tradeSkillList
 	local frameName = "SkilletFrameTradeButtons-"..player
@@ -614,7 +614,7 @@ function Skillet:UpdateTradeButtons(player)
 		end
 	end
 	position = position + 10
-	DA.DEBUG(0,"doing "..tostring(#Skillet.AutoButtonsList).." AutoButtonsList entries")
+	--DA.DEBUG(0,"doing "..tostring(#Skillet.AutoButtonsList).." AutoButtonsList entries")
 	for i=1,#Skillet.AutoButtonsList,1 do	-- iterate thru all skills in defined order for neatness (professions, secondary, class skills)
 		local additionalSpellTab = Skillet.AutoButtonsList[i]
 		local additionalSpellId = additionalSpellTab[1]
@@ -623,7 +623,7 @@ function Skillet:UpdateTradeButtons(player)
 		local buttonName = "SkilletDo"..additionalSpellName
 		local button = _G[buttonName]
 		if not button then
-			DA.DEBUG(0,"CreateFrame for "..tostring(buttonName))
+			--DA.DEBUG(0,"CreateFrame for "..tostring(buttonName))
 			button = CreateFrame("Button", buttonName, frame, "SkilletTradeButtonAdditionalTemplate")
 			button:SetID(additionalSpellId)
 			button:SetAttribute("type", "macro");
@@ -641,7 +641,7 @@ function Skillet:UpdateTradeButtons(player)
 end
 
 function Skillet:UpdateAutoTradeButtons()
-	DA.DEBUG(0,"UpdateAutoTradeButtons()")
+	--DA.DEBUG(0,"UpdateAutoTradeButtons()")
 	local tradeSkillList = self.tradeSkillList
 	Skillet.AutoButtonsList = {}
 	for i=1,#tradeSkillList,1 do
@@ -693,7 +693,6 @@ function Skillet:PluginButton_OnClick(button)
 			else
 				button:Show()
 			end
-			--DA.DEBUG(0,"okay")
 		end
 	end
 end
@@ -2219,7 +2218,6 @@ function Skillet:Tradeskill_OnShow()
 			return self:SkilletFrameForceClose() or found
 		end
 	end
-	--DA.DEBUG(0,"Tradeksill_OnShow END")
 end
 
 -- Called when the trade skill window is hidden
