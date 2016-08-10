@@ -1752,6 +1752,8 @@ function Skillet:ScanTrade()
 		skillData[i].color = skill_style_type[skillType]
 		local skillDBString = DifficultyChar[skillType]..tostring(recipeID)
 
+		recipeInfo.sourceText = C_TradeSkillUI.GetRecipeSourceText(recipeID); -- capture for later use
+
 		local tools = { C_TradeSkillUI.GetRecipeTools(recipeID) }
 		recipeInfo.tools = tools	-- save a copy for our records
 		skillData[i].tools = {}
