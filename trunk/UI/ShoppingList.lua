@@ -650,7 +650,7 @@ end
 -- Event fires after all applicable BAG_UPDATE events for a specific action have been fired.
 -- It doesn't happen as often as BAG_UPDATE so its a better event for us to use.
 function Skillet:BAG_UPDATE_DELAYED(event)
-	DA.DEBUG(2,"BAG_UPDATE_DELAYED")
+	--DA.DEBUG(0,"BAG_UPDATE_DELAYED")
 	if Skillet.bankBusy then
 		DA.DEBUG(1,"BAG_UPDATE_DELAYED and bankBusy")
 		Skillet.gotBagUpdateEvent = true

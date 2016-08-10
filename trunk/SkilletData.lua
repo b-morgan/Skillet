@@ -1441,11 +1441,13 @@ end
 function Skillet:EnableUpdateEvents()
 	self:RegisterEvent("CHAT_MSG_SKILL")
 	self:RegisterEvent("CHAT_MSG_SYSTEM")
+	self:RegisterEvent("CHAT_MSG_TRADESKILLS")
 end
 
 function Skillet:DisableUpdateEvents()
 	self:UnregisterEvent("CHAT_MSG_SKILL")
 	self:UnregisterEvent("CHAT_MSG_SYSTEM")
+	self:UnregisterEvent("CHAT_MSG_TRADESKILLS")
 end
 
 function Skillet:EnableDataGathering(addon)
@@ -1455,17 +1457,23 @@ function Skillet:EnableDataGathering(addon)
 end
 
 function Skillet:EnableQueue(addon)
+	self:RegisterEvent("UNIT_SPELLCAST_START")
+	self:RegisterEvent("UNIT_SPELLCAST_SENT")
 	self:RegisterEvent("UNIT_SPELLCAST_SUCCEEDED")
 	self:RegisterEvent("UNIT_SPELLCAST_FAILED")
 	self:RegisterEvent("UNIT_SPELLCAST_INTERRUPTED")
-	self:RegisterEvent("UNIT_SPELLCAST_STOPPED")
+	self:RegisterEvent("UNIT_SPELLCAST_DELAYED")
+	self:RegisterEvent("UNIT_SPELLCAST_STOP")
 end
 
 function Skillet:DisableQueue(addon)
+	self:UnregisterEvent("UNIT_SPELLCAST_START")
+	self:UnregisterEvent("UNIT_SPELLCAST_SENT")
 	self:UnregisterEvent("UNIT_SPELLCAST_SUCCEEDED")
 	self:UnregisterEvent("UNIT_SPELLCAST_FAILED")
 	self:UnregisterEvent("UNIT_SPELLCAST_INTERRUPTED")
-	self:UnregisterEvent("UNIT_SPELLCAST_STOPPED")
+	self:UnregisterEvent("UNIT_SPELLCAST_DELAYED")
+	self:UnregisterEvent("UNIT_SPELLCAST_STOP")
 end
 
 -- takes a profession and a skill index and returns the recipe
@@ -1482,6 +1490,14 @@ function Skillet:GetRecipeDataByTradeIndex(tradeID, index)
 		end
 	end
 	return self.unknownRecipe
+end
+
+function Skillet:UNIT_SPELLCAST_SENT(event, unit, spell)
+	--DA.DEBUG(0,"UNIT_SPELLCAST_SENT("..tostring(unit)..", "..tostring(spell)..")")
+end
+
+function Skillet:UNIT_SPELLCAST_START(event, unit, spell)
+	--DA.DEBUG(0,"UNIT_SPELLCAST_START("..tostring(unit)..", "..tostring(spell)..")")
 end
 
 function Skillet:UNIT_SPELLCAST_SUCCEEDED(event, unit, spell)
@@ -1505,20 +1521,27 @@ function Skillet:UNIT_SPELLCAST_INTERRUPTED(event, unit, spell)
 	end
 end
 
-function Skillet:UNIT_SPELLCAST_STOPPED(event, unit, spell)
-	DA.DEBUG(0,"UNIT_SPELLCAST_STOPPED("..tostring(unit)..", "..tostring(spell)..")")
-	if unit == "player" and spell==self.processingSpell then
-		self:StopCast(spell)
-	end
+function Skillet:UNIT_SPELLCAST_DELAYED(event, unit, spell)
+	DA.DEBUG(0,"UNIT_SPELLCAST_DELAYED("..tostring(unit)..", "..tostring(spell)..")")
 end
 
+function Skillet:UNIT_SPELLCAST_STOP(event, unit, spell)
+	--DA.DEBUG(0,"UNIT_SPELLCAST_STOP("..tostring(unit)..", "..tostring(spell)..")")
+end
 
-function Skillet:CHAT_MSG_SKILL()
-	DA.DEBUG(0,"CHAT_MSG_SKILL")
+function Skillet:CHAT_MSG_SKILL(event,msg)
+	--DA.DEBUG(0,"CHAT_MSG_SKILL")
+	--DA.DEBUG(0,"msg= "..tostring(msg))
 end
 
 function Skillet:CHAT_MSG_SYSTEM(event,msg)
 	--DA.DEBUG(0,"CHAT_MSG_SYSTEM")
+	--DA.DEBUG(0,"msg= "..tostring(msg))
+end
+
+function Skillet:CHAT_MSG_TRADESKILLS(event,msg)
+	--DA.DEBUG(0,"CHAT_MSG_TRADESKILLS")
+	--DA.DEBUG(0,"msg= "..tostring(msg))
 end
 
 function Skillet:CalculateCraftableCounts(playerOverride)
@@ -1536,7 +1559,6 @@ function Skillet:CalculateCraftableCounts(playerOverride)
 			end
 		end
 	end
-	--DA.DEBUG(0,"CalculateCraftableCounts Complete")
 end
 
 function Skillet:RescanTrade()
@@ -1789,17 +1811,15 @@ function Skillet:ScanTrade()
 				else
 					itemString = tostring(itemID)
 				end
-				Skillet:ItemDataAddRecipeSource(itemID,recipeID) -- add a cross reference for the source of particular items
+				Skillet:ItemDataAddRecipeSource(itemID,recipeID) -- add a cross reference for the source of this item
 			else 
 				recipe.numMade = 1
 				recipeInfo.numMade = 1
--- Sure wish there was a better way to do this. I hate having to maintain this table.
-				if Skillet.scrollData[recipeID] then
+				if Skillet.scrollData[recipeID] then	-- note that this table is maintained by datamining
 					local itemID = Skillet.scrollData[recipeID]
 					recipe.itemID = itemID
 					itemString = itemID
-					Skillet:ItemDataAddRecipeSource(itemID,recipeID)	-- add a cross reference for the source of particular items
-				else
+					Skillet:ItemDataAddRecipeSource(itemID,recipeID)	-- add a cross reference for the source of this item
 					recipe.itemID = 0	-- indicates an enchant
 				end
 			end

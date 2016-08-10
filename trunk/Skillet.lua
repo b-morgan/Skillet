@@ -1298,7 +1298,7 @@ end
 
 -- So we can track when the players inventory changes and update craftable counts
 function Skillet:BAG_UPDATE(event, bagID)
-	--DA.DEBUG(2,"BAG_UPDATE( "..bagID.." )")
+	--DA.DEBUG(0,"BAG_UPDATE( "..bagID.." )")
 	local showing = false
 	if self.tradeSkillFrame and self.tradeSkillFrame:IsVisible() then
 		showing = true

@@ -258,16 +258,16 @@ function Skillet:ProcessQueue(altMode)
 				local itemID = Skillet:GetAutoTargetItem(recipe.tradeID)
 				if itemID then
 					self.processingCount = 1
-					DA.DEBUG(0,"altMode Crafting: "..tostring(command.recipeID).." and using "..tostring(itemID))
+					DA.DEBUG(0,"altMode Crafting: "..tostring(command.recipeID).." and using "..tostring(itemID)..", "..tostring(self.processingSpell))
 					C_TradeSkillUI.CraftRecipe(command.recipeID,1)
 					UseItemByName(itemID)
 					self.queuecasting = false
 				else
-					DA.DEBUG(0,"altMode Crafting: "..tostring(command.count).." of "..tostring(command.recipeID))
+					DA.DEBUG(0,"altMode Crafting: "..tostring(command.count).." of "..tostring(command.recipeID)..", "..tostring(self.processingSpell))
 					C_TradeSkillUI.CraftRecipe(command.recipeID,command.count)
 				end
 			else
-				DA.DEBUG(0,"Crafting: "..tostring(command.count).." of "..tostring(command.recipeID))
+				DA.DEBUG(0,"Crafting: "..tostring(command.count).." of "..tostring(command.recipeID)..", "..tostring(self.processingSpell))
 				C_TradeSkillUI.CraftRecipe(command.recipeID,command.count)
 			end
 			self.adjustInventory = true
@@ -334,12 +334,13 @@ function Skillet:CreateAllItems(mouse)
 end
 
 function Skillet:ContinueCast(spell)
-	DA.DEBUG(0,"processingCount= "..tostring(Skillet.processingCount))
-	Skillet.processingCount = Skillet.processingCount - 1
-	if Skillet.processingCount == 0 then
-		Skillet:StopCast(spell, true)
-	end
+	DA.DEBUG(0,"ContinueCast("..tostring(spell)..")")
 	if spell == self.processingSpell then
+		DA.DEBUG(0,"processingCount= "..tostring(Skillet.processingCount))
+		Skillet.processingCount = Skillet.processingCount - 1
+		if Skillet.processingCount == 0 then
+			Skillet:StopCast(spell, true)
+		end
 		local queue = self.db.realm.queueData[self.currentPlayer]
 		local qpos = self.processingPosition
 		if queue[qpos] and queue[qpos] == self.processingCommand then
@@ -354,9 +355,9 @@ end
 
 function Skillet:StopCast(spell, success)
 	DA.DEBUG(0,"StopCast("..tostring(spell)..", "..tostring(success)..")")
-	local queue = self.db.realm.queueData[self.currentPlayer]
 	if spell == self.processingSpell then
 		if success then
+			local queue = self.db.realm.queueData[self.currentPlayer]
 			local qpos = self.processingPosition or 1
 			local command = nil
 			if not queue[qpos] or queue[qpos] ~= self.processingCommand then
@@ -408,9 +409,6 @@ end
 -- Removes an item from the queue
 function Skillet:RemoveQueuedCommand(queueIndex)
 	DA.DEBUG(0,"RemoveQueuedCommand("..tostring(queueIndex)..")")
-	if queueIndex == 1 then
-		self:CancelCast()
-	end
 	self.reagentsChanged = {}
 	self:RemoveFromQueue(queueIndex)
 	self:UpdateQueueWindow()
