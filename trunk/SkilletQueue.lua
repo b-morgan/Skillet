@@ -23,7 +23,7 @@ Skillet.reagentsChanged = {}
 
 -- iterates through a list of reagentIDs and recalculates craftability
 function Skillet:AdjustInventory()
-	DA.DEBUG(0,"AdjustInventory")
+	DA.DEBUG(0,"AdjustInventory()")
 	-- update queue for faster response time
 	self:UpdateQueueWindow()
 	if self.reagentsChanged then
@@ -32,7 +32,6 @@ function Skillet:AdjustInventory()
 		end
 	end
 	self:CalculateCraftableCounts()
-	self.dataScanned = false
 	self.reagentsChanged = {}
 	-- update whole window to show craft counts
 	self:UpdateTradeSkillWindow()
@@ -188,7 +187,6 @@ function Skillet:ClearQueue()
 	if #self.db.realm.queueData[self.currentPlayer]>0 then
 		self.db.realm.queueData[self.currentPlayer] = {}
 		self.db.realm.reagentsInQueue[self.currentPlayer] = {}
-		self.dataScanned = false
 		self:UpdateTradeSkillWindow()
 	end
 end

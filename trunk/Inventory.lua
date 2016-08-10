@@ -137,7 +137,7 @@ function Skillet:InventorySkillIterations(tradeID, skillIndex, playerOverride)
 end
 
 function Skillet:InventoryScan(playerOverride)
-	DA.DEBUG(0,"InventoryScan("..tostring(playerOverride)..")")
+	--DA.DEBUG(0,"InventoryScan("..tostring(playerOverride)..")")
 	if self.linkedSkill or self.isGuild then
 		return
 	end
@@ -182,7 +182,6 @@ function Skillet:InventoryScan(playerOverride)
 			end
 		end
 	end
-		DA.DEBUG(0,"InventoryScan complete for "..tostring(player))
 end
 
 function Skillet:GetInventory(player, reagentID)

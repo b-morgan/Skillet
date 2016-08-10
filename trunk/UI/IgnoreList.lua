@@ -231,7 +231,6 @@ function Skillet:internal_DisplayIgnoreList()
 		frame:Show()
 	end
 	self:UpdateIgnoreListWindow()
-	DA.DEBUG(0,"internal_DisplayIgnoreList complete")
 end
 
 function Skillet:internal_HideIgnoreList()

@@ -1598,7 +1598,6 @@ function Skillet:RescanTrade()
 		Skillet.db.global.Categories[tradeID] = {}
 	end
 	Skillet.dataScanned = self:ScanTrade()
-	--DA.DEBUG(0,"Skillet:RescanTrade Complete")
 	Skillet:EnableUpdateEvents()
 	Skillet.scanInProgress = false
 	return Skillet.dataScanned

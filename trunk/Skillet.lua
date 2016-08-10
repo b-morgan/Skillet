@@ -1407,12 +1407,11 @@ function Skillet:UpdateTradeSkill()
 		-- this fires off a redraw event, so only change after data has been acquired
 		filterbox:SetText(filtertext);
 	end
-	DA.DEBUG(0,"UPDATE TRADE SKILL complete")
 end
 
 -- Shows the trade skill frame.
 function Skillet:internal_ShowTradeSkillWindow()
-	DA.DEBUG(0,"internal_ShowTradeSkillWindow")
+	--DA.DEBUG(0,"internal_ShowTradeSkillWindow")
 	local frame = self.tradeSkillFrame
 	if not frame then
 		frame = self:CreateTradeSkillWindow()
@@ -1422,11 +1421,8 @@ function Skillet:internal_ShowTradeSkillWindow()
 	Skillet:ShowFullView()
 	if not frame:IsVisible() then
 		frame:Show()
-		self:UpdateTradeSkillWindow()
-	else
-		self:UpdateTradeSkillWindow()
 	end
-	DA.DEBUG(0,"internal_ShowTradeSkillWindow complete")
+	self:UpdateTradeSkillWindow()
 end
 
 --
@@ -1490,11 +1486,10 @@ end
 
 -- Updates the text we filter the list of recipes against.
 function Skillet:UpdateFilter(text)
-	DA.DEBUG(0,"UpdateFilter")
+	DA.DEBUG(0,"UpdateFilter("..tostring(text)..")")
 	self:SetTradeSkillOption("filtertext", text)
 	self:SortAndFilterRecipes()
 	self:UpdateTradeSkillWindow()
-	DA.DEBUG(0,"UpdateFilter complete")
 end
 
 -- Gets the note associated with the item, if there is such a note.

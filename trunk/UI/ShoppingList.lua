@@ -166,7 +166,7 @@ function Skillet:ClearShoppingList(player)
 end
 
 function Skillet:GetShoppingList(player, includeGuildbank)
-	DA.DEBUG(0,"GetShoppingList("..tostring(player)..", "..tostring(includeGuildbank)..")")
+	--DA.DEBUG(0,"GetShoppingList("..tostring(player)..", "..tostring(includeGuildbank)..")")
 	self:InventoryScan()
 	if not Skillet.db.global.cachedGuildbank then
 		Skillet.db.global.cachedGuildbank = {}
@@ -182,7 +182,7 @@ function Skillet:GetShoppingList(player, includeGuildbank)
 			table.insert(playerList, player)
 		end
 	end
-	DA.DEBUG(0,"shopping list for: "..(player or "all players"))
+	--DA.DEBUG(0,"shopping list for: "..(player or "all players"))
 	local usedInventory = {}  -- only use the items from each player once
 	local curPlayer = self.currentPlayer
 	local usedGuild = {}
@@ -199,17 +199,17 @@ function Skillet:GetShoppingList(player, includeGuildbank)
 			usedInventory[player] = {}
 		end
 		local reagentsInQueue = self.db.realm.reagentsInQueue[player]
-		DA.DEBUG(1,"player: "..player)
+		--DA.DEBUG(1,"player: "..player)
 		if reagentsInQueue then
 			for id,count in pairs(reagentsInQueue) do
-			DA.DEBUG(2,"reagent: "..id.." x "..count)
+			--DA.DEBUG(2,"reagent: "..id.." x "..count)
 				local deficit = count -- deficit is usually negative
 				local numInBoth, numInBothCurrent, numGuildbank = 0,0,0
 				local _
 				if not usedInventory[player][id] then
 					numInBoth = self:GetInventory(player, id)
 				end
-				DA.DEBUG(2,"numInBoth= "..numInBoth)
+				--DA.DEBUG(2,"numInBoth= "..numInBoth)
 				if numInBoth > 0 then
 					usedInventory[player][id] = true
 				end
@@ -217,7 +217,7 @@ function Skillet:GetShoppingList(player, includeGuildbank)
 					if not usedInventory[curPlayer] then
 						numInBothCurrent = self:GetInventory(curPlayer, id)
 					end
-					DA.DEBUG(2,"numInBothCurrent= "..numInBothCurrent)
+					--DA.DEBUG(2,"numInBothCurrent= "..numInBothCurrent)
 					if numInBothCurrent > 0 then
 						usedInventory[curPlayer][id] = true
 					end
@@ -234,7 +234,7 @@ function Skillet:GetShoppingList(player, includeGuildbank)
 				-- only count guild bank items when not at the guild bank because
 				-- we might start using them.
 				if includeGuildbank and curGuild and not guildbankFrameOpen then
-					DA.DEBUG(2,"deficit=",deficit,"cachedGuildbank=",cachedGuildbank[curGuild][id],"usedGuild=",usedGuild[id])
+					--DA.DEBUG(2,"deficit=",deficit,"cachedGuildbank=",cachedGuildbank[curGuild][id],"usedGuild=",usedGuild[id])
 					local temp = -1 * math.min(deficit,0) -- calculate exactly how many are needed
 					deficit = deficit + cachedGuildbank[curGuild][id] - usedGuild[id]
 					usedGuild[id] = usedGuild[id] + temp  -- keep track how many have been used
@@ -903,7 +903,6 @@ function Skillet:internal_DisplayShoppingList(atBank)
 	end
 	-- true == use cached recipes, we just loaded them after all
 	self:UpdateShoppingListWindow(true)
-	DA.TRACE("internal_DisplayShoppingList complete")
 end
 
 -- Hides the shopping list window
