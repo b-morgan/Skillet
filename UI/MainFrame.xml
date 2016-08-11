@@ -875,8 +875,6 @@
 							if (not ChatEdit_InsertLink(link) ) then
 								assert(activeEditBox:GetName(), "Failed to add tradeskill link")
 							end
-						else
-							ToggleDropDownMenu(1, nil, TradeSkillLinkDropDown, "SkilletTradeSkillLinkButton", 25, 25);
 						end
 					</OnClick>
 					<OnEnter>
