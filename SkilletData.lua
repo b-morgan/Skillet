@@ -1814,14 +1814,14 @@ function Skillet:ScanTrade()
 				end
 				Skillet:ItemDataAddRecipeSource(itemID,recipeID) -- add a cross reference for the source of this item
 			else 
+				recipe.itemID = 0
 				recipe.numMade = 1
 				recipeInfo.numMade = 1
 				if Skillet.scrollData[recipeID] then	-- note that this table is maintained by datamining
 					local itemID = Skillet.scrollData[recipeID]
 					recipe.itemID = itemID
-					itemString = itemID
+					itemString = tostring(itemID)
 					Skillet:ItemDataAddRecipeSource(itemID,recipeID)	-- add a cross reference for the source of this item
-					recipe.itemID = 0	-- indicates an enchant
 				end
 			end
 		else

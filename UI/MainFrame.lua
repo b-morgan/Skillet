@@ -36,6 +36,7 @@ local SKILLET_SKILLLIST_MIN_WIDTH = 440
 -- min/max width for the reagent window
 local SKILLET_REAGENT_MIN_WIDTH = 240
 local SKILLET_REAGENT_MAX_WIDTH = 320
+local SKILLET_REAGENT_MIN_HEIGHT = 300
 
 local nonLinkingTrade = { [2656] = true, [53428] = true }				-- smelting, runeforging
 
@@ -739,19 +740,22 @@ function Skillet:internal_UpdateTradeSkillWindow()
 		updateWindowBusy = false
 		return
 	end
+	-- shopping list button always shown
+	SkilletShoppingListButton:Show()
 	SkilletFrame:SetAlpha(self.db.profile.transparency)
 	SkilletFrame:SetScale(self.db.profile.scale)
 	local uiScale = SkilletFrame:GetEffectiveScale()
-	-- shopping list button always shown
-	SkilletShoppingListButton:Show()
 	local width = SkilletFrame:GetWidth() - 20 -- for padding.
+	local height = SkilletFrame:GetHeight()
 	local reagent_width = width / 2
+	local reagent_height = SKILLET_REAGENT_MIN_HEIGHT + (height - SKILLET_MIN_HEIGHT) * 2 / 3
 	if reagent_width < SKILLET_REAGENT_MIN_WIDTH then
 		reagent_width = SKILLET_REAGENT_MIN_WIDTH
 	elseif reagent_width > SKILLET_REAGENT_MAX_WIDTH then
 		reagent_width = SKILLET_REAGENT_MAX_WIDTH
 	end
 	SkilletReagentParent:SetWidth(reagent_width)
+	SkilletReagentParent:SetHeight(reagent_height)
 	SkilletQueueManagementParent:SetWidth(reagent_width)
 	SkilletViewCraftersParent:SetWidth(reagent_width)
 	local width = SkilletFrame:GetWidth() - reagent_width - 20 -- padding
@@ -1125,7 +1129,9 @@ function Skillet:SkillButton_OnEnter(button)
 				_, altlink = GetItemInfo(recipe.itemID)
 			end
 		else
-			name,link,quality = GetItemInfo(recipe.itemID)
+			if recipe.itemID then
+				name,link,quality = GetItemInfo(recipe.itemID)
+			end
 			altlink = GetSpellLink(skill.recipeID)
 			quantity = recipe.numMade
 		end
@@ -1359,8 +1365,8 @@ function Skillet:UpdateDetailsWindow(skillIndex)
 		-- Name of the skill
 		SkilletSkillName:SetText(recipe.name)
 		SkilletRecipeNotesButton:Show()
-		if recipe.spellID then
-			local orange,yellow,green,gray = self:GetTradeSkillLevels((recipe.itemID>0 and recipe.itemID))
+		if recipe.spellID and recipe.itemID then
+			local orange,yellow,green,gray = self:GetTradeSkillLevels((recipe.itemID > 0 and recipe.itemID))
 			SkilletRankFrame.subRanks.green:SetValue(gray)
 			SkilletRankFrame.subRanks.yellow:SetValue(green)
 			SkilletRankFrame.subRanks.orange:SetValue(yellow)
@@ -1420,7 +1426,7 @@ function Skillet:UpdateDetailsWindow(skillIndex)
 		SkilletRequirementText:Hide()
 		SkilletRequirementLabel:Hide()
 	end
-	if recipe.itemID ~= 0 then
+	if recipe.itemID and recipe.itemID ~= 0 then
 		texture = GetItemIcon(recipe.itemID)
 	else
 		texture = "Interface\\Icons\\Spell_Holy_GreaterHeal"		-- standard enchant icon
