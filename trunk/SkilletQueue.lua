@@ -260,15 +260,18 @@ function Skillet:ProcessQueue(altMode)
 				if itemID then
 					self.processingCount = 1
 					DA.DEBUG(0,"altMode Crafting: "..tostring(command.recipeID).." and using "..tostring(itemID)..", "..tostring(self.processingSpell))
+					C_TradeSkillUI.SetRecipeRepeatCount(command.recipeID, 1)
 					C_TradeSkillUI.CraftRecipe(command.recipeID, 1)
 					UseItemByName(itemID)
 					self.queuecasting = false
 				else
 					DA.DEBUG(0,"altMode Crafting: "..tostring(command.count).." of "..tostring(command.recipeID)..", "..tostring(self.processingSpell))
+					C_TradeSkillUI.SetRecipeRepeatCount(command.recipeID, command.count)
 					C_TradeSkillUI.CraftRecipe(command.recipeID, command.count)
 				end
 			else
 				DA.DEBUG(0,"Crafting: "..tostring(command.count).." of "..tostring(command.recipeID)..", "..tostring(self.processingSpell))
+				C_TradeSkillUI.SetRecipeRepeatCount(command.recipeID, command.count)
 				C_TradeSkillUI.CraftRecipe(command.recipeID, command.count)
 			end
 			return
