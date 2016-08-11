@@ -1454,58 +1454,6 @@ function Skillet:GetRecipeDataByTradeIndex(tradeID, index)
 	return self.unknownRecipe
 end
 
-function Skillet:UNIT_SPELLCAST_SENT(event, unit, spell)
-	--DA.DEBUG(0,"UNIT_SPELLCAST_SENT("..tostring(unit)..", "..tostring(spell)..")")
-end
-
-function Skillet:UNIT_SPELLCAST_START(event, unit, spell)
-	--DA.DEBUG(0,"UNIT_SPELLCAST_START("..tostring(unit)..", "..tostring(spell)..")")
-end
-
-function Skillet:UNIT_SPELLCAST_SUCCEEDED(event, unit, spell)
-	--DA.DEBUG(0,"UNIT_SPELLCAST_SUCCEEDED("..tostring(unit)..", "..tostring(spell)..")")
-	if unit == "player" and spell == self.processingSpell then
-		self:ContinueCast(spell)
-	end
-end
-
-function Skillet:UNIT_SPELLCAST_FAILED(event, unit, spell)
-	--DA.DEBUG(0,"UNIT_SPELLCAST_FAILED("..tostring(unit)..", "..tostring(spell)..")")
-	if unit == "player" and spell == self.processingSpell then
-		self:StopCast(spell)
-	end
-end
-
-function Skillet:UNIT_SPELLCAST_INTERRUPTED(event, unit, spell)
-	--DA.DEBUG(0,"UNIT_SPELLCAST_INTERRUPTED("..tostring(unit)..", "..tostring(spell)..")")
-	if unit == "player" and spell == self.processingSpell then
-		self:StopCast(spell)
-	end
-end
-
-function Skillet:UNIT_SPELLCAST_DELAYED(event, unit, spell)
-	--DA.DEBUG(0,"UNIT_SPELLCAST_DELAYED("..tostring(unit)..", "..tostring(spell)..")")
-end
-
-function Skillet:UNIT_SPELLCAST_STOP(event, unit, spell)
-	--DA.DEBUG(0,"UNIT_SPELLCAST_STOP("..tostring(unit)..", "..tostring(spell)..")")
-end
-
-function Skillet:CHAT_MSG_SKILL(event,msg)
-	--DA.DEBUG(0,"CHAT_MSG_SKILL")
-	--DA.DEBUG(0,"msg= "..tostring(msg))
-end
-
-function Skillet:CHAT_MSG_SYSTEM(event,msg)
-	--DA.DEBUG(0,"CHAT_MSG_SYSTEM")
-	--DA.DEBUG(0,"msg= "..tostring(msg))
-end
-
-function Skillet:CHAT_MSG_TRADESKILLS(event,msg)
-	--DA.DEBUG(0,"CHAT_MSG_TRADESKILLS")
-	--DA.DEBUG(0,"msg= "..tostring(msg))
-end
-
 function Skillet:CalculateCraftableCounts(playerOverride)
 	--DA.DEBUG(0,"CalculateCraftableCounts("..tostring(playerOverride)..")")
 	local player = playerOverride or self.currentPlayer
