@@ -1065,12 +1065,10 @@ function Skillet:OnEnable()
 	self:RegisterEvent("UNIT_SPELLCAST_SENT")
 	self:RegisterEvent("UNIT_SPELLCAST_SUCCEEDED")
 	self:RegisterEvent("UNIT_SPELLCAST_FAILED")
+	self:RegisterEvent("UNIT_SPELLCAST_FAILED_QUIET")
 	self:RegisterEvent("UNIT_SPELLCAST_INTERRUPTED")
 	self:RegisterEvent("UNIT_SPELLCAST_DELAYED")
 	self:RegisterEvent("UNIT_SPELLCAST_STOP")
---	self:RegisterEvent("CHAT_MSG_SKILL")
---	self:RegisterEvent("CHAT_MSG_SYSTEM")
---	self:RegisterEvent("CHAT_MSG_TRADESKILLS")
 
 	self.hideUncraftableRecipes = false
 	self.hideTrivialRecipes = false
@@ -1456,7 +1454,6 @@ function Skillet:internal_HideTradeSkillWindow()
 	local closed -- was anything closed by us?
 	local frame = self.tradeSkillFrame
 	if frame and frame:IsVisible() then
-		self:StopCast()
 		frame:Hide()
 		closed = true
 	end

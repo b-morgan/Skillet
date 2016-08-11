@@ -31,6 +31,7 @@ function Skillet:AdjustInventory()
 			self:InventoryReagentCraftability(id)
 		end
 	end
+	Skillet:InventoryScan()
 	self:CalculateCraftableCounts()
 	self.reagentsChanged = {}
 	-- update whole window to show craft counts
@@ -248,6 +249,7 @@ function Skillet:ProcessQueue(altMode)
 				CastSpellByName(self:GetTradeName(recipe.tradeID))					-- switch professions
 			end
 			self.processingSpell = self:GetRecipeName(command.recipeID)
+			self.processingSpellID = command.recipeID
 			self.processingPosition = qpos
 			self.processingCommand = command
 			self.processingCount = command.count
@@ -258,16 +260,16 @@ function Skillet:ProcessQueue(altMode)
 				if itemID then
 					self.processingCount = 1
 					DA.DEBUG(0,"altMode Crafting: "..tostring(command.recipeID).." and using "..tostring(itemID)..", "..tostring(self.processingSpell))
-					C_TradeSkillUI.CraftRecipe(command.recipeID,1)
+					C_TradeSkillUI.CraftRecipe(command.recipeID, 1)
 					UseItemByName(itemID)
 					self.queuecasting = false
 				else
 					DA.DEBUG(0,"altMode Crafting: "..tostring(command.count).." of "..tostring(command.recipeID)..", "..tostring(self.processingSpell))
-					C_TradeSkillUI.CraftRecipe(command.recipeID,command.count)
+					C_TradeSkillUI.CraftRecipe(command.recipeID, command.count)
 				end
 			else
 				DA.DEBUG(0,"Crafting: "..tostring(command.count).." of "..tostring(command.recipeID)..", "..tostring(self.processingSpell))
-				C_TradeSkillUI.CraftRecipe(command.recipeID,command.count)
+				C_TradeSkillUI.CraftRecipe(command.recipeID, command.count)
 			end
 			return
 		else
@@ -331,13 +333,58 @@ function Skillet:CreateAllItems(mouse)
 	end
 end
 
-function Skillet:ContinueCast(spell)
-	DA.DEBUG(0,"ContinueCast("..tostring(spell)..")")
+function Skillet:UNIT_SPELLCAST_SENT(event, unit, spell, rank, target, lineID)
+	DA.DEBUG(0,"UNIT_SPELLCAST_SENT("..tostring(unit)..", "..tostring(spell)..", "..tostring(rank)..", "..tostring(target)..", "..tostring(lineID)..")")
+end
+
+function Skillet:UNIT_SPELLCAST_START(event, unit, spell, rank, lineID, spellID)
+	DA.DEBUG(0,"UNIT_SPELLCAST_START("..tostring(unit)..", "..tostring(spell)..", "..tostring(rank)..", "..tostring(lineID)..", "..tostring(spellID)..")")
+end
+
+function Skillet:UNIT_SPELLCAST_SUCCEEDED(event, unit, spell, rank, lineID, spellID)
+	DA.DEBUG(0,"UNIT_SPELLCAST_SUCCEEDED("..tostring(unit)..", "..tostring(spell)..", "..tostring(rank)..", "..tostring(lineID)..", "..tostring(spellID)..")")
+end
+
+function Skillet:UNIT_SPELLCAST_FAILED(event, unit, spell, rank, lineID, spellID)
+	DA.DEBUG(0,"UNIT_SPELLCAST_FAILED("..tostring(unit)..", "..tostring(spell)..", "..tostring(rank)..", "..tostring(lineID)..", "..tostring(spellID)..")")
+	if unit == "player" and spell == self.processingSpell then
+		self:StopCast(spell)
+	end
+end
+
+function Skillet:UNIT_SPELLCAST_FAILED_QUIET(event, unit, spell, rank, lineID, spellID)
+	DA.DEBUG(0,"UNIT_SPELLCAST_FAILED_QUIET("..tostring(unit)..", "..tostring(spell)..", "..tostring(rank)..", "..tostring(lineID)..", "..tostring(spellID)..")")
+	if unit == "player" and spell == self.processingSpell then
+		self:StopCast(spell)
+	end
+end
+
+function Skillet:UNIT_SPELLCAST_INTERRUPTED(event, unit, spell, rank, lineID, spellID)
+	DA.DEBUG(0,"UNIT_SPELLCAST_INTERRUPTED("..tostring(unit)..", "..tostring(spell)..", "..tostring(rank)..", "..tostring(lineID)..", "..tostring(spellID)..")")
+	if unit == "player" and spell == self.processingSpell then
+		self:StopCast(spell)
+	end
+end
+
+function Skillet:UNIT_SPELLCAST_DELAYED(event, unit, spell, rank, lineID, spellID)
+	DA.DEBUG(0,"UNIT_SPELLCAST_DELAYED("..tostring(unit)..", "..tostring(spell)..", "..tostring(rank)..", "..tostring(lineID)..", "..tostring(spellID)..")")
+end
+
+function Skillet:UNIT_SPELLCAST_STOP(event, unit, spell, rank, lineID, spellID)
+	DA.DEBUG(0,"UNIT_SPELLCAST_STOP("..tostring(unit)..", "..tostring(spell)..", "..tostring(rank)..", "..tostring(lineID)..", "..tostring(spellID)..")")
+	if unit == "player" and spell == self.processingSpell then
+		self:ContinueCast(spell,spellID)
+	end
+end
+
+function Skillet:ContinueCast(spell, spellID)
+	DA.DEBUG(0,"ContinueCast("..tostring(spell)..", "..tostring(spellID)..")")
 	if spell == self.processingSpell then
-		DA.DEBUG(0,"processingCount= "..tostring(Skillet.processingCount))
+		--DA.DEBUG(0,"ContinueCast: processingCount= "..tostring(Skillet.processingCount))
 		Skillet.processingCount = Skillet.processingCount - 1
 		if Skillet.processingCount == 0 then
 			Skillet:StopCast(spell, true)
+			return
 		end
 		local queue = self.db.realm.queueData[self.currentPlayer]
 		local qpos = self.processingPosition
@@ -347,7 +394,7 @@ function Skillet:ContinueCast(spell)
 				command.count = command.count - 1
 			end
 		end
-		self:AdjustInventory()
+		Skillet:AdjustInventory()
 	end
 end
 
@@ -373,6 +420,7 @@ function Skillet:StopCast(spell, success)
 			if not queue[1] or not command then
 				self.queuecasting = false
 				self.processingSpell = nil
+				self.processingSpellID = nil
 				self.processingPosition = nil
 				self.processingCommand = nil
 				self:UpdateTradeSkillWindow()
@@ -381,6 +429,7 @@ function Skillet:StopCast(spell, success)
 			if command.op == "iterate" then
 				self.queuecasting = false
 				self.processingSpell = nil
+				self.processingSpellID = nil
 				self.processingPosition = nil
 				self.processingCommand = nil
 				self.reagentsChanged = {}
@@ -388,11 +437,11 @@ function Skillet:StopCast(spell, success)
 			end
 		else
 			self.processingSpell = nil
+			self.processingSpellID = nil
 			self.processingPosition = nil
 			self.processingCommand = nil
 			self.queuecasting = false
 		end
-		self:AdjustInventory()
 	end
 end
 
