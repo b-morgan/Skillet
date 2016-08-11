@@ -1061,6 +1061,16 @@ function Skillet:OnEnable()
 	self:RegisterEvent("AUCTION_HOUSE_SHOW")
 	self:RegisterEvent("AUCTION_HOUSE_CLOSED")
 	self:RegisterEvent("PLAYER_LOGOUT")
+	self:RegisterEvent("UNIT_SPELLCAST_START")
+	self:RegisterEvent("UNIT_SPELLCAST_SENT")
+	self:RegisterEvent("UNIT_SPELLCAST_SUCCEEDED")
+	self:RegisterEvent("UNIT_SPELLCAST_FAILED")
+	self:RegisterEvent("UNIT_SPELLCAST_INTERRUPTED")
+	self:RegisterEvent("UNIT_SPELLCAST_DELAYED")
+	self:RegisterEvent("UNIT_SPELLCAST_STOP")
+--	self:RegisterEvent("CHAT_MSG_SKILL")
+--	self:RegisterEvent("CHAT_MSG_SYSTEM")
+--	self:RegisterEvent("CHAT_MSG_TRADESKILLS")
 
 	self.hideUncraftableRecipes = false
 	self.hideTrivialRecipes = false
@@ -1069,10 +1079,10 @@ function Skillet:OnEnable()
 	self.currentPlayer = UnitName("player")
 	self.currentGroupLabel = "Blizzard"
 	self.currentGroup = nil
+	self.dataScanned = false
 	-- run the upgrade code to convert any old settings
 	self:UpgradeDataAndOptions()
-	self:EnableQueue("Skillet")
-	self:EnableDataGathering("Skillet")
+	self:CollectTradeSkillData()
 	self:UpdateAutoTradeButtons()
 	self:EnablePlugins()
 end
