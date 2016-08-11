@@ -1438,44 +1438,6 @@ function Skillet:ScanPlayerTradeSkills(player)
 	end
 end
 
-function Skillet:EnableUpdateEvents()
-	self:RegisterEvent("CHAT_MSG_SKILL")
-	self:RegisterEvent("CHAT_MSG_SYSTEM")
-	self:RegisterEvent("CHAT_MSG_TRADESKILLS")
-end
-
-function Skillet:DisableUpdateEvents()
-	self:UnregisterEvent("CHAT_MSG_SKILL")
-	self:UnregisterEvent("CHAT_MSG_SYSTEM")
-	self:UnregisterEvent("CHAT_MSG_TRADESKILLS")
-end
-
-function Skillet:EnableDataGathering(addon)
-	Skillet:EnableUpdateEvents()
-	self.dataScanned = false
-	self:CollectTradeSkillData()
-end
-
-function Skillet:EnableQueue(addon)
-	self:RegisterEvent("UNIT_SPELLCAST_START")
-	self:RegisterEvent("UNIT_SPELLCAST_SENT")
-	self:RegisterEvent("UNIT_SPELLCAST_SUCCEEDED")
-	self:RegisterEvent("UNIT_SPELLCAST_FAILED")
-	self:RegisterEvent("UNIT_SPELLCAST_INTERRUPTED")
-	self:RegisterEvent("UNIT_SPELLCAST_DELAYED")
-	self:RegisterEvent("UNIT_SPELLCAST_STOP")
-end
-
-function Skillet:DisableQueue(addon)
-	self:UnregisterEvent("UNIT_SPELLCAST_START")
-	self:UnregisterEvent("UNIT_SPELLCAST_SENT")
-	self:UnregisterEvent("UNIT_SPELLCAST_SUCCEEDED")
-	self:UnregisterEvent("UNIT_SPELLCAST_FAILED")
-	self:UnregisterEvent("UNIT_SPELLCAST_INTERRUPTED")
-	self:UnregisterEvent("UNIT_SPELLCAST_DELAYED")
-	self:UnregisterEvent("UNIT_SPELLCAST_STOP")
-end
-
 -- takes a profession and a skill index and returns the recipe
 function Skillet:GetRecipeDataByTradeIndex(tradeID, index)
 	if not tradeID or not index then
@@ -1501,28 +1463,28 @@ function Skillet:UNIT_SPELLCAST_START(event, unit, spell)
 end
 
 function Skillet:UNIT_SPELLCAST_SUCCEEDED(event, unit, spell)
-	DA.DEBUG(0,"UNIT_SPELLCAST_SUCCEEDED("..tostring(unit)..", "..tostring(spell)..")")
-	if unit == "player" and spell==self.processingSpell then
+	--DA.DEBUG(0,"UNIT_SPELLCAST_SUCCEEDED("..tostring(unit)..", "..tostring(spell)..")")
+	if unit == "player" and spell == self.processingSpell then
 		self:ContinueCast(spell)
 	end
 end
 
 function Skillet:UNIT_SPELLCAST_FAILED(event, unit, spell)
-	DA.DEBUG(0,"UNIT_SPELLCAST_FAILED("..tostring(unit)..", "..tostring(spell)..")")
-	if unit == "player" and spell==self.processingSpell then
+	--DA.DEBUG(0,"UNIT_SPELLCAST_FAILED("..tostring(unit)..", "..tostring(spell)..")")
+	if unit == "player" and spell == self.processingSpell then
 		self:StopCast(spell)
 	end
 end
 
 function Skillet:UNIT_SPELLCAST_INTERRUPTED(event, unit, spell)
-	DA.DEBUG(0,"UNIT_SPELLCAST_INTERRUPTED("..tostring(unit)..", "..tostring(spell)..")")
-	if unit == "player" and spell==self.processingSpell then
+	--DA.DEBUG(0,"UNIT_SPELLCAST_INTERRUPTED("..tostring(unit)..", "..tostring(spell)..")")
+	if unit == "player" and spell == self.processingSpell then
 		self:StopCast(spell)
 	end
 end
 
 function Skillet:UNIT_SPELLCAST_DELAYED(event, unit, spell)
-	DA.DEBUG(0,"UNIT_SPELLCAST_DELAYED("..tostring(unit)..", "..tostring(spell)..")")
+	--DA.DEBUG(0,"UNIT_SPELLCAST_DELAYED("..tostring(unit)..", "..tostring(spell)..")")
 end
 
 function Skillet:UNIT_SPELLCAST_STOP(event, unit, spell)
@@ -1566,7 +1528,6 @@ function Skillet:RescanTrade()
 	local player, tradeID = Skillet.currentPlayer, Skillet.currentTrade
 	if not player or not tradeID then return end
 	Skillet.scanInProgress = true
-	Skillet:DisableUpdateEvents()
 	if not Skillet.data.skillList[player] then
 		Skillet.data.skillList[player] = {}
 	end
@@ -1598,7 +1559,6 @@ function Skillet:RescanTrade()
 		Skillet.db.global.Categories[tradeID] = {}
 	end
 	Skillet.dataScanned = self:ScanTrade()
-	Skillet:EnableUpdateEvents()
 	Skillet.scanInProgress = false
 	return Skillet.dataScanned
 end

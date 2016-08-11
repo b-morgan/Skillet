@@ -184,7 +184,7 @@ end
 
 function Skillet:ClearQueue()
 	--DA.DEBUG(0,"ClearQueue()")
-	if #self.db.realm.queueData[self.currentPlayer]>0 then
+	if #self.db.realm.queueData[self.currentPlayer] > 0 then
 		self.db.realm.queueData[self.currentPlayer] = {}
 		self.db.realm.reagentsInQueue[self.currentPlayer] = {}
 		self:UpdateTradeSkillWindow()
@@ -251,6 +251,7 @@ function Skillet:ProcessQueue(altMode)
 			self.processingPosition = qpos
 			self.processingCommand = command
 			self.processingCount = command.count
+			self.adjustInventory = true
 			-- if alt down/right click - auto use items / like vellums
 			if altMode then
 				local itemID = Skillet:GetAutoTargetItem(recipe.tradeID)
@@ -268,7 +269,6 @@ function Skillet:ProcessQueue(altMode)
 				DA.DEBUG(0,"Crafting: "..tostring(command.count).." of "..tostring(command.recipeID)..", "..tostring(self.processingSpell))
 				C_TradeSkillUI.CraftRecipe(command.recipeID,command.count)
 			end
-			self.adjustInventory = true
 			return
 		else
 			DA.DEBUG(0,"unsupported queue op: "..(command.op or "nil"))
