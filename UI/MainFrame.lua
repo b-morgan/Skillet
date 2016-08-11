@@ -1509,8 +1509,12 @@ function Skillet:UpdateDetailsWindow(skillIndex)
 	local label, extra_text = Skillet:GetExtraText(skill, recipe)
 	-- Is there any source info from the recipe?
 	local recipeInfo = C_TradeSkillUI.GetRecipeInfo(skill.id)
-	local sourceText = not recipeInfo.learned and C_TradeSkillUI.GetRecipeSourceText(skill.id)
---	local sourceText = C_TradeSkillUI.GetRecipeSourceText(skill.id) -- replace the previous two lines with this one
+	local sourceText
+	if Skillet.db.profile.show_recipe_source_for_learned then
+		sourceText = C_TradeSkillUI.GetRecipeSourceText(skill.id) -- replace the previous two lines with this one
+	else
+		sourceText = not recipeInfo.learned and C_TradeSkillUI.GetRecipeSourceText(skill.id)
+	end
 	if label then
 		if sourceText then
 			label = label.."\n\n"..sourceText

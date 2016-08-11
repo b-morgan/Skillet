@@ -69,9 +69,9 @@ local defaults = {
 		vendor_auto_buy   = false,
 		show_item_notes_tooltip = false,
 		show_crafters_tooltip = true,
-		show_detailed_recipe_tooltip = true,        -- show any tooltips?
-		display_full_tooltip = true,		         -- show full blizzards tooltip
-		display_item_tooltip = true,                    -- show item tooltip or recipe tooltip
+		show_detailed_recipe_tooltip = true,	-- show any tooltips?
+		display_full_tooltip = true,			-- show full blizzards tooltip
+		display_item_tooltip = true,			-- show item tooltip or recipe tooltip
 		link_craftable_reagents = true,
 		queue_craftable_reagents = true,
 		queue_glyph_reagents = false,
@@ -80,6 +80,7 @@ local defaults = {
 		display_shopping_list_at_guildbank = true,
 		display_shopping_list_at_auction = true,
 		use_blizzard_for_followers = false,
+		show_recipe_source_for_learned = false,
 		transparency = 1.0,
 		scale = 1.0,
 		plugins = {},
@@ -147,10 +148,10 @@ Skillet.options =
 					name = L["VENDORBUYBUTTONNAME"],
 					desc = L["VENDORBUYBUTTONDESC"],
 					get = function()
-						return Skillet.db.profile.vendor_buy_button;
+						return Skillet.db.profile.vendor_buy_button
 					end,
 					set = function(self,value)
-						Skillet.db.profile.vendor_buy_button = value;
+						Skillet.db.profile.vendor_buy_button = value
 					end,
 					width = "double",
 					order = 12
@@ -160,10 +161,10 @@ Skillet.options =
 					name = L["VENDORAUTOBUYNAME"],
 					desc = L["VENDORAUTOBUYDESC"],
 					get = function()
-						return Skillet.db.profile.vendor_auto_buy;
+						return Skillet.db.profile.vendor_auto_buy
 					end,
 					set = function(self,value)
-						Skillet.db.profile.vendor_auto_buy = value;
+						Skillet.db.profile.vendor_auto_buy = value
 					end,
 					width = "double",
 					order = 13
@@ -173,10 +174,10 @@ Skillet.options =
 					name = L["SHOWITEMNOTESTOOLTIPNAME"],
 					desc = L["SHOWITEMNOTESTOOLTIPDESC"],
 					get = function()
-						return Skillet.db.profile.show_item_notes_tooltip;
+						return Skillet.db.profile.show_item_notes_tooltip
 					end,
 					set = function(self,value)
-						Skillet.db.profile.show_item_notes_tooltip = value;
+						Skillet.db.profile.show_item_notes_tooltip = value
 					end,
 					width = "double",
 					order = 14
@@ -186,10 +187,10 @@ Skillet.options =
 					name = L["SHOWDETAILEDRECIPETOOLTIPNAME"],
 					desc = L["SHOWDETAILEDRECIPETOOLTIPDESC"],
 					get = function()
-						return Skillet.db.profile.show_detailed_recipe_tooltip;
+						return Skillet.db.profile.show_detailed_recipe_tooltip
 					end,
 					set = function(self,value)
-						Skillet.db.profile.show_detailed_recipe_tooltip = value;
+						Skillet.db.profile.show_detailed_recipe_tooltip = value
 					end,
 					width = "double",
 					order = 15
@@ -199,10 +200,10 @@ Skillet.options =
 					name = L["SHOWFULLTOOLTIPNAME"],
 					desc = L["SHOWFULLTOOLTIPDESC"],
 					get = function()
-						return Skillet.db.profile.display_full_tooltip;
+						return Skillet.db.profile.display_full_tooltip
 					end,
 					set = function(self,value)
-						Skillet.db.profile.display_full_tooltip = value;
+						Skillet.db.profile.display_full_tooltip = value
 					end,
 					width = "double",
 					order = 16
@@ -212,10 +213,10 @@ Skillet.options =
 					name = L["SHOWITEMTOOLTIPNAME"],
 					desc = L["SHOWITEMTOOLTIPDESC"],
 					get = function()
-						return Skillet.db.profile.display_item_tooltip;
+						return Skillet.db.profile.display_item_tooltip
 					end,
 					set = function(self,value)
-						Skillet.db.profile.display_item_tooltip = value;
+						Skillet.db.profile.display_item_tooltip = value
 					end,
 					width = "double",
 					order = 17
@@ -226,10 +227,10 @@ Skillet.options =
 					desc = L["SHOWCRAFTERSTOOLTIPDESC"],
 					disabled = true, -- because of 5.4 changes to trade links 
 					get = function()
-						return Skillet.db.profile.show_crafters_tooltip;
+						return Skillet.db.profile.show_crafters_tooltip
 					end,
 					set = function(self,value)
-						Skillet.db.profile.show_crafters_tooltip = value;
+						Skillet.db.profile.show_crafters_tooltip = value
 					end,
 					width = "double",
 					order = 18
@@ -239,10 +240,10 @@ Skillet.options =
 					name = L["LINKCRAFTABLEREAGENTSNAME"],
 					desc = L["LINKCRAFTABLEREAGENTSDESC"],
 					get = function()
-						return Skillet.db.profile.link_craftable_reagents;
+						return Skillet.db.profile.link_craftable_reagents
 					end,
 					set = function(self,value)
-						Skillet.db.profile.link_craftable_reagents = value;
+						Skillet.db.profile.link_craftable_reagents = value
 					end,
 					width = "double",
 					order = 19
@@ -252,10 +253,10 @@ Skillet.options =
 					name = L["QUEUECRAFTABLEREAGENTSNAME"],
 					desc = L["QUEUECRAFTABLEREAGENTSDESC"],
 					get = function()
-						return Skillet.db.profile.queue_craftable_reagents;
+						return Skillet.db.profile.queue_craftable_reagents
 					end,
 					set = function(self,value)
-						Skillet.db.profile.queue_craftable_reagents = value;
+						Skillet.db.profile.queue_craftable_reagents = value
 					end,
 					width = "double",
 					order = 20
@@ -265,10 +266,10 @@ Skillet.options =
 					name = L["QUEUEGLYPHREAGENTSNAME"],
 					desc = L["QUEUEGLYPHREAGENTSDESC"],
 					get = function()
-						return Skillet.db.profile.queue_glyph_reagents;
+						return Skillet.db.profile.queue_glyph_reagents
 					end,
 					set = function(self,value)
-						Skillet.db.profile.queue_glyph_reagents = value;
+						Skillet.db.profile.queue_glyph_reagents = value
 					end,
 					width = "double",
 					order = 21
@@ -278,10 +279,10 @@ Skillet.options =
 					name = L["DISPLAYSHOPPINGLISTATBANKNAME"],
 					desc = L["DISPLAYSHOPPINGLISTATBANKDESC"],
 					get = function()
-						return Skillet.db.profile.display_shopping_list_at_bank;
+						return Skillet.db.profile.display_shopping_list_at_bank
 					end,
 					set = function(self,value)
-						Skillet.db.profile.display_shopping_list_at_bank = value;
+						Skillet.db.profile.display_shopping_list_at_bank = value
 					end,
 					width = "double",
 					order = 22
@@ -291,10 +292,10 @@ Skillet.options =
 					name = L["DISPLAYSHOPPINGLISTATGUILDBANKNAME"],
 					desc = L["DISPLAYSHOPPINGLISTATGUILDBANKDESC"],
 					get = function()
-						return Skillet.db.profile.display_shopping_list_at_guildbank;
+						return Skillet.db.profile.display_shopping_list_at_guildbank
 					end,
 					set = function(self,value)
-						Skillet.db.profile.display_shopping_list_at_guildbank = value;
+						Skillet.db.profile.display_shopping_list_at_guildbank = value
 					end,
 					width = "double",
 					order = 23
@@ -304,10 +305,10 @@ Skillet.options =
 					name = L["DISPLAYSGOPPINGLISTATAUCTIONNAME"],
 					desc = L["DISPLAYSGOPPINGLISTATAUCTIONDESC"],
 					get = function()
-						return Skillet.db.profile.display_shopping_list_at_auction;
+						return Skillet.db.profile.display_shopping_list_at_auction
 					end,
 					set = function(self,value)
-						Skillet.db.profile.display_shopping_list_at_auction = value;
+						Skillet.db.profile.display_shopping_list_at_auction = value
 					end,
 					width = "double",
 					order = 24
@@ -331,13 +332,26 @@ Skillet.options =
 					name = L["USEBLIZZARDFORFOLLOWERSNAME"],
 					desc = L["USEBLIZZARDFORFOLLOWERSDESC"],
 					get = function()
-						return Skillet.db.profile.use_blizzard_for_followers;
+						return Skillet.db.profile.use_blizzard_for_followers
 					end,
 					set = function(self,value)
-						Skillet.db.profile.use_blizzard_for_followers = value;
+						Skillet.db.profile.use_blizzard_for_followers = value
 					end,
 					width = "double",
 					order = 26
+				},
+				show_recipe_source_for_learned = {
+					type = "toggle",
+					name = L["SHOWRECIPESOURCEFORLEARNEDNAME"],
+					desc = L["SHOWRECIPESOURCEFORLEARNEDDESC"],
+					get = function()
+						return Skillet.db.profile.show_recipe_source_for_learned
+					end,
+					set = function(self,value)
+						Skillet.db.profile.show_recipe_source_for_learned = value
+					end,
+					width = "double",
+					order = 27
 				},
 			}
 		},
