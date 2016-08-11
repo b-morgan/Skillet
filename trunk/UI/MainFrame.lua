@@ -1937,12 +1937,12 @@ function Skillet:SkillButton_OnClick(button, mouse)
 				end
 				self:SortAndFilterRecipes()
 			else
-				local id = button:GetID()
-				local spellLink = C_TradeSkillUI.GetRecipeLink(id)
-				if (ChatEdit_GetLastActiveWindow():IsVisible() or WIM_EditBoxInFocus ~= nil) then
-					ChatEdit_InsertLink(spellLink)
-				else
-					DA.DEBUG(0, spellLink)
+				local skill = button.skill
+				if skill and skill.recipeID then
+					local spellLink = C_TradeSkillUI.GetRecipeLink(skill.recipeID)
+					if (ChatEdit_GetLastActiveWindow():IsVisible() or WIM_EditBoxInFocus ~= nil) then
+						ChatEdit_InsertLink(spellLink)
+					end
 				end
 			end
 		elseif not button.skill.mainGroup then
@@ -2329,24 +2329,26 @@ local skillMenuList = {
 	{
 		text = "Link Recipe",
 		func = function()
-					local spellLink = C_TradeSkillUI.GetRecipeLink(Skillet.menuButton:GetID())
-					if (ChatEdit_GetLastActiveWindow():IsVisible() or WIM_EditBoxInFocus ~= nil) then
-						ChatEdit_InsertLink(spellLink)
-					else
-						DA.DEBUG(0, spellLink)
+					local skill = Skillet.menuButton.skill
+					if skill and skill.recipeID then
+						local spellLink = C_TradeSkillUI.GetRecipeLink(skill.recipeID)
+						if (ChatEdit_GetLastActiveWindow():IsVisible() or WIM_EditBoxInFocus ~= nil) then
+							ChatEdit_InsertLink(spellLink)
+						end
 					end
 				end,
 	},
 	{
 		text = "Add to Ignore Materials",
 		func = function()
-					local index = Skillet.menuButton:GetID()
-					local spellLink = C_TradeSkillUI.GetRecipeLink(index)
-					local recipeID = Skillet:GetItemIDFromLink(spellLink)
-					DA.DEBUG(0, tostring(index)..", "..tostring(spellLink)..", "..tostring(recipeID))
-					Skillet.db.realm.userIgnoredMats[Skillet.currentPlayer][recipeID] = spellLink
-					if Skillet.ignoreList and Skillet.ignoreList:IsVisible() then
-						Skillet:UpdateIgnoreListWindow()
+					local skill = Skillet.menuButton.skill
+					if skill and skill.recipeID then
+						local recipeID = skill.recipeID
+						local spellLink = C_TradeSkillUI.GetRecipeLink(skill.recipeID)
+						Skillet.db.realm.userIgnoredMats[Skillet.currentPlayer][recipeID] = spellLink
+						if Skillet.ignoreList and Skillet.ignoreList:IsVisible() then
+							Skillet:UpdateIgnoreListWindow()
+						end
 					end
 				end,
 	},
