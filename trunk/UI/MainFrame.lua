@@ -1012,12 +1012,48 @@ function Skillet:internal_UpdateTradeSkillWindow()
 				countText:SetWidth(countWidth)
 				Skillet:CustomizeCountsColumn(recipe, countText)
 				button:SetID(skillIndex or 0)
-				if self.db.profile.enhanced_recipe_display then
-					text = text .. skill_color.alttext;
-				end
 				-- If enhanced recipe display is enabled, show the difficulty as text,
 				-- rather than as a colour. This should help used that have problems
 				-- distinguishing between the difficulty colours we use.
+				if self.db.profile.enhanced_recipe_display then
+					text = text .. skill_color.alttext;
+				end
+				-- If this recipe is upgradable, append the current and maximum upgrade levels
+				local recipeInfo = Skillet.db.realm.recipeInfo[self.currentPlayer][self.currentTrade]
+				if recipeInfo[skill.recipeID].previousRecipeID or recipeInfo[skill.recipeID].nextRecipeID then
+					local n,m = 1,1
+					if recipeInfo[skill.recipeID].previousRecipeID then
+						-- Start by going backwards from this node until we find the first in the line
+						local currentRecipeInfo = recipeInfo[skill.recipeID]
+						local previousRecipeID = recipeInfo[skill.recipeID].previousRecipeID
+						while previousRecipeID do
+--							local previousRecipeInfo = C_TradeSkillUI.GetRecipeInfo(previousRecipeID)
+							local previousRecipeInfo = recipeInfo[previousRecipeID]
+							currentRecipeInfo.previousRecipeInfo = previousRecipeInfo
+							previousRecipeInfo.nextRecipeInfo = currentRecipeInfo
+							currentRecipeInfo = previousRecipeInfo
+							previousRecipeID = currentRecipeInfo.previousRecipeID
+							n = n + 1
+							m = m + 1
+						end
+					end
+					if recipeInfo[skill.recipeID].nextRecipeID then
+						-- Now move forward from this node linking them until the end
+						local currentRecipeInfo = recipeInfo[skill.recipeID]
+						local nextRecipeID = recipeInfo[skill.recipeID].nextRecipeID
+						while nextRecipeID do
+--							local nextRecipeInfo = C_TradeSkillUI.GetRecipeInfo(nextRecipeID)
+							local nextRecipeInfo = recipeInfo[nextRecipeID]
+							nextRecipeInfo.previousRecipeInfo = currentRecipeInfo
+							currentRecipeInfo.nextRecipeInfo = nextRecipeInfo
+							currentRecipeInfo = nextRecipeInfo
+							nextRecipeID = currentRecipeInfo.nextRecipeID
+							m = m + 1
+						end
+					end
+					text = text .. " ("..tostring(n).."/"..tostring(m)..")"
+				end
+				-- Get any additional text that plugins might add
 				text = text .. (self:GetRecipeNameSuffix(self.currentTrade, skillIndex) or "")
 				buttonText:SetText(text)
 				buttonText:SetWordWrap(false)
