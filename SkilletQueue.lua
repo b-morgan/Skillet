@@ -286,30 +286,31 @@ end
 -- Adds the currently selected number of items to the queue
 function Skillet:QueueItems(count)
 	DA.DEBUG(0,"QueueItems("..tostring(count)..")");
-	local skill = self:GetSkill(self.currentPlayer, self.currentTrade, self.selectedSkill)
-	if not skill then return 0 end
-	local recipe = self:GetRecipe(skill.id)
-	local recipeID = skill.id
-	if not count then
-		count = skill.numCraftable / (recipe.numMade or 1)
-		if count == 0 then
-			count = (skill.numCraftableVendor or 0)/ (recipe.numMade or 1)
+	if self.currentTrade and self.selectedSkill and self.selectedSkill then
+		local skill = self:GetSkill(self.currentPlayer, self.currentTrade, self.selectedSkill)
+		if not skill then return 0 end
+		local recipe = self:GetRecipe(skill.id)
+		local recipeID = skill.id
+		if not count then
+			count = skill.numCraftable / (recipe.numMade or 1)
+			if count == 0 then
+				count = (skill.numCraftableVendor or 0)/ (recipe.numMade or 1)
+			end
+			if count == 0 then
+				count = (skill.numCraftableAlts or 0) / (recipe.numMade or 1)
+			end
 		end
-		if count == 0 then
-			count = (skill.numCraftableAlts or 0) / (recipe.numMade or 1)
-		end
-	end
-	count = math.min(count, 9999)
-	self.visited = {}
-	if count > 0 then
-		if self.currentTrade and self.selectedSkill then
+		count = math.min(count, 9999)
+		self.visited = {}
+		if count > 0 then
 			if recipe then
 				local queueCommand = self:QueueCommandIterate(recipeID, count)
 				self:QueueAppendCommand(queueCommand, Skillet.db.profile.queue_craftable_reagents)
 			end
 		end
+		return count
 	end
-	return count
+	return 0
 end
 
 -- Queue the max number of craftable items for the currently selected skill

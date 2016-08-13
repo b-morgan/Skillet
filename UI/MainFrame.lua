@@ -1508,12 +1508,14 @@ function Skillet:UpdateDetailsWindow(skillIndex)
 	-- Do any mods want to add extra info to the details window?
 	local label, extra_text = Skillet:GetExtraText(skill, recipe)
 	-- Is there any source info from the recipe?
-	local recipeInfo = C_TradeSkillUI.GetRecipeInfo(skill.id)
 	local sourceText
 	if Skillet.db.profile.show_recipe_source_for_learned then
-		sourceText = C_TradeSkillUI.GetRecipeSourceText(skill.id) -- replace the previous two lines with this one
+		sourceText = C_TradeSkillUI.GetRecipeSourceText(skill.id)
 	else
-		sourceText = not recipeInfo.learned and C_TradeSkillUI.GetRecipeSourceText(skill.id)
+		local recipeInfo = C_TradeSkillUI.GetRecipeInfo(skill.id)
+		if recipeInfo and not recipeInfo.learned then
+			sourceText = C_TradeSkillUI.GetRecipeSourceText(skill.id)
+		end
 	end
 	if label then
 		if sourceText then
