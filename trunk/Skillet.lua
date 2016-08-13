@@ -124,6 +124,9 @@ Skillet.unknownRecipe = {
 	itemID = 0,
 	numMade = 0,
 	spellID = 0,
+	numCraftable = 0,
+	numCraftableVendor = 0,
+	numCraftableAlts = 0,
 }
 
 -- All the options that we allow the user to control.
@@ -723,6 +726,42 @@ Skillet.options =
 			end,
 			order = 91
 		},
+		DebugOff = {
+			type = 'execute',
+			name = "DebugOff",
+			desc = "Turn Debug Off",
+			func = function()
+				if Skillet.db.profile.WarnShow then
+					Skillet.db.profile.WarnShow = false
+					Skillet.WarnShow = false
+				end
+				if Skillet.db.profile.WarnLog then
+					Skillet.db.profile.WarnLog = false
+					Skillet.WarnLog = false
+				end
+				if Skillet.db.profile.DebugShow then
+					Skillet.db.profile.DebugShow= false
+					Skillet.DebugShow = false
+				end
+				if Skillet.db.profile.DebugLogging then
+					Skillet.db.profile.DebugLogging = false
+					Skillet.DebugLogging = false
+				end
+				if Skillet.db.profile.TraceShow then
+					Skillet.db.profile.TraceShow = false
+					Skillet.TraceShow = false
+				end
+				if Skillet.db.profile.TraceLog then
+					Skillet.db.profile.TraceLog = false
+					Skillet.TraceLog = false
+				end
+				if Skillet.db.profile.ProfileShow then
+					Skillet.db.profile.ProfileShow = false
+					Skillet.ProfileShow = false
+				end
+			end,
+			order = 92
+		},
 
 		reset = {
 			type = 'execute',
@@ -1069,6 +1108,7 @@ function Skillet:OnEnable()
 	self:RegisterEvent("UNIT_SPELLCAST_INTERRUPTED")
 	self:RegisterEvent("UNIT_SPELLCAST_DELAYED")
 	self:RegisterEvent("UNIT_SPELLCAST_STOP")
+	self:RegisterEvent("CHAT_MSG_SKILL")
 
 	self.hideUncraftableRecipes = false
 	self.hideTrivialRecipes = false
@@ -1095,8 +1135,14 @@ function Skillet:PLAYER_LOGOUT()
 		SkilletMemory = DA.deepcopy(self.data)
 	end
 end
+function Skillet:CHAT_MSG_SKILL()
+	DA.DEBUG(0,"CHAT_MSG_SKILL")
+	if Skillet.tradeSkillOpen then
+		Skillet:ScanTrade()
+		Skillet:UpdateTradeSkillWindow()
+	end
+end
 
--- DA.DEBUG(0, DA.WARN(
 function Skillet:TRADE_SKILL_SHOW()
 	DA.DEBUG(0,"TRADE_SKILL_SHOW")
 	Skillet.dataSourceChanged = false
@@ -1121,6 +1167,10 @@ function Skillet:TRADE_SKILL_DATA_SOURCE_CHANGED()
 	if Skillet.tradeSkillOpen then
 		Skillet.dataSourceChanged = true
 		Skillet:SkilletShowWindow()
+		if Skillet.delaySelectedSkill then
+			self:SetSelectedSkill(Skillet.delaySkillIndex)
+			Skillet.delaySelectedSkill = false
+		end
 	end
 end
 
@@ -1377,6 +1427,8 @@ function Skillet:SetTradeSkill(player, tradeID, skillIndex)
 			if tradeID == 2575 then tradeID = 2656 end -- Ye old Mining vs. Smelting issue
 			DA.DEBUG(0,"cast: "..self:GetTradeName(tradeID))
 			CastSpellByName(self:GetTradeName(tradeID)) -- this will trigger the whole rescan process via a TRADE_SKILL_SHOW event
+			Skillet.delaySelectedSkill = true
+			Skillet.delaySkillIndex = skillIndex
 		else
 			self.dataSource = "cache"
 			CloseTradeSkill()
