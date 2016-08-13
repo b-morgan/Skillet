@@ -1085,7 +1085,7 @@ function Skillet:OnEnable()
 	self:RegisterEvent("GARRISON_TRADESKILL_NPC_CLOSED")
 	self:RegisterEvent("BAG_UPDATE") -- Fires for both bag and bank updates.
 	self:RegisterEvent("BAG_UPDATE_DELAYED") -- Fires after all applicable BAG_UPADTE events for a specific action have been fired.
-	-- MERCHANT_SHOW, MERCHANT_HIDE, MERCHANT_UPDATE events needed for auto buying.
+	-- MERCHANT_* events needed for auto buying.
 	self:RegisterEvent("MERCHANT_SHOW")
 	self:RegisterEvent("MERCHANT_UPDATE")
 	self:RegisterEvent("MERCHANT_CLOSED")
@@ -1109,6 +1109,9 @@ function Skillet:OnEnable()
 	self:RegisterEvent("UNIT_SPELLCAST_DELAYED")
 	self:RegisterEvent("UNIT_SPELLCAST_STOP")
 	self:RegisterEvent("CHAT_MSG_SKILL")
+	self:RegisterEvent("SKILL_LINES_CHANGED") -- replacement for CHAT_MSG_SKILL?
+	self:RegisterEvent("LEARNED_SPELL_IN_TAB") -- arg1 = professionID
+	self:RegisterEvent("NEW_RECIPE_LEARNED") -- arg1 = recipeID
 
 	self.hideUncraftableRecipes = false
 	self.hideTrivialRecipes = false
@@ -1135,12 +1138,39 @@ function Skillet:PLAYER_LOGOUT()
 		SkilletMemory = DA.deepcopy(self.data)
 	end
 end
+
 function Skillet:CHAT_MSG_SKILL()
 	DA.DEBUG(0,"CHAT_MSG_SKILL")
 	if Skillet.tradeSkillOpen then
 		Skillet:ScanTrade()
 		Skillet:UpdateTradeSkillWindow()
 	end
+end
+
+function Skillet:SKILL_LINES_CHANGED()
+	DA.DEBUG(0,"SKILL_LINES_CHANGED")
+--	if Skillet.tradeSkillOpen then
+--		Skillet:ScanTrade()
+--		Skillet:UpdateTradeSkillWindow()
+--	end
+end
+
+function Skillet:LEARNED_SPELL_IN_TAB(event, profession)
+	DA.DEBUG(0,"LEARNED_SPELL_IN_TAB")
+	DA.DEBUG(0,"profession= "..tostring(profession))
+--	if Skillet.tradeSkillOpen then
+--		Skillet:ScanTrade()
+--		Skillet:UpdateTradeSkillWindow()
+--	end
+end
+
+function Skillet:NEW_RECIPE_LEARNED(event, recipeID)
+	DA.DEBUG(0,"NEW_RECIPE_LEARNED")
+	DA.DEBUG(0,"recipeID= "..tostring(recipeID))
+--	if Skillet.tradeSkillOpen then
+--		Skillet:ScanTrade()
+--		Skillet:UpdateTradeSkillWindow()
+--	end
 end
 
 function Skillet:TRADE_SKILL_SHOW()

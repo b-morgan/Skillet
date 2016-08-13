@@ -719,7 +719,7 @@ function Skillet:internal_UpdateTradeSkillWindow()
 	end
 	if not self.data.sortedSkillList[skillListKey] then
 		numTradeSkills = self:SortAndFilterRecipes()
-		if not numTradeSkills or numTradeSkills<1 then
+		if not numTradeSkills or numTradeSkills < 1 then
 			numTradeSkills = 0
 		end
 	end
@@ -863,7 +863,11 @@ function Skillet:internal_UpdateTradeSkillWindow()
 			end
 			if skill.subGroup then
 				if SkillButtonNameEdit.originalButton ~= buttonText then
-					local _, _, _, _, _, _,_,showProgressBar, currentRank,maxRank,startingRank  = Skillet:GetTradeSkillInfo(skill.id)
+					local skillData = Skillet.data.skillList[self.currentPlayer][self.currentTrade][skillIndex]
+					local category = Skillet.db.global.Categories[self.currentTrade][skillData.category]
+					local currentRank = category.skillLineCurrentLevel
+					local startingRank = category.skillLineStartingRank
+					local maxRank = category.skillLineMaxLevel
 					buttonText:SetTextColor(NORMAL_FONT_COLOR.r, NORMAL_FONT_COLOR.g, NORMAL_FONT_COLOR.b, textAlpha)
 					countText:SetTextColor(NORMAL_FONT_COLOR.r, NORMAL_FONT_COLOR.g, NORMAL_FONT_COLOR.b, textAlpha)
 					local expanded = skill.subGroup.expanded
@@ -875,14 +879,14 @@ function Skillet:internal_UpdateTradeSkillWindow()
 						buttonExpand:SetHighlightTexture("Interface\\Addons\\Skillet\\Icons\\expand_arrow_closed.tga")
 					end
 					local name = skill.name.." ("..#skill.subGroup.entries..")"
-					buttonText:SetText(name)      -- THIS IS A HEADER SO DON'T TRY TO USE THE RECIPE ID!
+					buttonText:SetText(name)
 					button:SetID(skillIndex or 0)
 					buttonExpand.group = skill.subGroup
 					button.skill = skill
 					button:UnlockHighlight() -- headers never get highlighted
 					buttonExpand:Show()
 					local rankBarWidth = 0
-					if ( showProgressBar ) then
+					if ( category.hasProgressBar ) then
 						skillRankBar:Show();
 						skillRankBar:SetMinMaxValues(startingRank,maxRank);
 						skillRankBar:SetValue(currentRank);
@@ -994,9 +998,9 @@ function Skillet:internal_UpdateTradeSkillWindow()
 					end
 				end
 				if skill_color.alttext == "+++" then
-					local _, _, _, _, _, numSkillUps  = Skillet:GetTradeSkillInfo(skill.id)
-					if numSkillUps and numSkillUps>1 then
-						local count = "{++"..numSkillUps.."} "..(countText:GetText() or "")
+					local _, _, _, _, _, numSkillUps  = Skillet:GetTradeSkillInfo(skill.recipeID)
+					if numSkillUps and numSkillUps > 1 then
+						local count = "<+"..numSkillUps.."> "..(countText:GetText() or "")
 						countWidth = countWidth + 20
 						countText:SetText(count)
 						countText:Show()

@@ -1633,7 +1633,9 @@ function Skillet:ScanTrade()
 					groupName = headerName
 				end
 				skillDB[i] = "header "..headerName
-				skillData[i] = nil
+				--DA.DEBUG(0,"i = "..tostring(i)..", category= "..tostring(category))
+				skillData[i] = {}
+				skillData[i].category = category
 				currentGroup = Skillet:RecipeGroupNew(player, tradeID, "Blizzard", groupName)
 				currentGroup.autoGroup = true
 				if headerType == "header" then
