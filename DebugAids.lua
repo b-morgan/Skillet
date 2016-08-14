@@ -286,6 +286,13 @@ function DA.PLINK(text)
 	return nil
 end
 
+function DA.TABLE(text, tab)
+	if not DA.DebugShow then return "" end
+	if ViragDevTool_AddData then
+		ViragDevTool_AddData(tab, addonName..": "..text)
+	end
+end
+
 function DA.DebugAidsStatus()
 	print("WarnShow= "..tostring(DA.WarnShow)..", WarnLog= "..tostring(DA.WarnLog))
 	print("DebugShow= "..tostring(DA.DebugShow)..", DebugLogging= "..tostring(DA.DebugLogging)..", DebugLevel= "..tostring(DA.DebugLevel))

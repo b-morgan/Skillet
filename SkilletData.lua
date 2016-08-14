@@ -1565,6 +1565,7 @@ function Skillet:ScanTrade()
 	end
 
 	self:ResetTradeSkillFilter() -- verify the search filter is blank (so we get all skills)
+	Skillet.hasProgressBar = {} -- table of (sub)headers in this list with progress bars (used in MainFrame.lua)
 	Skillet.db.realm.Filtered[player][tradeID] = C_TradeSkillUI.GetFilteredRecipeIDs()
 	local numSkills = #C_TradeSkillUI.GetFilteredRecipeIDs()
 	--DA.DEBUG(0,"ScanTrade: Expanding, "..tostring(profession)..":"..tostring(tradeID).." "..tostring(numSkills).." recipes")
@@ -1632,10 +1633,13 @@ function Skillet:ScanTrade()
 					groupList[headerName] = 1
 					groupName = headerName
 				end
-				skillDB[i] = "header "..headerName
-				--DA.DEBUG(0,"i = "..tostring(i)..", category= "..tostring(category))
-				skillData[i] = {}
-				skillData[i].category = category
+				if Skillet.db.global.Categories[tradeID][category].hasProgressBar then
+					skillDB[i] = "header "..headerName..":"..tostring(category)
+					Skillet.hasProgressBar[headerName] = category
+				else
+					skillDB[i] = "header "..headerName
+				end
+				skillData[i] = nil
 				currentGroup = Skillet:RecipeGroupNew(player, tradeID, "Blizzard", groupName)
 				currentGroup.autoGroup = true
 				if headerType == "header" then
