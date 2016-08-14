@@ -829,13 +829,13 @@ function Skillet:internal_UpdateTradeSkillWindow()
 			local levelText = _G[button:GetName() .. "Level"]
 			local countText = _G[button:GetName() .. "Counts"]
 			local buttonExpand = _G[button:GetName() .. "Expand"]
-			local skillRankBar = _G[button:GetName() .. "SubSkillRankBar"]
+			local subSkillRankBar = _G[button:GetName() .. "SubSkillRankBar"]
 			buttonText:SetText("")
 			levelText:SetText("")
 			countText:SetText("")
 			countText:Hide()
 			countText:SetWidth(10)
-			skillRankBar:Hide()
+			subSkillRankBar:Hide()
 			levelText:SetWidth(skill.depth*8+20)
 			local textAlpha = 1
 			if self.dragEngaged then
@@ -863,11 +863,6 @@ function Skillet:internal_UpdateTradeSkillWindow()
 			end
 			if skill.subGroup then
 				if SkillButtonNameEdit.originalButton ~= buttonText then
-					local skillData = Skillet.data.skillList[self.currentPlayer][self.currentTrade][skillIndex]
-					local category = Skillet.db.global.Categories[self.currentTrade][skillData.category]
-					local currentRank = category.skillLineCurrentLevel
-					local startingRank = category.skillLineStartingRank
-					local maxRank = category.skillLineMaxLevel
 					buttonText:SetTextColor(NORMAL_FONT_COLOR.r, NORMAL_FONT_COLOR.g, NORMAL_FONT_COLOR.b, textAlpha)
 					countText:SetTextColor(NORMAL_FONT_COLOR.r, NORMAL_FONT_COLOR.g, NORMAL_FONT_COLOR.b, textAlpha)
 					local expanded = skill.subGroup.expanded
@@ -885,15 +880,18 @@ function Skillet:internal_UpdateTradeSkillWindow()
 					button.skill = skill
 					button:UnlockHighlight() -- headers never get highlighted
 					buttonExpand:Show()
-					local rankBarWidth = 0
-					if ( category.hasProgressBar ) then
-						skillRankBar:Show();
-						skillRankBar:SetMinMaxValues(startingRank,maxRank);
-						skillRankBar:SetValue(currentRank);
-						skillRankBar.currentRank = currentRank;
-						skillRankBar.maxRank = maxRank;
-						skillRankBar.Rank:SetText(currentRank.."/"..maxRank);
-						rankBarWidth = 60;
+					local hasProgressBar = Skillet.hasProgressBar[skill.name]
+					if hasProgressBar then
+						local category = Skillet.db.global.Categories[self.currentTrade][hasProgressBar]
+						local currentRank = category.skillLineCurrentLevel
+						local startingRank = category.skillLineStartingRank
+						local maxRank = category.skillLineMaxLevel
+						subSkillRankBar:Show();
+						subSkillRankBar:SetMinMaxValues(startingRank,maxRank);
+						subSkillRankBar:SetValue(currentRank);
+						subSkillRankBar.currentRank = currentRank;
+						subSkillRankBar.maxRank = maxRank;
+						subSkillRankBar.Rank:SetText(currentRank.."/"..maxRank);
 					end
 					local button_width = button:GetTextWidth()
 					show_button(button, self.currentTrade, skillIndex, i)
@@ -1020,7 +1018,7 @@ function Skillet:internal_UpdateTradeSkillWindow()
 				end
 				-- If this recipe is upgradable, append the current and maximum upgrade levels
 				local recipeInfo = Skillet.db.realm.recipeInfo[self.currentPlayer][self.currentTrade]
-				if recipeInfo[skill.recipeID].previousRecipeID or recipeInfo[skill.recipeID].nextRecipeID then
+				if skill.recipeID and (recipeInfo[skill.recipeID].previousRecipeID or recipeInfo[skill.recipeID].nextRecipeID) then
 					local n,m = 1,1
 					if recipeInfo[skill.recipeID].previousRecipeID then
 						-- Start by going backwards from this node until we find the first in the line
