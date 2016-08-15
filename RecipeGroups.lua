@@ -430,7 +430,7 @@ function Skillet:RecipeGroupFlatten(group, depth, list, index)
 					else
 						newSkill.parentIndex = nil
 					end
-					if not (filterLevel or filterCraftable) then
+					if not (filterLevel or filterCraftable or Skillet:IsUpgradeHidden(newSkill.spellID)) then
 						num = num + 1
 						list[num + index] = newSkill
 					end

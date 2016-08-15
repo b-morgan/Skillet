@@ -1017,39 +1017,9 @@ function Skillet:internal_UpdateTradeSkillWindow()
 					text = text .. skill_color.alttext;
 				end
 				-- If this recipe is upgradable, append the current and maximum upgrade levels
-				local recipeInfo = Skillet.db.realm.recipeInfo[self.currentPlayer][self.currentTrade]
-				if skill.recipeID and (recipeInfo[skill.recipeID].previousRecipeID or recipeInfo[skill.recipeID].nextRecipeID) then
-					local n,m = 1,1
-					if recipeInfo[skill.recipeID].previousRecipeID then
-						-- Start by going backwards from this node until we find the first in the line
-						local currentRecipeInfo = recipeInfo[skill.recipeID]
-						local previousRecipeID = recipeInfo[skill.recipeID].previousRecipeID
-						while previousRecipeID do
---							local previousRecipeInfo = C_TradeSkillUI.GetRecipeInfo(previousRecipeID)
-							local previousRecipeInfo = recipeInfo[previousRecipeID]
-							currentRecipeInfo.previousRecipeInfo = previousRecipeInfo
-							previousRecipeInfo.nextRecipeInfo = currentRecipeInfo
-							currentRecipeInfo = previousRecipeInfo
-							previousRecipeID = currentRecipeInfo.previousRecipeID
-							n = n + 1
-							m = m + 1
-						end
-					end
-					if recipeInfo[skill.recipeID].nextRecipeID then
-						-- Now move forward from this node linking them until the end
-						local currentRecipeInfo = recipeInfo[skill.recipeID]
-						local nextRecipeID = recipeInfo[skill.recipeID].nextRecipeID
-						while nextRecipeID do
---							local nextRecipeInfo = C_TradeSkillUI.GetRecipeInfo(nextRecipeID)
-							local nextRecipeInfo = recipeInfo[nextRecipeID]
-							nextRecipeInfo.previousRecipeInfo = currentRecipeInfo
-							currentRecipeInfo.nextRecipeInfo = nextRecipeInfo
-							currentRecipeInfo = nextRecipeInfo
-							nextRecipeID = currentRecipeInfo.nextRecipeID
-							m = m + 1
-						end
-					end
-					text = text .. " ("..tostring(n).."/"..tostring(m)..")"
+				local recipeInfo = Skillet.db.realm.recipeInfo[self.currentPlayer][self.currentTrade][skill.recipeID]
+				if recipeInfo.upgradeable then
+				  text = text .. " ("..tostring(recipeInfo.recipeUpgrade).."/"..tostring(recipeInfo.maxUpgrade)..")"
 				end
 				-- Get any additional text that plugins might add
 				text = text .. (self:GetRecipeNameSuffix(self.currentTrade, skillIndex) or "")

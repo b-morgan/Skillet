@@ -1511,6 +1511,66 @@ function Skillet:RescanTrade()
 	return Skillet.dataScanned
 end
 
+function Skillet:IsUpgradeHidden(recipeID) 
+  local recipeInfo = Skillet.db.realm.recipeInfo[Skillet.currentPlayer][Skillet.currentTrade][recipeID]
+  --filter out upgrades
+  if recipeInfo and recipeInfo.upgradeable then		
+       if Skillet.unlearnedRecipes then
+  	   -- for unlearned, show next upgrade to learn
+       if recipeInfo.recipeUpgrade ~= recipeInfo.learnedUpgrade + 1 then
+         return true
+       end  	   
+  	else
+  	   -- for learned, show only highest upgrade learned
+  	   if recipeInfo.recipeUpgrade ~= recipeInfo.learnedUpgrade then
+  	     return true
+  	   end
+  	end
+  end
+  return false
+end	
+
+
+function Skillet:SetUpgradeLevels(recipeInfo) 
+        if recipeInfo.previousRecipeID or recipeInfo.nextRecipeID then
+          local n,m,l = 1,1,0
+          if recipeInfo.previousRecipeID then
+            -- Start by going backwards from this node until we find the first in the line
+            local currentRecipeInfo = recipeInfo
+            local previousRecipeID = recipeInfo.previousRecipeID
+            while previousRecipeID do
+              local previousRecipeInfo = C_TradeSkillUI.GetRecipeInfo(previousRecipeID)
+              currentRecipeInfo.previousRecipeInfo = previousRecipeInfo
+              previousRecipeInfo.nextRecipeInfo = currentRecipeInfo
+              currentRecipeInfo = previousRecipeInfo
+              previousRecipeID = currentRecipeInfo.previousRecipeID
+              n = n + 1
+              m = m + 1
+            end
+          end
+          if recipeInfo.nextRecipeID then
+            -- Now move forward from this node linking them until the end
+            local currentRecipeInfo = recipeInfo
+            local nextRecipeID = recipeInfo.nextRecipeID
+            if currentRecipeInfo.learned then l = 1 end
+            while nextRecipeID do
+              local nextRecipeInfo = C_TradeSkillUI.GetRecipeInfo(nextRecipeID)
+              nextRecipeInfo.previousRecipeInfo = currentRecipeInfo
+              currentRecipeInfo.nextRecipeInfo = nextRecipeInfo
+              currentRecipeInfo = nextRecipeInfo
+              if currentRecipeInfo.learned then l = l + 1 end
+              nextRecipeID = currentRecipeInfo.nextRecipeID
+              m = m + 1
+            end
+          end
+          recipeInfo.upgradeable = true
+          recipeInfo.maxUpgrade = m
+          recipeInfo.recipeUpgrade = n
+          recipeInfo.learnedUpgrade = l
+        end
+        return recipeInfo
+end
+
 function Skillet:ScanTrade()
 	--DA.PROFILE("Skillet:ScanTrade()")
 	local link = C_TradeSkillUI.GetTradeSkillListLink()
@@ -1576,6 +1636,7 @@ function Skillet:ScanTrade()
 		local id = Skillet.db.realm.Filtered[player][tradeID][i]
 		local info = C_TradeSkillUI.GetRecipeInfo(id)
 		headerUsed[info.categoryID] = false
+		info = self:SetUpgradeLevels(info) 
 		Skillet.db.realm.recipeInfo[player][tradeID][id] = info
 	end
 
