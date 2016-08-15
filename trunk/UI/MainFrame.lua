@@ -1390,6 +1390,7 @@ function Skillet:UpdateDetailsWindow(skillIndex)
 		if recipeInfo and recipeInfo.upgradeable then
 			for i, starFrame in ipairs(SkilletReagentParent.StarsFrame.Stars) do
 				starFrame.EarnedStar:SetShown(i <= recipeInfo.recipeUpgrade);
+				starFrame.UnearnedStar:SetShown(i <= recipeInfo.maxUpgrade);
 			end
 			SkilletReagentParent.StarsFrame:Show();
 		end
