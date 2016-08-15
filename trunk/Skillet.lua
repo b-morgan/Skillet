@@ -825,7 +825,7 @@ function Skillet:EnableBlizzardFrame()
 		self.BlizzardTradeSkillFrame = nil
 		TradeSkillFrame:SetScript("OnHide", Skillet.tradeSkillHide)
 		Skillet.tradeSkillHide = nil
-		ShowUIPanel(TradeSkillFrame)
+		--ShowUIPanel(TradeSkillFrame)
 	end
 end
 
