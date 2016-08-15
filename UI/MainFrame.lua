@@ -1353,6 +1353,8 @@ local ARLProfessionInitialized = {}
 -- Updates the details window with information about the currently selected skill
 function Skillet:UpdateDetailsWindow(skillIndex)
 	--DA.DEBUG(0,"UpdateDetailsWindow("..tostring(skillIndex)..")")
+	SkilletReagentParent.StarsFrame:Hide();
+	self.currentRecipeInfo = nil;
 	if not skillIndex or skillIndex < 0 then
 		Skillet:HideDetailWindow()
 		return
@@ -1382,6 +1384,14 @@ function Skillet:UpdateDetailsWindow(skillIndex)
 			for c,s in pairs(SkilletRankFrame.subRanks) do
 				s:Show()
 			end
+		end
+		local recipeInfo = Skillet.db.realm.recipeInfo[self.currentPlayer][self.currentTrade][recipe.spellID]
+		self.currentRecipeInfo = recipeInfo
+		if recipeInfo and recipeInfo.upgradeable then
+			for i, starFrame in ipairs(SkilletReagentParent.StarsFrame.Stars) do
+				starFrame.EarnedStar:SetShown(i <= recipeInfo.recipeUpgrade);
+			end
+			SkilletReagentParent.StarsFrame:Show();
 		end
 		local description = C_TradeSkillUI.GetRecipeDescription(skill.id)
 		--DA.DEBUG(0,"description="..tostring(description))
@@ -2810,4 +2820,9 @@ function Skillet:AuctionatorSearch()
 		end
 	end
 	Atr_SearchAH (shoppingListName, items)
+end
+
+function Skillet:ReagentStarsFrame_OnMouseEnter(starsFrame)
+	GameTooltip:SetOwner(starsFrame, "ANCHOR_TOPLEFT");
+	GameTooltip:SetRecipeRankInfo(self.currentRecipeInfo.recipeID, self.currentRecipeInfo.recipeUpgrade);
 end

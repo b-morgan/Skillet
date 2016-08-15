@@ -761,6 +761,17 @@
 		<CheckedTexture file="Interface\Buttons\UI-CheckBox-Check"/>
 		<DisabledCheckedTexture file="Interface\Buttons\UI-CheckBox-Check-Disabled"/>
 	</CheckButton>
+	<Frame name="SkilletDetailsStarTemplate" parentArray="Stars" virtual="true">
+		<Size x="16" y="15"/>
+		<Layers>
+			<Layer level="BACKGROUND">
+				<Texture parentKey="UnearnedStar" atlas="tradeskills-star-off" alpha=".28" />
+			</Layer>
+			<Layer level="OVERLAY">
+				<Texture parentKey="EarnedStar" atlas="tradeskills-star"/>
+			</Layer>
+		</Layers>
+	</Frame>	
 	<!--
 	#
 	# Tool tip to be used when hovering over recipe lines in the skill list
@@ -1788,6 +1799,35 @@
 					</Layer> <!-- OVERLAY -->
 				</Layers>
 			</Frame>
+			<Frame parentKey="StarsFrame" parent="SkilletReagentParent" enableMouse="true">
+				<Size x="45" y="16"/>
+				<Anchors>
+					<Anchor point="TOPRIGHT" relativeTo="SkilletReagentParent" relativePoint="TOPRIGHT" x="-15" y="-10"/>
+				</Anchors>
+				<Frames>
+					<Frame parentKey="Star1" inherits="SkilletDetailsStarTemplate">
+						<Anchors>
+							<Anchor point="LEFT" />
+						</Anchors>
+					</Frame>
+					<Frame parentKey="Star2" inherits="SkilletDetailsStarTemplate">
+						<Anchors>
+							<Anchor point="LEFT" relativeKey="$parent.Star1" relativePoint="RIGHT" x="2" y="0"/>
+						</Anchors>
+					</Frame>
+					<Frame parentKey="Star3" inherits="SkilletDetailsStarTemplate">
+						<Anchors>
+							<Anchor point="LEFT" relativeKey="$parent.Star2" relativePoint="RIGHT" x="2" y="0"/>
+						</Anchors>
+					</Frame>
+				</Frames>
+				<Scripts>
+					<OnEnter>
+						Skillet:ReagentStarsFrame_OnMouseEnter(self);
+					</OnEnter>
+					<OnLeave function="GameTooltip_Hide" />
+				</Scripts>
+			</Frame>			
 			<Frame name="SkilletQueueManagementParent" parent="SkilletFrame" hidden="true">
 				<Size>
 					<AbsDimension x="280" y="260"/>
