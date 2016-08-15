@@ -151,6 +151,11 @@ local function SkillIsFilteredOut(skillIndex)
 		-- it's a header, don't filter here
 		return false
 	end
+	
+	if Skillet:IsUpgradeHidden(recipeID) then 
+   	   return true
+	end
+	
 		-- are we hiding anything that is trivial (has no chance of giving a skill point)
 	if skill_style_type[skill.difficulty] then
 		if skill_style_type[skill.difficulty].level < (Skillet:GetTradeSkillOption("filterLevel") or 4) then
