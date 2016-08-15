@@ -813,7 +813,10 @@ function Skillet:DisableBlizzardFrame()
 		self.BlizzardTradeSkillFrame = TradeSkillFrame
 		self.tradeSkillHide = TradeSkillFrame:GetScript("OnHide")
 		TradeSkillFrame:SetScript("OnHide", nil)
-		HideUIPanel(TradeSkillFrame)
+		HideUIPanel(TradeSkillFrame)	
+	else
+		TradeSkillFrame:SetScript("OnHide", nil)
+		HideUIPanel(TradeSkillFrame)	
 	end
 end
 
@@ -1302,7 +1305,6 @@ function Skillet:SkilletShow()
 	else
 		DA.DEBUG(0,"SkilletShow: "..tostring(skillLineName).." not linkable")
 	end
-	self:InitializeDatabase(self.currentPlayer)
 	-- Verify that the user understands this is an alpha build. 
 	-- Skillet.alpha is 0 for ask the question, 1 to use Blizzard UI, and 2 to use the Skillet UI (if appropriate).
 	-- If the user is smart enough to turn on debugging, skip the question.
@@ -1326,6 +1328,7 @@ function Skillet:SkilletShow()
 	else
 		if self:IsSupportedTradeskill(self.currentTrade) then
 			self:DisableBlizzardFrame()
+			self:InitializeDatabase(self.currentPlayer)
 			self.tradeSkillOpen = true
 			self.selectedSkill = nil
 			self.dataScanned = false
