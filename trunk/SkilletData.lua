@@ -1238,6 +1238,7 @@ function Skillet:SetTradeSkillLearned()
 	C_TradeSkillUI.SetOnlyShowLearnedRecipes(true);
 	C_TradeSkillUI.SetOnlyShowUnlearnedRecipes(false);
 	Skillet.unlearnedRecipes = false
+	Skillet.selectedSkill = nil
 	Skillet:NewFilterDropdown_OnShow()
 end
 
@@ -1245,6 +1246,7 @@ function Skillet:SetTradeSkillUnlearned()
 	C_TradeSkillUI.SetOnlyShowLearnedRecipes(false);
 	C_TradeSkillUI.SetOnlyShowUnlearnedRecipes(true);
 	Skillet.unlearnedRecipes = true
+	Skillet.selectedSkill = nil
 	Skillet:NewFilterDropdown_OnShow()
 end
 
