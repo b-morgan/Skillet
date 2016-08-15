@@ -2423,6 +2423,42 @@ local skillMenuList = {
 		func = function() Skillet:SkillButton_PasteSelected(Skillet.menuButton) end,
 	},
 }
+local skillMenuListLocked = {
+	{
+		text = "Link Recipe",
+		func = function()
+					local skill = Skillet.menuButton.skill
+					if skill and skill.recipeID then
+						local spellLink = C_TradeSkillUI.GetRecipeLink(skill.recipeID)
+						if (ChatEdit_GetLastActiveWindow():IsVisible() or WIM_EditBoxInFocus ~= nil) then
+							ChatEdit_InsertLink(spellLink)
+						end
+					end
+				end,
+	},
+	{
+		text = "Add to Ignore Materials",
+		func = function()
+					local skill = Skillet.menuButton.skill
+					if skill and skill.recipeID then
+						local recipeID = skill.recipeID
+						local spellLink = C_TradeSkillUI.GetRecipeLink(skill.recipeID)
+						Skillet.db.realm.userIgnoredMats[Skillet.currentPlayer][recipeID] = spellLink
+						if Skillet.ignoreList and Skillet.ignoreList:IsVisible() then
+							Skillet:UpdateIgnoreListWindow()
+						end
+					end
+				end,
+	},
+	{
+		text = "",
+		disabled = true,
+	},
+	{
+		text = "Copy",
+		func = function() Skillet:SkillButton_CopySelected() end,
+	},
+}
 local headerMenuList = {
 	{
 		text = "Rename Group",
@@ -2459,6 +2495,12 @@ local headerMenuList = {
 		func = function() Skillet:SkillButton_PasteSelected(Skillet.menuButton) end,
 	},
 }
+local headerMenuListLocked = {
+	{
+		text = "Copy",
+		func = function() Skillet:SkillButton_CopySelected() end,
+	},
+}
 local headerMenuListMainGroup = {
 	{
 		text = "New Group",
@@ -2487,31 +2529,10 @@ local headerMenuListMainGroup = {
 		func = function() Skillet:SkillButton_PasteSelected(Skillet.menuButton) end,
 	},
 }
-local skillMenuListHidden = {
-{		text = "New Group",
-		hasArrow = true,
-		menuList = skillMenuGroup,
-	},
-	{
-		text = "Selection",
-		hasArrow = true,
-		menuList = skillMenuSelection,
-	},
-	{
-		text = "",
-		disabled = true,
-	},
+local headerMenuListMainGroupLocked = {
 	{
 		text = "Copy",
 		func = function() Skillet:SkillButton_CopySelected() end,
-	},
-	{
-		text = "Cut",
-		func = function() Skillet:SkillButton_CutSelected() end,
-	},
-	{
-		text = "Paste",
-		func = function() Skillet:SkillButton_PasteSelected(Skillet.menuButton) end,
 	},
 }
 local queueMenuList = {
@@ -2548,16 +2569,25 @@ function Skillet:SkilletSkillMenu_Show(button)
 	end
 	local x, y = GetCursorPosition()
 	local uiScale = UIParent:GetEffectiveScale()
+	local locked = Skillet:RecipeGroupIsLocked()
 	self.menuButton = button
 	if button.skill.subGroup then
 		if button.skill.mainGroup then
-			EasyMenu(headerMenuListMainGroup, SkilletSkillMenu, _G["UIParent"], x/uiScale,y/uiScale, "MENU", 5)
+			if locked then
+				EasyMenu(headerMenuListMainGroupLocked, SkilletSkillMenu, _G["UIParent"], x/uiScale,y/uiScale, "MENU", 5)
+			else
+				EasyMenu(headerMenuListMainGroup, SkilletSkillMenu, _G["UIParent"], x/uiScale,y/uiScale, "MENU", 5)
+			end
 		else
-			EasyMenu(headerMenuList, SkilletSkillMenu, _G["UIParent"], x/uiScale,y/uiScale, "MENU", 5)
+			if locked then
+				EasyMenu(headerMenuListLocked, SkilletSkillMenu, _G["UIParent"], x/uiScale,y/uiScale, "MENU", 5)
+			else
+				EasyMenu(headerMenuList, SkilletSkillMenu, _G["UIParent"], x/uiScale,y/uiScale, "MENU", 5)
+			end
 		end
 	else
-		if button:GetText() == "" then
-			EasyMenu(skillMenuListEmpty, SkilletSkillMenu, _G["UIParent"], x/uiScale,y/uiScale, "MENU", 5)
+		if locked then
+			EasyMenu(skillMenuListLocked, SkilletSkillMenu, _G["UIParent"], x/uiScale,y/uiScale, "MENU", 5)
 		else
 			EasyMenu(skillMenuList, SkilletSkillMenu, _G["UIParent"], x/uiScale,y/uiScale, "MENU", 5)
 		end
