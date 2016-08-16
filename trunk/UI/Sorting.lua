@@ -153,7 +153,7 @@ local function SkillIsFilteredOut(skillIndex)
 	end
 	
 	if Skillet:IsUpgradeHidden(recipeID) then 
-   	   return true
+	   return true
 	end
 	
 	if Skillet:GetTradeSkillOption("favoritesOnly") and not Skillet:IsFavorite(recipeID) then
