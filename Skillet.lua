@@ -966,11 +966,10 @@ function Skillet:FlushRecipeData()
 	Skillet.db.global.recipeDB = {}
 	Skillet.db.global.itemRecipeUsedIn = {}
 	Skillet.db.global.itemRecipeSource = {}
---	Skillet.db.global.AllRecipe = {}
 	Skillet.db.global.Categories = {}
 	Skillet.db.realm.skillDB = {}
---	Skillet.db.realm.Filtered = {}
 	Skillet.db.realm.recipeInfo = {}
+	Skillet.data.recipeInfo = {}
 end
 
 function Skillet:InitializeDatabase(player)
@@ -979,6 +978,9 @@ function Skillet:InitializeDatabase(player)
 		return
 	end
 	if player then
+		self.db.global.AllRecipe = {}
+		self.db.realm.Filtered = {}
+		self.db.realm.recipeInfo = {}	
 		if not self.db.realm.groupDB then
 			self.db.realm.groupDB = {}
 		end
@@ -987,12 +989,6 @@ function Skillet:InitializeDatabase(player)
 		end
 		if not self.db.realm.skillDB[player] then
 			self.db.realm.skillDB[player] = {}
-		end
-		if not self.db.realm.recipeInfo then
-			self.db.realm.recipeInfo = {}
-		end
-		if not self.db.realm.recipeInfo[player] then
-			self.db.realm.recipeInfo[player] = {}
 		end
 		if not self.db.realm.tradeSkills then
 			self.db.realm.tradeSkills = {}
@@ -1015,6 +1011,9 @@ function Skillet:InitializeDatabase(player)
 		if not self.data then
 			self.data = {}
 		end
+    if not self.data.recipeInfo then
+      self.data.recipeInfo = {}
+    end		
 		if not self.data.recipeList then
 			self.data.recipeList = {}
 		end

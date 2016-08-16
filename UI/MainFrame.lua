@@ -1017,9 +1017,9 @@ function Skillet:internal_UpdateTradeSkillWindow()
 					text = text .. skill_color.alttext;
 				end
 				-- If this recipe is upgradable, append the current and maximum upgrade levels
-				local recipeInfo = Skillet.db.realm.recipeInfo[self.currentPlayer][self.currentTrade][skill.recipeID]
+				local recipeInfo = Skillet.data.recipeInfo[self.currentTrade][skill.recipeID]
 				if recipeInfo.upgradeable then
-				  text = text .. " ("..tostring(recipeInfo.learnedUpgrade).."/"..tostring(recipeInfo.maxUpgrade)..")"
+				  text = text .. " ("..tostring(recipeInfo.recipeUpgrade).."/"..tostring(recipeInfo.maxUpgrade)..")"
 				end
 				-- Get any additional text that plugins might add
 				text = text .. (self:GetRecipeNameSuffix(self.currentTrade, skillIndex) or "")
@@ -1385,7 +1385,7 @@ function Skillet:UpdateDetailsWindow(skillIndex)
 				s:Show()
 			end
 		end
-		local recipeInfo = Skillet.db.realm.recipeInfo[self.currentPlayer][self.currentTrade][recipe.spellID]
+		local recipeInfo = Skillet.data.recipeInfo[self.currentTrade][recipe.spellID]
 		self.currentRecipeInfo = recipeInfo
 		if recipeInfo and recipeInfo.upgradeable then
 			for i, starFrame in ipairs(SkilletReagentParent.StarsFrame.Stars) do
@@ -2825,5 +2825,5 @@ end
 
 function Skillet:ReagentStarsFrame_OnMouseEnter(starsFrame)
 	GameTooltip:SetOwner(starsFrame, "ANCHOR_TOPLEFT");
-	GameTooltip:SetRecipeRankInfo(self.currentRecipeInfo.recipeID, self.currentRecipeInfo.recipeUpgrade);
+	GameTooltip:SetRecipeRankInfo(self.currentRecipeInfo.recipeID, self.currentRecipeInfo.learnedUpgrade);
 end
