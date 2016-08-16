@@ -398,13 +398,19 @@ function Skillet:RecipeGroupFlatten(group, depth, list, index)
 				if entry.subGroup.expanded then
 					inSub = self:RecipeGroupFlatten(entry.subGroup, depth+1, list, num+index)
 				end
-				num = num + inSub
+				if inSub == 0 and entry.subGroup.expanded then -- empty group - remove the header
+				  table.remove(list, num + index)
+				  num = num - 1
+				else
+				  num = num + inSub
+				end				
 			else
 				local skillData = self:GetSkill(self.currentPlayer, self.currentTrade, entry.skillIndex)
 				local recipe = self:GetRecipe(entry.recipeID)
 				if skillData then
 					local filterLevel = ((skillLevel[entry.difficulty] or skillLevel[skillData.difficulty] or 0) < (self:GetTradeSkillOption("filterLevel")))
 					local filterCraftable = false
+					local filterFavoritesOnly = self:GetTradeSkillOption("favoritesOnly") and not Skillet:IsFavorite(entry.recipeID)
 					if Skillet:GetTradeSkillOption("hideuncraftable") then
 						DA.DEBUG(1,"name="..tostring(skillData.name)..", numCraftable="..tostring(skillData.numCraftable)..", numRecursive="..tostring(skillData.numRecursive)..", numCraftableVendor="..tostring(skillData.numCraftableVendor)..", numCraftableAlts="..tostring(skillData.numCraftableAlts))
 						if not (skillData.numCraftable > 0 and Skillet:GetTradeSkillOption("filterInventory-bag")) and
@@ -430,7 +436,7 @@ function Skillet:RecipeGroupFlatten(group, depth, list, index)
 					else
 						newSkill.parentIndex = nil
 					end
-					if not (filterLevel or filterCraftable or Skillet:IsUpgradeHidden(newSkill.spellID)) then
+					if not (filterLevel or filterCraftable or filterFavoritesOnly or Skillet:IsUpgradeHidden(newSkill.spellID)) then
 						num = num + 1
 						list[num + index] = newSkill
 					end
