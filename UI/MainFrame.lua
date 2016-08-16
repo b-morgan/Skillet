@@ -815,6 +815,7 @@ function Skillet:internal_UpdateTradeSkillWindow()
 	self.visibleSkillButtons = math.min(numTradeSkills - skillOffset, button_count)
 	-- Iterate through all the buttons that make up the scroll window
 	-- and fill them in with data or hide them, as necessary
+	self.selectedSkillButton = nil
 	for i=1, button_count, 1 do
 		local rawSkillIndex = i + skillOffset
 		local button, buttonDrag = get_recipe_button(i)
@@ -830,6 +831,9 @@ function Skillet:internal_UpdateTradeSkillWindow()
 			local countText = _G[button:GetName() .. "Counts"]
 			local buttonExpand = _G[button:GetName() .. "Expand"]
 			local subSkillRankBar = _G[button:GetName() .. "SubSkillRankBar"]
+      if self.selectedSkill == rawSkillIndex then
+        self.selectedSkillButton = button
+      end			
 			buttonText:SetText("")
 			levelText:SetText("")
 			countText:SetText("")
