@@ -815,7 +815,7 @@
 	<!-- Don't change the name 'SkilletFrame' as other mods may depend on it -->
 	<Frame name="SkilletFrame" toplevel="true" movable="true" resizable="true" parent="UIParent" enableMouse="true" hidden="true">
 		<Size>
-			<AbsDimension x="680" y="545"/>
+			<AbsDimension x="720" y="545"/>
 		</Size>
 		<Frames>
 			<!--
@@ -1083,7 +1083,7 @@
 				<Anchors>
 					<Anchor point="BOTTOMLEFT" relativeTo="SkilletSkillListParent" relativePoint="TOPLEFT">
 						<Offset>
-							<AbsDimension x="45" y="38"/>
+							<AbsDimension x="60" y="38"/>
 						</Offset>
 					</Anchor>
 				</Anchors>
@@ -1201,7 +1201,7 @@
 				<Anchors>
 					<Anchor point="LEFT" relativeTo="SkilletSortDescButton" relativePoint="RIGHT">
 						<Offset>
-							<AbsDimension x="0" y="0"/>
+							<AbsDimension x="-8" y="-1"/>
 						</Offset>
 					</Anchor>
 				</Anchors>
@@ -2352,7 +2352,7 @@
 			-->
 			<Button name="SkilletQueueAllButton" inherits="UIPanelButtonTemplate" text="QUEUE_ALL" parent="SkilletFrame">
 				<Size>
-					<AbsDimension x="85" y="22"/>
+					<AbsDimension x="105" y="22"/>
 				</Size>
 				<Anchors>
 					<Anchor point="TOPLEFT" relativeTo="SkilletReagentParent" relativePoint="BOTTOMLEFT">
@@ -2370,7 +2370,7 @@
 			</Button>
 			<Button name="SkilletEnchantButton" inherits="UIPanelButtonTemplate" text="QUEUE_ALL" parent="SkilletFrame">
 				<Size>
-					<AbsDimension x="85" y="22"/>
+					<AbsDimension x="105" y="22"/>
 				</Size>
 				<Anchors>
 					<Anchor point="TOPLEFT" relativeTo="SkilletReagentParent" relativePoint="BOTTOMLEFT">
@@ -2388,7 +2388,7 @@
 			</Button>
 			<Button name="SkilletCreateAllButton" inherits="UIPanelButtonTemplate" text="CREATE_ALL" parent="SkilletFrame">
 				<Size>
-					<AbsDimension x="85" y="22"/>
+					<AbsDimension x="105" y="22"/>
 				</Size>
 				<Anchors>
 					<Anchor point="TOPLEFT" relativeTo="SkilletQueueAllButton" relativePoint="BOTTOMLEFT">
@@ -2414,7 +2414,7 @@
 			-->
 			<Button name="SkilletQueueButton" inherits="UIPanelButtonTemplate" text="QUEUE" parent="SkilletFrame">
 				<Size>
-					<AbsDimension x="85" y="22"/>
+					<AbsDimension x="105" y="22"/>
 				</Size>
 				<Anchors>
 					<Anchor point="TOPRIGHT" relativeTo="SkilletReagentParent" relativePoint="BOTTOMRIGHT">
@@ -2437,7 +2437,7 @@
 			-->
 			<Button name="SkilletCreateButton" inherits="UIPanelButtonTemplate" text="Create" parent="SkilletFrame">
 				<Size>
-					<AbsDimension x="85" y="22"/>
+					<AbsDimension x="105" y="22"/>
 				</Size>
 				<Anchors>
 					<Anchor point="TOPRIGHT" relativeTo="SkilletQueueButton" relativePoint="BOTTOMRIGHT">
@@ -2653,7 +2653,7 @@
 			-->
 			<Button name="SkilletStartQueueButton" inherits="UIPanelButtonTemplate" text="Start" parent="SkilletQueueParentBase">
 				<Size>
-					<AbsDimension x="80" y="22"/>
+					<AbsDimension x="90" y="22"/>
 				</Size>
 				<Anchors>
 					<Anchor point="TOPLEFT" relativeTo="SkilletQueueParent" relativePoint="BOTTOMLEFT">
@@ -2679,7 +2679,7 @@
 			-->
 			<Button name="SkilletEmptyQueueButton" inherits="UIPanelButtonTemplate" text="Clear" parent="SkilletQueueParentBase">
 				<Size>
-					<AbsDimension x="80" y="22"/>
+					<AbsDimension x="90" y="22"/>
 				</Size>
 				<Anchors>
 					<Anchor point="TOPLEFT" relativeTo="SkilletStartQueueButton" relativePoint="TOPRIGHT">
@@ -2725,7 +2725,7 @@
 			-->
 			<Button name="SkilletShoppingListButton" inherits="UIPanelButtonTemplate" text="Shopping List" parent="SkilletQueueParentBase">
 				<Size>
-					<AbsDimension x="100" y="22"/>
+					<AbsDimension x="110" y="22"/>
 				</Size>
 				<Anchors>
 					<Anchor point="TOPRIGHT" relativeTo="SkilletQueueParent" relativePoint="BOTTOMRIGHT">
