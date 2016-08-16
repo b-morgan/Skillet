@@ -887,6 +887,23 @@ function Skillet:CountEnchants()
 	DA.CHAT("enchantingItemIDs count= "..tostring(j)..", missing= "..DA.DUMP1(Skillet.missing_enchantingItemIDs))
 end
 ]]--
+--[[
+-- The following function can be used (/run Skillet:DumpRecipeInfo()) to get Blizzard's original recipeInfo
+-- Note: The trade skill frame needs to be open to the correct set of recipes for this to work.
+function Skillet:DumpRecipeInfo()
+	local recipeInfoDump = {102698, 102699, 201683, 201684, 201685} -- two from First-aid, three from Cooking (unlearned in 7.0.3)
+	if not Skillet.db.global.recipeInfoDump then
+		Skillet.db.global.recipeInfoDump = {}
+	end
+	for i=1,#recipeInfoDump,1 do
+		local id = recipeInfoDump[i]
+		local info = C_TradeSkillUI.GetRecipeInfo(id)
+		if info then
+			Skillet.db.global.recipeInfoDump[id] = info
+		end
+	end
+end
+]]--
 
 --[[ == Local Tables == ]]--
 
@@ -1484,17 +1501,17 @@ function Skillet:RescanTrade()
 	if not Skillet.data.skillList[player][tradeID] then
 		Skillet.data.skillList[player][tradeID]={}
 	end
+	if not Skillet.data.Filtered then
+		Skillet.data.Filtered = {}
+	end
+	if not Skillet.data.Filtered[tradeID] then
+		Skillet.data.Filtered[tradeID] = {}
+	end
 	if not Skillet.db.realm.skillDB[player] then
 		Skillet.db.realm.skillDB[player] = {}
 	end
 	if not Skillet.db.realm.skillDB[player][tradeID] then
 		Skillet.db.realm.skillDB[player][tradeID] = {}
-	end
-	if not Skillet.db.realm.Filtered[player] then
-		Skillet.db.realm.Filtered[player] = {}
-	end
-	if not Skillet.db.realm.Filtered[player][tradeID] then
-		Skillet.db.realm.Filtered[player][tradeID] = {}
 	end
 	if not Skillet.db.realm.recipeInfo[player] then
 		Skillet.db.realm.recipeInfo[player] = {}
@@ -1502,9 +1519,9 @@ function Skillet:RescanTrade()
 	if not Skillet.db.realm.recipeInfo[player][tradeID] then
 		Skillet.db.realm.recipeInfo[player][tradeID] = {}
 	end
-	if not Skillet.db.global.AllRecipe[tradeID] then
-		Skillet.db.global.AllRecipe[tradeID] = {}
-	end
+--	if not Skillet.db.global.AllRecipe[tradeID] then
+--		Skillet.db.global.AllRecipe[tradeID] = {}
+--	end
 	if not Skillet.db.global.Categories[tradeID] then
 		Skillet.db.global.Categories[tradeID] = {}
 	end
@@ -1514,68 +1531,59 @@ function Skillet:RescanTrade()
 end
 
 function Skillet:IsUpgradeHidden(recipeID) 
-  local recipeInfo = Skillet.db.realm.recipeInfo[Skillet.currentPlayer][Skillet.currentTrade][recipeID]
-  --filter out upgrades
-  if recipeInfo and recipeInfo.upgradeable then		
-       if Skillet.unlearnedRecipes then
-  	   -- for unlearned, show next upgrade to learn
-       if recipeInfo.recipeUpgrade ~= recipeInfo.learnedUpgrade + 1 then
-         return true
-       end  	   
-  	else
-  	   -- for learned, show only highest upgrade learned
-  	   if recipeInfo.recipeUpgrade ~= recipeInfo.learnedUpgrade then
-  	     return true
-  	   end
-  	end
-  end
-  return false
-end	
-
+	local recipeInfo = Skillet.db.realm.recipeInfo[Skillet.currentPlayer][Skillet.currentTrade][recipeID]
+	--filter out upgrades
+	if recipeInfo and recipeInfo.upgradeable then
+		if Skillet.unlearnedRecipes then
+			-- for unlearned, show next upgrade to learn
+			if recipeInfo.recipeUpgrade ~= recipeInfo.learnedUpgrade + 1 then
+				return true
+			end
+		else
+			-- for learned, show only highest upgrade learned
+			if recipeInfo.recipeUpgrade ~= recipeInfo.learnedUpgrade then
+				return true
+			end
+		end
+	end
+	return false
+end
 
 function Skillet:SetUpgradeLevels(recipeInfo) 
-        if recipeInfo.previousRecipeID or recipeInfo.nextRecipeID then
-          local n,m = 1,1
-          local firstRecipeInfo = recipeInfo
-          if recipeInfo.previousRecipeID then
-            -- Start by going backwards from this node until we find the first in the line
-            local currentRecipeInfo = recipeInfo
-            local previousRecipeID = recipeInfo.previousRecipeID
-            while previousRecipeID do
-              local previousRecipeInfo = C_TradeSkillUI.GetRecipeInfo(previousRecipeID)
-              firstRecipeInfo = previousRecipeInfo
-              currentRecipeInfo.previousRecipeInfo = previousRecipeInfo
-              previousRecipeInfo.nextRecipeInfo = currentRecipeInfo
-              currentRecipeInfo = previousRecipeInfo
-              previousRecipeID = currentRecipeInfo.previousRecipeID
-              n = n + 1
-              m = m + 1
-            end
-          end
-          if recipeInfo.nextRecipeID then
-            -- Now move forward from this node linking them until the end
-            local currentRecipeInfo = recipeInfo
-            local nextRecipeID = recipeInfo.nextRecipeID
-            while nextRecipeID do
-              local nextRecipeInfo = C_TradeSkillUI.GetRecipeInfo(nextRecipeID)
-              nextRecipeInfo.previousRecipeInfo = currentRecipeInfo
-              currentRecipeInfo.nextRecipeInfo = nextRecipeInfo
-              currentRecipeInfo = nextRecipeInfo
-              nextRecipeID = currentRecipeInfo.nextRecipeID
-              m = m + 1
-            end
-          end
-          local l = 0
-	 	  while firstRecipeInfo and recipeInfo.learned do
+	if recipeInfo.previousRecipeID or recipeInfo.nextRecipeID then
+		local n,m = 1,1
+		local firstRecipeInfo = recipeInfo
+		if recipeInfo.previousRecipeID then
+			-- Start by going backwards from this node until we find the first in the line
+			local previousRecipeID = recipeInfo.previousRecipeID
+			while previousRecipeID do
+				local previousRecipeInfo = C_TradeSkillUI.GetRecipeInfo(previousRecipeID)
+				firstRecipeInfo = previousRecipeInfo
+				previousRecipeID = previousRecipeInfo.previousRecipeID
+				n = n + 1
+				m = m + 1
+			end
+		end
+		if recipeInfo.nextRecipeID then
+			-- Now move forward from this node linking them until the end
+			local nextRecipeID = recipeInfo.nextRecipeID
+			while nextRecipeID do
+				local nextRecipeInfo = C_TradeSkillUI.GetRecipeInfo(nextRecipeID)
+				nextRecipeID = nextRecipeInfo.nextRecipeID
+				m = m + 1
+			end
+		end
+		local l = 0
+		while firstRecipeInfo and recipeInfo.learned do
 			l = l + 1
 			firstRecipeInfo = firstRecipeInfo.nextRecipeInfo;
-		  end
-          recipeInfo.upgradeable = true
-          recipeInfo.maxUpgrade = m
-          recipeInfo.recipeUpgrade = n
-          recipeInfo.learnedUpgrade = l
-        end
-        return recipeInfo
+		end
+		recipeInfo.upgradeable = true
+		recipeInfo.maxUpgrade = m
+		recipeInfo.recipeUpgrade = n
+		recipeInfo.learnedUpgrade = l
+	end
+	return recipeInfo
 end
 
 function Skillet:ScanTrade()
@@ -1608,9 +1616,9 @@ function Skillet:ScanTrade()
 	Skillet.db.realm.tradeSkills[player][tradeID].maxRank = maxRank
 	Skillet.db.realm.tradeSkills[player][tradeID].name = profession
 
-	if #Skillet.db.global.AllRecipe[tradeID] == 0 then
-		Skillet.db.global.AllRecipe[tradeID] = C_TradeSkillUI.GetAllRecipeIDs()
-	end
+--	if #Skillet.db.global.AllRecipe[tradeID] == 0 then
+--		Skillet.db.global.AllRecipe[tradeID] = C_TradeSkillUI.GetAllRecipeIDs()
+--	end
 
 	if #Skillet.db.global.Categories[tradeID] == 0 then
 		local categories = { C_TradeSkillUI.GetCategories() }
@@ -1633,14 +1641,14 @@ function Skillet:ScanTrade()
 
 	self:ResetTradeSkillFilter() -- verify the search filter is blank (so we get all skills)
 	Skillet.hasProgressBar = {} -- table of (sub)headers in this list with progress bars (used in MainFrame.lua)
-	Skillet.db.realm.Filtered[player][tradeID] = C_TradeSkillUI.GetFilteredRecipeIDs()
+	Skillet.data.Filtered[tradeID] = C_TradeSkillUI.GetFilteredRecipeIDs()
 	local numSkills = #C_TradeSkillUI.GetFilteredRecipeIDs()
 	--DA.DEBUG(0,"ScanTrade: Expanding, "..tostring(profession)..":"..tostring(tradeID).." "..tostring(numSkills).." recipes")
 
 -- Build a list of categories (headers) used for this set of filtered recipes
 	local headerUsed = {}
 	for i = 1, numSkills do
-		local id = Skillet.db.realm.Filtered[player][tradeID][i]
+		local id = Skillet.data.Filtered[tradeID][i]
 		local info = C_TradeSkillUI.GetRecipeInfo(id)
 		headerUsed[info.categoryID] = false
 		info = self:SetUpgradeLevels(info) 
@@ -1665,7 +1673,7 @@ function Skillet:ScanTrade()
 	--DA.DEBUG(0,"ScanTrade: Scanning, "..tostring(profession)..":"..tostring(tradeID).." "..tostring(numSkills).." recipes")
 	local i = 1
 	for j = 1, numSkills, 1 do
-		local recipeID = Skillet.db.realm.Filtered[player][tradeID][j]
+		local recipeID = Skillet.data.Filtered[tradeID][j]
 		local recipeInfo = Skillet.db.realm.recipeInfo[player][tradeID][recipeID]
 		local skillName, skillType, _, isExpanded, _, _, _, _, _, _, _, displayAsUnavailable, _ = Skillet:GetTradeSkillInfo(recipeID);
 		if displayAsUnavailable then skillType = "unavailable" end
