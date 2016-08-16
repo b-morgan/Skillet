@@ -830,6 +830,7 @@ function Skillet:internal_UpdateTradeSkillWindow()
 			local levelText = _G[button:GetName() .. "Level"]
 			local countText = _G[button:GetName() .. "Counts"]
 			local buttonExpand = _G[button:GetName() .. "Expand"]
+			local buttonFavorite = _G[button:GetName() .. "Favorite"]
 			local subSkillRankBar = _G[button:GetName() .. "SubSkillRankBar"]
       if self.selectedSkill == rawSkillIndex then
         self.selectedSkillButton = button
@@ -841,6 +842,7 @@ function Skillet:internal_UpdateTradeSkillWindow()
 			countText:SetWidth(10)
 			subSkillRankBar:Hide()
 			levelText:SetWidth(skill.depth*8+20)
+			buttonFavorite:Hide()
 			local textAlpha = 1
 			if self.dragEngaged then
 				buttonDrag:SetWidth(width)
@@ -908,6 +910,16 @@ function Skillet:internal_UpdateTradeSkillWindow()
 				buttonText:SetTextColor(skill_color.r, skill_color.g, skill_color.b, textAlpha)
 				countText:SetTextColor(skill_color.r, skill_color.g, skill_color.b, textAlpha)
 				buttonExpand:Hide()
+				buttonFavorite.skill = skill				
+				buttonFavorite.SetFavorite = function(self, state)
+  				if state then
+  				  self:GetNormalTexture():SetAlpha(0.5)				  
+  				else
+  				  self:GetNormalTexture():SetAlpha(0)
+  				end
+  			end  			
+  			buttonFavorite:SetFavorite(Skillet:IsFavorite(skill.recipeID))
+				buttonFavorite:Show()
 				-- if the item has a minimum level requirement, then print that here
 				if self.db.profile.display_required_level then
 					local level = self:GetLevelRequiredToUse(recipe.itemID)
@@ -1935,6 +1947,23 @@ function Skillet:SkillButton_NameEditEnable(button)
 		buttonText:Hide()
 		button:UnregisterEvent("MODIFIER_STATE_CHANGED")
 	end
+end
+
+function Skillet:FavoriteButton_OnClick(button, mouse)
+  if (mouse=="LeftButton") then
+    if button.skill then
+        Skillet:ToggleFavorite(button.skill.recipeID)
+        button:SetFavorite(Skillet:IsFavorite(button.skill.recipeID))
+    end
+  end
+end
+
+function Skillet:FavoritesOnlyRefresh()
+  if Skillet:GetTradeSkillOption("favoritesOnly") then
+    SkilletFavoritesOnlyButton:LockHighlight()
+  else
+    SkilletFavoritesOnlyButton:UnlockHighlight()
+  end
 end
 
 local lastClick = 0

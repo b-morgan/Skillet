@@ -113,6 +113,7 @@ Skillet.defaultOptions = {
 	["filterInventory-owned"] = true,
 	["filterLevel"] = 1,
 	["hideuncraftable"] = false,
+  ["favoritesOnly"] = false,
 }
 
 Skillet.unknownRecipe = {

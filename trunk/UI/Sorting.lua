@@ -156,6 +156,9 @@ local function SkillIsFilteredOut(skillIndex)
    	   return true
 	end
 	
+	if Skillet:GetTradeSkillOption("favoritesOnly") and not Skillet:IsFavorite(recipeID) then
+	     return true
+	end
 		-- are we hiding anything that is trivial (has no chance of giving a skill point)
 	if skill_style_type[skill.difficulty] then
 		if skill_style_type[skill.difficulty].level < (Skillet:GetTradeSkillOption("filterLevel") or 4) then

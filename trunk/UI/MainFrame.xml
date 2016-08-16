@@ -189,6 +189,40 @@
 			</OnClick>
 		</Scripts>
 	</Button>
+	<Button name="SkilletFavoriteButtonTemplate" hidden="true" virtual="true">
+		<Size>
+			<AbsDimension x="16" y="16" />
+		</Size>
+		<NormalTexture name="$parentNormal" atlas="tradeskills-star" alpha="0">
+			<Size>
+				<AbsDimension x="12" y="12" />
+			</Size>
+			<Anchors>
+				<Anchor point="TOPLEFT">
+					<Offset>
+						<AbsDimension x="2" y="-2" />
+					</Offset>
+				</Anchor>
+			</Anchors>
+		</NormalTexture>
+		<HighlightTexture name="$parentHighlight" atlas="tradeskills-star">
+			<Size>
+				<AbsDimension x="12" y="12" />
+			</Size>
+			<Anchors>
+				<Anchor point="TOPLEFT">
+					<Offset>
+						<AbsDimension x="2" y="-2" />
+					</Offset>
+				</Anchor>
+			 </Anchors>
+		</HighlightTexture>
+		<Scripts>
+			<OnClick>
+				Skillet:FavoriteButton_OnClick(self,button)
+			</OnClick>				
+		</Scripts>
+	</Button>	
 	<Button name="SkilletEmptySpaceTemplate" virtual="true">
 		<Scripts>
 			<OnLoad>
@@ -282,6 +316,15 @@
 		-->
 		<Frames>
 			<Button name="$parentExpand" inherits="SkilletHeaderExpandButtonTemplate">
+				<Anchors>
+					<Anchor point="TOPLEFT" relativeTo="$parent" relativePoint="TOPLEFT">
+						<Offset>
+							<AbsDimension x="0" y="0"/>
+						</Offset>
+					</Anchor>
+				</Anchors>
+			</Button>
+			<Button name="$parentFavorite" inherits="SkilletFavoriteButtonTemplate">
 				<Anchors>
 					<Anchor point="TOPLEFT" relativeTo="$parent" relativePoint="TOPLEFT">
 						<Offset>
@@ -1625,6 +1668,31 @@
 					<OnLeave>
 						GameTooltip:Hide()
 					</OnLeave>
+				</Scripts>
+			</Button>
+			<Button name="SkilletFavoritesOnlyButton">
+				<Size>
+					<AbsDimension x="20" y="20"/>
+				</Size>
+				<NormalTexture name="$parentIcon" atlas="tradeskills-star-off" alpha="0.5"/>
+				<HighlightTexture name="$parentIcon" atlas="tradeskills-star"/>
+				<Anchors>
+					<Anchor point="BOTTOMRIGHT" relativeTo="SkilletExpandAllButton" relativePoint="BOTTOMLEFT">
+						<Offset>
+							<AbsDimension x="-5" y="0"/>
+						</Offset>
+					</Anchor>
+				</Anchors>
+				<Scripts>
+					<OnShow>
+						Skillet:FavoritesOnlyRefresh()
+					</OnShow>				
+					<OnClick>
+					    Skillet:SetTradeSkillOption("favoritesOnly", not Skillet:GetTradeSkillOption("favoritesOnly"))
+						Skillet:FavoritesOnlyRefresh()
+						Skillet:SortAndFilterRecipes()
+  						Skillet:UpdateTradeSkillWindow()
+					</OnClick>
 				</Scripts>
 			</Button>
 			<!--
