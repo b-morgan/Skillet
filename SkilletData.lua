@@ -1525,32 +1525,32 @@ function Skillet:RescanTrade()
 end
 
 function Skillet:IsFavorite(recipeID)
-  return self.data.recipeInfo[self.currentTrade][recipeID].favorite
+	return self.data.recipeInfo[self.currentTrade][recipeID].favorite
 end
 
 function Skillet:ToggleFavorite(recipeID)
-    local recipeInfo = self.data.recipeInfo[self.currentTrade][recipeID]
-    recipeInfo.favorite = not recipeInfo.favorite 
-    C_TradeSkillUI.SetRecipeFavorite(recipeID, recipeInfo.favorite);
+	local recipeInfo = self.data.recipeInfo[self.currentTrade][recipeID]
+	recipeInfo.favorite = not recipeInfo.favorite 
+	C_TradeSkillUI.SetRecipeFavorite(recipeID, recipeInfo.favorite);
 end
 
 function Skillet:IsUpgradeHidden(recipeID) 
-  local recipeInfo = Skillet.data.recipeInfo[Skillet.currentTrade][recipeID]
-  --filter out upgrades
-  if recipeInfo and recipeInfo.upgradeable then		
-       if Skillet.unlearnedRecipes then
-  	   -- for unlearned, show next upgrade to learn
-       if recipeInfo.recipeUpgrade ~= recipeInfo.learnedUpgrade + 1 then
-         return true
-       end
-  	else
-  	   -- for learned, show only highest upgrade learned
-  	   if recipeInfo.recipeUpgrade ~= recipeInfo.learnedUpgrade then
-  	     return true
-  	   end
-  	end
-  end
-  return false
+	local recipeInfo = Skillet.data.recipeInfo[Skillet.currentTrade][recipeID]
+	--filter out upgrades
+	if recipeInfo and recipeInfo.upgradeable then		
+		if Skillet.unlearnedRecipes then
+			-- for unlearned, show next upgrade to learn
+			if recipeInfo.recipeUpgrade ~= recipeInfo.learnedUpgrade + 1 then
+				return true
+			end
+	  	else
+			-- for learned, show only highest upgrade learned
+			if recipeInfo.recipeUpgrade ~= recipeInfo.learnedUpgrade then
+				return true
+			end
+		end
+	end
+	return false
 end	
 
 

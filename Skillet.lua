@@ -113,7 +113,7 @@ Skillet.defaultOptions = {
 	["filterInventory-owned"] = true,
 	["filterLevel"] = 1,
 	["hideuncraftable"] = false,
-  ["favoritesOnly"] = false,
+	["favoritesOnly"] = false,
 }
 
 Skillet.unknownRecipe = {
@@ -1012,9 +1012,9 @@ function Skillet:InitializeDatabase(player)
 		if not self.data then
 			self.data = {}
 		end
-    if not self.data.recipeInfo then
-      self.data.recipeInfo = {}
-    end		
+		if not self.data.recipeInfo then
+			self.data.recipeInfo = {}
+		end		
 		if not self.data.recipeList then
 			self.data.recipeList = {}
 		end
