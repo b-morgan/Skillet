@@ -1513,15 +1513,9 @@ function Skillet:RescanTrade()
 	if not Skillet.db.realm.skillDB[player][tradeID] then
 		Skillet.db.realm.skillDB[player][tradeID] = {}
 	end
-	if not Skillet.db.realm.recipeInfo[player] then
-		Skillet.db.realm.recipeInfo[player] = {}
+	if not Skillet.data.recipeInfo[tradeID] then
+		Skillet.data.recipeInfo[tradeID] = {}
 	end
-	if not Skillet.db.realm.recipeInfo[player][tradeID] then
-		Skillet.db.realm.recipeInfo[player][tradeID] = {}
-	end
---	if not Skillet.db.global.AllRecipe[tradeID] then
---		Skillet.db.global.AllRecipe[tradeID] = {}
---	end
 	if not Skillet.db.global.Categories[tradeID] then
 		Skillet.db.global.Categories[tradeID] = {}
 	end
@@ -1531,23 +1525,24 @@ function Skillet:RescanTrade()
 end
 
 function Skillet:IsUpgradeHidden(recipeID) 
-	local recipeInfo = Skillet.db.realm.recipeInfo[Skillet.currentPlayer][Skillet.currentTrade][recipeID]
-	--filter out upgrades
-	if recipeInfo and recipeInfo.upgradeable then
-		if Skillet.unlearnedRecipes then
-			-- for unlearned, show next upgrade to learn
-			if recipeInfo.recipeUpgrade ~= recipeInfo.learnedUpgrade + 1 then
-				return true
-			end
-		else
-			-- for learned, show only highest upgrade learned
-			if recipeInfo.recipeUpgrade ~= recipeInfo.learnedUpgrade then
-				return true
-			end
-		end
-	end
-	return false
-end
+  local recipeInfo = Skillet.data.recipeInfo[Skillet.currentTrade][recipeID]
+  --filter out upgrades
+  if recipeInfo and recipeInfo.upgradeable then		
+       if Skillet.unlearnedRecipes then
+  	   -- for unlearned, show next upgrade to learn
+       if recipeInfo.recipeUpgrade ~= recipeInfo.learnedUpgrade + 1 then
+         return true
+       end
+  	else
+  	   -- for learned, show only highest upgrade learned
+  	   if recipeInfo.recipeUpgrade ~= recipeInfo.learnedUpgrade then
+  	     return true
+  	   end
+  	end
+  end
+  return false
+end	
+
 
 function Skillet:SetUpgradeLevels(recipeInfo) 
 	if recipeInfo.previousRecipeID or recipeInfo.nextRecipeID then
@@ -1656,7 +1651,7 @@ function Skillet:ScanTrade()
 		local info = C_TradeSkillUI.GetRecipeInfo(id)
 		headerUsed[info.categoryID] = false
 		info = self:SetUpgradeLevels(info) 
-		Skillet.db.realm.recipeInfo[player][tradeID][id] = info
+		Skillet.data.recipeInfo[tradeID][id] = info
 	end
 
 	local skillDB = Skillet.db.realm.skillDB[player][tradeID]
@@ -1678,7 +1673,7 @@ function Skillet:ScanTrade()
 	local i = 1
 	for j = 1, numSkills, 1 do
 		local recipeID = Skillet.data.Filtered[tradeID][j]
-		local recipeInfo = Skillet.db.realm.recipeInfo[player][tradeID][recipeID]
+		local recipeInfo = Skillet.data.recipeInfo[tradeID][recipeID]
 		local skillName, skillType, _, isExpanded, _, _, _, _, _, _, _, displayAsUnavailable, _ = Skillet:GetTradeSkillInfo(recipeID);
 		if displayAsUnavailable then skillType = "unavailable" end
 		if not headerUsed[recipeInfo.categoryID] then
