@@ -1565,7 +1565,7 @@ function Skillet:SetUpgradeLevels(recipeInfo)
 			end
 		end
 		if recipeInfo.nextRecipeID then
-			-- Now move forward from this node linking them until the end
+			-- Now move forward from this node until the end
 			local nextRecipeID = recipeInfo.nextRecipeID
 			while nextRecipeID do
 				local nextRecipeInfo = C_TradeSkillUI.GetRecipeInfo(nextRecipeID)
@@ -1574,9 +1574,13 @@ function Skillet:SetUpgradeLevels(recipeInfo)
 			end
 		end
 		local l = 0
-		while firstRecipeInfo and recipeInfo.learned do
+		while firstRecipeInfo and firstRecipeInfo.learned do
 			l = l + 1
-			firstRecipeInfo = firstRecipeInfo.nextRecipeInfo;
+			if firstRecipeInfo.nextRecipeID then
+				firstRecipeInfo = C_TradeSkillUI.GetRecipeInfo(firstRecipeInfo.nextRecipeID)
+			else
+				firstRecipeInfo = nil
+			end
 		end
 		recipeInfo.upgradeable = true
 		recipeInfo.maxUpgrade = m
