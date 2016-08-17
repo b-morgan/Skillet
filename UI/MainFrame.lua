@@ -841,7 +841,11 @@ function Skillet:internal_UpdateTradeSkillWindow()
 			countText:Hide()
 			countText:SetWidth(10)
 			subSkillRankBar:Hide()
-			levelText:SetWidth(skill.depth*8+20)
+			if self.db.profile.display_required_level then
+				levelText:SetWidth(skill.depth*8+20)
+			else
+				levelText:SetWidth(skill.depth*8)
+			end
 			buttonFavorite:Hide()
 			local textAlpha = 1
 			if self.dragEngaged then
@@ -988,25 +992,11 @@ function Skillet:internal_UpdateTradeSkillWindow()
 				else
 					countText:Hide()
 				end
-				local countWidth = 0
-				if showBag then
-					countWidth = countWidth + 25
-				end
-				if showCraft then
-					countWidth = countWidth + 25
-				end
-				if showVendor then
-					countWidth = countWidth + 25
-				end
-				if showAlts then
-					countWidth = countWidth + 25
-				end
 				-- show the count of the item currently owned that the recipe will produce
 				if showOwned and Skillet.currentPlayer == UnitName("player") then
 					local numowned = (self.db.realm.auctionData[Skillet.currentPlayer][recipe.itemID] or 0) + GetItemCount(recipe.itemID,true)
 					if numowned > 0 then
 						local count = "|cff95fcff("..numowned..") "..(countText:GetText() or "")
-						countWidth = countWidth + 25
 						countText:SetText(count)
 						countText:Show()
 					end
@@ -1015,15 +1005,12 @@ function Skillet:internal_UpdateTradeSkillWindow()
 					local _, _, _, _, _, numSkillUps  = Skillet:GetTradeSkillInfo(skill.recipeID)
 					if numSkillUps and numSkillUps > 1 then
 						local count = "<+"..numSkillUps.."> "..(countText:GetText() or "")
-						countWidth = countWidth + 20
 						countText:SetText(count)
 						countText:Show()
 					end
 				end
-				if countWidth > 0 then
-					countWidth = countWidth + 20
-				end
-				countText:SetWidth(countWidth)
+				countText:SetWidth(SKILLET_REAGENT_MIN_WIDTH)
+				countText:SetWidth(countText:GetStringWidth())
 				Skillet:CustomizeCountsColumn(recipe, countText)
 				button:SetID(skillIndex or 0)
 				-- If enhanced recipe display is enabled, show the difficulty as text,
@@ -1041,7 +1028,7 @@ function Skillet:internal_UpdateTradeSkillWindow()
 				text = text .. (self:GetRecipeNameSuffix(self.currentTrade, skillIndex) or "")
 				buttonText:SetText(text)
 				buttonText:SetWordWrap(false)
-				buttonText:SetWidth(max_text_width - countWidth)
+				buttonText:SetWidth(max_text_width - countText:GetWidth())
 				if not self.dragEngaged and self.selectedSkill and self.selectedSkill == skillIndex then
 					SkilletHighlightFrame:SetPoint("TOPLEFT", "SkilletScrollButton"..i, "TOPLEFT", 0, 0)
 					SkilletHighlightFrame:SetWidth(button:GetWidth())

@@ -289,7 +289,11 @@
 						<AbsDimension x="25" y="0" />
 					</Size>
 					<Anchors>
-						<Anchor point="LEFT" />
+						<Anchor point="LEFT">
+							<Offset>
+								<AbsDimension x="16" y="0"/>
+							</Offset>
+						</Anchor>
 					</Anchors>
 					<Color r="1" g="1" b="1" a="1" />
 				</FontString>
