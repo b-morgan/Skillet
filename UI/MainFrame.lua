@@ -2348,27 +2348,36 @@ end
 
 local skillMenuSelection = {
 	{
-		text = "Select All",
+		text = L["Select All"],
 		func = function() Skillet:SkillButton_SetAllSelections(true) Skillet:UpdateTradeSkillWindow() end,
 	},
 	{
-		text = "Select None",
+		text = L["Select None"],
 		func = function() Skillet:SkillButton_SetAllSelections(false) Skillet:UpdateTradeSkillWindow() end,
 	},
 }
 local skillMenuGroup = {
 	{
-		text = "Empty Group",
+		text = L["Empty Group"],
 		func = function() Skillet:SkillButton_NewGroup() end,
 	},
 	{
-		text = "From Selection",
+		text = L["From Selection"],
 		func = function() Skillet:SkillButton_MakeGroup() end,
 	},
 }
+local favoriteMenu = {
+		text = "",	
+		func = function()
+					local recipeID = Skillet.menuButton.skill.recipeID
+					local favoriteButton = _G[Skillet.menuButton:GetName() .. "Favorite"]
+					Skillet:ToggleFavorite(recipeID)
+					favoriteButton:SetFavorite(Skillet:IsFavorite(recipeID))
+				end,
+}
 local skillMenuList = {
 	{
-		text = "Link Recipe",
+		text = L["Link Recipe"],
 		func = function()
 					local skill = Skillet.menuButton.skill
 					if skill and skill.recipeID then
@@ -2380,7 +2389,7 @@ local skillMenuList = {
 				end,
 	},
 	{
-		text = "Add to Ignore Materials",
+		text = L["Add to Ignore Materials"],
 		func = function()
 					local skill = Skillet.menuButton.skill
 					if skill and skill.recipeID then
@@ -2393,17 +2402,18 @@ local skillMenuList = {
 					end
 				end,
 	},
+	favoriteMenu,
 	{
 		text = "",
 		disabled = true,
 	},
 	{
-		text = "New Group",
+		text = L["New Group"],
 		hasArrow = true,
 		menuList = skillMenuGroup,
 	},
 	{
-		text = "Selection",
+		text = L["Selection"],
 		hasArrow = true,
 		menuList = skillMenuSelection,
 	},
@@ -2412,21 +2422,21 @@ local skillMenuList = {
 		disabled = true,
 	},
 	{
-		text = "Copy",
+		text = L["Copy"],
 		func = function() Skillet:SkillButton_CopySelected() end,
 	},
 	{
-		text = "Cut",
+		text = L["Cut"],
 		func = function() Skillet:SkillButton_CutSelected() end,
 	},
 	{
-		text = "Paste",
+		text = L["Paste"],
 		func = function() Skillet:SkillButton_PasteSelected(Skillet.menuButton) end,
 	},
 }
 local skillMenuListLocked = {
 	{
-		text = "Link Recipe",
+		text = L["Link Recipe"],
 		func = function()
 					local skill = Skillet.menuButton.skill
 					if skill and skill.recipeID then
@@ -2438,7 +2448,7 @@ local skillMenuListLocked = {
 				end,
 	},
 	{
-		text = "Add to Ignore Materials",
+		text = L["Add to Ignore Materials"],
 		func = function()
 					local skill = Skillet.menuButton.skill
 					if skill and skill.recipeID then
@@ -2451,18 +2461,19 @@ local skillMenuListLocked = {
 					end
 				end,
 	},
+	favoriteMenu,	
 	{
 		text = "",
 		disabled = true,
 	},
 	{
-		text = "Copy",
+		text = L["Copy"],
 		func = function() Skillet:SkillButton_CopySelected() end,
 	},
 }
 local headerMenuList = {
 	{
-		text = "Rename Group",
+		text = L["Rename Group"],
 		func = function() Skillet:SkillButton_NameEditEnable(Skillet.menuButton) end,
 	},
 	{
@@ -2470,12 +2481,12 @@ local headerMenuList = {
 		disabled = true,
 	},
 	{
-		text = "New Group",
+		text = L["New Group"],
 		hasArrow = true,
 		menuList = skillMenuGroup,
 	},
 	{
-		text = "Selection",
+		text = L["Selection"],
 		hasArrow = true,
 		menuList = skillMenuSelection,
 	},
@@ -2484,32 +2495,32 @@ local headerMenuList = {
 		disabled = true,
 	},
 	{
-		text = "Copy",
+		text = L["Copy"],
 		func = function() Skillet:SkillButton_CopySelected() end,
 	},
 	{
-		text = "Cut",
+		text = L["Cut"],
 		func = function() Skillet:SkillButton_CutSelected() end,
 	},
 	{
-		text = "Paste",
+		text = L["Paste"],
 		func = function() Skillet:SkillButton_PasteSelected(Skillet.menuButton) end,
 	},
 }
 local headerMenuListLocked = {
 	{
-		text = "Copy",
+		text = L["Copy"],
 		func = function() Skillet:SkillButton_CopySelected() end,
 	},
 }
 local headerMenuListMainGroup = {
 	{
-		text = "New Group",
+		text = L["New Group"],
 		hasArrow = true,
 		menuList = skillMenuGroup,
 	},
 	{
-		text = "Selection",
+		text = L["Selection"],
 		hasArrow = true,
 		menuList = skillMenuSelection,
 	},
@@ -2518,21 +2529,21 @@ local headerMenuListMainGroup = {
 		disabled = true,
 	},
 	{
-		text = "Copy",
+		text = L["Copy"],
 		func = function() Skillet:SkillButton_CopySelected() end,
 	},
 	{
-		text = "Cut",
+		text = L["Cut"],
 		func = function() Skillet:SkillButton_CutSelected() end,
 	},
 	{
-		text = "Paste",
+		text = L["Paste"],
 		func = function() Skillet:SkillButton_PasteSelected(Skillet.menuButton) end,
 	},
 }
 local headerMenuListMainGroupLocked = {
 	{
-		text = "Copy",
+		text = L["Copy"],
 		func = function() Skillet:SkillButton_CopySelected() end,
 	},
 }
@@ -2587,6 +2598,11 @@ function Skillet:SkilletSkillMenu_Show(button)
 			end
 		end
 	else
+		GameTooltip:Hide() --hide tooltip, because it may be over the menu, sometimes it still fails
+		favoriteMenu["text"] = L["Set Favorite"]
+		if Skillet:IsFavorite(button.skill.recipeID) then
+			favoriteMenu["text"] = L["Remove Favorite"]
+		end	
 		if locked then
 			EasyMenu(skillMenuListLocked, SkilletSkillMenu, _G["UIParent"], x/uiScale,y/uiScale, "MENU", 5)
 		else

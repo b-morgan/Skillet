@@ -220,7 +220,15 @@
 		<Scripts>
 			<OnClick>
 				Skillet:FavoriteButton_OnClick(self,button)
-			</OnClick>				
+			</OnClick>
+			<OnEnter>
+				GameTooltip:SetOwner(self, "ANCHOR_TOPLEFT")
+				GameTooltip:SetText(Skillet.L["Click to toggle favorite"], nil, nil, nil, nil, true)
+				GameTooltip:Show()
+			</OnEnter>
+			<OnLeave>
+				GameTooltip:Hide();
+			</OnLeave>
 		</Scripts>
 	</Button>	
 	<Button name="SkilletEmptySpaceTemplate" virtual="true">
@@ -1699,7 +1707,7 @@
 					</OnClick>
 					<OnEnter>
 						GameTooltip:SetOwner(self, "ANCHOR_TOPLEFT")
-						GameTooltip:SetText(Skillet.L["Show favorite recipes only"], nil, nil, nil, nil, true)
+						GameTooltip:SetText(Skillet.L["Show favorite recipes only. Click on a star on the left side of a recipe to set favorite."], nil, nil, nil, nil, true)
 						GameTooltip:Show()
 					</OnEnter>
 					<OnLeave>
