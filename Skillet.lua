@@ -866,6 +866,9 @@ function Skillet:OnInitialize()
 	if self.db.realm.Filtered then
 		self.db.realm.Filtered = nil
 	end
+	if self.db.realm.recipeInfo then
+		self.db.realm.recipeInfo = nil
+	end
 
 -- Clean up if database is stale 
 	local _,wowBuild,_,wowVersion = GetBuildInfo();
@@ -896,9 +899,6 @@ function Skillet:OnInitialize()
 	if not self.db.global.Categories then
 		self.db.global.Categories = {}
 	end
---	if not self.db.global.AllRecipe then
---		self.db.global.AllRecipe = {}
---	end
 	self:InitializeDatabase(UnitName("player"))
 
 -- Hook default tooltips
@@ -969,7 +969,6 @@ function Skillet:FlushRecipeData()
 	Skillet.db.global.itemRecipeSource = {}
 	Skillet.db.global.Categories = {}
 	Skillet.db.realm.skillDB = {}
-	Skillet.db.realm.recipeInfo = {}
 	Skillet.data.recipeInfo = {}
 end
 
@@ -979,9 +978,6 @@ function Skillet:InitializeDatabase(player)
 		return
 	end
 	if player then
-		self.db.global.AllRecipe = {}
-		self.db.realm.Filtered = {}
-		self.db.realm.recipeInfo = {}	
 		if not self.db.realm.groupDB then
 			self.db.realm.groupDB = {}
 		end
@@ -1014,7 +1010,7 @@ function Skillet:InitializeDatabase(player)
 		end
 		if not self.data.recipeInfo then
 			self.data.recipeInfo = {}
-		end		
+		end
 		if not self.data.recipeList then
 			self.data.recipeList = {}
 		end
