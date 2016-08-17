@@ -1584,10 +1584,9 @@ function Skillet:SetSelectedSkill(skillIndex)
 	self.selectedSkill = skillIndex
 	self:ScrollToSkillIndex(skillIndex)
 	self:UpdateDetailsWindow(skillIndex)	
-	if self.selectedSkillButton then
-	 DA.DEBUG(0,"Button set")
-	 self.selectedSkillButton:Click("LeftButton", true);
-	end
+--	if self.selectedSkillButton then
+--	 self.selectedSkillButton:Click("LeftButton", true);
+--	end
 end
 
 -- Updates the text we filter the list of recipes against.
