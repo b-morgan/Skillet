@@ -1693,6 +1693,14 @@
 						Skillet:SortAndFilterRecipes()
   						Skillet:UpdateTradeSkillWindow()
 					</OnClick>
+					<OnEnter>
+						GameTooltip:SetOwner(self, "ANCHOR_TOPLEFT")
+						GameTooltip:SetText(Skillet.L["Show favorite recipes only"], nil, nil, nil, nil, true)
+						GameTooltip:Show()
+					</OnEnter>
+					<OnLeave>
+						GameTooltip:Hide();
+					</OnLeave>					
 				</Scripts>
 			</Button>
 			<!--
