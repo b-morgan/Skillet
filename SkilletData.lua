@@ -500,6 +500,21 @@ Skillet.scrollData = {
 	[190991] = 128561,  -- Enchant Gloves - Legion Surveying
 }
 
+Skillet.tinkerData = {
+	--  Engineering Tinker enchants - Scraped from WoWhead manually. Need a way to automate this.
+	[126392] = 109076,  -- Goblin Glider
+	[109099] = 109099,  -- Watergliding Jets
+	[67839] = 67839,  -- Mind Amplification Dish
+	[55016] = 55016,  -- Nitro Boosts
+	[54793] = 54793,  -- Frag Belt
+	[55002] = 55002,  -- Flexweave Underlay
+	[84424] = 84424,  -- Invisibility Field
+	[84425] = 84425,  -- Cardboard Assassin
+	[54736] = 54736,  -- EMP Generator
+	[82200] = 82200,  -- Spinal Healing Injector
+	[84427] = 84427,  -- Grounded Plasma Shield
+}
+
 --[[
 Skillet.enchantingItemIDs = {
 	-- "Borrowed" from TradeSkillMaster_Crafting\Modules\EnchantingInfo.lua
@@ -1802,7 +1817,7 @@ function Skillet:ScanTrade()
 			if (not itemID or tonumber(itemID) == 0) then
 				DA.DEBUG(0,"recipeID= "..tostring(recipeID)..", itemID= "..tostring(itemID))
 			end
-			if not recipeInfo.alternateVerb or recipeInfo.alternateVerb ~= ENSCRIBE then
+			if not recipeInfo.alternateVerb then
 				local minMade,maxMade = C_TradeSkillUI.GetRecipeNumItemsProduced(recipeID)
 				recipeInfo.minMade = minMade	-- save a copy for our records
 				recipeInfo.maxMade = maxMade	-- save a copy for our records
@@ -1814,7 +1829,8 @@ function Skillet:ScanTrade()
 					itemString = tostring(itemID)
 				end
 				Skillet:ItemDataAddRecipeSource(itemID,recipeID) -- add a cross reference for the source of this item
-			else 
+			elseif recipeInfo.alternateVerb == ENSCRIBE then
+				DA.DEBUG(0,"alternateVerb= "..tostring(recipeInfo.alternateVerb))
 				recipe.itemID = 0
 				recipe.numMade = 1
 				recipeInfo.numMade = 1
@@ -1824,7 +1840,64 @@ function Skillet:ScanTrade()
 					itemString = tostring(itemID)
 					Skillet:ItemDataAddRecipeSource(itemID,recipeID)	-- add a cross reference for the source of this item
 				end
+			elseif recipeInfo.alternateVerb == L["Tinker"] then	-- need to find out if this needs to be translated.
+				DA.DEBUG(0,"alternateVerb= "..tostring(recipeInfo.alternateVerb))
+				recipe.itemID = 0
+				recipe.numMade = 1
+				recipeInfo.numMade = 1
+				if Skillet.tinkerData[recipeID] then	-- note that this table is maintained by datamining
+					local itemID = Skillet.tinkerData[recipeID]
+					recipe.itemID = itemID
+					itemString = tostring(itemID)
+					Skillet:ItemDataAddRecipeSource(itemID,recipeID)	-- add a cross reference for the source of this item
+				end
+			else
+				DA.DEBUG(0,"Unknown alternateVerb")
 			end
+--[[
+			if recipeInfo.alternateVerb then
+				DA.DEBUG(0,"alternateVerb= "..tostring(recipeInfo.alternateVerb))
+				if recipeInfo.alternateVerb == ENSCRIBE then
+					DA.DEBUG(0,"Processing Enchant")
+					recipe.itemID = 0
+					recipe.numMade = 1
+					recipeInfo.numMade = 1
+					if Skillet.scrollData[recipeID] then	-- note that this table is maintained by datamining
+						local itemID = Skillet.scrollData[recipeID]
+						recipe.itemID = itemID
+						itemString = tostring(itemID)
+						Skillet:ItemDataAddRecipeSource(itemID,recipeID)	-- add a cross reference for the source of this item
+					end
+				elseif recipeInfo.alternateVerb == L["Tinker"] then		-- need to find out if this needs to be translated.
+					DA.DEBUG(0,"Processing Tinker")
+					local minMade,maxMade = C_TradeSkillUI.GetRecipeNumItemsProduced(recipeID)
+					recipeInfo.minMade = minMade	-- save a copy for our records
+					recipeInfo.maxMade = maxMade	-- save a copy for our records
+					recipe.itemID = itemID
+					recipe.numMade = (minMade + maxMade)/2
+					if recipe.numMade > 1 then
+						itemString = itemID..":"..recipe.numMade
+					else
+						itemString = tostring(itemID)
+					end
+--					Skillet:ItemDataAddRecipeSource(itemID,recipeID) -- add a cross reference for the source of this item
+				else
+					DA.DEBUG(0,"Unknown alternateVerb")
+				end
+			else
+				local minMade,maxMade = C_TradeSkillUI.GetRecipeNumItemsProduced(recipeID)
+				recipeInfo.minMade = minMade	-- save a copy for our records
+				recipeInfo.maxMade = maxMade	-- save a copy for our records
+				recipe.itemID = itemID
+				recipe.numMade = (minMade + maxMade)/2
+				if recipe.numMade > 1 then
+					itemString = itemID..":"..recipe.numMade
+				else
+					itemString = tostring(itemID)
+				end
+				Skillet:ItemDataAddRecipeSource(itemID,recipeID) -- add a cross reference for the source of this item
+			end
+]]--
 		else
 			DA.DEBUG(0,"recipeID= "..tostring(recipeID).." has no itemLink")
 		end
