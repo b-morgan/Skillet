@@ -138,6 +138,7 @@ function Skillet:CreateTradeSkillWindow()
 	local label = _G["SkilletFilterLabel"];
 --	label:SetText(L["Filter"]);
 	label:SetText(L["Search"]);
+	SkilletPluginButton:SetText(L["Plugins"])
 	SkilletCreateAllButton:SetText(L["Create All"])
 	SkilletQueueAllButton:SetText(L["Queue All"])
 	SkilletCreateButton:SetText(L["Create"])

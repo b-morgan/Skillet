@@ -1722,7 +1722,7 @@
 			-->
 			<Button name="SkilletPluginButton" inherits="UIPanelButtonTemplate" text="Plugins" parent="SkilletFrame">
 				<Size>
-					<AbsDimension x="60" y="22"/>
+					<AbsDimension x="80" y="22"/>
 				</Size>
 				<Anchors>
 					<Anchor point="TOPLEFT" relativeTo="SkilletFrame" relativePoint="TOPLEFT">
