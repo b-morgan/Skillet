@@ -328,6 +328,16 @@ function Skillet:UpdateNumItemsSlider(item_count, clicked)
 		end
 	end
 end
+function Skillet:ClickSkillButton(skillIndex) 
+	if skillIndex and self.button_count then
+		for i=1, self.button_count, 1 do
+			local button = _G["SkilletScrollButton"..i]
+			if button and button.rawIndex and button.rawIndex == skillIndex and button:IsVisible() and not button.skill.subGroup then
+				button:Click("LeftButton", true);
+			end
+		end		
+	end
+end
 
 -- Called when the list of skills is scrolled
 function Skillet:SkillList_OnScroll()
@@ -788,6 +798,7 @@ function Skillet:internal_UpdateTradeSkillWindow()
 	-- it seems the resize for the main skillet window happens before the resize for the skill list box
 	local button_count = (SkilletFrame:GetHeight() - 115) / SKILLET_TRADE_SKILL_HEIGHT
 	button_count = math.floor(button_count)
+	self.button_count = button_count
 	-- Update the scroll frame
 	FauxScrollFrame_Update(SkilletSkillList,				-- frame
 							numTradeSkills,					-- num items
@@ -815,7 +826,6 @@ function Skillet:internal_UpdateTradeSkillWindow()
 	self.visibleSkillButtons = math.min(numTradeSkills - skillOffset, button_count)
 	-- Iterate through all the buttons that make up the scroll window
 	-- and fill them in with data or hide them, as necessary
-	self.selectedSkillButton = nil
 	for i=1, button_count, 1 do
 		local rawSkillIndex = i + skillOffset
 		local button, buttonDrag = get_recipe_button(i)
@@ -832,9 +842,6 @@ function Skillet:internal_UpdateTradeSkillWindow()
 			local buttonExpand = _G[button:GetName() .. "Expand"]
 			local buttonFavorite = _G[button:GetName() .. "Favorite"]
 			local subSkillRankBar = _G[button:GetName() .. "SubSkillRankBar"]
-			if self.selectedSkill == rawSkillIndex then
-				self.selectedSkillButton = button
-			end			
 			buttonText:SetText("")
 			levelText:SetText("")
 			countText:SetText("")
@@ -1953,6 +1960,11 @@ function Skillet:FavoritesOnlyRefresh()
 	end
 end
 
+function Skillet:SetGroupSelection(skillName)
+	self.currentGroup = skillName
+	Skillet:SetTradeSkillOption("group", skillName)
+end
+
 local lastClick = 0
 -- When one of the skill buttons in the left scroll pane is clicked
 function Skillet:SkillButton_OnClick(button, mouse)
@@ -1968,12 +1980,10 @@ function Skillet:SkillButton_OnClick(button, mouse)
 		if doubleClicked then
 			if button.skill.subGroup then
 				if button.skill.mainGroup or self.currentGroup == button.skill.name then
-					self.currentGroup = nil
-					Skillet:SetTradeSkillOption("group", nil)
+					Skillet:SetGroupSelection(nil)
 					button.skill.subGroup.expanded = true
 				else
-					self.currentGroup = button.skill.name
-					Skillet:SetTradeSkillOption("group", button.skill.name)
+					Skillet:SetGroupSelection(button.skill.name)
 					button.skill.subGroup.expanded = true
 				end
 				self:SortAndFilterRecipes()

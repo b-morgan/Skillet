@@ -410,7 +410,7 @@ function Skillet:internal_SortAndFilterRecipes()
 		end
 		if Skillet.currentGroup then
 			Skillet:RecipeGroupInitFlatten(group, sortedSkillList)
-			button_index = Skillet:RecipeGroupFlatten(group, 1, sortedSkillList, 1)
+			button_index = Skillet:RecipeGroupFlatten(group, 1, sortedSkillList, 1) + 1
 		else
 			button_index = Skillet:RecipeGroupFlatten(group, 0, sortedSkillList, 0)
 		end
