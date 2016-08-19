@@ -1789,6 +1789,8 @@ function Skillet:ScanTrade()
 		recipe.tradeID = tradeID
 		recipe.spellID = recipeID
 		recipe.name = skillName
+		recipe.itemID = 0
+		recipe.numMade = 1
 
 		local itemLink = C_TradeSkillUI.GetRecipeItemLink(recipeID)
 		--DA.DEBUG(2,"itemLink = "..DA.PLINK(itemLink))
@@ -1814,8 +1816,6 @@ function Skillet:ScanTrade()
 				Skillet:ItemDataAddRecipeSource(itemID,recipeID) -- add a cross reference for the source of this item
 			elseif recipeInfo.alternateVerb == ENSCRIBE then
 				--DA.DEBUG(2,"alternateVerb= "..tostring(recipeInfo.alternateVerb))
-				recipe.itemID = 0
-				recipe.numMade = 1
 				recipeInfo.numMade = 1		-- save a copy for our records
 				if Skillet.scrollData[recipeID] then	-- note that this table is maintained by datamining
 					local itemID = Skillet.scrollData[recipeID]
@@ -1826,14 +1826,12 @@ function Skillet:ScanTrade()
 				end
 			elseif recipeInfo.alternateVerb == L["Tinker"] then		-- need to find out if this needs to be translated.
 				--DA.DEBUG(2,"alternateVerb= "..tostring(recipeInfo.alternateVerb))
-				recipe.itemID = 0
-				recipe.numMade = 1
 				recipeInfo.numMade = 1		-- save a copy for our records
 				recipeInfo.itemID = itemID		-- save a copy for our records
 				itemString = tostring(itemID)
 --				Skillet:ItemDataAddRecipeSource(itemID,recipeID)	-- add a cross reference for the source of this item
 			else
-				DA.DEBUG(0,"Unknown alternateVerb")
+				DA.DEBUG(0,"Unknown alternateVerb= "..tostring(recipeInfo.alternateVerb))
 			end
 		else
 			DA.DEBUG(0,"recipeID= "..tostring(recipeID).." has no itemLink")
