@@ -1364,15 +1364,16 @@ local ARLProfessionInitialized = {}
 -- Updates the details window with information about the currently selected skill
 function Skillet:UpdateDetailsWindow(skillIndex)
 	--DA.DEBUG(0,"UpdateDetailsWindow("..tostring(skillIndex)..")")
-	SkilletReagentParent.StarsFrame:Hide();
-	self.currentRecipeInfo = nil;
+	SkilletReagentParent.StarsFrame:Hide()
+	self.currentRecipeInfo = nil
+	local recipeInfo = nil
 	if not skillIndex or skillIndex < 0 then
 		Skillet:HideDetailWindow()
 		return
 	end
 	local texture;
-	SkilletFrame.selectedSkill = skillIndex;
-	self.numItemsToCraft = 1;
+	SkilletFrame.selectedSkill = skillIndex
+	self.numItemsToCraft = 1
 	if self.recipeNotesFrame then
 		self.recipeNotesFrame:Hide()
 	end
@@ -1396,7 +1397,7 @@ function Skillet:UpdateDetailsWindow(skillIndex)
 				s:Show()
 			end
 		end
-		local recipeInfo = Skillet.data.recipeInfo[self.currentTrade][recipe.spellID]
+		recipeInfo = Skillet.data.recipeInfo[self.currentTrade][recipe.spellID]
 		self.currentRecipeInfo = recipeInfo
 		if recipeInfo and recipeInfo.upgradeable then
 			for i, starFrame in ipairs(SkilletReagentParent.StarsFrame.Stars) do
@@ -1456,10 +1457,14 @@ function Skillet:UpdateDetailsWindow(skillIndex)
 		SkilletRequirementText:Hide()
 		SkilletRequirementLabel:Hide()
 	end
-	if recipe.itemID and recipe.itemID ~= 0 then
-		texture = GetItemIcon(recipe.itemID)
+	if recipeInfo and recipeInfo.alternateVerb and recipeInfo.alternateVerb == L["Tinker"] then
+		texture = recipeInfo.icon
 	else
-		texture = "Interface\\Icons\\Spell_Holy_GreaterHeal"		-- standard enchant icon
+		if recipe.itemID and recipe.itemID ~= 0 then
+			texture = GetItemIcon(recipe.itemID)
+		else
+			texture = "Interface\\Icons\\Spell_Holy_GreaterHeal"		-- standard enchant icon
+		end
 	end
 	SkilletSkillIcon:SetNormalTexture(texture)
 	SkilletSkillIcon:Show()
