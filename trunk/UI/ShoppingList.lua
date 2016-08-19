@@ -143,7 +143,7 @@ function Skillet:ShoppingListButton_OnEnter(button)
 end
 
 function Skillet:ClearShoppingList(player)
-	DA.DEBUG(0,"ClearShoppingList(",player,")")
+	DA.DEBUG(0,"ClearShoppingList("..tostring(player)..")")
 	local playerList
 	if player then
 		playerList = { player }
@@ -773,15 +773,13 @@ local function get_button(i)
 end
 
 -- Called to update the shopping list window
-function Skillet:UpdateShoppingListWindow(use_cached_recipes)
-	DA.DEBUG(0,"UpdateShoppingListWindow(",use_cached_recipes,")")
+function Skillet:UpdateShoppingListWindow()
+	DA.DEBUG(0,"UpdateShoppingListWindow()")
 	local num_buttons = 0
 	if not self.shoppingList or not self.shoppingList:IsVisible() then
 		return
 	end
-	if not use_cached_recipes then
-		cache_list(self)
-	end
+	cache_list(self)
 	SkilletShoppingList:SetAlpha(self.db.profile.transparency)
 	SkilletShoppingList:SetScale(self.db.profile.scale)
 	local numItems = #self.cachedShoppingList

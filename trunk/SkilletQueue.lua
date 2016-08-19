@@ -26,6 +26,7 @@ function Skillet:AdjustInventory()
 	DA.DEBUG(0,"AdjustInventory()")
 	-- update queue for faster response time
 	self:UpdateQueueWindow()
+	self:UpdateShoppingListWindow()
 	if self.reagentsChanged then
 		for id,v in pairs(self.reagentsChanged) do
 			self:InventoryReagentCraftability(id)
@@ -347,6 +348,9 @@ end
 
 function Skillet:UNIT_SPELLCAST_SUCCEEDED(event, unit, spell, rank, lineID, spellID)
 	DA.DEBUG(0,"UNIT_SPELLCAST_SUCCEEDED("..tostring(unit)..", "..tostring(spell)..", "..tostring(rank)..", "..tostring(lineID)..", "..tostring(spellID)..")")
+	if unit == "player" and spell == self.processingSpell then
+		self:ContinueCast(spell,spellID)
+	end
 end
 
 function Skillet:UNIT_SPELLCAST_FAILED(event, unit, spell, rank, lineID, spellID)
@@ -376,9 +380,9 @@ end
 
 function Skillet:UNIT_SPELLCAST_STOP(event, unit, spell, rank, lineID, spellID)
 	DA.DEBUG(0,"UNIT_SPELLCAST_STOP("..tostring(unit)..", "..tostring(spell)..", "..tostring(rank)..", "..tostring(lineID)..", "..tostring(spellID)..")")
-	if unit == "player" and spell == self.processingSpell then
-		self:ContinueCast(spell,spellID)
-	end
+--	if unit == "player" and spell == self.processingSpell then
+--		self:ContinueCast(spell,spellID)
+--	end
 end
 
 function Skillet:ContinueCast(spell, spellID)
@@ -440,11 +444,11 @@ function Skillet:StopCast(spell, success)
 				self:RemoveFromQueue(qpos)
 			end
 		else
+			self.queuecasting = false
 			self.processingSpell = nil
 			self.processingSpellID = nil
 			self.processingPosition = nil
 			self.processingCommand = nil
-			self.queuecasting = false
 		end
 	end
 end

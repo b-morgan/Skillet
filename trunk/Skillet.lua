@@ -390,7 +390,7 @@ Skillet.options =
 					set = function(self,t)
 						Skillet.db.profile.transparency = t
 						Skillet:UpdateTradeSkillWindow()
-						Skillet:UpdateShoppingListWindow(false)
+						Skillet:UpdateShoppingListWindow()
 						Skillet:UpdateStandaloneQueueWindow()
 					end,
 					width = "double",
@@ -407,7 +407,7 @@ Skillet.options =
 					set = function(self,t)
 						Skillet.db.profile.scale = t
 						Skillet:UpdateTradeSkillWindow()
-						Skillet:UpdateShoppingListWindow(false)
+						Skillet:UpdateShoppingListWindow()
 						Skillet:UpdateStandaloneQueueWindow()
 					end,
 					width = "double",
@@ -1099,14 +1099,14 @@ function Skillet:OnEnable()
 	self:RegisterEvent("AUCTION_HOUSE_SHOW")
 	self:RegisterEvent("AUCTION_HOUSE_CLOSED")
 	self:RegisterEvent("PLAYER_LOGOUT")
-	self:RegisterEvent("UNIT_SPELLCAST_START")
-	self:RegisterEvent("UNIT_SPELLCAST_SENT")
+--	self:RegisterEvent("UNIT_SPELLCAST_START")
+--	self:RegisterEvent("UNIT_SPELLCAST_SENT")
 	self:RegisterEvent("UNIT_SPELLCAST_SUCCEEDED")
 	self:RegisterEvent("UNIT_SPELLCAST_FAILED")
 	self:RegisterEvent("UNIT_SPELLCAST_FAILED_QUIET")
 	self:RegisterEvent("UNIT_SPELLCAST_INTERRUPTED")
-	self:RegisterEvent("UNIT_SPELLCAST_DELAYED")
-	self:RegisterEvent("UNIT_SPELLCAST_STOP")
+--	self:RegisterEvent("UNIT_SPELLCAST_DELAYED")
+--	self:RegisterEvent("UNIT_SPELLCAST_STOP")
 	self:RegisterEvent("CHAT_MSG_SKILL")
 	self:RegisterEvent("SKILL_LINES_CHANGED") -- replacement for CHAT_MSG_SKILL?
 	self:RegisterEvent("LEARNED_SPELL_IN_TAB") -- arg1 = professionID
@@ -1385,8 +1385,8 @@ function Skillet:RescanBags()
 	DA.DEBUG(0,"RescanBags()")
 	local start = GetTime()
 	Skillet:InventoryScan()
+	Skillet:UpdateShoppingListWindow()
 	Skillet:UpdateTradeSkillWindow()
-	Skillet:UpdateShoppingListWindow(true)
 	local elapsed = GetTime() - start
 	if elapsed > 0.5 then
 		DA.DEBUG(0,"WARNING: skillet inventory scan took " .. math.floor(elapsed*100+.5)/100 .. " seconds to complete.")
@@ -1424,7 +1424,7 @@ function Skillet:BAG_UPDATE(event, bagID)
 	-- Most of the shoppingList code is in ShoppingList.lua
 	if self.shoppingList and self.shoppingList:IsVisible() then
 		Skillet:InventoryScan()
-		Skillet:UpdateShoppingListWindow(true)
+		Skillet:UpdateShoppingListWindow()
 	end
 end
 
