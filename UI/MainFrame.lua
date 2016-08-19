@@ -1457,14 +1457,11 @@ function Skillet:UpdateDetailsWindow(skillIndex)
 		SkilletRequirementText:Hide()
 		SkilletRequirementLabel:Hide()
 	end
-	if recipeInfo and recipeInfo.alternateVerb and recipeInfo.alternateVerb == L["Tinker"] then
+	if recipeInfo and recipeInfo.alternateVerb then
 		texture = recipeInfo.icon
-	else
-		if recipe.itemID and recipe.itemID ~= 0 then
-			texture = GetItemIcon(recipe.itemID)
-		else
-			texture = "Interface\\Icons\\Spell_Holy_GreaterHeal"		-- standard enchant icon
-		end
+	end
+	if recipe.itemID and recipe.itemID ~= 0 then
+		texture = GetItemIcon(recipe.itemID)
 	end
 	SkilletSkillIcon:SetNormalTexture(texture)
 	SkilletSkillIcon:Show()
