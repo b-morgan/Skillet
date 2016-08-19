@@ -1789,8 +1789,8 @@ function Skillet:ScanTrade()
 		recipe.tradeID = tradeID
 		recipe.spellID = recipeID
 		recipe.name = skillName
-		recipe.itemID = 0
-		recipe.numMade = 1
+		recipe.itemID = 0		-- Make sure this value exists
+		recipe.numMade = 1		-- Make sure this value exists
 
 		local itemLink = C_TradeSkillUI.GetRecipeItemLink(recipeID)
 		--DA.DEBUG(2,"itemLink = "..DA.PLINK(itemLink))
@@ -1800,6 +1800,7 @@ function Skillet:ScanTrade()
 			--DA.DEBUG(2,"itemID= "..tostring(itemID))
 			if (not itemID or tonumber(itemID) == 0) then
 				DA.DEBUG(0,"recipeID= "..tostring(recipeID)..", itemID= "..tostring(itemID))
+				itemID = 0
 			end
 			if not recipeInfo.alternateVerb then
 				local minMade,maxMade = C_TradeSkillUI.GetRecipeNumItemsProduced(recipeID)
@@ -1808,31 +1809,28 @@ function Skillet:ScanTrade()
 				recipeInfo.itemID = itemID		-- save a copy for our records
 				recipe.itemID = itemID
 				recipe.numMade = (minMade + maxMade)/2
-				if recipe.numMade > 1 then
-					itemString = itemID..":"..recipe.numMade
-				else
-					itemString = tostring(itemID)
-				end
-				Skillet:ItemDataAddRecipeSource(itemID,recipeID) -- add a cross reference for the source of this item
-			elseif recipeInfo.alternateVerb == ENSCRIBE then
+			elseif recipeInfo.alternateVerb == ENSCRIBE then -- use the itemID of the scroll created by using the enchant on vellum
 				--DA.DEBUG(2,"alternateVerb= "..tostring(recipeInfo.alternateVerb))
 				recipeInfo.numMade = 1		-- save a copy for our records
 				if Skillet.scrollData[recipeID] then	-- note that this table is maintained by datamining
 					local itemID = Skillet.scrollData[recipeID]
 					recipeInfo.itemID = itemID		-- save a copy for our records
 					recipe.itemID = itemID
-					itemString = tostring(itemID)
-					Skillet:ItemDataAddRecipeSource(itemID,recipeID)	-- add a cross reference for the source of this item
+				else
+					recipeInfo.itemID = recipe.itemID		-- save a copy for our records
 				end
-			elseif recipeInfo.alternateVerb == L["Tinker"] then		-- need to find out if this needs to be translated.
-				--DA.DEBUG(2,"alternateVerb= "..tostring(recipeInfo.alternateVerb))
-				recipeInfo.numMade = 1		-- save a copy for our records
-				recipeInfo.itemID = itemID		-- save a copy for our records
-				itemString = tostring(itemID)
---				Skillet:ItemDataAddRecipeSource(itemID,recipeID)	-- add a cross reference for the source of this item
 			else
-				DA.DEBUG(0,"Unknown alternateVerb= "..tostring(recipeInfo.alternateVerb))
+				DA.DEBUG(0,"alternateVerb= "..tostring(recipeInfo.alternateVerb))
+				recipeInfo.numMade = 1		-- save a copy for our records
+				recipeInfo.itemID = recipe.itemID		-- save a copy for our records
+				DA.TABLE("recipeInfo["..tostring(recipeID).."]", recipeInfo)
 			end
+			if recipe.numMade > 1 then
+				itemString = itemID..":"..recipe.numMade
+			else
+				itemString = tostring(itemID)
+			end
+			Skillet:ItemDataAddRecipeSource(itemID,recipeID) -- add a cross reference for the source of this item
 		else
 			DA.DEBUG(0,"recipeID= "..tostring(recipeID).." has no itemLink")
 		end
