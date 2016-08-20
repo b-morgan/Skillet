@@ -2549,6 +2549,7 @@
 			# The slider to select the number of items to be crafted
 			#
 			-->
+<!--			
 			<Slider name="SkilletCreateCountSlider" orientation="HORIZONTAL" enableMouse="true" parent="SkilletFrame">
 				<Size>
 					<AbsDimension x="135" y="17"/>
@@ -2590,6 +2591,7 @@
 					</OnValueChanged>
 				</Scripts>
 			</Slider>
+-->			
 			<!--
 			#
 			# The text box where they can enter the number of items to craft.
@@ -2600,9 +2602,9 @@
 					<AbsDimension x="36" y="20"/>
 				</Size>
 				<Anchors>
-					<Anchor point="BOTTOM" relativeTo="SkilletCreateCountSlider" relativePoint="TOP">
+					<Anchor point="TOPLEFT" relativeTo="SkilletQueueAllButton" relativePoint="TOPRIGHT">
 						<Offset>
-							<AbsDimension x="0" y="5"/>
+							<AbsDimension x="25" y="0"/>
 						</Offset>
 					</Anchor>
 				</Anchors>
@@ -2667,6 +2669,83 @@
 				</Scripts>
 				<FontString inherits="ChatFontNormal"/>
 			</EditBox>
+			<Button name="SkilletAdd1Button" inherits="UIPanelButtonTemplate" text="1" parent="SkilletFrame">
+				<Size>
+					<AbsDimension x="32" y="22"/>
+				</Size>
+				<Anchors>
+					<Anchor point="TOPLEFT" relativeTo="SkilletCreateAllButton" relativePoint="TOPRIGHT">
+						<Offset>
+							<AbsDimension x="5" y="0"/>
+						</Offset>
+					</Anchor>
+				</Anchors>
+				<Scripts>
+					<OnLoad>
+						self:RegisterForClicks("LeftButtonUp", "RightButtonUp")
+					</OnLoad>
+					<OnClick>
+						Skillet:IncreaseItemCount(self, button, 1)
+					</OnClick>
+				</Scripts>
+			</Button>
+			<Button name="SkilletAdd2Button" inherits="UIPanelButtonTemplate" text="10" parent="SkilletFrame">
+				<Size>
+					<AbsDimension x="32" y="22"/>
+				</Size>
+				<Anchors>
+					<Anchor point="LEFT" relativeTo="SkilletAdd1Button" relativePoint="RIGHT">
+						<Offset>
+							<AbsDimension x="1" y="0"/>
+						</Offset>
+					</Anchor>
+				</Anchors>
+				<Scripts>
+					<OnLoad>
+						self:RegisterForClicks("LeftButtonUp", "RightButtonUp")
+					</OnLoad>
+					<OnClick>
+						Skillet:IncreaseItemCount(self, button, 10)
+					</OnClick>
+				</Scripts>
+			</Button>
+			<Button name="SkilletAdd3Button" inherits="UIPanelButtonTemplate" text="100" parent="SkilletFrame">
+				<Size>
+					<AbsDimension x="32" y="22"/>
+				</Size>
+				<Anchors>
+					<Anchor point="LEFT" relativeTo="SkilletAdd2Button" relativePoint="RIGHT">
+						<Offset>
+							<AbsDimension x="1" y="0"/>
+						</Offset>
+					</Anchor>
+				</Anchors>
+				<Scripts>
+					<OnLoad>
+						self:RegisterForClicks("LeftButtonUp", "RightButtonUp")
+					</OnLoad>				
+					<OnClick>
+						Skillet:IncreaseItemCount(self, button, 100)
+					</OnClick>
+				</Scripts>
+			</Button>
+			<Button name="SkilletClearNumButton" inherits="UIPanelButtonTemplate" text="C" parent="SkilletFrame">
+				<Size>
+					<AbsDimension x="25" y="22"/>
+				</Size>
+				<Anchors>
+					<Anchor point="LEFT" relativeTo="SkilletItemCountInputBox" relativePoint="RIGHT">
+						<Offset>
+							<AbsDimension x="1" y="0"/>
+						</Offset>
+					</Anchor>
+				</Anchors>
+				<Scripts>
+					<OnClick>
+						SkilletItemCountInputBox:SetText(1)
+					</OnClick>
+				</Scripts>
+			</Button>			
 			<!--
 			#
 			# A frame to hold the queue and buttons

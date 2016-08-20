@@ -160,10 +160,11 @@ function Skillet:CreateTradeSkillWindow()
 
 	-- Always want these visible.
 	SkilletItemCountInputBox:SetText("1");
-	SkilletCreateCountSlider:SetMinMaxValues(1, 20);
-	SkilletCreateCountSlider:SetValue(1);
-	SkilletCreateCountSlider:Show();
-	SkilletCreateCountSliderThumb:Show();
+
+--	SkilletCreateCountSlider:SetMinMaxValues(1, 20);
+--	SkilletCreateCountSlider:SetValue(1);
+--	SkilletCreateCountSlider:Show();
+--	SkilletCreateCountSliderThumb:Show();
 
 	-- Progression status bar
 	SkilletRankFrame:SetStatusBarColor(0.2, 0.2, 1.0, 1.0)
@@ -318,17 +319,17 @@ function Skillet:TradeSkillRank_Updated()
 end
 
 -- Someone dragged the slider or set the value programatically.
-function Skillet:UpdateNumItemsSlider(item_count, clicked)
-	local value = floor(item_count + 0.5);
-	self.numItemsToCraft = value
-	if SkilletCreateCountSlider:IsVisible() then
-		SkilletItemCountInputBox:SetText(tostring(value))
-		SkilletItemCountInputBox:HighlightText()
-		if not clicked then
-			SkilletCreateCountSlider:SetValue(value)
-		end
-	end
-end
+--function Skillet:UpdateNumItemsSlider(item_count, clicked)
+--	local value = floor(item_count + 0.5);
+--	self.numItemsToCraft = value
+--	if SkilletCreateCountSlider:IsVisible() then
+--		SkilletItemCountInputBox:SetText(tostring(value))
+--		SkilletItemCountInputBox:HighlightText()
+--		if not clicked then
+--			SkilletCreateCountSlider:SetValue(value)
+--		end
+--	end
+--end
 function Skillet:ClickSkillButton(skillIndex) 
 	if skillIndex and self.button_count then
 		for i=1, self.button_count, 1 do
@@ -427,8 +428,8 @@ function Skillet:ConfigureRecipeControls(enchant)
 		SkilletQueueButton:Hide()
 		SkilletCreateAllButton:Hide()
 		SkilletCreateButton:Hide()
-		SkilletCreateCountSlider:Hide()
-		SkilletCreateCountSliderThumb:Hide()
+--		SkilletCreateCountSlider:Hide()
+--		SkilletCreateCountSliderThumb:Hide()
 		SkilletItemCountInputBox:Hide()
 --        SkilletQueueParent:Hide()
 		SkilletStartQueueButton:Hide()
@@ -439,8 +440,8 @@ function Skillet:ConfigureRecipeControls(enchant)
 		SkilletQueueButton:Show()
 		SkilletCreateAllButton:Show()
 		SkilletCreateButton:Show()
-		SkilletCreateCountSlider:Show()
-		SkilletCreateCountSliderThumb:Show()
+--		SkilletCreateCountSlider:Show()
+--		SkilletCreateCountSliderThumb:Show()
 		SkilletItemCountInputBox:Show()
 		SkilletQueueParent:Show()
 		SkilletStartQueueButton:Show()
@@ -1348,8 +1349,8 @@ function Skillet:HideDetailWindow()
 	SkilletFrame.selectedSkill = -1;
 	-- Always want these set.
 	SkilletItemCountInputBox:SetText("1");
-	SkilletCreateCountSlider:SetMinMaxValues(1, 20);
-	SkilletCreateCountSlider:SetValue(1);
+--	SkilletCreateCountSlider:SetMinMaxValues(1, 20);
+--	SkilletCreateCountSlider:SetValue(1);
 	for i=1, SKILLET_NUM_REAGENT_BUTTONS, 1 do
 		local button = _G["SkilletReagent"..i]
 		button:Hide();
@@ -1477,10 +1478,10 @@ function Skillet:UpdateDetailsWindow(skillIndex)
 		SkilletSkillIconCount:Hide()
 	end
 	-- How many can we queue/create?
-	SkilletCreateCountSlider:SetValue(self.numItemsToCraft);
+--	SkilletCreateCountSlider:SetValue(self.numItemsToCraft);
 	SkilletItemCountInputBox:SetText("" .. self.numItemsToCraft);
 	SkilletItemCountInputBox:HighlightText()
-	SkilletCreateCountSlider.tooltipText = L["Number of items to queue/create"];
+--	SkilletCreateCountSlider.tooltipText = L["Number of items to queue/create"];
 	-- Reagents required ...
 	SkilletReagentLabel:SetText(self:GetReagentLabel(SkilletFrame.selectedSkill));
 	SkilletReagentLabel:Show();
@@ -1585,6 +1586,22 @@ local function get_queue_button(i)
 		button:SetFrameLevel(SkilletQueueParent:GetFrameLevel() + 1)
 	end
 	return button
+end
+
+function Skillet:IncreaseItemCount(this, button, count)
+	local val = SkilletItemCountInputBox:GetNumber()
+	if button == "LeftButton" then
+		if val == 1 and count > 1 then
+			val = 0
+		end
+		val = val + count
+	elseif button == "RightButton" then
+		val = val - count
+	end
+	if val < 1 then
+		val = 1
+	end
+	SkilletItemCountInputBox:SetText(val)
 end
 
 function Skillet:QueueItemButton_OnClick(this, button)
