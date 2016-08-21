@@ -982,7 +982,6 @@ local TradeSkillIgnoredMats	 = {
 }
 Skillet.TradeSkillIgnoredMats = TradeSkillIgnoredMats
 
-local TradeSkillIDsByName = {}		-- filled in with ids and names for reverse matching (since the same name has multiple id's based on level)
 local DifficultyText = {
 	x = "unknown",
 	o = "optimal",
@@ -1423,12 +1422,14 @@ end
 -- collects generic tradeskill data (id to name and name to id)
 function Skillet:CollectTradeSkillData()
 	--DA.DEBUG(0,"CollectTradeSkillData()")
+	self.tradeSkillIDsByName = {}
+	self.tradeSkillNamesByID = {}
 	for i=1,#TradeSkillList,1 do
 		local id = TradeSkillList[i]
 		local name, _, icon = GetSpellInfo(id)
-		TradeSkillIDsByName[name] = id
+		self.tradeSkillIDsByName[name] = id
+		self.tradeSkillNamesByID[id] = name
 	end
-	self.tradeSkillIDsByName = TradeSkillIDsByName
 	self.tradeSkillList = TradeSkillList
 end
 
@@ -1609,7 +1610,7 @@ function Skillet:ScanTrade()
 		DA.DEBUG(0,"ScanTrade: "..tostring(profession).." not linkable")
 	end
 	local player = Skillet.currentPlayer
-	local tradeID = TradeSkillIDsByName[profession]
+	local tradeID = Skillet.tradeSkillIDsByName[profession]
 	if not player or not tradeID then
 		DA.DEBUG(0,"ScanTrade: abort! player= "..tostring(player)..", "..tostring(tradeID))
 		Skillet.scanInProgress = false

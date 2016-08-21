@@ -330,6 +330,7 @@ end
 --		end
 --	end
 --end
+--end
 function Skillet:ClickSkillButton(skillIndex) 
 	if skillIndex and self.button_count then
 		for i=1, self.button_count, 1 do
@@ -796,7 +797,8 @@ function Skillet:internal_UpdateTradeSkillWindow()
 	for c,s in pairs(SkilletRankFrame.subRanks) do
 		s:SetMinMaxValues(0, maxRank)
 	end
-	SkilletPlayerSelectText:SetText(self.currentPlayer)
+--	SkilletPlayerSelectText:SetText(self.currentPlayer)
+	SkilletPlayerSelect:Hide()		-- Currently doesn't do anything and the player name is in the title
 	-- it seems the resize for the main skillet window happens before the resize for the skill list box
 	local button_count = (SkilletFrame:GetHeight() - 115) / SKILLET_TRADE_SKILL_HEIGHT
 	button_count = math.floor(button_count)
@@ -1604,6 +1606,21 @@ function Skillet:IncreaseItemCount(this, button, count)
 	SkilletItemCountInputBox:SetText(val)
 end
 
+function Skillet:IncreaseItemCount(this, button, count)
+	local val = SkilletItemCountInputBox:GetNumber()
+	if button == "LeftButton" then
+		if val == 1 and count > 1 then
+			val = 0
+		end
+		val = val + count
+	elseif button == "RightButton" then
+		val = val - count
+	end
+	if val < 1 then
+		val = 1
+	end
+	SkilletItemCountInputBox:SetText(val)
+end
 function Skillet:QueueItemButton_OnClick(this, button)
 	local queue = self.db.realm.queueData[self.currentPlayer]
 	local index = this:GetID()
@@ -2295,7 +2312,7 @@ function Skillet:StartQueue_OnClick(button,mouse)
 	if self.queuecasting then
 		DA.CHAT("Cancel incomplete processing")
 		self:CancelCast() -- next update will reset the text
-		button:Disable()
+--		button:Disable()
 		self.queuecasting = false
 	else
 		button:SetText(L["Pause"])

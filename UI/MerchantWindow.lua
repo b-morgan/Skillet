@@ -57,7 +57,7 @@ local function update_merchant_inventory()
 				local name, texture, price, quantity, numAvailable, isUsable = GetMerchantItemInfo(i)
 				if numAvailable == -1  then
 					local id = Skillet:GetItemIDFromLink(link)
-					merchant_inventory[id] = {}					-- TODO: record this info if PT doesn't already have it
+					merchant_inventory[id] = {}
 					merchant_inventory[id].price = price
 					merchant_inventory[id].quantity = quantity
 				end
@@ -77,6 +77,9 @@ local function update_merchant_buy_button()
 	elseif does_merchant_sell_required_items(list) == false then
 		SkilletMerchantBuyFrame:Hide()
 		return
+	end
+	if Skillet.db.profile.display_shopping_list_at_merchant then
+		Skillet:DisplayShoppingList(false)
 	end
 	if SkilletMerchantBuyFrame:IsVisible() then
 		-- already inserted the button
