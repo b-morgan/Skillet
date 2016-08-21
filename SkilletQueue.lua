@@ -242,7 +242,6 @@ function Skillet:ProcessQueue(altMode)
 				self.processingSpellID = command.recipeID
 				self.processingPosition = qpos
 				self.processingCommand = command
-				self.processingCount = command.count
 				self.adjustInventory = true
 				-- if alt down/right click - auto use items / like vellums
 				if altMode then
@@ -251,6 +250,7 @@ function Skillet:ProcessQueue(altMode)
 						self.processingCount = 1
 						DA.DEBUG(1,"altMode Crafting: "..tostring(self.processingSpell).." ("..tostring(command.recipeID)..") and using "..tostring(itemID))
 						self.queuecasting = true
+						self.processingCount = 1
 						C_TradeSkillUI.SetRecipeRepeatCount(command.recipeID, 1)
 						C_TradeSkillUI.CraftRecipe(command.recipeID, 1)
 						UseItemByName(itemID)
@@ -264,6 +264,7 @@ function Skillet:ProcessQueue(altMode)
 				end
 				DA.DEBUG(1,"Crafting: "..tostring(command.count).." of "..tostring(self.processingSpell).." ("..tostring(command.recipeID)..")")
 				self.queuecasting = true
+				self.processingCount = craftCount
 				C_TradeSkillUI.SetRecipeRepeatCount(command.recipeID, craftCount)
 				C_TradeSkillUI.CraftRecipe(command.recipeID, craftCount)
 			else
@@ -381,54 +382,28 @@ end
 -- Counts down each successful completion of the current command and does finish processing when the count reaches zero
 function Skillet:ContinueCast(spell, spellID)
 	DA.DEBUG(0,"ContinueCast("..tostring(spell)..", "..tostring(spellID)..")")
-	if spell == self.processingSpell then
+	if spell == self.processingSpell then	
 		--DA.DEBUG(0,"ContinueCast: processingCount= "..tostring(Skillet.processingCount))
-		Skillet.processingCount = Skillet.processingCount - 1
-		if Skillet.processingCount == 0 then
-			Skillet:FinishCast(spell, spellID)
-			return
-		end
 		local queue = self.db.realm.queueData[self.currentPlayer]
-		local qpos = self.processingPosition
+		local qpos = self.processingPosition		
 		if queue[qpos] and queue[qpos] == self.processingCommand then
 			local command = queue[qpos]
 			if command.op == "iterate" then
 				command.count = command.count - 1
-			end
-		end
---		Skillet:AdjustInventory()	-- Adjustment of the inventory and updating the window will happen via other events
-	end
-end
-
--- Finish a trade skill currently in progress. Called when the last UNIT_SPELLCAST_SUCCESS event occurs
-function Skillet:FinishCast(spell, spellID)
-	DA.DEBUG(0,"FinishCast("..tostring(spell)..", "..tostring(spellID)..")")
-	if spell == self.processingSpell then
-		local queue = self.db.realm.queueData[self.currentPlayer]
-		local qpos = self.processingPosition
-		local command
-		if queue and qpos and queue[qpos] and queue[qpos] == self.processingCommand then
-			command = queue[qpos]
-		else
-			DA.DEBUG(0,"FinishCast: Looking for command in queue")
-			for i=1,#queue,1 do		-- Look for the current command in the queue (this should never happen)
-				if queue[i] == self.processingCommand then
-					command = queue[i]
-					qpos = i
-					break
+				if command.count == 0 then
+					self:RemoveFromQueue(qpos)
 				end
-			end
+			end			
 		end
-		if command and command == self.processingCommand and command.op == "iterate" then
+		Skillet.processingCount = Skillet.processingCount - 1
+		if Skillet.processingCount == 0 then
 			self.queuecasting = false
 			self.processingSpell = nil
 			self.processingSpellID = nil
 			self.processingPosition = nil
 			self.processingCommand = nil
-			self:RemoveFromQueue(qpos) -- will call AdjustInventory
-		else
-			DA.DEBUG(0,"FinishCast: Processing queue entry missing")
-		end
+		end		
+--		Skillet:AdjustInventory()	-- Adjustment of the inventory and updating the window will happen via other events
 	end
 end
 
