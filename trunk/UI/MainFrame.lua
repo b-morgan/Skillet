@@ -327,15 +327,15 @@ end
 --		SkilletItemCountInputBox:HighlightText()
 --		if not clicked then
 --			SkilletCreateCountSlider:SetValue(value)
+
 --		end
 --	end
---end
 --end
 function Skillet:ClickSkillButton(skillIndex) 
 	if skillIndex and self.button_count then
 		for i=1, self.button_count, 1 do
 			local button = _G["SkilletScrollButton"..i]
-			if button and button.rawIndex and button.rawIndex == skillIndex and button:IsVisible() and not button.skill.subGroup then
+			if button and button.skill and button.skill.skillIndex and button.skill.skillIndex == skillIndex and button:IsVisible() and not button.skill.subGroup then
 				button:Click("LeftButton", true);
 			end
 		end		
@@ -1592,30 +1592,13 @@ end
 
 function Skillet:IncreaseItemCount(this, button, count)
 	local val = SkilletItemCountInputBox:GetNumber()
-	if button == "LeftButton" then
-		if val == 1 and count > 1 then
-			val = 0
-		end
-		val = val + count
-	elseif button == "RightButton" then
-		val = val - count
+	if button == "RightButton" then
+		count = count * 10
 	end
-	if val < 1 then
-		val = 1
+	if val == 1 and count > 1 then
+		val = 0
 	end
-	SkilletItemCountInputBox:SetText(val)
-end
-
-function Skillet:IncreaseItemCount(this, button, count)
-	local val = SkilletItemCountInputBox:GetNumber()
-	if button == "LeftButton" then
-		if val == 1 and count > 1 then
-			val = 0
-		end
-		val = val + count
-	elseif button == "RightButton" then
-		val = val - count
-	end
+	val = val + count
 	if val < 1 then
 		val = 1
 	end

@@ -2604,7 +2604,7 @@
 				<Anchors>
 					<Anchor point="TOPLEFT" relativeTo="SkilletQueueAllButton" relativePoint="TOPRIGHT">
 						<Offset>
-							<AbsDimension x="25" y="0"/>
+							<AbsDimension x="39" y="0"/>
 						</Offset>
 					</Anchor>
 				</Anchors>
@@ -2669,14 +2669,68 @@
 				</Scripts>
 				<FontString inherits="ChatFontNormal"/>
 			</EditBox>
-			<Button name="SkilletAdd1Button" inherits="UIPanelButtonTemplate" text="1" parent="SkilletFrame">
+			<Button name="SkilletSub10Button" parent="SkilletFrame">
 				<Size>
-					<AbsDimension x="32" y="22"/>
+					<AbsDimension x="31" y="23"/>
 				</Size>
 				<Anchors>
 					<Anchor point="TOPLEFT" relativeTo="SkilletCreateAllButton" relativePoint="TOPRIGHT">
 						<Offset>
-							<AbsDimension x="5" y="0"/>
+							<AbsDimension x="2" y="0"/>
+						</Offset>
+					</Anchor>
+				</Anchors>
+				<Scripts>
+					<OnLoad>
+						self:RegisterForClicks("LeftButtonUp", "RightButtonUp")
+					</OnLoad>
+					<OnClick>
+						Skillet:IncreaseItemCount(self, button, -10)
+					</OnClick>
+				</Scripts>
+				<NormalTexture file="Interface\Addons\Skillet\Icons\Buttons\PrevPrevPage-Up">
+					<TexCoords left="0" right="0.640625" top="0" bottom="0.5"/>
+				</NormalTexture>
+				<PushedTexture file="Interface\Addons\Skillet\Icons\Buttons\PrevPrevPage-Down">
+					<TexCoords left="0" right="0.640625" top="0" bottom="0.5"/>
+				</PushedTexture>
+				<DisabledTexture file="Interface\Addons\Skillet\Icons\Buttons\PrevPrevPage-Disabled">
+					<TexCoords left="0" right="0.640625" top="0" bottom="0.5"/>
+				</DisabledTexture>				
+				<HighlightTexture file="Interface\Buttons\UI-Common-MouseHilight" alphaMode="ADD"/>				
+			</Button>
+			<Button name="SkilletSub1Button" parent="SkilletFrame">
+				<Size>
+					<AbsDimension x="22" y="23"/>
+				</Size>
+				<Anchors>
+					<Anchor point="TOPLEFT" relativeTo="SkilletSub10Button" relativePoint="TOPRIGHT">
+						<Offset>
+							<AbsDimension x="0" y="0"/>
+						</Offset>
+					</Anchor>
+				</Anchors>
+				<Scripts>
+					<OnLoad>
+						self:RegisterForClicks("LeftButtonUp", "RightButtonUp")
+					</OnLoad>
+					<OnClick>
+						Skillet:IncreaseItemCount(self, button, -1)
+					</OnClick>
+				</Scripts>
+				<NormalTexture file="Interface\Addons\Skillet\Icons\Buttons\PrevPage-Up"/>
+				<PushedTexture file="Interface\Addons\Skillet\Icons\Buttons\PrevPage-Down"/>
+				<DisabledTexture file="Interface\Addons\Skillet\Icons\Buttons\PrevPage-Disabled"/>
+				<HighlightTexture file="Interface\Buttons\UI-Common-MouseHilight" alphaMode="ADD"/>				
+			</Button>
+			<Button name="SkilletAdd1Button" parent="SkilletFrame">
+				<Size>
+					<AbsDimension x="22" y="23"/>
+				</Size>
+				<Anchors>
+					<Anchor point="TOPLEFT" relativeTo="SkilletSub1Button" relativePoint="TOPRIGHT">
+						<Offset>
+							<AbsDimension x="0" y="0"/>
 						</Offset>
 					</Anchor>
 				</Anchors>
@@ -2688,15 +2742,19 @@
 						Skillet:IncreaseItemCount(self, button, 1)
 					</OnClick>
 				</Scripts>
+				<NormalTexture file="Interface\Addons\Skillet\Icons\Buttons\NextPage-Up"/>
+				<PushedTexture file="Interface\Addons\Skillet\Icons\Buttons\NextPage-Down"/>
+				<DisabledTexture file="Interface\Addons\Skillet\Icons\Buttons\NextPage-Disabled"/>
+				<HighlightTexture file="Interface\Buttons\UI-Common-MouseHilight" alphaMode="ADD"/>				
 			</Button>
-			<Button name="SkilletAdd2Button" inherits="UIPanelButtonTemplate" text="10" parent="SkilletFrame">
+			<Button name="SkilletAdd10Button" parent="SkilletFrame">
 				<Size>
-					<AbsDimension x="32" y="22"/>
+					<AbsDimension x="31" y="23"/>
 				</Size>
 				<Anchors>
-					<Anchor point="LEFT" relativeTo="SkilletAdd1Button" relativePoint="RIGHT">
+					<Anchor point="TOPLEFT" relativeTo="SkilletAdd1Button" relativePoint="TOPRIGHT">
 						<Offset>
-							<AbsDimension x="1" y="0"/>
+							<AbsDimension x="0" y="0"/>
 						</Offset>
 					</Anchor>
 				</Anchors>
@@ -2708,35 +2766,25 @@
 						Skillet:IncreaseItemCount(self, button, 10)
 					</OnClick>
 				</Scripts>
-			</Button>
-			<Button name="SkilletAdd3Button" inherits="UIPanelButtonTemplate" text="100" parent="SkilletFrame">
+				<NormalTexture file="Interface\Addons\Skillet\Icons\Buttons\NextNextPage-Up">
+					<TexCoords left="0" right="0.640625" top="0" bottom="0.5"/>
+				</NormalTexture>
+				<PushedTexture file="Interface\Addons\Skillet\Icons\Buttons\NextNextPage-Down">
+					<TexCoords left="0" right="0.640625" top="0" bottom="0.5"/>
+				</PushedTexture>
+				<DisabledTexture file="Interface\Addons\Skillet\Icons\Buttons\NextNextPage-Disabled">
+					<TexCoords left="0" right="0.640625" top="0" bottom="0.5"/>
+				</DisabledTexture>
+				<HighlightTexture file="Interface\Buttons\UI-Common-MouseHilight" alphaMode="ADD"/>				
+			</Button>			
+			<Button name="SkilletClearNumButton" parent="SkilletFrame">
 				<Size>
-					<AbsDimension x="32" y="22"/>
-				</Size>
-				<Anchors>
-					<Anchor point="LEFT" relativeTo="SkilletAdd2Button" relativePoint="RIGHT">
-						<Offset>
-							<AbsDimension x="1" y="0"/>
-						</Offset>
-					</Anchor>
-				</Anchors>
-				<Scripts>
-					<OnLoad>
-						self:RegisterForClicks("LeftButtonUp", "RightButtonUp")
-					</OnLoad>				
-					<OnClick>
-						Skillet:IncreaseItemCount(self, button, 100)
-					</OnClick>
-				</Scripts>
-			</Button>
-			<Button name="SkilletClearNumButton" inherits="UIPanelButtonTemplate" text="C" parent="SkilletFrame">
-				<Size>
-					<AbsDimension x="25" y="22"/>
+					<AbsDimension x="32" y="32"/>
 				</Size>
 				<Anchors>
 					<Anchor point="LEFT" relativeTo="SkilletItemCountInputBox" relativePoint="RIGHT">
 						<Offset>
-							<AbsDimension x="1" y="0"/>
+							<AbsDimension x="-8" y="-2"/>
 						</Offset>
 					</Anchor>
 				</Anchors>
@@ -2745,6 +2793,9 @@
 						SkilletItemCountInputBox:SetText(1)
 					</OnClick>
 				</Scripts>
+				<NormalTexture file="Interface\Buttons\CancelButton-Up"/>
+				<PushedTexture file="Interface\Buttons\CancelButton-Down"/>
+				<HighlightTexture file="Interface\Buttons\CancelButton-Highlight" alphaMode="ADD"/>
 			</Button>			
 			<!--
 			#
