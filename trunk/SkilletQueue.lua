@@ -201,14 +201,13 @@ function Skillet:ProcessQueue(altMode)
 				for i=1,#recipe.reagentData,1 do
 					local reagent = recipe.reagentData[i]
 					local reagentName = GetItemInfo(reagent.reagentID) or reagent.reagentID
-					local numNeeded = reagent.numNeeded * command.count
-					DA.DEBUG(1,"id= "..tostring(reagent.reagentID)..", reagentName="..tostring(reagentName)..", numNeeded="..tostring(numNeeded))
+					DA.DEBUG(1,"id= "..tostring(reagent.reagentID)..", reagentName="..tostring(reagentName)..", numNeeded="..tostring(reagent.numNeeded))
 					local numInBoth = GetItemCount(reagent.reagentID,true)
 					local numInBags = GetItemCount(reagent.reagentID)
 					local numInBank =  numInBoth - numInBags
 					DA.DEBUG(1,"numInBoth= "..tostring(numInBoth)..", numInBags="..tostring(numInBags)..", numInBank="..tostring(numInBank))
-					if numInBoth < numNeeded then
-						Skillet:Print(L["Skipping"],recipe.name,"-",L["need"],numNeeded,"x",reagentName,"("..L["have"],numInBoth..")")
+					if numInBoth < reagent.numNeeded then
+						Skillet:Print(L["Skipping"],recipe.name,"-",L["need"],reagent.numNeeded,"x",reagentName,"("..L["have"],numInBoth..")")
 						craftable = false
 						break
 					end
@@ -237,7 +236,7 @@ function Skillet:ProcessQueue(altMode)
 			DA.DEBUG(1,"recipeInfo= "..DA.DUMP1(recipeInfo))
 			DA.TABLE("recipeInfo["..tostring(command.recipeID).."]", recipeInfo)
 			local numAvailable = recipeInfo.numAvailable
-			if command.count <= numAvailable or altMode and numAvailable > 0 then
+			if numAvailable > 0 then
 				self.processingSpell = self:GetRecipeName(command.recipeID)
 				self.processingSpellID = command.recipeID
 				self.processingPosition = qpos
@@ -258,10 +257,14 @@ function Skillet:ProcessQueue(altMode)
 						return
 					end
 				end
+				local craftCount = command.count
+				if craftCount > numAvailable then
+					craftCount = numAvailable
+				end
 				DA.DEBUG(1,"Crafting: "..tostring(command.count).." of "..tostring(self.processingSpell).." ("..tostring(command.recipeID)..")")
 				self.queuecasting = true
-				C_TradeSkillUI.SetRecipeRepeatCount(command.recipeID, command.count)
-				C_TradeSkillUI.CraftRecipe(command.recipeID, command.count)
+				C_TradeSkillUI.SetRecipeRepeatCount(command.recipeID, craftCount)
+				C_TradeSkillUI.CraftRecipe(command.recipeID, craftCount)
 			else
 				DA.CHAT("Insufficent Materials available, count= "..tostring(command.count)..", numAvailable= "..tostring(numAvailable))
 				self.queuecasting = false
