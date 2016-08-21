@@ -411,24 +411,13 @@ end
 function Skillet:StopCast(spell, spellID)
 	DA.DEBUG(0,"StopCast("..tostring(spell)..", "..tostring(spellID)..")")
 	if spell == self.processingSpell then
-		local queue = self.db.realm.queueData[self.currentPlayer]
-		local qpos = self.processingPosition
-		local command
-		if queue and qpos and queue[qpos] and queue[qpos] == self.processingCommand then
-			local command = queue[qpos]
-		end
-		if command and command == self.processingCommand and command.op == "iterate" then
-			self.queuecasting = false
-			self.processingSpell = nil
-			self.processingSpellID = nil
-			self.processingPosition = nil
-			self.processingCommand = nil
-			self.processingCount = nil
-			self.reagentsChanged = {}
-			table.remove(queue, qpos)
-		else
-			DA.DEBUG(0,"StopCast: Processing queue entry missing")
-		end
+		self.queuecasting = false
+		self.processingSpell = nil
+		self.processingSpellID = nil
+		self.processingPosition = nil
+		self.processingCommand = nil
+		self.processingCount = nil
+		self.reagentsChanged = {}
 	end
 end
 
