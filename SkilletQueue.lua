@@ -32,7 +32,8 @@ function Skillet:AdjustInventory()
 			self:InventoryReagentCraftability(id)
 		end
 	end
-	Skillet:InventoryScan()
+	Skillet:ScanQueuedReagents()
+	Skillet:InventoryScan()	
 	self:CalculateCraftableCounts()
 	self.reagentsChanged = {}
 	-- update whole window to show craft counts
