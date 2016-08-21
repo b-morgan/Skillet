@@ -426,7 +426,7 @@ end
 -- made from secure code. All this does is stop repeating after the current item
 function Skillet:CancelCast()
 	DA.DEBUG(0,"CancelCast()")
-	C_TradeSkillUI.StopRecipeRepeat()
+	--C_TradeSkillUI.StopRecipeRepeat()
 end
 
 -- Removes an item from the queue
