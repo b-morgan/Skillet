@@ -55,7 +55,8 @@ end
 
 -- Returns the name of the current trade skill
 function Skillet:GetTradeName(tradeID)
-	return (GetSpellInfo(tradeID))
+	local tradeName = GetSpellInfo(tonumber(tradeID))
+	return tradeName
 end
 
 -- Returns a link for the currently selected tradeskill item.

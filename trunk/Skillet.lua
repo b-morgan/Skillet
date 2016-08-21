@@ -79,6 +79,7 @@ local defaults = {
 		display_shopping_list_at_bank = true,
 		display_shopping_list_at_guildbank = true,
 		display_shopping_list_at_auction = true,
+		display_shopping_list_at_merchant = false,
 		use_blizzard_for_followers = false,
 		show_recipe_source_for_learned = false,
 		transparency = 1.0,
@@ -306,8 +307,8 @@ Skillet.options =
 				},
 				display_shopping_list_at_auction = {
 					type = "toggle",
-					name = L["DISPLAYSGOPPINGLISTATAUCTIONNAME"],
-					desc = L["DISPLAYSGOPPINGLISTATAUCTIONDESC"],
+					name = L["DISPLAYSHOPPINGLISTATAUCTIONNAME"],
+					desc = L["DISPLAYSHOPPINGLISTATAUCTIONDESC"],
 					get = function()
 						return Skillet.db.profile.display_shopping_list_at_auction
 					end,
@@ -316,6 +317,19 @@ Skillet.options =
 					end,
 					width = "double",
 					order = 24
+				},
+				display_shopping_list_at_merchant = {
+					type = "toggle",
+					name = L["DISPLAYSHOPPINGLISTATMERCHANTNAME"],
+					desc = L["DISPLAYSHOPPINGLISTATMERCHANTDESC"],
+					get = function()
+						return Skillet.db.profile.display_shopping_list_at_merchant
+					end,
+					set = function(self,value)
+						Skillet.db.profile.display_shopping_list_at_merchant = value
+					end,
+					width = "double",
+					order = 25
 				},
 				show_craft_counts = {
 					type = "toggle",
@@ -329,7 +343,7 @@ Skillet.options =
 						Skillet:UpdateTradeSkillWindow()
 					end,
 					width = "double",
-					order = 25,
+					order = 26,
 				},
 				use_blizzard_for_followers = {
 					type = "toggle",
@@ -342,7 +356,7 @@ Skillet.options =
 						Skillet.db.profile.use_blizzard_for_followers = value
 					end,
 					width = "double",
-					order = 26
+					order = 27
 				},
 				show_recipe_source_for_learned = {
 					type = "toggle",
@@ -355,7 +369,7 @@ Skillet.options =
 						Skillet.db.profile.show_recipe_source_for_learned = value
 					end,
 					width = "double",
-					order = 27
+					order = 28
 				},
 			}
 		},
@@ -624,7 +638,7 @@ Skillet.options =
 		},
 		DebugLogging = {
 			type = "toggle",
-			name = "DebugLoggibg",
+			name = "DebugLogging",
 			desc = "Option for debugging",
 			get = function()
 				return Skillet.db.profile.DebugLogging
@@ -874,8 +888,8 @@ function Skillet:OnInitialize()
 	local _,wowBuild,_,wowVersion = GetBuildInfo();
 	self.wowBuild = wowBuild
 	self.wowVersion = wowVersion
-	if not self.db.global.dataVersion or self.db.global.dataVersion ~= 7 then
-		self.db.global.dataVersion = 7
+	if not self.db.global.dataVersion or self.db.global.dataVersion ~= 8 then
+		self.db.global.dataVersion = 8
 		self:FlushAllData()
 	elseif not self.db.global.wowBuild or self.db.global.wowBuild ~= self.wowBuild then
 		self.db.global.wowBuild = self.wowBuild
@@ -1353,18 +1367,16 @@ function Skillet:SkilletShowWindow()
 	end
 	self.currentGroup = nil
 	self.currentGroupLabel = self:GetTradeSkillOption("grouping")
+	self.dataSource = "api"
 	self:RecipeGroupDropdown_OnShow()
 	self:ShowTradeSkillWindow()
 	local filterbox = _G["SkilletFilterBox"]
 	local oldtext = filterbox:GetText()
 	local filterText = self:GetTradeSkillOption("filtertext")
-	-- if the text is changed, set the new text (which fires off an update) otherwise just do the update
+	-- if the text is changed, set the new text (which fires off an update)
 	if filterText ~= oldtext then
 		filterbox:SetText(filterText)
-	else
-		self:UpdateTradeSkillWindow()
 	end
-	self.dataSource = "api"
 end
 
 function Skillet:SkilletClose()
