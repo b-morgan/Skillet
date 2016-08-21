@@ -173,15 +173,15 @@ function Skillet:BuyRequiredReagents()
 						break
 					end
 				end
-				if count > 0 then
-					DA.DEBUG(0,"count= "..tostring(count)..", name= "..tostring(name)..", price= "..tostring(price)..", quantity= "..tostring(quantity))
+				if count > 0 then					
 					purchased = 0;
 					local maxStack = GetMerchantItemMaxStack(i)
+					DA.DEBUG(0,"count= "..tostring(count)..", name= "..tostring(name)..", price= "..tostring(price)..", quantity= "..tostring(quantity)..", maxStack= "..tostring(maxStack))
 					while count > 0 do
 						if count <= maxStack then
-							BuyMerchantItem(i,quantity)
-							purchased = purchased + quantity
-							count = count - quantity
+							BuyMerchantItem(i,count)
+							purchased = purchased + count
+							count = 0
 						else
 							BuyMerchantItem(i,maxStack)
 							purchased = purchased + maxStack
