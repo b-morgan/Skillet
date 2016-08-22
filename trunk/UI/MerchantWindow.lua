@@ -173,8 +173,9 @@ function Skillet:BuyRequiredReagents()
 						break
 					end
 				end
-				if count > 0 then					
+				if count > 0 then
 					purchased = 0;
+					count = math.ceil(count/quantity) * quantity	-- Merchant charges us full price for a partial stack, so round up.
 					local maxStack = GetMerchantItemMaxStack(i)
 					DA.DEBUG(0,"count= "..tostring(count)..", name= "..tostring(name)..", price= "..tostring(price)..", quantity= "..tostring(quantity)..", maxStack= "..tostring(maxStack))
 					while count > 0 do
