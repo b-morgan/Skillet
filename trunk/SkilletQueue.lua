@@ -19,23 +19,13 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
 local L = Skillet.L
 
-Skillet.reagentsChanged = {}
-
 -- iterates through a list of reagentIDs and recalculates craftability
 function Skillet:AdjustInventory()
 	DA.DEBUG(0,"AdjustInventory()")
 	-- update queue for faster response time
-	self:UpdateQueueWindow()
-	self:UpdateShoppingListWindow()
-	if self.reagentsChanged then
-		for id,v in pairs(self.reagentsChanged) do
-			self:InventoryReagentCraftability(id)
-		end
-	end
 	Skillet:ScanQueuedReagents()
-	Skillet:InventoryScan()	
+	Skillet:InventoryScan()
 	self:CalculateCraftableCounts()
-	self.reagentsChanged = {}
 	-- update whole window to show craft counts
 	self:UpdateTradeSkillWindow()
 end
@@ -64,7 +54,6 @@ function Skillet:QueueAppendCommand(command, queueCraftables, noWindowRefresh)
 		self.visited[command.recipeID] = true
 		local count = command.count
 		local reagentsInQueue = self.db.realm.reagentsInQueue[Skillet.currentPlayer]
-		local reagentsChanged = self.reagentsChanged
 		local skillIndexLookup = self.data.skillIndexLookup[Skillet.currentPlayer]
 		for i=1,#recipe.reagentData,1 do
 			local reagent = recipe.reagentData[i]
@@ -76,7 +65,6 @@ function Skillet:QueueAppendCommand(command, queueCraftables, noWindowRefresh)
 			DA.DEBUG(1,"numInBoth= "..tostring(numInBoth)..", numInBags="..tostring(numInBags)..", numInBank="..tostring(numInBank))
 			local have = numInBoth + (reagentsInQueue[reagent.reagentID] or 0);
 			reagentsInQueue[reagent.reagentID] = (reagentsInQueue[reagent.reagentID] or 0) - need;
-			reagentsChanged[reagent.reagentID] = true
 			DA.DEBUG(1,"queueCraftables= "..tostring(queueCraftables)..", need= "..tostring(need)..", have= "..tostring(have))
 			if queueCraftables and need > have and (Skillet.db.profile.queue_glyph_reagents or not recipe.name:match(Skillet.L["Glyph "])) then
 				local recipeSource = self.db.global.itemRecipeSource[reagent.reagentID]
@@ -92,7 +80,7 @@ function Skillet:QueueAppendCommand(command, queueCraftables, noWindowRefresh)
 							local newCommand = self:QueueCommandIterate(recipeSourceID, newCount)
 							newCommand.level = (command.level or 0) + 1
 							-- do not add items from transmutation - this can create weird loops
-							if not Skillet.TradeSkillIgnoredMats[recipeSourceID] and 
+							if not Skillet.TradeSkillIgnoredMats[recipeSourceID] and
 							  not Skillet.db.realm.userIgnoredMats[Skillet.currentPlayer][recipeSourceID] then
 								self:QueueAppendCommand(newCommand, queueCraftables, true)
 							end
@@ -102,7 +90,6 @@ function Skillet:QueueAppendCommand(command, queueCraftables, noWindowRefresh)
 			end
 		end
 		reagentsInQueue[recipe.itemID] = (reagentsInQueue[recipe.itemID] or 0) + command.count * recipe.numMade;
-		reagentsChanged[recipe.itemID] = true
 		Skillet:AddToQueue(command, noWindowRefresh)
 		self.visited[command.recipeID] = nil
 	end
@@ -148,19 +135,12 @@ function Skillet:RemoveFromQueue(index)
 	local queue = self.db.realm.queueData[self.currentPlayer]
 	local command = queue[index]
 	local reagentsInQueue = self.db.realm.reagentsInQueue[Skillet.currentPlayer]
-	local reagentsChanged = self.reagentsChanged
 	if command.op == "iterate" then
 		local recipe = self:GetRecipe(command.recipeID)
 		if not command.count then
 			command.count = 1
 		end
 		reagentsInQueue[recipe.itemID] = (reagentsInQueue[recipe.itemID] or 0) - recipe.numMade * command.count
-		reagentsChanged[recipe.itemID] = true
-		for i=1,#recipe.reagentData,1 do
-			local reagent = recipe.reagentData[i]
-			reagentsInQueue[reagent.reagentID] = (reagentsInQueue[reagent.reagentID] or 0) + reagent.numNeeded * command.count
-			reagentsChanged[reagent.reagentID] = true
-		end
 	end
 	table.remove(queue, index)
 	self:AdjustInventory()
@@ -208,7 +188,7 @@ function Skillet:ProcessQueue(altMode)
 					local numInBank =  numInBoth - numInBags
 					DA.DEBUG(1,"numInBoth= "..tostring(numInBoth)..", numInBags="..tostring(numInBags)..", numInBank="..tostring(numInBank))
 					if numInBoth < reagent.numNeeded then
-						Skillet:Print(L["Skipping"],recipe.name,"-",L["need"],reagent.numNeeded,"x",reagentName,"("..L["have"],numInBoth..")")
+						Skillet:Print(L["Skipping"],recipe.name,"-",L["need"],reagent.numNeeded*command.count,"x",reagentName,"("..L["have"],numInBoth..")")
 						craftable = false
 						break
 					end
@@ -382,10 +362,10 @@ end
 -- Counts down each successful completion of the current command and does finish processing when the count reaches zero
 function Skillet:ContinueCast(spell, spellID)
 	DA.DEBUG(0,"ContinueCast("..tostring(spell)..", "..tostring(spellID)..")")
-	if spell == self.processingSpell then	
+	if spell == self.processingSpell then
 		--DA.DEBUG(0,"ContinueCast: processingCount= "..tostring(Skillet.processingCount))
 		local queue = self.db.realm.queueData[self.currentPlayer]
-		local qpos = self.processingPosition		
+		local qpos = self.processingPosition
 		if queue[qpos] and queue[qpos] == self.processingCommand then
 			local command = queue[qpos]
 			if command.op == "iterate" then
@@ -393,7 +373,7 @@ function Skillet:ContinueCast(spell, spellID)
 				if command.count == 0 then
 					self:RemoveFromQueue(qpos)
 				end
-			end			
+			end
 		end
 		Skillet.processingCount = Skillet.processingCount - 1
 		if Skillet.processingCount == 0 then
@@ -402,7 +382,7 @@ function Skillet:ContinueCast(spell, spellID)
 			self.processingSpellID = nil
 			self.processingPosition = nil
 			self.processingCommand = nil
-		end		
+		end
 --		Skillet:AdjustInventory()	-- Adjustment of the inventory and updating the window will happen via other events
 	end
 end
@@ -417,7 +397,6 @@ function Skillet:StopCast(spell, spellID)
 		self.processingPosition = nil
 		self.processingCommand = nil
 		self.processingCount = nil
-		self.reagentsChanged = {}
 	end
 end
 
@@ -432,9 +411,7 @@ end
 -- Removes an item from the queue
 function Skillet:RemoveQueuedCommand(queueIndex)
 	DA.DEBUG(0,"RemoveQueuedCommand("..tostring(queueIndex)..")")
-	self.reagentsChanged = {}
 	self:RemoveFromQueue(queueIndex)
-	self:UpdateQueueWindow()
 	self:UpdateTradeSkillWindow()
 end
 

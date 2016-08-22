@@ -331,14 +331,14 @@ end
 --		end
 --	end
 --end
-function Skillet:ClickSkillButton(skillIndex) 
+function Skillet:ClickSkillButton(skillIndex)
 	if skillIndex and self.button_count then
 		for i=1, self.button_count, 1 do
 			local button = _G["SkilletScrollButton"..i]
 			if button and button.skill and button.skill.skillIndex and button.skill.skillIndex == skillIndex and button:IsVisible() and not button.skill.subGroup then
 				button:Click("LeftButton", true);
 			end
-		end		
+		end
 	end
 end
 
@@ -777,6 +777,7 @@ function Skillet:internal_UpdateTradeSkillWindow()
 	self:RecipeDifficultyButton_OnShow()
 	SkilletHideUncraftableRecipes:SetChecked(self:GetTradeSkillOption("hideuncraftable"))
 	self:UpdateQueueWindow()
+	self:UpdateShoppingListWindow()
 	-- Window Title
 	local tradeName = self:GetTradeName(self.currentTrade)
 	local title = _G["SkilletTitleText"];
@@ -925,14 +926,14 @@ function Skillet:internal_UpdateTradeSkillWindow()
 				buttonText:SetTextColor(skill_color.r, skill_color.g, skill_color.b, textAlpha)
 				countText:SetTextColor(skill_color.r, skill_color.g, skill_color.b, textAlpha)
 				buttonExpand:Hide()
-				buttonFavorite.skill = skill				
+				buttonFavorite.skill = skill
 				buttonFavorite.SetFavorite = function(self, state)
 					if state then
-						self:GetNormalTexture():SetAlpha(0.5)				  
+						self:GetNormalTexture():SetAlpha(0.5)
 					else
 						self:GetNormalTexture():SetAlpha(0)
 					end
-				end  			
+				end
 				buttonFavorite:SetFavorite(Skillet:IsFavorite(skill.recipeID))
 				buttonFavorite:Show()
 				-- if the item has a minimum level requirement, then print that here
@@ -2397,7 +2398,7 @@ local skillMenuGroup = {
 	},
 }
 local favoriteMenu = {
-		text = "",	
+		text = "",
 		func = function()
 					local recipeID = Skillet.menuButton.skill.recipeID
 					local favoriteButton = _G[Skillet.menuButton:GetName() .. "Favorite"]
@@ -2491,7 +2492,7 @@ local skillMenuListLocked = {
 					end
 				end,
 	},
-	favoriteMenu,	
+	favoriteMenu,
 	{
 		text = "",
 		disabled = true,
@@ -2632,7 +2633,7 @@ function Skillet:SkilletSkillMenu_Show(button)
 		favoriteMenu["text"] = L["Set Favorite"]
 		if Skillet:IsFavorite(button.skill.recipeID) then
 			favoriteMenu["text"] = L["Remove Favorite"]
-		end	
+		end
 		if locked then
 			EasyMenu(skillMenuListLocked, SkilletSkillMenu, _G["UIParent"], x/uiScale,y/uiScale, "MENU", 5)
 		else
