@@ -260,7 +260,7 @@ end
 
 local function indexBank()
 	DA.DEBUG(0,"indexBank()")
--- bank contains detailed contents of each tab,slot which 
+-- bank contains detailed contents of each tab,slot which
 -- is only needed while the bank is open.
 --
 	bank = {}
@@ -290,13 +290,13 @@ local function indexGuildBank(tab)
 	--
 	-- Build a current view of the contents of the Guildbank (one tab at a time).
 	--
-	-- guildbank contains detailed contents of each tab,slot which 
+	-- guildbank contains detailed contents of each tab,slot which
 	-- is only needed while the guildbank is open.
 	--
-	-- cachedGuildbank is a count by item, usable (but not necessarily 
+	-- cachedGuildbank is a count by item, usable (but not necessarily
 	-- accurate) when the Guildbank is closed.
-	-- It is in db.global instead of db.realm because of connected realms 
-	-- This means it is broken if this account is in guilds on 
+	-- It is in db.global instead of db.realm because of connected realms
+	-- This means it is broken if this account is in guilds on
 	-- different realms (not connected) with the same name.
 	--
 	local guildName = GetGuildInfo("player")
@@ -560,7 +560,7 @@ end
 
 -- Subset of the BAG_UPDATE event processed in Skillet.lua
 -- It may look like a real Blizzard event but its not.
-function Skillet:BANK_UPDATE(event,bagID) 
+function Skillet:BANK_UPDATE(event,bagID)
 	DA.DEBUG(2,"BANK_UPDATE( "..tostring(bagID).." )")
 	if Skillet.bankBusy then
 		DA.DEBUG(1, "BANK_UPDATE and bankBusy")

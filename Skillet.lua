@@ -230,7 +230,7 @@ Skillet.options =
 					type = "toggle",
 					name = L["SHOWCRAFTERSTOOLTIPNAME"],
 					desc = L["SHOWCRAFTERSTOOLTIPDESC"],
-					disabled = true, -- because of 5.4 changes to trade links 
+					disabled = true, -- because of 5.4 changes to trade links
 					get = function()
 						return Skillet.db.profile.show_crafters_tooltip
 					end,
@@ -404,7 +404,6 @@ Skillet.options =
 					set = function(self,t)
 						Skillet.db.profile.transparency = t
 						Skillet:UpdateTradeSkillWindow()
-						Skillet:UpdateShoppingListWindow()
 						Skillet:UpdateStandaloneQueueWindow()
 					end,
 					width = "double",
@@ -421,7 +420,6 @@ Skillet.options =
 					set = function(self,t)
 						Skillet.db.profile.scale = t
 						Skillet:UpdateTradeSkillWindow()
-						Skillet:UpdateShoppingListWindow()
 						Skillet:UpdateStandaloneQueueWindow()
 					end,
 					width = "double",
@@ -786,20 +784,20 @@ Skillet.options =
 				if not (UnitAffectingCombat("player")) then
 					SkilletFrame:SetWidth(710);
 					SkilletFrame:SetHeight(545);
-					SkilletFrame:SetPoint("TOPLEFT",200,-100);                    
+					SkilletFrame:SetPoint("TOPLEFT",200,-100);
 					SkilletStandalonQueue:SetWidth(385);
 					SkilletStandalonQueue:SetHeight(240);
 					SkilletStandalonQueue:SetPoint("TOPLEFT",300,-150);
 					local windowManger = LibStub("LibWindow-1.1")
 					windowManger.SavePosition(SkilletFrame)
-					windowManger.SavePosition(SkilletStandalonQueue) 
+					windowManger.SavePosition(SkilletStandalonQueue)
 				else
 					DA.DEBUG(0,"|cff8888ffSkillet|r: Combat lockdown restriction." ..
 												  " Leave combat and try again.")
 				end
 			end,
 			order = 99
-		},        
+		},
 	}
 }
 
@@ -828,10 +826,10 @@ function Skillet:DisableBlizzardFrame()
 		self.BlizzardTradeSkillFrame = TradeSkillFrame
 		self.tradeSkillHide = TradeSkillFrame:GetScript("OnHide")
 		TradeSkillFrame:SetScript("OnHide", nil)
-		HideUIPanel(TradeSkillFrame)	
+		HideUIPanel(TradeSkillFrame)
 	else
 		TradeSkillFrame:SetScript("OnHide", nil)
-		HideUIPanel(TradeSkillFrame)	
+		HideUIPanel(TradeSkillFrame)
 	end
 end
 
@@ -884,7 +882,7 @@ function Skillet:OnInitialize()
 		self.db.realm.recipeInfo = nil
 	end
 
--- Clean up if database is stale 
+-- Clean up if database is stale
 	local _,wowBuild,_,wowVersion = GetBuildInfo();
 	self.wowBuild = wowBuild
 	self.wowVersion = wowVersion
@@ -943,7 +941,7 @@ function Skillet:OnInitialize()
 	acedia:AddToBlizOptions("Skillet Profiles", "Profiles", "Skillet")
 
 --
--- Copy the profile debugging variables to the "addon name" global table 
+-- Copy the profile debugging variables to the "addon name" global table
 -- where DebugAids.lua is looking for them.
 --
 -- Warning:	Setting TableDump can be a performance hog, use caution.
@@ -1315,7 +1313,7 @@ function Skillet:SkilletShow()
 	else
 		DA.DEBUG(0,"SkilletShow: "..tostring(skillLineName).." not linkable")
 	end
-	-- Verify that the user understands this is an alpha build. 
+	-- Verify that the user understands this is an alpha build.
 	-- Skillet.alpha is 0 for ask the question, 1 to use Blizzard UI, and 2 to use the Skillet UI (if appropriate).
 	-- If the user is smart enough to turn on debugging, skip the question.
 	if self.DebugLogging then
@@ -1397,7 +1395,6 @@ function Skillet:RescanBags()
 	DA.DEBUG(0,"RescanBags()")
 	local start = GetTime()
 	Skillet:InventoryScan()
-	Skillet:UpdateShoppingListWindow()
 	Skillet:UpdateTradeSkillWindow()
 	local elapsed = GetTime() - start
 	if elapsed > 0.5 then
@@ -1435,13 +1432,13 @@ function Skillet:BAG_UPDATE(event, bagID)
 	end
 	-- Most of the shoppingList code is in ShoppingList.lua
 	if self.shoppingList and self.shoppingList:IsVisible() then
-		Skillet:InventoryScan()
-		Skillet:UpdateShoppingListWindow()
+		self:InventoryScan()
+		self:UpdateShoppingListWindow()
 	end
 end
 
-function Skillet:BAG_CLOSED(event, bagID)        -- Fires when the whole bag is removed from 
-	DA.TRACE("BAG_CLOSED( "..tostring(bagID).." )") -- inventory or bank. We don't really care. 
+function Skillet:BAG_CLOSED(event, bagID)        -- Fires when the whole bag is removed from
+	DA.TRACE("BAG_CLOSED( "..tostring(bagID).." )") -- inventory or bank. We don't really care.
 end
 
 -- Trade window close, the counts may need to be updated.
@@ -1596,7 +1593,7 @@ function Skillet:SetSelectedSkill(skillIndex)
 	self.selectedSkill = skillIndex
 	self:ScrollToSkillIndex(skillIndex)
 	self:UpdateDetailsWindow(skillIndex)
-	self:ClickSkillButton(skillIndex) 
+	self:ClickSkillButton(skillIndex)
 end
 
 -- Updates the text we filter the list of recipes against.
@@ -1673,7 +1670,7 @@ function Skillet:AddItemNotesToTooltip(tooltip)
 	end
 	-- get item name
 	local name,link = tooltip:GetItem();
-	if not link then 
+	if not link then
 		--DA.DEBUG(0,"Error: AddItemNotesToTooltip() could not determine link")
 		return;
 	end
