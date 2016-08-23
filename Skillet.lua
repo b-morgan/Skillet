@@ -1119,7 +1119,7 @@ function Skillet:OnEnable()
 	self:RegisterEvent("UNIT_SPELLCAST_INTERRUPTED")
 --	self:RegisterEvent("UNIT_SPELLCAST_DELAYED")
 --	self:RegisterEvent("UNIT_SPELLCAST_STOP")
-	self:RegisterEvent("CHAT_MSG_SKILL")
+--	self:RegisterEvent("CHAT_MSG_SKILL")
 	self:RegisterEvent("SKILL_LINES_CHANGED") -- replacement for CHAT_MSG_SKILL?
 	self:RegisterEvent("LEARNED_SPELL_IN_TAB") -- arg1 = professionID
 	self:RegisterEvent("NEW_RECIPE_LEARNED") -- arg1 = recipeID
@@ -1150,7 +1150,7 @@ function Skillet:PLAYER_LOGOUT()
 	end
 end
 
-function Skillet:CHAT_MSG_SKILL()
+function Skillet:CHAT_MSG_SKILL() -- Replaced by SKILL_LINES_CHANGED?
 	DA.DEBUG(0,"CHAT_MSG_SKILL")
 	if Skillet.tradeSkillOpen then
 		Skillet:ScanTrade()
@@ -1160,28 +1160,27 @@ end
 
 function Skillet:SKILL_LINES_CHANGED()
 	DA.DEBUG(0,"SKILL_LINES_CHANGED")
---	if Skillet.tradeSkillOpen then
---		Skillet:ScanTrade()
---		Skillet:UpdateTradeSkillWindow()
---	end
+	if Skillet.tradeSkillOpen then
+		Skillet:ScanTrade()
+		Skillet:UpdateTradeSkillWindow()
+	end
 end
 
 function Skillet:LEARNED_SPELL_IN_TAB(event, profession)
 	DA.DEBUG(0,"LEARNED_SPELL_IN_TAB")
 	DA.DEBUG(0,"profession= "..tostring(profession))
---	if Skillet.tradeSkillOpen then
---		Skillet:ScanTrade()
---		Skillet:UpdateTradeSkillWindow()
---	end
+	if Skillet.tradeSkillOpen then
+		Skillet:ScanTrade()
+		Skillet:UpdateTradeSkillWindow()
+	end
 end
 
 function Skillet:NEW_RECIPE_LEARNED(event, recipeID)
 	DA.DEBUG(0,"NEW_RECIPE_LEARNED")
 	DA.DEBUG(0,"recipeID= "..tostring(recipeID))
---	if Skillet.tradeSkillOpen then
---		Skillet:ScanTrade()
---		Skillet:UpdateTradeSkillWindow()
---	end
+	if Skillet.tradeSkillOpen then
+		Skillet.dataSourceChanged = true
+	end
 end
 
 function Skillet:TRADE_SKILL_SHOW()
