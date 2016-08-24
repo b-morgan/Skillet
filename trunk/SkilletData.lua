@@ -1529,7 +1529,8 @@ function Skillet:RescanTrade()
 end
 
 function Skillet:IsFavorite(recipeID)
-	return self.data.recipeInfo[self.currentTrade][recipeID].favorite
+	local info = self.data.recipeInfo
+	return info and info[self.currentTrade] and info[self.currentTrade][recipeID] and info[self.currentTrade][recipeID].favorite
 end
 
 function Skillet:ToggleFavorite(recipeID)
