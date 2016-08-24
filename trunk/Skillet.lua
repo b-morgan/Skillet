@@ -1150,7 +1150,7 @@ function Skillet:PLAYER_LOGOUT()
 	end
 end
 
-function Skillet:CHAT_MSG_SKILL() -- Replaced by SKILL_LINES_CHANGED?
+function Skillet:CHAT_MSG_SKILL()	-- Replaced by SKILL_LINES_CHANGED?
 	DA.DEBUG(0,"CHAT_MSG_SKILL")
 	if Skillet.tradeSkillOpen then
 		Skillet:ScanTrade()
@@ -1161,8 +1161,9 @@ end
 function Skillet:SKILL_LINES_CHANGED()
 	DA.DEBUG(0,"SKILL_LINES_CHANGED")
 	if Skillet.tradeSkillOpen then
-		Skillet:ScanTrade()
-		Skillet:UpdateTradeSkillWindow()
+--		Skillet:ScanTrade()
+--		Skillet:UpdateTradeSkillWindow()
+		Skillet.dataSourceChanged = true	-- Process the change on the next TRADE_SKILL_LIST_UPDATE
 	end
 end
 
@@ -1170,8 +1171,8 @@ function Skillet:LEARNED_SPELL_IN_TAB(event, profession)
 	DA.DEBUG(0,"LEARNED_SPELL_IN_TAB")
 	DA.DEBUG(0,"profession= "..tostring(profession))
 	if Skillet.tradeSkillOpen then
-		Skillet:ScanTrade()
-		Skillet:UpdateTradeSkillWindow()
+		Skillet:ScanTrade()					-- Untested
+		Skillet:UpdateTradeSkillWindow()	-- Untested
 	end
 end
 
@@ -1179,7 +1180,7 @@ function Skillet:NEW_RECIPE_LEARNED(event, recipeID)
 	DA.DEBUG(0,"NEW_RECIPE_LEARNED")
 	DA.DEBUG(0,"recipeID= "..tostring(recipeID))
 	if Skillet.tradeSkillOpen then
-		Skillet.dataSourceChanged = true
+		Skillet.dataSourceChanged = true	-- Process the change on the next TRADE_SKILL_LIST_UPDATE
 	end
 end
 
