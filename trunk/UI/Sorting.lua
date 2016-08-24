@@ -371,7 +371,7 @@ function Skillet:internal_SortAndFilterRecipes()
 	local groupLabel = Skillet.currentGroupLabel
 	--DA.DEBUG(1,"filtertext="..tostring(filtertext)..", groupLabel="..tostring(groupLabel))
 	if filtertext and filtertext ~= "" or groupLabel == "Flat" then
-		DA.DEBUG(1,"SortAndFilterRecipes Flat")
+		--DA.DEBUG(1,"SortAndFilterRecipes Flat")
 		for i=1, numSkills, 1 do
 			local skill = Skillet:GetSkill(Skillet.currentPlayer, Skillet.currentTrade, i)
 			if skill then
@@ -404,7 +404,7 @@ function Skillet:internal_SortAndFilterRecipes()
 		end
 	else
 		local group = Skillet:RecipeGroupFind(Skillet.currentPlayer, Skillet.currentTrade, Skillet.currentGroupLabel, Skillet.currentGroup)
-		DA.DEBUG(1,"current grouping "..Skillet.currentGroupLabel.." "..(Skillet.currentGroup or "nil"))
+		--DA.DEBUG(1,"current grouping "..Skillet.currentGroupLabel.." "..(Skillet.currentGroup or "nil"))
 		if recipe_sort_method ~= NOSORT then
 			Skillet:RecipeGroupSort(group, recipe_sort_method, is_sort_desc())
 		end
