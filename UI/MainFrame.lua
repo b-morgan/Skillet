@@ -778,6 +778,7 @@ function Skillet:internal_UpdateTradeSkillWindow()
 	SkilletHideUncraftableRecipes:SetChecked(self:GetTradeSkillOption("hideuncraftable"))
 	self:UpdateQueueWindow()
 	self:UpdateShoppingListWindow()
+	self:FavoritesOnlyRefresh()
 	-- Window Title
 	local tradeName = self:GetTradeName(self.currentTrade)
 	local title = _G["SkilletTitleText"];
