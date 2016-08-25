@@ -31,11 +31,12 @@ function Skillet:AdjustInventory()
 end
 
 -- this is the simplest command:  iterate recipeID x count
--- this is the only currently implemented queue command
 function Skillet:QueueCommandIterate(recipeID, count)
 	DA.DEBUG(0,"QueueCommandIterate("..tostring(recipeID)..", "..tostring(count)..")")
-	local _, tradeName = C_TradeSkillUI.GetTradeSkillLineForRecipe(recipeID)
-	local tradeID = self.tradeSkillIDsByName[tradeName]
+	local recipe = self:GetRecipe(recipeID)
+	--DA.DEBUG(0,"recipe= "..DA.DUMP1(recipe))
+	local tradeID = recipe.tradeID
+	local tradeName = self.tradeSkillNamesByID[tradeID]
 	local newCommand = {}
 	newCommand.op = "iterate"
 	newCommand.recipeID = recipeID
