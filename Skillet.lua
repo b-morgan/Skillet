@@ -981,7 +981,9 @@ function Skillet:FlushRecipeData()
 	Skillet.db.global.itemRecipeSource = {}
 	Skillet.db.global.Categories = {}
 	Skillet.db.realm.skillDB = {}
-	Skillet.data.recipeInfo = {}
+	if Skillet.data and Skillet.data.recipeInfo then
+		Skillet.data.recipeInfo = {}
+	end
 end
 
 function Skillet:InitializeDatabase(player)
