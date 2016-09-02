@@ -370,7 +370,14 @@ function Skillet:GUILDBANKFRAME_OPENED()
 	Skillet.db.global.cachedGuildbank[guildName] = {}
 	local numTabs = GetNumGuildBankTabs()
 	for tab=1, numTabs, 1 do
-		QueryGuildBankTab(tab)  -- event GUILDBANKBAGSLOTS_CHANGED will fire when the data is available
+		--DA.DEBUG(1,"QueryGuildBankTab("..tostring(tab)..")")
+		local name, icon, isViewable, canDeposit, numWithdrawals, remainingWithdrawals = GetGuildBankTabInfo(tab);
+		--DA.DEBUG(1,"tab="..tab..", isViewable="..tostring(isViewable)..", numWithdrawals="..numWithdrawals)
+		if isViewable then
+			QueryGuildBankTab(tab)  -- event GUILDBANKBAGSLOTS_CHANGED will fire when the data is available
+		else
+			guildbankQuery = guildbankQuery + 1 -- we won't get an event for this tab, count it manually
+		end
 	end
 	if not self.db.profile.display_shopping_list_at_guildbank then
 		return
@@ -606,7 +613,7 @@ end
 -- Event is fired when the guild bank contents change.
 -- Called as a result of a QueryGuildBankTab call or as a result of a change in the guildbank's contents.
 function Skillet:GUILDBANKBAGSLOTS_CHANGED(event)
-	--DA.DEBUG(0,"GUILDBANKBAGSLOTS_CHANGED")
+	DA.DEBUG(0,"GUILDBANKBAGSLOTS_CHANGED")
 	if guildbankOnce then
 		guildbankQuery = guildbankQuery + 1
 		if guildbankQuery == GetNumGuildBankTabs() then
