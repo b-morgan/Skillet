@@ -1,7 +1,4 @@
-local addonName,addonTable = ...
-local DA = _G[addonName] -- for DebugAids.lua
 --[[
-
 Skillet: A tradeskill window replacement.
 
 This program is free software: you can redistribute it and/or modify
@@ -16,28 +13,27 @@ GNU General Public License for more details.
 
 You should have received a copy of the GNU General Public License
 along with this program.  If not, see <http://www.gnu.org/licenses/>.
-
 ]]--
 
-Skillet.TSMPlugin = {}
+Skillet.ATRPlugin = {}
 
-local plugin = Skillet.TSMPlugin
+local plugin = Skillet.ATRPlugin
 local L = Skillet.L
 
 plugin.options =
 {
 	type = 'group',
-	name = "TradeskillMaster",
+	name = "Auctionator",
 	order = 1,
 	args = {
 		enabled = {
 			type = "toggle",
 			name = L["Enabled"],
 			get = function()
-				return Skillet.db.profile.plugins.TSM.enabled
+				return Skillet.db.profile.plugins.ATR.enabled
 			end,
 			set = function(self,value)
-				Skillet.db.profile.plugins.TSM.enabled = value
+				Skillet.db.profile.plugins.ATR.enabled = value
 				Skillet:UpdateTradeSkillWindow()
 			end,
 			width = "double",
@@ -47,33 +43,31 @@ plugin.options =
 }
 
 function plugin.OnInitialize()
-	if not Skillet.db.profile.plugins.TSM then
-		Skillet.db.profile.plugins.TSM = {}
-		Skillet.db.profile.plugins.TSM.enabled = true
+	if not Skillet.db.profile.plugins.ATR then
+		Skillet.db.profile.plugins.ATR = {}
+		Skillet.db.profile.plugins.ATR.enabled = true
 	end
 	local acecfg = LibStub("AceConfig-3.0")
-	acecfg:RegisterOptionsTable("Skillet TradeskillMaster", plugin.options)
+	acecfg:RegisterOptionsTable("Skillet Auctionator", plugin.options)
 	local acedia = LibStub("AceConfigDialog-3.0")
-	acedia:AddToBlizOptions("Skillet TradeskillMaster", "TradeskillMaster", "Skillet")
-end
-
-function plugin.OnEnable()
-	plugin.TSM = LibStub("AceAddon-3.0"):GetAddon("TSM_Crafting", true)
-	if plugin.TSM and plugin.TSM.CraftingGUI then
-		plugin.GUI = plugin.TSM.CraftingGUI
-		plugin.ShowProfessionWindow = plugin.GUI.ShowProfessionWindow
-		plugin.GUI.ShowProfessionWindow = function () end
-	end
+	acedia:AddToBlizOptions("Skillet Auctionator", "Auctionator", "Skillet")
 end
 
 function plugin.GetExtraText(skill, recipe)
-end
-
-function plugin.TSMShow()
-	DA.DEBUG(0,"TSMShow()")
-	if plugin.TSM and plugin.GUI and plugin.ShowProfessionWindow then
-		plugin.ShowProfessionWindow();
+	local label, extra_text
+	local bop
+	if not skill or not recipe then return end
+	local itemID = recipe.itemID
+	if Atr_GetAuctionBuyout and Skillet.db.profile.plugins.TUJ.enabled and itemID then
+		local abacus = LibStub("LibAbacus-3.0")
+		local value = Atr_GetAuctionBuyout(itemID)
+		if value then
+			extra_text = abacus:FormatMoneyFull(value, true);
+			label = "Buyout"..":"
+--			label = L["Buyout"]..":"
+		end
 	end
+	return label, extra_text
 end
 
-Skillet:RegisterDisplayDetailPlugin("TSMPlugin")
+Skillet:RegisterDisplayDetailPlugin("ATRPlugin")
