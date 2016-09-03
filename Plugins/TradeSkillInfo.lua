@@ -17,11 +17,43 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
 ]]--
 
-
 Skillet.TSIPlugin = {}
 
 local plugin = Skillet.TSIPlugin
 local L = Skillet.L
+
+plugin.options =
+{
+	type = 'group',
+	name = "TradeskillInfo",
+	order = 1,
+	args = {
+		enabled = {
+			type = "toggle",
+			name = L["Enabled"],
+			get = function()
+				return Skillet.db.profile.plugins.TSI.enabled
+			end,
+			set = function(self,value)
+				Skillet.db.profile.plugins.TSI.enabled = value
+				Skillet:UpdateTradeSkillWindow()
+			end,
+			width = "double",
+			order = 1
+		},
+	},
+}
+
+function plugin.OnInitialize()
+	if not Skillet.db.profile.plugins.TSI then
+		Skillet.db.profile.plugins.TSI = {}
+		Skillet.db.profile.plugins.TSI.enabled = true
+	end
+	local acecfg = LibStub("AceConfig-3.0")
+	acecfg:RegisterOptionsTable("Skillet TradeskillInfo", plugin.options)
+	local acedia = LibStub("AceConfigDialog-3.0")
+	acedia:AddToBlizOptions("Skillet TradeskillInfo", "TradeskillInfo", "Skillet")
+end
 
 local TSISourceColor = {
 	V = "|cff00ff00",
@@ -100,17 +132,13 @@ local function TSIGetRecipeSources(recipe, opposing)
 end
 
 function plugin.GetExtraText(skill, recipe)
-	if not TradeskillInfo then return end
+	if not TradeskillInfo or not Skillet.db.profile.plugins.TSI.enabled then return end
 	if not skill or not recipe then return end
-
 	local _, bop, extra_text
 	local label = GRAY_FONT_COLOR_CODE..L["Source:"]..FONT_COLOR_CODE_CLOSE
-
 	local tsiRecipeID = recipe.spellID
-
 	if tsiRecipeID then
 		local combineID = TradeskillInfo:GetCombineRecipe(tsiRecipeID)
-
 		if combineID then
 			_, extra_text = TSIGetRecipeSources(combineID, false)
 			if not extra_text then
@@ -118,36 +146,36 @@ function plugin.GetExtraText(skill, recipe)
 			end
 			if TradeskillInfo:ShowingSkillAuctioneerProfit() then -- insert item value and reagent costs from Auctioneer
 				local value, cost, profit = TradeskillInfo:GetCombineAuctioneerCost(tsiRecipeID)
-
+				if GetAuctionBuyout and Skillet.scrollData[tsiRecipeID] then
+					value = GetAuctionBuyout(Skillet.scrollData[tsiRecipeID]) or 0
+					profit = value - cost
+				end
 				label = label.."\n"..GRAY_FONT_COLOR_CODE.."Auction Profit:"..FONT_COLOR_CODE_CLOSE
 				extra_text = extra_text.."\n"..("%s - %s = %s"):format( TradeskillInfo:GetMoneyString(value), TradeskillInfo:GetMoneyString(cost), TradeskillInfo:GetMoneyString(profit) )
 			end
-
 			if TradeskillInfo:ShowingSkillProfit() then -- insert item value and reagent costs
 				local value, cost, profit = TradeskillInfo:GetCombineCost(tsiRecipeID)
-
+				if Skillet.scrollData[tsiRecipeID] then
+					value = select(11, GetItemInfo(Skillet.scrollData[tsiRecipeID]))
+					profit = value - cost
+				end
 				label = label.."\n"..GRAY_FONT_COLOR_CODE.."Vendor Profit:"..FONT_COLOR_CODE_CLOSE
 				extra_text = extra_text.."\n"..("%s - %s = %s"):format( TradeskillInfo:GetMoneyString(value), TradeskillInfo:GetMoneyString(cost), TradeskillInfo:GetMoneyString(profit) )
 			end
-
 			if TradeskillInfo:ShowingSkillLevel() then
 				label = label.."\n"..GRAY_FONT_COLOR_CODE.."Skill Levels:"..FONT_COLOR_CODE_CLOSE
 				extra_text = extra_text.."\n"..TradeskillInfo:GetColoredDifficulty(tsiRecipeID)
 			end
-
 			if Skillet:bopCheck(combineID) then
 				bop = true
 			end
-
 		else
 			extra_text = "|cffff0000"..L["Unknown"].."|r"
 		end
 	end
-
 	if bop then
 		label = label.."\n|cffff0000(*BOP*)|r"
 	end
-
 	return label, extra_text
 end
 
