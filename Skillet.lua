@@ -145,7 +145,7 @@ Skillet.options =
 			args = {
 				header = {
 					type = "header",
-					name = L["Skillet Trade Skills"].." "..MAJOR_VERSION,
+					name = L["Skillet Trade Skills"].." "..Skillet.version,
 					order = 11
 				},
 				vendor_buy_button = {

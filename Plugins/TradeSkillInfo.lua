@@ -49,10 +49,7 @@ function plugin.OnInitialize()
 		Skillet.db.profile.plugins.TSI = {}
 		Skillet.db.profile.plugins.TSI.enabled = true
 	end
-	local acecfg = LibStub("AceConfig-3.0")
-	acecfg:RegisterOptionsTable("Skillet TradeskillInfo", plugin.options)
-	local acedia = LibStub("AceConfigDialog-3.0")
-	acedia:AddToBlizOptions("Skillet TradeskillInfo", "TradeskillInfo", "Skillet")
+	Skillet:AddPluginOptions(plugin.options)
 end
 
 local TSISourceColor = {

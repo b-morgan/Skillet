@@ -77,10 +77,7 @@ function plugin.OnInitialize()
 		Skillet.db.profile.plugins.TUJ = {}
 		Skillet.db.profile.plugins.TUJ.enabled = true
 	end
-	local acecfg = LibStub("AceConfig-3.0")
-	acecfg:RegisterOptionsTable("Skillet TheUndermineJournal", plugin.options)
-	local acedia = LibStub("AceConfigDialog-3.0")
-	acedia:AddToBlizOptions("Skillet TheUndermineJournal", "TheUndermineJournal", "Skillet")
+	Skillet:AddPluginOptions(plugin.options)
 end
 
 function plugin.GetExtraText(skill, recipe)
