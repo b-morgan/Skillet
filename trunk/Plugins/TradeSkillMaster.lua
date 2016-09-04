@@ -51,10 +51,7 @@ function plugin.OnInitialize()
 		Skillet.db.profile.plugins.TSM = {}
 		Skillet.db.profile.plugins.TSM.enabled = true
 	end
-	local acecfg = LibStub("AceConfig-3.0")
-	acecfg:RegisterOptionsTable("Skillet TradeskillMaster", plugin.options)
-	local acedia = LibStub("AceConfigDialog-3.0")
-	acedia:AddToBlizOptions("Skillet TradeskillMaster", "TradeskillMaster", "Skillet")
+	Skillet:AddPluginOptions(plugin.options)
 end
 
 function plugin.OnEnable()

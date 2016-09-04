@@ -47,10 +47,7 @@ function plugin.OnInitialize()
 		Skillet.db.profile.plugins.ARL = {}
 		Skillet.db.profile.plugins.ARL.enabled = true
 	end
-	local acecfg = LibStub("AceConfig-3.0")
-	acecfg:RegisterOptionsTable("Skillet AckisRecipeList", plugin.options)
-	local acedia = LibStub("AceConfigDialog-3.0")
-	acedia:AddToBlizOptions("Skillet AckisRecipeList", "AckisRecipeList", "Skillet")
+	Skillet:AddPluginOptions(plugin.options)
 end
 
 function plugin.GetExtraText(skill, recipe)

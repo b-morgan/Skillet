@@ -90,12 +90,9 @@ function plugin.OnInitialize()
 		Skillet.db.profile.plugins.beancounter.enabled = true
 		Skillet.db.profile.plugins.beancounter.days = 30
 	end
-	local acecfg = LibStub("AceConfig-3.0")
-	acecfg:RegisterOptionsTable("Skillet BeanCounter", plugin.options)
-	local acedia = LibStub("AceConfigDialog-3.0")
-	acedia:AddToBlizOptions("Skillet BeanCounter", "BeanCounter", "Skillet")
-	--Skillet:AddRecipeSorter("BC: "..L["Sold amount"], plugin.SortSoldAmount)
-	--Skillet:AddRecipeSorter("BC: "..L["Gold earned"], plugin.SortGoldEarned)
+	Skillet:AddPluginOptions(plugin.options)
+--	Skillet:AddRecipeSorter("BC: "..L["Sold amount"], plugin.SortSoldAmount)
+--	Skillet:AddRecipeSorter("BC: "..L["Gold earned"], plugin.SortGoldEarned)
 end
 
 function plugin.GetBCValues(itemID)

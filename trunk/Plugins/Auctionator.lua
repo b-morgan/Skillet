@@ -47,10 +47,7 @@ function plugin.OnInitialize()
 		Skillet.db.profile.plugins.ATR = {}
 		Skillet.db.profile.plugins.ATR.enabled = true
 	end
-	local acecfg = LibStub("AceConfig-3.0")
-	acecfg:RegisterOptionsTable("Skillet Auctionator", plugin.options)
-	local acedia = LibStub("AceConfigDialog-3.0")
-	acedia:AddToBlizOptions("Skillet Auctionator", "Auctionator", "Skillet")
+	Skillet:AddPluginOptions(plugin.options)
 end
 
 function plugin.GetExtraText(skill, recipe)

@@ -19,6 +19,16 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
 Skillet.displayDetailPlugins = {}
 
+Skillet.pluginsOrder = 1
+Skillet.pluginsOptions = {
+		name = "Plugins",
+		type = "group",
+		childGroups = "tree",
+		args = {
+-- Filled in dynamically by AddPluginOptions
+		},
+	}
+
 function Skillet:RegisterDisplayDetailPlugin(moduleName, priority)
 	DA.DEBUG(0,"RegisterDisplayDetailPlugin("..tostring(moduleName)..", "..tostring(priority))
 	if not priority then priority = 100 end
@@ -60,6 +70,12 @@ function Skillet:GetExtraText(skill, recipe)
 	return output_label, output_text
 end
 
+function Skillet:AddPluginOptions(options)
+	options.order = Skillet.pluginsOrder
+	Skillet.pluginsOrder = Skillet.pluginsOrder + 1
+	Skillet.pluginsOptions.args[options.name] = options
+end
+
 function Skillet:InitializePlugins()
 	DA.DEBUG(0,"InitializePlugins()")
 	for k,v in pairs(Skillet.displayDetailPlugins) do
@@ -68,6 +84,10 @@ function Skillet:InitializePlugins()
 			v.OnInitialize()
 		end
 	end
+	local acecfg = LibStub("AceConfig-3.0")
+	acecfg:RegisterOptionsTable("Skillet Plugins", Skillet.pluginsOptions)
+	local acedia = LibStub("AceConfigDialog-3.0")
+	acedia:AddToBlizOptions("Skillet Plugins", "Plugins", "Skillet")
 end
 
 function Skillet:EnablePlugins()
