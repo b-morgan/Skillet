@@ -44,12 +44,16 @@ local FrameBackdrop = {
 }
 
 local bankFrameOpen = false
-local bank                   -- Detailed contents of the bank.
+local bank = {}					-- Detailed contents of the bank.
+Skillet.bankBusy = false
+Skillet.bankQueue = {}
 
 local guildbankFrameOpen = false
-local guildbankQuery = 0     -- Need to wait until all the QueryGuildBankTab()s finish
-local guildbankOnce = true   -- but only indexGuildBank once for each OPENED
-local guildbank              -- Detailed contents of the guildbank
+local guildbank = {}			-- Detailed contents of the guildbank
+local guildbankOnce = false		-- but only indexGuildBank once for each OPENED
+Skillet.guildBusy = false
+Skillet.guildQueue = {}
+Skillet.guildTab = 0
 
 -- Creates and sets up the shopping list window
 local function createShoppingListFrame(self)
@@ -299,6 +303,7 @@ local function indexGuildBank(tab)
 	-- This means it is broken if this account is in guilds on
 	-- different realms (not connected) with the same name.
 	--
+	if tab == 0 then return end		-- Something is wrong, don't make it worse.
 	local guildName = GetGuildInfo("player")
 	local cachedGuildbank = Skillet.db.global.cachedGuildbank
 	local name, icon, isViewable, canDeposit, numWithdrawals, remainingWithdrawals = GetGuildBankTabInfo(tab);
@@ -333,7 +338,6 @@ function Skillet:indexAllGuildBankTabs()
 	for tab=1, numTabs, 1 do
 		indexGuildBank(tab)
 	end
-	guildbankFrameOpen = true
 end
 
 -- Called when the bank frame is opened
@@ -363,6 +367,7 @@ end
 
 function Skillet:GUILDBANKFRAME_OPENED()
 	DA.DEBUG(0,"GUILDBANKFRAME_OPENED")
+	guildbankFrameOpen = true
 	guildbankOnce = true
 	Skillet.guildBusy = false
 	Skillet.guildQueue = {}
@@ -621,7 +626,7 @@ end
 -- Event is fired when the guild bank contents change.
 -- Called as a result of a QueryGuildBankTab call or as a result of a change in the guildbank's contents.
 function Skillet:GUILDBANKBAGSLOTS_CHANGED(event)
-	DA.DEBUG(0,"GUILDBANKBAGSLOTS_CHANGED")
+	--DA.DEBUG(0,"GUILDBANKBAGSLOTS_CHANGED")
 	if guildbankOnce then
 		indexGuildBank(Skillet.guildTab)
 		repeat
