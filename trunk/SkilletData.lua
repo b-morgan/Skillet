@@ -133,6 +133,14 @@ Skillet.TradeSkillAutoTarget = {
 		[109128] = 5, -- Nagrand Arrowbloom
 		[109129] = 5, -- Talador Orchid
 		[109130] = 5, -- Chameleon Lotus
+-- Added in Legion
+		[124101] = 5, -- Aethril
+		[124102] = 5, -- Dreamleaf
+		[124103] = 5, -- Foxflower
+		[124104] = 5, -- Fjarnskaggl
+		[124105] = 5, -- Starlight-rose
+		[124106] = 5, -- Felwort
+		[128304] = 5, -- Yseralline-seed
 	}
 }
 
@@ -923,6 +931,66 @@ Skillet.enchantingItemIDs = {
 	[190989] = "i:128559",  -- Enchant Gloves - Legion Mining
 	[190990] = "i:128560",  -- Enchant Gloves - Legion Skinning
 	[190991] = "i:128561",  -- Enchant Gloves - Legion Surveying
+	[190869] = "i:128540",  -- Enchant Ring - Word of Versatility Rank 1
+	[190995] = "i:128540",  -- Enchant Ring - Word of Versatility Rank 2
+	[191012] = "i:128540",  -- Enchant Ring - Word of Versatility Rank 3
+	[190866] = "i:128537",  -- Enchant Ring - Word of Critical Strike Rank 1
+	[190992] = "i:128537",  -- Enchant Ring - Word of Critical Strike Rank 2
+	[191009] = "i:128537",  -- Enchant Ring - Word of Critical Strike Rank 3
+	[190875] = "i:128546",  -- Enchant Cloak - Word of Agility Rank 1
+	[191001] = "i:128546",  -- Enchant Cloak - Word of Agility Rank 2
+	[191018] = "i:128546",  -- Enchant Cloak - Word of Agility Rank 3
+	[190867] = "i:128538",  -- Enchant Ring - Word of Haste Rank 1
+	[190993] = "i:128538",  -- Enchant Ring - Word of Haste Rank 2
+	[191010] = "i:128538",  -- Enchant Ring - Word of Haste Rank 3
+	[190876] = "i:128547",  -- Enchant Cloak - Word of Intellect Rank 1
+	[191002] = "i:128547",  -- Enchant Cloak - Word of Intellect Rank 2
+	[191019] = "i:128547",  -- Enchant Cloak - Word of Intellect Rank 3
+	[190868] = "i:128539",  -- Enchant Ring - Word of Mastery Rank 1
+	[190994] = "i:128539",  -- Enchant Ring - Word of Mastery Rank 2
+	[191011] = "i:128539",  -- Enchant Ring - Word of Mastery Rank 3
+	[190874] = "i:128545",  -- Enchant Cloak - Word of Strength Rank 1
+	[191000] = "i:128545",  -- Enchant Cloak - Word of Strength Rank 2
+	[191017] = "i:128545",  -- Enchant Cloak - Word of Strength Rank 3
+	[228408] = "i:141910",  -- Enchant Neck - Mark Of The Ancient Priestess Rank 1
+	[228409] = "i:141910",  -- Enchant Neck - Mark Of The Ancient Priestess Rank 2
+	[228410] = "i:141910",  -- Enchant Neck - Mark Of The Ancient Priestess Rank 3
+	[190892] = "i:128551",  -- Enchant Neck - Mark Of The Claw Rank 1
+	[191006] = "i:128551",  -- Enchant Neck - Mark Of The Claw Rank 2
+	[191023] = "i:128551",  -- Enchant Neck - Mark Of The Claw Rank 3
+	[190893] = "i:128552",  -- Enchant Neck - Mark Of The Distant Army Rank 1
+	[191007] = "i:128552",  -- Enchant Neck - Mark Of The Distant Army Rank 2
+	[191024] = "i:128552",  -- Enchant Neck - Mark Of The Distant Army Rank 3
+	[228402] = "i:141908",  -- Enchant Neck - Mark Of The Heavy Hide Rank 1
+	[228403] = "i:141908",  -- Enchant Neck - Mark Of The Heavy Hide Rank 2
+	[228404] = "i:141908",  -- Enchant Neck - Mark Of The Heavy Hide Rank 3
+	[190894] = "i:128553",  -- Enchant Neck - Mark of the Hidden Satyr Rank 1
+	[191008] = "i:128553",  -- Enchant Neck - Mark of the Hidden Satyr Rank 2
+	[191025] = "i:128553",  -- Enchant Neck - Mark of the Hidden Satyr Rank 3
+	[228405] = "i:141909",  -- Enchant Neck - Mark of the Trained Soldier Rank 1
+	[228406] = "i:141909",  -- Enchant Neck - Mark of the Trained Soldier Rank 2
+	[228407] = "i:141909",  -- Enchant Neck - Mark of the Trained Soldier Rank 3
+	[190870] = "i:128541",  -- Enchant Ring - Binding Of Critical Strike Rank 1
+	[190996] = "i:128541",  -- Enchant Ring - Binding Of Critical Strike Rank 2
+	[191013] = "i:128541",  -- Enchant Ring - Binding Of Critical Strike Rank 3
+	[190871] = "i:128542",  -- Enchant Ring - Binding Of Haste Rank 1
+	[190997] = "i:128542",  -- Enchant Ring - Binding Of Haste Rank 2
+	[191014] = "i:128542",  -- Enchant Ring - Binding Of Haste Rank 3
+	[190872] = "i:128543",  -- Enchant Ring - Binding Of Mastery Rank 1
+	[190998] = "i:128543",  -- Enchant Ring - Binding Of Mastery Rank 2
+	[191015] = "i:128543",  -- Enchant Ring - Binding Of Mastery Rank 3
+	[190873] = "i:128544",  -- Enchant Ring - Binding Of Versatility Rank 1
+	[190999] = "i:128544",  -- Enchant Ring - Binding Of Versatility Rank 2
+	[191016] = "i:128544",  -- Enchant Ring - Binding Of Versatility Rank 3
+	[190877] = "i:128548",  -- Enchant Cloak - Binding Of Strength Rank 1
+	[191003] = "i:128548",  -- Enchant Cloak - Binding Of Strength Rank 2
+	[191020] = "i:128548",  -- Enchant Cloak - Binding Of Strength Rank 3
+	[190878] = "i:128549",  -- Enchant Cloak - Binding Of Agility Rank 1
+	[191004] = "i:128549",  -- Enchant Cloak - Binding Of Agility Rank 2
+	[191021] = "i:128549",  -- Enchant Cloak - Binding Of Agility Rank 3
+	[190879] = "i:128550",  -- Enchant Cloak - Binding Of Intellect Rank 1
+	[191005] = "i:128550",  -- Enchant Cloak - Binding Of Intellect Rank 2
+	[191022] = "i:128550",  -- Enchant Cloak - Binding Of Intellect Rank 3
 }
 
 -- The following function can be used (/run Skillet:CountEnchants()) to check for missing items
@@ -946,7 +1014,7 @@ function Skillet:CountEnchants()
 	DA.CHAT("scrollData count= "..tostring(i)..", missing= "..DA.DUMP1(Skillet.missing_scrollData))
 	DA.CHAT("enchantingItemIDs count= "..tostring(j)..", missing= "..DA.DUMP1(Skillet.missing_enchantingItemIDs))
 end
-]]--
+--]]
 
 --[[
 -- The following function can be used (/run Skillet:DumpRecipeInfo()) to get Blizzard's original recipeInfo
@@ -1079,7 +1147,7 @@ local missingVendorItems = {
 	[3857]	= true,				-- Coal
 }
 
-local topink = 113111				-- Warbinder's Ink
+local topink = 129032				-- Roseate Pigmentd
 local specialVendorItems = {
 	[37101] = {1, topink},			--Ivory Ink
 	[39469] = {1, topink},			--Moonglow Ink
@@ -1092,6 +1160,7 @@ local specialVendorItems = {
 	[43126] = {1, topink},			--Ink of the Sea
 	[61978] = {1, topink},			--Blackfallow Ink
 	[79254] = {1, topink},			--Ink of Dreams
+	[113111] = {1, topink},			--Warbinder's Inkms
 
 	[43127] = {10, topink},			--Snowfall Ink
 	[61981] = {10, topink},			--Inferno Ink
