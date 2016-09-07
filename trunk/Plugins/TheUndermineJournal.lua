@@ -99,4 +99,28 @@ function plugin.GetExtraText(skill, recipe)
 	return label, extra_text
 end
 
-Skillet:RegisterDisplayDetailPlugin("TUJPlugin")
+function plugin.RecipeNamePrefix(skill, recipe)
+	local text
+	return text
+end
+
+function plugin.RecipeNameSuffix(skill, recipe)
+	local text
+	if recipe then
+		local itemID = recipe.itemID
+		if TUJMarketInfo and Skillet.db.profile.plugins.TUJ.enabled and itemID then
+			local abacus = LibStub("LibAbacus-3.0")
+			local o={}
+			TUJMarketInfo(itemID,o)
+			local value = o['market']
+			if value then
+				text = abacus:FormatMoneyFull(value, true);
+			end
+		end
+	end
+	return text
+end
+
+Skillet:RegisterRecipeNamePlugin("TUJPlugin")		-- we have a RecipeNamePrefix or a RecipeNameSuffix function
+
+Skillet:RegisterDisplayDetailPlugin("TUJPlugin")	-- we have a GetExtraText function

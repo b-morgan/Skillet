@@ -160,4 +160,4 @@ function plugin.GetExtraText(skill, recipe)
 	return label, extra_text
 end
 
-Skillet:RegisterDisplayDetailPlugin("BCPlugin")
+Skillet:RegisterDisplayDetailPlugin("BCPlugin")		-- we have a GetExtraText function
