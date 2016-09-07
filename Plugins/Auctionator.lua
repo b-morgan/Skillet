@@ -67,4 +67,16 @@ function plugin.GetExtraText(skill, recipe)
 	return label, extra_text
 end
 
-Skillet:RegisterDisplayDetailPlugin("ATRPlugin")
+function plugin.RecipeNamePrefix(skill, recipe)
+	local text
+	return text
+end
+
+function plugin.RecipeNameSuffix(skill, recipe)
+	local text
+	return text
+end
+
+Skillet:RegisterRecipeNamePlugin("ATRPlugin")		-- we have a RecipeNamePrefix or a RecipeNameSuffix function
+
+Skillet:RegisterDisplayDetailPlugin("ATRPlugin")	-- we have a GetExtraText function
