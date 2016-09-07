@@ -325,6 +325,26 @@
 				</OnClick>
 			</Scripts>
 		</CheckButton>
+		<!--
+		# Auctionator button
+		-->
+		<Button name="SkilletSHAuctionatorButton" inherits="UIPanelButtonTemplate" text="Auctionator" parent="SkilletShoppingList">
+			<Size>
+				<AbsDimension x="85" y="22"/>
+			</Size>
+			<Anchors>
+				<Anchor point="BOTTOMLEFT" relativeTo="SkilletShoppingList" relativePoint="BOTTOMLEFT">
+					<Offset>
+						<AbsDimension x="5" y="50"/>
+					</Offset>
+				</Anchor>
+			</Anchors>
+			<Scripts>
+				<OnClick>
+					Skillet:AuctionatorShoppingList();
+				</OnClick>
+			</Scripts>
+		</Button>
 
 		<!--
 		#

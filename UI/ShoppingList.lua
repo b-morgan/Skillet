@@ -108,6 +108,11 @@ local function createShoppingListFrame(self)
 	SkilletShowQueuesIncludeGuildText:SetText(L["Include guild"])
 	SkilletShowQueuesIncludeGuild:SetChecked(Skillet.db.char.include_guild)
 
+	if AuctionatorLoaded then
+		SkilletSHAuctionatorButton:Show()
+	else
+		SkilletSHAuctionatorButton:Hide()
+	end
 	-- The frame enclosing the scroll list needs a border and a background .....
 	local backdrop = SkilletShoppingListParent
 	backdrop:SetBackdrop(ControlBackdrop)
@@ -137,7 +142,9 @@ end
 function Skillet:ShoppingListButton_OnEnter(button)
 	local name, link, quality = self:GetItemInfo(button.id)
 	GameTooltip:SetOwner(button, "ANCHOR_TOPLEFT")
-	GameTooltip:SetHyperlink(link)
+	if link then
+		GameTooltip:SetHyperlink(link)
+	end
 	GameTooltip:Show()
 	if EnhTooltip and EnhTooltip.TooltipCall then
 		local quantity = button.count
@@ -804,11 +811,17 @@ end
 
 -- Called to update the shopping list window
 function Skillet:UpdateShoppingListWindow()
-	DA.DEBUG(0,"UpdateShoppingListWindow()")
+	--DA.DEBUG(0,"UpdateShoppingListWindow()")
 	local num_buttons = 0
 	if not self.shoppingList or not self.shoppingList:IsVisible() then
 		return
 	end
+	if AuctionatorLoaded and AuctionFrame and AuctionFrame:IsVisible() then
+		SkilletSHAuctionatorButton:Show()
+	else
+		SkilletSHAuctionatorButton:Hide()
+	end
+
 	cache_list(self)
 	SkilletShoppingList:SetAlpha(self.db.profile.transparency)
 	SkilletShoppingList:SetScale(self.db.profile.scale)
@@ -939,4 +952,30 @@ function Skillet:internal_HideShoppingList()
 		self.shoppingList:Hide()
 	end
 	self.cachedShoppingList = nil
+end
+
+function Skillet:AuctionatorShoppingList()
+	if not AuctionatorLoaded and not AuctionFrame and not AuctionFrame:IsVisible() then
+		return
+	end
+	local slist = self:GetShoppingList(Skillet.currentPlayer)
+	if not slist then
+		return
+	end
+	local BUY_TAB = 3;
+	Atr_SelectPane (BUY_TAB);
+	local items = {}
+	local shoppingListName = "Skillet Shopping List"
+	local reagentIndex
+	for reagentIndex = 1, #slist do
+		local reagentId = slist[reagentIndex].id
+		if (reagentId and not self:VendorSellsReagent(reagentId)) then
+			local reagentName = GetItemInfo(reagentId)
+			if (reagentName) then
+				table.insert (items, reagentName)
+				-- DA.DEBUG(0, "Reagent num "..reagentIndex.." ("..reagentId..") "..reagentName.." added")
+			end
+		end
+	end
+	Atr_SearchAH (shoppingListName, items)
 end
