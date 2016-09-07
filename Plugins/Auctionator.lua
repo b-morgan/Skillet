@@ -69,12 +69,20 @@ end
 
 function plugin.RecipeNamePrefix(skill, recipe)
 	local text
-	return text
+	if not skill or not recipe then return end
+	if Skillet.db.profile.plugins.TUJ.enabled then
+--		Processing goes here
+		return text
+	end
 end
 
 function plugin.RecipeNameSuffix(skill, recipe)
 	local text
-	return text
+	if not skill or not recipe then return end
+	if Skillet.db.profile.plugins.TUJ.enabled then
+--		Processing goes here
+		return text
+	end
 end
 
 Skillet:RegisterRecipeNamePlugin("ATRPlugin")		-- we have a RecipeNamePrefix or a RecipeNameSuffix function
