@@ -321,6 +321,12 @@
 					</Anchors>
 					<Color r="1" g="1" b="1" a="1" />
 				</FontString>
+				<FontString name="$parentSuffix" inherits="GameFontNormalSmall" justifyH="RIGHT">
+					<Anchors>
+						<Anchor point="RIGHT" relativeTo="$parentCounts" relativePoint="LEFT" />
+					</Anchors>
+					<Color r="1" g="1" b="1" a="1" />
+				</FontString>
 			</Layer>
 		</Layers>
 		<!--

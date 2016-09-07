@@ -38,6 +38,9 @@ local SKILLET_REAGENT_MIN_WIDTH = 280
 local SKILLET_REAGENT_MAX_WIDTH = 320
 local SKILLET_REAGENT_MIN_HEIGHT = 300
 
+-- min width of count text
+local SKILLET_COUNT_MIN_WIDTH = 100
+
 local nonLinkingTrade = { [2656] = true, [53428] = true }				-- smelting, runeforging
 
 -- Stack of previsouly selected skills for use by the
@@ -52,14 +55,15 @@ local ControlBackdrop  = {
 	edgeFile = "Interface\\Tooltips\\UI-Tooltip-Border",
 	tile = true, tileSize = 16, edgeSize = 16,
 	insets = { left = 3, right = 3, top = 3, bottom = 3 }
-}local FrameBackdrop = {
+}
+local FrameBackdrop = {
 	bgFile = "Interface\\Tooltips\\UI-Tooltip-Background",
 	edgeFile = "Interface\\Tooltips\\UI-Tooltip-Border",
 	tile = true, tileSize = 16, edgeSize = 16,
 	insets = { left = 3, right = 3, top = 30, bottom = 3 }
-}-- List of functions that are called before a button is shown
+}
+-- List of functions that are called before a button is shown
 local pre_show_callbacks = {}
-
 -- List of functions that are called before a button is hidden
 local pre_hide_callbacks = {}
 
@@ -397,9 +401,9 @@ end
 
 -- shows a recipe button (in the scrolling list) after doing the
 -- required callbacks.
-local function show_button(button, trade, skill, index)
+local function show_button(button, trade, skill, index, recipeID)
 	for i=1, #pre_show_callbacks, 1 do
-		local new_button = pre_show_callbacks[i](button, trade, skill, index)
+		local new_button = pre_show_callbacks[i](button, trade, skill, index, recipeID)
 		if new_button and new_button ~= button then
 			button:Hide() -- hide the old one just in case ....
 			button = new_button
@@ -845,6 +849,7 @@ function Skillet:internal_UpdateTradeSkillWindow()
 			local buttonText = _G[button:GetName() .. "Name"]
 			local levelText = _G[button:GetName() .. "Level"]
 			local countText = _G[button:GetName() .. "Counts"]
+			local suffixText = _G[button:GetName() .. "Suffix"]
 			local buttonExpand = _G[button:GetName() .. "Expand"]
 			local buttonFavorite = _G[button:GetName() .. "Favorite"]
 			local subSkillRankBar = _G[button:GetName() .. "SubSkillRankBar"]
@@ -853,6 +858,8 @@ function Skillet:internal_UpdateTradeSkillWindow()
 			countText:SetText("")
 			countText:Hide()
 			countText:SetWidth(10)
+			suffixText:SetText("")
+			suffixText:Hide()
 			subSkillRankBar:Hide()
 			if self.db.profile.display_required_level then
 				levelText:SetWidth(skill.depth*8+20)
@@ -949,7 +956,8 @@ function Skillet:internal_UpdateTradeSkillWindow()
 						levelText:SetText(level)
 					end
 				end
-				text = (self:GetRecipeNamePrefix(self.currentTrade, skillIndex) or "") .. (skill.name or "")
+				-- Get any additional text that ThirdPartyHooks (or plugins) might add
+				text = (self:RecipeNamePrefix(skill, recipe) or "") .. (skill.name or "")
 				if #recipe.reagentData > 0 then
 					local num, numrecursive, numwvendor, numwalts = get_craftable_counts(skill.skillData, recipe.numMade)
 					local cbag = "|cff80ff80" -- green
@@ -1009,6 +1017,9 @@ function Skillet:internal_UpdateTradeSkillWindow()
 				if showOwned and Skillet.currentPlayer == UnitName("player") then
 					local numowned = (self.db.realm.auctionData[Skillet.currentPlayer][recipe.itemID] or 0) + GetItemCount(recipe.itemID,true)
 					if numowned > 0 then
+						if numowned >= 1000 then
+							numowned = "##"
+						end
 						local count = "|cff95fcff("..numowned..") "..(countText:GetText() or "")
 						countText:SetText(count)
 						countText:Show()
@@ -1022,9 +1033,8 @@ function Skillet:internal_UpdateTradeSkillWindow()
 						countText:Show()
 					end
 				end
-				countText:SetWidth(SKILLET_REAGENT_MIN_WIDTH)
-				countText:SetWidth(countText:GetStringWidth())
-				Skillet:CustomizeCountsColumn(recipe, countText)
+				countText:SetWidth(math.max(countText:GetStringWidth(),SKILLET_COUNT_MIN_WIDTH)) -- make end of buttonText have a fixed location
+				Skillet:CustomizeCountsColumn(recipe, countText) -- ThirdPartyHook
 				button:SetID(skillIndex or 0)
 				-- If enhanced recipe display is enabled, show the difficulty as text,
 				-- rather than as a colour. This should help used that have problems
@@ -1037,8 +1047,9 @@ function Skillet:internal_UpdateTradeSkillWindow()
 				if recipeInfo.upgradeable then
 				  text = text .. " ("..tostring(recipeInfo.recipeUpgrade).."/"..tostring(recipeInfo.maxUpgrade)..")"
 				end
-				-- Get any additional text that plugins might add
-				text = text .. (self:GetRecipeNameSuffix(self.currentTrade, skillIndex) or "")
+				-- Get any additional text that ThirdPartyHooks (or plugins) might add (right justified at end of text)
+				suffixText:SetText(self:RecipeNameSuffix(skill, recipe) or "")
+				suffixText:Show()
 				buttonText:SetText(text)
 				buttonText:SetWordWrap(false)
 				buttonText:SetWidth(max_text_width - countText:GetWidth())
@@ -1061,10 +1072,11 @@ function Skillet:internal_UpdateTradeSkillWindow()
 					button:SetBackdropColor(0.8, 0.2, 0.2)
 					button:UnlockHighlight()
 				end
-				show_button(button, self.currentTrade, skillIndex, i)
+				show_button(button, self.currentTrade, skillIndex, i, skill.recipeID)
 			end
 		else
 			-- We have no data for you Mister Button .....
+--			hide_button(button, self.currentTrade, skillIndex, i, skill.recipeID)
 			hide_button(button, self.currentTrade, skillIndex, i)
 			button:UnlockHighlight()
 		end
@@ -1206,7 +1218,7 @@ function Skillet:SkillButton_OnEnter(button)
 		tip:AddLine(text, 1, 1, 1, false);	-- (text, r, g, b, wrap)
 	end
 	Skillet:AddCustomTooltipInfo(tip, recipe)
-	tip:AddLine("\n" .. self:GetReagentLabel(self.currentTrade, id));
+	tip:AddLine("\n" .. (self:GetReagentLabel(self.currentTrade, id) or ""));
 	-- now the list of regents for this recipe and some info about them
 	for i=1, #recipe.reagentData, 1 do
 		local reagent = recipe.reagentData[i]
@@ -1470,7 +1482,7 @@ function Skillet:UpdateDetailsWindow(skillIndex)
 	end
 	SkilletSkillIcon:SetNormalTexture(texture)
 	SkilletSkillIcon:Show()
-	if AuctionFrame and AuctionatorLoaded then
+	if AuctionatorLoaded and AuctionFrame then
 		SkilletAuctionatorButton:Show()
 	end
 	-- How many of these items are produced at one time ..
@@ -1487,7 +1499,7 @@ function Skillet:UpdateDetailsWindow(skillIndex)
 	SkilletItemCountInputBox:HighlightText()
 --	SkilletCreateCountSlider.tooltipText = L["Number of items to queue/create"];
 	-- Reagents required ...
-	SkilletReagentLabel:SetText(self:GetReagentLabel(SkilletFrame.selectedSkill));
+	SkilletReagentLabel:SetText(self:GetReagentLabel(SkilletFrame.selectedSkill) or "");
 	SkilletReagentLabel:Show();
 	local width = SkilletReagentParent:GetWidth()
 	local lastReagentButton
@@ -1542,8 +1554,9 @@ function Skillet:UpdateDetailsWindow(skillIndex)
 	else
 		SkilletPreviousItemButton:Hide()
 	end
-	-- Do any mods want to add extra info to the details window?
+--	Do any plugins want to add extra info to the details window?
 	local label, extra_text = Skillet:GetExtraText(skill, recipe)
+
 	-- Is there any source info from the recipe?
 	local sourceText
 	if Skillet.db.profile.show_recipe_source_for_learned then
@@ -2855,7 +2868,7 @@ end
 
 -- Add Auctionator support
 function Skillet:AuctionatorSearch()
-		if not AuctionFrame then
+	if not AuctionatorLoaded or not AuctionFrame then
 		return
 	end
 	if not AuctionFrame:IsShown() then
@@ -2879,7 +2892,7 @@ function Skillet:AuctionatorSearch()
 		table.insert (items, shoppingListName)
 	end
 	for reagentIndex = 1, numReagents do
-		local reagentId = recipe.reagentData[reagentIndex].id
+		local reagentId = recipe.reagentData[reagentIndex].reagentID
 		if (reagentId and (reagentId ~= 3371)) then
 			local reagentName = GetItemInfo(reagentId)
 			if (reagentName) then

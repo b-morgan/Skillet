@@ -33,9 +33,9 @@ To hook this routine with an Ace2 mod, use (for example):
 
 and write your method:
 
-	function MyMod:GetExtraItemDetailText(obj, tradeskill, skill_index)
+	function MyMod:GetExtraItemDetailText(skill, recipe)
 		-- get the previous value from the hook chain
-		local before = self.hooks["GetExtraItemDetailText"](obj, tradeskill, skill_index)
+		local before = self.hooks["GetExtraItemDetailText"](obj, skill, recipe)
 		local myvalue = "samplething"
 		if before then
 			return before .. "\n" .. myvalue
@@ -48,8 +48,8 @@ Hooking a Method Without Using AceHook
 --------------------------------------
 
 local orig_get_extra = Skillet.GetExtraItemDetailText
-Skillet.GetExtraItemDetailText = function(obj, tradeskill, skill_index)
-	local before = orig_get_extra(obj, tradeskill, skill_index)
+Skillet.GetExtraItemDetailText = function(obj, skill, recipe)
+	local before = orig_get_extra(obj, skill, recipe)
 	local myvalue = "samplething"
 	if before then
 		return before .. "\n" .. myvalue
@@ -71,25 +71,6 @@ your own in as sane a fashion as possible.
 
 ]]
 
-local function tradejunkie_custom_add()
-	if TradeJunkieMain and TJ_OpenButtonTradeSkill then
-		-- Override the default action of the button to attach it
-		-- to our window, rather than the Blizzard trade skill window
-		TJ_OpenButtonTradeSkill:SetScript("OnClick", function()
-			TradeJunkie_Attach("SkilletFrame")
-			TradeJunkieMain:SetPoint("TOPLEFT", "SkilletFrame", "TOPRIGHT", 0, 0)
-		end)
-	end
-end
-
-local function armorcraft_custom_add()
-	if AC_Craft and AC_UseButton and AC_ToggleButton then
-		AC_Craft:SetParent("SkilletFrame")
-		AC_Craft:SetPoint("TOPLEFT","SkilletFrame","TOPRIGHT", 0, 0)
-		AC_Craft:SetAlpha(1.0)
-	end
-end
-
 local function Skillet_NOP()
 	-- do nothing!
 end
@@ -109,13 +90,8 @@ function Skillet:AddButtonToTradeskillWindow(button)
 	if not SkilletFrame.added_buttons then
 		SkilletFrame.added_buttons = {}
 	end
-	if TJ_OpenButtonTradeSkill and button == TJ_OpenButtonTradeSkill then
-		tradejunkie_custom_add()
-	elseif AC_UseButton and button == AC_UseButton then
-		armorcraft_custom_add()
-	end
-		button:Hide()
-		-- See if this button has already been added ....
+	button:Hide()
+	-- See if this button has already been added ....
 	for i=1, #SkilletFrame.added_buttons, 1 do
 		if SkilletFrame.added_buttons[i] == button then
 			-- ... yup
@@ -161,28 +137,11 @@ end
 -- Refer to the notes at the top of this file for how to hook this method.
 --
 -- @param tradeskill name of the currently selected tradeskill
--- @param skill_index the index of the currently selected recipe
+-- @param skillIndex the index of the currently selected recipe
+-- @param recipeID the ID of the currently selected recipe
 --
-function Skillet:GetReagentLabel(tradeskill, skill_index)
-	if (FRC_PriceSource ~= nil and FRC_CraftFrame_SetSelection and FRC_TradeSkillFrame_SetSelection) then
-		-- Support for Fizzwidget's Reagent Cost
-		if self:IsCraft() then
-			local Orig_CraftFrame_SetSelection = FRC_Orig_CraftFrame_SetSelection;
-			FRC_Orig_CraftFrame_SetSelection = Skillet_NOP;
-			FRC_CraftFrame_SetSelection(skill_index);
-			FRC_Orig_CraftFrame_SetSelection = Orig_CraftFrame_SetSelection;
-			return CraftReagentLabel:GetText();
-		else
-			local Orig_TradeSkillFrame_SetSelection = FRC_Orig_TradeSkillFrame_SetSelection
-			FRC_Orig_TradeSkillFrame_SetSelection = Skillet_NOP
-			FRC_TradeSkillFrame_SetSelection(skill_index)
-			FRC_Orig_TradeSkillFrame_SetSelection = Orig_TradeSkillFrame_SetSelection
-			return TradeSkillReagentLabel:GetText()
-		end
-	else
-		-- boring
-		return SPELL_REAGENTS;
-	end
+function Skillet:GetReagentLabel(tradeskill, skillIndex, recipeID)
+	return SPELL_REAGENTS
 end
 
 --
@@ -196,10 +155,14 @@ end
 --
 -- Refer to the notes at the top of this file for how to hook this method.
 --
--- @param tradeskill name of the currently selected tradeskill
--- @param skill_index the index of the currently selected recipe
+-- @param skill table containing name of the currently selected tradeskill (see documentation below)
+-- @param recipe table containing the index and ID of the currently selected recipe (see documentation below)
 --
-function Skillet:GetRecipeNamePrefix(tradeskill, skill_index)
+-- @return text string (left side)
+--
+function Skillet:GetRecipeNamePrefix(skill, recipe)
+	local text
+	return text
 end
 
 --
@@ -213,10 +176,14 @@ end
 --
 -- Refer to the notes at the top of this file for how to hook this method.
 --
--- @param tradeskill name of the currently selected tradeskill
--- @param skill_index the index of the currently selected recipe
+-- @param skill table containing name of the currently selected tradeskill (see documentation below)
+-- @param recipe table containing the index and ID of the currently selected recipe (see documentation below)
 --
-function Skillet:GetRecipeNameSuffix(tradeskill, skill_index)
+-- @return text string (right side)
+--
+function Skillet:GetRecipeNameSuffix(skill, recipe)
+	local text
+	return text
 end
 
 --
@@ -225,15 +192,18 @@ end
 -- The text will be added to the bottom the frame, after the list of reagents.
 --
 -- This will be called for both crafts and tradeskills, you can use Skillet:IsCraft()
--- to determine if it's a craft. This avoid having to localize the tradeskill name just to
+-- to determine if it's a craft. This avoids having to localize the tradeskill name just to
 -- see if it is a craft or a tradeskill.
 --
 -- Refer to the notes at the top of this file for how to hook this method.
 --
--- @param tradeskill name of the currently selected tradeskill
--- @param skill_index the index of the currently selected recipe
+-- @param skill table containing name of the currently selected tradeskill (need to add documentation below)
+-- @param recipe table containing the index and ID of the currently selected recipe (need to update documentation below)
 --
-function Skillet:GetExtraItemDetailText(tradeskill, skill_index)
+-- @return label string (left side)
+-- @return text string (right side)
+--
+function Skillet:GetExtraItemDetailText(skill, recipe)
 end
 
 --
@@ -261,7 +231,7 @@ end
 -- Skillet's button shown, or you can return your own button.
 --
 -- If you return your own button, you are responsible for attaching
--- properly in the list. The list_offset parameter might be useful
+-- properly in the list. The listOffset parameter might be useful
 -- here as you could use this to determine the name of the button
 -- immediately before this one in the list and attach to it.
 --
@@ -269,21 +239,23 @@ end
 --
 -- @param button the button that is about to be displayed
 -- @param tradeskill the name of the currently selected tradeskill
--- @param skill_index the index of recipe thius button is used for
--- @param list_offset how far down in the scrolling this button is located.
+-- @param skillIndex the index of recipe thius button is used for
+-- @param listOffset how far down in the scrolling this button is located.
 --        No matter where the list is scrolled to, the first visible recipe
---        is at list_offset 0
+--        is at listOffset 0
+-- @param recipeID the ID of the currently selected recipe
 --
 -- @return a button who's :Show() method is to be called. Use nil to have
 --         the default button used.
 --
-function Skillet:BeforeRecipeButtonShow(button, tradeskill, skill_index, list_offset)
+function Skillet:BeforeRecipeButtonShow(button, tradeskill, skillIndex, listOffset, recipeID)
 	-- these tests are in here to make sure that I don't
 	-- accidentally break the hooking code.
 	assert(button, "Button cannot be nil")
 	assert(tradeskill  and tostring(tradeskill), "Tradeskill cannot be nil")
-	assert(skill_index and tonumber(skill_index) and skill_index > 0, "Recipe index cannot be nil")
-	assert(list_offset and tonumber(list_offset) and list_offset > 0, "List offset cannot be nil")
+	assert(skillIndex and tonumber(skillIndex) and skillIndex > 0, "Recipe index cannot be nil")
+	assert(listOffset and tonumber(listOffset) and listOffset > 0, "List offset cannot be nil")
+	assert(recipeID and tonumber(recipeID) and recipeID >= 0, "Recipe ID cannot be nil")
 	return button
 end
 
@@ -296,7 +268,7 @@ end
 -- Skillet's button hidden, or you can return your own button.
 --
 -- If you return your own button, you are responsible for attaching
--- properly in the list. The list_offset parameter might be useful
+-- properly in the list. The listOffset parameter might be useful
 -- here as you could use this to determine the name of the button
 -- immediately before this one in the list and attach to it.
 --
@@ -304,21 +276,21 @@ end
 --
 -- @param button the button that is about to be hidden
 -- @param tradeskill the name of the currently selected tradeskill
--- @param skill_index the index of the recipe this button is used for
--- @param list_offset how far down in the scrolling this button is located.
+-- @param skillIndex the index of the recipe this button is used for
+-- @param listOffset how far down in the scrolling this button is located.
 --        No matter where the list is scrolled to, the first visible recipe
---        is at list_offset 0
+--        is at listOffset 0
 --
 -- @return a button who's :Hide() method is to be called. Use nil to have
 --         the default button used.
 --
-function Skillet:BeforeRecipeButtonHide(button, tradeskill, skill_index, list_offset)
+function Skillet:BeforeRecipeButtonHide(button, tradeskill, skillIndex, listOffset)
 	-- these tests are in here to make sure that I don't
 	-- accidentally break the hooking code.
 	assert(button, "Button cannot be nil")
 	assert(tradeskill  and tostring(tradeskill), "Tradeskill cannot be nil")
-	assert(skill_index and tonumber(skill_index) and skill_index >= 0, "Recipe index cannot be nil")
-	assert(list_offset and tonumber(list_offset) and list_offset >= 0, "List offset cannot be nil")
+	assert(skillIndex and tonumber(skillIndex) and skillIndex >= 0, "Recipe index cannot be nil")
+	assert(listOffset and tonumber(listOffset) and listOffset >= 0, "List offset cannot be nil")
 	return button
 end
 
@@ -329,21 +301,22 @@ end
 --
 -- The method you provide *must* have the following signature and behaviour:
 --
---   function yourfunc(button, tradeskill, skill_index, list_offset)
+--   function yourfunc(button, tradeskill, skillIndex, listOffset, recipeID)
 --
 --     where:
 --        o button the button that is about to be displayed
 --        o tradeskill the name of the currently selected tradeskill
---        o skill_index the index of recipe thius button is used for
---        o list_offset how far down in the scrolling this button is located.
+--        o skillIndex the index of recipe this button is used for
+--        o listOffset how far down in the scrolling this button is located.
 --          No matter where the list is scrolled to, the first visible recipe
---          is at list_offset 0
+--          is at listOffset 0
+--        o recipeID is the id of the recipe of this button
 --
 --     returns:
 --        the button who's :Show() method is to be called
 --
 -- If you return your own button (instead of returning the button passed in),
--- you are responsible for attaching it properly in the list. The list_offset
+-- you are responsible for attaching it properly in the list. The listOffset
 -- parameter might be useful here as you could use this to determine the name
 -- of the button immediately before this one in the list and attach to it.
 --
@@ -360,21 +333,21 @@ end
 --
 -- The method you provide *must* have the following signature and behaviour:
 --
---   function yourfunc(button, tradeskill, skill_index, list_offset)
+--   function yourfunc(button, tradeskill, skillIndex, listOffset)
 --
 --     where:
 --        o button the button that is about to be displayed
 --        o tradeskill the name of the currently selected tradeskill
---        o skill_index the index of recipe thius button is used for
---        o list_offset how far down in the scrolling this button is located.
+--        o skillIndex the index of recipe thius button is used for
+--        o listOffset how far down in the scrolling this button is located.
 --          No matter where the list is scrolled to, the first visible recipe
---          is at list_offset 0
+--          is at listOffset 0
 --
 --     returns:
 --        the button who's :Hide() method is to be called
 --
 -- If you return your own button (instead of returning the button passed in),
--- you are responsible for attaching it properly in the list. The list_offset
+-- you are responsible for attaching it properly in the list. The listOffset
 -- parameter might be useful here as you could use this to determine the name
 -- of the button immediately before this one in the list and attach to it.
 --
@@ -513,108 +486,32 @@ Data Formats
 ============
 
 Reagent = {
-	["name"] = name,
-	["link"] = link,
-	["needed"] = number,
-	["texture"] = texture
+	["numNeeded"] = number
+	["reagentID"] = number
+}
+
+Skill = {
+	["parentIndex"] = number
+	["skillData"] = {table}
+	["name"] = string
+	["skillIndex"] = number
+	["parent"] = {table}
+	["depth"] = number
+	["recipeID"] = number 
+	["spellID"] = number (same as recipeID)
 }
 
 Recipe = {
-	["name"] = name,
-	["link"] = link,
-	["texture"] = texture
-	["difficulty"] = "optimal", "medium", "easy", trivial" (non-localized)
-	["nummade"] = number made, (how many this recipe make)
-	["tools"] = "tools", (tools required, nil for no requirements)
-	["count"] = number of reagents for this recipe
-	[index 1] = Reagent,
-	[index 2] = Reagent,
-	....
+	["name"] = string
+	["nummade"] = number (how many this recipe make)
+	["vendorOnly"] = boolean
+	["itemID"] = number
+	["tradeID"] = number
+	["spellID"] = number
+	["reagentData] = {table} with number of reagents for this recipe
+		[index 1] = Reagent
+		[index 2] = Reagent
+		...
 }
-
-So, recipe.name is the name of the recipe, recipe[1].name is the name of
-the first required reagent.
-
-Profession = {
-	["name"] = trade skill name
-	["count"] = number of recipes for this profession
-	[recipe 1] = Recipe,
-	[recipe 2] = Recipe,
-	....
-}
-
-So, profession.name is the name of the profession, profession[1].name is the
-name of the first recipe in the profession.
-
-Character = {
-	["name"] = name of the character
-	["count"] = number of professions for this character
-	[profession 1] = Profession,
-	[profession 2] = Profession,
-	...
-}
-
-So, character.name is the name of the character, character[1].name is the
-name of the first profession known by that character.
-
-Characters = {
-	["count"] = number of characters
-	[character 1] = Character,
-	[character 2] = Character,
-}
-
-So, characters.count is the number of characters, characters[1].name is the
-name of the first character.
 
 ]]
-
---
--- Returns a list of characters for which Skillet recipe data
--- is available. This list will apply only to current realm and
--- faction. Characters on other servers or in the opposite
--- faction will no be included.
---
--- You should not hook this method, you should call it directly.
---
--- @return A list of characters for which Skillet has data
---
-function Skillet:GetCharacters()
-	return self:internal_GetCharacters()
-end
-
---
--- Returns the list of professions that a particular character
--- knows. The character name must be one of those returned by
--- Skillet:GetCharacters().
---
--- You should not hook this method, you should call it directly.
---
--- @param character_name the character for which a profession list
---           should be returned
---
--- @return A list of professions for the specified character or nil
---            if the character has no professions known to Skillet.
---
-function Skillet:GetCharacterProfessions(character_name)
-	return self:internal_GetCharacterProfessions(character_name)
-end
-
---
--- Returns the list of tradeskills for the specified character
--- and profession, or nil if either the character or profession
--- is unknown to Skillet.
---
--- You should not hook this method, you should call it directly.
---
--- @param character_name the character for which a tradeksill list
---           should be returned
--- @param professions the profession for which a tradeksill list
---           should be returned
---
--- @return A table of tradeskills known for the specified character name
---           and profession. Refer to the comment above for details on
---           the table's format.
---
-function Skillet:GetCharacterTradeskills(character_name, profession)
-	return self:internal_GetCharacterTradeskills(character_name, profession)
-end
