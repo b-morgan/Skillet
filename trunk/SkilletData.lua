@@ -1136,17 +1136,6 @@ local skill_style_type = {
 	["unavailable"]		= { r = 0.3, g = 0.3, b = 0.3,	  level = 6, alttext="",	cstring = "|cff606060"},
 }
 
-local missingVendorItems = {
-	[30817] = true,				-- simple flour
-	[4539] = true,				-- Goldenbark Apple
-	[17035] = true,				-- Stranglethorn seed
-	[17034] = true,				-- Maple seed
-	[52188] = true,				-- Jeweler's Setting
-	[4399]	= true,				-- Wooden Stock
-	[38682] = true,				-- Enchanting Vellum
-	[3857]	= true,				-- Coal
-}
-
 local topink = 129032				-- Roseate Pigmentd
 local specialVendorItems = {
 	[37101] = {1, topink},			--Ivory Ink
@@ -1298,6 +1287,10 @@ function Skillet:IsSupportedTradeskill(tradeID)
 	if IsShiftKeyDown() or not tradeID or tradeID == 5419 or tradeID == 53428 then
 		return false
 	end
+	local ranks = self:GetSkillRanks(self.currentPlayer, tradeID)
+	if not ranks then
+		return false
+	end
 	return true
 end
 
@@ -1358,7 +1351,7 @@ end
 -- queries for vendor info for a particular itemID
 function Skillet:VendorSellsReagent(itemID)
 -- Check our local data first
-	if missingVendorItems[itemID] or specialVendorItems[itemID] then
+	if self.db.global.MissingVendorItems[itemID] or specialVendorItems[itemID] then
 		return true
 	end
 -- Check the LibPeriodicTable data next

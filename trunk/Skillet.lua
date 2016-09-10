@@ -911,6 +911,18 @@ function Skillet:OnInitialize()
 	if not self.db.global.Categories then
 		self.db.global.Categories = {}
 	end
+	if not self.db.global.MissingVendorItems then
+		self.db.global.MissingVendorItems = {
+			[30817] = "Simple Flour",
+			[4539]  = "Goldenbark Apple",
+			[17035] = "Stranglethorn Seed",
+			[17034] = "Maple Seed",
+			[52188] = "Jeweler's Setting",
+			[4399]	= "Wooden Stock",
+			[38682] = "Enchanting Vellum",
+			[3857]	= "Coal",
+}
+	end
 	self:InitializeDatabase(UnitName("player"))
 
 -- Hook default tooltips

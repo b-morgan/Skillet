@@ -60,6 +60,18 @@ local function update_merchant_inventory()
 					merchant_inventory[id] = {}
 					merchant_inventory[id].price = price
 					merchant_inventory[id].quantity = quantity
+					if Skillet.db.global.itemRecipeUsedIn[id] then		-- if this item is used in any recipes we know about then
+						if not Skillet:VendorSellsReagent(id) then		-- if its not a known vendor item then
+							Skillet.db.global.MissingVendorItems[id] = name or true		-- add it to our table
+						elseif Skillet.db.global.MissingVendorItems[id] then	-- if it is in both our table and the LibPeriodicTable then
+							local PT = LibStub("LibPeriodicTable-3.1")
+							if PT then
+								if id~=0 and PT:ItemInSet(id,"Tradeskill.Mat.BySource.Vendor") then
+									Skillet.db.global.MissingVendorItems[id] = nil		-- remove it from our table
+								end
+							end
+						end
+					end
 				end
 			end
 		end
@@ -131,7 +143,6 @@ function Skillet:MERCHANT_UPDATE()
 	if Skillet.db.profile.vendor_buy_button or Skillet.db.profile.vendor_auto_buy then
 		update_merchant_inventory()
 	end
-	self:InventoryScan()						-- prolly not needed
 end
 
 -- Merchant window closed
@@ -139,7 +150,6 @@ function Skillet:MERCHANT_CLOSED()
 	remove_merchant_buy_button()
 	merchant_inventory = {}
 	self.autoPurchaseComplete = nil
-	self:InventoryScan()						-- prolly not needed
 end
 
 -- If at a vendor with the window open, buy anything that they
