@@ -62,11 +62,13 @@ local function update_merchant_inventory()
 					merchant_inventory[id].quantity = quantity
 					if Skillet.db.global.itemRecipeUsedIn[id] then		-- if this item is used in any recipes we know about then
 						if not Skillet:VendorSellsReagent(id) then		-- if its not a known vendor item then
+							DA.DEBUG(1,"adding "..tostring(name).." ("..tostring(id)..")")
 							Skillet.db.global.MissingVendorItems[id] = name or true		-- add it to our table
 						elseif Skillet.db.global.MissingVendorItems[id] then	-- if it is in both our table and the LibPeriodicTable then
 							local PT = LibStub("LibPeriodicTable-3.1")
 							if PT then
 								if id~=0 and PT:ItemInSet(id,"Tradeskill.Mat.BySource.Vendor") then
+									DA.DEBUG(1,"removing "..tostring(name).." ("..tostring(id)..")")
 									Skillet.db.global.MissingVendorItems[id] = nil		-- remove it from our table
 								end
 							end
