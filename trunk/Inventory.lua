@@ -100,6 +100,13 @@ function Skillet:InventorySkillIterations(tradeID, skillIndex, playerOverride)
 						reagentAvailableAlts = reagentAvailableAlts + altBoth
 					end
 				end
+				if Skillet.db.profile.use_guildbank_as_alt then
+					local guildName = GetGuildInfo("player")
+					local cachedGuildbank = Skillet.db.global.cachedGuildbank
+					if guildName and cachedGuildbank[guildName] and cachedGuildbank[guildName][reagentID] then
+						reagentAvailableAlts = reagentAvailableAlts + cachedGuildbank[guildName][reagentID]
+					end
+				end
 				if self:VendorSellsReagent(reagentID) then	-- if it's available from a vendor, then only worry about bag inventory
 					local vendorAvailable, vendorAvailableAlt = Skillet:VendorItemAvailable(reagentID)
 					numCraftVendor = math.min(numCraftVendor, vendorAvailable)

@@ -82,6 +82,7 @@ local defaults = {
 		display_shopping_list_at_merchant = false,
 		use_blizzard_for_followers = false,
 		show_recipe_source_for_learned = false,
+		use_guildbank_as_alt = false,
 		transparency = 1.0,
 		scale = 1.0,
 		plugins = {},
@@ -370,6 +371,20 @@ Skillet.options =
 					end,
 					width = "double",
 					order = 28
+				},
+				use_guildbank_as_alt = {
+					type = "toggle",
+					name = L["USEGUILDBANKASALTNAME"],
+					desc = L["USEGUILDBANKASALTDESC"],
+					get = function()
+						return Skillet.db.profile.use_guildbank_as_alt
+					end,
+					set = function(self,value)
+						Skillet.db.profile.use_guildbank_as_alt = value
+						Skillet:UpdateTradeSkillWindow()
+					end,
+					width = "double",
+					order = 29
 				},
 			}
 		},
