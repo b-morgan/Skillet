@@ -1219,7 +1219,7 @@ end
 
 -- adds a recipe usage for an itemID (recipeID uses itemID as a reagent)
 function Skillet:ItemDataAddUsedInRecipe(itemID,recipeID)
-	if not itemID or not recipeID then return end
+	if not itemID or not recipeID or itemID == 0 then return end
 	if not self.db.global.itemRecipeUsedIn then
 		self.db.global.itemRecipeUsedIn = {}
 	end
