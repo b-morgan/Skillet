@@ -1305,7 +1305,7 @@ end
 function Skillet:IsTradeSkillLinked()
 	local isGuild = C_TradeSkillUI.IsTradeSkillGuild()
 	local isLinked, linkedPlayer = C_TradeSkillUI.IsTradeSkillLinked()
-	DA.DEBUG(0,"IsTradeSkillLinked, isGuild="..tostring(isGuild)..", isLinked="..tostring(isLinked)..", linkedPlayer="..tostring(linkedPlayer))
+	DA.DEBUG(0,"IsTradeSkillLinked: isGuild="..tostring(isGuild)..", isLinked="..tostring(isLinked)..", linkedPlayer="..tostring(linkedPlayer))
 	if isLinked or isGuild then
 		if not linkedPlayer then
 			if isGuild then
@@ -1375,17 +1375,17 @@ function Skillet:SkilletShow()
 			self:HideAllWindows()
 			self:EnableBlizzardFrame()
 			ShowUIPanel(TradeSkillFrame)
-			Skillet.TSMPlugin.TSMShow()
+--			Skillet.TSMPlugin.TSMShow()
 		end
 	end
 end
 
 function Skillet:SkilletShowWindow()
 	DA.DEBUG(0,"SkilletShowWindow: "..tostring(self.currentTrade))
-	if Skillet.tradeSkillOpen then
+	if self.tradeSkillOpen then
 		HideUIPanel(TradeSkillFrame)
 	end
-	if IsControlKeyDown() then
+	if IsAltKeyDown() then
 		self.db.realm.skillDB[self.currentPlayer][self.currentTrade] = {}
 	end
 	if not self:RescanTrade() then
@@ -1491,9 +1491,12 @@ function Skillet:SetTradeSkill(player, tradeID, skillIndex)
 			self.currentGroup = nil
 			self.currentGroupLabel = self:GetTradeSkillOption("grouping")
 			self:RecipeGroupDropdown_OnShow()
-			if tradeID == 2575 then tradeID = 2656 end -- Ye old Mining vs. Smelting issue
-			DA.DEBUG(0,"cast: "..self:GetTradeName(tradeID))
-			CastSpellByName(self:GetTradeName(tradeID)) -- this will trigger the whole rescan process via a TRADE_SKILL_SHOW event
+			local orig = self:GetTradeName(tradeID)
+			local spellID = tradeID
+			if tradeID == 2575 then spellID = 2656 end		-- Ye old Mining vs. Smelting issue
+			local spell = self:GetTradeName(spellID)
+			DA.DEBUG(0,"SetTradeSkill: orig= "..tostring(orig).." ("..tostring(tradeID).."), spell= "..tostring(spell).." ("..tostring(spellID)..")")
+			CastSpellByName(spell)		-- this will trigger the whole rescan process via a TRADE_SKILL_SHOW event
 			Skillet.delaySelectedSkill = true
 			Skillet.delaySkillIndex = skillIndex
 		else
