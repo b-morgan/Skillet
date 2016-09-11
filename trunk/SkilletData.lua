@@ -22,6 +22,14 @@ local L = Skillet.L
 
 --[[ == Global Tables == ]]--
 
+-- Table of tradeskills that should use the Blizzard frame
+Skillet.BlizzardSkillList = {
+	[5419]   = true,		-- ???
+	[53428]  = true,		-- runeforging
+	[194174] = true,		-- skinning skills
+	[193290] = true,		-- herbalism skills
+}
+
 -- Table of follower (C_TradeSkillUI.IsNPCCrafting) tradeskills that should use the Blizzard frame
 Skillet.FollowerSkillList = {
 }
@@ -1046,10 +1054,12 @@ local TradeSkillList = {
 	25229,		-- jewelcrafting
 	2108,		-- leatherworking
 	2575,		-- mining
-	2656,		-- smelting (from mining, 2575)
+	2656,		-- mining skills, smelting (from mining, 2575)
 	3908,		-- tailoring
 	2550,		-- cooking
 	3273,		-- first aid
+--	194174,		-- skinning skills
+--	193290,		-- herbalism skills
 --	53428,		-- runeforging
 }
 
@@ -1280,11 +1290,13 @@ function Skillet:CollectRecipeInformation()
 end
 
 -- Checks to see if the current trade is one that we support.
--- Shift key say we don't support it (even if we do).
--- 5419  is ?
--- 53428 is Runeforging
+-- Control key says we do (even if we don't, debugging)
+-- Shift key says we don't support it (even if we do)
 function Skillet:IsSupportedTradeskill(tradeID)
-	if IsShiftKeyDown() or not tradeID or tradeID == 5419 or tradeID == 53428 then
+	if tradeID and IsControlKeyDown() then
+		return true
+	end
+	if IsShiftKeyDown() or not tradeID or self.BlizzardSkillList[tradeID] then
 		return false
 	end
 	local ranks = self:GetSkillRanks(self.currentPlayer, tradeID)
