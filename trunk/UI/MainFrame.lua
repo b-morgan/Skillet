@@ -1502,7 +1502,7 @@ function Skillet:UpdateDetailsWindow(skillIndex)
 	SkilletReagentLabel:SetText(self:GetReagentLabel(SkilletFrame.selectedSkill) or "");
 	SkilletReagentLabel:Show();
 	local width = SkilletReagentParent:GetWidth()
-	local lastReagentButton
+	local lastReagentButton = _G["SkilletReagent1"]
 	for i=1, SKILLET_NUM_REAGENT_BUTTONS, 1 do
 		local button = _G["SkilletReagent"..i]
 		local   text = _G[button:GetName() .. "Text"]
