@@ -938,6 +938,9 @@ function Skillet:OnInitialize()
 			[3857]	= "Coal",
 }
 	end
+	if not self.db.global.AdjustNumMade then
+		self.db.global.AdjustNumMade = {}
+	end
 	self:InitializeDatabase(UnitName("player"))
 
 -- Hook default tooltips

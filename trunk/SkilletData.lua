@@ -1453,7 +1453,11 @@ function Skillet:GetRecipe(id)
 			Skillet.data.recipeList[id].name = GetSpellInfo(tonumber(id))
 			Skillet.data.recipeList[id].tradeID = tonumber(tradeID)
 			Skillet.data.recipeList[id].itemID = tonumber(itemID)
-			Skillet.data.recipeList[id].numMade = tonumber(numMade)
+			if Skillet.db.global.AdjustNumMade and Skillet.db.global.AdjustNumMade[id] then
+				Skillet.data.recipeList[id].numMade = Skillet.db.global.AdjustNumMade[id]
+			else
+				Skillet.data.recipeList[id].numMade = tonumber(numMade)
+			end
 			Skillet.data.recipeList[id].slot = slot
 			Skillet.data.recipeList[id].reagentData = {}
 			if reagentString then
@@ -1947,6 +1951,14 @@ function Skillet:ScanTrade()
 				recipeInfo.itemID = itemID		-- save a copy for our records
 				recipe.itemID = itemID
 				recipe.numMade = (minMade + maxMade)/2
+				local adjustNumMade = Skillet.db.global.AdjustNumMade[recipeID]
+				if adjustNumMade then
+					if recipe.numMade ~= adjustNumMade then
+						recipe.numMade = adjustNumMade
+					else
+						adjustNumMade = nil
+					end
+				end
 			elseif recipeInfo.alternateVerb == ENSCRIBE then -- use the itemID of the scroll created by using the enchant on vellum
 				--DA.DEBUG(2,"alternateVerb= "..tostring(recipeInfo.alternateVerb))
 				recipeInfo.numMade = 1		-- save a copy for our records

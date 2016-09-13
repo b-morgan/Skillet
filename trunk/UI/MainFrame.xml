@@ -2301,18 +2301,26 @@
 				<Scripts>
 					<OnLoad>
 						self:RegisterEvent("MODIFIER_STATE_CHANGED");
+						self:RegisterForClicks("LeftButtonUp","RightButtonUp")
 					</OnLoad>
 					<OnClick>
 						Skillet:InventoryFilterButtons_Hide()
 						local link = Skillet:GetRecipeItemLink(Skillet.selectedSkill);
-						if ( IsControlKeyDown() ) then
+						if ( button == "LeftButton" and IsControlKeyDown() ) then
 							<!-- This opens up the dressing room window and display the character
 								 wearing the item (if that is possible) -->
 							DressUpItemLink(link);
-						elseif ( IsShiftKeyDown() ) then
+						elseif ( button == "LeftButton" and IsShiftKeyDown() ) then
 							<!-- This put a link to the *item* that can be created with this trade skill
 								 into the current chat  box -->
 							ChatEdit_InsertLink(link);
+						elseif ( button == "RightButton" ) then
+							<!-- right clicking allow adjusting numCreated -->
+							if ( IsShiftKeyDown() ) then
+								Skillet:AdjustNumberMade(Skillet.selectedSkill,-1)
+							else
+								Skillet:AdjustNumberMade(Skillet.selectedSkill,1)
+							end
 						end
 					</OnClick>
 					<OnEnter>
