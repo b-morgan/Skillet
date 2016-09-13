@@ -1188,7 +1188,7 @@ function Skillet:CHAT_MSG_SKILL()	-- Replaced by SKILL_LINES_CHANGED?
 end
 
 function Skillet:SKILL_LINES_CHANGED()
-	DA.DEBUG(0,"SKILL_LINES_CHANGED")
+	--DA.DEBUG(0,"SKILL_LINES_CHANGED")
 	if Skillet.tradeSkillOpen then
 --		Skillet:ScanTrade()
 --		Skillet:UpdateTradeSkillWindow()
