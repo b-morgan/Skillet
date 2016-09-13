@@ -23,6 +23,7 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
 -- the level is returned, otherwise 0 is returned
 --
 -- item can be: itemID or "itemString" or "itemName" or "itemLink"
+
 function Skillet:GetLevelRequiredToUse(item)
 	if not item then return end
 		local level = select(5, GetItemInfo(item))
@@ -69,6 +70,18 @@ function Skillet:GetRecipeItemLink(index)
 		return link
 	end
 		return nil
+end
+
+function Skillet:AdjustNumberMade(index, adjust)
+	--DA.DEBUG(0,"AdjustNumberMade("..tostring(index)..", adjust= "..tostring(adjust)..")")
+	local recipe, recipeID = self:GetRecipeDataByTradeIndex(self.currentTrade, index)
+	--DA.DEBUG(0,"recipe= "..DA.DUMP1(recipe,1))
+	if recipe then
+		recipe.numMade = math.max(recipe.numMade + adjust, 1)
+		self.db.global.AdjustNumMade[recipeID] = recipe.numMade
+		--DA.DEBUG(0,"recipeID= "..tostring(recipeID)..", recipe.numMade= "..tostring(recipe.numMade))
+		self:UpdateTradeSkillWindow()
+	end
 end
 
 function Skillet:GetTradeSkillNumReagents(skillIndex)

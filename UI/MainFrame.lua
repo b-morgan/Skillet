@@ -1487,7 +1487,14 @@ function Skillet:UpdateDetailsWindow(skillIndex)
 	end
 	-- How many of these items are produced at one time ..
 	if recipe.numMade > 1 then
-		SkilletSkillIconCount:SetText(recipe.numMade)
+		--DA.DEBUG(0,"recipe= "..DA.DUMP1(recipe,1))
+		local text = tostring(recipe.numMade)
+		local adjustNumMade = self.db.global.AdjustNumMade[recipe.spellID]
+		--DA.DEBUG(0,"recipeID= "..tostring(recipe.spellID)..", adjustNumMade= "..tostring(adjustNumMade))
+		if adjustNumMade then
+			text = string.format("|cffff8080%d|r",recipe.numMade)
+		end
+		SkilletSkillIconCount:SetText(text)
 		SkilletSkillIconCount:Show()
 	else
 		SkilletSkillIconCount:SetText("")
