@@ -1896,7 +1896,7 @@
 			<Frame parentKey="StarsFrame" parent="SkilletReagentParent" enableMouse="true">
 				<Size x="45" y="16"/>
 				<Anchors>
-					<Anchor point="TOPRIGHT" relativeTo="SkilletReagentParent" relativePoint="TOPRIGHT" x="-15" y="-10"/>
+					<Anchor point="TOPRIGHT" relativeTo="SkilletReagentParent" relativePoint="TOPRIGHT" x="-15" y="-7"/>
 				</Anchors>
 				<Frames>
 					<Frame parentKey="Star1" inherits="SkilletDetailsStarTemplate">
