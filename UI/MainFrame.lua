@@ -656,7 +656,7 @@ function Skillet:UpdateTradeButtons(player)
 		local buttonName = "SkilletDo"..additionalSpellName
 		local button = _G[buttonName]
 		if not button then
-			--DA.DEBUG(0,"CreateFrame for "..tostring(buttonName))
+			DA.DEBUG(0,"CreateFrame for "..tostring(buttonName))
 			button = CreateFrame("Button", buttonName, frame, "SkilletTradeButtonAdditionalTemplate")
 			button:SetID(additionalSpellId)
 			if additionalToy then
