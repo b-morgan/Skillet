@@ -584,7 +584,7 @@ function Skillet:TradeButton_OnClick(this,button)
 end
 
 function Skillet:UpdateTradeButtons(player)
-	DA.DEBUG(0,"UpdateTradeButtons()")
+	--DA.DEBUG(0,"UpdateTradeButtons()")
 	local position = 0 -- pixels
 	local tradeSkillList = self.tradeSkillList
 	local frameName = "SkilletFrameTradeButtons-"..player
@@ -640,7 +640,7 @@ function Skillet:UpdateTradeButtons(player)
 		end
 	end
 	position = position + 10
-	DA.DEBUG(0,"doing "..tostring(#Skillet.AutoButtonsList).." AutoButtonsList entries")
+	--DA.DEBUG(0,"doing "..tostring(#Skillet.AutoButtonsList).." AutoButtonsList entries")
 	for i=1,#Skillet.AutoButtonsList,1 do	-- iterate thru all skills in defined order for neatness (professions, secondary, class skills)
 		local additionalSpellTab = Skillet.AutoButtonsList[i]
 		local additionalSpellId = additionalSpellTab[1]
