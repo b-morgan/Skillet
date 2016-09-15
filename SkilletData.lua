@@ -40,13 +40,16 @@ Skillet.FollowerNPC = {
 }
 
 Skillet.TradeSkillAdditionalAbilities = {
-	[7411]	= {13262,"Disenchant"},		-- enchanting = disenchant
-	[2550]	= {818,"Basic_Campfire"},	-- cooking = basic campfire
-	[45357] = {51005,"Milling"},		-- inscription = milling
-	[25229] = {31252,"Prospecting"},	-- jewelcrafting = prospecting
-	[2018]	= {126462,"Thermal_Anvil"},	 -- blacksmithing = thermal anvil (item:87216)
-	[4036]	= {126462,"Thermal_Anvil"},	 -- engineering = thermal anvil (item:87216)
-	[2575]	= {126462,"Thermal_Anvil"},	 -- smelting = thermal anvil (item:87216)
+	[7411]	=	{13262,"Disenchant"},		-- enchanting = disenchant
+	[2550]	=	{
+				{818,"Basic_Campfire"},		-- cooking = basic campfire
+				{134020,"Chef's_Hat",true},	-- cooking = Chef's Hat (toy)
+				},
+	[45357] =	{51005,"Milling"},			-- inscription = milling
+	[25229] =	{31252,"Prospecting"},		-- jewelcrafting = prospecting
+	[2018]	=	{126462,"Thermal_Anvil"},	-- blacksmithing = thermal anvil (item:87216)
+	[4036]	=	{126462,"Thermal_Anvil"},	-- engineering = thermal anvil (item:87216)
+	[2575]	=	{126462,"Thermal_Anvil"},	-- smelting = thermal anvil (item:87216)
 }
 
 Skillet.TradeSkillAutoTarget = {
@@ -1205,13 +1208,18 @@ function Skillet:GetAutoTargetItem(addSpellID)
 	end
 end
 
-function Skillet:GetAutoTargetMacro(addSpellID)
-	--DA.DEBUG(0,"GetAutoTargetMacro("..tostring(addSpellID)..")")
-	local itemID = Skillet:GetAutoTargetItem(addSpellID)
-	if itemID then
-		return "/cast "..(GetSpellInfo(addSpellID) or "").."\n/use "..(GetItemInfo(itemID) or "")
+function Skillet:GetAutoTargetMacro(addSpellID, toy)
+	--DA.DEBUG(0,"GetAutoTargetMacro("..tostring(addSpellID)..", "..tostring(toy)..")")
+	if toy then
+		local _, name = C_ToyBox.GetToyInfo(addSpellID)
+		return "/cast "..(name or "")
 	else
-		return "/cast "..(GetSpellInfo(addSpellID) or "")
+		local itemID = Skillet:GetAutoTargetItem(addSpellID)
+		if itemID then
+			return "/cast "..(GetSpellInfo(addSpellID) or "").."\n/use "..(GetItemInfo(itemID) or "")
+		else
+			return "/cast "..(GetSpellInfo(addSpellID) or "")
+		end
 	end
 end
 
