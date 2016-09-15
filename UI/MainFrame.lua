@@ -673,6 +673,16 @@ function Skillet:UpdateTradeButtons(player)
 		buttonIcon:SetTexture(spellIcon)
 		position = position + button:GetWidth()
 		button:Show()
+		if additionalToy then
+			--DA.DEBUG(0,"IsToyUsable= "..tostring(C_ToyBox.IsToyUsable(additionalSpellId)))
+			if C_ToyBox.IsToyUsable(additionalSpellId) then
+				button:Enable()
+				button:SetAlpha(1.0)
+			else
+				button:Disable()
+				button:SetAlpha(0.2)
+			end
+		end
 	end
 end
 
