@@ -510,13 +510,21 @@ function Skillet:TradeButton_OnEnter(button)
 end
 
 function Skillet:TradeButtonAdditional_OnEnter(button)
+	--DA.DEBUG(0,"TradeButtonAdditional_OnEnter("..tostring(button)..")")
 	GameTooltip:SetOwner(button, "ANCHOR_TOPLEFT")
 	GameTooltip:ClearLines()
 	local spellID = button:GetID()
-	GameTooltip:AddLine(GetSpellInfo(spellID))
-	local itemID = Skillet:GetAutoTargetItem(spellID)
-	if itemID and IsAltKeyDown() then
-		GameTooltip:AddLine("/use "..GetItemInfo(itemID))
+	local spellInfo, _ = GetSpellInfo(spellID)
+	if button.Toy then
+		_, spellInfo = C_ToyBox.GetToyInfo(spellID)
+	end
+	--DA.DEBUG(0,"spellInfo= "..tostring(spellInfo))
+	GameTooltip:AddLine(spellInfo)
+	if not button.Toy then
+		local itemID = Skillet:GetAutoTargetItem(spellID)
+		if itemID and IsAltKeyDown() then
+			GameTooltip:AddLine("/use "..GetItemInfo(itemID))
+		end
 	end
 	GameTooltip:Show()
 end
@@ -576,7 +584,7 @@ function Skillet:TradeButton_OnClick(this,button)
 end
 
 function Skillet:UpdateTradeButtons(player)
-	--DA.DEBUG(0,"UpdateTradeButtons()")
+	DA.DEBUG(0,"UpdateTradeButtons()")
 	local position = 0 -- pixels
 	local tradeSkillList = self.tradeSkillList
 	local frameName = "SkilletFrameTradeButtons-"..player
@@ -607,7 +615,7 @@ function Skillet:UpdateTradeButtons(player)
 				DA.DEBUG(0,"CreateFrame for "..tostring(buttonName))
 				button = CreateFrame("CheckButton", buttonName, frame, "SkilletTradeButtonTemplate")
 			end
-			if player ~= UnitName("player") and not tradeLink then						-- fade out buttons that don't have data collected
+			if player ~= UnitName("player") and not tradeLink then		-- fade out buttons that don't have data collected
 				button:SetAlpha(.4)
 				button:SetHighlightTexture("")
 				button:SetPushedTexture("")
@@ -632,23 +640,33 @@ function Skillet:UpdateTradeButtons(player)
 		end
 	end
 	position = position + 10
-	--DA.DEBUG(0,"doing "..tostring(#Skillet.AutoButtonsList).." AutoButtonsList entries")
+	DA.DEBUG(0,"doing "..tostring(#Skillet.AutoButtonsList).." AutoButtonsList entries")
 	for i=1,#Skillet.AutoButtonsList,1 do	-- iterate thru all skills in defined order for neatness (professions, secondary, class skills)
 		local additionalSpellTab = Skillet.AutoButtonsList[i]
 		local additionalSpellId = additionalSpellTab[1]
 		local additionalSpellName = additionalSpellTab[2]
-		local spellName, _, spellIcon = GetSpellInfo(additionalSpellId)
+		local additionalToy = additionalSpellTab[3]
+		local spellName, _, spellIcon
+		if additionalToy then
+			_, spellName, spellIcon = C_ToyBox.GetToyInfo(additionalSpellId)
+		else
+			spellName, _, spellIcon = GetSpellInfo(additionalSpellId)
+		end
+		--DA.DEBUG(0,"additionalSpellId= "..tostring(additionalSpellId)..", spellName= "..tostring(spellName)..", spellIcon= "..tostring(spellIcon))
 		local buttonName = "SkilletDo"..additionalSpellName
 		local button = _G[buttonName]
 		if not button then
 			--DA.DEBUG(0,"CreateFrame for "..tostring(buttonName))
 			button = CreateFrame("Button", buttonName, frame, "SkilletTradeButtonAdditionalTemplate")
 			button:SetID(additionalSpellId)
-			button:SetAttribute("type", "macro");
-			local macrotext = Skillet:GetAutoTargetMacro(additionalSpellId)
-			--DA.DEBUG(0,"macrotext= "..tostring(macrotext))
-			button:SetAttribute("macrotext", macrotext)
+			if additionalToy then
+				button.Toy = true
+			end
 		end
+		button:SetAttribute("type", "macro");
+		local macrotext = Skillet:GetAutoTargetMacro(additionalSpellId, button.Toy)
+		--DA.DEBUG(0,"macrotext= "..tostring(macrotext))
+		button:SetAttribute("macrotext", macrotext)
 		button:ClearAllPoints()
 		button:SetPoint("BOTTOMLEFT", SkilletRankFrame, "TOPLEFT", position, 0)
 		local buttonIcon = _G[buttonName.."Icon"]
@@ -668,7 +686,15 @@ function Skillet:UpdateAutoTradeButtons()
 		if ranks then	-- this player knows this skill
 			local additionalSpellTab = Skillet.TradeSkillAdditionalAbilities[tradeID]
 			if additionalSpellTab then -- this skill has additional abilities
-				table.insert(Skillet.AutoButtonsList, additionalSpellTab)
+				if type(additionalSpellTab[1]) == "table" then
+					for j=1,#additionalSpellTab,1 do
+						DA.DEBUG(0,"UpdateAutoTradeButtons: additionalSpellTab["..tostring(j).."]= "..DA.DUMP1(additionalSpellTab[j]))
+						table.insert(Skillet.AutoButtonsList, additionalSpellTab[j])
+					end
+				else
+					DA.DEBUG(0,"UpdateAutoTradeButtons: additionalSpellTab= "..DA.DUMP1(additionalSpellTab))
+					table.insert(Skillet.AutoButtonsList, additionalSpellTab)
+				end
 			end
 		end
 	end
