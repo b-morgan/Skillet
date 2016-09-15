@@ -1031,12 +1031,6 @@ function Skillet:InitializeDatabase(player)
 		if not self.db.realm.skillDB[player] then
 			self.db.realm.skillDB[player] = {}
 		end
-		if not self.db.realm.tradeSkills then
-			self.db.realm.tradeSkills = {}
-		end
-		if not self.db.realm.tradeSkills[player] then
-			self.db.realm.tradeSkills[player] = {}
-		end
 		if not self.db.realm.queueData then
 			self.db.realm.queueData = {}
 		end
@@ -1098,7 +1092,6 @@ function Skillet:InitializeDatabase(player)
 			if not self.db.profile.SavedQueues then
 				self.db.profile.SavedQueues = {}
 			end
-			self:ScanPlayerTradeSkills(player)
 		end
 	end
 end
@@ -1167,7 +1160,6 @@ function Skillet:OnEnable()
 	-- run the upgrade code to convert any old settings
 	self:UpgradeDataAndOptions()
 	self:CollectTradeSkillData()
-	self:UpdateAutoTradeButtons()
 	self:EnablePlugins()
 end
 
@@ -1323,9 +1315,6 @@ end
 -- Show the tradeskill window, called from TRADE_SKILL_SHOW event, clicking on links, or clicking on guild professions
 function Skillet:SkilletShow()
 	DA.DEBUG(0,"SkilletShow: (was showing "..tostring(self.currentTrade)..")");
-	if PandaPanel and PandaPanel:IsShown() then
-		return
-	end
 	self.linkedSkill, self.currentPlayer, self.isGuild = self:IsTradeSkillLinked()
 	if self.linkedSkill then
 		if not self.currentPlayer then
@@ -1334,6 +1323,8 @@ function Skillet:SkilletShow()
 	else
 		self.currentPlayer = (UnitName("player"))
 	end
+	self:ScanPlayerTradeSkills(self.currentPlayer)
+	self:UpdateAutoTradeButtons()
 	local skillLineID, skillLineName, skillLineRank, skillLineMaxRank, skillLineModifier = C_TradeSkillUI.GetTradeSkillLine();
 	DA.DEBUG(0,"SkilletShow: skillLineName= "..tostring(skillLineName)..", skillLineRank= "..tostring(skillLineRank)..
 		", skillLineRank= "..tostring(skillLineRank)..", skillLineModifier= "..tostring(skillLineModifier))
