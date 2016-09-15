@@ -1559,6 +1559,16 @@ end
 -- Shows the trade skill frame.
 function Skillet:internal_ShowTradeSkillWindow()
 	--DA.DEBUG(0,"internal_ShowTradeSkillWindow")
+	if UnitAffectingCombat("player") then
+		print("|cff8888ffSkillet|r: Combat lockdown restriction." ..
+		  " Leave combat and try again.")
+		self.dataSourceChanged = false
+		self.detailsUpdate = false
+		self.skillListUpdate = false
+		self.adjustInventory = false
+		self:SkilletClose()
+		return
+	end
 	local frame = self.tradeSkillFrame
 	if not frame then
 		frame = self:CreateTradeSkillWindow()
