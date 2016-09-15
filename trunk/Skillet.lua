@@ -33,9 +33,9 @@ Skillet.L = L
 local MAJOR_VERSION = GetAddOnMetadata("Skillet", "Version");
 local PACKAGE_VERSION = GetAddOnMetadata("Skillet", "X-Curse-Packaged-Version");
 Skillet.version = MAJOR_VERSION
+Skillet.package = PACKAGE_VERSION
 Skillet.alpha = 2 -- Assume this is a released version of Skillet
 if PACKAGE_VERSION then
-	Skillet.version = PACKAGE_VERSION
 	if PACKAGE_VERSION ~= MAJOR_VERSION then
 		if not string.find(string.lower(PACKAGE_VERSION), "beta") then
 			Skillet.alpha = 0 -- 0 = This is most likely an alpha version of Skillet, ask the user. 2 = always use Skillet
@@ -911,6 +911,8 @@ function Skillet:OnInitialize()
 	end
 
 -- Initialize global data
+	self.db.global.version = self.version	-- save a copy for 
+	self.db.global.package = self.package	-- post-mortem purposes
 	if not self.db.global.recipeDB then
 		self.db.global.recipeDB = {}
 	end
