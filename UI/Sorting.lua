@@ -154,16 +154,18 @@ local function SkillIsFilteredOut(skillIndex)
 	end
 
 	local recipeInfo = Skillet.data.recipeInfo[Skillet.currentTrade][recipeID]
-	--DA.DEBUG(1,"unlearnedRecipes= "..tostring(Skillet.unlearnedRecipes)..", recipeInfo = "..DA.DUMP1(recipeInfo,1))
-	if Skillet.unlearnedRecipes then
-		if recipeInfo.learned then
+	if recipeInfo then
+		--DA.DEBUG(1,"unlearnedRecipes= "..tostring(Skillet.unlearnedRecipes)..", recipeInfo = "..DA.DUMP1(recipeInfo,1))
+		if Skillet.unlearnedRecipes then
+			if recipeInfo.learned then
+				return true
+			end
+		elseif not recipeInfo.learned then
 			return true
 		end
-	elseif not recipeInfo.learned then
-		return true
 	end
 
-	if Skillet:IsUpgradeHidden(recipeID) then 
+	if Skillet:IsUpgradeHidden(recipeID) then
 		return true
 	end
 
@@ -228,7 +230,7 @@ local function SkillIsFilteredOut(skillIndex)
 				searchText = Skillet.data.tooltipCache[recipeID]
 			end
 		end
-		if searchText then 
+		if searchText then
 			searchText = string.lower(searchText)
 			local wordList = { string.split(" ",filter) }
 			for v,word in pairs(wordList) do
@@ -275,7 +277,7 @@ end
 function Skillet:ExpandAll()
 	local skillListKey = Skillet.currentPlayer..":"..Skillet.currentTrade..":"..Skillet.currentGroupLabel
 	if self.data.sortedSkillList[skillListKey] then
-		local sortedSkillList = self.data.sortedSkillList[skillListKey]	
+		local sortedSkillList = self.data.sortedSkillList[skillListKey]
 		local numTradeSkills = sortedSkillList.count
 		for i=1, numTradeSkills, 1 do
 			local skill = sortedSkillList[i]
@@ -291,7 +293,7 @@ end
 function Skillet:CollapseAll()
 	local skillListKey = Skillet.currentPlayer..":"..Skillet.currentTrade..":"..Skillet.currentGroupLabel
 	if self.data.sortedSkillList[skillListKey] then
-		local sortedSkillList = self.data.sortedSkillList[skillListKey]	
+		local sortedSkillList = self.data.sortedSkillList[skillListKey]
 		local numTradeSkills = sortedSkillList.count
 		for i=1, numTradeSkills, 1 do
 			local skill = sortedSkillList[i]
