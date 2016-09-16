@@ -146,18 +146,29 @@ local function SkillIsFilteredOut(skillIndex)
 	local skill = Skillet:GetSkill(Skillet.currentPlayer, Skillet.currentTrade, skillIndex)
 	--DA.DEBUG(1,"skill = "..DA.DUMP1(skill,1))
 	local recipe = Skillet:GetRecipe(skill.id)
+	--DA.DEBUG(1,"recipe = "..DA.DUMP1(recipe,1))
 	local recipeID = recipe.spellID or 0
 	if recipeID == 0 then
 		-- it's a header, don't filter here
 		return false
 	end
-	
-	if Skillet:IsUpgradeHidden(recipeID) then 
-	   return true
+
+	local recipeInfo = Skillet.data.recipeInfo[Skillet.currentTrade][recipeID]
+	--DA.DEBUG(1,"unlearnedRecipes= "..tostring(Skillet.unlearnedRecipes)..", recipeInfo = "..DA.DUMP1(recipeInfo,1))
+	if Skillet.unlearnedRecipes then
+		if recipeInfo.learned then
+			return true
+		end
+	elseif not recipeInfo.learned then
+		return true
 	end
-	
+
+	if Skillet:IsUpgradeHidden(recipeID) then 
+		return true
+	end
+
 	if Skillet:GetTradeSkillOption("favoritesOnly") and not Skillet:IsFavorite(recipeID) then
-	     return true
+		return true
 	end
 		-- are we hiding anything that is trivial (has no chance of giving a skill point)
 	if skill_style_type[skill.difficulty] then
@@ -365,7 +376,7 @@ function Skillet:internal_SortAndFilterRecipes()
 	end
 	local sortedSkillList = Skillet.data.sortedSkillList[skillListKey]
 	local oldLength = #sortedSkillList
-	--DA.DEBUG(1,"oldLength= ",tostring(oldLength))
+	--DA.DEBUG(1,"numSkills= "..tostring(numSkills)..", oldLength= ",tostring(oldLength))
 	local button_index = 0
 	local filtertext = Skillet:GetTradeSkillOption("filtertext")
 	local groupLabel = Skillet.currentGroupLabel
