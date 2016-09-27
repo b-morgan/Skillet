@@ -1275,7 +1275,6 @@
 					</OnShow>
 				</Scripts>
 			</Frame>
-			<!--
 			<Button name="SkilletNewFilterOperations">
 				<Size>
 					<AbsDimension x="20" y="20"/>
@@ -1293,11 +1292,18 @@
 				<Scripts>
 					<OnClick>
 						Skillet:InventoryFilterButtons_Hide()
-						Skillet:RecipeNewFilterOperations_OnClick(self)
+						ToggleDropDownMenu(1, nil, SkilletFilterDropDown, self, self:GetWidth(), 0)
 					</OnClick>
 				</Scripts>
 			</Button>
-			-->
+			<Frame name="SkilletFilterDropDown" inherits="UIDropDownMenuTemplate">
+				<Scripts>
+					<OnLoad>
+						self.Text:SetJustifyH("CENTER");
+						self.Button:Show();
+					</OnLoad>
+				</Scripts>
+			</Frame>
 			<!--
 			#
 			# An edit box where users can type in filter text

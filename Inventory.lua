@@ -22,16 +22,16 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
 -- does consider queued recipes
 function Skillet:InventoryReagentCraftability(reagentID, playerOverride)
 	--DA.DEBUG(0,"InventoryReagentCraftability("..tostring(reagentID)..", "..tostring(playerOverride)..") -- "..tostring((GetItemInfo(reagentID))))
-	if self.visited[reagentID] then
-		DA.DEBUG(0,"Been Here Before")
-		return 0			-- we've been here before, so bail out to avoid infinite loop
-	end
 	local player = playerOverride or Skillet.currentPlayer
+	if self.visited[reagentID] then
+		local reagentA, reagentC = self:GetInventory(player, reagentID)
+		--DA.DEBUG(1,"Have visited reagentID= "..tostring(reagentID)..", Available= "..tostring(reagentA)..", Craftable= "..tostring(reagentC))
+		return reagentC
+	end
 	self.visited[reagentID] = true
 	local recipeSource = self.db.global.itemRecipeSource[reagentID]
 	local numReagentsCrafted = 0
 	local skillIndexLookup = self.data.skillIndexLookup[player]
-	local cachedInventory = self.db.realm.inventoryData[player]
 	if recipeSource then
 		for childRecipeID in pairs(recipeSource) do
 			local childRecipe = self:GetRecipe(childRecipeID)
@@ -66,18 +66,16 @@ function Skillet:InventoryReagentCraftability(reagentID, playerOverride)
 		--DA.DEBUG(0,"player="..player..", numCrafted="..tostring(numCrafted)..", reagentID="..tostring(reagentID).."("..tostring((GetItemInfo(reagentID)))..")")
 		Skillet.db.realm.inventoryData[player][reagentID] = numInBoth.." "..numCrafted
 	end
-	self.visited[reagentID] = false -- okay to calculate this reagent again
+--	self.visited[reagentID] = false -- okay to calculate this reagent again
 	return numCrafted
 end
 
 -- recipe iteration check: calculate how many times a recipe can be iterated with materials available
 -- (not to be confused with the reagent craftability which is designed to determine how many 
 -- craftable reagents are available for recipe iterations)
-function Skillet:InventorySkillIterations(tradeID, skillIndex, playerOverride)
-	--DA.DEBUG(1,"InventorySkillIterations("..tostring(tradeID)..", "..tostring(skillIndex)..", "..tostring(playerOverride)..")")
+function Skillet:InventorySkillIterations(tradeID, recipe, playerOverride)
+	--DA.DEBUG(1,"InventorySkillIterations("..tostring(tradeID)..", "..DA.DUMP1(recipe)..", "..tostring(playerOverride)..")")
 	local player = playerOverride or Skillet.currentPlayer
-	local skill = self:GetSkill(player, tradeID, skillIndex)
-	local recipe = self:GetRecipe(skill.id)
 	if recipe and recipe.reagentData and #recipe.reagentData > 0 then	-- make sure that recipe is in the database before continuing
 		local numCraft = 100000
 		local numCraftable = 100000
@@ -92,6 +90,10 @@ function Skillet:InventorySkillIterations(tradeID, skillIndex, playerOverride)
 				local reagentCraftable = 0
 				local reagentAvailableAlts = 0
 				reagentAvailable, reagentCraftable = self:GetInventory(player, reagentID)
+--				if reagentCraftable == 0 then
+--					reagentCraftable = self:InventoryReagentCraftability(reagentID, player)
+--					DA.DEBUG(2,"InventorySkillIterations: reagentID= "..tostring(reagentID)..", reagentCraftable= "..tostring(reagentCraftable))
+--				end
 				numCraft = math.min(numCraft, math.floor(reagentAvailable/numNeeded))
 				numCraftable = math.min(numCraftable, math.floor(reagentCraftable/numNeeded))
 				for alt in pairs(self.db.realm.inventoryData) do
@@ -133,10 +135,10 @@ function Skillet:InventorySkillIterations(tradeID, skillIndex, playerOverride)
 		if numCraftable == 100000 then
 			numCraftable = 0					-- there were no craftable reagents
 		end
---		if numCraft > 0 or numCraftable > 0 or numCraftVendor > 0 or numCraftAlts > 0 then
+		if numCraft > 0 or numCraftable > 0 or numCraftVendor > 0 or numCraftAlts > 0 then
 			--DA.DEBUG(1,"recipe="..DA.DUMP1(recipe))
 			--DA.DEBUG(1,"numCraft="..tostring(numCraft)..", numCraftable="..tostring(numCraftable)..", numCraftVendor="..tostring(numCraftVendor)..", numCraftAlts="..tostring(numCraftAlts))
---		end
+		end
 		local numMade = recipe.numMade
 		return numCraft * numMade, numCraftable * numMade, numCraftVendor * numMade, numCraftAlts * numMade
 	end

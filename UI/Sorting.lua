@@ -552,7 +552,3 @@ function Skillet:NewFilterDropdown_OnClick()
 	Skillet:ScanTrade()
 	Skillet:UpdateTradeSkillWindow()
 end
-
-function Skillet:RecipeNewFilterOperations_OnClick(self)
-	DA.DEBUG(0,"RecipeNewFilterOperations_OnClick()")
-end

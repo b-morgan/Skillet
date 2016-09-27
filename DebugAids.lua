@@ -50,7 +50,7 @@ DA.TraceShow = false
 DA.TraceLog = false
 DA.ProfileShow = false
 DA.DebugLog = {} -- Add to SavedVariables for debugging
-DA.MAXDEBUG = 2000
+DA.MAXDEBUG = 4000
 DA.DebugProfile = {} -- Add to SavedVariables for debugging
 DA.MAXPROFILE = 2000
 DA.STATUS_COLOR = "|c0033CCFF"
@@ -299,8 +299,8 @@ function DA.DebugAidsStatus()
 	print("TraceShow= "..tostring(DA.TraceShow)..", TraceLog= "..tostring(DA.TraceLog))
 	print("ProfileShow= "..tostring(DA.ProfileShow))
 	print("TableDump= "..tostring(DA.TableDump))
-	print("#DebugLog= "..tostring(#DA.DebugLog))
-	print("#DebugProfile= "..tostring(#DA.DebugProfile))
+	print("#DebugLog= "..tostring(#DA.DebugLog).." ("..tostring(DA.MAXDEBUG)..")")
+	print("#DebugProfile= "..tostring(#DA.DebugProfile).." ("..tostring(DA.MAXPROFILE)..")")
 end
 
 --

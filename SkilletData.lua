@@ -35,7 +35,7 @@ Skillet.FollowerSkillList = {
 }
 
 -- In case the previous table is too broad
--- Table of follower (C_TradeSkillUI.IsNPCCrafting) NPC IDs (from GUID) that should use the Blizzard frame 
+-- Table of follower (C_TradeSkillUI.IsNPCCrafting) NPC IDs (from GUID) that should use the Blizzard frame
 Skillet.FollowerNPC = {
 }
 
@@ -157,7 +157,7 @@ Skillet.TradeSkillAutoTarget = {
 
 Skillet.scrollData = {
 	-- Scraped from WoWhead using the following javascript:
-	-- for (i=0; i<listviewitems.length; i++) console.log("["+listviewitems[i].sourcemore[0].ti+"] = "+listviewitems[i].id+", 
+	-- for (i=0; i<listviewitems.length; i++) console.log("["+listviewitems[i].sourcemore[0].ti+"] = "+listviewitems[i].id+",
 	-- "+listviewitems[i].name.substr(1));
 	[158914] = 110638, -- Enchant Ring - Gift of Critical Strike
 	[158915] = 110639, -- Enchant Ring - Gift of Haste
@@ -1137,7 +1137,7 @@ local DifficultyChar = {
 	medium = "m",
 	easy = "e",
 	trivial = "t",
-	unavailable = "u", 
+	unavailable = "u",
 }
 local skill_style_type = {
 	["unknown"]			= { r = 1.00, g = 0.00, b = 0.00, level = 5, alttext="???", cstring = "|cffff0000"},
@@ -1189,7 +1189,7 @@ function Skillet:GetAutoTargetItem(addSpellID)
 	if Skillet.TradeSkillAutoTarget[addSpellID] then
 		local itemID = lastAutoTarget[addSpellID]
 		--DA.DEBUG(0,"itemID= "..tostring(itemID))
-		if itemID then 
+		if itemID then
 			local limit = Skillet.TradeSkillAutoTarget[addSpellID][itemID]
 			local count = GetItemCount(itemID)
 			if count >= limit then
@@ -1396,7 +1396,7 @@ function Skillet:ResetTradeSkillFilter()
 end
 
 function Skillet:SetTradeSkillLearned()
-    Skillet:SetGroupSelection(nil)
+	Skillet:SetGroupSelection(nil)
 	C_TradeSkillUI.SetOnlyShowLearnedRecipes(true);
 	C_TradeSkillUI.SetOnlyShowUnlearnedRecipes(false);
 	Skillet.unlearnedRecipes = false
@@ -1413,22 +1413,136 @@ function Skillet:SetTradeSkillUnlearned()
 	Skillet:NewFilterDropdown_OnShow()
 end
 
+local function GetUnfilteredSubCategoryName(categoryID, ...)
+	local areAllUnfiltered = true;
+	for i = 1, select("#", ...) do
+		local subCategoryID = select(i, ...);
+		if C_TradeSkillUI.IsRecipeCategoryFiltered(categoryID, subCategoryID) then
+			areAllUnfiltered = false;
+			break;
+		end
+	end
+	if areAllUnfiltered then
+		return nil;
+	end
+	for i = 1, select("#", ...) do
+		local subCategoryID = select(i, ...);
+		if not C_TradeSkillUI.IsRecipeCategoryFiltered(categoryID, subCategoryID) then
+			local subCategoryData = C_TradeSkillUI.GetCategoryInfo(subCategoryID);
+			return subCategoryData.name;
+		end
+	end
+end
+
+local function GetUnfilteredCategoryName(...)
+	-- Try subCategories first
+	for i = 1, select("#", ...) do
+		local categoryID = select(i, ...);
+		local subCategoryName = GetUnfilteredSubCategoryName(categoryID, C_TradeSkillUI.GetSubCategories(categoryID));
+		if subCategoryName then
+			return subCategoryName;
+		end
+	end
+	for i = 1, select("#", ...) do
+		local categoryID = select(i, ...);
+		if not C_TradeSkillUI.IsRecipeCategoryFiltered(categoryID) then
+			local categoryData = C_TradeSkillUI.GetCategoryInfo(categoryID);
+			return categoryData.name;
+		end
+	end
+	return nil;
+end
+
+local function GetUnfilteredInventorySlotName(...)
+	for i = 1, select("#", ...) do
+		if not C_TradeSkillUI.IsInventorySlotFiltered(i) then
+			local inventorySlot = select(i, ...);
+			return inventorySlot;
+		end
+	end
+	return nil;
+end
+
+function Skillet:UpdateFilterBar()
+	local filters = nil;
+	if C_TradeSkillUI.GetOnlyShowMakeableRecipes() then
+		filters = filters or {};
+		filters[#filters + 1] = CRAFT_IS_MAKEABLE;
+	end
+	if C_TradeSkillUI.GetOnlyShowSkillUpRecipes() then
+		filters = filters or {};
+		filters[#filters + 1] = TRADESKILL_FILTER_HAS_SKILL_UP;
+	end
+	if C_TradeSkillUI.AnyRecipeCategoriesFiltered() then
+		local categoryName = GetUnfilteredCategoryName(C_TradeSkillUI.GetCategories());
+		if categoryName then
+			filters = filters or {};
+			filters[#filters + 1] = categoryName;
+		end
+	end
+	if C_TradeSkillUI.AreAnyInventorySlotsFiltered() then
+		local inventorySlot = GetUnfilteredInventorySlotName(C_TradeSkillUI.GetAllFilterableInventorySlots());
+		if inventorySlot then
+			filters = filters or {};
+			filters[#filters + 1] = inventorySlot;
+		end
+	end
+	if not TradeSkillFrame_AreAllSourcesUnfiltered() then
+		local numSources = C_PetJournal.GetNumPetSources();
+		for i = 1, numSources do
+			if C_TradeSkillUI.IsAnyRecipeFromSource(i) and C_TradeSkillUI.IsRecipeSourceTypeFiltered(i) then
+				filters = filters or {};
+				filters[#filters + 1] = _G["BATTLE_PET_SOURCE_"..i];
+			end
+		end
+	end
+	if filters == nil then
+--[[
+		self.FilterBar:Hide();
+		self:SetHeight(LIST_FULL_HEIGHT);
+
+		self:SetPoint("TOPLEFT", 7, -83);
+		self.LearnedTab:SetPoint("BOTTOMLEFT", self, "TOPLEFT", 10, 3);
+		self.scrollBar:SetPoint("TOPLEFT", self, "TOPRIGHT", 1, -14);
+--]]
+		self.FilterBarText = nil
+		DA.DEBUG(0,"filter= "..tostring(self.FilterBarText))
+	else
+--[[
+		self:SetHeight(LIST_FULL_HEIGHT - ROW_HEIGHT);
+		self.FilterBar:Show();
+
+		self:SetPoint("TOPLEFT", 7, -83 - ROW_HEIGHT);
+		self.LearnedTab:SetPoint("BOTTOMLEFT", self, "TOPLEFT", 10, 3 + ROW_HEIGHT);
+		self.scrollBar:SetPoint("TOPLEFT", self, "TOPRIGHT", 1, -14 + ROW_HEIGHT);
+		self.FilterBar.Text:SetFormattedText("%s: %s", FILTER, table.concat(filters, PLAYER_LIST_DELIMITER));
+--]]
+		self.FilterBarText = table.concat(filters, PLAYER_LIST_DELIMITER)
+		DA.DEBUG(0,"filter= "..tostring(self.FilterBarText))
+	end
+end
+
+function Skillet:PrintTradeSkillFilter()
+	DA.DEBUG(0,"PrintTradeSkillFilter()")
+	self:UpdateFilterBar()
+end
+
 function Skillet:ExpandTradeSkillSubClass(i)
-	--DA.DEBUG(0,"Skillet:ExpandTradeSkillSubClass "..tostring(i))
+	--DA.DEBUG(0,"ExpandTradeSkillSubClass "..tostring(i))
 end
 
 function Skillet:GetRecipeName(id)
 	if not id then return "unknown" end
 	local name = GetSpellInfo(id)
 	--DA.DEBUG(0,"name "..(id or "nil").." "..(name or "nil"))
-	if name then 
-		return name, id 
+	if name then
+		return name, id
 	end
 end
 
 function Skillet:GetRecipe(id)
 	--DA.DEBUG(0,"Skillet:GetRecipe("..tostring(id)..")")
-	if id and id ~= 0 then 
+	if id and id ~= 0 then
 		if Skillet.data.recipeList[id] then
 			return Skillet.data.recipeList[id]
 		end
@@ -1632,17 +1746,19 @@ function Skillet:GetRecipeDataByTradeIndex(tradeID, index)
 end
 
 function Skillet:CalculateCraftableCounts(playerOverride)
-	--DA.DEBUG(0,"CalculateCraftableCounts("..tostring(playerOverride)..")")
+	DA.DEBUG(0,"CalculateCraftableCounts("..tostring(playerOverride)..")")
 	local player = playerOverride or self.currentPlayer
-	--DA.DEBUG(0,tostring(player).." "..tostring(self.currentTrade))
 	self.visited = {}
 	local n = self:GetNumSkills(player, self.currentTrade)
 	if n then
 		for i=1,n do
 			local skill = self:GetSkill(player, self.currentTrade, i)
-			if skill then -- skip headers
-				skill.numCraftable, skill.numRecursive, skill.numCraftableVendor, skill.numCraftableAlts = self:InventorySkillIterations(self.currentTrade, i, player)
-				--DA.DEBUG(2,"name= "..tostring(skill.name)..", numCraftable= "..tostring(skill.numCraftable)..", numRecursive= "..tostring(skill.numRecursive)..", numCraftableVendor= "..tostring(skill.numCraftableVendor)..", numCraftableAlts= "..tostring(skill.numCraftableAlts))
+			if skill and skill.id ~= 0 then -- skip headers
+				local recipe = self:GetRecipe(skill.id)
+				if recipe and recipe.reagentData and #recipe.reagentData > 0 then	-- make sure that recipe is in the database before continuing
+					skill.numCraftable, skill.numRecursive, skill.numCraftableVendor, skill.numCraftableAlts = self:InventorySkillIterations(self.currentTrade, recipe, player)
+					DA.DEBUG(2,"name= "..tostring(skill.name)..", numCraftable= "..tostring(skill.numCraftable)..", numRecursive= "..tostring(skill.numRecursive)..", numCraftableVendor= "..tostring(skill.numCraftableVendor)..", numCraftableAlts= "..tostring(skill.numCraftableAlts))
+				end
 			end
 		end
 	end
@@ -1689,20 +1805,20 @@ end
 
 function Skillet:ToggleFavorite(recipeID)
 	local recipeInfo = self.data.recipeInfo[self.currentTrade][recipeID]
-	recipeInfo.favorite = not recipeInfo.favorite 
+	recipeInfo.favorite = not recipeInfo.favorite
 	C_TradeSkillUI.SetRecipeFavorite(recipeID, recipeInfo.favorite);
 end
 
-function Skillet:IsUpgradeHidden(recipeID) 
+function Skillet:IsUpgradeHidden(recipeID)
 	local recipeInfo = Skillet.data.recipeInfo[Skillet.currentTrade][recipeID]
 	--filter out upgrades
-	if recipeInfo and recipeInfo.upgradeable then		
+	if recipeInfo and recipeInfo.upgradeable then
 		if Skillet.unlearnedRecipes then
 			-- for unlearned, show next upgrade to learn
 			if recipeInfo.recipeUpgrade ~= recipeInfo.learnedUpgrade + 1 then
 				return true
 			end
-	  	else
+		else
 			-- for learned, show only highest upgrade learned
 			if recipeInfo.recipeUpgrade ~= recipeInfo.learnedUpgrade then
 				return true
@@ -1710,10 +1826,9 @@ function Skillet:IsUpgradeHidden(recipeID)
 		end
 	end
 	return false
-end	
+end
 
-
-function Skillet:SetUpgradeLevels(recipeInfo) 
+function Skillet:SetUpgradeLevels(recipeInfo)
 	if recipeInfo.previousRecipeID or recipeInfo.nextRecipeID then
 		local n,m = 1,1
 		local firstRecipeInfo = recipeInfo
@@ -1752,6 +1867,42 @@ function Skillet:SetUpgradeLevels(recipeInfo)
 		recipeInfo.learnedUpgrade = l
 	end
 	return recipeInfo
+end
+
+local function GetRecipeList()
+	local dataList = {}
+	local currentCategoryID, currentParentCategoryID
+	local isCurrentCategoryEnabled, isCurrentParentCategoryEnabled = true, true
+	local filteredRecipeIDs = C_TradeSkillUI.GetFilteredRecipeIDs()
+	--DA.DEBUG(0,"#filteredRecipeIDs= "..tostring(#filteredRecipeIDs))
+	for i, recipeID in ipairs(filteredRecipeIDs) do
+		local recipeInfo = C_TradeSkillUI.GetRecipeInfo(recipeID)
+		if recipeInfo.categoryID ~= currentCategoryID then
+			local categoryData = C_TradeSkillUI.GetCategoryInfo(recipeInfo.categoryID)
+			isCurrentCategoryEnabled = categoryData.enabled
+			if categoryData.parentCategoryID ~= currentParentCategoryID then
+				currentParentCategoryID = categoryData.parentCategoryID
+				if currentParentCategoryID then
+					local parentCategoryData = C_TradeSkillUI.GetCategoryInfo(currentParentCategoryID)
+					isCurrentParentCategoryEnabled = parentCategoryData.enabled
+					if isCurrentParentCategoryEnabled then
+						--DA.DEBUG(1,"insert(1) recipeID= "..tostring(recipeID))
+						tinsert(dataList, recipeID)
+					end
+				else
+					isCurrentParentCategoryEnabled = true
+				end
+			elseif isCurrentCategoryEnabled and isCurrentParentCategoryEnabled then
+				--DA.DEBUG(1,"insert(2) recipeID= "..tostring(recipeID))
+				tinsert(dataList, recipeID)
+				currentCategoryID = recipeInfo.categoryID
+			end
+		elseif isCurrentCategoryEnabled and isCurrentParentCategoryEnabled then
+			--DA.DEBUG(1,"insert(3) recipeID= "..tostring(recipeID))
+			tinsert(dataList, recipeID)
+		end
+	end
+	return dataList
 end
 
 function Skillet:ScanTrade()
@@ -1803,11 +1954,13 @@ function Skillet:ScanTrade()
 		end
 	end
 
-	self:ResetTradeSkillFilter() -- verify the search filter is blank (so we get all skills)
 	Skillet.hasProgressBar = {} -- table of (sub)headers in this list with progress bars (used in MainFrame.lua)
-	Skillet.data.Filtered[tradeID] = C_TradeSkillUI.GetFilteredRecipeIDs()
-	local numSkills = #C_TradeSkillUI.GetFilteredRecipeIDs()
-	--DA.DEBUG(0,"ScanTrade: Expanding, "..tostring(profession)..":"..tostring(tradeID).." "..tostring(numSkills).." recipes")
+--	self:ResetTradeSkillFilter() -- verify the search filter is blank (so we get all skills)
+--	Skillet.data.Filtered[tradeID] = C_TradeSkillUI.GetFilteredRecipeIDs()
+	Skillet:PrintTradeSkillFilter()
+	Skillet.data.Filtered[tradeID] = GetRecipeList()
+	local numSkills = #Skillet.data.Filtered[tradeID]
+	DA.DEBUG(0,"ScanTrade: Expanding, "..tostring(profession)..":"..tostring(tradeID).." "..tostring(numSkills).." recipes")
 
 -- Build a list of categories (headers) used for this set of filtered recipes
 	local headerUsed = {}
@@ -1815,7 +1968,7 @@ function Skillet:ScanTrade()
 		local id = Skillet.data.Filtered[tradeID][i]
 		local info = C_TradeSkillUI.GetRecipeInfo(id)
 		headerUsed[info.categoryID] = false
-		info = self:SetUpgradeLevels(info) 
+		info = self:SetUpgradeLevels(info)
 		Skillet.data.recipeInfo[tradeID][id] = info
 	end
 
