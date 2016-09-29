@@ -138,10 +138,13 @@ function Skillet:CreateTradeSkillWindow()
 	titletext:SetShadowColor(0,0,0)
 	titletext:SetShadowOffset(1,-1)
 	titletext:SetTextColor(1,1,1)
-	titletext:SetText(L["Skillet Trade Skills"].." "..Skillet.version);
-	local label = _G["SkilletFilterLabel"];
---	label:SetText(L["Filter"]);
-	label:SetText(L["Search"]);
+	titletext:SetText(L["Skillet Trade Skills"].." "..Skillet.version)
+	local label = _G["SkilletNewFilterLabel"]
+	label:SetText(L["Filter"])
+	local label = _G["SkilletNewFilterText"]
+	label:SetText("")
+	local label = _G["SkilletFilterLabel"]
+	label:SetText(L["Search"])
 	SkilletPluginButton:SetText(L["Plugins"])
 	SkilletCreateAllButton:SetText(L["Create All"])
 	SkilletQueueAllButton:SetText(L["Queue All"])
@@ -2977,7 +2980,10 @@ function Skillet.InitializeDropdown(self, level)
 		info.func = function()
 			TradeSkillFrame_SetAllSourcesFiltered(true)
 			Skillet:ResetTradeSkillFilter() -- verify the search filter is blank (so we get all skills)
+			Skillet:SetTradeSkillOption("hideuncraftable", false)
+			Skillet:SetTradeSkillOption("filterLevel", 1)
 			UIDropDownMenu_RefreshAll(SkilletFilterDropDown, 3)
+			SkilletNewFilterText:SetText("")
 			Skillet.dataScanned = false
 			Skillet:UpdateTradeSkillWindow()
 		end
@@ -2987,6 +2993,7 @@ function Skillet.InitializeDropdown(self, level)
 		info.text = CRAFT_IS_MAKEABLE
 		info.func = function()
 			C_TradeSkillUI.SetOnlyShowMakeableRecipes(not C_TradeSkillUI.GetOnlyShowMakeableRecipes())
+			Skillet:SetTradeSkillOption("hideuncraftable", C_TradeSkillUI.GetOnlyShowMakeableRecipes())
 			Skillet.dataScanned = false
 			Skillet:UpdateTradeSkillWindow()
 		end
@@ -2999,6 +3006,11 @@ function Skillet.InitializeDropdown(self, level)
 			info.text = TRADESKILL_FILTER_HAS_SKILL_UP
 			info.func = function()
 				C_TradeSkillUI.SetOnlyShowSkillUpRecipes(not C_TradeSkillUI.GetOnlyShowSkillUpRecipes())
+				if C_TradeSkillUI.GetOnlyShowSkillUpRecipes() then
+					Skillet:SetTradeSkillOption("filterLevel", 2)
+				else
+					Skillet:SetTradeSkillOption("filterLevel", 1)
+				end
 				Skillet.dataScanned = false
 				Skillet:UpdateTradeSkillWindow()
 			end
@@ -3032,7 +3044,7 @@ function Skillet.InitializeDropdown(self, level)
 			local inventorySlots = {C_TradeSkillUI.GetAllFilterableInventorySlots()}
 			for i, inventorySlot in ipairs(inventorySlots) do
 				info.text = inventorySlot
-				info.func = function() 
+				info.func = function()
 					Skillet.SetSlotFilter(i)
 				end
 				info.notCheckable = true
@@ -3100,7 +3112,7 @@ function Skillet.InitializeDropdown(self, level)
 		for i, subCategoryID in ipairs(subCategories) do
 			local subCategoryData = C_TradeSkillUI.GetCategoryInfo(subCategoryID)
 			info.text = subCategoryData.name
-			info.func = function() 
+			info.func = function()
 				Skillet.SetSlotFilter(nil, categoryID, subCategoryId)
 			end
 			info.notCheckable = true
