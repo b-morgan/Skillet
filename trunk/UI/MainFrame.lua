@@ -28,7 +28,9 @@ local COLORGREEN =  "|cff40c040"
 local COLORGRAY =   "|cff808080"
 
 -- min height for Skillet window
-local SKILLET_MIN_HEIGHT = 545
+local SKILLET_MIN_HEIGHT = 575
+-- height of the header portion
+local SKILLET_HEADER_HEIGHT = 145
 
 -- min width for skill list window
 local SKILLET_SKILLLIST_MIN_WIDTH = 440
@@ -139,11 +141,11 @@ function Skillet:CreateTradeSkillWindow()
 	titletext:SetShadowOffset(1,-1)
 	titletext:SetTextColor(1,1,1)
 	titletext:SetText(L["Skillet Trade Skills"].." "..Skillet.version)
-	local label = _G["SkilletNewFilterLabel"]
-	label:SetText(L["Filter"])
-	local label = _G["SkilletNewFilterText"]
-	label:SetText("")
 	local label = _G["SkilletFilterLabel"]
+	label:SetText(L["Filter"])
+	local label = _G["SkilletFilterText"]
+	label:SetText("")
+	local label = _G["SkilletSearchLabel"]
 	label:SetText(L["Search"])
 	SkilletPluginButton:SetText(L["Plugins"])
 	SkilletCreateAllButton:SetText(L["Create All"])
@@ -167,11 +169,6 @@ function Skillet:CreateTradeSkillWindow()
 
 	-- Always want these visible.
 	SkilletItemCountInputBox:SetText("1");
-
---	SkilletCreateCountSlider:SetMinMaxValues(1, 20);
---	SkilletCreateCountSlider:SetValue(1);
---	SkilletCreateCountSlider:Show();
---	SkilletCreateCountSliderThumb:Show();
 
 	-- Progression status bar
 	SkilletRankFrame:SetStatusBarColor(0.2, 0.2, 1.0, 1.0)
@@ -305,8 +302,6 @@ function Skillet:ResetTradeSkillWindow()
 				last_button = button
 			end
 		end
-	 else
---	 	SkilletPluginButton:Hide()
 	 end
 end
 
@@ -325,20 +320,6 @@ function Skillet:TradeSkillRank_Updated()
 	end
 	DA.DEBUG(0,"TradeSkillRank_Updated over")
 end
-
--- Someone dragged the slider or set the value programatically.
---function Skillet:UpdateNumItemsSlider(item_count, clicked)
---	local value = floor(item_count + 0.5);
---	self.numItemsToCraft = value
---	if SkilletCreateCountSlider:IsVisible() then
---		SkilletItemCountInputBox:SetText(tostring(value))
---		SkilletItemCountInputBox:HighlightText()
---		if not clicked then
---			SkilletCreateCountSlider:SetValue(value)
-
---		end
---	end
---end
 
 function Skillet:ClickSkillButton(skillIndex)
 	if skillIndex and self.button_count then
@@ -438,10 +419,7 @@ function Skillet:ConfigureRecipeControls(enchant)
 		SkilletQueueButton:Hide()
 		SkilletCreateAllButton:Hide()
 		SkilletCreateButton:Hide()
---		SkilletCreateCountSlider:Hide()
---		SkilletCreateCountSliderThumb:Hide()
 		SkilletItemCountInputBox:Hide()
---        SkilletQueueParent:Hide()
 		SkilletStartQueueButton:Hide()
 		SkilletEmptyQueueButton:Hide()
 		SkilletEnchantButton:Show();
@@ -450,8 +428,6 @@ function Skillet:ConfigureRecipeControls(enchant)
 		SkilletQueueButton:Show()
 		SkilletCreateAllButton:Show()
 		SkilletCreateButton:Show()
---		SkilletCreateCountSlider:Show()
---		SkilletCreateCountSliderThumb:Show()
 		SkilletItemCountInputBox:Show()
 		SkilletQueueParent:Show()
 		SkilletStartQueueButton:Show()
@@ -459,7 +435,7 @@ function Skillet:ConfigureRecipeControls(enchant)
 		SkilletEnchantButton:Hide()
 	end
 	self:InitRecipeFilterButtons()
-	if self.currentPlayer ~= (UnitName("player")) then				-- only allow processing for the current player
+	if self.currentPlayer ~= (UnitName("player")) then		-- only allow processing for the current player
 		SkilletStartQueueButton:Disable()
 		SkilletCreateAllButton:Disable()
 		SkilletCreateButton:Disable()
@@ -627,7 +603,7 @@ function Skillet:UpdateTradeButtons(player)
 				button:SetCheckedTexture("")
 			end
 			button:ClearAllPoints()
-			button:SetPoint("BOTTOMLEFT", SkilletRankFrame, "TOPLEFT", position, 0)
+			button:SetPoint("BOTTOMLEFT", SkilletRankFrame, "TOPLEFT", position, 3)
 			local buttonIcon = _G[buttonName.."Icon"]
 			buttonIcon:SetTexture(spellIcon)
 			position = position + button:GetWidth()
@@ -673,7 +649,7 @@ function Skillet:UpdateTradeButtons(player)
 		--DA.DEBUG(0,"macrotext= "..tostring(macrotext))
 		button:SetAttribute("macrotext", macrotext)
 		button:ClearAllPoints()
-		button:SetPoint("BOTTOMLEFT", SkilletRankFrame, "TOPLEFT", position, 0)
+		button:SetPoint("BOTTOMLEFT", SkilletRankFrame, "TOPLEFT", position, 3)
 		local buttonIcon = _G[buttonName.."Icon"]
 		buttonIcon:SetTexture(spellIcon)
 		position = position + button:GetWidth()
@@ -847,7 +823,7 @@ function Skillet:internal_UpdateTradeSkillWindow()
 --	SkilletPlayerSelectText:SetText(self.currentPlayer)
 	SkilletPlayerSelect:Hide()		-- Currently doesn't do anything and the player name is in the title
 	-- it seems the resize for the main skillet window happens before the resize for the skill list box
-	local button_count = (SkilletFrame:GetHeight() - 115) / SKILLET_TRADE_SKILL_HEIGHT
+	local button_count = (SkilletFrame:GetHeight() - SKILLET_HEADER_HEIGHT) / SKILLET_TRADE_SKILL_HEIGHT
 	button_count = math.floor(button_count)
 	self.button_count = button_count
 	-- Update the scroll frame
@@ -2983,7 +2959,7 @@ function Skillet.InitializeDropdown(self, level)
 			Skillet:SetTradeSkillOption("hideuncraftable", false)
 			Skillet:SetTradeSkillOption("filterLevel", 1)
 			UIDropDownMenu_RefreshAll(SkilletFilterDropDown, 3)
-			SkilletNewFilterText:SetText("")
+			SkilletFilterText:SetText("")
 			Skillet.dataScanned = false
 			Skillet:UpdateTradeSkillWindow()
 		end

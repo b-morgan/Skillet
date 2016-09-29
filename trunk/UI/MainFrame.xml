@@ -97,7 +97,7 @@
 		<Anchors>
 			<Anchor point="TOPRIGHT">
 				<Offset>
-					<AbsDimension x="-12" y="-75"/>
+					<AbsDimension x="-12" y="-78"/>
 				</Offset>
 			</Anchor>
 		</Anchors>
@@ -1258,7 +1258,7 @@
 			# Drop down where users can select the new filter they want to use
 			#
 			-->
-			<Frame name="SkilletNewFilterDropdown" inherits="UIDropDownMenuTemplate">
+			<Frame name="SkilletFilterDropdown" inherits="UIDropDownMenuTemplate">
 				<Anchors>
 					<Anchor point="TOPLEFT" relativeTo="SkilletSortDropdown" relativePoint="BOTTOMLEFT">
 						<Offset>
@@ -1268,7 +1268,7 @@
 				</Anchors>
 				<Layers>
 					<Layer level="ARTWORK">
-						<FontString name="SkilletNewFilterLabel" inherits="GameFontNormal" text="Sorting">
+						<FontString name="SkilletFilterLabel" inherits="GameFontNormal" text="Sorting">
 							<Anchors>
 								<Anchor point="RIGHT" relativeTo="$parent" relativePoint="LEFT">
 									<Offset>
@@ -1282,19 +1282,19 @@
 				</Layers>
 				<Scripts>
 					<OnLoad>
-						Skillet:NewFilterDropdown_OnLoad()
+						Skillet:FilterDropDown_OnLoad()
 					</OnLoad>
 					<OnShow>
-						Skillet:NewFilterDropdown_OnShow()
+						Skillet:FilterDropDown_OnShow()
 					</OnShow>
 				</Scripts>
 			</Frame>
-			<Button name="SkilletNewFilterOperations">
+			<Button name="SkilletFilterOperations">
 				<Size>
 					<AbsDimension x="20" y="20"/>
 				</Size>
 				<Anchors>
-					<Anchor point="LEFT" relativeTo="SkilletNewFilterDropdownButton" relativePoint="RIGHT">
+					<Anchor point="LEFT" relativeTo="SkilletFilterDropdownButton" relativePoint="RIGHT">
 						<Offset>
 							<AbsDimension x="-2" y="0"/>
 						</Offset>
@@ -1302,7 +1302,7 @@
 				</Anchors>
 				<Layers>
 					<Layer level="ARTWORK">
-						<FontString name="SkilletNewFilterText" inherits="GameFontNormalSmall" text="Filter text goes here">
+						<FontString name="SkilletFilterText" inherits="GameFontNormalSmall" wordwrap="false" justifyH="LEFT">
 							<Anchors>
 								<Anchor point="LEFT" relativeTo="$parent" relativePoint="RIGHT">
 									<Offset>
@@ -1337,12 +1337,12 @@
 			# An edit box where users can type in filter text
 			#
 			-->
-			<EditBox name="SkilletFilterBox" letters="50" historyLines="0" autoFocus="false">
+			<EditBox name="SkilletSearchBox" letters="50" historyLines="0" autoFocus="false">
 				<Size>
 					<AbsDimension x="126" y="20"/>
 				</Size>
 				<Anchors>
-					<Anchor point="TOPLEFT" relativeTo="SkilletNewFilterDropdown" relativePoint="BOTTOMLEFT">
+					<Anchor point="TOPLEFT" relativeTo="SkilletFilterDropdown" relativePoint="BOTTOMLEFT">
 						<Offset>
 							<AbsDimension x="22" y="4"/>
 						</Offset>
@@ -1388,7 +1388,7 @@
 						</Texture>
 					</Layer>
 					<Layer level="ARTWORK">
-						<FontString name="SkilletFilterLabel" inherits="GameFontNormal" text="Search">
+						<FontString name="SkilletSearchLabel" inherits="GameFontNormal" text="Search">
 							<Anchors>
 								<Anchor point="RIGHT" relativeTo="$parent" relativePoint="LEFT">
 									<Offset>
@@ -1428,7 +1428,7 @@
 					<AbsDimension x="32" y="32"/>
 				</Size>
 				<Anchors>
-					<Anchor point="LEFT" relativeTo="SkilletFilterBox" relativePoint="RIGHT">
+					<Anchor point="LEFT" relativeTo="SkilletSearchBox" relativePoint="RIGHT">
 						<Offset>
 							<AbsDimension x="-8" y="-2"/>
 						</Offset>
@@ -1440,8 +1440,8 @@
 				<Scripts>
 					<OnClick>
 						Skillet:InventoryFilterButtons_Hide()
-						SkilletFilterBox:SetText("")
-						SkilletFilterBox:ClearFocus()
+						SkilletSearchBox:SetText("")
+						SkilletSearchBox:ClearFocus()
 					</OnClick>
 				</Scripts>
 			</Button>
@@ -2596,54 +2596,6 @@
 					</OnClick>
 				</Scripts>
 			</Button>
-			<!--
-			#
-			# The slider to select the number of items to be crafted
-			#
-			-->
-<!--
-			<Slider name="SkilletCreateCountSlider" orientation="HORIZONTAL" enableMouse="true" parent="SkilletFrame">
-				<Size>
-					<AbsDimension x="135" y="17"/>
-				</Size>
-				<Anchors>
-					<Anchor point="LEFT" relativeTo="SkilletCreateAllButton" relativePoint="RIGHT">
-						<Offset>
-							<AbsDimension x="5" y="0"/>
-						</Offset>
-					</Anchor>
-					<Anchor point="RIGHT" relativeTo="SkilletCreateButton" relativePoint="LEFT">
-						<Offset>
-							<AbsDimension x="-5" y="0"/>
-						</Offset>
-					</Anchor>
-				</Anchors>
-				<HitRectInsets>
-					<AbsInset left="0" right="0" top="-10" bottom="-10"/>
-				</HitRectInsets>
-				<Backdrop bgFile="Interface\Buttons\UI-SliderBar-Background" edgeFile="Interface\Buttons\UI-SliderBar-Border" tile="true">
-					<EdgeSize>
-						<AbsValue val="8"/>
-					</EdgeSize>
-					<TileSize>
-						<AbsValue val="8"/>
-					</TileSize>
-					<BackgroundInsets>
-						<AbsInset left="3" right="3" top="6" bottom="6"/>
-					</BackgroundInsets>
-				</Backdrop>
-				<ThumbTexture name="$parentThumb" file="Interface\Buttons\UI-SliderBar-Button-Horizontal">
-					<Size>
-						<AbsDimension x="32" y="32"/>
-					</Size>
-				</ThumbTexture>
-				<Scripts>
-					<OnValueChanged>
-						Skillet:UpdateNumItemsSlider(value, true);
-					</OnValueChanged>
-				</Scripts>
-			</Slider>
--->
 			<!--
 			#
 			# The text box where they can enter the number of items to craft.
