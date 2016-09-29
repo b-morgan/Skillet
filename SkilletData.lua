@@ -1401,7 +1401,7 @@ function Skillet:SetTradeSkillLearned()
 	C_TradeSkillUI.SetOnlyShowUnlearnedRecipes(false);
 	Skillet.unlearnedRecipes = false
 	Skillet.selectedSkill = nil
-	Skillet:NewFilterDropdown_OnShow()
+	Skillet:FilterDropDown_OnShow()
 end
 
 function Skillet:SetTradeSkillUnlearned()
@@ -1410,7 +1410,7 @@ function Skillet:SetTradeSkillUnlearned()
 	C_TradeSkillUI.SetOnlyShowUnlearnedRecipes(true);
 	Skillet.unlearnedRecipes = true
 	Skillet.selectedSkill = nil
-	Skillet:NewFilterDropdown_OnShow()
+	Skillet:FilterDropDown_OnShow()
 end
 
 local function GetUnfilteredSubCategoryName(categoryID, ...)
@@ -1499,11 +1499,15 @@ function Skillet:UpdateFilterBar()
 	if filters == nil then
 		self.FilterBarText = nil
 		DA.DEBUG(0,"filter= "..tostring(self.FilterBarText))
-		SkilletNewFilterText:SetText("")
+		SkilletFilterText:SetText("")
 	else
 		self.FilterBarText = table.concat(filters, PLAYER_LIST_DELIMITER)
 		DA.DEBUG(0,"filter= "..tostring(self.FilterBarText))
-		SkilletNewFilterText:SetFormattedText("%s: %s", FILTER, self.FilterBarText)
+		SkilletFilterText:SetFormattedText("%s: %s", FILTER, self.FilterBarText)
+		local offset = SkilletFilterText:GetLeft() - SkilletFrame:GetLeft()
+		DA.DEBUG(0,"offset= "..tostring(offset))
+		local max_text_width = SkilletFrame:GetWidth() - offset - 20 
+		SkilletFilterText:SetWidth(max_text_width)
 	end
 end
 
@@ -1951,10 +1955,14 @@ function Skillet:ScanTrade()
 	local headerUsed = {}
 	for i = 1, numSkills do
 		local id = Skillet.data.Filtered[tradeID][i]
-		local info = C_TradeSkillUI.GetRecipeInfo(id)
-		headerUsed[info.categoryID] = false
-		info = self:SetUpgradeLevels(info)
-		Skillet.data.recipeInfo[tradeID][id] = info
+		if id then
+			local info = C_TradeSkillUI.GetRecipeInfo(id)
+			if info then
+				headerUsed[info.categoryID] = false
+				info = self:SetUpgradeLevels(info)
+				Skillet.data.recipeInfo[tradeID][id] = info
+			end
+		end
 	end
 
 	local skillDB = Skillet.db.realm.skillDB[player][tradeID]

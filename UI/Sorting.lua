@@ -195,9 +195,9 @@ local function SkillIsFilteredOut(skillIndex)
 		end
 	end
 	-- string search
-	local filtertext = Skillet:GetTradeSkillOption("filtertext")
-	if filtertext and filtertext ~= "" then
-		local filter = string.lower(filtertext)
+	local searchtext = Skillet:GetTradeSkillOption("searchtext")
+	if searchtext and searchtext ~= "" then
+		local filter = string.lower(searchtext)
 		local nameOnly = false
 		if string.sub(filter,1,1) == "!" then
 			filter = string.sub(filter,2)
@@ -380,10 +380,10 @@ function Skillet:internal_SortAndFilterRecipes()
 	local oldLength = #sortedSkillList
 	--DA.DEBUG(1,"numSkills= "..tostring(numSkills)..", oldLength= ",tostring(oldLength))
 	local button_index = 0
-	local filtertext = Skillet:GetTradeSkillOption("filtertext")
+	local searchtext = Skillet:GetTradeSkillOption("searchtext")
 	local groupLabel = Skillet.currentGroupLabel
-	--DA.DEBUG(1,"filtertext="..tostring(filtertext)..", groupLabel="..tostring(groupLabel))
-	if filtertext and filtertext ~= "" or groupLabel == "Flat" then
+	--DA.DEBUG(1,"searchtext="..tostring(searchtext)..", groupLabel="..tostring(groupLabel))
+	if searchtext and searchtext ~= "" or groupLabel == "Flat" then
 		--DA.DEBUG(1,"SortAndFilterRecipes Flat")
 		for i=1, numSkills, 1 do
 			local skill = Skillet:GetSkill(Skillet.currentPlayer, Skillet.currentTrade, i)
@@ -494,33 +494,33 @@ function Skillet:SortDropdown_OnClick()
 end
 
 -- called when the new filter drop down is first loaded
-function Skillet:NewFilterDropdown_OnLoad()
-	--DA.DEBUG(0,"NewFilterDropdown_OnLoad()")
-	UIDropDownMenu_Initialize(SkilletNewFilterDropdown, Skillet.NewFilterDropdown_Initialize)
-	SkilletNewFilterDropdown.displayMode = "MENU"  -- changes the pop-up borders to be rounded instead of square
+function Skillet:FilterDropDown_OnLoad()
+	--DA.DEBUG(0,"FilterDropDown_OnLoad()")
+	UIDropDownMenu_Initialize(SkilletFilterDropdown, Skillet.FilterDropDown_Initialize)
+	SkilletFilterDropdown.displayMode = "MENU"  -- changes the pop-up borders to be rounded instead of square
 end
 
 -- Called when the new filter drop down is displayed
-function Skillet:NewFilterDropdown_OnShow()
-	--DA.DEBUG(0,"NewFilterDropdown_OnShow()")
-	UIDropDownMenu_Initialize(SkilletNewFilterDropdown, Skillet.NewFilterDropdown_Initialize)
-	SkilletNewFilterDropdown.displayMode = "MENU"  -- changes the pop-up borders to be rounded instead of square
+function Skillet:FilterDropDown_OnShow()
+	--DA.DEBUG(0,"FilterDropDown_OnShow()")
+	UIDropDownMenu_Initialize(SkilletFilterDropdown, Skillet.FilterDropDown_Initialize)
+	SkilletFilterDropdown.displayMode = "MENU"  -- changes the pop-up borders to be rounded instead of square
 	if Skillet.unlearnedRecipes then
-		UIDropDownMenu_SetSelectedID(SkilletNewFilterDropdown, 2)
+		UIDropDownMenu_SetSelectedID(SkilletFilterDropdown, 2)
 	else
-		UIDropDownMenu_SetSelectedID(SkilletNewFilterDropdown, 1)
+		UIDropDownMenu_SetSelectedID(SkilletFilterDropdown, 1)
 	end
 end
 
 -- The method we use the initialize the new filter drop down.
-function Skillet:NewFilterDropdown_Initialize()
-	--DA.DEBUG(0,"NewFilterDropdown_Initialize()")
+function Skillet:FilterDropDown_Initialize()
+	--DA.DEBUG(0,"FilterDropDown_Initialize()")
 	local info
 	local i = 1
 
 	info = UIDropDownMenu_CreateInfo()
 	info.text = L["Learned"]
-	info.func = Skillet.NewFilterDropdown_OnClick
+	info.func = Skillet.FilterDropDown_OnClick
 	info.value = i
 	if self then
 		info.owner = self:GetParent()
@@ -530,7 +530,7 @@ function Skillet:NewFilterDropdown_Initialize()
 
 	info = UIDropDownMenu_CreateInfo()
 	info.text = L["Unlearned"]
-	info.func = Skillet.NewFilterDropdown_OnClick
+	info.func = Skillet.FilterDropDown_OnClick
 	info.value = i
 	if self then
 		info.owner = self:GetParent()
@@ -540,9 +540,9 @@ function Skillet:NewFilterDropdown_Initialize()
 end
 
 -- Called when the user selects an item in the new filter drop down
-function Skillet:NewFilterDropdown_OnClick()
-	--DA.DEBUG(0,"NewFilterDropdown_OnClick()")
-	UIDropDownMenu_SetSelectedID(SkilletNewFilterDropdown, self:GetID())
+function Skillet:FilterDropDown_OnClick()
+	--DA.DEBUG(0,"FilterDropDown_OnClick()")
+	UIDropDownMenu_SetSelectedID(SkilletFilterDropdown, self:GetID())
 	local index = self:GetID()
 	if index == 1 then
 		Skillet:SetTradeSkillLearned()
