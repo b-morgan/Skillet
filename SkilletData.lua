@@ -1464,61 +1464,46 @@ local function GetUnfilteredInventorySlotName(...)
 end
 
 function Skillet:UpdateFilterBar()
-	local filters = nil;
+	local filters = nil
 	if C_TradeSkillUI.GetOnlyShowMakeableRecipes() then
-		filters = filters or {};
-		filters[#filters + 1] = CRAFT_IS_MAKEABLE;
+		filters = filters or {}
+		filters[#filters + 1] = CRAFT_IS_MAKEABLE
 	end
 	if C_TradeSkillUI.GetOnlyShowSkillUpRecipes() then
-		filters = filters or {};
-		filters[#filters + 1] = TRADESKILL_FILTER_HAS_SKILL_UP;
+		filters = filters or {}
+		filters[#filters + 1] = TRADESKILL_FILTER_HAS_SKILL_UP
 	end
 	if C_TradeSkillUI.AnyRecipeCategoriesFiltered() then
-		local categoryName = GetUnfilteredCategoryName(C_TradeSkillUI.GetCategories());
+		local categoryName = GetUnfilteredCategoryName(C_TradeSkillUI.GetCategories())
 		if categoryName then
-			filters = filters or {};
-			filters[#filters + 1] = categoryName;
+			filters = filters or {}
+			filters[#filters + 1] = categoryName
 		end
 	end
 	if C_TradeSkillUI.AreAnyInventorySlotsFiltered() then
-		local inventorySlot = GetUnfilteredInventorySlotName(C_TradeSkillUI.GetAllFilterableInventorySlots());
+		local inventorySlot = GetUnfilteredInventorySlotName(C_TradeSkillUI.GetAllFilterableInventorySlots())
 		if inventorySlot then
-			filters = filters or {};
-			filters[#filters + 1] = inventorySlot;
+			filters = filters or {}
+			filters[#filters + 1] = inventorySlot
 		end
 	end
 	if not TradeSkillFrame_AreAllSourcesUnfiltered() then
-		local numSources = C_PetJournal.GetNumPetSources();
+		local numSources = C_PetJournal.GetNumPetSources()
 		for i = 1, numSources do
 			if C_TradeSkillUI.IsAnyRecipeFromSource(i) and C_TradeSkillUI.IsRecipeSourceTypeFiltered(i) then
-				filters = filters or {};
-				filters[#filters + 1] = _G["BATTLE_PET_SOURCE_"..i];
+				filters = filters or {}
+				filters[#filters + 1] = "not ".._G["BATTLE_PET_SOURCE_"..i]
 			end
 		end
 	end
 	if filters == nil then
---[[
-		self.FilterBar:Hide();
-		self:SetHeight(LIST_FULL_HEIGHT);
-
-		self:SetPoint("TOPLEFT", 7, -83);
-		self.LearnedTab:SetPoint("BOTTOMLEFT", self, "TOPLEFT", 10, 3);
-		self.scrollBar:SetPoint("TOPLEFT", self, "TOPRIGHT", 1, -14);
---]]
 		self.FilterBarText = nil
 		DA.DEBUG(0,"filter= "..tostring(self.FilterBarText))
+		SkilletNewFilterText:SetText("")
 	else
---[[
-		self:SetHeight(LIST_FULL_HEIGHT - ROW_HEIGHT);
-		self.FilterBar:Show();
-
-		self:SetPoint("TOPLEFT", 7, -83 - ROW_HEIGHT);
-		self.LearnedTab:SetPoint("BOTTOMLEFT", self, "TOPLEFT", 10, 3 + ROW_HEIGHT);
-		self.scrollBar:SetPoint("TOPLEFT", self, "TOPRIGHT", 1, -14 + ROW_HEIGHT);
-		self.FilterBar.Text:SetFormattedText("%s: %s", FILTER, table.concat(filters, PLAYER_LIST_DELIMITER));
---]]
 		self.FilterBarText = table.concat(filters, PLAYER_LIST_DELIMITER)
 		DA.DEBUG(0,"filter= "..tostring(self.FilterBarText))
+		SkilletNewFilterText:SetFormattedText("%s: %s", FILTER, self.FilterBarText)
 	end
 end
 

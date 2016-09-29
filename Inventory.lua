@@ -71,7 +71,7 @@ function Skillet:InventoryReagentCraftability(reagentID, playerOverride)
 end
 
 -- recipe iteration check: calculate how many times a recipe can be iterated with materials available
--- (not to be confused with the reagent craftability which is designed to determine how many 
+-- (not to be confused with the reagent craftability which is designed to determine how many
 -- craftable reagents are available for recipe iterations)
 function Skillet:InventorySkillIterations(tradeID, recipe, playerOverride)
 	--DA.DEBUG(1,"InventorySkillIterations("..tostring(tradeID)..", "..DA.DUMP1(recipe)..", "..tostring(playerOverride)..")")
@@ -195,7 +195,7 @@ end
 
 function Skillet:GetInventory(player, reagentID)
 	if player and reagentID then
-		if self.db.realm.inventoryData[player] and self.db.realm.inventoryData[player][reagentID] then 
+		if self.db.realm.inventoryData[player] and self.db.realm.inventoryData[player][reagentID] then
 			local data = { string.split(" ", self.db.realm.inventoryData[player][reagentID]) }
 			if #data == 1 then			-- no craftability info yet
 				return tonumber(data[1]) or 0, 0

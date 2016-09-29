@@ -230,7 +230,7 @@
 				GameTooltip:Hide();
 			</OnLeave>
 		</Scripts>
-	</Button>	
+	</Button>
 	<Button name="SkilletEmptySpaceTemplate" virtual="true">
 		<Scripts>
 			<OnLoad>
@@ -832,7 +832,7 @@
 				<Texture parentKey="EarnedStar" atlas="tradeskills-star"/>
 			</Layer>
 		</Layers>
-	</Frame>	
+	</Frame>
 	<!--
 	#
 	# Tool tip to be used when hovering over recipe lines in the skill list
@@ -1032,7 +1032,7 @@
 				<Anchors>
 					<Anchor point="TOPLEFT" relativeTo="SkilletFrame" relativePoint="TOPLEFT">
 						<Offset>
-							<AbsDimension x="10" y="-100"/>
+							<AbsDimension x="10" y="-130"/>
 						</Offset>
 					</Anchor>
 					<Anchor point="BOTTOM" relativeTo="SkilletFrame" relativePoint="BOTTOM">
@@ -1144,7 +1144,7 @@
 				<Anchors>
 					<Anchor point="BOTTOMLEFT" relativeTo="SkilletSkillListParent" relativePoint="TOPLEFT">
 						<Offset>
-							<AbsDimension x="60" y="38"/>
+							<AbsDimension x="60" y="68"/>
 						</Offset>
 					</Anchor>
 				</Anchors>
@@ -1198,7 +1198,7 @@
 				<Anchors>
 					<Anchor point="TOPLEFT" relativeTo="SkilletRecipeGroupDropdown" relativePoint="BOTTOMLEFT">
 						<Offset>
-							<AbsDimension x="0" y="8"/>
+							<AbsDimension x="0" y="6"/>
 						</Offset>
 					</Anchor>
 				</Anchors>
@@ -1260,12 +1260,26 @@
 			-->
 			<Frame name="SkilletNewFilterDropdown" inherits="UIDropDownMenuTemplate">
 				<Anchors>
-					<Anchor point="LEFT" relativeTo="SkilletSortDescButton" relativePoint="RIGHT">
+					<Anchor point="TOPLEFT" relativeTo="SkilletSortDropdown" relativePoint="BOTTOMLEFT">
 						<Offset>
-							<AbsDimension x="-8" y="-1"/>
+							<AbsDimension x="0" y="6"/>
 						</Offset>
 					</Anchor>
 				</Anchors>
+				<Layers>
+					<Layer level="ARTWORK">
+						<FontString name="SkilletNewFilterLabel" inherits="GameFontNormal" text="Sorting">
+							<Anchors>
+								<Anchor point="RIGHT" relativeTo="$parent" relativePoint="LEFT">
+									<Offset>
+										<AbsDimension x="15" y="2"/>
+									</Offset>
+								</Anchor>
+							</Anchors>
+							<Color r="1" g="1" b="1" a="1"/>
+						</FontString>
+					</Layer>
+				</Layers>
 				<Scripts>
 					<OnLoad>
 						Skillet:NewFilterDropdown_OnLoad()
@@ -1286,6 +1300,20 @@
 						</Offset>
 					</Anchor>
 				</Anchors>
+				<Layers>
+					<Layer level="ARTWORK">
+						<FontString name="SkilletNewFilterText" inherits="GameFontNormalSmall" text="Filter text goes here">
+							<Anchors>
+								<Anchor point="LEFT" relativeTo="$parent" relativePoint="RIGHT">
+									<Offset>
+										<AbsDimension x="10" y="0"/>
+									</Offset>
+								</Anchor>
+							</Anchors>
+							<Color r="1" g="1" b="1" a="1"/>
+						</FontString>
+					</Layer>
+				</Layers>
 				<NormalTexture file="Interface\Buttons\UI-SpellbookIcon-NextPage-Up"/>
 				<PushedTexture file="Interface\Buttons\UI-SpellbookIcon-NextPage-Down"/>
 				<HighlightTexture file="Interface\Buttons\ButtonHilight-Round" alphaMode="ADD"/>
@@ -1314,9 +1342,9 @@
 					<AbsDimension x="126" y="20"/>
 				</Size>
 				<Anchors>
-					<Anchor point="TOPLEFT" relativeTo="SkilletSortDropdown" relativePoint="BOTTOMLEFT">
+					<Anchor point="TOPLEFT" relativeTo="SkilletNewFilterDropdown" relativePoint="BOTTOMLEFT">
 						<Offset>
-							<AbsDimension x="22" y="6"/>
+							<AbsDimension x="22" y="4"/>
 						</Offset>
 					</Anchor>
 				</Anchors>
@@ -1364,7 +1392,7 @@
 							<Anchors>
 								<Anchor point="RIGHT" relativeTo="$parent" relativePoint="LEFT">
 									<Offset>
-										<AbsDimension x="-5" y="0"/>
+										<AbsDimension x="-8" y="0"/>
 									</Offset>
 								</Anchor>
 							</Anchors>
@@ -1458,6 +1486,7 @@
 							end
 							local before = Skillet:GetTradeSkillOption("hideuncraftable")
 							Skillet:SetTradeSkillOption("hideuncraftable", not before)
+							C_TradeSkillUI.SetOnlyShowMakeableRecipes(not before)
 							Skillet:SortAndFilterRecipes()
 							Skillet:UpdateTradeSkillWindow()
 						else
@@ -1631,6 +1660,9 @@
 						local scale = SkilletFrame:GetEffectiveScale()
 						local newLevel = math.floor(4*(y/scale-bottom)/(top-bottom+1)+1)
 						Skillet:SetTradeSkillOption("filterLevel", newLevel)
+						if newLevel > 1 then
+							C_TradeSkillUI.SetOnlyShowSkillUpRecipes(true)
+						end
 						self:Hide()
 						SkilletRecipeDifficultyButton:Show()
 						Skillet:SortAndFilterRecipes()
@@ -1710,9 +1742,9 @@
 				<Scripts>
 					<OnShow>
 						Skillet:FavoritesOnlyRefresh()
-					</OnShow>				
+					</OnShow>
 					<OnClick>
-					    Skillet:SetTradeSkillOption("favoritesOnly", not Skillet:GetTradeSkillOption("favoritesOnly"))
+						Skillet:SetTradeSkillOption("favoritesOnly", not Skillet:GetTradeSkillOption("favoritesOnly"))
 						Skillet:FavoritesOnlyRefresh()
 						Skillet:SortAndFilterRecipes()
   						Skillet:UpdateTradeSkillWindow()
@@ -1724,7 +1756,7 @@
 					</OnEnter>
 					<OnLeave>
 						GameTooltip:Hide();
-					</OnLeave>					
+					</OnLeave>
 				</Scripts>
 			</Button>
 			<!--
@@ -1795,7 +1827,7 @@
 				<Anchors>
 					<Anchor point="TOPRIGHT" relativeTo="SkilletFrame" relativePoint="TOPRIGHT">
 						<Offset>
-							<AbsDimension x="-10" y="-100"/>
+							<AbsDimension x="-10" y="-130"/>
 						</Offset>
 					</Anchor>
 				</Anchors>
@@ -1927,7 +1959,7 @@
 					</OnEnter>
 					<OnLeave function="GameTooltip_Hide" />
 				</Scripts>
-			</Frame>			
+			</Frame>
 			<Frame name="SkilletQueueManagementParent" parent="SkilletFrame" hidden="true">
 				<Size>
 					<AbsDimension x="280" y="260"/>
@@ -2569,7 +2601,7 @@
 			# The slider to select the number of items to be crafted
 			#
 			-->
-<!--			
+<!--
 			<Slider name="SkilletCreateCountSlider" orientation="HORIZONTAL" enableMouse="true" parent="SkilletFrame">
 				<Size>
 					<AbsDimension x="135" y="17"/>
@@ -2716,8 +2748,8 @@
 				</PushedTexture>
 				<DisabledTexture file="Interface\Addons\Skillet\Icons\Buttons\PrevPrevPage-Disabled">
 					<TexCoords left="0" right="0.640625" top="0" bottom="0.5"/>
-				</DisabledTexture>				
-				<HighlightTexture file="Interface\Buttons\UI-Common-MouseHilight" alphaMode="ADD"/>				
+				</DisabledTexture>
+				<HighlightTexture file="Interface\Buttons\UI-Common-MouseHilight" alphaMode="ADD"/>
 			</Button>
 			<Button name="SkilletSub1Button" parent="SkilletFrame">
 				<Size>
@@ -2741,7 +2773,7 @@
 				<NormalTexture file="Interface\Addons\Skillet\Icons\Buttons\PrevPage-Up"/>
 				<PushedTexture file="Interface\Addons\Skillet\Icons\Buttons\PrevPage-Down"/>
 				<DisabledTexture file="Interface\Addons\Skillet\Icons\Buttons\PrevPage-Disabled"/>
-				<HighlightTexture file="Interface\Buttons\UI-Common-MouseHilight" alphaMode="ADD"/>				
+				<HighlightTexture file="Interface\Buttons\UI-Common-MouseHilight" alphaMode="ADD"/>
 			</Button>
 			<Button name="SkilletAdd1Button" parent="SkilletFrame">
 				<Size>
@@ -2765,7 +2797,7 @@
 				<NormalTexture file="Interface\Addons\Skillet\Icons\Buttons\NextPage-Up"/>
 				<PushedTexture file="Interface\Addons\Skillet\Icons\Buttons\NextPage-Down"/>
 				<DisabledTexture file="Interface\Addons\Skillet\Icons\Buttons\NextPage-Disabled"/>
-				<HighlightTexture file="Interface\Buttons\UI-Common-MouseHilight" alphaMode="ADD"/>				
+				<HighlightTexture file="Interface\Buttons\UI-Common-MouseHilight" alphaMode="ADD"/>
 			</Button>
 			<Button name="SkilletAdd10Button" parent="SkilletFrame">
 				<Size>
@@ -2795,8 +2827,8 @@
 				<DisabledTexture file="Interface\Addons\Skillet\Icons\Buttons\NextNextPage-Disabled">
 					<TexCoords left="0" right="0.640625" top="0" bottom="0.5"/>
 				</DisabledTexture>
-				<HighlightTexture file="Interface\Buttons\UI-Common-MouseHilight" alphaMode="ADD"/>				
-			</Button>			
+				<HighlightTexture file="Interface\Buttons\UI-Common-MouseHilight" alphaMode="ADD"/>
+			</Button>
 			<Button name="SkilletClearNumButton" parent="SkilletFrame">
 				<Size>
 					<AbsDimension x="32" y="32"/>
@@ -2816,7 +2848,7 @@
 				<NormalTexture file="Interface\Buttons\CancelButton-Up"/>
 				<PushedTexture file="Interface\Buttons\CancelButton-Down"/>
 				<HighlightTexture file="Interface\Buttons\CancelButton-Highlight" alphaMode="ADD"/>
-			</Button>			
+			</Button>
 			<!--
 			#
 			# A frame to hold the queue and buttons

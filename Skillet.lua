@@ -911,7 +911,7 @@ function Skillet:OnInitialize()
 	end
 
 -- Initialize global data
-	self.db.global.version = self.version	-- save a copy for 
+	self.db.global.version = self.version	-- save a copy for
 	self.db.global.package = self.package	-- post-mortem purposes
 	if not self.db.global.recipeDB then
 		self.db.global.recipeDB = {}
