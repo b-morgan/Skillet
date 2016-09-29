@@ -34,31 +34,6 @@ local MAJOR_VERSION = GetAddOnMetadata("Skillet", "Version");
 local PACKAGE_VERSION = GetAddOnMetadata("Skillet", "X-Curse-Packaged-Version");
 Skillet.version = MAJOR_VERSION
 Skillet.package = PACKAGE_VERSION
-Skillet.alpha = 2 -- Assume this is a released version of Skillet
-if PACKAGE_VERSION then
-	if PACKAGE_VERSION ~= MAJOR_VERSION then
-		if not string.find(string.lower(PACKAGE_VERSION), "beta") then
-			Skillet.alpha = 0 -- 0 = This is most likely an alpha version of Skillet, ask the user. 2 = always use Skillet
-		end
-	end
-end
-
-StaticPopupDialogs["Skillet_Alpha"] = {
-	text = "You are using an alpha build of Skillet.\nThis build may not work.\nDo you wish to continue?\n",
-	button1 = TEXT(ACCEPT),
-	button2 = TEXT(CANCEL),
-	OnAccept = function(this)
-		Skillet.alpha = 2
-	end,
-	OnCancel = function(this, data, reason)
-		Skillet.alpha = 1
-	end,
-	timeout = 0,
-	hideOnEscape = 1,
-	exclusive = 1,
-	whileDead = 1,
-	preferredIndex = 3,
-}
 
 local nonLinkingTrade = { [2656] = true, [53428] = true }				-- smelting, runeforging
 
@@ -1337,21 +1312,6 @@ function Skillet:SkilletShow()
 		DA.DEBUG(0,"SkilletShow: link= "..link..", "..DA.PLINK(link))
 	else
 		DA.DEBUG(0,"SkilletShow: "..tostring(skillLineName).." not linkable")
-	end
-	-- Verify that the user understands this is an alpha build.
-	-- Skillet.alpha is 0 for ask the question, 1 to use Blizzard UI, and 2 to use the Skillet UI (if appropriate).
-	-- If the user is smart enough to turn on debugging, skip the question.
-	if self.DebugLogging then
-		self.alpha = 2
-	end
-	if self.alpha == 0 then
-		StaticPopup_Show("Skillet_Alpha");
-		return
-	end
-	if self.alpha < 2 then
-		self:HideAllWindows()
-		self:OnDisable()
-		return
 	end
 	-- Use the Blizzard UI for any garrison follower that can't use ours.
 	if self:IsNotSupportedFollower(self.currentTrade) then
