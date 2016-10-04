@@ -1737,7 +1737,9 @@ end
 function Skillet:CalculateCraftableCounts(playerOverride)
 	DA.DEBUG(0,"CalculateCraftableCounts("..tostring(playerOverride)..")")
 	local player = playerOverride or self.currentPlayer
-	self.visited = {}
+	if not self.visited then
+		self.visited = {}
+	end
 	local n = self:GetNumSkills(player, self.currentTrade)
 	if n then
 		for i=1,n do
@@ -1751,6 +1753,7 @@ function Skillet:CalculateCraftableCounts(playerOverride)
 			end
 		end
 	end
+	--DA.DEBUG(0,"CalculateCraftableCounts: #visited= "..tostring(#self.visited))
 end
 
 function Skillet:RescanTrade()
@@ -1944,27 +1947,49 @@ function Skillet:ScanTrade()
 	end
 
 	Skillet.hasProgressBar = {} -- table of (sub)headers in this list with progress bars (used in MainFrame.lua)
---	self:ResetTradeSkillFilter() -- verify the search filter is blank (so we get all skills)
---	Skillet.data.Filtered[tradeID] = C_TradeSkillUI.GetFilteredRecipeIDs()
 	Skillet:PrintTradeSkillFilter()
-	Skillet.data.Filtered[tradeID] = GetRecipeList()
-	local numSkills = #Skillet.data.Filtered[tradeID]
-	DA.DEBUG(0,"ScanTrade: Expanding, "..tostring(profession)..":"..tostring(tradeID).." "..tostring(numSkills).." recipes")
+	local firstPass = {}
+	firstPass = GetRecipeList()
+	local numSkills = #firstPass
 
+	DA.DEBUG(0,"ScanTrade: Compressing, "..tostring(profession)..":"..tostring(tradeID).." "..tostring(numSkills).." recipes")
+-- Build the Filtered list by removing all but the current upgradeable recipe (if we are looking at learned recipes)
 -- Build a list of categories (headers) used for this set of filtered recipes
+	Skillet.data.Filtered[tradeID] = {}
+	local i = 0
 	local headerUsed = {}
-	for i = 1, numSkills do
-		local id = Skillet.data.Filtered[tradeID][i]
+	for j = 1, numSkills do
+		local id = firstPass[j]
 		if id then
 			local info = C_TradeSkillUI.GetRecipeInfo(id)
 			if info then
 				headerUsed[info.categoryID] = false
 				info = self:SetUpgradeLevels(info)
-				Skillet.data.recipeInfo[tradeID][id] = info
+				if not Skillet.unlearnedRecipes and info.upgradeable then		-- for upgradeable recipes
+					if info.recipeUpgrade == info.learnedUpgrade then		-- only keep the current one
+						i = i + 1
+						--DA.DEBUG(1,"ScanTrade: Adding upgradable recipe "..tostring(id)..", i= "..tostring(j))
+						Skillet.data.recipeInfo[tradeID][id] = info
+						Skillet.data.Filtered[tradeID][i] = id
+					else
+						--DA.DEBUG(1,"ScanTrade: Skipping upgradable recipe "..tostring(id)..", i= "..tostring(j))
+					end
+				else		-- not upgradeable
+					i = i + 1
+					--DA.DEBUG(1,"ScanTrade: Adding recipe "..tostring(id)..", i= "..tostring(j))
+					Skillet.data.recipeInfo[tradeID][id] = info
+					Skillet.data.Filtered[tradeID][i] = id
+				end
+			else		-- no info? probably never get here
+				i = i + 1
+				DA.DEBUG(1,"ScanTrade: Adding recipe with no info "..tostring(id)..", i= "..tostring(j))
+				Skillet.data.Filtered[tradeID][i] = id
 			end
 		end
 	end
+	numSkills = i
 
+	DA.DEBUG(0,"ScanTrade: Processing, "..tostring(profession)..":"..tostring(tradeID).." "..tostring(numSkills).." recipes")
 	local skillDB = Skillet.db.realm.skillDB[player][tradeID]
 	local skillData = Skillet.data.skillList[player][tradeID]
 	local recipeDB = Skillet.db.global.recipeDB
@@ -2147,17 +2172,13 @@ function Skillet:ScanTrade()
 
 		local reagentData = {}
 		for k = 1, C_TradeSkillUI.GetRecipeNumReagents(recipeID), 1 do
+			local reagentLink = C_TradeSkillUI.GetRecipeReagentItemLink(recipeID,k)
 			local reagentName, _, numNeeded = C_TradeSkillUI.GetRecipeReagentInfo(recipeID, k)
 			local reagentID = 0
-			if reagentName then
-				local reagentLink = C_TradeSkillUI.GetRecipeReagentItemLink(recipeID,k)
-				if reagentLink then
-					reagentID = Skillet:GetItemIDFromLink(reagentLink)
-				else
-					DA.DEBUG(0,"recipeID= "..tostring(recipeID)..", reagentName= "..tostring(reagentName).." has no reagentLink")
-				end
+			if reagentLink then
+				reagentID = Skillet:GetItemIDFromLink(reagentLink)
 			else
-				--DA.DEBUG(0,"recipeID= "..tostring(recipeID).."("..tostring(k)..") reagentName missing")
+				DA.DEBUG(0,"recipeID= "..tostring(recipeID)..", reagentName= "..tostring(reagentName).." has no reagentLink")
 			end
 			reagentData[k] = {}
 			reagentData[k].reagentID = reagentID
@@ -2187,6 +2208,7 @@ function Skillet:ScanTrade()
 		i = i + 1
 	end
 
+	self.visited = {}
 	Skillet:ScanQueuedReagents()
 	Skillet:InventoryScan()
 	Skillet:CalculateCraftableCounts()

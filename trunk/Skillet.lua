@@ -765,6 +765,49 @@ Skillet.options =
 			end,
 			order = 92
 		},
+		LogLevel = {
+			type = "toggle",
+			name = "LogLevel",
+			desc = "Option for debugging",
+			get = function()
+				return Skillet.db.profile.LogLevel
+			end,
+			set = function(self,value)
+				Skillet.db.profile.LogLevel = value
+				Skillet.LogLevel = value
+			end,
+			order = 93
+		},
+		MaxDebug = {
+			type = "input",
+			name = "MaxDebug",
+			desc = "Option for debugging",
+			get = function()
+				return Skillet.db.profile.MAXDEBUG
+			end,
+			set = function(self,value)
+				value = tonumber(value)
+				if not value then value = 4000 end
+				Skillet.db.profile.MAXDEBUG = value
+				Skillet.MAXDEBUG = value
+			end,
+			order = 94
+		},
+		MaxProfile = {
+			type = "input",
+			name = "MaxProfile",
+			desc = "Option for debugging",
+			get = function()
+				return Skillet.db.profile.MAXPROFILE
+			end,
+			set = function(self,value)
+				value = tonumber(value)
+				if not value then value = 2000 end
+				Skillet.db.profile.MAXPROFILE = value
+				Skillet.MAXPROFILE = value
+			end,
+			order = 95
+		},
 
 		reset = {
 			type = 'execute',
@@ -963,6 +1006,9 @@ function Skillet:OnInitialize()
 	Skillet.DebugShow = Skillet.db.profile.DebugShow
 	Skillet.DebugLogging = Skillet.db.profile.DebugLogging
 	Skillet.DebugLevel = Skillet.db.profile.DebugLevel
+	Skillet.LogLevel = Skillet.db.profile.LogLevel
+	Skillet.MAXDEBUG = Skillet.db.profile.MAXDEBUG or 4000
+	Skillet.MAXPROFILE = Skillet.db.profile.MAXPROFILE or 2000
 	Skillet.TableDump = Skillet.db.profile.TableDump
 	Skillet.TraceShow = Skillet.db.profile.TraceShow
 	Skillet.TraceLog = Skillet.db.profile.TraceLog
