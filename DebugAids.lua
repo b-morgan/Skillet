@@ -155,9 +155,11 @@ function DA.DEBUG(...)
 	if (DA.DebugShow and level < dlevel) then
 		print(DA.DEBUG_COLOR..addonName..": "..text)
 	end
-	table.insert(DA.DebugLog,date().."(D"..level.."): "..text)
-	if (table.getn(DA.DebugLog) > DA.MAXDEBUG) then
-		table.remove(DA.DebugLog,1)
+	if (not DA.LogLevel or level < dlevel) then
+		table.insert(DA.DebugLog,date().."(D"..level.."): "..text)
+		if (table.getn(DA.DebugLog) > DA.MAXDEBUG) then
+			table.remove(DA.DebugLog,1)
+		end
 	end
 end
 
@@ -299,6 +301,7 @@ function DA.DebugAidsStatus()
 	print("TraceShow= "..tostring(DA.TraceShow)..", TraceLog= "..tostring(DA.TraceLog))
 	print("ProfileShow= "..tostring(DA.ProfileShow))
 	print("TableDump= "..tostring(DA.TableDump))
+	print("LogLevel= "..tostring(DA.LogLevel))
 	print("#DebugLog= "..tostring(#DA.DebugLog).." ("..tostring(DA.MAXDEBUG)..")")
 	print("#DebugProfile= "..tostring(#DA.DebugProfile).." ("..tostring(DA.MAXPROFILE)..")")
 end
