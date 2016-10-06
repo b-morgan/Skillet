@@ -26,6 +26,9 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
 function Skillet:UpgradeDataAndOptions()
 
 	local player = self.currentPlayer
+	if not self.db.realm.options then
+		self.db.realm.options = {}
+	end
 	local options = self.db.realm.options[player]
 	if options then
 		DA.DEBUG(0,"options= "..DA.DUMP1(options))
