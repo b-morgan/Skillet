@@ -25,10 +25,10 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
 -- Runs all the update functions, should they be required
 function Skillet:UpgradeDataAndOptions()
 
-	local player = self.currentPlayer
 	if not self.db.realm.options then
 		self.db.realm.options = {}
 	end
+	local player = self.currentPlayer
 	local options = self.db.realm.options[player]
 	if options then
 		DA.DEBUG(0,"options= "..DA.DUMP1(options))
