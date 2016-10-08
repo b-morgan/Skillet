@@ -702,6 +702,9 @@ function Skillet:BAG_UPDATE_DELAYED(event)
 			processGuildQueue("bag update")
 		end
 	end
+	if Skillet.tradeSkillOpen then
+		Skillet.adjustInventory = true
+	end
 end
 
 -- Gets all the reagents possible for queued recipes from the bank
