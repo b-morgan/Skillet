@@ -275,9 +275,7 @@ function Skillet:QueueItems(count)
 			end
 		end
 		count = math.min(count, 9999)
-		if not self.visited then
-			self.visited = {}
-		end
+		self.visited = {}
 		if count > 0 then
 			if recipe then
 				local queueCommand = self:QueueCommandIterate(recipeID, count)
