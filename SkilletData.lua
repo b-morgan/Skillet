@@ -1737,9 +1737,7 @@ end
 function Skillet:CalculateCraftableCounts(playerOverride)
 	DA.DEBUG(0,"CalculateCraftableCounts("..tostring(playerOverride)..")")
 	local player = playerOverride or self.currentPlayer
-	if not self.visited then
-		self.visited = {}
-	end
+	self.visited = {}
 	local n = self:GetNumSkills(player, self.currentTrade)
 	if n then
 		for i=1,n do

@@ -163,22 +163,28 @@ function Skillet:InventoryScan(playerOverride)
 	end
 	local player = playerOverride or self.currentPlayer
 	local cachedInventory = self.db.realm.inventoryData[player]
+	if not cachedInventory then
+		cachedInventory = {}
+	end
 	local inventoryData = {}
 	local reagent
 	local numInBoth
 	if self.db.global.itemRecipeUsedIn then
 		for reagentID in pairs(self.db.global.itemRecipeUsedIn) do
-			local a = GetItemInfo(reagentID)
-			local b = inventoryData[reagentID]
-			--DA.DEBUG(2,"reagent "..tostring(a).." "..tostring(b))
+			--DA.DEBUG(2,"reagent "..tostring(GetItemInfo(reagentID)).." "..tostring(inventoryData[reagentID]))
 			if reagentID and not inventoryData[reagentID] then				-- have we calculated this one yet?
 				if self.currentPlayer == (UnitName("player")) then			-- if this is the current player, use the API
 					--DA.DEBUG(2,"Using API")
 					numInBoth = GetItemCount(reagentID,true)				-- both bank and bags
-				elseif cachedInventory and cachedInventory[reagentID] then	-- otherwise, use what cached data is available
-					--DA.DEBUG(2,"Using cachedInventory")
+				end
+				if cachedInventory[reagentID] then
 					local a,b,c,d = string.split(" ", cachedInventory[reagentID])
-					numInBoth = a
+					if numInBoth then
+						cachedInventory[reagentID] = tostring(numInBoth).." "..tostring(b or 0).." "..tostring(c or 0).." "..tostring(d or 0)
+					else
+						--DA.DEBUG(2,"Using cachedInventory")
+						numInBoth = a
+					end
 				else
 					--DA.DEBUG(2,"Using Zero")
 					numInBoth = 0
@@ -188,9 +194,7 @@ function Skillet:InventoryScan(playerOverride)
 			end
 		end
 	end
-	if not self.visited then
-		self.visited = {} -- this is a simple infinite loop avoidance scheme: basically, don't visit the same node twice
-	end
+	self.visited = {} -- this is a simple infinite loop avoidance scheme: basically, don't visit the same node twice
 	if inventoryData then
 		-- now calculate the craftability of these same reagents
 		for reagentID,inventory in pairs(inventoryData) do
