@@ -1304,7 +1304,7 @@ function Skillet:IsSupportedTradeskill(tradeID)
 	if tradeID and IsControlKeyDown() then
 		return true
 	end
-	if IsShiftKeyDown() or not tradeID or self.BlizzardSkillList[tradeID] then
+	if IsShiftKeyDown() or not tradeID or self.BlizzardSkillList[tradeID] or self.currentPlayer ~= UnitName("player") then
 		return false
 	end
 	local ranks = self:GetSkillRanks(self.currentPlayer, tradeID)
@@ -1734,9 +1734,12 @@ function Skillet:GetRecipeDataByTradeIndex(tradeID, index)
 	return self.unknownRecipe
 end
 
-function Skillet:CalculateCraftableCounts(playerOverride)
-	DA.DEBUG(0,"CalculateCraftableCounts("..tostring(playerOverride)..")")
-	local player = playerOverride or self.currentPlayer
+function Skillet:CalculateCraftableCounts()
+	DA.DEBUG(0,"CalculateCraftableCounts()")
+	local player = self.currentPlayer
+	if player ~= UnitName("player") then
+		return
+	end
 	self.visited = {}
 	local n = self:GetNumSkills(player, self.currentTrade)
 	if n then
@@ -1745,7 +1748,7 @@ function Skillet:CalculateCraftableCounts(playerOverride)
 			if skill and skill.id ~= 0 then -- skip headers
 				local recipe = self:GetRecipe(skill.id)
 				if recipe and recipe.reagentData and #recipe.reagentData > 0 then	-- make sure that recipe is in the database before continuing
-					skill.numCraftable, skill.numRecursive, skill.numCraftableVendor, skill.numCraftableAlts = self:InventorySkillIterations(self.currentTrade, recipe, player)
+					skill.numCraftable, skill.numRecursive, skill.numCraftableVendor, skill.numCraftableAlts = self:InventorySkillIterations(self.currentTrade, recipe)
 					DA.DEBUG(2,"name= "..tostring(skill.name)..", numCraftable= "..tostring(skill.numCraftable)..", numRecursive= "..tostring(skill.numRecursive)..", numCraftableVendor= "..tostring(skill.numCraftableVendor)..", numCraftableAlts= "..tostring(skill.numCraftableAlts))
 				end
 			end
@@ -1925,7 +1928,7 @@ function Skillet:ScanTrade()
 	Skillet.db.realm.tradeSkills[player][tradeID].maxRank = maxRank
 	Skillet.db.realm.tradeSkills[player][tradeID].name = profession
 
-	if #Skillet.db.global.Categories[tradeID] == 0 then
+	if Skillet.db.global.Categories[tradeID] and #Skillet.db.global.Categories[tradeID] == 0 then
 		local categories = { C_TradeSkillUI.GetCategories() }
 		for i, categoryID in ipairs(categories) do
 			Skillet.db.global.Categories[tradeID][categoryID] = C_TradeSkillUI.GetCategoryInfo(categoryID)

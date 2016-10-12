@@ -20,12 +20,15 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
 -- recursive reagent craftability check
 -- not considering alts
 -- does consider queued recipes
-function Skillet:InventoryReagentCraftability(reagentID, playerOverride)
-	--DA.DEBUG(0,"InventoryReagentCraftability("..tostring(reagentID)..", "..tostring(playerOverride)..") -- "..tostring((GetItemInfo(reagentID))))
+function Skillet:InventoryReagentCraftability(reagentID)
+	--DA.DEBUG(0,"InventoryReagentCraftability("..tostring(reagentID)..") -- "..tostring((GetItemInfo(reagentID))))
 	if not reagentID or reagentID == 0 then
 		return 0 
 	end
-	local player = playerOverride or Skillet.currentPlayer
+	local player = Skillet.currentPlayer
+	if player ~= UnitName("player") then
+		return 0
+	end
 	if self.visited[reagentID] then
 		local reagentA, reagentC = self:GetInventory(player, reagentID)
 		--DA.DEBUG(0,"     ReagentCraftability: visited reagentID= "..tostring(reagentID).." ("..tostring((GetItemInfo(reagentID))).."), Available= "..tostring(reagentA)..", Craftable= "..tostring(reagentC))
@@ -46,7 +49,7 @@ function Skillet:InventoryReagentCraftability(reagentID, playerOverride)
 				for i=1,#childRecipe.reagentData,1 do
 					local childReagent = childRecipe.reagentData[i]
 					local numReagentOnHand = GetItemCount(childReagent.reagentID,true)
-					local numReagentCraftable = self:InventoryReagentCraftability(childReagent.reagentID, player)
+					local numReagentCraftable = self:InventoryReagentCraftability(childReagent.reagentID)
 					--DA.DEBUG(1,"     ReagentCraftability: childID="..childReagent.reagentID.." ("..tostring((GetItemInfo(childReagent.reagentID))).."), numReagentOnHand="..tostring(numReagentOnHand)..", numReagentCraftable= "..tostring(numReagentCraftable))
 					numReagentCraftable = numReagentCraftable + numReagentOnHand
 					numCraftable = math.min(numCraftable, math.floor(numReagentCraftable/childReagent.numNeeded))
@@ -75,9 +78,12 @@ end
 -- recipe iteration check: calculate how many times a recipe can be iterated with materials available
 -- (not to be confused with the reagent craftability which is designed to determine how many
 -- craftable reagents are available for recipe iterations)
-function Skillet:InventorySkillIterations(tradeID, recipe, playerOverride)
-	--DA.DEBUG(0,"InventorySkillIterations("..tostring(tradeID)..", "..DA.DUMP1(recipe)..", "..tostring(playerOverride)..")")
-	local player = playerOverride or Skillet.currentPlayer
+function Skillet:InventorySkillIterations(tradeID, recipe)
+	--DA.DEBUG(0,"InventorySkillIterations("..tostring(tradeID)..", "..DA.DUMP1(recipe)..")")
+	local player = Skillet.currentPlayer
+	if player ~= UnitName("player") then
+		return 0, 0, 0, 0
+	end
 	if recipe and recipe.reagentData and #recipe.reagentData > 0 then	-- make sure that recipe is in the database before continuing
 		local recipeID = recipe.spellID
 		local numMade = recipe.numMade
@@ -96,7 +102,7 @@ function Skillet:InventorySkillIterations(tradeID, recipe, playerOverride)
 				local reagentAvailableAlts = 0
 				reagentAvailable, reagentCraftable = self:GetInventory(player, reagentID)
 				if reagentCraftable == 0 then
-					reagentCraftable = self:InventoryReagentCraftability(reagentID, player)
+					reagentCraftable = self:InventoryReagentCraftability(reagentID)
 				end
 				--DA.DEBUG(0,"     SkillIterations: reagentID= "..tostring(reagentID).."("..tostring((GetItemInfo(reagentID))).."), reagentCraftable= "..tostring(reagentCraftable))
 				numCraft = math.min(numCraft, math.floor(reagentAvailable/numNeeded))
@@ -156,12 +162,12 @@ function Skillet:InventorySkillIterations(tradeID, recipe, playerOverride)
 	return 0, 0, 0, 0
 end
 
-function Skillet:InventoryScan(playerOverride)
-	DA.DEBUG(0,"InventoryScan("..tostring(playerOverride)..")")
-	if self.linkedSkill or self.isGuild then
+function Skillet:InventoryScan()
+	DA.DEBUG(0,"InventoryScan()")
+	local player = self.currentPlayer
+	if self.linkedSkill or self.isGuild or player ~= UnitName("player") then
 		return
 	end
-	local player = playerOverride or self.currentPlayer
 	local cachedInventory = self.db.realm.inventoryData[player]
 	if not cachedInventory then
 		cachedInventory = {}
@@ -198,7 +204,7 @@ function Skillet:InventoryScan(playerOverride)
 	if inventoryData then
 		-- now calculate the craftability of these same reagents
 		for reagentID,inventory in pairs(inventoryData) do
-			numCrafted = self:InventoryReagentCraftability(reagentID, player)
+			numCrafted = self:InventoryReagentCraftability(reagentID)
 			if numCrafted > 0 then
 				inventoryData[reagentID] = tostring(inventoryData[reagentID]).." "..tostring(numCrafted)
 			end
