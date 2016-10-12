@@ -1377,7 +1377,6 @@ function Skillet:SkilletShow()
 			self:HideAllWindows()
 			self:EnableBlizzardFrame()
 			ShowUIPanel(TradeSkillFrame)
---			Skillet.TSMPlugin.TSMShow()
 		end
 	end
 end
@@ -1750,10 +1749,10 @@ function Skillet:ToggleTradeSkillOption(option)
 end
 
 -- Returns the state of a craft specific option
-function Skillet:GetTradeSkillOption(option, playerOverride, tradeOverride)
+function Skillet:GetTradeSkillOption(option)
 	local r
-	local player = playerOverride or self.currentPlayer
-	local trade = tradeOverride or self.currentTrade
+	local player = self.currentPlayer
+	local trade = self.currentTrade
 	local options = self.db.realm.options
 	if not options or not options[player] or not options[player][trade] then
 		r = Skillet.defaultOptions[option]
@@ -1762,15 +1761,14 @@ function Skillet:GetTradeSkillOption(option, playerOverride, tradeOverride)
 	else
 		r = options[player][trade][option]
 	end
-	--DA.DEBUG(0,"GetTradeSkillOption("..tostring(option)..", "..tostring(playerOverride)..", "..tostring(tradeOverride)..")= "..tostring(r)..", player= "..tostring(player)..", trade= "..tostring(trade))
 	return r
 end
 
 -- sets the state of a craft specific option
-function Skillet:SetTradeSkillOption(option, value, playerOverride, tradeOverride)
+function Skillet:SetTradeSkillOption(option, value)
 	if not self.linkedSkill and not self.isGuild then
-		local player = playerOverride or self.currentPlayer
-		local trade = tradeOverride or self.currentTrade
+		local player = self.currentPlayer
+		local trade = self.currentTrade
 		if not self.db.realm.options then
 			self.db.realm.options = {}
 		end
