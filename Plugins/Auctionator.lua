@@ -16,6 +16,7 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
 ]]--
 
 Skillet.ATRPlugin = {}
+Skillet.ATRPlugin.Vendor = { [133588] = 5000, [133589] = 2780, [133590] = 5000, [133591] = 5000, [133592] = 5000, [133593] = 5000 }
 
 local plugin = Skillet.ATRPlugin
 local L = Skillet.L
@@ -55,9 +56,9 @@ function plugin.GetExtraText(skill, recipe)
 	local bop
 	if not skill or not recipe then return end
 	local itemID = recipe.itemID
-	if Atr_GetAuctionBuyout and Skillet.db.profile.plugins.TUJ.enabled and itemID then
+	if Atr_GetAuctionBuyout and Skillet.db.profile.plugins.ATR.enabled and itemID then
 		local abacus = LibStub("LibAbacus-3.0")
-		local value = Atr_GetAuctionBuyout(itemID)
+		local value = ( Atr_GetAuctionBuyout(itemID) or 0 ) * recipe.numMade
 		if value then
 			extra_text = abacus:FormatMoneyFull(value, true);
 			label = "Buyout"..":"
@@ -78,11 +79,29 @@ end
 
 function plugin.RecipeNameSuffix(skill, recipe)
 	local text
-	if not skill or not recipe then return end
-	if Skillet.db.profile.plugins.TUJ.enabled then
---		Processing goes here
-		return text
+	if recipe then
+		local itemID = recipe.itemID
+		if Atr_GetAuctionBuyout and Skillet.db.profile.plugins.ATR.enabled and itemID then
+			local abacus = LibStub("LibAbacus-3.0")
+			local value = Atr_GetAuctionBuyout(itemID) or 0
+			if value then
+				value = value * recipe.numMade
+				local matsum = 0
+				for k,v in pairs(recipe.reagentData) do
+					local iprice = Atr_GetAuctionBuyout(v.reagentID)
+					if tContains(Skillet.ATRPlugin.Vendor,v.reagentID) then
+						iprice = Skillet.ATRPlugin.Vendor[v.reagentID]
+					end
+					if iprice then
+						matsum = matsum + v.numNeeded * iprice
+					end
+				end
+				value = value - matsum
+				text = abacus:FormatMoneyFull(value, true);
+			end
+		end
 	end
+	return text
 end
 
 Skillet:RegisterRecipeNamePlugin("ATRPlugin")		-- we have a RecipeNamePrefix or a RecipeNameSuffix function
