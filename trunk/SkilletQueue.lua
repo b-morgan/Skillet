@@ -216,7 +216,7 @@ function Skillet:ProcessQueue(altMode)
 			end
 			local recipeInfo = C_TradeSkillUI.GetRecipeInfo(command.recipeID)
 			--DA.DEBUG(1,"recipeInfo= "..DA.DUMP1(recipeInfo))
-			local numAvailable = recipeInfo.numAvailable
+			local numAvailable = recipeInfo.numAvailable or 0
 			if numAvailable > 0 then
 				self.processingSpell = self:GetRecipeName(command.recipeID)
 				self.processingSpellID = command.recipeID
