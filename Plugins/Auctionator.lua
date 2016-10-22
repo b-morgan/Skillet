@@ -40,6 +40,36 @@ plugin.options =
 			width = "double",
 			order = 1
 		},
+		useShort = {
+			type = "toggle",
+			name = "useShort",
+			desc = "Use Short money format",
+			get = function()
+				return Skillet.db.profile.plugins.ATR.useShort
+			end,
+			set = function(self,value)
+				Skillet.db.profile.plugins.ATR.useShort = value
+				if value then
+					Skillet.db.profile.plugins.ATR.useShort = value
+				end
+			end,
+			order = 2
+		},
+		onlyPositive = {
+			type = "toggle",
+			name = "onlyPositive",
+			desc = "Only show positive values",
+			get = function()
+				return Skillet.db.profile.plugins.ATR.onlyPositive
+			end,
+			set = function(self,value)
+				Skillet.db.profile.plugins.ATR.onlyPositive = value
+				if value then
+					Skillet.db.profile.plugins.ATR.onlyPositive = value
+				end
+			end,
+			order = 3
+		},
 	},
 }
 
@@ -60,7 +90,7 @@ function plugin.GetExtraText(skill, recipe)
 		local abacus = LibStub("LibAbacus-3.0")
 		local value = ( Atr_GetAuctionBuyout(itemID) or 0 ) * recipe.numMade
 		if value then
-			extra_text = abacus:FormatMoneyFull(value, true);
+			extra_text = abacus:FormatMoneyFull(value, true)
 			label = "Buyout"..":"
 --			label = L["Buyout"]..":"
 		end
@@ -71,7 +101,7 @@ end
 function plugin.RecipeNamePrefix(skill, recipe)
 	local text
 	if not skill or not recipe then return end
-	if Skillet.db.profile.plugins.TUJ.enabled then
+	if Skillet.db.profile.plugins.ATR.enabled then
 --		Processing goes here
 		return text
 	end
@@ -97,7 +127,14 @@ function plugin.RecipeNameSuffix(skill, recipe)
 					end
 				end
 				value = value - matsum
-				text = abacus:FormatMoneyFull(value, true);
+				if Skillet.db.profile.plugins.ATR.useShort then
+					text = abacus:FormatMoneyShort(value, true)
+				else
+					text = abacus:FormatMoneyFull(value, true)
+				end
+				if Skillet.db.profile.plugins.ATR.onlyPositive and value <= 0 then
+					text = nil
+				end
 			end
 		end
 	end
