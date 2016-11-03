@@ -69,6 +69,36 @@ plugin.options =
 			width = "double",
 			order = 1
 		},
+		useShort = {
+			type = "toggle",
+			name = "useShort",
+			desc = "Use Short money format",
+			get = function()
+				return Skillet.db.profile.plugins.TUJ.useShort
+			end,
+			set = function(self,value)
+				Skillet.db.profile.plugins.TUJ.useShort = value
+				if value then
+					Skillet.db.profile.plugins.TUJ.useShort = value
+				end
+			end,
+			order = 2
+		},
+		onlyPositive = {
+			type = "toggle",
+			name = "onlyPositive",
+			desc = "Only show positive values",
+			get = function()
+				return Skillet.db.profile.plugins.TUJ.onlyPositive
+			end,
+			set = function(self,value)
+				Skillet.db.profile.plugins.TUJ.onlyPositive = value
+				if value then
+					Skillet.db.profile.plugins.TUJ.onlyPositive = value
+				end
+			end,
+			order = 3
+		},
 	},
 }
 
@@ -92,8 +122,7 @@ function plugin.GetExtraText(skill, recipe)
 		local value = o['market']
 		if value then
 			extra_text = abacus:FormatMoneyFull(value, true);
-			label = "Market"..":"
---			label = L["Market"]..":"
+			label = L["Market"]..":"
 		end
 	end
 	return label, extra_text
@@ -104,17 +133,37 @@ function plugin.RecipeNamePrefix(skill, recipe)
 	return text
 end
 
+local function TUJMarketValue(itemID)
+	local o = {}
+	TUJMarketInfo(itemID,o)
+	return o['market']
+end
+
 function plugin.RecipeNameSuffix(skill, recipe)
 	local text
 	if recipe then
 		local itemID = recipe.itemID
 		if TUJMarketInfo and Skillet.db.profile.plugins.TUJ.enabled and itemID then
 			local abacus = LibStub("LibAbacus-3.0")
-			local o={}
-			TUJMarketInfo(itemID,o)
-			local value = o['market']
+			local value = TUJMarketValue(itemID)
 			if value then
-				text = abacus:FormatMoneyFull(value, true);
+				value = value * recipe.numMade
+				local matsum = 0
+				for k,v in pairs(recipe.reagentData) do
+					local iprice = TUJMarketValue(v.reagentID)
+					if iprice then
+						matsum = matsum + v.numNeeded * iprice
+					end
+				end
+				value = value - matsum
+				if Skillet.db.profile.plugins.TUJ.useShort then
+					text = abacus:FormatMoneyShort(value, true)
+				else
+					text = abacus:FormatMoneyFull(value, true)
+				end
+				if Skillet.db.profile.plugins.TUJ.onlyPositive and value <= 0 then
+					text = nil
+				end
 			end
 		end
 	end

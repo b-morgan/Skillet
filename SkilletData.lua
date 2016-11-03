@@ -1463,7 +1463,8 @@ local function GetUnfilteredInventorySlotName(...)
 	return nil;
 end
 
-function Skillet:UpdateFilterBar()
+function Skillet:PrintTradeSkillFilter()
+	DA.DEBUG(0,"PrintTradeSkillFilter()")
 	local filters = nil
 	if C_TradeSkillUI.GetOnlyShowMakeableRecipes() then
 		filters = filters or {}
@@ -1504,16 +1505,13 @@ function Skillet:UpdateFilterBar()
 		self.FilterBarText = table.concat(filters, PLAYER_LIST_DELIMITER)
 		DA.DEBUG(0,"filter= "..tostring(self.FilterBarText))
 		SkilletFilterText:SetFormattedText("%s: %s", FILTER, self.FilterBarText)
-		local offset = SkilletFilterText:GetLeft() - SkilletFrame:GetLeft()
-		DA.DEBUG(0,"offset= "..tostring(offset))
-		local max_text_width = SkilletFrame:GetWidth() - offset - 20 
-		SkilletFilterText:SetWidth(max_text_width)
+		if SkilletFrame:IsVisible() then
+			local offset = SkilletFilterText:GetLeft() - SkilletFrame:GetLeft()
+			DA.DEBUG(0,"offset= "..tostring(offset))
+			local max_text_width = SkilletFrame:GetWidth() - offset - 20 
+			SkilletFilterText:SetWidth(max_text_width)
+		end
 	end
-end
-
-function Skillet:PrintTradeSkillFilter()
-	DA.DEBUG(0,"PrintTradeSkillFilter()")
-	self:UpdateFilterBar()
 end
 
 function Skillet:ExpandTradeSkillSubClass(i)

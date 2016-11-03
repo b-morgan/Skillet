@@ -91,8 +91,7 @@ function plugin.GetExtraText(skill, recipe)
 		local value = ( Atr_GetAuctionBuyout(itemID) or 0 ) * recipe.numMade
 		if value then
 			extra_text = abacus:FormatMoneyFull(value, true)
-			label = "Buyout"..":"
---			label = L["Buyout"]..":"
+			label = L["Buyout"]..":"
 		end
 	end
 	return label, extra_text

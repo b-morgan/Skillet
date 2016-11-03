@@ -576,6 +576,20 @@ Skillet.options =
 			end,
 			order = 60
 		},
+		resetrecipefilter = {
+			type = 'execute',
+			name = L["Reset Recipe Filter"],
+			desc = L["RESETRECIPEFILTERDESC"],
+			func = function()
+				if not (UnitAffectingCombat("player")) then
+					Skillet:ResetTradeSkillFilter()
+				else
+					DA.DEBUG(0,"|cff8888ffSkillet|r: Combat lockdown restriction." ..
+												  " Leave combat and try again.")
+				end
+			end,
+			order = 61
+		},
 
 		WarnShow = {
 			type = "toggle",
