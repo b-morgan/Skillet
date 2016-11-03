@@ -43,6 +43,36 @@ plugin.options =
 			width = "double",
 			order = 1
 		},
+		useShort = {
+			type = "toggle",
+			name = "useShort",
+			desc = "Use Short money format",
+			get = function()
+				return Skillet.db.profile.plugins.TSM.useShort
+			end,
+			set = function(self,value)
+				Skillet.db.profile.plugins.TSM.useShort = value
+				if value then
+					Skillet.db.profile.plugins.TSM.useShort = value
+				end
+			end,
+			order = 2
+		},
+		onlyPositive = {
+			type = "toggle",
+			name = "onlyPositive",
+			desc = "Only show positive values",
+			get = function()
+				return Skillet.db.profile.plugins.TSM.onlyPositive
+			end,
+			set = function(self,value)
+				Skillet.db.profile.plugins.TSM.onlyPositive = value
+				if value then
+					Skillet.db.profile.plugins.TSM.onlyPositive = value
+				end
+			end,
+			order = 3
+		},
 	},
 }
 
@@ -74,8 +104,7 @@ function plugin.GetExtraText(skill, recipe)
 		local value = TSMAPI:GetItemValue(itemID, "DBMarket")
 		if value then
 			extra_text = abacus:FormatMoneyFull(value, true);
-			label = "DBMarket"..":"
---			label = L["DBMarket"]..":"
+			label = L["DBMarket"]..":"
 		end
 	end
 	return label, extra_text
@@ -96,7 +125,23 @@ function plugin.RecipeNameSuffix(skill, recipe)
 			local abacus = LibStub("LibAbacus-3.0")
 			local value = TSMAPI:GetItemValue(itemID, "DBMarket")
 			if value then
-				text = abacus:FormatMoneyFull(value, true);
+				value = value * recipe.numMade
+				local matsum = 0
+				for k,v in pairs(recipe.reagentData) do
+					local iprice = TSMAPI:GetItemValue(v.reagentID, "DBMarket")
+					if iprice then
+						matsum = matsum + v.numNeeded * iprice
+					end
+				end
+				value = value - matsum
+				if Skillet.db.profile.plugins.TSM.useShort then
+					text = abacus:FormatMoneyShort(value, true)
+				else
+					text = abacus:FormatMoneyFull(value, true)
+				end
+				if Skillet.db.profile.plugins.TSM.onlyPositive and value <= 0 then
+					text = nil
+				end
 			end
 		end
 	end
