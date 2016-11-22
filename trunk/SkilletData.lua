@@ -1863,33 +1863,31 @@ end
 local function GetRecipeList()
 	local dataList = {}
 	local currentCategoryID, currentParentCategoryID
+	local categoryData, parentCategoryData
 	local isCurrentCategoryEnabled, isCurrentParentCategoryEnabled = true, true
 	local filteredRecipeIDs = C_TradeSkillUI.GetFilteredRecipeIDs()
 	--DA.DEBUG(0,"#filteredRecipeIDs= "..tostring(#filteredRecipeIDs))
 	for i, recipeID in ipairs(filteredRecipeIDs) do
 		local recipeInfo = C_TradeSkillUI.GetRecipeInfo(recipeID)
 		if recipeInfo.categoryID ~= currentCategoryID then
-			local categoryData = C_TradeSkillUI.GetCategoryInfo(recipeInfo.categoryID)
+			currentCategoryID = recipeInfo.categoryID
+			categoryData = C_TradeSkillUI.GetCategoryInfo(currentCategoryID)
+			--DA.TABLE("C:"..tostring(currentCategoryID),categoryData)
 			isCurrentCategoryEnabled = categoryData.enabled
 			if categoryData.parentCategoryID ~= currentParentCategoryID then
 				currentParentCategoryID = categoryData.parentCategoryID
 				if currentParentCategoryID then
-					local parentCategoryData = C_TradeSkillUI.GetCategoryInfo(currentParentCategoryID)
+					parentCategoryData = C_TradeSkillUI.GetCategoryInfo(currentParentCategoryID)
+					--DA.TABLE("P:"..tostring(currentParentCategoryID),parentCategoryData)
 					isCurrentParentCategoryEnabled = parentCategoryData.enabled
-					if isCurrentParentCategoryEnabled then
-						--DA.DEBUG(1,"insert(1) recipeID= "..tostring(recipeID))
-						tinsert(dataList, recipeID)
-					end
 				else
 					isCurrentParentCategoryEnabled = true
 				end
-			elseif isCurrentCategoryEnabled and isCurrentParentCategoryEnabled then
-				--DA.DEBUG(1,"insert(2) recipeID= "..tostring(recipeID))
-				tinsert(dataList, recipeID)
-				currentCategoryID = recipeInfo.categoryID
 			end
-		elseif isCurrentCategoryEnabled and isCurrentParentCategoryEnabled then
-			--DA.DEBUG(1,"insert(3) recipeID= "..tostring(recipeID))
+		end
+		if isCurrentCategoryEnabled and isCurrentParentCategoryEnabled then
+			--DA.TABLE("R:"..tostring(recipeID),recipeInfo)
+			--DA.DEBUG(1,"insert recipeID= "..tostring(recipeID))
 			tinsert(dataList, recipeID)
 		end
 	end
