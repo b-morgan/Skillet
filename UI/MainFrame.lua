@@ -1388,8 +1388,10 @@ function Skillet:HideDetailWindow()
 		local button = _G["SkilletReagent"..i]
 		button:Hide();
 	end
-	for c,s in pairs(SkilletRankFrame.subRanks) do
-		s:Hide()
+	if SkilletRankFrame.subRanks then
+		for c,s in pairs(SkilletRankFrame.subRanks) do
+			s:Hide()
+		end
 	end
 end
 
