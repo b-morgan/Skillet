@@ -1360,6 +1360,11 @@ function Skillet:SkilletShow()
 	else
 		self.currentPlayer = (UnitName("player"))
 	end
+	local frame = self.tradeSkillFrame
+	if not frame then
+		frame = self:CreateTradeSkillWindow()
+		self.tradeSkillFrame = frame
+	end
 	self:ScanPlayerTradeSkills(self.currentPlayer)
 	self:UpdateAutoTradeButtons()
 	local skillLineID, skillLineName, skillLineRank, skillLineMaxRank, skillLineModifier = C_TradeSkillUI.GetTradeSkillLine();
@@ -1404,6 +1409,7 @@ function Skillet:SkilletShowWindow()
 		self.db.realm.skillDB[self.currentPlayer][self.currentTrade] = {}
 	end
 	if not self:RescanTrade() then
+		DA.DEBUG(0,"No headers, reset filter")
 		self.ResetTradeSkillFilter()
 		if not self:RescanTrade() then
 			DA.CHAT("No headers, try again");
