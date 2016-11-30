@@ -1404,8 +1404,11 @@ function Skillet:SkilletShowWindow()
 		self.db.realm.skillDB[self.currentPlayer][self.currentTrade] = {}
 	end
 	if not self:RescanTrade() then
-		DA.CHAT("No headers, try again");
-		return
+		self.ResetTradeSkillFilter()
+		if not self:RescanTrade() then
+			DA.CHAT("No headers, try again");
+			return
+		end
 	end
 	self.currentGroup = nil
 	self.currentGroupLabel = self:GetTradeSkillOption("grouping")

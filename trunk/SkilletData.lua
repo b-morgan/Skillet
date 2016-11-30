@@ -1755,40 +1755,6 @@ function Skillet:CalculateCraftableCounts()
 	--DA.DEBUG(0,"CalculateCraftableCounts: #visited= "..tostring(#self.visited))
 end
 
-function Skillet:RescanTrade()
-	--DA.PROFILE("Skillet:RescanTrade()")
-	local player, tradeID = Skillet.currentPlayer, Skillet.currentTrade
-	if not player or not tradeID then return end
-	Skillet.scanInProgress = true
-	if not Skillet.data.skillList[player] then
-		Skillet.data.skillList[player] = {}
-	end
-	if not Skillet.data.skillList[player][tradeID] then
-		Skillet.data.skillList[player][tradeID]={}
-	end
-	if not Skillet.data.Filtered then
-		Skillet.data.Filtered = {}
-	end
-	if not Skillet.data.Filtered[tradeID] then
-		Skillet.data.Filtered[tradeID] = {}
-	end
-	if not Skillet.db.realm.skillDB[player] then
-		Skillet.db.realm.skillDB[player] = {}
-	end
-	if not Skillet.db.realm.skillDB[player][tradeID] then
-		Skillet.db.realm.skillDB[player][tradeID] = {}
-	end
-	if not Skillet.data.recipeInfo[tradeID] then
-		Skillet.data.recipeInfo[tradeID] = {}
-	end
-	if not Skillet.db.global.Categories[tradeID] then
-		Skillet.db.global.Categories[tradeID] = {}
-	end
-	Skillet.dataScanned = self:ScanTrade()
-	Skillet.scanInProgress = false
-	return Skillet.dataScanned
-end
-
 function Skillet:IsFavorite(recipeID)
 	local info = self.data.recipeInfo
 	return info and info[self.currentTrade] and info[self.currentTrade][recipeID] and info[self.currentTrade][recipeID].favorite
@@ -1892,6 +1858,40 @@ local function GetRecipeList()
 		end
 	end
 	return dataList
+end
+
+function Skillet:RescanTrade()
+	--DA.PROFILE("Skillet:RescanTrade()")
+	local player, tradeID = Skillet.currentPlayer, Skillet.currentTrade
+	if not player or not tradeID then return end
+	Skillet.scanInProgress = true
+	if not Skillet.data.skillList[player] then
+		Skillet.data.skillList[player] = {}
+	end
+	if not Skillet.data.skillList[player][tradeID] then
+		Skillet.data.skillList[player][tradeID]={}
+	end
+	if not Skillet.data.Filtered then
+		Skillet.data.Filtered = {}
+	end
+	if not Skillet.data.Filtered[tradeID] then
+		Skillet.data.Filtered[tradeID] = {}
+	end
+	if not Skillet.db.realm.skillDB[player] then
+		Skillet.db.realm.skillDB[player] = {}
+	end
+	if not Skillet.db.realm.skillDB[player][tradeID] then
+		Skillet.db.realm.skillDB[player][tradeID] = {}
+	end
+	if not Skillet.data.recipeInfo[tradeID] then
+		Skillet.data.recipeInfo[tradeID] = {}
+	end
+	if not Skillet.db.global.Categories[tradeID] then
+		Skillet.db.global.Categories[tradeID] = {}
+	end
+	Skillet.dataScanned = self:ScanTrade()
+	Skillet.scanInProgress = false
+	return Skillet.dataScanned
 end
 
 function Skillet:ScanTrade()
