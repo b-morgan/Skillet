@@ -1670,6 +1670,7 @@
 						Skillet:PrintTradeSkillFilter()
 						self:Hide()
 						SkilletRecipeDifficultyButton:Show()
+						Skillet.dataScanned = false
 						Skillet:SortAndFilterRecipes()
 						Skillet:UpdateTradeSkillWindow()
 					</OnClick>
