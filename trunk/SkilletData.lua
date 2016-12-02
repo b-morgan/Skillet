@@ -1392,7 +1392,10 @@ function Skillet:ResetTradeSkillFilter()
 	C_TradeSkillUI.SetRecipeItemNameFilter(nil)
 	C_TradeSkillUI.SetRecipeItemLevelFilter(0, 0)
 	C_TradeSkillUI.SetOnlyShowMakeableRecipes(false)
+	Skillet:SetTradeSkillOption("hideuncraftable", false)
 	C_TradeSkillUI.SetOnlyShowSkillUpRecipes(false)
+	Skillet:SetTradeSkillOption("filterLevel", 0)
+
 end
 
 function Skillet:SetTradeSkillLearned()

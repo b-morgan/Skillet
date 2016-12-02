@@ -1487,6 +1487,8 @@
 							local before = Skillet:GetTradeSkillOption("hideuncraftable")
 							Skillet:SetTradeSkillOption("hideuncraftable", not before)
 							C_TradeSkillUI.SetOnlyShowMakeableRecipes(not before)
+							Skillet:PrintTradeSkillFilter()
+							Skillet.dataScanned = false
 							Skillet:SortAndFilterRecipes()
 							Skillet:UpdateTradeSkillWindow()
 						else
@@ -1662,7 +1664,10 @@
 						Skillet:SetTradeSkillOption("filterLevel", newLevel)
 						if newLevel > 1 then
 							C_TradeSkillUI.SetOnlyShowSkillUpRecipes(true)
+						else
+							C_TradeSkillUI.SetOnlyShowSkillUpRecipes(false)
 						end
+						Skillet:PrintTradeSkillFilter()
 						self:Hide()
 						SkilletRecipeDifficultyButton:Show()
 						Skillet:SortAndFilterRecipes()
