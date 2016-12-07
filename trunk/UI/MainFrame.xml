@@ -1469,6 +1469,7 @@
 				<Scripts>
 					<OnShow>
 						local hideUncraftable = Skillet:GetTradeSkillOption("hideuncraftable")
+						C_TradeSkillUI.SetOnlyShowMakeableRecipes(hideUncraftable)
 						if hideUncraftable then
 							self:SetChecked(true)
 						else

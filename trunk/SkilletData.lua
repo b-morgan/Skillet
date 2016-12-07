@@ -1394,7 +1394,7 @@ function Skillet:ResetTradeSkillFilter()
 	C_TradeSkillUI.SetOnlyShowMakeableRecipes(false)
 	Skillet:SetTradeSkillOption("hideuncraftable", false)
 	C_TradeSkillUI.SetOnlyShowSkillUpRecipes(false)
-	Skillet:SetTradeSkillOption("filterLevel", 0)
+	Skillet:SetTradeSkillOption("filterLevel", 1)
 
 end
 
