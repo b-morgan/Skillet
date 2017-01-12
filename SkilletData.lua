@@ -589,6 +589,7 @@ Skillet.scrollData = {
 	[235695] = 144304, -- Enchant Neck - Mark of the Master Rank 1
 	[235699] = 144304, -- Enchant Neck - Mark of the Master Rank 2
 	[235703] = 144304, -- Enchant Neck - Mark of the Master Rank 3}
+}
 
 --[[
 Skillet.enchantingItemIDs = {
