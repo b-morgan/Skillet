@@ -577,7 +577,18 @@ Skillet.scrollData = {
 	[228408] = 141910, -- Enchant Neck - Mark of the Ancient Priestess Rank 1
 	[228409] = 141910, -- Enchant Neck - Mark of the Ancient Priestess Rank 2
 	[228410] = 141910, -- Enchant Neck - Mark of the Ancient Priestess Rank 3
-}
+	[235698] = 144307, -- Enchant Neck - Mark of the Deadly Rank 1
+	[235702] = 144307, -- Enchant Neck - Mark of the Deadly Rank 2
+	[235706] = 144307, -- Enchant Neck - Mark of the Deadly Rank 3
+	[235697] = 144306, -- Enchant Neck - Mark of the Quick Rank 1
+	[235701] = 144306, -- Enchant Neck - Mark of the Quick Rank 2
+	[235706] = 144306, -- Enchant Neck - Mark of the Quick Rank 3
+	[235696] = 144305, -- Enchant Neck - Mark of the Versatile Rank 1
+	[235700] = 144305, -- Enchant Neck - Mark of the Versatile Rank 2
+	[235704] = 144305, -- Enchant Neck - Mark of the Versatile Rank 3
+	[235695] = 144304, -- Enchant Neck - Mark of the Master Rank 1
+	[235699] = 144304, -- Enchant Neck - Mark of the Master Rank 2
+	[235703] = 144304, -- Enchant Neck - Mark of the Master Rank 3}
 
 --[[
 Skillet.enchantingItemIDs = {
