@@ -1,25 +1,25 @@
 package-as: Skillet
 
 externals:
-    Libs/LibStub:                svn://repos.wowace.com/wow/libstub/mainline/trunk
-    Libs/CallbackHandler-1.0:    svn://repos.wowace.com/wow/callbackhandler/mainline/trunk/CallbackHandler-1.0
-    Libs/AceAddon-3.0:           svn://repos.wowace.com/wow/ace3/mainline/trunk/AceAddon-3.0
-    Libs/AceConfig-3.0:          svn://repos.wowace.com/wow/ace3/mainline/trunk/AceConfig-3.0
-    Libs/AceConsole-3.0:         svn://repos.wowace.com/wow/ace3/mainline/trunk/AceConsole-3.0    
-    Libs/AceLocale-3.0:          svn://repos.wowace.com/wow/ace3/mainline/trunk/AceLocale-3.0
-    Libs/AceDB-3.0:              svn://repos.wowace.com/wow/ace3/mainline/trunk/AceDB-3.0
-    Libs/AceDBOptions-3.0:       svn://repos.wowace.com/wow/ace3/mainline/trunk/AceDBOptions-3.0
-    Libs/AceGUI-3.0:             svn://repos.wowace.com/wow/ace3/mainline/trunk/AceGUI-3.0
-    Libs/AceHook-3.0:            svn://repos.wowace.com/wow/ace3/mainline/trunk/AceHook-3.0
-    Libs/AceEvent-3.0:           svn://repos.wowace.com/wow/ace3/mainline/trunk/AceEvent-3.0
-    Libs/AceTimer-3.0:           svn://repos.wowace.com/wow/ace3/mainline/trunk/AceTimer-3.0
-    Libs/LibAbacus-3.0:          svn://repos.wowace.com/wow/libabacus-3-0/mainline/trunk
-    Libs/LibDialog-1.0:          http://hg.wowace.com/wow/libdialog-1-0/mainline
-    Libs/LibWindow-1.1:          svn://repos.wowace.com/wow/libwindow-1-1/mainline/trunk/LibWindow-1.1
-    Libs/LibPeriodicTable-3.1:   svn://repos.wowace.com/wow/libperiodictable-3-1/mainline/trunk/LibPeriodicTable-3.1
-    Libs/LibPeriodicTable-3.1/LibPeriodicTable-3.1-Tradeskill:   svn://repos.wowace.com/wow/libperiodictable-3-1/mainline/trunk/LibPeriodicTable-3.1-Tradeskill
-    Libs/LibPeriodicTable-3.1/LibPeriodicTable-3.1-TradeskillLevels:   svn://repos.wowace.com/wow/libperiodictable-3-1/mainline/trunk/LibPeriodicTable-3.1-TradeskillLevels
-    Libs/LibPeriodicTable-3.1/LibPeriodicTable-3.1-TradeskillResultMats:   svn://repos.wowace.com/wow/libperiodictable-3-1/mainline/trunk/LibPeriodicTable-3.1-TradeskillResultMats
+    Libs/LibStub:                https://repos.wowace.com/wow/libstub/trunk
+    Libs/CallbackHandler-1.0:    https://repos.wowace.com/wow/callbackhandler/trunk/CallbackHandler-1.0
+    Libs/AceAddon-3.0:           https://repos.wowace.com/wow/ace3/trunk/AceAddon-3.0
+    Libs/AceConfig-3.0:          https://repos.wowace.com/wow/ace3/trunk/AceConfig-3.0
+    Libs/AceConsole-3.0:         https://repos.wowace.com/wow/ace3/trunk/AceConsole-3.0    
+    Libs/AceLocale-3.0:          https://repos.wowace.com/wow/ace3/trunk/AceLocale-3.0
+    Libs/AceDB-3.0:              https://repos.wowace.com/wow/ace3/trunk/AceDB-3.0
+    Libs/AceDBOptions-3.0:       https://repos.wowace.com/wow/ace3/trunk/AceDBOptions-3.0
+    Libs/AceGUI-3.0:             https://repos.wowace.com/wow/ace3/trunk/AceGUI-3.0
+    Libs/AceHook-3.0:            https://repos.wowace.com/wow/ace3/trunk/AceHook-3.0
+    Libs/AceEvent-3.0:           https://repos.wowace.com/wow/ace3/trunk/AceEvent-3.0
+    Libs/AceTimer-3.0:           https://repos.wowace.com/wow/ace3/trunk/AceTimer-3.0
+    Libs/LibAbacus-3.0:          https://repos.wowace.com/wow/libabacus-3-0/trunk
+    Libs/LibDialog-1.0:          http://hg.wowace.com/wow/libdialog-1-0
+    Libs/LibWindow-1.1:          https://repos.wowace.com/wow/libwindow-1-1/trunk/LibWindow-1.1
+    Libs/LibPeriodicTable-3.1:   https://repos.wowace.com/wow/libperiodictable-3-1/trunk/LibPeriodicTable-3.1
+    Libs/LibPeriodicTable-3.1/LibPeriodicTable-3.1-Tradeskill:   https://repos.wowace.com/wow/libperiodictable-3-1/trunk/LibPeriodicTable-3.1-Tradeskill
+    Libs/LibPeriodicTable-3.1/LibPeriodicTable-3.1-TradeskillLevels:   https://repos.wowace.com/wow/libperiodictable-3-1/trunk/LibPeriodicTable-3.1-TradeskillLevels
+    Libs/LibPeriodicTable-3.1/LibPeriodicTable-3.1-TradeskillResultMats:   https://repos.wowace.com/wow/libperiodictable-3-1/trunk/LibPeriodicTable-3.1-TradeskillResultMats
 
 ignore:
     - Old # old classic skillet files
