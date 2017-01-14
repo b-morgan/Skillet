@@ -15,7 +15,7 @@ externals:
     Libs/AceTimer-3.0:           https://repos.wowace.com/wow/ace3/trunk/AceTimer-3.0
     Libs/LibAbacus-3.0:          https://repos.wowace.com/wow/libabacus-3-0/trunk
     Libs/LibDialog-1.0:          http://repos.wowace.com/wow/libdialog-1-0
-    Libs/LibWindow-1.1:          https://repos.wowace.com/wow/libwindow-1-1/trunk/LibWindow-1.1
+    Libs/LibWindow-1.1:          https://repos.wowace.com/wow/libwindow-1-1/trunk
     Libs/LibPeriodicTable-3.1:   https://repos.wowace.com/wow/libperiodictable-3-1/trunk/LibPeriodicTable-3.1
     Libs/LibPeriodicTable-3.1/LibPeriodicTable-3.1-Tradeskill:   https://repos.wowace.com/wow/libperiodictable-3-1/trunk/LibPeriodicTable-3.1-Tradeskill
     Libs/LibPeriodicTable-3.1/LibPeriodicTable-3.1-TradeskillLevels:   https://repos.wowace.com/wow/libperiodictable-3-1/trunk/LibPeriodicTable-3.1-TradeskillLevels
