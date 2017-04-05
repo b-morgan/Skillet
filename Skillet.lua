@@ -58,6 +58,7 @@ local defaults = {
 		use_blizzard_for_followers = false,
 		show_recipe_source_for_learned = false,
 		use_guildbank_as_alt = false,
+		use_altcurrency_vendor_items = false,
 		transparency = 1.0,
 		scale = 1.0,
 		plugins = {},
@@ -202,6 +203,7 @@ Skillet.options =
 					width = "double",
 					order = 17
 				},
+--[[
 				show_crafters_tooltip = {
 					type = "toggle",
 					name = L["SHOWCRAFTERSTOOLTIPNAME"],
@@ -216,6 +218,7 @@ Skillet.options =
 					width = "double",
 					order = 18
 				},
+--]]
 				link_craftable_reagents = {
 					type = "toggle",
 					name = L["LINKCRAFTABLEREAGENTSNAME"],
@@ -360,6 +363,20 @@ Skillet.options =
 					end,
 					width = "double",
 					order = 29
+				},
+				use_altcurrency_vendor_items = {
+					type = "toggle",
+					name = L["USEALTCURRVENDITEMSNAME"],
+					desc = L["USEALTCURRVENDITEMSDESC"],
+					get = function()
+						return Skillet.db.profile.use_altcurrency_vendor_items
+					end,
+					set = function(self,value)
+						Skillet.db.profile.use_altcurrency_vendor_items = value
+						Skillet:UpdateTradeSkillWindow()
+					end,
+					width = "double",
+					order = 30
 				},
 			}
 		},

@@ -54,16 +54,29 @@ local function update_merchant_inventory()
 		for i=1, count, 1 do
 			local link = GetMerchantItemLink(i)
 			if link then
-				local name, texture, price, quantity, numAvailable, isUsable = GetMerchantItemInfo(i)
+				local itemCount, itemTexture, itemValue, itemLink
+				local id = Skillet:GetItemIDFromLink(link)
+				local name, texture, price, quantity, numAvailable, isUsable, extendedCost = GetMerchantItemInfo(i)
+				if extendedCost then
+					itemCount = GetMerchantItemCostInfo(i)
+					if itemCount > 0 then
+						DA.DEBUG(1,"itemCount for "..tostring(name).." ("..tostring(id)..")= "..tostring(itemCount))
+						itemTexture, itemValue, itemLink = GetMerchantItemCostItem(i, 1)
+						DA.DEBUG(1,"Currency for "..tostring(name).." ("..tostring(id)..")= "..tostring(itemLink).."x"..tostring(itemValue))
+					end
+				end
 				if numAvailable == -1  then
-					local id = Skillet:GetItemIDFromLink(link)
 					merchant_inventory[id] = {}
 					merchant_inventory[id].price = price
 					merchant_inventory[id].quantity = quantity
 					if Skillet.db.global.itemRecipeUsedIn[id] then		-- if this item is used in any recipes we know about then
 						if not Skillet:VendorSellsReagent(id) then		-- if its not a known vendor item then
 							DA.DEBUG(1,"adding "..tostring(name).." ("..tostring(id)..")")
-							Skillet.db.global.MissingVendorItems[id] = name or true		-- add it to our table
+							if itemCount > 0 then
+								Skillet.db.global.MissingVendorItems[id] = {name or true, itemValue, Skillet:GetItemIDFromLink(itemLink)}		-- add it to our table
+							else
+								Skillet.db.global.MissingVendorItems[id] = name or true		-- add it to our table
+							end
 						elseif Skillet.db.global.MissingVendorItems[id] then	-- if it is in both our table and the LibPeriodicTable then
 							local PT = LibStub("LibPeriodicTable-3.1")
 							if PT then
