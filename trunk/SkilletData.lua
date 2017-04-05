@@ -1383,8 +1383,17 @@ end
 -- queries for vendor info for a particular itemID
 function Skillet:VendorSellsReagent(itemID)
 -- Check our local data first
-	if self.db.global.MissingVendorItems[itemID] or specialVendorItems[itemID] then
+	if specialVendorItems[itemID] then
 		return true
+	end
+	if self.db.global.MissingVendorItems[itemID] then
+		if type(self.db.global.MissingVendorItems[itemID]) == 'table' then
+			if Skillet.db.profile.use_altcurrency_vendor_items then
+				return true
+			end
+		else
+			return true
+		end
 	end
 -- Check the LibPeriodicTable data next
 	if PT then
