@@ -79,8 +79,8 @@ end
 -- (not to be confused with the reagent craftability which is designed to determine how many
 -- craftable reagents are available for recipe iterations)
 function Skillet:InventorySkillIterations(tradeID, recipe)
---	DA.DEBUG(0,"InventorySkillIterations("..tostring(tradeID)..", "..DA.DUMP1(recipe)..")")
-	DA.DEBUG(0,"InventorySkillIterations("..tostring(tradeID)..", "..tostring(recipe.name)..")")
+--	DA.DEBUG(1,"InventorySkillIterations("..tostring(tradeID)..", "..DA.DUMP1(recipe)..")")
+	DA.DEBUG(1,"InventorySkillIterations("..tostring(tradeID)..", "..tostring(recipe.name)..")")
 	local player = Skillet.currentPlayer
 	if player ~= UnitName("player") then
 		return 0, 0, 0, 0
