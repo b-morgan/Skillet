@@ -403,7 +403,7 @@ function Skillet:RecipeGroupFlatten(group, depth, list, index)
 				  num = num - 1
 				else
 				  num = num + inSub
-				end				
+				end
 			else
 				local skillData = self:GetSkill(self.currentPlayer, self.currentTrade, entry.skillIndex)
 				local recipe = self:GetRecipe(entry.recipeID)
@@ -413,10 +413,10 @@ function Skillet:RecipeGroupFlatten(group, depth, list, index)
 					local filterFavoritesOnly = self:GetTradeSkillOption("favoritesOnly") and not Skillet:IsFavorite(entry.recipeID)
 					if Skillet:GetTradeSkillOption("hideuncraftable") then
 						--DA.DEBUG(1,"name="..tostring(skillData.name)..", numCraftable="..tostring(skillData.numCraftable)..", numRecursive="..tostring(skillData.numRecursive)..", numCraftableVendor="..tostring(skillData.numCraftableVendor)..", numCraftableAlts="..tostring(skillData.numCraftableAlts))
-						if not (skillData.numCraftable > 0 and Skillet:GetTradeSkillOption("filterInventory-bag")) and
-						   not (skillData.numRecursive > 0 and Skillet:GetTradeSkillOption("filterInventory-crafted")) and
-						   not (skillData.numCraftableVendor > 0 and Skillet:GetTradeSkillOption("filterInventory-vendor")) and
-						   not (skillData.numCraftableAlts > 0 and Skillet:GetTradeSkillOption("filterInventory-alts")) then
+						if not (skillData.numCraftable and skillData.numCraftable > 0 and Skillet:GetTradeSkillOption("filterInventory-bag")) and
+						   not (skillData.numRecursive and skillData.numRecursive > 0 and Skillet:GetTradeSkillOption("filterInventory-crafted")) and
+						   not (skillData.numCraftableVendor and skillData.numCraftableVendor > 0 and Skillet:GetTradeSkillOption("filterInventory-vendor")) and
+						   not (skillData.numCraftableAlts and skillData.numCraftableAlts > 0 and Skillet:GetTradeSkillOption("filterInventory-alts")) then
 							filterCraftable = true
 						end
 					end
@@ -568,7 +568,7 @@ function Skillet:RecipeGroupDeconstructDBStrings()
 							recipeID = tonumber(recipeID)
 							--DA.DEBUG(0,recipeID)
 							local skillIndex = self.data.skillIndexLookup[player][recipeID]
-							if skillIndex then 
+							if skillIndex then
 								--DA.DEBUG(0,"adding recipe "..recipeID.." to "..group.name.."/"..player..":"..skillIndex)
 								self:RecipeGroupAddRecipe(group, recipeID, skillIndex, true)
 							end
@@ -653,7 +653,7 @@ end
 
 function Skillet:RecipeGroupIsLocked()
 	if self.currentGroupLabel == "Flat" or self.currentGroupLabel == "Blizzard" then
-		return true 
+		return true
 	end
 	return Skillet:GetTradeSkillOption(self.currentGroupLabel.."-locked")
 end
