@@ -19,6 +19,7 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
 -- Localization
 local L = LibStub("AceLocale-3.0"):GetLocale("Skillet")
+local PT = LibStub("LibPeriodicTable-3.1")
 
 local merchant_inventory = {}
 
@@ -54,15 +55,18 @@ local function update_merchant_inventory()
 		for i=1, count, 1 do
 			local link = GetMerchantItemLink(i)
 			if link then
-				local itemCount, itemTexture, itemValue, itemLink
+				local itemCount, itemTexture, itemValue, itemLink, currencyName
 				local id = Skillet:GetItemIDFromLink(link)
 				local name, texture, price, quantity, numAvailable, isUsable, extendedCost = GetMerchantItemInfo(i)
 				if extendedCost then
 					itemCount = GetMerchantItemCostInfo(i)
 					if itemCount > 0 then
-						DA.DEBUG(1,"itemCount for "..tostring(name).." ("..tostring(id)..")= "..tostring(itemCount))
-						itemTexture, itemValue, itemLink = GetMerchantItemCostItem(i, 1)
-						DA.DEBUG(1,"Currency for "..tostring(name).." ("..tostring(id)..")= "..tostring(itemLink).."x"..tostring(itemValue))
+						DA.DEBUG(2,"itemCount for "..tostring(name).." ("..tostring(id)..")= "..tostring(itemCount))
+						itemTexture, itemValue, itemLink, currencyName = GetMerchantItemCostItem(i, 1)
+						if itemLink then
+							currencyName = GetItemInfo(itemLink)
+						end
+						DA.DEBUG(2,"Currency for "..tostring(name).." ("..tostring(id)..")= "..tostring(currencyName).."x"..tostring(itemValue))
 					end
 				end
 				if numAvailable == -1  then
@@ -73,7 +77,7 @@ local function update_merchant_inventory()
 						if not Skillet:VendorSellsReagent(id) then		-- if its not a known vendor item then
 							DA.DEBUG(1,"adding "..tostring(name).." ("..tostring(id)..")")
 							if itemCount > 0 then
-								Skillet.db.global.MissingVendorItems[id] = {name or true, itemValue, Skillet:GetItemIDFromLink(itemLink)}		-- add it to our table
+								Skillet.db.global.MissingVendorItems[id] = {name or true, itemValue, currencyName}		-- add it to our table
 							else
 								Skillet.db.global.MissingVendorItems[id] = name or true		-- add it to our table
 							end
@@ -81,10 +85,8 @@ local function update_merchant_inventory()
 						if Skillet.db.global.MissingVendorItems[id] then
 							if itemCount > 0 and type(Skillet.db.global.MissingVendorItems[id]) ~= "table" then
 								DA.DEBUG(1,"converting "..tostring(name).." ("..tostring(id)..")")
-								Skillet.db.global.MissingVendorItems[id] = {name or true, itemValue, Skillet:GetItemIDFromLink(itemLink)}		-- convert it
-							end
-							local PT = LibStub("LibPeriodicTable-3.1")
-							if PT then
+								Skillet.db.global.MissingVendorItems[id] = {name or true, itemValue, currencyName}		-- convert it
+							elseif PT then
 								if id~=0 and PT:ItemInSet(id,"Tradeskill.Mat.BySource.Vendor") then
 									DA.DEBUG(1,"removing "..tostring(name).." ("..tostring(id)..")")
 									Skillet.db.global.MissingVendorItems[id] = nil		-- remove it from our table
