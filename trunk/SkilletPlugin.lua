@@ -176,10 +176,6 @@ function Skillet:InitializePlugins()
 			v.OnInitialize()
 		end
 	end
-	local acecfg = LibStub("AceConfig-3.0")
-	acecfg:RegisterOptionsTable("Skillet Plugins", Skillet.pluginsOptions)
-	local acedia = LibStub("AceConfigDialog-3.0")
-	acedia:AddToBlizOptions("Skillet Plugins", "Plugins", "Skillet")
 end
 
 function Skillet:EnablePlugins()
@@ -188,6 +184,8 @@ function Skillet:EnablePlugins()
 		DA.DEBUG(1,"k= "..tostring(k)..", v= "..tostring(v))
 		if v and v.OnEnable then
 			v.OnEnable()
+		elseif v and v.OnInitialize then
+			v.OnInitialize()
 		end
 	end
 end

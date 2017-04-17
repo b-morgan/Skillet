@@ -1016,10 +1016,12 @@ function Skillet:OnInitialize()
 	acecfg:RegisterOptionsTable("Skillet Features", self.options.args.features)
 	acecfg:RegisterOptionsTable("Skillet Appearance", self.options.args.appearance)
 	acecfg:RegisterOptionsTable("Skillet Profiles", LibStub("AceDBOptions-3.0"):GetOptionsTable(self.db))
+	acecfg:RegisterOptionsTable("Skillet Plugins", Skillet.pluginsOptions)
 	local acedia = LibStub("AceConfigDialog-3.0")
 	acedia:AddToBlizOptions("Skillet Features", "Skillet")
 	acedia:AddToBlizOptions("Skillet Appearance", "Appearance", "Skillet")
 	acedia:AddToBlizOptions("Skillet Profiles", "Profiles", "Skillet")
+	acedia:AddToBlizOptions("Skillet Plugins", "Plugins", "Skillet")
 
 --
 -- Copy the profile debugging variables to the "addon name" global table
@@ -1044,7 +1046,7 @@ function Skillet:OnInitialize()
 	Skillet.TraceShow = Skillet.db.profile.TraceShow
 	Skillet.TraceLog = Skillet.db.profile.TraceLog
 	Skillet.ProfileShow = Skillet.db.profile.ProfileShow
-	Skillet:InitializePlugins()
+--	Skillet:InitializePlugins()
 end
 
 function Skillet:FlushAllData()
@@ -1146,6 +1148,10 @@ function Skillet:InitializeDatabase(player)
 			if not self.db.profile.SavedQueues then
 				self.db.profile.SavedQueues = {}
 			end
+			if not self.db.profile.plugins then
+				self.db.profile.plugins = {}
+			end
+			Skillet:InitializePlugins()
 		end
 	end
 end
