@@ -58,6 +58,27 @@ local TSISourceColor = {
 	D = "|cffff0000",
 }
 
+local function GetMoneyString(value)
+	if not value then return "???" end
+	local neg = value < 0 and "-" or ""
+	local gold = floor(math.abs(value) / 10000)
+	local silver = mod(floor(math.abs(value) / 100), 100)
+	local copper = mod(floor(math.abs(value)), 100)
+	if gold ~= 0 then
+		if gold < 100 then
+			return format("%s%dg %ds %dc", neg, gold, silver, copper)
+		elseif gold < 1000 then
+			return format("%s%dg %ds", neg, gold, silver)
+		else
+			return format("%s%dg", neg, gold)
+		end
+	elseif silver ~= 0 then
+		return format("%s%ds %dc", neg, silver, copper)
+	else
+		return format("%s%dc", neg, copper)
+	end
+end
+
 local function TSIGetRecipeSources(recipe, opposing)
 	if not TradeskillInfo.vars.recipes[recipe] then
 		return nil
@@ -148,16 +169,16 @@ function plugin.GetExtraText(skill, recipe)
 					profit = value - cost
 				end
 				label = label.."\n"..GRAY_FONT_COLOR_CODE.."Auction Profit:"..FONT_COLOR_CODE_CLOSE
-				extra_text = extra_text.."\n"..("%s - %s = %s"):format( TradeskillInfo:GetMoneyString(value), TradeskillInfo:GetMoneyString(cost), TradeskillInfo:GetMoneyString(profit) )
+				extra_text = extra_text.."\n"..("%s - %s = %s"):format(GetMoneyString(value), GetMoneyString(cost), GetMoneyString(profit))
 			end
 			if TradeskillInfo:ShowingSkillProfit() then -- insert item value and reagent costs
 				local value, cost, profit = TradeskillInfo:GetCombineCost(tsiRecipeID)
 				if Skillet.scrollData[tsiRecipeID] then
 					value = select(11, GetItemInfo(Skillet.scrollData[tsiRecipeID]))
-					profit = value - cost
+					profit = (value or 0) - (cost or 0) 
 				end
 				label = label.."\n"..GRAY_FONT_COLOR_CODE.."Vendor Profit:"..FONT_COLOR_CODE_CLOSE
-				extra_text = extra_text.."\n"..("%s - %s = %s"):format( TradeskillInfo:GetMoneyString(value), TradeskillInfo:GetMoneyString(cost), TradeskillInfo:GetMoneyString(profit) )
+				extra_text = extra_text.."\n"..("%s - %s = %s"):format(GetMoneyString(value), GetMoneyString(cost), GetMoneyString(profit))
 			end
 			if TradeskillInfo:ShowingSkillLevel() then
 				label = label.."\n"..GRAY_FONT_COLOR_CODE.."Skill Levels:"..FONT_COLOR_CODE_CLOSE

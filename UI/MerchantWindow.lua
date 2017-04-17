@@ -77,7 +77,12 @@ local function update_merchant_inventory()
 							else
 								Skillet.db.global.MissingVendorItems[id] = name or true		-- add it to our table
 							end
-						elseif Skillet.db.global.MissingVendorItems[id] then	-- if it is in both our table and the LibPeriodicTable then
+						end
+						if Skillet.db.global.MissingVendorItems[id] then
+							if itemCount > 0 and type(Skillet.db.global.MissingVendorItems[id]) ~= "table" then
+								DA.DEBUG(1,"converting "..tostring(name).." ("..tostring(id)..")")
+								Skillet.db.global.MissingVendorItems[id] = {name or true, itemValue, Skillet:GetItemIDFromLink(itemLink)}		-- convert it
+							end
 							local PT = LibStub("LibPeriodicTable-3.1")
 							if PT then
 								if id~=0 and PT:ItemInSet(id,"Tradeskill.Mat.BySource.Vendor") then
