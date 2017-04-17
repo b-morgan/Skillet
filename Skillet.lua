@@ -978,16 +978,7 @@ function Skillet:OnInitialize()
 		self.db.global.Categories = {}
 	end
 	if not self.db.global.MissingVendorItems then
-		self.db.global.MissingVendorItems = {
-			[30817] = "Simple Flour",
-			[4539]  = "Goldenbark Apple",
-			[17035] = "Stranglethorn Seed",
-			[17034] = "Maple Seed",
-			[52188] = "Jeweler's Setting",
-			[4399]	= "Wooden Stock",
-			[38682] = "Enchanting Vellum",
-			[3857]	= "Coal",
-}
+		self:InitializeMissingVendorItems()
 	end
 	if not self.db.global.AdjustNumMade then
 		self.db.global.AdjustNumMade = {}
@@ -1059,6 +1050,7 @@ function Skillet:FlushAllData()
 	Skillet.db.realm.inventoryData = {}
 	Skillet.db.realm.userIgnoredMats = {}
 	Skillet:FlushRecipeData()
+	Skillet:InitializeMissingVendorItems()
 end
 
 function Skillet:FlushRecipeData()
@@ -1070,6 +1062,19 @@ function Skillet:FlushRecipeData()
 	if Skillet.data and Skillet.data.recipeInfo then
 		Skillet.data.recipeInfo = {}
 	end
+end
+
+function Skillet:InitializeMissingVendorItems()
+	self.db.global.MissingVendorItems = {
+		[30817] = "Simple Flour",
+		[4539]  = "Goldenbark Apple",
+		[17035] = "Stranglethorn Seed",
+		[17034] = "Maple Seed",
+		[52188] = "Jeweler's Setting",
+		[4399]	= "Wooden Stock",
+		[38682] = "Enchanting Vellum",
+		[3857]	= "Coal",
+	}
 end
 
 function Skillet:InitializeDatabase(player)
