@@ -1236,6 +1236,23 @@ function Skillet:CollectTradeSkillData()
 	self.tradeSkillList = TradeSkillList
 end
 
+-- collects currency data (id to name and name to id)
+function Skillet:CollectCurrencyData()
+	--DA.DEBUG(0,"CollectCurrencyData()")
+	self.currencyIDsByName = {}
+	self.currencyNamesByID = {}
+	local maxCurrency = GetCurrencyListSize()
+	for i=1,maxCurrency,1 do
+		local name, isHeader, isExpanded, isUnused, isWatched, count, icon, maximum, hasWeeklyLimit, currentWeeklyAmount, unknown = GetCurrencyListInfo(i)
+		local currencyLink = GetCurrencyListLink(i)
+		local currencyID = Skillet:GetItemIDFromLink(currencyLink)
+		if not isHeader then
+			self.currencyIDsByName[name] = currencyID
+			self.currencyNamesByID[currencyID] = name
+		end
+	end
+end
+
 -- this routine collects the basic data (which tradeskills a player has)
 -- clean = true means wipe the old data
 function Skillet:ScanPlayerTradeSkills(player)
