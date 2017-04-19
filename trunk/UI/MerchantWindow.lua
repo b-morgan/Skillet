@@ -66,6 +66,8 @@ local function update_merchant_inventory()
 						if itemLink then
 							currencyName = GetItemInfo(itemLink)
 							currencyID = Skillet:GetItemIDFromLink(itemLink)
+						else
+							currencyID = Skillet.currencyIDsByName[currencyName] or 0
 						end
 						DA.DEBUG(2,"Currency for "..tostring(name).." ("..tostring(id)..")= "..tostring(currencyName).." x "..tostring(itemValue))
 					end
@@ -77,9 +79,13 @@ local function update_merchant_inventory()
 					DA.DEBUG(2,"Skillet.db.global.itemRecipeUsedIn["..tostring(id).."]= "..tostring(Skillet.db.global.itemRecipeUsedIn[id]))
 					if Skillet.db.global.itemRecipeUsedIn[id] then		-- if this item is used in any recipes we know about then
 						if not Skillet:VendorSellsReagent(id) then		-- if its not a known vendor item then
-							DA.DEBUG(1,"adding "..tostring(name).." ("..tostring(id)..")")
+							if Skillet.db.global.MissingVendorItems[id] then
+								DA.DEBUG(1,"updating "..tostring(name).." ("..tostring(id)..")")
+							else
+								DA.DEBUG(1,"adding "..tostring(name).." ("..tostring(id)..")")
+							end
 							if itemCount > 0 then
-								Skillet.db.global.MissingVendorItems[id] = {name or true, itemValue, currencyName, currencyID or 0}		-- add it to our table
+								Skillet.db.global.MissingVendorItems[id] = {name or true, itemValue, currencyName, currencyID}		-- add it to our table
 							else
 								Skillet.db.global.MissingVendorItems[id] = name or true		-- add it to our table
 							end
@@ -89,7 +95,7 @@ local function update_merchant_inventory()
 						if Skillet.db.global.MissingVendorItems[id] then
 							if itemCount > 0 and type(Skillet.db.global.MissingVendorItems[id]) ~= "table" then
 								DA.DEBUG(1,"converting "..tostring(name).." ("..tostring(id)..")")
-								Skillet.db.global.MissingVendorItems[id] = {name or true, itemValue, currencyName, currencyID or 0}		-- convert it
+								Skillet.db.global.MissingVendorItems[id] = {name or true, itemValue, currencyName, currencyID}		-- convert it
 							elseif PT then
 								if id~=0 and PT:ItemInSet(id,"Tradeskill.Mat.BySource.Vendor") then
 									DA.DEBUG(1,"removing "..tostring(name).." ("..tostring(id)..")")
