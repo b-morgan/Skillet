@@ -74,7 +74,7 @@ local function update_merchant_inventory()
 					merchant_inventory[id] = {}
 					merchant_inventory[id].price = price
 					merchant_inventory[id].quantity = quantity
-					DA.DEBUG(1,"Skillet.db.global.itemRecipeUsedIn["..tostring(id).."]= "..tostring(Skillet.db.global.itemRecipeUsedIn[id]))
+					DA.DEBUG(2,"Skillet.db.global.itemRecipeUsedIn["..tostring(id).."]= "..tostring(Skillet.db.global.itemRecipeUsedIn[id]))
 					if Skillet.db.global.itemRecipeUsedIn[id] then		-- if this item is used in any recipes we know about then
 						if not Skillet:VendorSellsReagent(id) then		-- if its not a known vendor item then
 							DA.DEBUG(1,"adding "..tostring(name).." ("..tostring(id)..")")
