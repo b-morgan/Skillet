@@ -1063,7 +1063,11 @@ function Skillet:internal_UpdateTradeSkillWindow()
 				-- If this recipe is upgradable, append the current and maximum upgrade levels
 				local recipeInfo = Skillet.data.recipeInfo[self.currentTrade][skill.recipeID]
 				if recipeInfo and recipeInfo.upgradeable then
-				  text = text .. " ("..tostring(recipeInfo.recipeUpgrade).."/"..tostring(recipeInfo.maxUpgrade)..")"
+					if Skillet.db.profile.show_max_upgrade then
+						text = text .. " ("..tostring(recipeInfo.recipeUpgrade).."/"..tostring(recipeInfo.maxUpgrade)..")"
+					else
+						text = text .. " ("..tostring(recipeInfo.recipeUpgrade)..")"
+					end
 				end
 				-- Get any additional text that ThirdPartyHooks (or plugins) might add (right justified at end of text)
 				suffixText:SetText(self:RecipeNameSuffix(skill, recipe) or "")

@@ -59,6 +59,8 @@ local defaults = {
 		show_recipe_source_for_learned = false,
 		use_guildbank_as_alt = false,
 		use_altcurrency_vendor_items = false,
+		show_max_upgrade = true,
+		enhanced_recipe_display = false,
 		transparency = 1.0,
 		scale = 1.0,
 		plugins = {},
@@ -324,19 +326,6 @@ Skillet.options =
 					width = "double",
 					order = 26,
 				},
-				use_blizzard_for_followers = {
-					type = "toggle",
-					name = L["USEBLIZZARDFORFOLLOWERSNAME"],
-					desc = L["USEBLIZZARDFORFOLLOWERSDESC"],
-					get = function()
-						return Skillet.db.profile.use_blizzard_for_followers
-					end,
-					set = function(self,value)
-						Skillet.db.profile.use_blizzard_for_followers = value
-					end,
-					width = "double",
-					order = 27
-				},
 				show_recipe_source_for_learned = {
 					type = "toggle",
 					name = L["SHOWRECIPESOURCEFORLEARNEDNAME"],
@@ -400,6 +389,46 @@ Skillet.options =
 					width = "double",
 					order = 1
 				},
+				show_max_upgrade = {
+					type = "toggle",
+					name = L["SHOWMAXUPGRADENAME"],
+					desc = L["SHOWMAXUPGRADEDESC"],
+					get = function()
+						return Skillet.db.profile.show_max_upgrade
+					end,
+					set = function(self,value)
+						Skillet.db.profile.show_max_upgrade = value
+					end,
+					width = "double",
+					order = 2
+				},
+				use_blizzard_for_followers = {
+					type = "toggle",
+					name = L["USEBLIZZARDFORFOLLOWERSNAME"],
+					desc = L["USEBLIZZARDFORFOLLOWERSDESC"],
+					get = function()
+						return Skillet.db.profile.use_blizzard_for_followers
+					end,
+					set = function(self,value)
+						Skillet.db.profile.use_blizzard_for_followers = value
+					end,
+					width = "double",
+					order = 3
+				},
+				enhanced_recipe_display = {
+					type = "toggle",
+					name = L["ENHANCHEDRECIPEDISPLAYNAME"],
+					desc = L["ENHANCHEDRECIPEDISPLAYDESC"],
+					get = function()
+						return Skillet.db.profile.enhanced_recipe_display
+					end,
+					set = function(self,value)
+						Skillet.db.profile.enhanced_recipe_display = value
+						Skillet:UpdateTradeSkillWindow()
+					end,
+					width = "double",
+					order = 4,
+				},
 				transparency = {
 					type = "range",
 					name = L["Transparency"],
@@ -414,7 +443,7 @@ Skillet.options =
 						Skillet:UpdateStandaloneQueueWindow()
 					end,
 					width = "double",
-					order = 2,
+					order = 10,
 				},
 				scale = {
 					type = "range",
@@ -430,21 +459,7 @@ Skillet.options =
 						Skillet:UpdateStandaloneQueueWindow()
 					end,
 					width = "double",
-					order = 3,
-				},
-				enhanced_recipe_display = {
-					type = "toggle",
-					name = L["ENHANCHEDRECIPEDISPLAYNAME"],
-					desc = L["ENHANCHEDRECIPEDISPLAYDESC"],
-					get = function()
-						return Skillet.db.profile.enhanced_recipe_display
-					end,
-					set = function(self,value)
-						Skillet.db.profile.enhanced_recipe_display = value
-						Skillet:UpdateTradeSkillWindow()
-					end,
-					width = "double",
-					order = 2,
+					order = 11,
 				},
 			},
 		},
