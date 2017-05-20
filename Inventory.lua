@@ -105,7 +105,6 @@ function Skillet:InventorySkillIterations(tradeID, recipe)
 				if reagentCraftable == 0 then
 					reagentCraftable = self:InventoryReagentCraftability(reagentID)
 				end
-				DA.DEBUG(2,"     SkillIterations: reagentID= "..tostring(reagentID).."("..tostring((GetItemInfo(reagentID))).."), reagentCraftable= "..tostring(reagentCraftable))
 				for alt in pairs(self.db.realm.inventoryData) do
 					if alt ~= player then
 						local altBoth = self:GetInventory(alt, reagentID)
@@ -119,9 +118,12 @@ function Skillet:InventorySkillIterations(tradeID, recipe)
 						reagentAvailableAlts = reagentAvailableAlts + cachedGuildbank[guildName][reagentID]
 					end
 				end
+				DA.DEBUG(2,"     SkillIterations: reagentID= "..tostring(reagentID).."("..tostring((GetItemInfo(reagentID))).."), reagentAvailable= "..tostring(reagentAvailable)..", reagentCraftable= "..tostring(reagentCraftable)..", reagentAvailableAlts= "..tostring(reagentAvailableAlts)..", VendorSellsReagent= "..tostring(self:VendorSellsReagent(reagentID)))
 				if self:VendorSellsReagent(reagentID) then	-- if it's available from a vendor, then only worry about bag inventory
 					local vendorAvailable, vendorAvailableAlt = Skillet:VendorItemAvailable(reagentID)
-					numCraftVendor = math.min(numCraftVendor, vendorAvailable, numCraftable2)
+					numCraft = math.min(numCraft, math.floor(reagentAvailable/numNeeded))
+					numCraftable = math.min(numCraftable, math.floor(reagentCraftable/numNeeded))
+					numCraftVendor = math.min(numCraftVendor, math.floor(vendorAvailable/numNeeded))
 					numCraftAlts = math.min(numCraftAlts, math.floor(vendorAvailableAlt/numNeeded))
 				else
 					vendorOnly = false
@@ -148,13 +150,6 @@ function Skillet:InventorySkillIterations(tradeID, recipe)
 		if numCraftable == 100000 then
 			numCraftable = 0					-- there were no craftable reagents
 		end
-		if numCraftable2 == 100000 then
-			numCraftable2 = 0					-- there were no craftable reagents
-		end
-		if numCraftable == 0 and numCraftable2 ~= 0 and numCraftable2 ~= numCraft then
-			numCraftable = numCraftable2
-		end
-
 		DA.DEBUG(2,"     SkillIterations: recipeID= "..tostring(recipeID).."("..tostring(recipe.name).."), numCraft="..tostring(numCraft)..", numCraftable="..tostring(numCraftable)..", numCraftVendor="..tostring(numCraftVendor)..", numCraftAlts="..tostring(numCraftAlts))
 		return numCraft * numMade, numCraftable * numMade, numCraftVendor * numMade, numCraftAlts * numMade
 	else

@@ -128,11 +128,6 @@ function plugin.GetExtraText(skill, recipe)
 	return label, extra_text
 end
 
-function plugin.RecipeNamePrefix(skill, recipe)
-	local text
-	return text
-end
-
 local function TUJMarketValue(itemID)
 	local o = {}
 	TUJMarketInfo(itemID,o)

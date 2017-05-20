@@ -1,10 +1,10 @@
-﻿## Interface: 70200
+## Interface: 70200
 ## Title: Skillet |cff7fff7f -Ace3-|r
 ## Notes: A replacement tradeskill window
 ## Notes-esES: Una sustitucion de la ventana de Habilidades de Comercio
 ## Notes-ruRU: Заменяет окно профессий на более функциональное.
 ## Author: yossa, bsmorgan
-## Version: @project-version@
+## Version: 3.23
 ## X-Category: Tradeskill
 ## X-eMail: yossa.addons@googlemail.com
 ## X-License GPL v3 or later
@@ -82,6 +82,7 @@ Plugins\BeanCounter.lua
 Plugins\TradeSkillMaster.lua
 Plugins\TheUndermineJournal.lua
 Plugins\Auctionator.lua
+Plugins\CanIMogIt.lua
 
 #### UI files
 UI\Utils.lua
