@@ -1226,17 +1226,15 @@ function Skillet:SkillButton_OnEnter(button)
 	-- how many can be created by crafting the reagents
 	if numrecursive > 0 then
 		local text = "\n" .. numrecursive .. " " .. L["can be created by crafting reagents"];
-		if num > 0 then
-			text = "\n" .. text;
-		end
 		tip:AddLine(text, 1, 1, 1, false); -- (text, r, g, b, wrap)
 	end
-	-- how many can be crafted with reagents on *all* alts, including this one.
-	if self.db.profile.show_bank_alt_counts and numwalts and numwalts > 0 and numwalts ~= num then
-		local text = numwalts .. " " .. L["can be created from reagents on all characters"];
-		if num > 0 or numrecursive > 0 then
-			text = "\n" .. text;
-		end
+	-- how many can be crafted with reagents on alts, excluding this one.
+	if numwalts and numwalts > 0 and numwalts ~= num then
+		local text =  "\n" .. numwalts .. " " .. L["can be created from reagents on other characters"];
+		tip:AddLine(text, 1, 1, 1, false);	-- (text, r, g, b, wrap)
+	end
+	if numwvendor and numwvendor > 0 and numwvendor ~= num then
+		local text =  "\n" .. numwvendor .. " " .. L["can be created with reagents bought at vendor"];
 		tip:AddLine(text, 1, 1, 1, false);	-- (text, r, g, b, wrap)
 	end
 	Skillet:AddCustomTooltipInfo(tip, recipe)

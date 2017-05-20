@@ -20,7 +20,8 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
 local L = Skillet.L
 
 Skillet.displayDetailPlugins = {}		-- each plugin will register if it has something to add
-Skillet.RecipeNamePlugins = {}			-- each plugin will register, only one can be active
+Skillet.RecipeNamePrefixes = {}			-- each plugin will register, only one can be active
+Skillet.RecipeNameSuffixes = {}			-- each plugin will register, only one can be active
 
 Skillet.pluginsOrder = 2
 Skillet.pluginsOptions = {
@@ -28,16 +29,33 @@ Skillet.pluginsOptions = {
 		type = "group",
 		childGroups = "tree",
 		args = {
-			RecipeNamePlugins = {
+			RecipeNamePrefix = {
 				type = "select",
-				name = "RecipeNamePlugins",
-				desc = "Only one plugin can supply prefix and/or suffix text",
+				name = "RecipeNamePrefix",
+				desc = "Only one plugin can supply prefix text",
 				order = 1,
 				get = function() 
-					return Skillet.db.profile.plugins.recipeNamePlugin
+					return Skillet.db.profile.plugins.recipeNamePrefix
 				end,
 				set = function(_, value)
-					Skillet.db.profile.plugins.recipeNamePlugin = value
+					Skillet.db.profile.plugins.recipeNamePrefix = value
+					Skillet:UpdateTradeSkillWindow()
+				end,
+				values = {
+					[" "] = " ",
+--					Additional entries filled in dynamically by RegisterRecipeNamePlugin
+				},
+			},
+			RecipeNameSuffix = {
+				type = "select",
+				name = "RecipeNameSuffix",
+				desc = "Only one plugin can supply suffix text",
+				order = 1,
+				get = function() 
+					return Skillet.db.profile.plugins.recipeNameSuffix
+				end,
+				set = function(_, value)
+					Skillet.db.profile.plugins.recipeNameSuffix = value
 					Skillet:UpdateTradeSkillWindow()
 				end,
 				values = {
@@ -60,9 +78,15 @@ function Skillet:RegisterRecipeNamePlugin(moduleName, priority)
 	if not priority then priority = 100 end
 	if type(moduleName) == "string" then
 		local module = Skillet[moduleName]
-		if module and type(module) == "table" and (module.RecipeNamePrefix or module.RecipeNameSuffix) then
-			Skillet.RecipeNamePlugins[moduleName] = module
-			Skillet.pluginsOptions.args.RecipeNamePlugins.values[module.options.name] = module.options.name
+		if module and type(module) == "table" then
+			if module.RecipeNamePrefix then
+				Skillet.RecipeNamePrefixes[moduleName] = module
+				Skillet.pluginsOptions.args.RecipeNamePrefix.values[module.options.name] = module.options.name
+			end
+			if module.RecipeNameSuffix then
+				Skillet.RecipeNameSuffixes[moduleName] = module
+				Skillet.pluginsOptions.args.RecipeNameSuffix.values[module.options.name] = module.options.name
+			end
 		end
 	end
 end
@@ -134,12 +158,13 @@ end
 
 function Skillet:RecipeNamePrefix(skill, recipe)
 	local text
-	local recipeNamePlugin = self.db.profile.plugins.recipeNamePlugin
-	if recipeNamePlugin and recipeNamePlugin ~= " " then
-		for k,v in pairs(Skillet.RecipeNamePlugins) do
+	local recipeNamePrefix = self.db.profile.plugins.recipeNamePrefix
+	if recipeNamePrefix and recipeNamePrefix ~= " " then
+		for k,v in pairs(Skillet.RecipeNamePrefixes) do
 			--DA.DEBUG(1,"k= "..tostring(k)..", v= "..tostring(v))
-			if v.RecipeNamePrefix and v.options.name == recipeNamePlugin then
+			if v.RecipeNamePrefix and v.options.name == recipeNamePrefix then
 				text = v.RecipeNamePrefix(skill, recipe)
+				--DA.DEBUG(1,"text= "..tostring(text))
 				break
 			end
 		end
@@ -152,12 +177,13 @@ end
 
 function Skillet:RecipeNameSuffix(skill, recipe)
 	local text
-	local recipeNamePlugin = self.db.profile.plugins.recipeNamePlugin
-	if recipeNamePlugin and recipeNamePlugin ~= " " then
-		for k,v in pairs(Skillet.RecipeNamePlugins) do
+	local recipeNameSuffix = self.db.profile.plugins.recipeNameSuffix
+	if recipeNameSuffix and recipeNameSuffix ~= " " then
+		for k,v in pairs(Skillet.RecipeNameSuffixes) do
 			--DA.DEBUG(1,"k= "..tostring(k)..", v= "..tostring(v))
-			if v.RecipeNameSuffix and v.options.name == recipeNamePlugin then
+			if v.RecipeNameSuffix and v.options.name == recipeNameSuffix then
 				text = v.RecipeNameSuffix(skill, recipe)
+				--DA.DEBUG(1,"text= "..tostring(text))
 				break
 			end
 		end

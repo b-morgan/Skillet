@@ -97,15 +97,6 @@ function plugin.GetExtraText(skill, recipe)
 	return label, extra_text
 end
 
-function plugin.RecipeNamePrefix(skill, recipe)
-	local text
-	if not skill or not recipe then return end
-	if Skillet.db.profile.plugins.ATR.enabled then
---		Processing goes here
-		return text
-	end
-end
-
 function plugin.RecipeNameSuffix(skill, recipe)
 	local text
 	if recipe then
