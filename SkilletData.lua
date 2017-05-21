@@ -896,19 +896,30 @@ function Skillet:IsNotSupportedFollower(tradeID)
 	return false -- Use Skillet frame
 end
 
+-- returns the number of items that can be bought limited by the amount of currency available
 function Skillet:VendorItemAvailable(itemID)
 	if specialVendorItems[itemID] then
 		local divider = specialVendorItems[itemID][1]
 		local currency = specialVendorItems[itemID][2]
-		local reagentAvailability = self:GetInventory(self.currentPlayer, currency)
-		local reagentAvailableAlts = 0
+		local currencyAvailable = self:GetInventory(self.currentPlayer, currency)
+		local currencyAvailableAlts = 0
 		for alt in pairs(self.db.realm.inventoryData) do
 			if alt ~= self.currentPlayer then
 				local altBoth = self:GetInventory(alt, currency)
-				reagentAvailableAlts = reagentAvailableAlts + (altBoth or 0)
+				currencyAvailableAlts = currencyAvailableAlts + (altBoth or 0)
 			end
 		end
-		return math.floor(reagentAvailability / divider), math.floor(reagentAvailableAlts / divider)
+		return math.floor(currencyAvailable / divider), math.floor(currencyAvailableAlts / divider)
+	elseif self.db.global.MissingVendorItems[itemID] then
+		if type(self.db.global.MissingVendorItems[itemID]) == 'table' then
+			if Skillet.db.profile.use_altcurrency_vendor_items then
+				return 100000, 100000
+			else
+				return 0, 0
+			end
+		else
+			return 100000, 100000
+		end
 	else
 		return 100000, 100000
 	end
