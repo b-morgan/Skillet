@@ -67,7 +67,7 @@ local function update_merchant_inventory()
 							currencyName = GetItemInfo(itemLink)
 							currencyID = Skillet:GetItemIDFromLink(itemLink)
 						else
-							currencyID = Skillet.currencyIDsByName[currencyName] or 0
+							currencyID = -1 * tonumber(Skillet.currencyIDsByName[currencyName] or 0)
 						end
 						DA.DEBUG(2,"Currency for "..tostring(name).." ("..tostring(id)..")= "..tostring(currencyName).." x "..tostring(itemValue))
 					end
@@ -84,7 +84,7 @@ local function update_merchant_inventory()
 								DA.DEBUG(1,"adding "..tostring(name).." ("..tostring(id)..")")
 							end
 							if itemCount and itemCount > 0 then
-								Skillet.db.global.MissingVendorItems[id] = {name or true, itemValue, currencyName, currencyID}		-- add it to our table
+								Skillet.db.global.MissingVendorItems[id] = {name or true, quantity, currencyName, currencyID, itemValue}		-- add it to our table
 							else
 								Skillet.db.global.MissingVendorItems[id] = name or true		-- add it to our table
 							end
@@ -94,7 +94,7 @@ local function update_merchant_inventory()
 						if Skillet.db.global.MissingVendorItems[id] then
 							if itemCount and itemCount > 0 and type(Skillet.db.global.MissingVendorItems[id]) ~= "table" then
 								DA.DEBUG(1,"converting "..tostring(name).." ("..tostring(id)..")")
-								Skillet.db.global.MissingVendorItems[id] = {name or true, itemValue, currencyName, currencyID}		-- convert it
+								Skillet.db.global.MissingVendorItems[id] = {name or true, quantity, currencyName, currencyID, itemValue}		-- convert it
 							elseif PT then
 								if id~=0 and PT:ItemInSet(id,"Tradeskill.Mat.BySource.Vendor") then
 									DA.DEBUG(1,"removing "..tostring(name).." ("..tostring(id)..")")

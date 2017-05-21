@@ -1079,6 +1079,8 @@ function Skillet:FlushRecipeData()
 	end
 end
 
+-- MissingVendorItem entries can be a string when bought with gold or a table when bought with an alternate currency
+-- table entries are {name, quantity, currencyName, currencyID, currencyCount}
 function Skillet:InitializeMissingVendorItems()
 	self.db.global.MissingVendorItems = {
 		[30817] = "Simple Flour",
