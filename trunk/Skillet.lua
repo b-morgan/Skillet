@@ -1052,7 +1052,6 @@ function Skillet:OnInitialize()
 	Skillet.TraceShow = Skillet.db.profile.TraceShow
 	Skillet.TraceLog = Skillet.db.profile.TraceLog
 	Skillet.ProfileShow = Skillet.db.profile.ProfileShow
---	Skillet:InitializePlugins()
 end
 
 function Skillet:FlushAllData()
@@ -1172,6 +1171,12 @@ function Skillet:InitializeDatabase(player)
 			end
 			if not self.db.profile.plugins then
 				self.db.profile.plugins = {}
+			end
+			if self.db.profile.plugins.recipeNamePlugin then
+				if not self.db.profile.plugins.recipeNameSuffix then
+					self.db.profile.plugins.recipeNameSuffix = self.db.profile.plugins.recipeNamePlugin
+				end
+				self.db.profile.plugins.recipeNamePlugin = nil
 			end
 			Skillet:InitializePlugins()
 		end
