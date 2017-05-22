@@ -90,6 +90,11 @@ local function update_merchant_inventory()
 							end
 						else
 							DA.DEBUG(1,"known "..tostring(name).." ("..tostring(id)..")")
+							if type(Skillet.db.global.MissingVendorItems[id]) == "table" then
+								if #Skillet.db.global.MissingVendorItems[id] ~= 5 then
+									Skillet.db.global.MissingVendorItems[id] = "Fix Me"
+								end
+							end
 						end
 						if Skillet.db.global.MissingVendorItems[id] then
 							if itemCount and itemCount > 0 and type(Skillet.db.global.MissingVendorItems[id]) ~= "table" then
