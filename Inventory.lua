@@ -79,8 +79,8 @@ end
 -- (not to be confused with the reagent craftability which is designed to determine how many
 -- craftable reagents are available for recipe iterations)
 function Skillet:InventorySkillIterations(tradeID, recipe)
---	DA.DEBUG(1,"InventorySkillIterations("..tostring(tradeID)..", "..DA.DUMP1(recipe)..")")
-	DA.DEBUG(1,"InventorySkillIterations("..tostring(tradeID)..", "..tostring(recipe.name)..")")
+	--DA.DEBUG(1,"InventorySkillIterations("..tostring(tradeID)..", "..DA.DUMP1(recipe)..")")
+	--DA.DEBUG(1,"InventorySkillIterations("..tostring(tradeID)..", "..tostring(recipe.name)..")")
 	local player = Skillet.currentPlayer
 	if player ~= UnitName("player") then
 		return 0, 0, 0, 0
@@ -118,7 +118,7 @@ function Skillet:InventorySkillIterations(tradeID, recipe)
 						reagentAvailableAlts = reagentAvailableAlts + cachedGuildbank[guildName][reagentID]
 					end
 				end
-				DA.DEBUG(2,"     SkillIterations: reagentID= "..tostring(reagentID).."("..tostring((GetItemInfo(reagentID))).."), reagentAvailable= "..tostring(reagentAvailable)..", reagentCraftable= "..tostring(reagentCraftable)..", reagentAvailableAlts= "..tostring(reagentAvailableAlts)..", VendorSellsReagent= "..tostring(self:VendorSellsReagent(reagentID)))
+				--DA.DEBUG(2,"     SkillIterations: reagentID= "..tostring(reagentID).."("..tostring((GetItemInfo(reagentID))).."), reagentAvailable= "..tostring(reagentAvailable)..", reagentCraftable= "..tostring(reagentCraftable)..", reagentAvailableAlts= "..tostring(reagentAvailableAlts)..", VendorSellsReagent= "..tostring(self:VendorSellsReagent(reagentID)))
 				if self:VendorSellsReagent(reagentID) then	-- if it's available from a vendor, then only worry about bag inventory
 					local vendorAvailable, vendorAvailableAlts = Skillet:VendorItemAvailable(reagentID)
 					numCraft = math.min(numCraft, math.floor(reagentAvailable/numNeeded))
@@ -132,7 +132,7 @@ function Skillet:InventorySkillIterations(tradeID, recipe)
 					numCraftAlts = math.min(numCraftAlts, math.floor(reagentAvailableAlts/numNeeded))
 					numCraftVendor = math.min(numCraftVendor, numCraft)
 				end
-				DA.DEBUG(2,"     SkillIterations:      numCraft="..tostring(numCraft)..", numCraftable="..tostring(numCraftable)..", numCraftAlts="..tostring(numCraftAlts)..", numCraftVendor="..tostring(numCraftVendor))
+				--DA.DEBUG(2,"     SkillIterations:      numCraft="..tostring(numCraft)..", numCraftable="..tostring(numCraftable)..", numCraftAlts="..tostring(numCraftAlts)..", numCraftVendor="..tostring(numCraftVendor))
 			else								-- no data means no craftability
 				DA.CHAT("reagent id seems corrupt!")
 				DA.DEBUG(0,"recipe= "..DA.DUMP1(recipe))
@@ -153,7 +153,7 @@ function Skillet:InventorySkillIterations(tradeID, recipe)
 		if numCraft == numCraftVendor then
 			numCraftVendor = 0					-- only keep vendor count if different
 		end
-		DA.DEBUG(2,"     SkillIterations: recipeID= "..tostring(recipeID).."("..tostring(recipe.name).."), numCraft="..tostring(numCraft)..", numCraftable="..tostring(numCraftable)..", numCraftVendor="..tostring(numCraftVendor)..", numCraftAlts="..tostring(numCraftAlts))
+		--DA.DEBUG(2,"     SkillIterations: recipeID= "..tostring(recipeID).."("..tostring(recipe.name).."), numCraft="..tostring(numCraft)..", numCraftable="..tostring(numCraftable)..", numCraftVendor="..tostring(numCraftVendor)..", numCraftAlts="..tostring(numCraftAlts))
 		return numCraft * numMade, numCraftable * numMade, numCraftVendor * numMade, numCraftAlts * numMade
 	else
 		DA.DEBUG(2,"     SkillIterations: recipeID= "..tostring(recipeID).."("..tostring(recipe.name)..") has no reagent data")
