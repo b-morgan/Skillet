@@ -61,7 +61,7 @@ local function update_merchant_inventory()
 				if extendedCost then
 					itemCount = GetMerchantItemCostInfo(i)
 					if itemCount > 0 then
-						DA.DEBUG(2,"itemCount for "..tostring(name).." ("..tostring(id)..")= "..tostring(itemCount))
+						--DA.DEBUG(2,"itemCount for "..tostring(name).." ("..tostring(id)..")= "..tostring(itemCount))
 						itemTexture, itemValue, itemLink, currencyName = GetMerchantItemCostItem(i, 1)
 						if itemLink then
 							currencyName = GetItemInfo(itemLink)
@@ -69,7 +69,7 @@ local function update_merchant_inventory()
 						else
 							currencyID = -1 * tonumber(Skillet.currencyIDsByName[currencyName] or 0)
 						end
-						DA.DEBUG(2,"Currency for "..tostring(name).." ("..tostring(id)..")= "..tostring(currencyName).." x "..tostring(itemValue))
+						--DA.DEBUG(2,"Currency for "..tostring(name).." ("..tostring(id)..")= "..tostring(currencyName).." x "..tostring(itemValue))
 					end
 				end
 				if numAvailable == -1  then
@@ -79,9 +79,9 @@ local function update_merchant_inventory()
 					if Skillet.db.global.itemRecipeUsedIn[id] then		-- if this item is used in any recipes we know about then
 						if not Skillet:VendorSellsReagent(id) then		-- if its not a known vendor item then
 							if Skillet.db.global.MissingVendorItems[id] then
-								DA.DEBUG(1,"updating "..tostring(name).." ("..tostring(id)..")")
+								--DA.DEBUG(1,"updating "..tostring(name).." ("..tostring(id)..")")
 							else
-								DA.DEBUG(1,"adding "..tostring(name).." ("..tostring(id)..")")
+								--DA.DEBUG(1,"adding "..tostring(name).." ("..tostring(id)..")")
 							end
 							if itemCount and itemCount > 0 then
 								Skillet.db.global.MissingVendorItems[id] = {name or true, quantity, currencyName, currencyID, itemValue}		-- add it to our table
@@ -89,7 +89,7 @@ local function update_merchant_inventory()
 								Skillet.db.global.MissingVendorItems[id] = name or true		-- add it to our table
 							end
 						else
-							DA.DEBUG(1,"known "..tostring(name).." ("..tostring(id)..")")
+							--DA.DEBUG(1,"known "..tostring(name).." ("..tostring(id)..")")
 							if type(Skillet.db.global.MissingVendorItems[id]) == "table" then
 								if #Skillet.db.global.MissingVendorItems[id] ~= 5 then
 									Skillet.db.global.MissingVendorItems[id] = "Fix Me"
@@ -98,11 +98,11 @@ local function update_merchant_inventory()
 						end
 						if Skillet.db.global.MissingVendorItems[id] then
 							if itemCount and itemCount > 0 and type(Skillet.db.global.MissingVendorItems[id]) ~= "table" then
-								DA.DEBUG(1,"converting "..tostring(name).." ("..tostring(id)..")")
+								--DA.DEBUG(1,"converting "..tostring(name).." ("..tostring(id)..")")
 								Skillet.db.global.MissingVendorItems[id] = {name or true, quantity, currencyName, currencyID, itemValue}		-- convert it
 							elseif PT then
 								if id~=0 and PT:ItemInSet(id,"Tradeskill.Mat.BySource.Vendor") then
-									DA.DEBUG(1,"removing "..tostring(name).." ("..tostring(id)..")")
+									--DA.DEBUG(1,"removing "..tostring(name).." ("..tostring(id)..")")
 									Skillet.db.global.MissingVendorItems[id] = nil		-- remove it from our table
 								end
 							end

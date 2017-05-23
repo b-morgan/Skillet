@@ -898,11 +898,12 @@ end
 
 -- returns the number of items that can be bought limited by the amount of currency available
 function Skillet:VendorItemAvailable(itemID)
+	--DA.DEBUG(0,"VendorItemAvailable("..tostring(itemID)..")")
+	local _, divider, currency, currencyAvailable, currencyAvailableAlts = 0
 	if specialVendorItems[itemID] then
-		local divider = specialVendorItems[itemID][1]
-		local currency = specialVendorItems[itemID][2]
-		local currencyAvailable = self:GetInventory(self.currentPlayer, currency)
-		local currencyAvailableAlts = 0
+		divider = specialVendorItems[itemID][1]
+		currency = specialVendorItems[itemID][2]
+		currencyAvailable = self:GetInventory(self.currentPlayer, currency)
 		for alt in pairs(self.db.realm.inventoryData) do
 			if alt ~= self.currentPlayer then
 				local altBoth = self:GetInventory(alt, currency)
@@ -911,17 +912,26 @@ function Skillet:VendorItemAvailable(itemID)
 		end
 		return math.floor(currencyAvailable / divider), math.floor(currencyAvailableAlts / divider)
 	elseif self.db.global.MissingVendorItems[itemID] then
-		if type(self.db.global.MissingVendorItems[itemID]) == 'table' then
+		local MissingVendorItem = self.db.global.MissingVendorItems[itemID]
+		if type(MissingVendorItem) == 'table' then	-- table entries are {name, quantity, currencyName, currencyID, currencyCount}
 			if Skillet.db.profile.use_altcurrency_vendor_items then
-				return 100000, 100000
+				--DA.DEBUG(1,"MissingVendorItem="..DA.DUMP1(MissingVendorItem))
+				if MissingVendorItem[4] > 0 then
+					currencyAvailable = self:GetInventory(self.currentPlayer, MissingVendorItem[4])
+				else
+					_, currencyAvailable = GetCurrencyInfo(-1 * MissingVendorItem[4])
+				end
+				--DA.DEBUG(1,"currencyAvailable="..tostring(currencyAvailable))
+-- compute how many this player can buy with alternate currency and return 0 for alts
+				return math.floor(MissingVendorItem[2] * currencyAvailable / (MissingVendorItem[5] or 1)), 0
 			else
-				return 0, 0
+				return 0, 0		-- vendor sells item for an alternate currency and we are ignoring it.
 			end
 		else
-			return 100000, 100000
+			return 100000, 100000	-- vendor sells item for gold, price is not available so assume lots of gold
 		end
 	else
-		return 100000, 100000
+		return 100000, 100000	-- vendor sells item for gold, price is not available so assume lots of gold
 	end
 end
 
