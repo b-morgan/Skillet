@@ -21,7 +21,7 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
 -- not considering alts
 -- does consider queued recipes
 function Skillet:InventoryReagentCraftability(reagentID)
-	--DA.DEBUG(0,"InventoryReagentCraftability("..tostring(reagentID)..") -- "..tostring((GetItemInfo(reagentID))))
+	--DA.DEBUG(1,"InventoryReagentCraftability("..tostring(reagentID)..") -- "..tostring((GetItemInfo(reagentID))))
 	if not reagentID or reagentID == 0 then
 		return 0 
 	end
@@ -44,7 +44,7 @@ function Skillet:InventoryReagentCraftability(reagentID)
 			local childRecipe = self:GetRecipe(childRecipeID)
 			local childSkillIndex = skillIndexLookup[childRecipeID]		-- only interested in current player for now
 			if childSkillIndex and childRecipe and #childRecipe.reagentData > 0 and
-			  not Skillet.TradeSkillIgnoredMats[childRecipeID] and not Skillet.db.realm.userIgnoredMats[player][childRecipeID] then
+			  not self.TradeSkillIgnoredMats[childRecipeID] and not self.db.realm.userIgnoredMats[player][childRecipeID] then
 				local numCraftable = 100000
 				for i=1,#childRecipe.reagentData,1 do
 					local childReagent = childRecipe.reagentData[i]
@@ -52,7 +52,11 @@ function Skillet:InventoryReagentCraftability(reagentID)
 					local numReagentCraftable = self:InventoryReagentCraftability(childReagent.reagentID)
 					--DA.DEBUG(2,"     ReagentCraftability: childID="..childReagent.reagentID.." ("..tostring((GetItemInfo(childReagent.reagentID))).."), numReagentOnHand="..tostring(numReagentOnHand)..", numReagentCraftable= "..tostring(numReagentCraftable))
 					numReagentCraftable = numReagentCraftable + numReagentOnHand
-					numCraftable = math.min(numCraftable, math.floor(numReagentCraftable/childReagent.numNeeded))
+					if not self:VendorSellsReagent(childReagent.reagentID) then
+						numCraftable = math.min(numCraftable, math.floor(numReagentCraftable/childReagent.numNeeded))
+					else
+					--DA.DEBUG(2,"     ReagentCraftability: VendorSellsReagent")
+					end
 				end
 				numReagentsCrafted = numReagentsCrafted + numCraftable * childRecipe.numMade
 			end
@@ -67,9 +71,9 @@ function Skillet:InventoryReagentCraftability(reagentID)
 	local numInBoth = self:GetInventory(player, reagentID)
 	local numCrafted = numReagentsCrafted + queued
 	if numCrafted == 0 then
-		Skillet.db.realm.inventoryData[player][reagentID] = numInBoth
+		self.db.realm.inventoryData[player][reagentID] = numInBoth
 	else
-		Skillet.db.realm.inventoryData[player][reagentID] = numInBoth.." "..numCrafted
+		self.db.realm.inventoryData[player][reagentID] = numInBoth.." "..numCrafted
 	end
 	--DA.DEBUG(2,"     ReagentCraftability: numInBoth= "..tostring(numInBoth)..", numCrafted= "..tostring(numCrafted)..", reagentID= "..tostring(reagentID).."("..tostring((GetItemInfo(reagentID)))..")")
 	return numCrafted
@@ -79,7 +83,6 @@ end
 -- (not to be confused with the reagent craftability which is designed to determine how many
 -- craftable reagents are available for recipe iterations)
 function Skillet:InventorySkillIterations(tradeID, recipe)
-	--DA.DEBUG(1,"InventorySkillIterations("..tostring(tradeID)..", "..DA.DUMP1(recipe)..")")
 	--DA.DEBUG(1,"InventorySkillIterations("..tostring(tradeID)..", "..tostring(recipe.name)..")")
 	local player = Skillet.currentPlayer
 	if player ~= UnitName("player") then
@@ -130,7 +133,7 @@ function Skillet:InventorySkillIterations(tradeID, recipe)
 					numCraft = math.min(numCraft, math.floor(reagentAvailable/numNeeded))
 					numCraftable = math.min(numCraftable, math.floor((reagentAvailable+reagentCraftable)/numNeeded))
 					numCraftAlts = math.min(numCraftAlts, math.floor(reagentAvailableAlts/numNeeded))
-					numCraftVendor = math.min(numCraftVendor, numCraft)
+					numCraftVendor = math.min(numCraftVendor, math.max(numCraft, numCraftable))
 				end
 				--DA.DEBUG(2,"     SkillIterations:      numCraft="..tostring(numCraft)..", numCraftable="..tostring(numCraftable)..", numCraftAlts="..tostring(numCraftAlts)..", numCraftVendor="..tostring(numCraftVendor))
 			else								-- no data means no craftability
@@ -150,7 +153,7 @@ function Skillet:InventorySkillIterations(tradeID, recipe)
 		if numCraft == numCraftable then
 			numCraftable = 0					-- only keep craftable count if different
 		end
-		if numCraft == numCraftVendor then
+		if numCraft == numCraftVendor or numCraftable == numCraftVendor then
 			numCraftVendor = 0					-- only keep vendor count if different
 		end
 		--DA.DEBUG(2,"     SkillIterations: recipeID= "..tostring(recipeID).."("..tostring(recipe.name).."), numCraft="..tostring(numCraft)..", numCraftable="..tostring(numCraftable)..", numCraftVendor="..tostring(numCraftVendor)..", numCraftAlts="..tostring(numCraftAlts))
@@ -235,6 +238,65 @@ function Skillet:GetInventory(player, reagentID)
 		end
 	end
 	return 0, 0		-- have, make
+end
+
+-- queries for vendor info for a particular itemID
+function Skillet:VendorSellsReagent(itemID)
+	if self.db.global.MissingVendorItems[itemID] then
+		if type(self.db.global.MissingVendorItems[itemID]) == 'table' then
+			if Skillet.db.profile.use_altcurrency_vendor_items then
+				return true
+			end
+		else
+			return true
+		end
+	end
+-- Check the LibPeriodicTable data next
+	if PT then
+		if itemID~=0 and PT:ItemInSet(itemID,"Tradeskill.Mat.BySource.Vendor") then
+			return true
+		end
+	end
+	return false
+end
+
+-- returns the number of items that can be bought limited by the amount of currency available
+function Skillet:VendorItemAvailable(itemID)
+	--DA.DEBUG(0,"VendorItemAvailable("..tostring(itemID)..")")
+	local _, divider, currency, currencyAvailable, currencyAvailableAlts = 0
+	if self.SpecialVendorItems[itemID] then
+		divider = self.SpecialVendorItems[itemID][1]
+		currency = self.SpecialVendorItems[itemID][2]
+		currencyAvailable = self:GetInventory(self.currentPlayer, currency)
+		for alt in pairs(self.db.realm.inventoryData) do
+			if alt ~= self.currentPlayer then
+				local altBoth = self:GetInventory(alt, currency)
+				currencyAvailableAlts = currencyAvailableAlts + (altBoth or 0)
+			end
+		end
+		return math.floor(currencyAvailable / divider), math.floor(currencyAvailableAlts / divider)
+	elseif self.db.global.MissingVendorItems[itemID] then
+		local MissingVendorItem = self.db.global.MissingVendorItems[itemID]
+		if type(MissingVendorItem) == 'table' then	-- table entries are {name, quantity, currencyName, currencyID, currencyCount}
+			if Skillet.db.profile.use_altcurrency_vendor_items then
+				--DA.DEBUG(1,"MissingVendorItem="..DA.DUMP1(MissingVendorItem))
+				if MissingVendorItem[4] > 0 then
+					currencyAvailable = self:GetInventory(self.currentPlayer, MissingVendorItem[4])
+				else
+					_, currencyAvailable = GetCurrencyInfo(-1 * MissingVendorItem[4])
+				end
+				--DA.DEBUG(1,"currencyAvailable="..tostring(currencyAvailable))
+-- compute how many this player can buy with alternate currency and return 0 for alts
+				return math.floor(MissingVendorItem[2] * currencyAvailable / (MissingVendorItem[5] or 1)), 0
+			else
+				return 0, 0		-- vendor sells item for an alternate currency and we are ignoring it.
+			end
+		else
+			return 100000, 100000	-- vendor sells item for gold, price is not available so assume lots of gold
+		end
+	else
+		return 100000, 100000	-- vendor sells item for gold, price is not available so assume lots of gold
+	end
 end
 
 function Skillet:AuctionScan()
