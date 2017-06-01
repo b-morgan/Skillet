@@ -92,6 +92,7 @@ end
 function Skillet:InventorySkillIterations(tradeID, recipe)
 	DA.DEBUG(1,"InventorySkillIterations("..tostring(tradeID)..", "..tostring(recipe.name)..")")
 	local player = Skillet.currentPlayer
+	local faction = self.db.realm.faction[player]
 	if player ~= UnitName("player") then
 		return 0, 0, 0, 0
 	end
@@ -118,7 +119,7 @@ function Skillet:InventorySkillIterations(tradeID, recipe)
 					reagentCraftable, reagentCraftableVendor = self:InventoryReagentCraftability(reagentID)
 				end
 				for alt in pairs(self.db.realm.inventoryData) do
-					if alt ~= player then
+					if alt ~= player and self.db.realm.faction[alt] == faction then
 						local altBoth = self:GetInventory(alt, reagentID)
 						reagentAvailableAlts = reagentAvailableAlts + altBoth
 					end
