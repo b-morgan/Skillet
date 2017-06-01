@@ -960,6 +960,9 @@ function Skillet:OnInitialize()
 	if self.db.realm.recipeInfo then
 		self.db.realm.recipeInfo = nil
 	end
+	if self.db.realm.skillDB then
+		self.db.realm.skillDB = nil
+	end
 
 -- Clean up if database is stale
 	local _,wowBuild,_,wowVersion = GetBuildInfo();
@@ -1072,7 +1075,6 @@ function Skillet:FlushRecipeData()
 	Skillet.db.global.itemRecipeUsedIn = {}
 	Skillet.db.global.itemRecipeSource = {}
 	Skillet.db.global.Categories = {}
-	Skillet.db.realm.skillDB = {}
 	if Skillet.data and Skillet.data.recipeInfo then
 		Skillet.data.recipeInfo = {}
 	end
@@ -1098,15 +1100,27 @@ function Skillet:InitializeDatabase(player)
 	if self.linkedSkill or self.isGuild then  -- Avoid adding unnecessary data to savedvariables
 		return
 	end
+	if not self.data then
+		self.data = {}
+	end
+	if not self.data.recipeInfo then
+		self.data.recipeInfo = {}
+	end
+	if not self.data.recipeList then
+		self.data.recipeList = {}
+	end
+	if not self.data.skillList then
+		self.data.skillList = {}
+	end
+	if not self.data.groupList then
+		self.data.groupList = {}
+	end
+	if not self.data.skillIndexLookup then
+		self.data.skillIndexLookup = {}
+	end
 	if player then
 		if not self.db.realm.groupDB then
 			self.db.realm.groupDB = {}
-		end
-		if not self.db.realm.skillDB then
-			self.db.realm.skillDB = {}
-		end
-		if not self.db.realm.skillDB[player] then
-			self.db.realm.skillDB[player] = {}
 		end
 		if not self.db.realm.queueData then
 			self.db.realm.queueData = {}
@@ -1119,33 +1133,6 @@ function Skillet:InitializeDatabase(player)
 		end
 		if not self.db.realm.auctionData[player] then
 			self.db.realm.auctionData[player] = {}
-		end
-		if not self.data then
-			self.data = {}
-		end
-		if not self.data.recipeInfo then
-			self.data.recipeInfo = {}
-		end
-		if not self.data.recipeList then
-			self.data.recipeList = {}
-		end
-		if not self.data.skillList then
-			self.data.skillList = {}
-		end
-		if not self.data.skillList[player] then
-			self.data.skillList[player] = {}
-		end
-		if not self.data.groupList then
-			self.data.groupList = {}
-		end
-		if not self.data.groupList[player] then
-			self.data.groupList[player] = {}
-		end
-		if not self.data.skillIndexLookup then
-			self.data.skillIndexLookup = {}
-		end
-		if not self.data.skillIndexLookup[player] then
-			self.data.skillIndexLookup[player] = {}
 		end
 		if player == UnitName("player") then
 			if not self.db.realm.inventoryData then
@@ -1457,7 +1444,7 @@ function Skillet:SkilletShowWindow()
 		HideUIPanel(TradeSkillFrame)
 	end
 	if IsAltKeyDown() then
-		self.db.realm.skillDB[self.currentPlayer][self.currentTrade] = {}
+		self.data.skillDB[self.currentTrade] = {}
 	end
 	if not self:RescanTrade() then
 		DA.DEBUG(0,"No headers, reset filter")
@@ -1584,11 +1571,8 @@ function Skillet:SetTradeSkill(player, tradeID, skillIndex)
 			self.currentGroupLabel = self:GetTradeSkillOption("grouping")
 			self:RecipeGroupGenerateAutoGroups()
 			self:RecipeGroupDropdown_OnShow()
-			if not self.data.skillList[player] then
-				self.data.skillList[player] = {}
-			end
-			if not self.data.skillList[player][tradeID] then
-				self.data.skillList[player][tradeID] = {}
+			if not self.data.skillList[tradeID] then
+				self.data.skillList[tradeID] = {}
 			end
 			-- remove any filters currently in place
 			local searchbox = _G["SkilletSearchBox"]

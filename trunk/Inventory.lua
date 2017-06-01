@@ -39,12 +39,12 @@ function Skillet:InventoryReagentCraftability(reagentID)
 	local recipeSource = self.db.global.itemRecipeSource[reagentID]
 	local numReagentsCrafted = 0
 	local numReagentsCraftedVendor = 0
-	local skillIndexLookup = self.data.skillIndexLookup[player]
+	local skillIndexLookup = self.data.skillIndexLookup
 	if recipeSource then
 		--DA.DEBUG(2,"     ReagentCraftability: reagentID= "..tostring(reagentID).."("..tostring((GetItemInfo(reagentID))).."), recipeSource= "..DA.DUMP1(recipeSource))
 		for childRecipeID in pairs(recipeSource) do
 			local childRecipe = self:GetRecipe(childRecipeID)
-			local childSkillIndex = skillIndexLookup[childRecipeID]		-- only interested in current player for now
+			local childSkillIndex = skillIndexLookup[childRecipeID]
 			if childSkillIndex and childRecipe and #childRecipe.reagentData > 0 and
 			  not self.TradeSkillIgnoredMats[childRecipeID] and not self.db.realm.userIgnoredMats[player][childRecipeID] then
 				local numCraftable = 100000
