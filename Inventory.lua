@@ -24,20 +24,21 @@ local PT = LibStub("LibPeriodicTable-3.1")
 function Skillet:InventoryReagentCraftability(reagentID)
 	--DA.DEBUG(1,"InventoryReagentCraftability("..tostring(reagentID)..") -- "..tostring((GetItemInfo(reagentID))))
 	if not reagentID or reagentID == 0 then
-		return 0 
+		return 0, 0
 	end
 	local player = Skillet.currentPlayer
 	if player ~= UnitName("player") then
-		return 0
+		return 0, 0
 	end
 	if self.visited[reagentID] then
-		local reagentA, reagentC = self:GetInventory(player, reagentID)
-		--DA.DEBUG(2,"     ReagentCraftability: visited reagentID= "..tostring(reagentID).." ("..tostring((GetItemInfo(reagentID))).."), Available= "..tostring(reagentA)..", Craftable= "..tostring(reagentC))
-		return reagentC
+		local reagentA, reagentC, reagentCV = self:GetInventory(player, reagentID)
+		--DA.DEBUG(2,"     ReagentCraftability: visited reagentID= "..tostring(reagentID).." ("..tostring((GetItemInfo(reagentID))).."), Available= "..tostring(reagentA)..", Craftable= "..tostring(reagentC)..", CraftableVendor= "..tostring(reagentCV))
+		return reagentC, reagentCV
 	end
 	self.visited[reagentID] = true
 	local recipeSource = self.db.global.itemRecipeSource[reagentID]
 	local numReagentsCrafted = 0
+	local numReagentsCraftedVendor = 0
 	local skillIndexLookup = self.data.skillIndexLookup[player]
 	if recipeSource then
 		--DA.DEBUG(2,"     ReagentCraftability: reagentID= "..tostring(reagentID).."("..tostring((GetItemInfo(reagentID))).."), recipeSource= "..DA.DUMP1(recipeSource))
@@ -47,19 +48,23 @@ function Skillet:InventoryReagentCraftability(reagentID)
 			if childSkillIndex and childRecipe and #childRecipe.reagentData > 0 and
 			  not self.TradeSkillIgnoredMats[childRecipeID] and not self.db.realm.userIgnoredMats[player][childRecipeID] then
 				local numCraftable = 100000
+				local numCraftableVendor = 100000
 				for i=1,#childRecipe.reagentData,1 do
 					local childReagent = childRecipe.reagentData[i]
 					local numReagentOnHand = GetItemCount(childReagent.reagentID,true)
-					local numReagentCraftable = self:InventoryReagentCraftability(childReagent.reagentID)
-					--DA.DEBUG(2,"     ReagentCraftability: childID="..childReagent.reagentID.." ("..tostring((GetItemInfo(childReagent.reagentID))).."), numReagentOnHand="..tostring(numReagentOnHand)..", numReagentCraftable= "..tostring(numReagentCraftable))
+					local numReagentCraftable, numReagentCraftableVendor = self:InventoryReagentCraftability(childReagent.reagentID)
+					--DA.DEBUG(2,"     ReagentCraftability: childID="..childReagent.reagentID.." ("..tostring((GetItemInfo(childReagent.reagentID))).."), numReagentOnHand="..tostring(numReagentOnHand)..", numReagentCraftable= "..tostring(numReagentCraftable)..", numReagentCraftableVendor= "..tostring(numReagentCraftableVendor))
 					numReagentCraftable = numReagentCraftable + numReagentOnHand
+					numReagentCraftableVendor = numReagentCraftableVendor + numReagentOnHand
+					numCraftable = math.min(numCraftable, math.floor(numReagentCraftable/childReagent.numNeeded))
 					if not self:VendorSellsReagent(childReagent.reagentID) then
-						numCraftable = math.min(numCraftable, math.floor(numReagentCraftable/childReagent.numNeeded))
+						numCraftableVendor = math.min(numCraftableVendor, math.floor(numReagentCraftableVendor/childReagent.numNeeded))
 					else
 						--DA.DEBUG(2,"     ReagentCraftability: VendorSellsReagent")
 					end
 				end
 				numReagentsCrafted = numReagentsCrafted + numCraftable * childRecipe.numMade
+				numReagentsCraftedVendor = numReagentsCraftedVendor + numCraftableVendor * childRecipe.numMade
 			end
 		end
 	else
@@ -71,13 +76,14 @@ function Skillet:InventoryReagentCraftability(reagentID)
 	end
 	local numInBoth = self:GetInventory(player, reagentID)
 	local numCrafted = numReagentsCrafted + queued
-	if numCrafted == 0 then
+	local numCraftedVendor = numReagentsCraftedVendor + queued
+	if numCraftedVendor == 0 then
 		self.db.realm.inventoryData[player][reagentID] = numInBoth
 	else
-		self.db.realm.inventoryData[player][reagentID] = numInBoth.." "..numCrafted
+		self.db.realm.inventoryData[player][reagentID] = numInBoth.." "..numCrafted.." "..numCraftedVendor
 	end
-	--DA.DEBUG(2,"     ReagentCraftability: numInBoth= "..tostring(numInBoth)..", numCrafted= "..tostring(numCrafted)..", reagentID= "..tostring(reagentID).."("..tostring((GetItemInfo(reagentID)))..")")
-	return numCrafted
+	--DA.DEBUG(2,"     ReagentCraftability: reagentID= "..tostring(reagentID).."("..tostring((GetItemInfo(reagentID))).."), numInBoth= "..tostring(numInBoth)..", numCrafted= "..tostring(numCrafted)..", numCraftedVendor= "..tostring(numCraftedVendor))
+	return numCrafted, numCraftedVendor
 end
 
 -- recipe iteration check: calculate how many times a recipe can be iterated with materials available
@@ -94,7 +100,7 @@ function Skillet:InventorySkillIterations(tradeID, recipe)
 		local numMade = recipe.numMade
 		local numCraft = 100000
 		local numCraftable = 100000
-		local numCraftable2 = 100000
+		local numCraftableVendor = 100000
 		local numCraftVendor = 100000
 		local numCraftAlts = 100000
 		local vendorOnly = true
@@ -105,10 +111,11 @@ function Skillet:InventorySkillIterations(tradeID, recipe)
 				local numNeeded = recipe.reagentData[i].numNeeded
 				local reagentAvailable = 0
 				local reagentCraftable = 0
+				local reagentCraftableVendor = 0
 				local reagentAvailableAlts = 0
-				reagentAvailable, reagentCraftable = self:GetInventory(player, reagentID)
+				reagentAvailable, reagentCraftable, reagentCraftableVendor = self:GetInventory(player, reagentID)
 				if reagentCraftable == 0 then
-					reagentCraftable = self:InventoryReagentCraftability(reagentID)
+					reagentCraftable, reagentCraftableVendor = self:InventoryReagentCraftability(reagentID)
 				end
 				for alt in pairs(self.db.realm.inventoryData) do
 					if alt ~= player then
@@ -123,20 +130,23 @@ function Skillet:InventorySkillIterations(tradeID, recipe)
 						reagentAvailableAlts = reagentAvailableAlts + cachedGuildbank[guildName][reagentID]
 					end
 				end
-				DA.DEBUG(2,"     SkillIterations: reagentID= "..tostring(reagentID).."("..tostring((GetItemInfo(reagentID))).."), reagentAvailable= "..tostring(reagentAvailable)..", reagentCraftable= "..tostring(reagentCraftable)..", reagentAvailableAlts= "..tostring(reagentAvailableAlts)..", VendorSellsReagent= "..tostring(self:VendorSellsReagent(reagentID)))
+				DA.DEBUG(2,"     SkillIterations: reagentID= "..tostring(reagentID).."("..tostring((GetItemInfo(reagentID))).."), reagentAvailable= "..tostring(reagentAvailable)..", reagentCraftable= "..tostring(reagentCraftable)..", reagentCraftableVendor= "..tostring(reagentCraftableVendor)..", reagentAvailableAlts= "..tostring(reagentAvailableAlts)..", VendorSellsReagent= "..tostring(self:VendorSellsReagent(reagentID)))
 				if self:VendorSellsReagent(reagentID) then	-- if it's available from a vendor, then only worry about bag inventory
 					local vendorAvailable, vendorAvailableAlts = Skillet:VendorItemAvailable(reagentID)
 					someVendor = true
-					numCraftAlts = math.min(numCraftAlts, math.floor(vendorAvailableAlts/numNeeded))
+					numCraft = math.min(numCraft, math.floor(reagentAvailable/numNeeded))
+					numCraftable = math.min(numCraftable, math.floor((reagentAvailable+reagentCraftable)/numNeeded))
 					numCraftVendor = math.min(numCraftVendor, math.floor(vendorAvailable/numNeeded))
+					numCraftAlts = math.min(numCraftAlts, math.floor(vendorAvailableAlts/numNeeded))
 				else
 					vendorOnly = false
 					numCraft = math.min(numCraft, math.floor(reagentAvailable/numNeeded))
 					numCraftable = math.min(numCraftable, math.floor((reagentAvailable+reagentCraftable)/numNeeded))
+					numCraftableVendor = math.min(numCraftableVendor, math.floor((reagentAvailable+reagentCraftableVendor)/numNeeded))
+					numCraftVendor = math.min(numCraftVendor, numCraftableVendor)
 					numCraftAlts = math.min(numCraftAlts, math.floor(reagentAvailableAlts/numNeeded))
-					numCraftVendor = math.min(numCraftVendor, math.max(numCraft, numCraftable))
 				end
-				DA.DEBUG(2,"     SkillIterations:      numCraft="..tostring(numCraft)..", numCraftable="..tostring(numCraftable)..", numCraftAlts="..tostring(numCraftAlts)..", numCraftVendor="..tostring(numCraftVendor))
+				DA.DEBUG(2,"     SkillIterations:      numCraft="..tostring(numCraft)..", numCraftable="..tostring(numCraftable)..", numCraftableVendor="..tostring(numCraftableVendor)..", numCraftVendor="..tostring(numCraftVendor)..", numCraftAlts="..tostring(numCraftAlts))
 			else								-- no data means no craftability
 				DA.CHAT("reagent id seems corrupt!")
 				DA.DEBUG(0,"recipe= "..DA.DUMP1(recipe))
@@ -153,16 +163,16 @@ function Skillet:InventorySkillIterations(tradeID, recipe)
 		if not someVendor then
 			numCraftVendor = 0					-- there were no vendor reagents
 		end
-		if someVendor and numCraft == numCraftVendor and numCraftable == numCraftVendor then
-			numCraft = 0						-- only keep vendor count
-			numCraftable = 0					-- only keep vendor count
-		end
+--		if someVendor and numCraft == numCraftVendor and numCraftable == numCraftVendor then
+--			numCraft = 0						-- only keep vendor count
+--			numCraftable = 0					-- only keep vendor count
+--		end
 		if numCraft == numCraftable then
 			numCraftable = 0					-- only keep craftable count if different
 		end
-		if numCraft == numCraftVendor then
-			numCraftVendor = 0					-- only keep vendor count if different
-		end
+--		if numCraft == numCraftVendor then
+--			numCraftVendor = 0					-- only keep vendor count if different
+--		end
 		if numCraftable == numCraftVendor then
 			numCraftVendor = 0					-- only keep vendor count if different
 		end
@@ -195,18 +205,6 @@ function Skillet:InventoryScan()
 					--DA.DEBUG(2,"Using API")
 					numInBoth = GetItemCount(reagentID,true)				-- both bank and bags
 				end
-				if cachedInventory[reagentID] then
-					local a,b,c,d = string.split(" ", cachedInventory[reagentID])
-					if numInBoth then
-						cachedInventory[reagentID] = tostring(numInBoth).." "..tostring(b or 0).." "..tostring(c or 0).." "..tostring(d or 0)
-					else
-						--DA.DEBUG(2,"Using cachedInventory")
-						numInBoth = a
-					end
-				else
-					--DA.DEBUG(2,"Using Zero")
-					numInBoth = 0
-				end
 				inventoryData[reagentID] = tostring(numInBoth)	-- only what we have for now (no craftability info)
 				--DA.DEBUG(2,"inventoryData["..reagentID.."]="..inventoryData[reagentID])
 			end
@@ -216,17 +214,18 @@ function Skillet:InventoryScan()
 	if inventoryData then
 		-- now calculate the craftability of these same reagents
 		for reagentID,inventory in pairs(inventoryData) do
-			numCrafted = self:InventoryReagentCraftability(reagentID)
-			if numCrafted > 0 then
-				inventoryData[reagentID] = tostring(inventoryData[reagentID]).." "..tostring(numCrafted)
+			numCrafted, numCraftedVendor = self:InventoryReagentCraftability(reagentID)
+			if numCraftedVendor > 0 then
+				inventoryData[reagentID] = tostring(inventoryData[reagentID]).." "..tostring(numCrafted).." "..tostring(numCraftedVendor)
 			end
 		end
 		-- remove any reagents that don't show up in our inventory
 		for reagentID,inventory in pairs(inventoryData) do
-			if inventoryData[reagentID] == 0 or inventoryData[reagentID] == "0" or inventoryData[reagentID] == "0 0" then
+			if inventoryData[reagentID] == 0 or inventoryData[reagentID] == "0" or inventoryData[reagentID] == "0 0" or inventoryData[reagentID] == "0 0 0" then
 				inventoryData[reagentID] = nil
+				cachedInventory[reagentID] = nil
 			else
-				self.db.realm.inventoryData[player][reagentID] = inventoryData[reagentID]
+				cachedInventory[reagentID] = inventoryData[reagentID]
 			end
 		end
 	end
@@ -238,16 +237,16 @@ function Skillet:GetInventory(player, reagentID)
 		if self.db.realm.inventoryData[player] and self.db.realm.inventoryData[player][reagentID] then
 			local data = { string.split(" ", self.db.realm.inventoryData[player][reagentID]) }
 			if #data == 1 then			-- no craftability info yet
-				return tonumber(data[1]) or 0, 0
+				return tonumber(data[1]) or 0, 0, 0
 			else
-				return tonumber(data[1]) or 0, tonumber(data[2]) or 0
+				return tonumber(data[1]) or 0, tonumber(data[2]) or 0, tonumber(data[3]) or 0
 			end
 		elseif player == UnitName("player") then
 			local numInBoth = GetItemCount(reagentID,true)		-- both bank and bags
-			return tonumber(numInBoth) or 0, 0
+			return tonumber(numInBoth) or 0, 0, 0
 		end
 	end
-	return 0, 0		-- have, make
+	return 0, 0, 0		-- have, make, make with vendor
 end
 
 -- queries for vendor info for a particular itemID
