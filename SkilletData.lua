@@ -828,22 +828,20 @@ function Skillet:CollectRecipeInformation()
 			end
 		end
 	end
-	for player,tradeList in pairs(self.db.realm.skillDB) do
-		self.data.skillIndexLookup[player] = {}
-		for trade,skillList in pairs(tradeList) do
+		self.data.skillIndexLookup = {}
+		for trade,skillList in pairs(self.data.skillDB) do
 			for i=1,#skillList do
-				local skillString = self.db.realm.skillDB[player][trade][i]
+				local skillString = self.data.skillDB[trade][i]
 				if skillString then
 					local skillData = string.split(" ",skillString)
 					if skillData ~= "header" or skillData ~= "subheader" then
 						local recipeID = string.sub(skillData,2)
 						recipeID = tonumber(recipeID) or 0
-						self.data.skillIndexLookup[player][recipeID] = i
+						self.data.skillIndexLookup[recipeID] = i
 					end
 				end
 			end
 		end
-	end
 end
 
 -- Checks to see if the current trade is one that we support.
@@ -1121,12 +1119,12 @@ end
 function Skillet:GetNumSkills(player, trade)
 	--DA.PROFILE("Skillet:GetNumSkills("..tostring(player)..", "..tostring(trade)..")")
 	local r
-	if not Skillet.db.realm.skillDB[player] then
+	if not Skillet.data.skillDB then
 		r = 0
-	elseif not Skillet.db.realm.skillDB[player][trade] then
+	elseif not Skillet.data.skillDB[trade] then
 		r = 0
 	else
-		r = #Skillet.db.realm.skillDB[player][trade]
+		r = #Skillet.data.skillDB[trade]
 	end
 	--DA.DEBUG(2,"r= "..tostring(r))
 	return r
@@ -1144,14 +1142,11 @@ end
 function Skillet:GetSkill(player,trade,index)
 	--DA.PROFILE("Skillet:GetSkill("..tostring(player)..", "..tostring(trade)..", "..tostring(index)..")")
 	if player and trade and index then
-		if not Skillet.data.skillList[player] then
-			Skillet.data.skillList[player] = {}
+		if not Skillet.data.skillList[trade] then
+			Skillet.data.skillList[trade] = {}
 		end
-		if not Skillet.data.skillList[player][trade] then
-			Skillet.data.skillList[player][trade] = {}
-		end
-		if not Skillet.data.skillList[player][trade][index] and Skillet.db.realm.skillDB[player][trade][index] then
-			local skillString = Skillet.db.realm.skillDB[player][trade][index]
+		if not Skillet.data.skillList[trade][index] and Skillet.data.skillDB[trade][index] then
+			local skillString = Skillet.data.skillDB[trade][index]
 			if skillString then
 				local skill = {}
 				local data = { string.split(" ",skillString) }
@@ -1179,10 +1174,10 @@ function Skillet:GetSkill(player,trade,index)
 						end
 					end
 				end
-				Skillet.data.skillList[player][trade][index] = skill
+				Skillet.data.skillList[trade][index] = skill
 			end
 		end
-		return Skillet.data.skillList[player][trade][index]
+		return Skillet.data.skillList[trade][index]
 	end
 	return self.unknownRecipe
 end
@@ -1401,11 +1396,8 @@ function Skillet:RescanTrade()
 	local player, tradeID = Skillet.currentPlayer, Skillet.currentTrade
 	if not player or not tradeID then return end
 	Skillet.scanInProgress = true
-	if not Skillet.data.skillList[player] then
-		Skillet.data.skillList[player] = {}
-	end
-	if not Skillet.data.skillList[player][tradeID] then
-		Skillet.data.skillList[player][tradeID]={}
+	if not Skillet.data.skillList[tradeID] then
+		Skillet.data.skillList[tradeID]={}
 	end
 	if not Skillet.data.Filtered then
 		Skillet.data.Filtered = {}
@@ -1413,11 +1405,11 @@ function Skillet:RescanTrade()
 	if not Skillet.data.Filtered[tradeID] then
 		Skillet.data.Filtered[tradeID] = {}
 	end
-	if not Skillet.db.realm.skillDB[player] then
-		Skillet.db.realm.skillDB[player] = {}
+	if not Skillet.data.skillDB then
+		Skillet.data.skillDB = {}
 	end
-	if not Skillet.db.realm.skillDB[player][tradeID] then
-		Skillet.db.realm.skillDB[player][tradeID] = {}
+	if not Skillet.data.skillDB[tradeID] then
+		Skillet.data.skillDB[tradeID] = {}
 	end
 	if not Skillet.data.recipeInfo[tradeID] then
 		Skillet.data.recipeInfo[tradeID] = {}
@@ -1448,8 +1440,8 @@ function Skillet:ScanTrade()
 		return false
 	end
 	Skillet.currentTrade = tradeID
-	if not Skillet.data.skillIndexLookup[player] then
-		Skillet.data.skillIndexLookup[player] = {}
+	if not Skillet.data.skillIndexLookup then
+		Skillet.data.skillIndexLookup = {}
 	end
 	if not Skillet.db.realm.tradeSkills[player] then
 		Skillet.db.realm.tradeSkills[player] = {}
@@ -1523,8 +1515,8 @@ function Skillet:ScanTrade()
 	numSkills = i
 
 	DA.DEBUG(0,"ScanTrade: Processing, "..tostring(profession)..":"..tostring(tradeID).." "..tostring(numSkills).." recipes")
-	local skillDB = Skillet.db.realm.skillDB[player][tradeID]
-	local skillData = Skillet.data.skillList[player][tradeID]
+	local skillDB = Skillet.data.skillDB[tradeID]
+	local skillData = Skillet.data.skillList[tradeID]
 	local recipeDB = Skillet.db.global.recipeDB
 	if not skillData then
 		DA.DEBUG(0,"ScanTrade: no skillData")
@@ -1637,7 +1629,7 @@ function Skillet:ScanTrade()
 			end
 		end
 		skillDB[i] = skillDBString
-		Skillet.data.skillIndexLookup[player][recipeID] = i
+		Skillet.data.skillIndexLookup[recipeID] = i
 
 		--DA.DEBUG(2,"recipeID= "..tostring(recipeID))
 		Skillet.data.recipeList[recipeID] = {}

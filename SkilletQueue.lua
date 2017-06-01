@@ -55,7 +55,7 @@ function Skillet:QueueAppendCommand(command, queueCraftables, noWindowRefresh)
 		self.visited[command.recipeID] = true
 		local count = command.count
 		local reagentsInQueue = self.db.realm.reagentsInQueue[Skillet.currentPlayer]
-		local skillIndexLookup = self.data.skillIndexLookup[Skillet.currentPlayer]
+		local skillIndexLookup = self.data.skillIndexLookup
 		for i=1,#recipe.reagentData,1 do
 			local reagent = recipe.reagentData[i]
 			--DA.DEBUG(1,"reagent= "..DA.DUMP1(reagent))

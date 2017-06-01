@@ -609,7 +609,7 @@ function Skillet:UpdateTradeButtons(player)
 			position = position + button:GetWidth()
 			if tradeID == self.currentTrade then
 				button:SetChecked(true)
-				if Skillet.data.skillList[player][tradeID].scanned then
+				if Skillet.data.skillList[tradeID].scanned then
 					buttonIcon:SetVertexColor(1,1,1)
 				else
 					buttonIcon:SetVertexColor(1,0,0)
@@ -1305,15 +1305,14 @@ function Skillet:SetReagentToolTip(reagentID, numNeeded, numCraftable)
 		for recipeID in pairs(self.db.global.itemRecipeSource[reagentID]) do
 			local recipe = self:GetRecipe(recipeID)
 			GameTooltip:AddDoubleLine("Source: ",(self:GetTradeName(recipe.tradeID) or recipe.tradeID)..":"..self:GetRecipeName(recipeID),0,1,0,1,1,1)
-			for player,lookupTable in pairs(self.data.skillIndexLookup) do
-				if lookupTable[recipeID] then
-					local rankData = self:GetSkillRanks(player, recipe.tradeID)
-					if rankData then
-						local rank, maxRank = rankData.rank, rankData.maxRank
-						GameTooltip:AddDoubleLine("  "..player,"["..(rank or "?").."/"..(maxRank or "?").."]",1,1,1)
-					else
-						GameTooltip:AddDoubleLine("  "..player,"[???/???]",1,1,1)
-					end
+			local lookupTable = self.data.skillIndexLookup
+			if lookupTable[recipeID] then
+				local rankData = self:GetSkillRanks(player, recipe.tradeID)
+				if rankData then
+					local rank, maxRank = rankData.rank, rankData.maxRank
+					GameTooltip:AddDoubleLine("  "..player,"["..(rank or "?").."/"..(maxRank or "?").."]",1,1,1)
+				else
+					GameTooltip:AddDoubleLine("  "..player,"[???/???]",1,1,1)
 				end
 			end
 		end
@@ -1656,7 +1655,7 @@ function Skillet:QueueItemButton_OnClick(this, button)
 		local recipeID = queue[index].recipeID
 		local recipe = self:GetRecipe(recipeID)
 		local tradeID = recipe.tradeID
-		local newSkillIndex = self.data.skillIndexLookup[self.currentPlayer][recipeID]
+		local newSkillIndex = self.data.skillIndexLookup[recipeID]
 		DA.DEBUG(0,"selecting new skill "..tradeID..":"..(newSkillIndex or "nil"))
 		self:SetTradeSkill(self.currentPlayer, tradeID, newSkillIndex)
 		DA.DEBUG(0,"done selecting new skill")
@@ -2240,7 +2239,7 @@ end
 function Skillet:ReagentButtonSkillSelect(player, id)
 	DA.DEBUG(0,"Skillet:ReagentButtonSkillSelect("..tostring(player)..", "..tostring(id)..")")
 	if player == Skillet.currentPlayer then -- Blizzard's 5.4 update prevents us from changing away from the current player
-		local skillIndexLookup = Skillet.data.skillIndexLookup[player]
+		local skillIndexLookup = Skillet.data.skillIndexLookup
 		gearTexture:Hide()
 		GameTooltip:Hide()
 		local newRecipe = Skillet:GetRecipe(id)
@@ -2274,31 +2273,23 @@ function Skillet:ReagentButtonOnClick(button, skillIndex, reagentIndex)
 			self.recipeMenu = CreateFrame("Frame", "SkilletRecipeMenu", _G["UIParent"], "UIDropDownMenuTemplate")
 		end
 		-- popup with selection if there is more than 1 potential recipe source for the reagent (small prismatic shards, for example)
-		for p in pairs(skillIndexLookup) do
-			for id in pairs(newRecipeTable) do
-				if skillIndexLookup[p][id] then
-					recipeCount = recipeCount + 1
-					newRecipe = self:GetRecipe(id)
-					local skillID = skillIndexLookup[p][id]
-					local newSkill = self:GetSkill(p, newRecipe.tradeID, skillID)
-					self.data.recipeMenuTable[recipeCount] = {}
-					self.data.recipeMenuTable[recipeCount].text = p .." : " .. newRecipe.name or "Unknown"
-					self.data.recipeMenuTable[recipeCount].arg1 = p
-					self.data.recipeMenuTable[recipeCount].arg2 = id
-					self.data.recipeMenuTable[recipeCount].func = function(arg1,arg2) Skillet.ReagentButtonSkillSelect(arg1,arg2) end
-					if p == self.currentPlayer then
-						myRecipeID = id
-						self.data.recipeMenuTable[recipeCount].textr = 1.0
-						self.data.recipeMenuTable[recipeCount].textg = 1.0
-						self.data.recipeMenuTable[recipeCount].textb = 1.0
-					else
-						self.data.recipeMenuTable[recipeCount].textR = .7
-						self.data.recipeMenuTable[recipeCount].textG = .7
-						self.data.recipeMenuTable[recipeCount].textB = .7
-					end
-					newPlayer = p
-					newRecipeID = id
-				end
+		for id in pairs(newRecipeTable) do
+			if skillIndexLookup[id] then
+				recipeCount = recipeCount + 1
+				newRecipe = self:GetRecipe(id)
+				local skillID = skillIndexLookup[id]
+				local newSkill = self:GetSkill(player, newRecipe.tradeID, skillID)
+				self.data.recipeMenuTable[recipeCount] = {}
+				self.data.recipeMenuTable[recipeCount].text = player .." : " .. newRecipe.name or "Unknown"
+				self.data.recipeMenuTable[recipeCount].arg1 = player
+				self.data.recipeMenuTable[recipeCount].arg2 = id
+				self.data.recipeMenuTable[recipeCount].func = function(arg1,arg2) Skillet.ReagentButtonSkillSelect(arg1,arg2) end
+				myRecipeID = id
+				self.data.recipeMenuTable[recipeCount].textr = 1.0
+				self.data.recipeMenuTable[recipeCount].textg = 1.0
+				self.data.recipeMenuTable[recipeCount].textb = 1.0
+				newPlayer = player
+				newRecipeID = id
 			end
 		end
 		--DA.DEBUG(0,"recipeMenuTable= "..DA.DUMP1(self.data.recipeMenuTable))
@@ -2312,7 +2303,7 @@ function Skillet:ReagentButtonOnClick(button, skillIndex, reagentIndex)
 			button:Hide()	-- hide the button so that if a new button is shown in this slot, a new "OnEnter" event will fire
 			newRecipe = self:GetRecipe(newRecipeID)
 			self:PushSkill(self.currentPlayer, self.currentTrade, self.selectedSkill)
-			self:SetTradeSkill(newPlayer, newRecipe.tradeID, skillIndexLookup[newPlayer][newRecipeID])
+			self:SetTradeSkill(newPlayer, newRecipe.tradeID, skillIndexLookup[newRecipeID])
 		else
 			local x, y = GetCursorPosition()
 			local uiScale = UIParent:GetEffectiveScale()
