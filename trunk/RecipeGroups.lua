@@ -486,7 +486,7 @@ end
 function Skillet:RecipeGroupPruneList()
 	--DA.DEBUG(0,"RecipeGroupPruneList()")
 	if self.data.groupList then
-		for trade, perTradeList in pairs(perPlayerList) do
+		for trade, perTradeList in pairs(self.data.groupList) do
 			for label, perLabelList in pairs(perTradeList) do
 				for name, group in pairs(perLabelList) do
 					if type(group)=="table" and name ~= OVERALL_PARENT_GROUP_NAME and group.parent == nil then
@@ -697,7 +697,7 @@ function Skillet:RecipeGroupOpNew()
 	local player = Skillet.currentPlayer
 	local tradeID = Skillet.currentTrade
 	local groupList = Skillet.data.groupList
-	while groupList[player][tradeID][label] do
+	while groupList[tradeID][label] do
 		serial = serial + 1
 		label = "Custom "..serial
 	end
