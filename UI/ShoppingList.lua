@@ -49,11 +49,13 @@ Skillet.bankBusy = false
 Skillet.bankQueue = {}
 
 local guildbankFrameOpen = false
-local guildbank = {}			-- Detailed contents of the guildbank
-local guildbankOnce = false		-- but only indexGuildBank once for each OPENED
-Skillet.guildBusy = false
+Skillet.guildbank = {}			-- Detailed contents of the guildbank
 Skillet.guildQueue = {}
+Skillet.guildbankOnce = false	-- but only indexGuildBank once for each OPENED
+Skillet.guildbankText = false
+Skillet.guildBusy = false
 Skillet.guildTab = 0
+Skillet.guildText = 0
 
 -- Creates and sets up the shopping list window
 local function createShoppingListFrame(self)
@@ -319,11 +321,12 @@ local function indexGuildBank(tab)
 		if numWithdrawals~=0 then
 			for slot=1, MAX_GUILDBANK_SLOTS_PER_TAB or 98, 1 do
 				local item = GetGuildBankItemLink(tab, slot)
+				--DA.DEBUG(2,"  tab= "..tostring(tab)..", slot= "..tostring(slot)..", item= "..tostring(item))
 				if item then
 					local _,count = GetGuildBankItemInfo(tab, slot)
 					local id = Skillet:GetItemIDFromLink(item)
 					if id then
-						table.insert(guildbank, {
+						table.insert(Skillet.guildbank, {
 							["bag"]   = tab,
 							["slot"]  = slot,
 							["id"]  = id,
@@ -372,30 +375,23 @@ function Skillet:BANKFRAME_CLOSED()
 	self:HideShoppingList()
 end
 
+-- Event fired when the guildbank is opened. Contents of the guildbank are not yet known.
+-- Query the server for the text associated with the first tab.
+-- The remaining texts will be queried in the event GUILDBANK_UPDATE_TEXT.
+-- When all the tabs have been queried, the event GUILDBANK_UPDATE_TEXT will query for contents.
 function Skillet:GUILDBANKFRAME_OPENED()
 	DA.DEBUG(0,"GUILDBANKFRAME_OPENED")
 	guildbankFrameOpen = true
-	guildbankOnce = true
+	Skillet.guildbankText = true
+	Skillet.guildbankOnce = false
 	Skillet.guildBusy = false
+	Skillet.guildText = 1
+	Skillet.guildTab = 1
 	Skillet.guildQueue = {}
-	Skillet.guildTab = 0
-	guildbank = {}
+	Skillet.guildbank = {}
 	local guildName = GetGuildInfo("player")
 	Skillet.db.global.cachedGuildbank[guildName] = {}
-	repeat
-		Skillet.guildTab = Skillet.guildTab + 1
-		if Skillet.guildTab > GetNumGuildBankTabs() then
-			break
-		end
-		local name, icon, isViewable, canDeposit, numWithdrawals, remainingWithdrawals = GetGuildBankTabInfo(Skillet.guildTab);
-		--DA.DEBUG(1,"GUILDBANKFRAME_OPENED tab="..Skillet.guildTab..", isViewable="..tostring(isViewable)..", canDeposit="..tostring(canDeposit)..", numWithdrawals="..tostring(numWithdrawals)..", remainingWithdrawals="..tostring(remainingWithdrawals))
-	until isViewable
-	if Skillet.guildTab <= GetNumGuildBankTabs() then
-		QueryGuildBankTab(Skillet.guildTab)  -- event GUILDBANKBAGSLOTS_CHANGED will fire when the data is available
-	else
-		guildbankOnce = false
-		Skillet:guildbankQueryComplete()
-	end
+	QueryGuildBankText(Skillet.guildText)  -- event GUILDBANK_UPDATE_TEXT will fire when the data is available
 end
 
 function Skillet:guildbankQueryComplete()
@@ -630,33 +626,46 @@ local function processGuildQueue(where)
 	end
 end
 
+-- Event is fired when the guild bank tab text is available.
+-- Called as a result of a QueryGuildBankText call.
+-- When all the tabs have been queried, query for contents.
+function Skillet:GUILDBANK_UPDATE_TEXT(event)
+	if Skillet.guildbankText then
+		--DA.DEBUG(0,"GUILDBANK_UPDATE_TEXT and guildbankText")
+		Skillet.guildText = Skillet.guildText + 1
+		if Skillet.guildText > GetNumGuildBankTabs() then
+			Skillet.guildbankText = false
+			Skillet.guildbankOnce = true
+			QueryGuildBankTab(Skillet.guildTab)  -- event GUILDBANKBAGSLOTS_CHANGED will fire when the data is available
+			return
+		end
+		QueryGuildBankText(Skillet.guildText)  -- event GUILDBANK_UPDATE_TEXT will fire when the data is available
+	else
+		--DA.DEBUG(2,"GUILDBANK_UPDATE_TEXT")
+	end
+end
+
 -- Event is fired when the guild bank contents change.
 -- Called as a result of a QueryGuildBankTab call or as a result of a change in the guildbank's contents.
 function Skillet:GUILDBANKBAGSLOTS_CHANGED(event)
-	--DA.DEBUG(0,"GUILDBANKBAGSLOTS_CHANGED")
-	if guildbankOnce then
+	if Skillet.guildbankOnce then
+		--DA.DEBUG(0,"GUILDBANKBAGSLOTS_CHANGED and guildbankOnce")
 		indexGuildBank(Skillet.guildTab)
-		repeat
-			Skillet.guildTab = Skillet.guildTab + 1
-			if Skillet.guildTab > GetNumGuildBankTabs() then
-				break
-			end
-			local name, icon, isViewable, canDeposit, numWithdrawals, remainingWithdrawals = GetGuildBankTabInfo(Skillet.guildTab);
-			--DA.DEBUG(1,"GUILDBANKBAGSLOTS_CHANGED tab="..Skillet.guildTab..", isViewable="..tostring(isViewable)..", canDeposit="..tostring(canDeposit)..", numWithdrawals="..tostring(numWithdrawals)..", remainingWithdrawals="..tostring(remainingWithdrawals))
-		until isViewable
-		if Skillet.guildTab <= GetNumGuildBankTabs() then
-			QueryGuildBankTab(Skillet.guildTab)  -- event GUILDBANKBAGSLOTS_CHANGED will fire when the data is available
-		else
-			guildbankOnce = false
+		Skillet.guildTab = Skillet.guildTab + 1
+		if Skillet.guildTab > GetNumGuildBankTabs() then
+			Skillet.guildbankOnce = false
 			Skillet:guildbankQueryComplete()
+			return
 		end
-	end
-	if Skillet.guildBusy then
-		--DA.DEBUG(1," GUILDBANKBAGSLOTS_CHANGED and guildBusy")
+		QueryGuildBankTab(Skillet.guildTab)  -- event GUILDBANKBAGSLOTS_CHANGED will fire when the data is available
+	elseif Skillet.guildBusy then
+		--DA.DEBUG(0,"GUILDBANKBAGSLOTS_CHANGED and guildBusy")
 		Skillet.gotGuildbankEvent = true
 		if Skillet.gotGuildbankEvent and Skillet.gotBagUpdateEvent then
 			processGuildQueue("guild bank")
 		end
+	else
+		--DA.DEBUG(2,"GUILDBANKBAGSLOTS_CHANGED")
 	end
 end
 
@@ -716,7 +725,7 @@ function Skillet:GetReagentsFromBanks()
 
 	-- Do things using a queue and events.
 	if bankFrameOpen then
-		--DA.DEBUG(0,"#list=",#list)
+		--DA.DEBUG(0,"Bank #list=",#list)
 		local bankQueue = Skillet.bankQueue
 		for j,v in pairs(list) do
 			--DA.DEBUG(2,"j=",j,", v=",DA.DUMP1(v))
@@ -748,13 +757,13 @@ function Skillet:GetReagentsFromBanks()
 
 	-- Do things using a queue and events.
 	if guildbankFrameOpen then
-		--DA.DEBUG(0,"#list=",#list)
+		--DA.DEBUG(0,"Guildbank #list=",#list)
 		local guildQueue = Skillet.guildQueue
 		for j,v in pairs(list) do
-			DA.DEBUG(2,"j=",j,", v=",DA.DUMP1(v))
+			--DA.DEBUG(2,"j=",j,", v=",DA.DUMP1(v))
 			local id = v.id
 			if incAlts or v.player == name then
-				for i,item in pairs(guildbank) do
+				for i,item in pairs(Skillet.guildbank) do
 					if item.id == id then
 						--DA.DEBUG(2,"i=",i,", item=",DA.DUMP1(item))
 						if item.count > 0 and v.count > 0 then
