@@ -1273,11 +1273,6 @@ function Skillet:SetTradeSkillToolTip(skillIndex)
 	if recipe then
 		if recipe.itemID ~= 0 then
 			GameTooltip:SetHyperlink("item:"..recipe.itemID)
-			if EnhTooltip and EnhTooltip.TooltipCall then
-				local name, link, quality = GetItemInfo("item:"..recipe.itemID)
-				local quantity = recipe.numMade
-				EnhTooltip.TooltipCall(GameTooltip, name, link, quality, quantity)
-			end
 			if IsShiftKeyDown() then
 				GameTooltip_ShowCompareItem()
 			end
@@ -1293,10 +1288,6 @@ end
 function Skillet:SetReagentToolTip(reagentID, numNeeded, numCraftable)
 	GameTooltip:ClearLines()
 	GameTooltip:SetHyperlink("item:"..reagentID)
-	if EnhTooltip and EnhTooltip.TooltipCall then
-		local name, link, quality = GetItemInfo("item:"..reagentID)
-		EnhTooltip.TooltipCall(GameTooltip, name, link, quality, numNeeded)
-	end
 	if self:VendorSellsReagent(reagentID) then
 		GameTooltip:AppendText(GRAY_FONT_COLOR_CODE .. " (" .. L["buyable"] .. ")" .. FONT_COLOR_CODE_CLOSE)
 	end
@@ -1306,6 +1297,7 @@ function Skillet:SetReagentToolTip(reagentID, numNeeded, numCraftable)
 			local recipe = self:GetRecipe(recipeID)
 			GameTooltip:AddDoubleLine("Source: ",(self:GetTradeName(recipe.tradeID) or recipe.tradeID)..":"..self:GetRecipeName(recipeID),0,1,0,1,1,1)
 			local lookupTable = self.data.skillIndexLookup
+			local player = self.currentPlayer
 			if lookupTable[recipeID] then
 				local rankData = self:GetSkillRanks(player, recipe.tradeID)
 				if rankData then

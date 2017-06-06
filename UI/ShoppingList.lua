@@ -148,10 +148,6 @@ function Skillet:ShoppingListButton_OnEnter(button)
 		GameTooltip:SetHyperlink(link)
 	end
 	GameTooltip:Show()
-	if EnhTooltip and EnhTooltip.TooltipCall then
-		local quantity = button.count
-		EnhTooltip.TooltipCall(GameTooltip, name, link, quality, quantity)
-	end
 	CursorUpdate(button)
 end
 
