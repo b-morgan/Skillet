@@ -118,6 +118,9 @@ function Skillet:InventorySkillIterations(tradeID, recipe)
 				if reagentCraftable == 0 then
 					reagentCraftable, reagentCraftableVendor = self:InventoryReagentCraftability(reagentID)
 				end
+				if reagentCraftableVendor > 0 then	-- or should this be reagentCraftableVendor > reagentCraftable
+					someVendor = true
+				end
 				for alt in pairs(self.db.realm.inventoryData) do
 					if alt ~= player and self.db.realm.faction[alt] == faction then
 						local altBoth = self:GetInventory(alt, reagentID)
@@ -161,15 +164,15 @@ function Skillet:InventorySkillIterations(tradeID, recipe)
 		recipe.vendorOnly = vendorOnly
 		recipe.someVendor = someVendor
 		--DA.DEBUG(2,"      pre-adjustment: recipeID= "..tostring(recipeID).."("..tostring(recipe.name).."), numCraft="..tostring(numCraft)..", numCraftable="..tostring(numCraftable)..", numCraftVendor="..tostring(numCraftVendor)..", numCraftAlts="..tostring(numCraftAlts)..", vendorOnly="..tostring(vendorOnly)..", someVendor="..tostring(someVendor))
-		if not someVendor then
-			numCraftVendor = 0					-- there were no vendor reagents
+		if numCraftable == numCraftVendor then
+			numCraftVendor = 0					-- only keep vendor count if different
 		end
 		if numCraft == numCraftable then
 			numCraftable = 0					-- only keep craftable count if different
 		end
-		if numCraftableVendor == numCraftVendor then
-			numCraftVendor = 0					-- only keep vendor count if different
-		end
+--		if not someVendor then
+--			numCraftVendor = 0					-- there were no vendor reagents
+--		end
 		--DA.DEBUG(2,"     SkillIterations: recipeID= "..tostring(recipeID).."("..tostring(recipe.name).."), numCraft="..tostring(numCraft)..", numCraftable="..tostring(numCraftable)..", numCraftVendor="..tostring(numCraftVendor)..", numCraftAlts="..tostring(numCraftAlts)..", vendorOnly="..tostring(vendorOnly)..", someVendor="..tostring(someVendor))
 		return numCraft * numMade, numCraftable * numMade, numCraftVendor * numMade, numCraftAlts * numMade
 	else
