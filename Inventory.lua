@@ -170,9 +170,9 @@ function Skillet:InventorySkillIterations(tradeID, recipe)
 		if numCraft == numCraftable then
 			numCraftable = 0					-- only keep craftable count if different
 		end
---		if not someVendor then
---			numCraftVendor = 0					-- there were no vendor reagents
---		end
+		if not someVendor and numCraftVendor > 0 then
+			numCraftVendor = -1 -- 0					-- there were no vendor reagents
+		end
 		--DA.DEBUG(2,"     SkillIterations: recipeID= "..tostring(recipeID).."("..tostring(recipe.name).."), numCraft="..tostring(numCraft)..", numCraftable="..tostring(numCraftable)..", numCraftVendor="..tostring(numCraftVendor)..", numCraftAlts="..tostring(numCraftAlts)..", vendorOnly="..tostring(vendorOnly)..", someVendor="..tostring(someVendor))
 		return numCraft * numMade, numCraftable * numMade, numCraftVendor * numMade, numCraftAlts * numMade
 	else
