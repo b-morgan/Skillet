@@ -1483,7 +1483,7 @@
 						if button=="LeftButton" then
 							Skillet:InventoryFilterButtons_Hide()
 							if self:GetChecked() then
-								PlaySound("igMainMenuOptionCheckBoxOn");
+								PlaySound(SOUNDKIT.IG_MAINMENU_OPTION_CHECKBOX_ON); -- "igMainMenuOptionCheckBoxOn"
 							end
 							local before = Skillet:GetTradeSkillOption("hideuncraftable")
 							Skillet:SetTradeSkillOption("hideuncraftable", not before)
@@ -1624,7 +1624,7 @@
 					</OnShow>
 					<OnClick>
 						Skillet:InventoryFilterButtons_Hide()
-						PlaySound("igMainMenuOptionCheckBoxOn");
+						PlaySound(SOUNDKIT.IG_MAINMENU_OPTION_CHECKBOX_ON); -- "igMainMenuOptionCheckBoxOn"
 						SkilletRecipeDifficultySelector:Show()
 						self:Hide()
 					</OnClick>
@@ -1656,7 +1656,7 @@
 					</OnLoad>
 					<OnClick>
 						Skillet:InventoryFilterButtons_Hide()
-						PlaySound("igMainMenuOptionCheckBoxOn");
+						PlaySound(SOUNDKIT.IG_MAINMENU_OPTION_CHECKBOX_ON); -- "igMainMenuOptionCheckBoxOn"
 						local bottom = self:GetBottom()
 						local top = self:GetTop()
 						local x,y = GetCursorPosition()
@@ -2976,12 +2976,12 @@
 				Skillet:SkillButton_OnKeyDown(self, key)
 			</OnKeyDown>
 			<OnShow>
-				PlaySound("igBackPackOpen")
+				PlaySound(SOUNDKIT.IG_BACKPACK_OPEN); -- "igBackPackOpen"
 				Skillet:Tradeskill_OnShow()
 				self:EnableKeyboard(false)
 			</OnShow>
 			<OnHide>
-				PlaySound("igBackPackClose")
+				PlaySound(SOUNDKIT.IG_BACKPACK_CLOSE); -- "igBackPackClose"
 				self:EnableKeyboard(false)
 			</OnHide>
 			<OnUpdate>
