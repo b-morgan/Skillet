@@ -130,7 +130,7 @@ function SkilletARL:RecipeFilterToggleButton_OnClick(button, mouse)
 	if mouse=="LeftButton" then
 		SkilletARL:RecipeFilterButtons_Hide()
 		if button:GetChecked() then
-			PlaySound("igMainMenuOptionCheckBoxOn");
+			PlaySound(SOUNDKIT.IG_MAINMENU_OPTION_CHECKBOX_ON); -- "igMainMenuOptionCheckBoxOn"
 		end
 		local before = Skillet:GetTradeSkillOption("recipeSourceFilter")
 		Skillet:SetTradeSkillOption("recipeSourceFilter", not before)
