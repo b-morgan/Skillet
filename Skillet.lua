@@ -61,6 +61,7 @@ local defaults = {
 		use_altcurrency_vendor_items = false,
 		show_max_upgrade = true,
 		enhanced_recipe_display = false,
+		confirm_queue_clear = false,
 		transparency = 1.0,
 		scale = 1.0,
 		plugins = {},
@@ -428,6 +429,20 @@ Skillet.options =
 					end,
 					width = "double",
 					order = 4,
+				},
+				confirm_queue_clear = {
+					type = "toggle",
+					name = L["CONFIRMQUEUECLEARNAME"],
+					desc = L["CONFIRMQUEUECLEARDESC"],
+					get = function()
+						return Skillet.db.profile.confirm_queue_clear
+					end,
+					set = function(self,value)
+						Skillet.db.profile.confirm_queue_clear = value
+						Skillet:UpdateTradeSkillWindow()
+					end,
+					width = "double",
+					order = 5,
 				},
 				transparency = {
 					type = "range",
