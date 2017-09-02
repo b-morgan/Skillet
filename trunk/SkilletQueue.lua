@@ -150,6 +150,9 @@ end
 function Skillet:ClearQueue()
 	--DA.DEBUG(0,"ClearQueue()")
 	if #self.db.realm.queueData[self.currentPlayer] > 0 then
+		if self.db.profile.confirm_queue_clear and not IsAltKeyDown() then
+			return
+		end
 		self.db.realm.queueData[self.currentPlayer] = {}
 		self.db.realm.reagentsInQueue[self.currentPlayer] = {}
 		self:UpdateTradeSkillWindow()
