@@ -1321,34 +1321,18 @@ function Skillet:SetReagentToolTip(reagentID, numNeeded, numCraftable)
 	end
 end
 
-local bopCache = {}
+Skillet.bopCache = {}
 function Skillet:bopCheck(item)
-	if bopCache[item] == 1 then
+	--DA.DEBUG(0,"bopCheck("..tostring(item)..")")
+	if not self.bopCache[item] then
+		local _, link, _, _, _, _, _, _, _, _, _, _, _, bindType, _, _, _ = GetItemInfo(item)
+		--DA.DEBUG(0,"bindType= "..tostring(bindType))
+		self.bopCache[item] = bindType or 0	-- Item binding type: 0 - none; 1 - on pickup; 2 - on equip; 3 - on use; 4 - quest
+	end
+	if self.bopCache[item] == 1 then
 		return true
 	end
-	if bopCache[item] == 0 then
-		return false
-	end
-	local _,link = GetItemInfo(item)
-	local tooltip = _G["SkilletParsingTooltip"]
-	if tooltip == nil then
-		tooltip = CreateFrame("GameTooltip", "SkilletParsingTooltip", _G["ANCHOR_NONE"], "GameTooltipTemplate")
-		tooltip:SetOwner(WorldFrame, "ANCHOR_NONE");
-	end
-	tooltip:SetHyperlink("item:"..item)
-	local tiplines = tooltip:NumLines()
-	--DA.DEBUG(0,(link or "nil"))
-	for i=1, tiplines, 1 do
-		local lineText = string.lower(_G["SkilletParsingTooltipTextLeft"..i]:GetText() or " ")
-		--DA.DEBUG(0,lineText)
-		if (string.find(lineText, "binds when picked up")) then
-			bopCache[item] = 1
-			--DA.DEBUG(0,"bop")
-			return true
-		end
-	end
-	bopCache[item] = 0
-	--DA.DEBUG(0,"boe")
+	return false
 end
 
 function Skillet:HideDetailWindow()
