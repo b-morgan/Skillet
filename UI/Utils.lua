@@ -20,98 +20,51 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
 local L = LibStub("AceLocale-3.0"):GetLocale("Skillet")
 local Dialog = LibStub("LibDialog-1.0")
 
-local infoBox
--- Stolen from the AceAddon about frame code. Just too useful
--- not to use
-local function createInfoBox()
-	infoBox = CreateFrame("Frame", "SkilletInfoBoxFrame", UIParent, "DialogBoxFrame")
-	infoBox:SetWidth(500)
-	infoBox:SetHeight(400)
-	infoBox:SetPoint("CENTER")
-	infoBox:SetBackdrop({
-		bgFile = [[Interface\DialogFrame\UI-DialogBox-Background]],
-		edgeFile = [[Interface\Tooltips\UI-Tooltip-Border]],
-		tile = true, tileSize = 16, edgeSize = 16,
-		insets = { left = 5, right = 5, top = 5, bottom = 5 }
+Dialog:Register("SKILLETMSG", {
+	text = "",
+	on_show = function(self, data)
+		self.text:SetText(data.msg)
+	end,
+	buttons = {
+		{
+			text = OKAY,
+		},
+	},
+	show_while_dead = true,
+	hide_on_escape = true,
+})
+
+function Skillet:MessageBox(msg)
+	Dialog:Spawn("SKILLETMSG", {
+		msg = msg,
 	})
-	infoBox:SetBackdropColor(0,0,0,1)
+end
 
-	local text = infoBox:CreateFontString(nil, "OVERLAY", "GameFontHighlightLarge")
-	infoBox.title = text
-	text:SetPoint("TOP", 0, -5)
+Dialog:Register("SKILLETASKFOR", {
+	text = "",
+	on_show = function(self, data)
+		self.text:SetText(data.msg)
+	end,
+	buttons = {
+		{
+			text = YES,
+			on_click = function(self, data)
+				data.handler()
+			end,
+		},
+		{
+			text = NO,
+		},
+	},
+	show_while_dead = true,
+	hide_on_escape = true,
+})
 
-	function infoBox:SetTitle(text)
-		infoBox.title:SetText(text)
-	end
-
-	infoBox.lefts = {}
-	infoBox.rights = {}
-	infoBox.textLefts = {}
-	infoBox.textRights = {}
-	function infoBox:Clear()
-		self.title:SetText("")
-		for i = 1, #self.lefts do
-			self.lefts[i] = nil
-			self.rights[i] = nil
-		end
-	end
-
-	function infoBox:AddLine(left, right)
-		infoBox.lefts[#infoBox.lefts+1] = left
-		infoBox.rights[#infoBox.rights+1] = right
-	end
-
-	local infoBox_Show = infoBox.Show
-	function infoBox:Show(...)
-		local maxLeftWidth = 0
-		local maxRightWidth = 0
-		local textHeight = 0
-
-		-- Create all the font strings and find the longest text
-		for i = 1, #self.lefts do
-			if not self.textLefts[i] then
-				local left = infoBox:CreateFontString(nil, "OVERLAY", "GameFontNormal")
-				self.textLefts[i] = left
-				local right = infoBox:CreateFontString(nil, "OVERLAY", "GameFontHighlight")
-				self.textRights[i] = right
-
-				-- Don't attach the first one until we know how big the rest of them are
-				if i > 1 then
-					left:SetPoint("TOPRIGHT", self.textLefts[i-1], "BOTTOMRIGHT", 0, -5)
-				end
-				right:SetPoint("LEFT", left, "RIGHT", 5, 0)
-			end
-
-			self.textLefts[i]:SetText(self.lefts[i] .. ":")
-			self.textRights[i]:SetText(self.rights[i])
-			local leftWidth = self.textLefts[i]:GetWidth()
-			local rightWidth = self.textRights[i]:GetWidth()
-			textHeight = self.textLefts[i]:GetHeight()
-			if maxLeftWidth < leftWidth then
-				maxLeftWidth = leftWidth
-			end
-			if maxRightWidth < rightWidth then
-				maxRightWidth = rightWidth
-			end
-
-		end
-
-		-- now attach buttons as needed
-		self.textLefts[1]:SetPoint("TOPRIGHT", infoBox, "TOPLEFT", maxLeftWidth + 10, -35)
-
-		for i = #self.lefts+1, #self.textLefts do
-			self.textLefts[i]:SetText('')
-			self.textRights[i]:SetText('')
-		end
-
-		infoBox:SetWidth(maxLeftWidth + maxRightWidth + 30)
-		infoBox:SetHeight(#self.lefts * (textHeight + 5) + 100)
-
-		infoBox_Show(self, ...)
-	end
-
-	infoBox:Hide()
-	createInfoBox = nil
+function Skillet:AskFor(msg, handler)
+	Dialog:Spawn("SKILLETASKFOR", {
+		msg = msg,
+		handler = handler,
+	})
 end
 
 -- Adds resizing to a window. Resizing is both width and height from the
@@ -162,81 +115,4 @@ function Skillet:EnableResize(frame, min_width, min_height, refresh_method)
 	line3:SetTexture("Interface\\Tooltips\\UI-Tooltip-Border")
 	local x = 0.1 * 8/17
 	line3:SetTexCoord(1/32 - x, 0.5, 1/32, 0.5 + x, 1/32, 0.5 - x, 1/32 + x, 0.5)
-end
-
---
--- Shows a popup about the supported mods for inventory tracking
---
-function Skillet:ShowInventoryInfoPopup()
-	if createInfoBox then
-		createInfoBox()
-	end
-
-	infoBox:Clear()
-	infoBox:SetTitle(L["INVENTORYDESC"])
-
-	if self.inventoryCheck then
-		infoBox:AddLine(L["Library"], self.inventoryCheck:GetVersion())
-
-		local list = self.inventoryCheck:GetSupportedAddons()
-		local text = list[1]
-		for i=2, #list, 1 do
-			text = text ..", " .. list[i]
-		end
-		infoBox:AddLine(L["Supported Addons"], text)
-
-		infoBox:AddLine(L["Selected Addon"], self.inventoryCheck:GetSelectedAddon())
-
-	else
-		infoBox:AddLine(L["Supported Addons"], "<none>")
-	end
-
-	infoBox:Show()
-end
-
-Dialog:Register("SKILLETMSG", {
-	text = "",
-	on_show = function(self, data)
-		self.text:SetText(data.msg)
-	end,
-	buttons = {
-		{
-			text = OKAY,
-		},
-	},
-	show_while_dead = true,
-	hide_on_escape = true,
-})
-
-function Skillet:MessageBox(msg)
-	Dialog:Spawn("SKILLETMSG", {
-		msg = msg,
-	})
-end
-
-Dialog:Register("SKILLETASKFOR", {
-	text = "",
-	on_show = function(self, data)
-		self.text:SetText(data.msg)
-	end,
-	buttons = {
-		{
-			text = YES,
-			on_click = function(self, data)
-				data.handler()
-			end,
-		},
-		{
-			text = NO,
-		},
-	},
-	show_while_dead = true,
-	hide_on_escape = true,
-})
-
-function Skillet:AskFor(msg, handler)
-	Dialog:Spawn("SKILLETASKFOR", {
-		msg = msg,
-		handler = handler,
-	})
 end
