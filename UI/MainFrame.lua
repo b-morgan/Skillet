@@ -1196,7 +1196,8 @@ function Skillet:SkillButton_OnEnter(button)
 		if altlink and IsAltKeyDown() then
 			tip:SetHyperlink(altlink)
 		elseif link then
-			tip:SetHyperlink(link)
+--			tip:SetHyperlink(link)
+			tip:SetRecipeResultItem(skill.recipeID);
 		end
 	else
 		-- Name of the recipe
