@@ -873,7 +873,7 @@ function Skillet:IsNotSupportedFollower(tradeID)
 		Skillet.wasNPCCrafting = true
 		return true -- Unknown tradeskill, play it safe and use Blizzard frame
 	end
-	if Skillet.FollowerSkillList[tradeID] then
+	if C_TradeSkillUI.IsNPCCrafting() and Skillet.FollowerSkillList[tradeID] then
 		Skillet.wasNPCCrafting = true
 		return true -- Any NPC for this tradeskill uses Blizzard Frame
 	end
@@ -881,18 +881,17 @@ function Skillet:IsNotSupportedFollower(tradeID)
 	if guid then
 		local gtype, zero, server_id, instance_id, zone_uid, npc_id, spawn_uid = strsplit("-",guid);
 		DA.DEBUG(0,"IsNPCCrafting="..tostring(C_TradeSkillUI.IsNPCCrafting())..", gtype="..tostring(gtype)..", npc_id="..tostring(npc_id))
+		if IsControlKeyDown() then
+			Skillet.wasNPCCrafting = true
+			return false -- Use Skillet frame (mostly for debugging)
+		end
 		if gtype and gtype == "Creature" and Skillet.FollowerNPC[npc_id] then
 			Skillet.wasNPCCrafting = true
 			return true -- This specific NPC crafts things Skillet can't process, use Blizzard frame
 		end
-		if Skillet.db.profile.use_blizzard_for_followers then
+		if C_TradeSkillUI.IsNPCCrafting() and Skillet.db.profile.use_blizzard_for_followers then
 			Skillet.wasNPCCrafting = true
 			return true -- Option makes this easy, use Blizzard frame
-		end
-		if IsControlKeyDown() then
-			DA.DEBUG(0,"npc_id="..tostring(npc_id))
-			Skillet.wasNPCCrafting = true
-			return false -- Use Skillet frame (mostly for debugging)
 		end
 	end
 	return false -- Use Skillet frame
