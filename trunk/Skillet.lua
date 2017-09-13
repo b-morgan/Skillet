@@ -46,7 +46,6 @@ local defaults = {
 		show_crafters_tooltip = true,
 		show_detailed_recipe_tooltip = true,	-- show any tooltips?
 		display_full_tooltip = true,			-- show full blizzards tooltip
-		display_item_tooltip = true,			-- show item tooltip or recipe tooltip
 		link_craftable_reagents = true,
 		queue_craftable_reagents = true,
 		queue_glyph_reagents = false,
@@ -193,35 +192,6 @@ Skillet.options =
 					width = "double",
 					order = 16
 				},
-				display_item_tooltip = {
-					type = "toggle",
-					name = L["SHOWITEMTOOLTIPNAME"],
-					desc = L["SHOWITEMTOOLTIPDESC"],
-					get = function()
-						return Skillet.db.profile.display_item_tooltip
-					end,
-					set = function(self,value)
-						Skillet.db.profile.display_item_tooltip = value
-					end,
-					width = "double",
-					order = 17
-				},
---[[
-				show_crafters_tooltip = {
-					type = "toggle",
-					name = L["SHOWCRAFTERSTOOLTIPNAME"],
-					desc = L["SHOWCRAFTERSTOOLTIPDESC"],
-					disabled = true, -- because of 5.4 changes to trade links
-					get = function()
-						return Skillet.db.profile.show_crafters_tooltip
-					end,
-					set = function(self,value)
-						Skillet.db.profile.show_crafters_tooltip = value
-					end,
-					width = "double",
-					order = 18
-				},
---]]
 				link_craftable_reagents = {
 					type = "toggle",
 					name = L["LINKCRAFTABLEREAGENTSNAME"],
@@ -1458,9 +1428,6 @@ function Skillet:SkilletShowWindow()
 	DA.DEBUG(0,"SkilletShowWindow: "..tostring(self.currentTrade))
 	if self.tradeSkillOpen then
 		HideUIPanel(TradeSkillFrame)
-	end
-	if IsAltKeyDown() then
-		self.data.skillDB[self.currentTrade] = {}
 	end
 	if not self:RescanTrade() then
 		DA.DEBUG(0,"No headers, reset filter")

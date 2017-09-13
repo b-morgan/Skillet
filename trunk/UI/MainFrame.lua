@@ -1177,28 +1177,7 @@ function Skillet:SkillButton_OnEnter(button)
 	tip:SetScale(uiScale)
 	-- If not displaying full tooltips you have to press Ctrl to see them
 	if IsControlKeyDown() or Skillet.db.profile.display_full_tooltip then
-		local name, link, quality, quantity, altlink, _
-		if recipe.itemID == 0 or not Skillet.db.profile.display_item_tooltip then
-			link = GetSpellLink(skill.recipeID)
-			name = GetSpellInfo(link)
-			quality = nil
-			quantity = nil
-			if recipe.itemID ~= 0 then
-				_, altlink = GetItemInfo(recipe.itemID)
-			end
-		else
-			if recipe.itemID then
-				name,link,quality = GetItemInfo(recipe.itemID)
-			end
-			altlink = GetSpellLink(skill.recipeID)
-			quantity = recipe.numMade
-		end
-		if altlink and IsAltKeyDown() then
-			tip:SetHyperlink(altlink)
-		elseif link then
---			tip:SetHyperlink(link)
-			tip:SetRecipeResultItem(skill.recipeID);
-		end
+		tip:SetRecipeResultItem(skill.recipeID);
 	else
 		-- Name of the recipe
 		local color = Skillet.skill_style_type[skill.difficulty]
@@ -1208,9 +1187,15 @@ function Skillet:SkillButton_OnEnter(button)
 			tip:AddLine(skill.name, NORMAL_FONT_COLOR.r, NORMAL_FONT_COLOR.g, NORMAL_FONT_COLOR.b, false);
 		end
 	end
-	local num, numrecursive, numwvendor, numwalts = 0, 0, 0, 0
+	local num, numrecursive, numwvendor, numwalts, numowned = 0, 0, 0, 0, 0
 	if skill.skillData then
 		num, numrecursive, numwvendor, numwalts = get_craftable_counts(skill.skillData, recipe.numMade)
+	end
+	numowned = GetItemCount(recipe.itemID,true)
+	-- how many are there already
+	if numowned > 0 then
+		local text = "\n" .. numowned .. " " .. L["in your inventory"];
+		tip:AddLine(text, 1, 1, 1, false); -- (text, r, g, b, wrap)
 	end
 	-- how many can be created with the reagents in the inventory
 	if num > 0 then
@@ -1266,12 +1251,18 @@ function Skillet:SetTradeSkillToolTip(skillIndex)
 	local recipe, recipeID = self:GetRecipeDataByTradeIndex(self.currentTrade, skillIndex)
 	if recipe then
 		if recipe.itemID ~= 0 then
---			GameTooltip:SetHyperlink("item:"..recipe.itemID)
-			GameTooltip:SetRecipeResultItem(recipeID);
+			if self.currentTrade == 7411 then		-- Enchanting
+				--DA.DEBUG(2,"Using SetHyperlink (itemID)")
+				GameTooltip:SetHyperlink("item:"..recipe.itemID)
+			else
+				--DA.DEBUG(2,"Using SetRecipeResultItem")
+				GameTooltip:SetRecipeResultItem(recipeID)
+			end
 			if IsShiftKeyDown() then
 				GameTooltip_ShowCompareItem()
 			end
 		else
+			--DA.DEBUG(2,"Using SetHyperlink (spellID)")
 			GameTooltip:SetHyperlink("enchant:"..recipe.spellID)				-- doesn't create an item, just tell us about the recipe
 		end
 	end
