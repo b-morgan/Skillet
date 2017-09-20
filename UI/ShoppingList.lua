@@ -44,7 +44,7 @@ local FrameBackdrop = {
 }
 
 local bankFrameOpen = false
-local bank = {}					-- Detailed contents of the bank.
+Skillet.bank = {}				-- Detailed contents of the bank.
 Skillet.bankBusy = false
 Skillet.bankQueue = {}
 
@@ -272,17 +272,20 @@ local function indexBank()
 -- bank contains detailed contents of each tab,slot which
 -- is only needed while the bank is open.
 --
-	bank = {}
+	Skillet.bank = {}
 	local player = Skillet.currentPlayer
 	local bankBags = {-1,5,6,7,8,9,10,11,-3}
 	for _, container in pairs(bankBags) do
+		--DA.DEBUG(1,"container="..tostring(container)..", slots="..tostring(GetContainerNumSlots(container)))
 		for i = 1, GetContainerNumSlots(container), 1 do
 			local item = GetContainerItemLink(container, i)
+			--DA.DEBUG(2,"item="..tostring(item))
 			if item then
 				local _,count = GetContainerItemInfo(container, i)
 				local id = Skillet:GetItemIDFromLink(item)
+				--DA.DEBUG(2,"id="..tostring(id))
 				if id then
-					table.insert(bank, {
+					table.insert(Skillet.bank, {
 						["bag"]   = container,
 						["slot"]  = i,
 						["id"]  = id,
@@ -292,6 +295,7 @@ local function indexBank()
 			end
 		end
 	end
+	--DA.DEBUG(0,"#Skillet.bank="..tostring(#Skillet.bank))
 end
 
 local function indexGuildBank(tab)
@@ -356,7 +360,6 @@ function Skillet:BANKFRAME_OPENED()
 	end
 	Skillet.bankBusy = false
 	Skillet.bankQueue = {}
-	bank = {}
 	cache_list(self)
 	if #self.cachedShoppingList == 0 then
 		return
@@ -727,7 +730,7 @@ function Skillet:GetReagentsFromBanks()
 			--DA.DEBUG(2,"j=",j,", v=",DA.DUMP1(v))
 			local id = v.id
 			if incAlts or v.player == name then
-				for i,item in pairs(bank) do
+				for i,item in pairs(Skillet.bank) do
 					if item.id == id then
 						--DA.DEBUG(2,"i=",i,", item=",DA.DUMP1(item))
 						if item.count > 0 and v.count > 0 then
