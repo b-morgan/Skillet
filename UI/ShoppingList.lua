@@ -269,11 +269,7 @@ end
 
 local function indexBank()
 	DA.DEBUG(0,"indexBank()")
--- bank contains detailed contents of each tab,slot which
--- is only needed while the bank is open.
---
-	Skillet.bank = {}
-	local player = Skillet.currentPlayer
+	Skillet.bank = {}	-- bank contains detailed contents of each tab,slot
 	local bankBags = {-1,5,6,7,8,9,10,11,-3}
 	for _, container in pairs(bankBags) do
 		--DA.DEBUG(1,"container="..tostring(container)..", slots="..tostring(GetContainerNumSlots(container)))
@@ -969,24 +965,22 @@ function Skillet:AuctionatorShoppingList()
 	if not AuctionatorLoaded and not AuctionFrame and not AuctionFrame:IsVisible() then
 		return
 	end
-	local slist = self:GetShoppingList(Skillet.currentPlayer)
-	if not slist then
-		return
-	end
-	local BUY_TAB = 3;
-	Atr_SelectPane (BUY_TAB);
+	cache_list(self)
+	local slist = self.cachedShoppingList
 	local items = {}
-	local shoppingListName = "Skillet Shopping List"
-	local reagentIndex
-	for reagentIndex = 1, #slist do
-		local reagentId = slist[reagentIndex].id
-		if (reagentId and not self:VendorSellsReagent(reagentId)) then
-			local reagentName = GetItemInfo(reagentId)
-			if (reagentName) then
+	for j,v in pairs(slist) do
+		--DA.DEBUG(2,"j=",j,", v=",DA.DUMP1(v))
+		local id = v.id
+		if id and (self.db.char.include_alts or v.player == self.currentPlayer) then
+			local reagentName = GetItemInfo(id)
+			if reagentName then
 				table.insert (items, reagentName)
-				-- DA.DEBUG(0, "Reagent num "..reagentIndex.." ("..reagentId..") "..reagentName.." added")
+				--DA.DEBUG(2,tostring(reagentName).." ("..tostring(id)..") added")
 			end
 		end
 	end
+	local BUY_TAB = 3;
+	local shoppingListName = "Skillet Shopping List"
+	Atr_SelectPane (BUY_TAB);
 	Atr_SearchAH (shoppingListName, items)
 end

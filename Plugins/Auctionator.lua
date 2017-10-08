@@ -16,7 +16,6 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
 ]]--
 
 Skillet.ATRPlugin = {}
-Skillet.ATRPlugin.Vendor = { [133588] = 5000, [133589] = 2780, [133590] = 5000, [133591] = 5000, [133592] = 5000, [133593] = 5000 }
 
 local plugin = Skillet.ATRPlugin
 local L = Skillet.L
@@ -109,9 +108,6 @@ function plugin.RecipeNameSuffix(skill, recipe)
 				local matsum = 0
 				for k,v in pairs(recipe.reagentData) do
 					local iprice = Atr_GetAuctionBuyout(v.reagentID)
-					if tContains(Skillet.ATRPlugin.Vendor,v.reagentID) then
-						iprice = Skillet.ATRPlugin.Vendor[v.reagentID]
-					end
 					if iprice then
 						matsum = matsum + v.numNeeded * iprice
 					end
