@@ -1780,6 +1780,61 @@ function Skillet:AddItemNotesToTooltip(tooltip)
 				tooltip:AddLine(" " .. note, 1, 1, 1, true) -- r,g,b, wrap
 			end
 		end
+		if self:VendorSellsReagent(id) then
+			if not header_added then
+				tooltip:AddLine("Skillet " .. L["Notes"] .. ":")
+				header_added = true
+			end
+--			tooltip:AppendText(GRAY_FONT_COLOR_CODE .. " (" .. L["buyable"] .. ")" .. FONT_COLOR_CODE_CLOSE)
+			tooltip:AddLine(" Buyable")
+		end
+		if self.db.global.itemRecipeSource[id] then
+			if not header_added then
+				tooltip:AddLine("Skillet " .. L["Notes"] .. ":")
+				header_added = true
+			end
+--			tooltip:AppendText(GRAY_FONT_COLOR_CODE .. " (" .. L["craftable"] .. ")" .. FONT_COLOR_CODE_CLOSE)
+			tooltip:AddLine(" Craftable")
+			for recipeID in pairs(self.db.global.itemRecipeSource[id]) do
+				local recipe = self:GetRecipe(recipeID)
+				tooltip:AddDoubleLine(" Source: ",(self:GetTradeName(recipe.tradeID) or recipe.tradeID)..":"..self:GetRecipeName(recipeID),0,1,0,1,1,1)
+				local lookupTable = self.data.skillIndexLookup
+				local player = self.currentPlayer
+				if lookupTable[recipeID] then
+					local rankData = self:GetSkillRanks(player, recipe.tradeID)
+					if rankData then
+						local rank, maxRank = rankData.rank, rankData.maxRank
+						tooltip:AddDoubleLine("  "..player,"["..(rank or "?").."/"..(maxRank or "?").."]",1,1,1)
+					else
+						tooltip:AddDoubleLine("  "..player,"[???/???]",1,1,1)
+					end
+				end
+			end
+		end
+--[[
+		local inBoth = self:GetInventory(self.currentPlayer, id)
+		local surplus = inBoth - numNeeded * numCraftable
+		if inBoth < 0 then
+			tooltip:AddDoubleLine("in shopping list:",(-inBoth),1,1,0)
+		end
+		if surplus < 0 then
+			tooltip:AddDoubleLine("to craft "..numCraftable.." you need:",(-surplus),1,0,0)
+		end
+--]]
+		if self.db.realm.reagentsInQueue[self.currentPlayer] then
+			local inQueue = self.db.realm.reagentsInQueue[self.currentPlayer][id]
+			if inQueue then
+				if not header_added then
+					tooltip:AddLine("Skillet " .. L["Notes"] .. ":")
+					header_added = true
+				end
+				if inQueue < 0 then
+					tooltip:AddDoubleLine(" Used in queued skills:",-inQueue,1,1,1)
+				else
+					tooltip:AddDoubleLine(" Created from queued skills:",inQueue,1,1,1)
+				end
+			end
+		end
 	end
 	return header_added
 end
