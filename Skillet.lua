@@ -61,6 +61,7 @@ local defaults = {
 		show_max_upgrade = true,
 		enhanced_recipe_display = false,
 		confirm_queue_clear = false,
+		queue_only_view = true,
 		transparency = 1.0,
 		scale = 1.0,
 		plugins = {},
@@ -409,6 +410,20 @@ Skillet.options =
 					end,
 					set = function(self,value)
 						Skillet.db.profile.confirm_queue_clear = value
+						Skillet:UpdateTradeSkillWindow()
+					end,
+					width = "double",
+					order = 5,
+				},
+				queue_only_view = {
+					type = "toggle",
+					name = L["QUEUEONLYVIEWNAME"],
+					desc = L["QUEUEONLYVIEWDESC"],
+					get = function()
+						return Skillet.db.profile.queue_only_view
+					end,
+					set = function(self,value)
+						Skillet.db.profile.queue_only_view = value
 						Skillet:UpdateTradeSkillWindow()
 					end,
 					width = "double",
@@ -846,15 +861,25 @@ Skillet.options =
 			desc = L["RESETDESC"],
 			func = function()
 				if not (UnitAffectingCombat("player")) then
-					SkilletFrame:SetWidth(710);
-					SkilletFrame:SetHeight(545);
-					SkilletFrame:SetPoint("TOPLEFT",200,-100);
-					SkilletStandalonQueue:SetWidth(385);
-					SkilletStandalonQueue:SetHeight(240);
-					SkilletStandalonQueue:SetPoint("TOPLEFT",300,-150);
-					local windowManger = LibStub("LibWindow-1.1")
-					windowManger.SavePosition(SkilletFrame)
-					windowManger.SavePosition(SkilletStandalonQueue)
+					local windowManager = LibStub("LibWindow-1.1")
+					if SkilletFrame and SkilletFrame:IsVisible() then
+						SkilletFrame:SetWidth(750);
+						SkilletFrame:SetHeight(580);
+						SkilletFrame:SetPoint("TOPLEFT",200,-100);
+						windowManager.SavePosition(SkilletFrame)
+					end
+						if SkilletStandaloneQueue and SkilletStandaloneQueue:IsVisible() then
+						SkilletStandaloneQueue:SetWidth(385);
+						SkilletStandaloneQueue:SetHeight(170);
+						SkilletStandaloneQueue:SetPoint("TOPLEFT",950,-100);
+						windowManager.SavePosition(SkilletStandaloneQueue)
+					end
+					if SkilletShoppingList and SkilletShoppingList:IsVisible() then
+						SkilletShoppingList:SetWidth(385);
+						SkilletShoppingList:SetHeight(170);
+						SkilletShoppingList:SetPoint("TOPLEFT",950,-400);
+						windowManager.SavePosition(SkilletShoppingList)
+					end
 				else
 					DA.DEBUG(0,"|cff8888ffSkillet|r: Combat lockdown restriction." ..
 												  " Leave combat and try again.")

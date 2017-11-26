@@ -127,15 +127,15 @@ local function createShoppingListFrame(self)
 
 	-- Ace Window manager library, allows the window position (and size)
 	-- to be automatically saved
-	local windowManger = LibStub("LibWindow-1.1")
+	local windowManager = LibStub("LibWindow-1.1")
 	local shoppingListLocation = {
 		prefix = "shoppingListLocation_"
 	}
-	windowManger.RegisterConfig(frame, self.db.profile, shoppingListLocation)
-	windowManger.RestorePosition(frame)  -- restores scale also
-	windowManger.MakeDraggable(frame)
+	windowManager.RegisterConfig(frame, self.db.profile, shoppingListLocation)
+	windowManager.RestorePosition(frame)  -- restores scale also
+	windowManager.MakeDraggable(frame)
 	-- lets play the resize me game!
-	Skillet:EnableResize(frame, 300, 165, Skillet.UpdateShoppingListWindow)
+	Skillet:EnableResize(frame, 385, 170, Skillet.UpdateShoppingListWindow)
 	-- so hitting [ESC] will close the window
 	tinsert(UISpecialFrames, frame:GetName())
 	return frame
@@ -819,7 +819,9 @@ end
 -- Called to update the shopping list window
 function Skillet:UpdateShoppingListWindow()
 	--DA.DEBUG(0,"UpdateShoppingListWindow()")
+	local num_items = 0
 	local num_buttons = 0
+	local button_count = 0
 	if not self.shoppingList or not self.shoppingList:IsVisible() then
 		return
 	end
@@ -832,8 +834,9 @@ function Skillet:UpdateShoppingListWindow()
 	cache_list(self)
 	SkilletShoppingList:SetAlpha(self.db.profile.transparency)
 	SkilletShoppingList:SetScale(self.db.profile.scale)
-	local numItems = #self.cachedShoppingList
-	if numItems == 0 then
+	num_items = #self.cachedShoppingList
+	--DA.DEBUG(0,"num_items="..num_items)
+	if num_items == 0 then
 		SkilletShoppingListRetrieveButton:Disable()
 	else
 		SkilletShoppingListRetrieveButton:Enable()
@@ -864,7 +867,7 @@ function Skillet:UpdateShoppingListWindow()
 					tryAgain = false
 				end
 			end
-			numItems = #self.cachedShoppingList
+			num_items = #self.cachedShoppingList
 		end
 	else
 		--sort by name
@@ -872,11 +875,11 @@ function Skillet:UpdateShoppingListWindow()
 			return (b.player > a.player)
 		end)
 	end
-	local button_count = SkilletShoppingListList:GetHeight() / SKILLET_SHOPPING_LIST_HEIGHT
+	button_count = SkilletShoppingListList:GetHeight() / SKILLET_SHOPPING_LIST_HEIGHT
 	button_count = math.floor(button_count)
 	-- Update the scroll frame
 	FauxScrollFrame_Update(SkilletShoppingListList,          -- frame
-							numItems,                        -- num items
+							num_items,                        -- num items
 							button_count,                    -- num to display
 							SKILLET_SHOPPING_LIST_HEIGHT)    -- value step (item height)
 	-- Where in the list of items to start counting.
@@ -900,7 +903,7 @@ function Skillet:UpdateShoppingListWindow()
 		name:SetPoint("LEFT", count:GetName(), "RIGHT", 4)
 		player:SetWidth(player_width)
 		player:SetPoint("LEFT", name:GetName(), "RIGHT", 4)
-		if itemIndex <= numItems then
+		if itemIndex <= num_items then
 			count:SetText(self.cachedShoppingList[itemIndex].count)
 			name:SetText(GetItemInfo(self.cachedShoppingList[itemIndex].id))
 			player:SetText(self.cachedShoppingList[itemIndex].player)
@@ -921,9 +924,9 @@ function Skillet:UpdateShoppingListWindow()
 		end
 	end
 	-- Hide any of the buttons that we created, but don't need right now
-	for i = button_count+1, num_buttons, 1 do
-	   local button = get_button(i)
-	   button:Hide()
+	for i = button_count + 1, num_items, 1 do
+		local button = get_button(i)
+		button:Hide()
 	end
 end
 
