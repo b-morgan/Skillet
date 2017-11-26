@@ -83,13 +83,13 @@ local function createIgnoreListFrame(self)
 	backdrop:SetBackdropBorderColor(0.6, 0.6, 0.6)
 	backdrop:SetBackdropColor(0.05, 0.05, 0.05)
 	backdrop:SetResizable(true)
-	local windowManger = LibStub("LibWindow-1.1")
+	local windowManager = LibStub("LibWindow-1.1")
 	local ignoreListLocation = {
 		prefix = "ignoreListLocation_"
 	}
-	windowManger.RegisterConfig(frame, self.db.profile, ignoreListLocation)
-	windowManger.RestorePosition(frame)  -- restores scale also
-	windowManger.MakeDraggable(frame)
+	windowManager.RegisterConfig(frame, self.db.profile, ignoreListLocation)
+	windowManager.RestorePosition(frame)  -- restores scale also
+	windowManager.MakeDraggable(frame)
 	-- lets play the resize me game!
 	Skillet:EnableResize(frame, 180,150, Skillet.UpdateIgnoreListWindow)
 	-- so hitting [ESC] will close the window

@@ -874,9 +874,9 @@
 		</Layers>
 	</GameTooltip>
 	<!-- Don't change the name 'SkilletFrame' as other mods may depend on it -->
-	<Frame name="SkilletFrame" toplevel="true" movable="true" resizable="true" parent="UIParent" enableMouse="true" hidden="true">
+	<Frame name="SkilletFrame" toplevel="true" movable="true" clampedToScreen="true" resizable="true" parent="UIParent" enableMouse="true" hidden="true">
 		<Size>
-			<AbsDimension x="720" y="545"/>
+			<AbsDimension x="750" y="580"/>
 		</Size>
 		<Frames>
 			<!--
@@ -2957,9 +2957,9 @@
 					<AbsDimension x="110" y="22"/>
 				</Size>
 				<Anchors>
-					<Anchor point="TOPRIGHT" relativeTo="SkilletQueueParent" relativePoint="BOTTOMRIGHT">
+					<Anchor point="TOPLEFT" relativeTo="SkilletQueueOnlyButton" relativePoint="TOPRIGHT">
 						<Offset>
-							<AbsDimension x="0" y="-1"/>
+							<AbsDimension x="5" y=""/>
 						</Offset>
 					</Anchor>
 				</Anchors>
@@ -2991,9 +2991,9 @@
 			</OnUpdate>
 		</Scripts>
 	</Frame> <!-- main trade skill frame -->
-	<Frame name="SkilletStandalonQueue" toplevel="true" movable="true" resizable="true" parent="UIParent" enableMouse="true" hidden="true">
+	<Frame name="SkilletStandaloneQueue" toplevel="true" movable="true" clampedToScreen="true" resizable="true" parent="UIParent" enableMouse="true" hidden="true">
 		<Size>
-			<AbsDimension x="385" y="240"/>
+			<AbsDimension x="385" y="170"/>
 		</Size>
 		<Frames>
 			<!--
@@ -3001,9 +3001,9 @@
 			# A button on the top right to close the window
 			#
 			-->
-			<Button name="SkilletStandalonQueueCloseButton" inherits="UIPanelCloseButton" parent="SkilletStandalonQueue">
+			<Button name="SkilletStandaloneQueueCloseButton" inherits="UIPanelCloseButton" parent="SkilletStandaloneQueue">
 				<Anchors>
-					<Anchor point="TOPRIGHT" relativeTo="SkilletStandalonQueue" relativePoint="TOPRIGHT">
+					<Anchor point="TOPRIGHT" relativeTo="SkilletStandaloneQueue" relativePoint="TOPRIGHT">
 						<Offset>
 							<AbsDimension x="-2" y="-2"/>
 						</Offset>

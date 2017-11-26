@@ -207,9 +207,9 @@
  #  The shopping list window ....
  #
 -->
-<Frame name="SkilletShoppingList" toplevel="true" movable="true" resizable="true" parent="UIParent" enableMouse="true" hidden="true">
+<Frame name="SkilletShoppingList" toplevel="true" movable="true" clampedToScreen="true" resizable="true" parent="UIParent" enableMouse="true" hidden="true">
 	<Size>
-		<AbsDimension x="385" y="240"/>
+		<AbsDimension x="385" y="170"/>
 	</Size>
 
 	<Frames>

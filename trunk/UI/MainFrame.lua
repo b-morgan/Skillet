@@ -28,7 +28,7 @@ local COLORGREEN =  "|cff40c040"
 local COLORGRAY =   "|cff808080"
 
 -- min height for Skillet window
-local SKILLET_MIN_HEIGHT = 575
+local SKILLET_MIN_HEIGHT = 580
 -- height of the header portion
 local SKILLET_HEADER_HEIGHT = 145
 
@@ -241,13 +241,13 @@ function Skillet:CreateTradeSkillWindow()
 	gearTexture:SetWidth(16)
 	-- Ace Window manager library, allows the window position (and size)
 	-- to be automatically saved
-	local windowManger = LibStub("LibWindow-1.1")
+	local windowManager = LibStub("LibWindow-1.1")
 	local tradeSkillLocation = {
 		prefix = "tradeSkillLocation_"
 	}
-	windowManger.RegisterConfig(frame, self.db.profile, tradeSkillLocation)
-	windowManger.RestorePosition(frame)  -- restores scale also
-	windowManger.MakeDraggable(frame)
+	windowManager.RegisterConfig(frame, self.db.profile, tradeSkillLocation)
+	windowManager.RestorePosition(frame)  -- restores scale also
+	windowManager.MakeDraggable(frame)
 	-- lets play the resize me game!
 	local minwidth = self:GetMinSkillButtonWidth()
 	if not minwidth or minwidth < SKILLET_SKILLLIST_MIN_WIDTH then
@@ -261,8 +261,11 @@ function Skillet:CreateTradeSkillWindow()
 	-- Set up the sorting methods here
 	self:InitializeSorting()
 	self:ConfigureRecipeControls(false)				-- initial setting
-	self.skilletStandalonQueue=Skillet:CreateStandaloneQueueFrame()
+	self.skilletStandaloneQueue=Skillet:CreateStandaloneQueueFrame()
 	UIDropDownMenu_Initialize(SkilletFilterDropDown, Skillet.InitializeDropdown, "MENU");
+	self.fullView = true
+	self.saved_full_button_count = 0
+	self.saved_SA_button_count = 0
 	return frame
 end
 
@@ -335,11 +338,6 @@ end
 -- Called when the list of skills is scrolled
 function Skillet:SkillList_OnScroll()
 	Skillet:UpdateTradeSkillWindow()
-end
-
--- Called when the list of queued items is scrolled
-function Skillet:QueueList_OnScroll()
-	Skillet:UpdateQueueWindow()
 end
 
 local num_recipe_buttons = 1
@@ -738,7 +736,7 @@ local updateWindowCount = 1
 -- Updates the trade skill window whenever anything has changed,
 -- number of skills, skill type, skill level, etc
 function Skillet:internal_UpdateTradeSkillWindow()
-	--DA.DEBUG(0,"internal_UpdateTradeSkillWindow()")
+	DA.DEBUG(0,"internal_UpdateTradeSkillWindow(), updateWindowBusy="..tostring(updateWindowBusy))
 	self:NameEditSave()
 	if not self.currentPlayer or not self.currentTrade then return end
 	local skillListKey = self.currentPlayer..":"..self.currentTrade..":"..self.currentGroupLabel
@@ -782,7 +780,12 @@ function Skillet:internal_UpdateTradeSkillWindow()
 	local width = SkilletFrame:GetWidth() - 20 -- for padding.
 	local height = SkilletFrame:GetHeight()
 	local reagent_width = width / 2
-	local reagent_height = SKILLET_REAGENT_MIN_HEIGHT + (height - SKILLET_MIN_HEIGHT) * 2 / 3
+	local reagent_height = SKILLET_REAGENT_MIN_HEIGHT + ((height - SKILLET_MIN_HEIGHT) * 2) / 3
+	--DA.DEBUG(0,"fullView="..tostring(self.fullView)..", reagent_height="..tostring(reagent_height))
+	if not self.fullView then
+		reagent_height = SKILLET_REAGENT_MIN_HEIGHT + height - SKILLET_MIN_HEIGHT + 85
+		--DA.DEBUG(0,"new_reagent_height="..tostring(reagent_height))
+	end
 	if reagent_width < SKILLET_REAGENT_MIN_WIDTH then
 		reagent_width = SKILLET_REAGENT_MIN_WIDTH
 	elseif reagent_width > SKILLET_REAGENT_MAX_WIDTH then
@@ -1580,18 +1583,6 @@ function Skillet:UpdateDetailsWindow(skillIndex)
 	end
 end
 
-local num_queue_buttons = 0
-local function get_queue_button(i)
-	local button = _G["SkilletQueueButton"..i]
-	if not button then
-		button = CreateFrame("Button", "SkilletQueueButton"..i, SkilletQueueParent, "SkilletQueueItemButtonTemplate")
-		button:SetParent(SkilletQueueParent)
-		button:SetPoint("TOPLEFT", "SkilletQueueButton"..(i-1), "BOTTOMLEFT")
-		button:SetFrameLevel(SkilletQueueParent:GetFrameLevel() + 1)
-	end
-	return button
-end
-
 function Skillet:IncreaseItemCount(this, button, count)
 	local val = SkilletItemCountInputBox:GetNumber()
 	if button == "RightButton" then
@@ -1605,100 +1596,6 @@ function Skillet:IncreaseItemCount(this, button, count)
 		val = 1
 	end
 	SkilletItemCountInputBox:SetText(val)
-end
-function Skillet:QueueItemButton_OnClick(this, button)
-	local queue = self.db.realm.queueData[self.currentPlayer]
-	local index = this:GetID()
-	if button == "LeftButton" then
-		Skillet:QueueManagementToggle(true)
-		local recipeID = queue[index].recipeID
-		local recipe = self:GetRecipe(recipeID)
-		local tradeID = recipe.tradeID
-		local newSkillIndex = self.data.skillIndexLookup[recipeID]
-		DA.DEBUG(0,"selecting new skill "..tradeID..":"..(newSkillIndex or "nil"))
-		self:SetTradeSkill(self.currentPlayer, tradeID, newSkillIndex)
-		DA.DEBUG(0,"done selecting new skill")
-	elseif button == "RightButton" then
-		Skillet:SkilletQueueMenu_Show(this)
-	end
-end
-
--- Updates the window/scroll list displaying queue of items
--- that are waiting to be crafted.
-function Skillet:UpdateQueueWindow()
-	local queue = self.db.realm.queueData[self.currentPlayer]
-	if not queue then
-		SkilletStartQueueButton:SetText(L["Process"])
-		SkilletEmptyQueueButton:Disable()
-		SkilletStartQueueButton:Disable()
-		return
-	end
-	local numItems = #queue
-	if numItems > 0 then
-		SkilletStartQueueButton:Enable()
-		SkilletEmptyQueueButton:Enable()
-	else
-		SkilletStartQueueButton:Disable()
-		SkilletEmptyQueueButton:Disable()
-	end
-	if self.queuecasting and UnitCastingInfo("player") then
-		SkilletStartQueueButton:SetText(L["Pause"])
-	else
-		SkilletStartQueueButton:SetText(L["Process"])
-	end
-	local button_count = SkilletQueueList:GetHeight() / SKILLET_TRADE_SKILL_HEIGHT
-	button_count = math.floor(button_count)
-	-- Update the scroll frame
-	FauxScrollFrame_Update(SkilletQueueList,				-- frame
-						   numItems,                        -- num items
-						   button_count,                    -- num to display
-						   SKILLET_TRADE_SKILL_HEIGHT)      -- value step (item height)
-	-- Where in the list of skill to start counting.
-	local itemOffset = FauxScrollFrame_GetOffset(SkilletQueueList)
-	local width = SkilletQueueList:GetWidth()
-	-- Iterate through all the buttons that make up the scroll window
-	-- and fill then in with data or hide them, as necessary
-	for i=1, button_count, 1 do
-		local itemIndex = i + itemOffset
-		num_queue_buttons = math.max(num_queue_buttons, i)
-		local button       = get_queue_button(i)
-		local countFrame   = _G[button:GetName() .. "Count"]
-		local queueCount   = _G[button:GetName() .. "CountText"]
-		local nameButton   = _G[button:GetName() .. "Name"]
-		local queueName    = _G[button:GetName() .. "NameText"]
-		local deleteButton = _G[button:GetName() .. "DeleteButton"]
-		button:SetWidth(width)
-		-- Stick this on top of the button we use for displaying queue contents.
-		deleteButton:SetFrameLevel(button:GetFrameLevel() + 1)
-		local fixed_width = countFrame:GetWidth() + deleteButton:GetWidth()
-		fixed_width = width - fixed_width - 10 -- 10 for the padding between items
-		queueName:SetWidth(fixed_width);
-		nameButton:SetWidth(fixed_width);
-		if itemIndex <= numItems then
-			deleteButton:SetID(itemIndex)
-			nameButton:SetID(itemIndex)
-			local queueCommand = queue[itemIndex]
-			if queueCommand then
-				local recipe = self:GetRecipe(queueCommand.recipeID)
-				queueName:SetText((self:GetTradeName(recipe.tradeID) or recipe.tradeID)..":"..(recipe.name or recipe.recipeID))
-				queueCount:SetText(queueCommand.count)
-			end
-			nameButton:Show()
-			queueName:Show()
-			countFrame:Show()
-			queueCount:Show()
-			button:Show()
-		else
-			button:Hide()
-			queueName:Hide()
-			queueCount:Hide()
-		end
-	end
-	-- Hide any of the buttons that we created, but don't need right now
-	for i = button_count+1, num_queue_buttons, 1 do
-	   local button = get_queue_button(i)
-	   button:Hide()
-	end
 end
 
 function Skillet:SkillButton_SetSelections(id1, id2)
@@ -2284,20 +2181,6 @@ function Skillet:SkilletFrameForceClose()
 	end
 end
 
--- The start/pause queue button.
-function Skillet:StartQueue_OnClick(button,mouse)
-	if self.queuecasting then
-		DA.CHAT("Cancel incomplete processing")
-		self:CancelCast() -- next update will reset the text
---		button:Disable()
-		self.queuecasting = false
-	else
-		button:SetText(L["Pause"])
-		self:ProcessQueue(mouse == "RightButton" or IsAltKeyDown())
-	end
-	self:UpdateQueueWindow()
-end
-
 local old_CloseSpecialWindows
 -- Called when the trade skill window is shown
 function Skillet:Tradeskill_OnShow()
@@ -2635,16 +2518,6 @@ function Skillet:SkilletSkillMenu_Show(button)
 	end
 end
 
-function Skillet:SkilletQueueMenu_Show(button)
-	if not SkilletQueueMenu then
-		SkilletQueueMenu = CreateFrame("Frame", "SkilletQueueMenu", _G["UIParent"], "UIDropDownMenuTemplate")
-	end
-	local x, y = GetCursorPosition()
-	local uiScale = UIParent:GetEffectiveScale()
-	self.queueMenuButton = button
-	EasyMenu(queueMenuList, SkilletQueueMenu, _G["UIParent"], x/uiScale,y/uiScale, "MENU", 5)
-end
-
 function Skillet:ReAnchorButtons(newFrame)
 	SkilletRecipeNotesButton:SetPoint("BOTTOMRIGHT",newFrame,"TOPRIGHT",0,0)
 	SkilletQueueAllButton:SetPoint("TOPLEFT",newFrame,"BOTTOMLEFT",0,-2)
@@ -2660,20 +2533,6 @@ function Skillet:ShowReagentDetails()
 		SkilletQueueManagementParent:SetHeight(260)
 		SkilletViewCraftersParent:SetHeight(260)
 		Skillet:ReAnchorButtons(SkilletReagentParent)
-end
-
-function Skillet:QueueManagementToggle(showDetails)
-	if SkilletQueueManagementParent:IsVisible() or showDetails then
-		Skillet:ShowReagentDetails()
-	else
-		SkilletQueueManagementParent:Show();
-		SkilletQueueManagementParent:SetHeight(100)
-		SkilletViewCraftersParent:Hide()
-		SkilletViewCraftersParent:SetHeight(100)
-		SkilletReagentParent:Hide()
-		SkilletReagentParent:SetHeight(100)
-		Skillet:ReAnchorButtons(SkilletQueueManagementParent)
-	end
 end
 
 function Skillet:ViewCraftersClicked()
@@ -2738,53 +2597,234 @@ function Skillet.ViewCraftersUpdate()
 	FauxScrollFrame_Update(SkilletViewCraftersScrollFrame, numMembers, SKILLET_CRAFTERS_DISPLAYED, TRADE_SKILL_HEIGHT);
 end
 
-Skillet.fullView = true
+-- The SkilletQueue functions start here
+-- The start/pause queue button.
+function Skillet:StartQueue_OnClick(button,mouse)
+	if self.queuecasting then
+		DA.CHAT("Cancel incomplete processing")
+		self:CancelCast() -- next update will reset the text
+--		button:Disable()
+		self.queuecasting = false
+	else
+		button:SetText(L["Pause"])
+		self:ProcessQueue(mouse == "RightButton" or IsAltKeyDown())
+	end
+	self:UpdateQueueWindow()
+end
+
+function Skillet:SkilletQueueMenu_Show(button)
+	if not SkilletQueueMenu then
+		SkilletQueueMenu = CreateFrame("Frame", "SkilletQueueMenu", _G["UIParent"], "UIDropDownMenuTemplate")
+	end
+	local x, y = GetCursorPosition()
+	local uiScale = UIParent:GetEffectiveScale()
+	self.queueMenuButton = button
+	EasyMenu(queueMenuList, SkilletQueueMenu, _G["UIParent"], x/uiScale,y/uiScale, "MENU", 5)
+end
+
+function Skillet:QueueManagementToggle(showDetails)
+	if SkilletQueueManagementParent:IsVisible() or showDetails then
+		Skillet:ShowReagentDetails()
+	else
+		SkilletQueueManagementParent:Show();
+		SkilletQueueManagementParent:SetHeight(100)
+		SkilletViewCraftersParent:Hide()
+		SkilletViewCraftersParent:SetHeight(100)
+		SkilletReagentParent:Hide()
+		SkilletReagentParent:SetHeight(100)
+		Skillet:ReAnchorButtons(SkilletQueueManagementParent)
+	end
+end
+
+function Skillet:QueueItemButton_OnClick(this, button)
+	local queue = self.db.realm.queueData[self.currentPlayer]
+	local index = this:GetID()
+	if button == "LeftButton" then
+		Skillet:QueueManagementToggle(true)
+		local recipeID = queue[index].recipeID
+		local recipe = self:GetRecipe(recipeID)
+		local tradeID = recipe.tradeID
+		local newSkillIndex = self.data.skillIndexLookup[recipeID]
+		DA.DEBUG(0,"selecting new skill "..tradeID..":"..(newSkillIndex or "nil"))
+		self:SetTradeSkill(self.currentPlayer, tradeID, newSkillIndex)
+		DA.DEBUG(0,"done selecting new skill")
+	elseif button == "RightButton" then
+		Skillet:SkilletQueueMenu_Show(this)
+	end
+end
+
+-- Called when the list of queued items is scrolled
+function Skillet:QueueList_OnScroll()
+	Skillet:UpdateQueueWindow()
+end
+
+local num_queue_buttons = 0
+local function get_queue_button(i)
+	local button = _G["SkilletQueueButton"..i]
+	if not button then
+		button = CreateFrame("Button", "SkilletQueueButton"..i, SkilletQueueParent, "SkilletQueueItemButtonTemplate")
+		button:SetParent(SkilletQueueParent)
+		button:SetPoint("TOPLEFT", "SkilletQueueButton"..(i-1), "BOTTOMLEFT")
+		button:SetFrameLevel(SkilletQueueParent:GetFrameLevel() + 1)
+	end
+	return button
+end
+
+-- Updates the window/scroll list displaying queue of items
+-- that are waiting to be crafted.
+function Skillet:UpdateQueueWindow()
+	DA.DEBUG(0,"UpdateQueueWindow()")
+	local queue = self.db.realm.queueData[self.currentPlayer]
+	if not queue then
+		SkilletStartQueueButton:SetText(L["Process"])
+		SkilletEmptyQueueButton:Disable()
+		SkilletStartQueueButton:Disable()
+		return
+	end
+	local numItems = #queue
+	if numItems > 0 then
+		SkilletStartQueueButton:Enable()
+		SkilletEmptyQueueButton:Enable()
+	else
+		SkilletStartQueueButton:Disable()
+		SkilletEmptyQueueButton:Disable()
+	end
+	if self.queuecasting and UnitCastingInfo("player") then
+		SkilletStartQueueButton:SetText(L["Pause"])
+	else
+		SkilletStartQueueButton:SetText(L["Process"])
+	end
+	local button_count = SkilletQueueParentBase:GetHeight() / SKILLET_TRADE_SKILL_HEIGHT
+	button_count = math.max(0, (math.floor(button_count) - 1))
+	--DA.DEBUG(0,"button_count="..button_count)
+	if button_count == 0 then
+		if self.fullView then
+			button_count = self.saved_full_button_count
+		else
+			button_count = self.saved_SA_button_count
+		end
+	else
+		if self.fullView then
+			self.saved_full_button_count = button_count
+		else
+			self.saved_SA_button_count = button_count
+		end
+	end
+	-- Update the scroll frame
+	FauxScrollFrame_Update(SkilletQueueList,				-- frame
+						   numItems,                        -- num items
+						   button_count,                    -- num to display
+						   SKILLET_TRADE_SKILL_HEIGHT)      -- value step (item height)
+	-- Where in the list of skill to start counting.
+	local itemOffset = FauxScrollFrame_GetOffset(SkilletQueueList)
+		--DA.DEBUG(0,"itemOffset="..itemOffset)
+	local width = SkilletQueueList:GetWidth()
+	-- Iterate through all the buttons that make up the scroll window
+	-- and fill then in with data or hide them, as necessary
+	for i=1, button_count, 1 do
+		local itemIndex = i + itemOffset
+		num_queue_buttons = math.max(num_queue_buttons, i)
+		local button       = get_queue_button(i)
+		local countFrame   = _G[button:GetName() .. "Count"]
+		local queueCount   = _G[button:GetName() .. "CountText"]
+		local nameButton   = _G[button:GetName() .. "Name"]
+		local queueName    = _G[button:GetName() .. "NameText"]
+		local deleteButton = _G[button:GetName() .. "DeleteButton"]
+		button:SetWidth(width)
+		-- Stick this on top of the button we use for displaying queue contents.
+		deleteButton:SetFrameLevel(button:GetFrameLevel() + 1)
+		local fixed_width = countFrame:GetWidth() + deleteButton:GetWidth()
+		fixed_width = width - fixed_width - 10 -- 10 for the padding between items
+		queueName:SetWidth(fixed_width);
+		nameButton:SetWidth(fixed_width);
+		if itemIndex <= numItems then
+			deleteButton:SetID(itemIndex)
+			nameButton:SetID(itemIndex)
+			local queueCommand = queue[itemIndex]
+			if queueCommand then
+				local recipe = self:GetRecipe(queueCommand.recipeID)
+				queueName:SetText((self:GetTradeName(recipe.tradeID) or recipe.tradeID)..":"..(recipe.name or recipe.recipeID))
+				queueCount:SetText(queueCommand.count)
+			end
+			nameButton:Show()
+			queueName:Show()
+			countFrame:Show()
+			queueCount:Show()
+			button:Show()
+		else
+			button:Hide()
+			queueName:Hide()
+			queueCount:Hide()
+		end
+	end
+	-- Hide any of the buttons that we created, but don't need right now
+	for i = button_count + 1, num_queue_buttons, 1 do
+	   local button = get_queue_button(i)
+	   button:Hide()
+	end
+end
+
 function Skillet:ShowFullView()
-	Skillet.fullView = true
+	DA.DEBUG(0,"ShowFullView()")
+	self.fullView = true
 	SkilletQueueParentBase:SetParent(SkilletFrame)
 	SkilletQueueParentBase:SetPoint("TOPLEFT",SkilletCreateAllButton,"BOTTOMLEFT",0,-3)
 	SkilletQueueParentBase:SetPoint("BOTTOMRIGHT",SkilletFrame,"BOTTOMRIGHT",-10,32)
-	SkilletStandalonQueue:Hide()
+	SkilletStandaloneQueue:Hide()
 	SkilletQueueOnlyButton:SetText(">")
-	Skillet:UpdateQueueWindow()
+	self:UpdateTradeSkillWindow()
 end
 
 function Skillet:ShowQueueView()
+	DA.DEBUG(0,"ShowQueueView()")
 	Skillet.fullView = false
-	SkilletQueueParentBase:SetParent(SkilletStandalonQueue)
-	SkilletQueueParentBase:SetPoint("TOPLEFT",SkilletStandalonQueue,"TOPLEFT",5,-32)
-	SkilletQueueParentBase:SetPoint("BOTTOMRIGHT",SkilletStandalonQueue,"BOTTOMRIGHT",-5,30)
-	SkilletStandalonQueue:Show()
+	SkilletQueueParentBase:SetParent(SkilletStandaloneQueue)
+	SkilletQueueParentBase:SetPoint("TOPLEFT",SkilletStandaloneQueue,"TOPLEFT",5,-32)
+	SkilletQueueParentBase:SetPoint("BOTTOMRIGHT",SkilletStandaloneQueue,"BOTTOMRIGHT",-5,30)
+	SkilletStandaloneQueue:Show()
 	SkilletQueueOnlyButton:SetText("<")
-	Skillet:UpdateQueueWindow()
+	self:UpdateTradeSkillWindow()
 end
 
 function Skillet:QueueOnlyViewToggle()
-	Skillet.fullView = not Skillet.fullView
-	if Skillet.fullView then
-		Skillet:ShowFullView()
-		SkilletFrame:Show()
+	DA.DEBUG(0,"QueueOnlyViewToggle()")
+	FauxScrollFrame_SetOffset(SkilletQueueList, 0)
+	self.fullView = not self.fullView
+	if self.fullView then
+		self:ShowFullView()
+		if self.db.profile.queue_only_view then
+			SkilletFrame:Show()
+		else
+			self:UpdateTradeSkillWindow()
+		end
 	else
-		Skillet:ShowQueueView()
-		SkilletFrame:Hide()
+		self:ShowQueueView()
+		if self.db.profile.queue_only_view then
+			SkilletFrame:Hide()
+		end
 	end
 end
 
 function Skillet:StandaloneQueueClose()
-	Skillet:ShowFullView()
-	Skillet:SkilletFrameForceClose()
+	DA.DEBUG(0,"StandaloneQueueClose()")
+	self:ShowFullView()
+	if self.db.profile.queue_only_view then
+		self:SkilletFrameForceClose()
+	end
 end
 
 function Skillet:HideStandaloneQueue()
-	if not self.skilletStandalonQueue or not self.skilletStandalonQueue:IsVisible() then
+	DA.DEBUG(0,"HideStandaloneQueue()")
+	if not self.skilletStandaloneQueue or not self.skilletStandaloneQueue:IsVisible() then
 		return
 	end
-	SkilletStandalonQueue:Hide()
+	SkilletStandaloneQueue:Hide()
 end
 
--- Creates and sets up the shopping list window
+-- Creates and sets up the standalone queue window
 function Skillet:CreateStandaloneQueueFrame()
-	local frame = SkilletStandalonQueue
+	DA.DEBUG(0,"CreateStandaloneQueueFrame()")
+	local frame = SkilletStandaloneQueue
 	if not frame then
 		return nil
 	end
@@ -2807,7 +2847,7 @@ function Skillet:CreateStandaloneQueueFrame()
 	local title = CreateFrame("Frame",nil,frame)
 	title:SetPoint("TOPLEFT",titlebar,"TOPLEFT",0,0)
 	title:SetPoint("BOTTOMRIGHT",titlebar2,"BOTTOMRIGHT",0,0)
-	local titletext = title:CreateFontString("SkilletStandalonQueueTitleText", "OVERLAY", "GameFontNormalLarge")
+	local titletext = title:CreateFontString("SkilletStandaloneQueueTitleText", "OVERLAY", "GameFontNormalLarge")
 	titletext:SetPoint("TOPLEFT",title,"TOPLEFT",0,0)
 	titletext:SetPoint("TOPRIGHT",title,"TOPRIGHT",0,0)
 	titletext:SetHeight(26)
@@ -2823,26 +2863,28 @@ function Skillet:CreateStandaloneQueueFrame()
 	backdrop:SetResizable(true)
 	-- Ace Window manager library, allows the window position (and size)
 	-- to be automatically saved
-	local windowManger = LibStub("LibWindow-1.1")
+	local windowManager = LibStub("LibWindow-1.1")
 	local standaloneQueueLocation = {
 		prefix = "standaloneQueueLocation_"
 	}
-	windowManger.RegisterConfig(frame, self.db.profile, standaloneQueueLocation)
-	windowManger.RestorePosition(frame)  -- restores scale also
-	windowManger.MakeDraggable(frame)
+	windowManager.RegisterConfig(frame, self.db.profile, standaloneQueueLocation)
+	windowManager.RestorePosition(frame)  -- restores scale also
+	windowManager.MakeDraggable(frame)
 	-- lets play the resize me game!
-	Skillet:EnableResize(frame, 320, 165, Skillet.UpdateStandaloneQueueWindow)
+	Skillet:EnableResize(frame, 385, 170, Skillet.UpdateStandaloneQueueWindow)
 	-- so hitting [ESC] will close the window
 	--tinsert(UISpecialFrames, frame:GetName())
 	return frame
 end
 
 function Skillet:UpdateStandaloneQueueWindow()
-	if not self.skilletStandalonQueue or not self.skilletStandalonQueue:IsVisible() then
+	DA.DEBUG(0,"UpdateStandaloneQueueWindow()")
+	if not self.skilletStandaloneQueue or not self.skilletStandaloneQueue:IsVisible() then
 		return
 	end
-	SkilletStandalonQueue:SetAlpha(self.db.profile.transparency)
-	SkilletStandalonQueue:SetScale(self.db.profile.scale)
+	SkilletStandaloneQueue:SetAlpha(self.db.profile.transparency)
+	SkilletStandaloneQueue:SetScale(self.db.profile.scale)
+	self:UpdateQueueWindow()
 end
 
 -- Add Auctionator support
