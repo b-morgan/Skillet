@@ -310,7 +310,7 @@ end
 
 -- Something has changed in the tradeskills, and the window needs to be updated
 function Skillet:TradeSkillRank_Updated()
-	DA.DEBUG(0,"TradeSkillRank_Updated")
+	--DA.DEBUG(0,"TradeSkillRank_Updated")
 	local _, rank, maxRank = self:GetTradeSkillLine();
 	if rank and maxRank then
 		SkilletRankFrame:SetMinMaxValues(0, maxRank);
@@ -321,7 +321,7 @@ function Skillet:TradeSkillRank_Updated()
 		end
 		SkilletRankFrame.subRanks.gray:SetValue(maxRank)
 	end
-	DA.DEBUG(0,"TradeSkillRank_Updated over")
+	--DA.DEBUG(0,"TradeSkillRank_Updated over")
 end
 
 function Skillet:ClickSkillButton(skillIndex)
@@ -513,7 +513,7 @@ function Skillet:TradeButton_OnClick(this,button)
 	local _, player, tradeID = string.split("-", name)
 	tradeID = tonumber(tradeID)
 	local data =  self:GetSkillRanks(player, tradeID)
-	DA.DEBUG(0,"TradeButton_OnClick "..(name or "nil").." "..(player or "nil").." "..(tradeID or "nil"))
+	--DA.DEBUG(0,"TradeButton_OnClick "..(name or "nil").." "..(player or "nil").." "..(tradeID or "nil"))
 	if button == "LeftButton" then
 		if player == UnitName("player") or (data and data ~= nil) then
 			if self.currentTrade == tradeID and IsShiftKeyDown() then
@@ -591,7 +591,7 @@ function Skillet:UpdateTradeButtons(player)
 			local buttonName = "SkilletFrameTradeButton-"..player.."-"..tradeID
 			local button = _G[buttonName]
 			if not button then
-				DA.DEBUG(0,"CreateFrame for "..tostring(buttonName))
+				--DA.DEBUG(0,"CreateFrame for "..tostring(buttonName))
 				button = CreateFrame("CheckButton", buttonName, frame, "SkilletTradeButtonTemplate")
 			end
 			if player ~= UnitName("player") and not tradeLink then		-- fade out buttons that don't have data collected
@@ -635,7 +635,7 @@ function Skillet:UpdateTradeButtons(player)
 		local buttonName = "SkilletDo"..additionalSpellName
 		local button = _G[buttonName]
 		if not button then
-			DA.DEBUG(0,"CreateFrame for "..tostring(buttonName))
+			--DA.DEBUG(0,"CreateFrame for "..tostring(buttonName))
 			button = CreateFrame("Button", buttonName, frame, "SkilletTradeButtonAdditionalTemplate")
 			button:SetID(additionalSpellId)
 			if additionalToy then
@@ -677,11 +677,11 @@ function Skillet:UpdateAutoTradeButtons()
 			if additionalSpellTab then -- this skill has additional abilities
 				if type(additionalSpellTab[1]) == "table" then
 					for j=1,#additionalSpellTab,1 do
-						DA.DEBUG(0,"UpdateAutoTradeButtons: additionalSpellTab["..tostring(j).."]= "..DA.DUMP1(additionalSpellTab[j]))
+						--DA.DEBUG(0,"UpdateAutoTradeButtons: additionalSpellTab["..tostring(j).."]= "..DA.DUMP1(additionalSpellTab[j]))
 						table.insert(Skillet.AutoButtonsList, additionalSpellTab[j])
 					end
 				else
-					DA.DEBUG(0,"UpdateAutoTradeButtons: additionalSpellTab= "..DA.DUMP1(additionalSpellTab))
+					--DA.DEBUG(0,"UpdateAutoTradeButtons: additionalSpellTab= "..DA.DUMP1(additionalSpellTab))
 					table.insert(Skillet.AutoButtonsList, additionalSpellTab)
 				end
 			end
@@ -736,7 +736,7 @@ local updateWindowCount = 1
 -- Updates the trade skill window whenever anything has changed,
 -- number of skills, skill type, skill level, etc
 function Skillet:internal_UpdateTradeSkillWindow()
-	DA.DEBUG(0,"internal_UpdateTradeSkillWindow(), updateWindowBusy="..tostring(updateWindowBusy))
+	--DA.DEBUG(0,"internal_UpdateTradeSkillWindow(), updateWindowBusy="..tostring(updateWindowBusy))
 	self:NameEditSave()
 	if not self.currentPlayer or not self.currentTrade then return end
 	local skillListKey = self.currentPlayer..":"..self.currentTrade..":"..self.currentGroupLabel
@@ -1725,7 +1725,7 @@ function Skillet:SkillButton_OnReceiveDrag(button, mouse)
 end
 
 function Skillet:SkillButton_CopySelected()
-	DA.DEBUG(0,"SkillButton_CopySelected()")
+	--DA.DEBUG(0,"SkillButton_CopySelected()")
 	local skillListKey = self.currentPlayer..":"..self.currentTrade..":"..self.currentGroupLabel
 	local sortedSkillList = self.data.sortedSkillList[skillListKey]
 	if not self.skillListCopyBuffer then
@@ -1743,7 +1743,7 @@ function Skillet:SkillButton_CopySelected()
 end
 
 function Skillet:SkillButton_PasteSelected(button)
-	DA.DEBUG(0,"SkillButton_PasteSelected("..tostring(button)..")")
+	--DA.DEBUG(0,"SkillButton_PasteSelected("..tostring(button)..")")
 	if not self:RecipeGroupIsLocked() then
 		local parentGroup
 		if button then
@@ -1763,7 +1763,7 @@ function Skillet:SkillButton_PasteSelected(button)
 end
 
 function Skillet:SkillButton_DeleteSelected()
-	DA.DEBUG(0,"SkillButton_DeleteSelected()")
+	--DA.DEBUG(0,"SkillButton_DeleteSelected()")
 	if not self:RecipeGroupIsLocked() then
 		local skillListKey = self.currentPlayer..":"..self.currentTrade..":"..self.currentGroupLabel
 		local sortedSkillList = self.data.sortedSkillList[skillListKey]
@@ -1779,13 +1779,13 @@ function Skillet:SkillButton_DeleteSelected()
 end
 
 function Skillet:SkillButton_CutSelected()
-	DA.DEBUG(0,"SkillButton_CutSelected()")
+	--DA.DEBUG(0,"SkillButton_CutSelected()")
 	Skillet:SkillButton_CopySelected()
 	Skillet:SkillButton_DeleteSelected()
 end
 
 function Skillet:SkillButton_NewGroup()
-	DA.DEBUG(0,"SkillButton_NewGroup()")
+	--DA.DEBUG(0,"SkillButton_NewGroup()")
 	if not self:RecipeGroupIsLocked() then
 		local player = self.currentPlayer
 		local tradeID = self.currentTrade
@@ -1800,7 +1800,7 @@ function Skillet:SkillButton_NewGroup()
 end
 
 function Skillet:SkillButton_MakeGroup()
-	DA.DEBUG(0,"SkillButton_MakeGroup()")
+	--DA.DEBUG(0,"SkillButton_MakeGroup()")
 	if not self:RecipeGroupIsLocked() then
 		local player = self.currentPlayer
 		local tradeID = self.currentTrade
@@ -2093,7 +2093,7 @@ function Skillet:ReagentButtonOnLeave(button, skillIndex, reagentIndex)
 end
 
 function Skillet:ReagentButtonSkillSelect(player, id)
-	DA.DEBUG(0,"Skillet:ReagentButtonSkillSelect("..tostring(player)..", "..tostring(id)..")")
+	--DA.DEBUG(0,"Skillet:ReagentButtonSkillSelect("..tostring(player)..", "..tostring(id)..")")
 	if player == Skillet.currentPlayer then -- Blizzard's 5.4 update prevents us from changing away from the current player
 		local skillIndexLookup = Skillet.data.skillIndexLookup
 		gearTexture:Hide()
@@ -2109,7 +2109,7 @@ end
 
 -- Called when the reagent button is clicked
 function Skillet:ReagentButtonOnClick(button, skillIndex, reagentIndex)
-	DA.DEBUG(0,"Skillet:ReagentButtonOnClick("..tostring(button)..", "..tostring(skillIndex)..", "..tostring(reagentIndex)..")")
+	--DA.DEBUG(0,"Skillet:ReagentButtonOnClick("..tostring(button)..", "..tostring(skillIndex)..", "..tostring(reagentIndex)..")")
 	if not self.db.profile.link_craftable_reagents then
 		return
 	end
@@ -2184,7 +2184,7 @@ end
 local old_CloseSpecialWindows
 -- Called when the trade skill window is shown
 function Skillet:Tradeskill_OnShow()
-	DA.DEBUG(0,"Tradeskill_OnShow")
+	--DA.DEBUG(0,"Tradeskill_OnShow")
 	-- Need to hook this so that hitting [ESC] will close the Skillet window(s).
 	if not old_CloseSpecialWindows then
 		old_CloseSpecialWindows = CloseSpecialWindows
@@ -2645,9 +2645,9 @@ function Skillet:QueueItemButton_OnClick(this, button)
 		local recipe = self:GetRecipe(recipeID)
 		local tradeID = recipe.tradeID
 		local newSkillIndex = self.data.skillIndexLookup[recipeID]
-		DA.DEBUG(0,"selecting new skill "..tradeID..":"..(newSkillIndex or "nil"))
+		--DA.DEBUG(0,"selecting new skill "..tradeID..":"..(newSkillIndex or "nil"))
 		self:SetTradeSkill(self.currentPlayer, tradeID, newSkillIndex)
-		DA.DEBUG(0,"done selecting new skill")
+		--DA.DEBUG(0,"done selecting new skill")
 	elseif button == "RightButton" then
 		Skillet:SkilletQueueMenu_Show(this)
 	end
@@ -2673,7 +2673,7 @@ end
 -- Updates the window/scroll list displaying queue of items
 -- that are waiting to be crafted.
 function Skillet:UpdateQueueWindow()
-	DA.DEBUG(0,"UpdateQueueWindow()")
+	--DA.DEBUG(0,"UpdateQueueWindow()")
 	local queue = self.db.realm.queueData[self.currentPlayer]
 	if not queue then
 		SkilletStartQueueButton:SetText(L["Process"])
@@ -2765,7 +2765,7 @@ function Skillet:UpdateQueueWindow()
 end
 
 function Skillet:ShowFullView()
-	DA.DEBUG(0,"ShowFullView()")
+	--DA.DEBUG(0,"ShowFullView()")
 	self.fullView = true
 	SkilletQueueParentBase:SetParent(SkilletFrame)
 	SkilletQueueParentBase:SetPoint("TOPLEFT",SkilletCreateAllButton,"BOTTOMLEFT",0,-3)
@@ -2776,7 +2776,7 @@ function Skillet:ShowFullView()
 end
 
 function Skillet:ShowQueueView()
-	DA.DEBUG(0,"ShowQueueView()")
+	--DA.DEBUG(0,"ShowQueueView()")
 	Skillet.fullView = false
 	SkilletQueueParentBase:SetParent(SkilletStandaloneQueue)
 	SkilletQueueParentBase:SetPoint("TOPLEFT",SkilletStandaloneQueue,"TOPLEFT",5,-32)
@@ -2787,7 +2787,7 @@ function Skillet:ShowQueueView()
 end
 
 function Skillet:QueueOnlyViewToggle()
-	DA.DEBUG(0,"QueueOnlyViewToggle()")
+	--DA.DEBUG(0,"QueueOnlyViewToggle()")
 	FauxScrollFrame_SetOffset(SkilletQueueList, 0)
 	self.fullView = not self.fullView
 	if self.fullView then
@@ -2806,7 +2806,7 @@ function Skillet:QueueOnlyViewToggle()
 end
 
 function Skillet:StandaloneQueueClose()
-	DA.DEBUG(0,"StandaloneQueueClose()")
+	--DA.DEBUG(0,"StandaloneQueueClose()")
 	self:ShowFullView()
 	if self.db.profile.queue_only_view then
 		self:SkilletFrameForceClose()
@@ -2814,7 +2814,7 @@ function Skillet:StandaloneQueueClose()
 end
 
 function Skillet:HideStandaloneQueue()
-	DA.DEBUG(0,"HideStandaloneQueue()")
+	--DA.DEBUG(0,"HideStandaloneQueue()")
 	if not self.skilletStandaloneQueue or not self.skilletStandaloneQueue:IsVisible() then
 		return
 	end
@@ -2823,7 +2823,7 @@ end
 
 -- Creates and sets up the standalone queue window
 function Skillet:CreateStandaloneQueueFrame()
-	DA.DEBUG(0,"CreateStandaloneQueueFrame()")
+	--DA.DEBUG(0,"CreateStandaloneQueueFrame()")
 	local frame = SkilletStandaloneQueue
 	if not frame then
 		return nil
@@ -2878,7 +2878,7 @@ function Skillet:CreateStandaloneQueueFrame()
 end
 
 function Skillet:UpdateStandaloneQueueWindow()
-	DA.DEBUG(0,"UpdateStandaloneQueueWindow()")
+	--DA.DEBUG(0,"UpdateStandaloneQueueWindow()")
 	if not self.skilletStandaloneQueue or not self.skilletStandaloneQueue:IsVisible() then
 		return
 	end
@@ -2918,7 +2918,7 @@ function Skillet:AuctionatorSearch()
 			local reagentName = GetItemInfo(reagentId)
 			if (reagentName) then
 				table.insert (items, reagentName)
-				-- DA.DEBUG(0, "Reagent num "..reagentIndex.." ("..reagentId..") "..reagentName.." added")
+				--DA.DEBUG(0, "Reagent num "..reagentIndex.." ("..reagentId..") "..reagentName.." added")
 			end
 		end
 	end
