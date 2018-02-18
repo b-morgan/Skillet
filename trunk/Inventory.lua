@@ -261,7 +261,8 @@ end
 -- returns the number of items that can be bought limited by the amount of currency available
 function Skillet:VendorItemAvailable(itemID)
 	--DA.DEBUG(0,"VendorItemAvailable("..tostring(itemID)..")")
-	local _, divider, currency, currencyAvailable, currencyAvailableAlts = 0
+	local _, divider, currency, currencyAvailable
+	local currencyAvailableAlts = 0
 	if self.SpecialVendorItems[itemID] then
 		divider = self.SpecialVendorItems[itemID][1]
 		currency = self.SpecialVendorItems[itemID][2]

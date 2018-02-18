@@ -678,7 +678,15 @@ function Skillet:UpdateAutoTradeButtons()
 				if type(additionalSpellTab[1]) == "table" then
 					for j=1,#additionalSpellTab,1 do
 						--DA.DEBUG(0,"UpdateAutoTradeButtons: additionalSpellTab["..tostring(j).."]= "..DA.DUMP1(additionalSpellTab[j]))
-						table.insert(Skillet.AutoButtonsList, additionalSpellTab[j])
+						if additionalSpellTab[j][4] then
+							local name = GetSpellInfo(additionalSpellTab[j][1])	-- always returns data
+							local _, rankName, icon = GetSpellInfo(name)	-- only returns data if you have this spell in your spellbook
+							if rankName then
+								table.insert(Skillet.AutoButtonsList, additionalSpellTab[j])
+							end
+						else
+							table.insert(Skillet.AutoButtonsList, additionalSpellTab[j])
+						end
 					end
 				else
 					--DA.DEBUG(0,"UpdateAutoTradeButtons: additionalSpellTab= "..DA.DUMP1(additionalSpellTab))

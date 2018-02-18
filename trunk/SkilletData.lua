@@ -49,7 +49,10 @@ Skillet.TradeSkillAdditionalAbilities = {
 				},
 	[45357] =	{51005,"Milling"},			-- inscription = milling
 	[25229] =	{31252,"Prospecting"},		-- jewelcrafting = prospecting
-	[2018]	=	{126462,"Thermal_Anvil"},	-- blacksmithing = thermal anvil (item:87216)
+	[2018]	=	{
+				{126462,"Thermal_Anvil"},	-- blacksmithing = thermal anvil (item:87216)
+				{255650,"Forge of Light",false,true}, -- Lightforged Draenei radical
+				},
 	[4036]	=	{126462,"Thermal_Anvil"},	-- engineering = thermal anvil (item:87216)
 	[2575]	=	{126462,"Thermal_Anvil"},	-- smelting = thermal anvil (item:87216)
 }
