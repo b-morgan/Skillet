@@ -1014,6 +1014,14 @@ function Skillet:OnInitialize()
 	if not self.db.global.spellIDtoName then
 		self.db.global.spellIDtoName = {}
 	end
+-- Temporary
+	if not self.db.global.skillLineIDtoName then
+		self.db.global.skillLineIDtoName = {}
+	end
+	if not self.db.global.skillLineNametoID then
+		self.db.global.skillLineNametoID = {}
+	end
+-- End Temporary
 	self:InitializeDatabase(UnitName("player"))
 
 -- Hook default tooltips
@@ -1439,9 +1447,12 @@ function Skillet:SkilletShow()
 	self:ScanPlayerTradeSkills(self.currentPlayer)
 	self:UpdateAutoTradeButtons()
 	local skillLineID, skillLineName, skillLineRank, skillLineMaxRank, skillLineModifier = C_TradeSkillUI.GetTradeSkillLine();
-	DA.DEBUG(0,"SkilletShow: skillLineName= "..tostring(skillLineName)..", skillLineRank= "..tostring(skillLineRank)..
+	DA.DEBUG(0,"SkilletShow: skillLineID= "..tostring(skillLineID)..", skillLineName= "..tostring(skillLineName)..
 		", skillLineRank= "..tostring(skillLineRank)..", skillLineModifier= "..tostring(skillLineModifier))
-	self.currentTrade = self.tradeSkillIDsByName[skillLineName]
+	self.db.global.skillLineIDtoName[skillLineID] = skillLineName -- Temporary
+	self.db.global.skillLineNametoID[skillLineName] = skillLineID -- Temporary
+--	self.currentTrade = self.tradeSkillIDsByName[skillLineName]
+	self.currentTrade = self.SkillLineIDList[skillLineID]
 	DA.DEBUG(0,"SkilletShow: trade= "..tostring(self.currentTrade))
 	local link = C_TradeSkillUI.GetTradeSkillListLink()
 	if link then
