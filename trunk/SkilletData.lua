@@ -596,9 +596,27 @@ Skillet.scrollData = {
 	[235703] = 144304, -- Enchant Neck - Mark of the Master Rank 3}
 }
 
+-- A table of SkillLineIDs returned by C_TradeSkillUI.GetTradeSkillLine() mapped to the Skill SpellID
+Skillet.SkillLineIDList = {
+	[171] = 2259,		-- alchemy
+	[164] = 2018,		-- blacksmithing
+	[333] = 7411,		-- enchanting
+	[202] = 4036,		-- engineering
+	[773] = 45357,		-- inscription
+	[755] = 25229,		-- jewelcrafting
+	[165] = 2108,		-- leatherworking
+	[186] = 2575,		-- mining
+	[197] = 3908,		-- tailoring
+	[185] = 2550,		-- cooking
+	[129] = 3273,		-- first aid
+--	[182] = 2366,		-- herbalism
+--	[960] = 53428,		-- runeforging
+}
+
 --[[ == Local Tables == ]]--
 
--- a table of tradeskills by id
+-- A table of tradeskills by id. This local table will be converted by
+-- Skillet:CollectTradeSkillData() into localized tables tradeSkillIDsByName and tradeSkillNamesByID
 local TradeSkillList = {
 	2259,		-- alchemy
 	2018,		-- blacksmithing
@@ -612,8 +630,9 @@ local TradeSkillList = {
 	3908,		-- tailoring
 	2550,		-- cooking
 	3273,		-- first aid
+--	2366,		-- herbalism
+--	193290,		-- herbalism skills (from herbalism, 2366)
 --	194174,		-- skinning skills
---	193290,		-- herbalism skills
 --	53428,		-- runeforging
 }
 
@@ -1187,7 +1206,7 @@ end
 
 -- collects generic tradeskill data (id to name and name to id)
 function Skillet:CollectTradeSkillData()
-	--DA.DEBUG(0,"CollectTradeSkillData()")
+	DA.DEBUG(0,"CollectTradeSkillData()")
 	self.tradeSkillIDsByName = {}
 	self.tradeSkillNamesByID = {}
 	for i=1,#TradeSkillList,1 do
@@ -1197,6 +1216,8 @@ function Skillet:CollectTradeSkillData()
 		self.tradeSkillNamesByID[id] = name
 	end
 	self.tradeSkillList = TradeSkillList
+	DA.DEBUG(1,"tradeSkillIDsByName= "..DA.DUMP(self.tradeSkillIDsByName))
+	DA.DEBUG(1,"tradeSkillNamesByID= "..DA.DUMP(self.tradeSkillNamesByID))
 end
 
 -- collects currency data (id to name and name to id)
@@ -1217,7 +1238,6 @@ function Skillet:CollectCurrencyData()
 end
 
 -- this routine collects the basic data (which tradeskills a player has)
--- clean = true means wipe the old data
 function Skillet:ScanPlayerTradeSkills(player)
 	DA.DEBUG(0,"Skillet:ScanPlayerTradeSkills("..tostring(player)..")")
 	if player == (UnitName("player")) then -- only for active player
