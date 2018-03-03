@@ -1450,7 +1450,7 @@ function Skillet:ScanTrade()
 	local link = C_TradeSkillUI.GetTradeSkillListLink()
 	local id, tradeSkill, rank, maxRank = C_TradeSkillUI.GetTradeSkillLine()
 	local tradeID = self.SkillLineIDList[id]
-	local profession = self.tradeSkillNamesByID[id]
+	local profession = self.tradeSkillNamesByID[tradeID]
 	DA.DEBUG(0,"ScanTrade: id= "..tostring(id)..", tradeSkill= "..tostring(tradeSkill)..", rank= "..tostring(rank)..
 		", maxRank= "..tostring(maxRank)..", tradeID= "..tostring(tradeID)..", profession= "..tostring(profession))
 	if link then
