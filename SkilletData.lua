@@ -1448,17 +1448,19 @@ end
 function Skillet:ScanTrade()
 	--DA.PROFILE("Skillet:ScanTrade()")
 	local link = C_TradeSkillUI.GetTradeSkillListLink()
-	local _, profession, rank, maxRank = C_TradeSkillUI.GetTradeSkillLine()
-	DA.DEBUG(0,"ScanTrade: profession= "..tostring(profession)..", rank= "..tostring(rank)..", maxRank= "..tostring(maxRank))
+	local id, tradeSkill, rank, maxRank = C_TradeSkillUI.GetTradeSkillLine()
+	local tradeID = self.SkillLineIDList[id]
+	local profession = self.tradeSkillNamesByID[id]
+	DA.DEBUG(0,"ScanTrade: id= "..tostring(id)..", tradeSkill= "..tostring(tradeSkill)..", rank= "..tostring(rank)..
+		", maxRank= "..tostring(maxRank)..", tradeID= "..tostring(tradeID)..", profession= "..tostring(profession))
 	if link then
-		--DA.DEBUG(0,"ScanTrade: "..tostring(profession).." link="..link.." "..DA.PLINK(link))
+		--DA.DEBUG(0,"ScanTrade: "..tostring(tradeSkill).." link="..link.." "..DA.PLINK(link))
 	else
-		DA.DEBUG(0,"ScanTrade: "..tostring(profession).." not linkable")
+		DA.DEBUG(0,"ScanTrade: "..tostring(tradeSkill).." not linkable")
 	end
 	local player = Skillet.currentPlayer
-	local tradeID = Skillet.tradeSkillIDsByName[profession]
 	if not player or not tradeID then
-		DA.DEBUG(0,"ScanTrade: abort! player= "..tostring(player)..", "..tostring(tradeID))
+		DA.DEBUG(0,"ScanTrade: abort! player= "..tostring(player)..", tradeID= "..tostring(tradeID))
 		Skillet.scanInProgress = false
 		return false
 	end

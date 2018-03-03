@@ -115,7 +115,7 @@ end
 function Skillet:GetTradeSkillLine()
 	local tradeName = GetSpellInfo(self.currentTrade)
 	local ranks = self:GetSkillRanks(self.currentPlayer, self.currentTrade)
-		local rank, maxRank
+	local rank, maxRank
 	if ranks then
 		rank, maxRank = ranks.rank, ranks.maxRank
 	else
