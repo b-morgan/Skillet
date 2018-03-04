@@ -1206,7 +1206,7 @@ end
 
 -- collects generic tradeskill data (id to name and name to id)
 function Skillet:CollectTradeSkillData()
-	DA.DEBUG(0,"CollectTradeSkillData()")
+	--DA.DEBUG(0,"CollectTradeSkillData()")
 	self.tradeSkillIDsByName = {}
 	self.tradeSkillNamesByID = {}
 	for i=1,#TradeSkillList,1 do
@@ -1216,8 +1216,8 @@ function Skillet:CollectTradeSkillData()
 		self.tradeSkillNamesByID[id] = name
 	end
 	self.tradeSkillList = TradeSkillList
-	DA.DEBUG(1,"tradeSkillIDsByName= "..DA.DUMP(self.tradeSkillIDsByName))
-	DA.DEBUG(1,"tradeSkillNamesByID= "..DA.DUMP(self.tradeSkillNamesByID))
+	--DA.DEBUG(1,"tradeSkillIDsByName= "..DA.DUMP(self.tradeSkillIDsByName))
+	--DA.DEBUG(1,"tradeSkillNamesByID= "..DA.DUMP(self.tradeSkillNamesByID))
 end
 
 -- collects currency data (id to name and name to id)
