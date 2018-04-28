@@ -121,6 +121,6 @@ function Skillet:GetTradeSkillLine()
 	else
 		rank, maxRank = 0, 0
 	end
-	DA.DEBUG(0,"GetTradeSkillLine "..(tradeName or "nil").." "..(rank or "nil").." "..(maxRank or "nil"))	
+	DA.DEBUG(0,"GetTradeSkillLine "..tostring(tradeName).." "..tostring(rank).." "..tostring(maxRank))
 	return tradeName, rank, maxRank
 end

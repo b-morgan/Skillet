@@ -1203,7 +1203,7 @@ function Skillet:OnEnable()
 	self:RegisterEvent("TRADE_SKILL_DATA_SOURCE_CHANGED")
 	self:RegisterEvent("TRADE_SKILL_DATA_SOURCE_CHANGING")
 	self:RegisterEvent("TRADE_SKILL_DETAILS_UPDATE")
-	self:RegisterEvent("TRADE_SKILL_FILTER_UPDATE")
+--	self:RegisterEvent("TRADE_SKILL_FILTER_UPDATE")
 	self:RegisterEvent("TRADE_SKILL_LIST_UPDATE")
 	self:RegisterEvent("GUILD_RECIPE_KNOWN_BY_MEMBERS", "SkilletShowGuildCrafters")
 	self:RegisterEvent("GARRISON_TRADESKILL_NPC_CLOSED")
@@ -1237,7 +1237,7 @@ function Skillet:OnEnable()
 	self:RegisterEvent("SKILL_LINES_CHANGED") -- replacement for CHAT_MSG_SKILL?
 	self:RegisterEvent("LEARNED_SPELL_IN_TAB") -- arg1 = professionID
 	self:RegisterEvent("NEW_RECIPE_LEARNED") -- arg1 = recipeID
-	self:RegisterEvent("SPELL_NAME_UPDATE") -- arg1 = spellID, arg2 = spellName
+--	self:RegisterEvent("SPELL_NAME_UPDATE") -- arg1 = spellID, arg2 = spellName
 
 	self.hideUncraftableRecipes = false
 	self.hideTrivialRecipes = false
@@ -1438,9 +1438,9 @@ function Skillet:SkilletShow()
 	end
 	self:ScanPlayerTradeSkills(self.currentPlayer)
 	self:UpdateAutoTradeButtons()
-	local skillLineID, skillLineName, skillLineRank, skillLineMaxRank, skillLineModifier = C_TradeSkillUI.GetTradeSkillLine();
+	local skillLineID, skillLineName, skillLineRank, skillLineMaxRank, skillLineModifier, parentSkillLineName  = C_TradeSkillUI.GetTradeSkillLine();
 	DA.DEBUG(0,"SkilletShow: skillLineID= "..tostring(skillLineID)..", skillLineName= "..tostring(skillLineName)..
-		", skillLineRank= "..tostring(skillLineRank)..", skillLineModifier= "..tostring(skillLineModifier))
+		", skillLineRank= "..tostring(skillLineRank)..", skillLineModifier= "..tostring(skillLineModifier)..", parentSkillLineName= "..tostring(parentSkillLineName))
 	self.currentTrade = self.SkillLineIDList[skillLineID]
 	DA.DEBUG(0,"SkilletShow: trade= "..tostring(self.currentTrade))
 	local link = C_TradeSkillUI.GetTradeSkillListLink()
@@ -1451,19 +1451,23 @@ function Skillet:SkilletShow()
 	end
 	-- Use the Blizzard UI for any garrison follower that can't use ours.
 	if self:IsNotSupportedFollower(self.currentTrade) then
+		DA.DEBUG(3,"SkilletShow: "..tostring(self.currentTrade).." IsNotSupportedFollower")
 		self:HideAllWindows()
 		self:EnableBlizzardFrame()
 		ShowUIPanel(TradeSkillFrame)
 	else
 		if self:IsSupportedTradeskill(self.currentTrade) then
+			DA.DEBUG(3,"SkilletShow: "..tostring(self.currentTrade).." IsSupportedTradeskill")
 			self:DisableBlizzardFrame()
 			self:InitializeDatabase(self.currentPlayer)
 			self.tradeSkillOpen = true
 			self.selectedSkill = nil
 			self.dataScanned = false
 			self:SetTradeSkillLearned()
+			DA.DEBUG(3,"SkilletShow: waiting for TRADE_SKILL_DATA_SOURCE_CHANGED")
 --			self:SkilletShowWindow() -- Need to wait until TRADE_SKILL_DATA_SOURCE_CHANGED
 		else
+			DA.DEBUG(3,"SkilletShow: "..tostring(self.currentTrade).." not IsSupportedTradeskill")
 			self:HideAllWindows()
 			self:EnableBlizzardFrame()
 			ShowUIPanel(TradeSkillFrame)
@@ -1480,7 +1484,7 @@ function Skillet:SkilletShowWindow()
 		DA.DEBUG(0,"No headers, reset filter")
 		self.ResetTradeSkillFilter()
 		if not self:RescanTrade() then
-			DA.CHAT("No headers, try again");
+			DA.CHAT("No headers for "..tostring(self.currentTrade).." ("..tostring(self.tradeSkillNamesByID[self.currentTrade]).."), try again");
 			return
 		end
 	end
