@@ -91,7 +91,7 @@ local function createIgnoreListFrame(self)
 	windowManager.RestorePosition(frame)  -- restores scale also
 	windowManager.MakeDraggable(frame)
 	-- lets play the resize me game!
-	Skillet:EnableResize(frame, 180,150, Skillet.UpdateIgnoreListWindow)
+	Skillet:EnableResize(frame, 320,150, Skillet.UpdateIgnoreListWindow)
 	-- so hitting [ESC] will close the window
 	tinsert(UISpecialFrames, frame:GetName())
 	return frame

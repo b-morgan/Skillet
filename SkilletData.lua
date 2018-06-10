@@ -701,13 +701,6 @@ local TradeSkillIgnoredMats	 = {
 	[53782] = 1 , -- Transmute: Eternal Earth to Shadow
 	[53783] = 1 , -- Transmute: Eternal Water to Air
 	[53784] = 1 , -- Transmute: Eternal Water to Fire
-	[45765] = 1 , -- Void Shatter
-	[42615] = 1 , -- small prismatic shard
-	[42613] = 1 , -- nexus transformation
-	[28022] = 1 , -- large prismatic shard
-	[118239] = 1 , -- sha shatter
-	[118238] = 1 , -- ethereal shard shatter
-	[118237] = 1 , -- mysterious diffusion
 	[181637] = 1 , -- Transmute: Sorcerous-air-to-earth
 	[181633] = 1 , -- Transmute: Sorcerous-air-to-fire
 	[181636] = 1 , -- Transmute: Sorcerous-air-to-water
@@ -721,6 +714,16 @@ local TradeSkillIgnoredMats	 = {
 	[181629] = 1 , -- Transmute: Sorcerous-water-to-earth
 	[181634] = 1 , -- Transmute: Sorcerous-water-to-fire
 	[181643] = 1 , -- Transmute: Savage Blood
+	[42615] = 1 ,  -- Small Prismatic Shard
+	[28022] = 1 ,  -- Large Prismatic Shard
+	[118239] = 1 , -- Sha Shatter
+	[116499] = 1 , -- Sha Crystal
+	[118238] = 1 , -- Ethereal Shatter
+	[116498] = 1 , -- Ethereal Shard
+	[118237] = 1 , -- Mysterious Diffusion
+	[116497] = 1 , -- Mysterious Essence
+--	[45765] = 1 ,  -- Void Shatter
+--	[252106] = 1 , -- Chaos Shatter
 }
 Skillet.TradeSkillIgnoredMats = TradeSkillIgnoredMats
 
@@ -828,11 +831,14 @@ end
 -- adds an recipe source for an itemID (recipeID produces itemID)
 function Skillet:ItemDataAddRecipeSource(itemID,recipeID)
 	if not itemID or not recipeID then return end
-	if not self.db.global.itemRecipeSource then
-		self.db.global.itemRecipeSource = {}
-	end
+--	if not self.db.global.itemRecipeSource then
+--		self.db.global.itemRecipeSource = {}
+--	end
 	if not self.db.global.itemRecipeSource[itemID] then
 		self.db.global.itemRecipeSource[itemID] = {}
+	end
+	if itemID == recipeID then
+		DA.DEBUG(0,"ItemDataAddRecipeSource: (itemID == recipeID)="..tostring(itemID))
 	end
 	self.db.global.itemRecipeSource[itemID][recipeID] = true
 end
@@ -840,9 +846,9 @@ end
 -- adds a recipe usage for an itemID (recipeID uses itemID as a reagent)
 function Skillet:ItemDataAddUsedInRecipe(itemID,recipeID)
 	if not itemID or not recipeID or itemID == 0 then return end
-	if not self.db.global.itemRecipeUsedIn then
-		self.db.global.itemRecipeUsedIn = {}
-	end
+--	if not self.db.global.itemRecipeUsedIn then
+--		self.db.global.itemRecipeUsedIn = {}
+--	end
 	if not self.db.global.itemRecipeUsedIn[itemID] then
 		self.db.global.itemRecipeUsedIn[itemID] = {}
 	end
@@ -853,8 +859,8 @@ end
 function Skillet:CollectRecipeInformation()
 	for recipeID, recipeString in pairs(self.db.global.recipeDB) do
 		local tradeID, itemString, reagentString, toolString = string.split(" ",recipeString)
-		local itemID, numMade = 0, 1
-		local slot = nil
+		local itemID = 0
+		local numMade = 1
 		if itemString ~= "0" then
 			local a, b = string.split(":",itemString)
 			if a ~= "0" then
@@ -862,7 +868,6 @@ function Skillet:CollectRecipeInformation()
 			else
 				itemID = 0
 				numMade = 1
-				slot = tonumber(b)
 			end
 			if not numMade then
 				numMade = 1
@@ -870,6 +875,9 @@ function Skillet:CollectRecipeInformation()
 		end
 		itemID = tonumber(itemID)
 		if itemID ~= 0 then
+			if itemID == recipeID then
+				DA.DEBUG(0,"CollectRecipeInformation: (itemID == recipeID)="..tostring(itemID))
+			end
 			self:ItemDataAddRecipeSource(itemID, recipeID)
 		end
 		if reagentString ~= "-" then
@@ -1480,7 +1488,11 @@ function Skillet:RescanTrade()
 	if not Skillet.db.global.Categories[tradeID] then
 		Skillet.db.global.Categories[tradeID] = {}
 	end
-	Skillet.dataScanned = self:ScanTrade()
+	if not Skillet.dataScanned then
+		Skillet.dataScanned = self:ScanTrade()
+	else
+		DA.DEBUG(0,"ScanTrade() was skipped")
+	end
 	Skillet.scanInProgress = false
 	return Skillet.dataScanned
 end
@@ -1593,6 +1605,7 @@ function Skillet:ScanTrade()
 	local skillDB = Skillet.data.skillDB[tradeID]
 	local skillData = Skillet.data.skillList[tradeID]
 	local recipeDB = Skillet.db.global.recipeDB
+	local nameDB = Skillet.db.global.recipeNameDB
 	if not skillData then
 		DA.DEBUG(0,"ScanTrade: no skillData")
 		return false
@@ -1605,12 +1618,11 @@ function Skillet:ScanTrade()
 	local groupList = {}
 	local numHeaders = 0
 	local parentGroup
-	DA.DEBUG(0,"ScanTrade: Scanning, "..tostring(profession)..":"..tostring(tradeID).." "..tostring(numSkills).." recipes")
 	local i = 1
 	for j = 1, numSkills, 1 do
 		local recipeID = Skillet.data.Filtered[tradeID][j]
 		local recipeInfo = Skillet.data.recipeInfo[tradeID][recipeID]
-		DA.DEBUG(2,"ScanTrade: recipeInfo= "..DA.DUMP(recipeInfo))
+		DA.DEBUG(1,"ScanTrade: tradeID= "..tostring(tradeID)..", recipeID= "..tostring(recipeID)..", recipeInfo= "..DA.DUMP1(recipeInfo))
 		local skillName, skillType, _, isExpanded, _, _, _, _, _, _, _, displayAsUnavailable, _ = Skillet:GetTradeSkillInfo(recipeID);
 		if displayAsUnavailable then skillType = "unavailable" end
 		if not headerUsed[recipeInfo.categoryID] then
@@ -1619,7 +1631,7 @@ function Skillet:ScanTrade()
 			local headerType = Skillet.db.global.Categories[tradeID][recipeInfo.categoryID].type
 			local headerName = Skillet.db.global.Categories[tradeID][recipeInfo.categoryID].name
 			local category = recipeInfo.categoryID
-			DA.DEBUG(2,"ScanTrade: category="..tostring(category))
+			--DA.DEBUG(2,"ScanTrade: category="..tostring(category))
 			local numCat = 1
 			local catStack = {}
 			catStack[numCat] = category
@@ -1642,13 +1654,13 @@ function Skillet:ScanTrade()
 				end
 				category = parent
 			end -- while
-			DA.DEBUG(2,"ScanTrade: numCat= "..tostring(numCat)..", catStack= "..DA.DUMP1(catStack))
+			--DA.DEBUG(2,"ScanTrade: numCat= "..tostring(numCat)..", catStack= "..DA.DUMP1(catStack))
 			while numCat > 0 do
 -- We have a stack of headers. Output them to the skillDB.
 				category = catStack[numCat]
 				headerType = Skillet.db.global.Categories[tradeID][category].type
 				headerName = Skillet.db.global.Categories[tradeID][category].name
-				DA.DEBUG(2,"ScanTrade: headerType= "..tostring(headerType)..", headerName= "..tostring(headerName))
+				--DA.DEBUG(2,"ScanTrade: headerType= "..tostring(headerType)..", headerName= "..tostring(headerName))
 				local groupName
 				if groupList[headerName] then
 					groupList[headerName] = groupList[headerName]+1
@@ -1689,9 +1701,6 @@ function Skillet:ScanTrade()
 		skillData[i].difficulty = skillType
 		skillData[i].color = skill_style_type[skillType]
 		local skillDBString = DifficultyChar[skillType]..tostring(recipeID)
-
-		recipeInfo.sourceText = C_TradeSkillUI.GetRecipeSourceText(recipeID); -- capture for later use
-
 		local tools = { C_TradeSkillUI.GetRecipeTools(recipeID) }
 		recipeInfo.tools = tools	-- save a copy for our records
 		skillData[i].tools = {}
@@ -1718,14 +1727,12 @@ function Skillet:ScanTrade()
 		end
 		skillDB[i] = skillDBString
 		Skillet.data.skillIndexLookup[recipeID] = i
-
-		DA.DEBUG(2,"recipeID= "..tostring(recipeID))
 		Skillet.data.recipeList[recipeID] = {}
-		local recipe = Skillet.data.recipeList[recipeID]
 		local itemString = "-"
 		local reagentString = "-"
 		local toolString = "-"
 		local recipeString = "-"
+		local recipe = Skillet.data.recipeList[recipeID]
 		recipe.tradeID = tradeID
 		recipe.spellID = recipeID
 		recipe.name = skillName
@@ -1733,7 +1740,7 @@ function Skillet:ScanTrade()
 		recipe.numMade = 1		-- Make sure this value exists
 
 		local itemLink = C_TradeSkillUI.GetRecipeItemLink(recipeID)
-		DA.DEBUG(2,"itemLink = "..DA.PLINK(itemLink))
+		DA.DEBUG(2,"recipeID= "..tostring(recipeID)..", itemLink = "..DA.PLINK(itemLink))
 		recipeInfo.itemLink = itemLink	-- save a copy for our records
 		if itemLink then
 			local itemID = Skillet:GetItemIDFromLink(itemLink)
@@ -1742,12 +1749,12 @@ function Skillet:ScanTrade()
 				DA.DEBUG(0,"recipeID= "..tostring(recipeID)..", itemID= "..tostring(itemID))
 				itemID = 0
 			end
+			recipe.itemID = itemID
+			recipeInfo.itemID = itemID		-- save a copy for our records
 			if not recipeInfo.alternateVerb then
 				local minMade,maxMade = C_TradeSkillUI.GetRecipeNumItemsProduced(recipeID)
 				recipeInfo.minMade = minMade	-- save a copy for our records
 				recipeInfo.maxMade = maxMade	-- save a copy for our records
-				recipeInfo.itemID = itemID		-- save a copy for our records
-				recipe.itemID = itemID
 				recipe.numMade = (minMade + maxMade)/2
 				local adjustNumMade = Skillet.db.global.AdjustNumMade[recipeID]
 				if adjustNumMade then
@@ -1758,25 +1765,26 @@ function Skillet:ScanTrade()
 					end
 				end
 			elseif recipeInfo.alternateVerb == ENSCRIBE then -- use the itemID of the scroll created by using the enchant on vellum
-				DA.DEBUG(2,"alternateVerb= "..tostring(recipeInfo.alternateVerb))
+				--DA.DEBUG(0,"recipeID= "..tostring(recipeID)..", alternateVerb= "..tostring(recipeInfo.alternateVerb))
 				recipeInfo.numMade = 1		-- save a copy for our records
-				if Skillet.scrollData[recipeID] then	-- note that this table is maintained by datamining
-					local itemID = Skillet.scrollData[recipeID]
-					recipeInfo.itemID = itemID		-- save a copy for our records
-					recipe.itemID = itemID
+				if Skillet.scrollData[recipeID] then					-- note that this table is maintained by datamining
+					recipeInfo.itemID = Skillet.scrollData[recipeID]	-- save a copy for our records
+					recipe.itemID = Skillet.scrollData[recipeID]
+					itemID = Skillet.scrollData[recipeID]
 				else
-					recipeInfo.itemID = recipe.itemID		-- save a copy for our records
+					DA.DEBUG(0,"recipeID= "..tostring(recipeID).." has no scrollData")
 				end
 			else
-				DA.DEBUG(0,"alternateVerb= "..tostring(recipeInfo.alternateVerb))
+				DA.DEBUG(0,"recipeID= "..tostring(recipeID).."alternateVerb= "..tostring(recipeInfo.alternateVerb))
 				recipeInfo.numMade = 1		-- save a copy for our records
-				recipeInfo.itemID = recipe.itemID		-- save a copy for our records
-				DA.TABLE("recipeInfo["..tostring(recipeID).."]", recipeInfo)
 			end
 			if recipe.numMade > 1 then
 				itemString = itemID..":"..recipe.numMade
 			else
 				itemString = tostring(itemID)
+			end
+			if itemID == recipeID then
+				DA.DEBUG(0,"ScanTrade: (itemID == recipeID)= "..tostring(itemID))
 			end
 			Skillet:ItemDataAddRecipeSource(itemID,recipeID) -- add a cross reference for the source of this item
 		else
@@ -1817,7 +1825,8 @@ function Skillet:ScanTrade()
 		recipeString = recipeString.." "..toolString
 
 		recipeDB[recipeID] = recipeString
-		DA.DEBUG(2,"recipeDB["..tostring(recipeID).."]= "..tostring(recipeDB[recipeID]))
+		nameDB[recipeID] = recipeInfo.name		-- for debugging
+		DA.DEBUG(2,"recipeDB["..tostring(recipeID).."] ("..tostring(recipeInfo.name)..") = "..tostring(recipeDB[recipeID]))
 		i = i + 1
 	end
 

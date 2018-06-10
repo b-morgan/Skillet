@@ -317,25 +317,27 @@ function DA.Command(msg)
 	command = string.lower(command)
 	options = string.lower(options)
 	if(command == "warn") then  
-		DA.Warn()                         -- Undocumented: Enable warning output
+		DA.Warn()                           -- Undocumented: Enable warning output
 	elseif(command == "wlog") then
-		DA.WarnL()                        -- Undocumented: Enable warning logging
+		DA.WarnL()                          -- Undocumented: Enable warning logging
 	elseif(command == "debug") then
-		DA.Debug()                        -- Undocumented: Enable debug output
+		DA.Debug()                          -- Undocumented: Enable debug output
 	elseif(command == "dlog") then
-		DA.DebugL()                       -- Undocumented: Enable debug logging
+		DA.DebugL()                         -- Undocumented: Enable debug logging
 	elseif(command == "dlevel") then
-		DA.DLevel(options)                -- Undocumented: Set debug level
+		DA.DLevel(options)                  -- Undocumented: Set debug level
 	elseif(command == "tdump") then
-		DA.TDump(options)                 -- Undocumented: Enable table dumps (recursive functions)
+		DA.TDump(options)                   -- Undocumented: Enable table dumps (recursive functions)
 	elseif(command == "trace") then
-		DA.Trace()                        -- Undocumented: Enable trace output
+		DA.Trace()                          -- Undocumented: Enable trace output
 	elseif(command == "tlog") then
-		DA.TraceL()                       -- Undocumented: Clear debug storage
+		DA.TraceL()                         -- Undocumented: Clear debug storage
 	elseif(command == "profile") then
 		DA.Profile()                        -- Undocumented: Enable trace output
-	elseif(command == "clear") then
-		DA.ClearDebugLog()                -- Undocumented: Clear debug storage
+	elseif(command == "clearlog") then
+		DA.ClearDebugLog()                  -- Undocumented: Clear debug storage
+	elseif(command == "clearprofile") then
+		DA.ClearProfileLog()                -- Undocumented: Clear debug storage
 	end
 end
 
@@ -438,5 +440,10 @@ end
 function DA.ClearDebugLog()
 	DA.CHAT("DebugLog initialized.")
 	DA.DebugLog = {}
+end
+
+function DA.ClearProfileLog()
+	DA.CHAT("ProfileLog initialized.")
+	DA.DebugProfile = {}
 end
 ]]--
