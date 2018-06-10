@@ -766,6 +766,16 @@ Skillet.options =
 			end,
 			order = 90
 		},
+		ClearProfileLog = {
+			type = "execute",
+			name = "ClearProfileLog",
+			desc = "Option for debugging",
+			func = function()
+				SkilletProfile = {}
+				DA.DebugProfile = SkilletProfile
+			end,
+			order = 91
+		},
 		DebugStatus = {
 			type = 'execute',
 			name = "DebugStatus",
@@ -773,7 +783,7 @@ Skillet.options =
 			func = function()
 				DA.DebugAidsStatus()
 			end,
-			order = 91
+			order = 92
 		},
 		DebugOff = {
 			type = 'execute',
@@ -809,7 +819,7 @@ Skillet.options =
 					Skillet.ProfileShow = false
 				end
 			end,
-			order = 92
+			order = 93
 		},
 		LogLevel = {
 			type = "toggle",
@@ -822,7 +832,7 @@ Skillet.options =
 				Skillet.db.profile.LogLevel = value
 				Skillet.LogLevel = value
 			end,
-			order = 93
+			order = 94
 		},
 		MaxDebug = {
 			type = "input",
@@ -837,7 +847,7 @@ Skillet.options =
 				Skillet.db.profile.MAXDEBUG = value
 				Skillet.MAXDEBUG = value
 			end,
-			order = 94
+			order = 95
 		},
 		MaxProfile = {
 			type = "input",
@@ -852,7 +862,7 @@ Skillet.options =
 				Skillet.db.profile.MAXPROFILE = value
 				Skillet.MAXPROFILE = value
 			end,
-			order = 95
+			order = 96
 		},
 
 		reset = {
@@ -993,6 +1003,9 @@ function Skillet:OnInitialize()
 	if not self.db.global.recipeDB then
 		self.db.global.recipeDB = {}
 	end
+	if not self.db.global.recipeNameDB then
+		self.db.global.recipeNameDB = {}
+	end
 	if not self.db.global.itemRecipeSource then
 		self.db.global.itemRecipeSource = {}
 	end
@@ -1085,6 +1098,7 @@ end
 
 function Skillet:FlushRecipeData()
 	Skillet.db.global.recipeDB = {}
+	Skillet.db.global.recipeNameDB = {}
 	Skillet.db.global.itemRecipeUsedIn = {}
 	Skillet.db.global.itemRecipeSource = {}
 	Skillet.db.global.Categories = {}
@@ -1268,7 +1282,7 @@ end
 function Skillet:CHAT_MSG_SKILL()	-- Replaced by SKILL_LINES_CHANGED?
 	DA.DEBUG(0,"CHAT_MSG_SKILL")
 	if Skillet.tradeSkillOpen then
-		Skillet:ScanTrade()
+		Skillet:RescanTrade()
 		Skillet:UpdateTradeSkillWindow()
 	end
 end
@@ -1276,7 +1290,7 @@ end
 function Skillet:SKILL_LINES_CHANGED()
 	--DA.DEBUG(0,"SKILL_LINES_CHANGED")
 	if Skillet.tradeSkillOpen then
---		Skillet:ScanTrade()
+--		Skillet:RescanTrade()
 --		Skillet:UpdateTradeSkillWindow()
 		Skillet.dataSourceChanged = true	-- Process the change on the next TRADE_SKILL_LIST_UPDATE
 	end
@@ -1286,7 +1300,7 @@ function Skillet:LEARNED_SPELL_IN_TAB(event, profession)
 	DA.DEBUG(0,"LEARNED_SPELL_IN_TAB")
 	DA.DEBUG(0,"profession= "..tostring(profession))
 	if Skillet.tradeSkillOpen then
-		Skillet:ScanTrade()					-- Untested
+		Skillet:RescanTrade()				-- Untested
 		Skillet:UpdateTradeSkillWindow()	-- Untested
 	end
 end
@@ -1360,7 +1374,7 @@ function Skillet:TRADE_SKILL_DETAILS_UPDATE()
 	DA.DEBUG(0,"tradeSkillOpen= "..tostring(Skillet.tradeSkillOpen))
 	if Skillet.tradeSkillOpen then
 		Skillet.detailsUpdate = true
-		Skillet:ScanTrade()
+		Skillet:RescanTrade()
 		Skillet:UpdateTradeSkillWindow()
 	end
 end
@@ -1370,10 +1384,10 @@ function Skillet:TRADE_SKILL_FILTER_UPDATE()
 end
 
 function Skillet:TRADE_SKILL_LIST_UPDATE()
-	DA.DEBUG(0,"TRADE_SKILL_LIST_UPDATE")
-	DA.DEBUG(0,"tradeSkillOpen= "..tostring(Skillet.tradeSkillOpen))
-	DA.DEBUG(0,"dataSourceChanged= "..tostring(Skillet.dataSourceChanged))
-	DA.DEBUG(0,"adjustInventory= "..tostring(Skillet.adjustInventory))
+	--DA.DEBUG(0,"TRADE_SKILL_LIST_UPDATE")
+	--DA.DEBUG(0,"tradeSkillOpen= "..tostring(Skillet.tradeSkillOpen))
+	--DA.DEBUG(0,"dataSourceChanged= "..tostring(Skillet.dataSourceChanged))
+	--DA.DEBUG(0,"adjustInventory= "..tostring(Skillet.adjustInventory))
 	if Skillet.tradeSkillOpen and Skillet.dataSourceChanged then
 		Skillet.dataSourceChanged = false
 		Skillet.adjustInventory = false
@@ -1583,7 +1597,7 @@ function Skillet:SetTradeSkill(player, tradeID, skillIndex)
 		local oldTradeID = self.currentTrade
 		if player == (UnitName("player")) then	-- we can update the tradeskills if this toon is the current one
 			self.dataSource = "api"
-			self.dataScanned = false
+--			self.dataScanned = false
 			self.currentGroup = nil
 			self.currentGroupLabel = self:GetTradeSkillOption("grouping")
 			self:RecipeGroupDropdown_OnShow()
@@ -1598,7 +1612,7 @@ function Skillet:SetTradeSkill(player, tradeID, skillIndex)
 		else
 			self.dataSource = "cache"
 			CloseTradeSkill()
-			self.dataScanned = false
+--			self.dataScanned = false
 			self:HideNotesWindow();
 			self.currentTrade = tradeID
 			self.currentGroup = nil

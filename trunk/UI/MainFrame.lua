@@ -2949,7 +2949,7 @@ function Skillet.SetSlotFilter(inventorySlotIndex, categoryId, subCategoryId)
 	if categoryId or subCategoryId then
 		C_TradeSkillUI.SetRecipeCategoryFilter(categoryId, subCategoryId)
 	end
-	Skillet.dataScanned = false
+--	Skillet.dataScanned = false
 	Skillet:UpdateTradeSkillWindow()
 end
 
@@ -2963,7 +2963,7 @@ function Skillet.InitializeDropdown(self, level)
 			Skillet:ResetTradeSkillFilter() -- verify the search filter is blank (so we get all skills)
 			UIDropDownMenu_RefreshAll(SkilletFilterDropDown, 3)
 			SkilletFilterText:SetText("")
-			Skillet.dataScanned = false
+--			Skillet.dataScanned = false
 			Skillet:UpdateTradeSkillWindow()
 		end
 		UIDropDownMenu_AddButton(info, level)
@@ -2990,7 +2990,7 @@ function Skillet.InitializeDropdown(self, level)
 				else
 					Skillet:SetTradeSkillOption("filterLevel", 1)
 				end
-				Skillet.dataScanned = false
+--				Skillet.dataScanned = false
 				Skillet:UpdateTradeSkillWindow()
 			end
 			info.keepShownOnClick = true
@@ -3053,7 +3053,7 @@ function Skillet.InitializeDropdown(self, level)
 			info.func = function()
 				TradeSkillFrame_SetAllSourcesFiltered(false)
 				UIDropDownMenu_Refresh(SkilletFilterDropDown, 3, 2)
-				Skillet.dataScanned = false
+--				Skillet.dataScanned = false
 				Skillet:UpdateTradeSkillWindow()
 			end
 			UIDropDownMenu_AddButton(info, level)
@@ -3062,7 +3062,7 @@ function Skillet.InitializeDropdown(self, level)
 			info.func = function()
 				TradeSkillFrame_SetAllSourcesFiltered(true)
 				UIDropDownMenu_Refresh(SkilletFilterDropDown, 3, 2)
-				Skillet.dataScanned = false
+--				Skillet.dataScanned = false
 				Skillet:UpdateTradeSkillWindow()
 			end
 			UIDropDownMenu_AddButton(info, level)
@@ -3073,7 +3073,7 @@ function Skillet.InitializeDropdown(self, level)
 					info.text = _G["BATTLE_PET_SOURCE_" .. i]
 					info.func = function(_, _, _, value)
 						C_TradeSkillUI.SetRecipeSourceTypeFilter(i, not value)
-						Skillet.dataScanned = false
+--						Skillet.dataScanned = false
 						Skillet:UpdateTradeSkillWindow()
 					end
 					info.checked = function()
