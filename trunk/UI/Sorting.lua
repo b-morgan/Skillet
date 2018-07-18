@@ -549,6 +549,7 @@ function Skillet:FilterDropDown_OnClick()
 	elseif index == 2 then
 		Skillet:SetTradeSkillUnlearned()
 	end
+	Skillet.dataScanned = false
 	Skillet:RescanTrade()
 	Skillet:UpdateTradeSkillWindow()
 end

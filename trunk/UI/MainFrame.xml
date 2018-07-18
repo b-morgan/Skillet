@@ -1489,6 +1489,7 @@
 							Skillet:SetTradeSkillOption("hideuncraftable", not before)
 							C_TradeSkillUI.SetOnlyShowMakeableRecipes(not before)
 							Skillet:PrintTradeSkillFilter()
+							Skillet.dataScanned = false
 							Skillet:SortAndFilterRecipes()
 							Skillet:UpdateTradeSkillWindow()
 						else
@@ -1670,6 +1671,7 @@
 						Skillet:PrintTradeSkillFilter()
 						self:Hide()
 						SkilletRecipeDifficultyButton:Show()
+						Skillet.dataScanned = false
 						Skillet:SortAndFilterRecipes()
 						Skillet:UpdateTradeSkillWindow()
 					</OnClick>
