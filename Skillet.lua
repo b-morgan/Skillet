@@ -988,8 +988,8 @@ function Skillet:OnInitialize()
 	local _,wowBuild,_,wowVersion = GetBuildInfo();
 	self.wowBuild = wowBuild
 	self.wowVersion = wowVersion
-	if not self.db.global.dataVersion or self.db.global.dataVersion ~= 8 then
-		self.db.global.dataVersion = 8
+	if not self.db.global.dataVersion or self.db.global.dataVersion ~= 9 then
+		self.db.global.dataVersion = 9
 		self:FlushAllData()
 	elseif not self.db.global.wowBuild or self.db.global.wowBuild ~= self.wowBuild then
 		self.db.global.wowBuild = self.wowBuild
@@ -1452,15 +1452,17 @@ function Skillet:SkilletShow()
 	end
 	self:ScanPlayerTradeSkills(self.currentPlayer)
 	self:UpdateAutoTradeButtons()
-	local skillLineID, skillLineName, skillLineRank, skillLineMaxRank, skillLineModifier, parentSkillLineName  = C_TradeSkillUI.GetTradeSkillLine();
+	local skillLineID, skillLineName, skillLineRank, skillLineMaxRank, skillLineModifier, parentSkillLineID  = C_TradeSkillUI.GetTradeSkillLine();
 	DA.DEBUG(0,"SkilletShow: skillLineID= "..tostring(skillLineID)..", skillLineName= "..tostring(skillLineName)..
-		", skillLineRank= "..tostring(skillLineRank)..", skillLineModifier= "..tostring(skillLineModifier)..", parentSkillLineName= "..tostring(parentSkillLineName))
-	self.currentTrade = self.SkillLineIDList[skillLineID]
+		", skillLineRank= "..tostring(skillLineRank)..", skillLineModifier= "..tostring(skillLineModifier)..", parentSkillLineID= "..tostring(parentSkillLineID))
+	if (parentSkillLineID) then
+		self.currentTrade = self.SkillLineIDList[parentSkillLineID]	-- names are localized so use a table to translate
+	else
+		self.currentTrade = self.SkillLineIDList[skillLineID]		-- names are localized so use a table to translate
+	end
 	DA.DEBUG(0,"SkilletShow: trade= "..tostring(self.currentTrade))
 	local link = C_TradeSkillUI.GetTradeSkillListLink()
-	if link then
-		DA.DEBUG(0,"SkilletShow: link= "..link..", "..DA.PLINK(link))
-	else
+	if not link then
 		DA.DEBUG(0,"SkilletShow: "..tostring(skillLineName).." not linkable")
 	end
 	-- Use the Blizzard UI for any garrison follower that can't use ours.
