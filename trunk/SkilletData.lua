@@ -608,37 +608,34 @@ Skillet.SkillLineIDList = {
 	[186] = 2575,		-- mining
 	[197] = 3908,		-- tailoring
 	[185] = 2550,		-- cooking
-	[129] = 3273,		-- first aid
+--	[129] = 3273,		-- first aid
 --	[182] = 2366,		-- herbalism
 --	[960] = 53428,		-- runeforging
 --	[0] = 0,			-- skinning
 --	[356] = 0,			-- fishing
 -- Battle for Azeroth
-	[2482] = 2259,		-- alchemy			3
-	[2485] = 2259,		-- alchemy			3
-	[2474] = 2018,		-- blacksmithing	2
-	[2477] = 2018,		-- blacksmithing	2
-	[2491] = 7411,		-- enchanting		4
-	[2494] = 7411,		-- enchanting		4
-	[2503] = 4036,		-- engineering		5
-	[2506] = 4036,		-- engineering		5
-	[2511] = 45357,		-- inscription		7
-	[2514] = 45357,		-- inscription		7
-	[2521] = 25229,		-- jewelcrafting	6
-	[2524] = 25229,		-- jewelcrafting	6
-	[2529] = 2108,		-- leatherworking	1
-	[2532] = 2108,		-- leatherworking	1
-	[2569] = 2575,		-- mining			2, 5, 6
-	[2572] = 2575,		-- mining			2, 5, 6
-	[2537] = 3908,		-- tailoring		4
-	[2540] = 3908,		-- tailoring		4
-	[2545] = 2550,		-- cooking			1
-	[2548] = 2550,		-- cooking			1
---	[129] = 3273,		-- first aid
---	[182] = 2366,		-- herbalism		3, 7
---	[960] = 53428,		-- runeforging
---	[2561] = 194174,	-- skinning			1
---	[2564] = 194174,	-- skinning			1
+	[2482] = 2259,		-- alchemy
+	[2485] = 2259,		-- alchemy
+	[2474] = 2018,		-- blacksmithing
+	[2477] = 2018,		-- blacksmithing
+	[2491] = 7411,		-- enchanting
+	[2494] = 7411,		-- enchanting
+	[2503] = 4036,		-- engineering
+	[2506] = 4036,		-- engineering
+	[2511] = 45357,		-- inscription
+	[2514] = 45357,		-- inscription
+	[2521] = 25229,		-- jewelcrafting
+	[2524] = 25229,		-- jewelcrafting
+	[2529] = 2108,		-- leatherworking
+	[2532] = 2108,		-- leatherworking
+	[2569] = 2575,		-- mining
+	[2572] = 2575,		-- mining
+	[2537] = 3908,		-- tailoring
+	[2540] = 3908,		-- tailoring
+	[2545] = 2550,		-- cooking
+	[2548] = 2550,		-- cooking
+--	[2561] = 194174,	-- skinning
+--	[2564] = 194174,	-- skinning
 }
 
 --[[ == Local Tables == ]]--
@@ -1499,18 +1496,20 @@ end
 
 function Skillet:ScanTrade()
 	--DA.PROFILE("Skillet:ScanTrade()")
+	local tradeID
 	local link = C_TradeSkillUI.GetTradeSkillListLink()
-	local tradeSkillID, skillLineName, skillLineRank, skillLineMaxRank, skillLineModifier, parentSkillLineName =  C_TradeSkillUI.GetTradeSkillLine();
+	local tradeSkillID, skillLineName, skillLineRank, skillLineMaxRank, skillLineModifier, parentSkillLineID =  C_TradeSkillUI.GetTradeSkillLine();
 	DA.DEBUG(0,"ScanTrade: tradeSkillID= "..tostring(tradeSkillID)..", skillLineName= "..tostring(skillLineName)..", skillLineRank= "..tostring(skillLineRank)..
-		", skillLineMaxRank= "..tostring(skillLineMaxRank)..", skillLineModifier= "..tostring(skillLineModifier)..", parentSkillLineName= "..tostring(parentSkillLineName))
-	if (parentSkillLineName) then
-		skillLineName = parentSkillLineName;
+		", skillLineMaxRank= "..tostring(skillLineMaxRank)..", skillLineModifier= "..tostring(skillLineModifier)..", parentSkillLineID= "..tostring(parentSkillLineID))
+	if (parentSkillLineID) then
+		tradeID = self.SkillLineIDList[parentSkillLineID]	-- names are localized so use a table to translate
+	else
+		tradeID = self.SkillLineIDList[tradeSkillID]		-- names are localized so use a table to translate
 	end
-	local tradeID = self.SkillLineIDList[tradeSkillID]		-- names are localized so use a table to translate
 	local profession = self.tradeSkillNamesByID[tradeID]
 	DA.DEBUG(0,"ScanTrade: tradeID= "..tostring(tradeID)..", profession= "..tostring(profession))
 	if link then
-		--DA.DEBUG(0,"ScanTrade: "..tostring(skillLineName).." link="..link.." "..DA.PLINK(link))
+		DA.DEBUG(0,"ScanTrade: "..tostring(skillLineName).." link="..link.." "..DA.PLINK(link))
 	else
 		DA.DEBUG(0,"ScanTrade: "..tostring(skillLineName).." not linkable")
 	end
@@ -1765,7 +1764,7 @@ function Skillet:ScanTrade()
 					end
 				end
 			elseif recipeInfo.alternateVerb == ENSCRIBE then -- use the itemID of the scroll created by using the enchant on vellum
-				--DA.DEBUG(0,"recipeID= "..tostring(recipeID)..", alternateVerb= "..tostring(recipeInfo.alternateVerb))
+				--DA.DEBUG(2,"recipeID= "..tostring(recipeID)..", alternateVerb= "..tostring(recipeInfo.alternateVerb))
 				recipeInfo.numMade = 1		-- save a copy for our records
 				if Skillet.scrollData[recipeID] then					-- note that this table is maintained by datamining
 					recipeInfo.itemID = Skillet.scrollData[recipeID]	-- save a copy for our records
@@ -1775,7 +1774,7 @@ function Skillet:ScanTrade()
 					DA.DEBUG(0,"recipeID= "..tostring(recipeID).." has no scrollData")
 				end
 			else
-				DA.DEBUG(0,"recipeID= "..tostring(recipeID).."alternateVerb= "..tostring(recipeInfo.alternateVerb))
+				DA.DEBUG(2,"recipeID= "..tostring(recipeID)..", alternateVerb= "..tostring(recipeInfo.alternateVerb))
 				recipeInfo.numMade = 1		-- save a copy for our records
 			end
 			if recipe.numMade > 1 then
@@ -1784,11 +1783,11 @@ function Skillet:ScanTrade()
 				itemString = tostring(itemID)
 			end
 			if itemID == recipeID then
-				DA.DEBUG(0,"ScanTrade: (itemID == recipeID)= "..tostring(itemID))
+				DA.DEBUG(2,"ScanTrade: (itemID == recipeID)= "..tostring(itemID))
 			end
 			Skillet:ItemDataAddRecipeSource(itemID,recipeID) -- add a cross reference for the source of this item
 		else
-			DA.DEBUG(0,"recipeID= "..tostring(recipeID).." has no itemLink")
+			DA.DEBUG(2,"recipeID= "..tostring(recipeID).." has no itemLink")
 		end
 
 		local reagentData = {}
