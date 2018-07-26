@@ -69,13 +69,13 @@ local pre_show_callbacks = {}
 -- List of functions that are called before a button is hidden
 local pre_hide_callbacks = {}
 
-function Skillet:internal_AddPreButtonShowCallback(method)
+function Skillet:internal_AddPreButtonShowCallback(method)		-- AddPreButtonShowCallback()
 	assert(method and type(method) == "function",
 		   "Usage: Skillet:AddPreButtonShowCallback(method). method must be a non-nil function")
 	table.insert(pre_show_callbacks, method)
 end
 
-function Skillet:internal_AddPreButtonHideCallback(method)
+function Skillet:internal_AddPreButtonHideCallback(method)		-- AddPreButtonHideCallback()
 	assert(method and type(method) == "function",
 		   "Usage: Skillet:AddPreButtonHideCallback(method). method must be a non-nil function")
 	table.insert(pre_hide_callbacks, method)
@@ -743,7 +743,7 @@ local updateWindowBusy = false
 local updateWindowCount = 1
 -- Updates the trade skill window whenever anything has changed,
 -- number of skills, skill type, skill level, etc
-function Skillet:internal_UpdateTradeSkillWindow()
+function Skillet:internal_UpdateTradeSkillWindow()		-- UpdateTradeSkillWindow()
 	--DA.DEBUG(0,"internal_UpdateTradeSkillWindow(), updateWindowBusy="..tostring(updateWindowBusy))
 	self:NameEditSave()
 	if not self.currentPlayer or not self.currentTrade then return end
@@ -932,7 +932,7 @@ function Skillet:internal_UpdateTradeSkillWindow()
 						buttonExpand:SetNormalTexture("Interface\\Addons\\Skillet\\Icons\\expand_arrow_closed.tga")
 						buttonExpand:SetHighlightTexture("Interface\\Addons\\Skillet\\Icons\\expand_arrow_closed.tga")
 					end
-					local name = skill.name.." ("..#skill.subGroup.entries..")"
+					local name = string.split(":", skill.name).." ("..#skill.subGroup.entries..")"
 					buttonText:SetText(name)
 					button:SetID(skillIndex or 0)
 					buttonExpand.group = skill.subGroup

@@ -1475,7 +1475,6 @@ function Skillet:SkilletShow()
 		if self:IsSupportedTradeskill(self.currentTrade) then
 			DA.DEBUG(3,"SkilletShow: "..tostring(self.currentTrade).." IsSupportedTradeskill")
 			self:DisableBlizzardFrame()
-			self:InitializeDatabase(self.currentPlayer)
 			self.tradeSkillOpen = true
 			self.selectedSkill = nil
 			self.dataScanned = false
@@ -1599,7 +1598,7 @@ function Skillet:SetTradeSkill(player, tradeID, skillIndex)
 		local oldTradeID = self.currentTrade
 		if player == (UnitName("player")) then	-- we can update the tradeskills if this toon is the current one
 			self.dataSource = "api"
---			self.dataScanned = false
+			self.dataScanned = false
 			self.currentGroup = nil
 			self.currentGroupLabel = self:GetTradeSkillOption("grouping")
 			self:RecipeGroupDropdown_OnShow()
@@ -1614,7 +1613,7 @@ function Skillet:SetTradeSkill(player, tradeID, skillIndex)
 		else
 			self.dataSource = "cache"
 			CloseTradeSkill()
---			self.dataScanned = false
+			self.dataScanned = false
 			self:HideNotesWindow();
 			self.currentTrade = tradeID
 			self.currentGroup = nil
@@ -1641,29 +1640,21 @@ end
 
 -- Updates the tradeskill window, if the current trade has changed.
 function Skillet:UpdateTradeSkill()
-	DA.DEBUG(0,"UPDATE TRADE SKILL")
-	local trade_changed = false
+	DA.DEBUG(0,"UpdateTradeSkill()")
 	local new_trade = self:GetTradeSkillLine()
-	if not self.currentTrade and new_trade then
-		trade_changed = true
-	elseif self.currentTrade ~= new_trade then
-		trade_changed = true
-	end
-	if true or trade_changed then
-		self:HideNotesWindow();
-		self.sortedRecipeList = {}
-		-- And start the update sequence through the rest of the mod
-		self:SetSelectedTrade(new_trade)
-		-- remove any filters currently in place
-		local searchbox = _G["SkilletSearchBox"];
-		local searchtext = self:GetTradeSkillOption("searchtext", self.currentPlayer, new_trade)
-		-- this fires off a redraw event, so only change after data has been acquired
-		searchbox:SetText(searchtext);
-	end
+	self:HideNotesWindow();
+	self.sortedRecipeList = {}
+	-- And start the update sequence through the rest of the mod
+	self:SetSelectedTrade(new_trade)
+	-- remove any filters currently in place
+	local searchbox = _G["SkilletSearchBox"];
+	local searchtext = self:GetTradeSkillOption("searchtext", self.currentPlayer, new_trade)
+	-- this fires off a redraw event, so only change after data has been acquired
+	searchbox:SetText(searchtext);
 end
 
 -- Shows the trade skill frame.
-function Skillet:internal_ShowTradeSkillWindow()
+function Skillet:internal_ShowTradeSkillWindow()		-- ShowTradeSkillWindow()
 	--DA.DEBUG(0,"internal_ShowTradeSkillWindow")
 	if UnitAffectingCombat("player") then
 		print("|cff8888ffSkillet|r: Combat lockdown restriction." ..
@@ -1691,7 +1682,7 @@ end
 --
 -- Hides the Skillet trade skill window. Does nothing if the window is not visible
 --
-function Skillet:internal_HideTradeSkillWindow()
+function Skillet:internal_HideTradeSkillWindow()		-- HideTradeSkillWindow()
 	local closed -- was anything closed by us?
 	local frame = self.tradeSkillFrame
 	if frame and frame:IsVisible() then
@@ -1704,7 +1695,7 @@ end
 --
 -- Hides any and all Skillet windows that are open
 --
-function Skillet:internal_HideAllWindows()
+function Skillet:internal_HideAllWindows()		-- HideAllWindows()
 	local closed -- was anything closed?
 	-- Cancel anything currently being created
 	if self:HideTradeSkillWindow() then

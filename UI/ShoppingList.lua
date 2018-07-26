@@ -936,7 +936,7 @@ function Skillet:ShoppingList_OnScroll()
 end
 
 -- Fills out and displays the shopping list frame
-function Skillet:internal_DisplayShoppingList(atBank)
+function Skillet:internal_DisplayShoppingList(atBank)		-- DisplayShoppingList()
 	DA.TRACE("internal_DisplayShoppingList")
 	if not self.shoppingList then
 		self.shoppingList = createShoppingListFrame(self)
@@ -957,7 +957,7 @@ function Skillet:internal_DisplayShoppingList(atBank)
 end
 
 -- Hides the shopping list window
-function Skillet:internal_HideShoppingList()
+function Skillet:internal_HideShoppingList()		-- HideShoppingList()
 	if self.shoppingList then
 		self.shoppingList:Hide()
 	end
