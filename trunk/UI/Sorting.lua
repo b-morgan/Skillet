@@ -313,7 +313,7 @@ end
 --
 -- Adds the sorting routine to the list of sorting routines.
 --
-function Skillet:internal_AddRecipeSorter(text, sorter)
+function Skillet:internal_AddRecipeSorter(text, sorter)		-- AddRecipeSorter()
 	assert(text and tostring(text),
 		"Usage Skillet:AddRecipeSorter(text, sorter), text must be a string")
 	assert(sorter and type(sorter) == "function",
@@ -364,7 +364,7 @@ end
 --
 -- Causes the list of recipes to be resorted
 --
-function Skillet:internal_SortAndFilterRecipes()
+function Skillet:internal_SortAndFilterRecipes()		-- SortAndFilterRecipes()
 	--DA.DEBUG(0,"internal_SortAndFilterRecipes()")
 	local skillListKey = Skillet.currentPlayer..":"..Skillet.currentTrade..":"..Skillet.currentGroupLabel
 	local numSkills = Skillet:GetNumSkills(Skillet.currentPlayer, Skillet.currentTrade)
