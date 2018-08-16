@@ -189,7 +189,7 @@ function Skillet:MERCHANT_CLOSED()
 end
 
 -- If at a vendor with the window open, buy anything that they
--- sell that is required by any queued reciped.
+-- sell that is required by any queued recipe.
 function Skillet:BuyRequiredReagents()
 	local list = Skillet:GetShoppingList(UnitName("player"))
 	if #list == 0 then
@@ -202,14 +202,13 @@ function Skillet:BuyRequiredReagents()
 	local totalspent = 0
 	local purchased = 0
 	local abacus = LibStub("LibAbacus-3.0")
-	-- for each item they sell, see if we need it
-	-- ... if we do, buy the hell out of it.
+-- for each item they sell, see if we need it and if so, buy it.
 	local numItems = GetMerchantNumItems()
 	for i=1, numItems, 1 do
 		local link = GetMerchantItemLink(i)
 		if link then
-			local name, texture, price, quantity, numAvailable, isUsable = GetMerchantItemInfo(i)
-			if numAvailable == -1 then -- Vendor has plenty.
+			local name, texture, price, quantity, numAvailable, isUsable, extendedCost = GetMerchantItemInfo(i)
+			if numAvailable == -1 then			-- only buy unlimited items automatically.
 				local id = self:GetItemIDFromLink(link)
 				-- OK, lets see if we need it.
 				local count = 0
@@ -221,10 +220,14 @@ function Skillet:BuyRequiredReagents()
 				end
 				if count > 0 then
 					purchased = 0;
-					count = math.ceil(count/quantity) * quantity	-- Merchant charges us full price for a partial stack, so round up.
+--					count = math.ceil(count/quantity) * quantity	-- merchant charges us full price for a partial stack, so round up.
+					if GetMerchantItemCostInfo(i) > 0 then			-- if not sold for alternate currency, merchant will sell partial stacks.
+						count = math.ceil(count/quantity) * quantity 
+					end
 					local maxStack = GetMerchantItemMaxStack(i)
-					DA.DEBUG(0,"count= "..tostring(count)..", name= "..tostring(name)..", price= "..tostring(price)..", quantity= "..tostring(quantity)..", maxStack= "..tostring(maxStack))
-					while count > 0 do
+					DA.DEBUG(0,"count= "..tostring(count)..", name= "..tostring(name)..", price= "..tostring(price)..", quantity= "..tostring(quantity)..
+						", maxStack= "..tostring(maxStack)..", extendedCost= "..tostring(extendedCost))
+					while count > 0 do				-- if there is not enough currency, a UI_ERROR_MESSAGE event is generated (which Skillet ignores)
 						if count <= maxStack then
 							BuyMerchantItem(i,count)
 							purchased = purchased + count
