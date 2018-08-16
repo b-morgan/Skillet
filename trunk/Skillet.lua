@@ -1452,9 +1452,12 @@ function Skillet:SkilletShow()
 	end
 	self:ScanPlayerTradeSkills(self.currentPlayer)
 	self:UpdateAutoTradeButtons()
-	local skillLineID, skillLineName, skillLineRank, skillLineMaxRank, skillLineModifier, parentSkillLineID  = C_TradeSkillUI.GetTradeSkillLine();
+	local skillLineID, skillLineName, skillLineRank, skillLineMaxRank, skillLineModifier, parentSkillLineID, parentSkillLineName =
+		C_TradeSkillUI.GetTradeSkillLine()
 	DA.DEBUG(0,"SkilletShow: skillLineID= "..tostring(skillLineID)..", skillLineName= "..tostring(skillLineName)..
-		", skillLineRank= "..tostring(skillLineRank)..", skillLineModifier= "..tostring(skillLineModifier)..", parentSkillLineID= "..tostring(parentSkillLineID))
+		", skillLineRank= "..tostring(skillLineRank)..", skillLineMaxRank= "..tostring(skillLineMaxRank)..
+		", skillLineModifier= "..tostring(skillLineModifier)..
+		", parentSkillLineID= "..tostring(parentSkillLineID)..", parentSkillLineName= "..tostring(parentSkillLineName))
 	if (parentSkillLineID) then
 		self.currentTrade = self.SkillLineIDList[parentSkillLineID]	-- names are localized so use a table to translate
 	else
@@ -1471,22 +1474,20 @@ function Skillet:SkilletShow()
 		self:HideAllWindows()
 		self:EnableBlizzardFrame()
 		ShowUIPanel(TradeSkillFrame)
+	elseif self:IsSupportedTradeskill(self.currentTrade) then
+		DA.DEBUG(3,"SkilletShow: "..tostring(self.currentTrade).." IsSupportedTradeskill")
+		self:DisableBlizzardFrame()
+		self.tradeSkillOpen = true
+		self.selectedSkill = nil
+		self.dataScanned = false
+		self:SetTradeSkillLearned()
+		DA.DEBUG(3,"SkilletShow: waiting for TRADE_SKILL_DATA_SOURCE_CHANGED")
+--		self:SkilletShowWindow() -- Need to wait until TRADE_SKILL_DATA_SOURCE_CHANGED
 	else
-		if self:IsSupportedTradeskill(self.currentTrade) then
-			DA.DEBUG(3,"SkilletShow: "..tostring(self.currentTrade).." IsSupportedTradeskill")
-			self:DisableBlizzardFrame()
-			self.tradeSkillOpen = true
-			self.selectedSkill = nil
-			self.dataScanned = false
-			self:SetTradeSkillLearned()
-			DA.DEBUG(3,"SkilletShow: waiting for TRADE_SKILL_DATA_SOURCE_CHANGED")
---			self:SkilletShowWindow() -- Need to wait until TRADE_SKILL_DATA_SOURCE_CHANGED
-		else
-			DA.DEBUG(3,"SkilletShow: "..tostring(self.currentTrade).." not IsSupportedTradeskill")
-			self:HideAllWindows()
-			self:EnableBlizzardFrame()
-			ShowUIPanel(TradeSkillFrame)
-		end
+		DA.DEBUG(3,"SkilletShow: "..tostring(self.currentTrade).." not IsSupportedTradeskill")
+		self:HideAllWindows()
+		self:EnableBlizzardFrame()
+		ShowUIPanel(TradeSkillFrame)
 	end
 end
 
@@ -1495,7 +1496,14 @@ function Skillet:SkilletShowWindow()
 	if self.tradeSkillOpen then
 		HideUIPanel(TradeSkillFrame)
 	end
+--	if not self.currentPlayer or not self.currentTrade then
+--		return
+--	end
 	if not self:RescanTrade() then
+		if self.useBlizzard then
+			self.useBlizzard = false
+			return
+		end
 		DA.DEBUG(0,"No headers, reset filter")
 		self.ResetTradeSkillFilter()
 		if not self:RescanTrade() then
@@ -1908,7 +1916,7 @@ function Skillet:GetTradeSkillOption(option)
 	local player = self.currentPlayer
 	local trade = self.currentTrade
 	local options = self.db.realm.options
-	if not options or not options[player] or not options[player][trade] then
+	if not options or not player or not options[player] or not trade or not options[player][trade] then
 		r = Skillet.defaultOptions[option]
 	elseif options[player][trade][option] == nil then
 		r =  Skillet.defaultOptions[option]
@@ -1926,13 +1934,15 @@ function Skillet:SetTradeSkillOption(option, value)
 		if not self.db.realm.options then
 			self.db.realm.options = {}
 		end
-		if not self.db.realm.options[player] then
-			self.db.realm.options[player] = {}
+		if player and trade then
+			if not self.db.realm.options[player] then
+				self.db.realm.options[player] = {}
+			end
+			if not self.db.realm.options[player][trade] then
+				self.db.realm.options[player][trade] = {}
+			end
+			self.db.realm.options[player][trade][option] = value
 		end
-		if not self.db.realm.options[player][trade] then
-			self.db.realm.options[player][trade] = {}
-		end
-		self.db.realm.options[player][trade][option] = value
 	end
 end
 

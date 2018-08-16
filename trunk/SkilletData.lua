@@ -34,12 +34,8 @@ Skillet.SkillLineIDList = {
 	[186] = 2575,		-- mining
 	[197] = 3908,		-- tailoring
 	[185] = 2550,		-- cooking
---	[129] = 3273,		-- first aid
---	[182] = 2366,		-- herbalism
---	[960] = 53428,		-- runeforging
---	[0] = 0,			-- skinning
---	[356] = 0,			-- fishing
--- Battle for Azeroth
+--	[129] = 3273,		-- first aid (removed in Battle for Azeroth)
+-- Battle for Azeroth (not sure these are needed anymore)
 	[2482] = 2259,		-- alchemy
 	[2485] = 2259,		-- alchemy
 	[2474] = 2018,		-- blacksmithing
@@ -60,17 +56,14 @@ Skillet.SkillLineIDList = {
 	[2540] = 3908,		-- tailoring
 	[2545] = 2550,		-- cooking
 	[2548] = 2550,		-- cooking
---	[2561] = 194174,	-- skinning
---	[2564] = 194174,	-- skinning
 }
 
 -- Table of tradeskills that should use the Blizzard frame
 Skillet.BlizzardSkillList = {
 	[182]    = true,		-- herbalism skills
+	[393]    = true,		-- skinning skills
+	[356]    = true,		-- fishing skills
 	[960]    = true,		-- runeforging
-	[2558]   = true,		-- skinning skills
-	[2586]   = true,		-- fishing skills
-	[5419]   = true,		-- ???
 }
 
 -- Table of follower (C_TradeSkillUI.IsNPCCrafting) tradeskills that should use the Blizzard frame
@@ -200,6 +193,7 @@ Skillet.TradeSkillAutoTarget = {
 		[124105] = 5, -- Starlight-rose
 		[124106] = 5, -- Felwort
 		[128304] = 5, -- Yseralline-seed
+-- Added in Battle for Azeroth
 	}
 }
 
@@ -636,7 +630,69 @@ Skillet.scrollData = {
 	[235704] = 144305, -- Enchant Neck - Mark of the Versatile Rank 3
 	[235695] = 144304, -- Enchant Neck - Mark of the Master Rank 1
 	[235699] = 144304, -- Enchant Neck - Mark of the Master Rank 2
-	[235703] = 144304, -- Enchant Neck - Mark of the Master Rank 3}
+	[235703] = 144304, -- Enchant Neck - Mark of the Master Rank 3
+-- Added in Battle for Azeroth (thanks to Tarkumi)
+	[255103] = 153476, -- Enchant Weapon - Coastal Surge Rank 1
+	[255104] = 153476, -- Enchant Weapon - Coastal Surge Rank 2
+	[255105] = 153476, -- Enchant Weapon - Coastal Surge Rank 3
+	[255141] = 153480, -- Enchant Weapon - Gale-Force Striking Rank 1
+	[255142] = 153480, -- Enchant Weapon - Gale-Force Striking Rank 2
+	[255143] = 153480, -- Enchant Weapon - Gale-Force Striking Rank 3
+	[255129] = 153479, -- Enchant Weapon - Torrent of Elements Rank 1
+	[255130] = 153479, -- Enchant Weapon - Torrent of Elements Rank 2
+	[255131] = 153479, -- Enchant Weapon - Torrent of Elements Rank 3
+	[255110] = 153478, -- Enchant Weapon - Siphoning Rank 1
+	[255111] = 153478, -- Enchant Weapon - Siphoning Rank 2
+	[255112] = 153478, -- Enchant Weapon - Siphoning Rank 3
+	[268907] = 159785, -- Enchant Weapon - Deadly Navigation Rank 1
+	[268908] = 159785, -- Enchant Weapon - Deadly Navigation Rank 2
+	[268909] = 159785, -- Enchant Weapon - Deadly Navigation Rank 3
+	[268901] = 159787, -- Enchant Weapon - Masterful Navigation Rank 1
+	[268902] = 159787, -- Enchant Weapon - Masterful Navigation Rank 2
+	[268903] = 159787, -- Enchant Weapon - Masterful Navigation Rank 3
+	[268894] = 159786, -- Enchant Weapon - Quick Navigation Rank 1
+	[268895] = 159786, -- Enchant Weapon - Quick Navigation Rank 2
+	[268897] = 159786, -- Enchant Weapon - Quick Navigation Rank 3
+	[268913] = 159789, -- Enchant Weapon - Stalwart Navigation Rank 1
+	[268914] = 159789, -- Enchant Weapon - Stalwart Navigation Rank 2
+	[268915] = 159789, -- Enchant Weapon - Stalwart Navigation Rank 3
+	[268852] = 159788, -- Enchant Weapon - Versatile Navigation Rank 1
+	[268878] = 159788, -- Enchant Weapon - Versatile Navigation Rank 2
+	[268879] = 159788, -- Enchant Weapon - Versatile Navigation Rank 3
+	[255071] = 153438, -- Enchant Ring - Seal of Critical Strike Rank 1
+	[255086] = 153438, -- Enchant Ring - Seal of Critical Strike Rank 2
+	[255094] = 153438, -- Enchant Ring - Seal of Critical Strike Rank 3
+	[255072] = 153439, -- Enchant Ring - Seal of Haste Rank 1
+	[255087] = 153439, -- Enchant Ring - Seal of Haste Rank 2
+	[255095] = 153439, -- Enchant Ring - Seal of Haste Rank 3
+	[255073] = 153440, -- Enchant Ring - Seal of Mastery Rank 1
+	[255088] = 153440, -- Enchant Ring - Seal of Mastery Rank 2
+	[255096] = 153440, -- Enchant Ring - Seal of Mastery Rank 3
+	[255074] = 153441, -- Enchant Ring - Seal of Versatility Rank 1
+	[255089] = 153441, -- Enchant Ring - Seal of Versatility Rank 2
+	[255097] = 153441, -- Enchant Ring - Seal of Versatility Rank 3
+	[255075] = 153442, -- Enchant Ring - Pact of Critical Strike Rank 1
+	[255090] = 153442, -- Enchant Ring - Pact of Critical Strike Rank 2
+	[255098] = 153442, -- Enchant Ring - Pact of Critical Strike Rank 3
+	[255076] = 153443, -- Enchant Ring - Pact of Haste Rank 1
+	[255091] = 153443, -- Enchant Ring - Pact of Haste Rank 2
+	[255099] = 153443, -- Enchant Ring - Pact of Haste Rank 3
+	[255077] = 153444, -- Enchant Ring - Pact of Mastery Rank 1
+	[255092] = 153444, -- Enchant Ring - Pact of Mastery Rank 2
+	[255100] = 153444, -- Enchant Ring - Pact of Mastery Rank 3
+	[255078] = 153445, -- Enchant Ring - Pact of Versatility Rank 1
+	[255093] = 153445, -- Enchant Ring - Pact of Versatility Rank 2
+	[255101] = 153445, -- Enchant Ring - Pact of Versatility Rank 3
+	[267498] = 159471, -- Enchant Gloves - Zandalari Crafting
+	[267458] = 159464, -- Enchant Gloves - Zandalari Herbalism
+	[267482] = 159466, -- Enchant Gloves - Zandalari Mining
+	[267486] = 159467, -- Enchant Gloves - Zandalari Skinning
+	[267490] = 159468, -- Enchant Gloves - Zandalari Surveying
+	[255070] = 153437, -- Enchant Gloves - Kul Tiran Crafting
+	[255035] = 153430, -- Enchant Gloves - Kul Tiran Herbalism
+	[255040] = 153431, -- Enchant Gloves - Kul Tiran Mining
+	[255065] = 153434, -- Enchant Gloves - Kul Tiran Skinning
+	[255066] = 153435, -- Enchant Gloves - Kul Tiran Surveying}
 }
 
 --[[ == Local Tables == ]]--
@@ -1486,13 +1542,30 @@ function Skillet:ScanTrade()
 	--DA.PROFILE("Skillet:ScanTrade()")
 	local tradeID
 	local link = C_TradeSkillUI.GetTradeSkillListLink()
-	local tradeSkillID, skillLineName, skillLineRank, skillLineMaxRank, skillLineModifier, parentSkillLineID =  C_TradeSkillUI.GetTradeSkillLine();
-	DA.DEBUG(0,"ScanTrade: tradeSkillID= "..tostring(tradeSkillID)..", skillLineName= "..tostring(skillLineName)..", skillLineRank= "..tostring(skillLineRank)..
-		", skillLineMaxRank= "..tostring(skillLineMaxRank)..", skillLineModifier= "..tostring(skillLineModifier)..", parentSkillLineID= "..tostring(parentSkillLineID))
-	if (parentSkillLineID) then
+	local skillLineID, skillLineName, skillLineRank, skillLineMaxRank, skillLineModifier, parentSkillLineID, parentSkillLineName =
+		C_TradeSkillUI.GetTradeSkillLine()
+	DA.DEBUG(0,"ScanTrade: skillLineID= "..tostring(skillLineID)..", skillLineName= "..tostring(skillLineName)..
+		", skillLineRank= "..tostring(skillLineRank)..", skillLineMaxRank= "..tostring(skillLineMaxRank)..
+		", skillLineModifier= "..tostring(skillLineModifier)..
+		", parentSkillLineID= "..tostring(parentSkillLineID)..", parentSkillLineName= "..tostring(parentSkillLineName))
+	if parentSkillLineID then
+		if self.BlizzardSkillList[parentSkillLineID] then
+			DA.CHAT("Skillet cannot display "..tostring(parentSkillLineName)..", use the Blizzard UI")
+			self.useBlizzard = true
+			self.currentTrade = nil
+			self:SkilletClose()
+			return false
+		end
 		tradeID = self.SkillLineIDList[parentSkillLineID]	-- names are localized so use a table to translate
-	else
-		tradeID = self.SkillLineIDList[tradeSkillID]		-- names are localized so use a table to translate
+	elseif skillLineID then
+		if self.BlizzardSkillList[skillLineID] then
+			DA.CHAT("Skillet cannot display "..tostring(skillLineName)..", use the Blizzard UI")
+			self.useBlizzard = true
+			self.currentTrade = nil
+			self:SkilletClose()
+			return false
+		end
+		tradeID = self.SkillLineIDList[skillLineID]		-- names are localized so use a table to translate
 	end
 	local profession = self.tradeSkillNamesByID[tradeID]
 	DA.DEBUG(0,"ScanTrade: tradeID= "..tostring(tradeID)..", profession= "..tostring(profession))
@@ -1503,9 +1576,11 @@ function Skillet:ScanTrade()
 	end
 	local player = Skillet.currentPlayer
 	if not player or not tradeID then
-		DA.CHAT("ScanTrade: abort! player= "..tostring(player)..", tradeID= "..tostring(tradeID)..", tradeSkillID= "..tostring(tradeSkillID)..", skillLineName= "..tostring(skillLineName))
+		DA.CHAT("ScanTrade: abort! player= "..tostring(player)..", tradeID= "..tostring(tradeID)..
+			", skillLineID= "..tostring(skillLineID)..", skillLineName= "..tostring(skillLineName)..
+			", parentSkillLineID= "..tostring(parentSkillLineID)..", parentSkillLineName= "..tostring(parentSkillLineName))
 		Skillet.scanInProgress = false
-		Skillet.currentTrade = tradeSkillID
+		Skillet.currentTrade = nil
 		return false
 	end
 	Skillet.currentTrade = tradeID
