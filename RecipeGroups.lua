@@ -484,8 +484,8 @@ function Skillet:RecipeGroupConstructDBString(group)
 	end
 end
 
-function Skillet:RecipeGroupPruneList()
-	--DA.DEBUG(0,"RecipeGroupPruneList()")
+function Skillet:RecipeGroupPruneList(player)
+	--DA.DEBUG(0,"RecipeGroupPruneList("..tostring(player)..")")
 	if self.data.groupList then
 		for trade, perTradeList in pairs(self.data.groupList) do
 			for label, perLabelList in pairs(perTradeList) do
@@ -563,7 +563,7 @@ function Skillet:RecipeGroupDeconstructDBStrings()
 					end
 				end
 			end
-			self:RecipeGroupPruneList()
+			self:RecipeGroupPruneList(player)
 		end
 	end
 end
