@@ -152,10 +152,9 @@ function plugin.GetExtraText(skill, recipe)
 		label=label..L["Sold amount"]..":\n";
 		label=label..L["Gold earned"]..":"..FONT_COLOR_CODE_CLOSE;
 		local success, failed, sucessStack, failedStack, earned  = plugin.GetBCValues(itemID)
-		local abacus = LibStub("LibAbacus-3.0")
 		extra_text = L["Sells for "]..(Skillet.db.profile.plugins.beancounter.days or 0)..L[" days"].."\n"
 		extra_text = extra_text..GREEN_FONT_COLOR_CODE..sucessStack..FONT_COLOR_CODE_CLOSE.." / "..RED_FONT_COLOR_CODE..failedStack.."\n"
-		extra_text = extra_text..FONT_COLOR_CODE_CLOSE..abacus:FormatMoneyFull(earned, true);
+		extra_text = extra_text..FONT_COLOR_CODE_CLOSE..Skillet:FormatMoneyFull(earned, true);
 	end
 	return label, extra_text
 end

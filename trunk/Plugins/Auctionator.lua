@@ -86,10 +86,9 @@ function plugin.GetExtraText(skill, recipe)
 	if not skill or not recipe then return end
 	local itemID = recipe.itemID
 	if Atr_GetAuctionBuyout and Skillet.db.profile.plugins.ATR.enabled and itemID then
-		local abacus = LibStub("LibAbacus-3.0")
 		local value = ( Atr_GetAuctionBuyout(itemID) or 0 ) * recipe.numMade
 		if value then
-			extra_text = abacus:FormatMoneyFull(value, true)
+			extra_text = Skillet:FormatMoneyFull(value, true)
 			label = L["Buyout"]..":"
 		end
 	end
@@ -101,7 +100,6 @@ function plugin.RecipeNameSuffix(skill, recipe)
 	if recipe then
 		local itemID = recipe.itemID
 		if Atr_GetAuctionBuyout and Skillet.db.profile.plugins.ATR.enabled and itemID then
-			local abacus = LibStub("LibAbacus-3.0")
 			local value = Atr_GetAuctionBuyout(itemID) or 0
 			if value then
 				value = value * recipe.numMade
@@ -114,9 +112,9 @@ function plugin.RecipeNameSuffix(skill, recipe)
 				end
 				value = value - matsum
 				if Skillet.db.profile.plugins.ATR.useShort then
-					text = abacus:FormatMoneyShort(value, true)
+					text = Skillet:FormatMoneyShort(value, true)
 				else
-					text = abacus:FormatMoneyFull(value, true)
+					text = Skillet:FormatMoneyFull(value, true)
 				end
 				if Skillet.db.profile.plugins.ATR.onlyPositive and value <= 0 then
 					text = nil

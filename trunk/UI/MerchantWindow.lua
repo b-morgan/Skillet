@@ -201,7 +201,6 @@ function Skillet:BuyRequiredReagents()
 	end
 	local totalspent = 0
 	local purchased = 0
-	local abacus = LibStub("LibAbacus-3.0")
 -- for each item they sell, see if we need it and if so, buy it.
 	local numItems = GetMerchantNumItems()
 	for i=1, numItems, 1 do
@@ -241,7 +240,7 @@ function Skillet:BuyRequiredReagents()
 					local itemspent = price * purchased / quantity -- spent on this type of item
 					totalspent = totalspent + itemspent  -- spent on all items from this merchant
 					local message = L["Purchased"]
-					local cash = abacus:FormatMoneyFull(itemspent, true);
+					local cash = Skillet:FormatMoneyFull(itemspent, true);
 					message = message..": "..tostring(purchased).." x "..link.." ("..cash..")"
 					self:Print(message);
 				end
@@ -250,7 +249,7 @@ function Skillet:BuyRequiredReagents()
 	end
 	if totalspent > 0 and purchased > 1 then
 		local message = L["Total spent"]
-		local cash = abacus:FormatMoneyFull(totalspent, true)
+		local cash = Skillet:FormatMoneyFull(totalspent, true)
 		message = message..": "..cash
 		self:Print(message)
 	end
@@ -259,7 +258,6 @@ function Skillet:BuyRequiredReagents()
 end
 
 function Skillet:MerchantBuyButton_OnEnter(button)
-	local abacus = LibStub("LibAbacus-3.0")
 	GameTooltip:SetOwner(button, "ANCHOR_BOTTOMRIGHT")
 	GameTooltip:ClearLines()
 	GameTooltip:AddLine(L["Buy Reagents"])
@@ -270,11 +268,11 @@ function Skillet:MerchantBuyButton_OnEnter(button)
 		if merchant_inventory[itemID] then
 			local cost = merchant_inventory[itemID].price * math.ceil(needList[i].count / merchant_inventory[itemID].quantity)
 			totalCost = totalCost + cost
-			GameTooltip:AddDoubleLine((GetItemInfo(itemID)).." x "..needList[i].count, abacus:FormatMoneyFull(cost, true),1,1,0)
+			GameTooltip:AddDoubleLine((GetItemInfo(itemID)).." x "..needList[i].count, Skillet:FormatMoneyFull(cost, true),1,1,0)
 		end
 	end
 	if #needList > 1 then
-		GameTooltip:AddDoubleLine(L["Total Cost:"], abacus:FormatMoneyFull(totalCost, true),0,1,0)
+		GameTooltip:AddDoubleLine(L["Total Cost:"], Skillet:FormatMoneyFull(totalCost, true),0,1,0)
 	end
 	GameTooltip:Show()
 end
