@@ -15,7 +15,6 @@
 <Script file="Libs\AceHook-3.0\AceHook-3.0.lua"/>
 <Script file="Libs\AceEvent-3.0\AceEvent-3.0.lua"/>
 <Script file="Libs\AceTimer-3.0\AceTimer-3.0.lua"/>
-<Script file="Libs\LibAbacus-3.0\LibAbacus-3.0.lua"/>
 <Script file="Libs\LibWindow-1.1\LibWindow-1.1.lua"/>
 <Script file="Libs\LibPeriodicTable-3.1\LibPeriodicTable-3.1.lua"/>
 <Script file="Libs\LibPeriodicTable-3.1\LibPeriodicTable-3.1-Tradeskill\LibPeriodicTable-3.1-Tradeskill.lua"/>
