@@ -17,7 +17,7 @@
 #### X-RelSite-UI.WoW:
 ## SavedVariables: SkilletDB
 ## SavedVariablesPerCharacter: SkilletDBPC, SkilletMemory, SkilletProfile
-## OptionalDeps: Ace3, LibDialog-1.0, LibWindow-1.1, LibPeriodicTable-3.1, TheUndermineJournal, TradeSkillInfo, TradeSkillMaster, Auctionator, BeanCounter
+## OptionalDeps: Ace3, LibDialog-1.0, LibWindow-1.1, LibPeriodicTable-3.1, TheUndermineJournal, TradeSkillInfo, Auctionator, BeanCounter
 ## X-Embeds: Ace3, LibStub, CallbackHandler-1.0, LibDialog-1.0, LibWindow-1.1, LibPeriodicTable-3.1
 
 ## LoadManagers: AddonLoader
@@ -75,7 +75,6 @@ DebugAids.lua
 Plugins\AckisRecipeList.lua
 Plugins\TradeSkillInfo.lua
 Plugins\BeanCounter.lua
-Plugins\TradeSkillMaster.lua
 Plugins\TheUndermineJournal.lua
 Plugins\Auctionator.lua
 Plugins\CanIMogIt.lua
