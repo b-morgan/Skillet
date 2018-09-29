@@ -125,9 +125,9 @@ function Skillet:CreateTradeSkillWindow()
 	titlebar2:SetPoint("TOPRIGHT",titlebar,"BOTTOMRIGHT",0,0)
 	titlebar2:SetHeight(13)
 	titlebar:SetGradientAlpha("VERTICAL",r*0.6,g*0.6,b*0.6,1,r,g,b,1)
-	titlebar:SetTexture(r,g,b,1)
+	titlebar:SetColorTexture(r,g,b,1)
 	titlebar2:SetGradientAlpha("VERTICAL",r*0.9,g*0.9,b*0.9,1,r*0.6,g*0.6,b*0.6,1)
-	titlebar2:SetTexture(r,g,b,1)
+	titlebar2:SetColorTexture(r,g,b,1)
 
 	local title = CreateFrame("Frame",nil,frame)
 	title:SetPoint("TOPLEFT",titlebar,"TOPLEFT",0,0)
@@ -865,6 +865,7 @@ function Skillet:internal_UpdateTradeSkillWindow()		-- UpdateTradeSkillWindow()
 	self.visibleSkillButtons = math.min(numTradeSkills - skillOffset, button_count)
 	-- Iterate through all the buttons that make up the scroll window
 	-- and fill them in with data or hide them, as necessary
+	--DA.DEBUG(0,"Start for loop, button_count= "..tostring(button_count))
 	for i=1, button_count, 1 do
 		local rawSkillIndex = i + skillOffset
 		local button, buttonDrag = get_recipe_button(i)
@@ -872,8 +873,8 @@ function Skillet:internal_UpdateTradeSkillWindow()		-- UpdateTradeSkillWindow()
 		button:SetWidth(width)
 		if rawSkillIndex <= numTradeSkills then
 			local skill = sortedSkillList[rawSkillIndex]
-			--DA.DEBUG(2,"rawSkillIndex= "..tostring(rawSkillIndex)..", name= "..tostring(skill.name))
-			--DA.DEBUG(3,"skill= "..DA.DUMP1(skill,1))
+			--DA.DEBUG(0,"  rawSkillIndex= "..tostring(rawSkillIndex)..", name= "..tostring(skill.name))
+			--DA.DEBUG(0,"  skill= "..DA.DUMP1(skill,1))
 			local skillIndex = skill.skillIndex
 			local buttonText = _G[button:GetName() .. "Name"]
 			local levelText = _G[button:GetName() .. "Level"]
@@ -882,6 +883,10 @@ function Skillet:internal_UpdateTradeSkillWindow()		-- UpdateTradeSkillWindow()
 			local buttonExpand = _G[button:GetName() .. "Expand"]
 			local buttonFavorite = _G[button:GetName() .. "Favorite"]
 			local subSkillRankBar = _G[button:GetName() .. "SubSkillRankBar"]
+-- Blizzard's Cooking database is FUBAR, fix it
+			if self.FixBugs and skill.name == "Food of Draenor - Header" then skill.name = "Food of Draenor" end
+-- end of FUBAR fixes
+			local hasProgressBar = Skillet.hasProgressBar[skill.name]
 			buttonText:SetText("")
 			levelText:SetText("")
 			countText:SetText("")
@@ -939,12 +944,12 @@ function Skillet:internal_UpdateTradeSkillWindow()		-- UpdateTradeSkillWindow()
 					button.skill = skill
 					button:UnlockHighlight() -- headers never get highlighted
 					buttonExpand:Show()
-					local hasProgressBar = Skillet.hasProgressBar[skill.name]
 					if hasProgressBar then
 						local category = Skillet.db.global.Categories[self.currentTrade][hasProgressBar]
 						local currentRank = category.skillLineCurrentLevel
 						local startingRank = category.skillLineStartingRank
 						local maxRank = category.skillLineMaxLevel
+						--DA.DEBUG(0,tostring(skill.name).." ("..tostring(hasProgressBar)..")"..", category= "..DA.DUMP1(category))
 						subSkillRankBar:Show();
 						subSkillRankBar:SetMinMaxValues(startingRank,maxRank);
 						subSkillRankBar:SetValue(currentRank);
@@ -1091,9 +1096,9 @@ function Skillet:internal_UpdateTradeSkillWindow()		-- UpdateTradeSkillWindow()
 					SkilletHighlightFrame:SetWidth(button:GetWidth())
 					SkilletHighlightFrame:SetFrameLevel(button:GetFrameLevel())
 					if color then
-						SkilletHighlight:SetTexture(color.r, color.g, color.b, 0.4)
+						SkilletHighlight:SetColorTexture(color.r, color.g, color.b, 0.4)
 					else
-						SkilletHighlight:SetTexture(0.7, 0.7, 0.7, 0.4)
+						SkilletHighlight:SetColorTexture(0.7, 0.7, 0.7, 0.4)
 					end
 					-- And update the details for this skill, just in case something
 					-- has changed (mats consumed, etc)
@@ -1107,13 +1112,11 @@ function Skillet:internal_UpdateTradeSkillWindow()		-- UpdateTradeSkillWindow()
 				end
 				show_button(button, self.currentTrade, skillIndex, i, skill.recipeID)
 			end
-		else
-			-- We have no data for you Mister Button .....
---			hide_button(button, self.currentTrade, skillIndex, i, skill.recipeID)
+		else -- rawSkillIndex > numTradeSkills 
 			hide_button(button, self.currentTrade, skillIndex, i)
 			button:UnlockHighlight()
 		end
-	end
+	end -- for
 	-- Hide any of the buttons that we created but don't need right now
 	for i = button_count+1, num_recipe_buttons, 1 do
 		local button, buttonDrag = get_recipe_button(i)
@@ -2849,9 +2852,9 @@ function Skillet:CreateStandaloneQueueFrame()
 	titlebar2:SetPoint("TOPRIGHT",titlebar,"BOTTOMRIGHT",0,0)
 	titlebar2:SetHeight(13)
 	titlebar:SetGradientAlpha("VERTICAL",r*0.6,g*0.6,b*0.6,1,r,g,b,1)
-	titlebar:SetTexture(r,g,b,1)
+	titlebar:SetColorTexture(r,g,b,1)
 	titlebar2:SetGradientAlpha("VERTICAL",r*0.9,g*0.9,b*0.9,1,r*0.6,g*0.6,b*0.6,1)
-	titlebar2:SetTexture(r,g,b,1)
+	titlebar2:SetColorTexture(r,g,b,1)
 	local title = CreateFrame("Frame",nil,frame)
 	title:SetPoint("TOPLEFT",titlebar,"TOPLEFT",0,0)
 	title:SetPoint("BOTTOMRIGHT",titlebar2,"BOTTOMRIGHT",0,0)

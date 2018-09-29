@@ -864,6 +864,23 @@ Skillet.options =
 			end,
 			order = 96
 		},
+		FixBugs = {
+			type = "toggle",
+			name = "FixBugs",
+			desc = "Option for debugging",
+			get = function()
+				return Skillet.db.profile.FixBugs
+			end,
+			set = function(self,value)
+				Skillet.db.profile.FixBugs = value
+				Skillet.FixBugs = value
+				if value then
+					Skillet.db.profile.TraceLog = value
+					Skillet.TraceLog = value
+				end
+			end,
+			order = 87
+		},
 
 		reset = {
 			type = 'execute',
@@ -1069,8 +1086,8 @@ function Skillet:OnInitialize()
 	if Skillet.db.profile.WarnLog == nil then
 		Skillet.db.profile.WarnLog = true
 	end
-	Skillet.WarnShow = Skillet.db.profile.WarnShow
 	Skillet.WarnLog = Skillet.db.profile.WarnLog
+	Skillet.WarnShow = Skillet.db.profile.WarnShow
 	Skillet.DebugShow = Skillet.db.profile.DebugShow
 	Skillet.DebugLogging = Skillet.db.profile.DebugLogging
 	Skillet.DebugLevel = Skillet.db.profile.DebugLevel
@@ -1081,6 +1098,15 @@ function Skillet:OnInitialize()
 	Skillet.TraceShow = Skillet.db.profile.TraceShow
 	Skillet.TraceLog = Skillet.db.profile.TraceLog
 	Skillet.ProfileShow = Skillet.db.profile.ProfileShow
+
+--
+-- Profile variable to control Skillet fixes for Blizzard bugs.
+-- Can be toggled [or turned off] with "/skillet fixbugs [off]"
+--
+	if Skillet.db.profile.FixBugs == nil then
+		Skillet.db.profile.FixBugs = true
+	end
+	Skillet.FixBugs = Skillet.db.profile.FixBugs
 end
 
 function Skillet:FlushAllData()
