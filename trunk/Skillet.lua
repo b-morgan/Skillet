@@ -217,7 +217,7 @@ Skillet.options =
 						Skillet.db.profile.link_craftable_reagents = value
 					end,
 					width = "double",
-					order = 20
+					order = 19
 				},
 				queue_craftable_reagents = {
 					type = "toggle",
@@ -230,7 +230,7 @@ Skillet.options =
 						Skillet.db.profile.queue_craftable_reagents = value
 					end,
 					width = "double",
-					order = 21
+					order = 20
 				},
 				queue_glyph_reagents = {
 					type = "toggle",
@@ -243,7 +243,7 @@ Skillet.options =
 						Skillet.db.profile.queue_glyph_reagents = value
 					end,
 					width = "double",
-					order = 22
+					order = 21
 				},
 				display_shopping_list_at_bank = {
 					type = "toggle",
@@ -256,7 +256,7 @@ Skillet.options =
 						Skillet.db.profile.display_shopping_list_at_bank = value
 					end,
 					width = "double",
-					order = 23
+					order = 22
 				},
 				display_shopping_list_at_guildbank = {
 					type = "toggle",
@@ -269,7 +269,7 @@ Skillet.options =
 						Skillet.db.profile.display_shopping_list_at_guildbank = value
 					end,
 					width = "double",
-					order = 24
+					order = 23
 				},
 				display_shopping_list_at_auction = {
 					type = "toggle",
@@ -282,7 +282,7 @@ Skillet.options =
 						Skillet.db.profile.display_shopping_list_at_auction = value
 					end,
 					width = "double",
-					order = 25
+					order = 24
 				},
 				display_shopping_list_at_merchant = {
 					type = "toggle",
@@ -295,7 +295,7 @@ Skillet.options =
 						Skillet.db.profile.display_shopping_list_at_merchant = value
 					end,
 					width = "double",
-					order = 26
+					order = 25
 				},
 				show_craft_counts = {
 					type = "toggle",
@@ -309,7 +309,7 @@ Skillet.options =
 						Skillet:UpdateTradeSkillWindow()
 					end,
 					width = "double",
-					order = 27,
+					order = 26,
 				},
 				show_recipe_source_for_learned = {
 					type = "toggle",
