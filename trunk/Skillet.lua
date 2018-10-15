@@ -167,6 +167,19 @@ Skillet.options =
 					width = "double",
 					order = 14
 				},
+				show_crafters_tooltip = {
+					type = "toggle",
+					name = L["SHOWCRAFTERSTOOLTIPNAME"],
+					desc = L["SHOWCRAFTERSTOOLTIPDESC"],
+					get = function()
+						return Skillet.db.profile.show_crafters_tooltip
+					end,
+					set = function(self,value)
+						Skillet.db.profile.show_crafters_tooltip = value
+					end,
+					width = "double",
+					order = 15
+				},
 				show_detailed_recipe_tooltip = {
 					type = "toggle",
 					name = L["SHOWDETAILEDRECIPETOOLTIPNAME"],
@@ -178,7 +191,7 @@ Skillet.options =
 						Skillet.db.profile.show_detailed_recipe_tooltip = value
 					end,
 					width = "double",
-					order = 15
+					order = 16
 				},
 				display_full_tooltip = {
 					type = "toggle",
@@ -191,7 +204,7 @@ Skillet.options =
 						Skillet.db.profile.display_full_tooltip = value
 					end,
 					width = "double",
-					order = 16
+					order = 17
 				},
 				link_craftable_reagents = {
 					type = "toggle",
@@ -204,7 +217,7 @@ Skillet.options =
 						Skillet.db.profile.link_craftable_reagents = value
 					end,
 					width = "double",
-					order = 19
+					order = 20
 				},
 				queue_craftable_reagents = {
 					type = "toggle",
@@ -217,7 +230,7 @@ Skillet.options =
 						Skillet.db.profile.queue_craftable_reagents = value
 					end,
 					width = "double",
-					order = 20
+					order = 21
 				},
 				queue_glyph_reagents = {
 					type = "toggle",
@@ -230,7 +243,7 @@ Skillet.options =
 						Skillet.db.profile.queue_glyph_reagents = value
 					end,
 					width = "double",
-					order = 21
+					order = 22
 				},
 				display_shopping_list_at_bank = {
 					type = "toggle",
@@ -243,7 +256,7 @@ Skillet.options =
 						Skillet.db.profile.display_shopping_list_at_bank = value
 					end,
 					width = "double",
-					order = 22
+					order = 23
 				},
 				display_shopping_list_at_guildbank = {
 					type = "toggle",
@@ -256,7 +269,7 @@ Skillet.options =
 						Skillet.db.profile.display_shopping_list_at_guildbank = value
 					end,
 					width = "double",
-					order = 23
+					order = 24
 				},
 				display_shopping_list_at_auction = {
 					type = "toggle",
@@ -269,7 +282,7 @@ Skillet.options =
 						Skillet.db.profile.display_shopping_list_at_auction = value
 					end,
 					width = "double",
-					order = 24
+					order = 25
 				},
 				display_shopping_list_at_merchant = {
 					type = "toggle",
@@ -282,7 +295,7 @@ Skillet.options =
 						Skillet.db.profile.display_shopping_list_at_merchant = value
 					end,
 					width = "double",
-					order = 25
+					order = 26
 				},
 				show_craft_counts = {
 					type = "toggle",
@@ -296,7 +309,7 @@ Skillet.options =
 						Skillet:UpdateTradeSkillWindow()
 					end,
 					width = "double",
-					order = 26,
+					order = 27,
 				},
 				show_recipe_source_for_learned = {
 					type = "toggle",
@@ -1044,7 +1057,6 @@ function Skillet:OnInitialize()
 	if not self.db.global.spellIDtoName then
 		self.db.global.spellIDtoName = {}
 	end
-	self:InitializeDatabase(UnitName("player"))
 
 -- Hook default tooltips
 	local tooltipsToHook = { ItemRefTooltip, GameTooltip, ShoppingTooltip1, ShoppingTooltip2 };
@@ -1107,6 +1119,11 @@ function Skillet:OnInitialize()
 		Skillet.db.profile.FixBugs = true
 	end
 	Skillet.FixBugs = Skillet.db.profile.FixBugs
+
+--
+-- Now do the character initialization
+--
+	self:InitializeDatabase(UnitName("player"))
 end
 
 function Skillet:FlushAllData()
@@ -1150,7 +1167,7 @@ function Skillet:InitializeMissingVendorItems()
 end
 
 function Skillet:InitializeDatabase(player)
-	DA.DEBUG(0,"initialize database for "..tostring(player))
+	DA.DEBUG(0,"Initialize database for "..tostring(player))
 	if self.linkedSkill or self.isGuild then  -- Avoid adding unnecessary data to savedvariables
 		return
 	end
@@ -1835,7 +1852,7 @@ end
 -- item.
 -- Returns true if tooltip modified.
 function Skillet:AddItemNotesToTooltip(tooltip)
---	DA.DEBUG(0,"AddItemNotesToTooltip()")
+	--DA.DEBUG(0,"AddItemNotesToTooltip()")
 	if IsControlKeyDown() then
 		return
 	end
@@ -1855,7 +1872,7 @@ function Skillet:AddItemNotesToTooltip(tooltip)
 		--DA.DEBUG(0,"Error: AddItemNotesToTooltip() could not determine id from "..DA.PLINK(link))
 		return
 	end
-	--DA.DEBUG(1,"link= "..tostring(link)..", id= "..tostring(id)..", notes= "..tostring(notes_enabled)..", crafters= "..tostring(crafters_enabled))
+	--DA.DEBUG(0,"link= "..tostring(link)..", id= "..tostring(id)..", notes= "..tostring(notes_enabled)..", crafters= "..tostring(crafters_enabled))
 	local header_added = false
 	if notes_enabled then
 		for player,notes_table in pairs(self.db.realm.notes) do
@@ -1877,15 +1894,15 @@ function Skillet:AddItemNotesToTooltip(tooltip)
 				tooltip:AddLine("Skillet " .. L["Notes"] .. ":")
 				header_added = true
 			end
---			tooltip:AppendText(GRAY_FONT_COLOR_CODE .. " (" .. L["buyable"] .. ")" .. FONT_COLOR_CODE_CLOSE)
 			tooltip:AddLine(" Buyable")
 		end
+	end
+	if crafters_enabled then
 		if self.db.global.itemRecipeSource[id] then
 			if not header_added then
 				tooltip:AddLine("Skillet " .. L["Notes"] .. ":")
 				header_added = true
 			end
---			tooltip:AppendText(GRAY_FONT_COLOR_CODE .. " (" .. L["craftable"] .. ")" .. FONT_COLOR_CODE_CLOSE)
 			tooltip:AddLine(" Craftable")
 			for recipeID in pairs(self.db.global.itemRecipeSource[id]) do
 				local recipe = self:GetRecipe(recipeID)
