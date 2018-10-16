@@ -43,7 +43,7 @@ local defaults = {
 		vendor_buy_button = true,
 		vendor_auto_buy   = false,
 		show_item_notes_tooltip = false,
-		show_crafters_tooltip = true,
+		show_crafters_tooltip = false,
 		show_detailed_recipe_tooltip = true,	-- show any tooltips?
 		display_full_tooltip = true,			-- show full blizzards tooltip
 		link_craftable_reagents = true,
@@ -1896,7 +1896,7 @@ function Skillet:AddItemNotesToTooltip(tooltip)
 			end
 			tooltip:AddLine(" Buyable")
 		end
-	end
+	end	-- notes_enabled
 	if crafters_enabled then
 		if self.db.global.itemRecipeSource[id] then
 			if not header_added then
@@ -1944,7 +1944,7 @@ function Skillet:AddItemNotesToTooltip(tooltip)
 				end
 			end
 		end
-	end
+	end	-- crafters_enabled
 	return header_added
 end
 
