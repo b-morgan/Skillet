@@ -118,7 +118,7 @@ end
 -- you to automatically buy reagents.
 local function update_merchant_buy_button()
 	Skillet:InventoryScan()
-	local list = Skillet:GetShoppingList(UnitName("player"))
+	local list = Skillet:GetShoppingList(Skillet.currentPlayer, Skillet.db.char.same_faction)
 	if not list or #list == 0 then
 		SkilletMerchantBuyFrame:Hide()
 		return
@@ -191,7 +191,7 @@ end
 -- If at a vendor with the window open, buy anything that they
 -- sell that is required by any queued recipe.
 function Skillet:BuyRequiredReagents()
-	local list = Skillet:GetShoppingList(UnitName("player"))
+	local list = Skillet:GetShoppingList(Skillet.currentPlayer, Skillet.db.char.same_faction)
 	if #list == 0 then
 		return
 	elseif does_merchant_sell_required_items(list) == false then
@@ -261,7 +261,7 @@ function Skillet:MerchantBuyButton_OnEnter(button)
 	GameTooltip:SetOwner(button, "ANCHOR_BOTTOMRIGHT")
 	GameTooltip:ClearLines()
 	GameTooltip:AddLine(L["Buy Reagents"])
-	local needList = Skillet:GetShoppingList(UnitName("player"))
+	local needList = Skillet:GetShoppingList(Skillet.currentPlayer, Skillet.db.char.same_faction)
 	local totalCost = 0
 	for i=1,#needList,1 do
 		local itemID = needList[i].id

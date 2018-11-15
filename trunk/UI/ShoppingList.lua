@@ -101,6 +101,9 @@ local function createShoppingListFrame(self)
 	SkilletShowQueuesFromAllAltsText:SetText(L["Include alts"])
 	SkilletShowQueuesFromAllAlts:SetChecked(Skillet.db.char.include_alts)
 
+	SkilletShowQueuesFromSameFactionText:SetText(L["Same faction"])
+	SkilletShowQueuesFromSameFaction:SetChecked(Skillet.db.char.same_faction)
+
 	SkilletShowQueuesInItemOrderText:SetText(L["Order by item"])
 	SkilletShowQueuesInItemOrder:SetChecked(Skillet.db.char.item_order)
 
@@ -174,8 +177,8 @@ function Skillet:ClearShoppingList(player)
 	self:UpdateTradeSkillWindow()
 end
 
-function Skillet:GetShoppingList(player, includeGuildbank)
-	--DA.DEBUG(0,"GetShoppingList("..tostring(player)..", "..tostring(includeGuildbank)..")")
+function Skillet:GetShoppingList(player, sameFaction, includeGuildbank)
+	--DA.DEBUG(0,"GetShoppingList("..tostring(player)..", "..tostring(sameFaction)..", "..tostring(includeGuildbank)..")")
 	self:InventoryScan()
 	if not Skillet.db.global.cachedGuildbank then
 		Skillet.db.global.cachedGuildbank = {}
@@ -183,22 +186,25 @@ function Skillet:GetShoppingList(player, includeGuildbank)
  	local cachedGuildbank = Skillet.db.global.cachedGuildbank
 	local list = {}
 	local playerList
+	local usedInventory = {}  -- only use the items from each player once
+	local usedGuild = {}
+	local curPlayer = self.currentPlayer
+	local curFaction = self.db.realm.faction[curPlayer] 
+	local curGuild = GetGuildInfo("player")
 	if player then
 		playerList = { player }
 	else
 		playerList = {}
 		for player,queue in pairs(self.db.realm.reagentsInQueue) do
-			table.insert(playerList, player)
+			if not sameFaction or self.db.realm.faction[player] == curFaction then
+				table.insert(playerList, player)
+			end
 		end
 	end
 	--DA.DEBUG(0,"shopping list for: "..(player or "all players"))
-	local usedInventory = {}  -- only use the items from each player once
-	local curPlayer = self.currentPlayer
-	local usedGuild = {}
 	if not usedInventory[curPlayer] then
 		usedInventory[curPlayer] = {}
 	end
-	local curGuild = GetGuildInfo("player")
 	if curGuild and not cachedGuildbank[curGuild] then
 		cachedGuildbank[curGuild] = {}
 	end
@@ -264,7 +270,7 @@ local function cache_list(self)
 	if not Skillet.db.char.include_alts then
 		name = Skillet.currentPlayer
 	end
-	self.cachedShoppingList = self:GetShoppingList(name, Skillet.db.char.include_guild)
+	self.cachedShoppingList = self:GetShoppingList(name, self.db.char.same_faction, self.db.char.include_guild)
 end
 
 local function indexBank()
@@ -785,6 +791,10 @@ end
 
 function Skillet:ShoppingListToggleShowAlts()
 	Skillet.db.char.include_alts = not Skillet.db.char.include_alts
+end
+
+function Skillet:ShoppingListToggleSameFaction()
+	Skillet.db.char.same_faction = not Skillet.db.char.same_faction
 end
 
 function Skillet:ShoppingListToggleItemOrder()

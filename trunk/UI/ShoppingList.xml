@@ -266,13 +266,29 @@
 			<Anchors>
 				<Anchor point="BOTTOMRIGHT" relativeTo="SkilletShoppingList" relativePoint="BOTTOMRIGHT">
 					<Offset>
-						<AbsDimension x="-10" y="30"/> <!-- 50 is the next row up -->
+						<AbsDimension x="-10" y="50"/> <!-- 50 is the next row up -->
 					</Offset>
 				</Anchor>
 			</Anchors>
 			<Scripts>
 				<OnClick>
 					Skillet:ShoppingListToggleShowAlts()
+					Skillet:UpdateShoppingListWindow(false)
+				</OnClick>
+			</Scripts>
+		</CheckButton>
+
+		<CheckButton name="SkilletShowQueuesFromSameFaction" inherits="SkilletShoppingListCheckButtonTemplate">
+			<Anchors>
+				<Anchor point="BOTTOMRIGHT" relativeTo="SkilletShoppingList" relativePoint="BOTTOMRIGHT">
+					<Offset>
+						<AbsDimension x="-10" y="30"/> <!-- 50 is the next row up -->
+					</Offset>
+				</Anchor>
+			</Anchors>
+			<Scripts>
+				<OnClick>
+					Skillet:ShoppingListToggleSameFaction()
 					Skillet:UpdateShoppingListWindow(false)
 				</OnClick>
 			</Scripts>
