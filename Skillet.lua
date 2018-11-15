@@ -75,6 +75,7 @@ local defaults = {
 		-- options specific to a current tradeskill
 		tradeskill_options = {},
 		include_alts = true,	-- Display alt's items in shopping list
+		same_faction = true,	-- Display same faction alt items only
 		item_order =  false,	-- Order shopping list by item
 		merge_items = false,	-- Merge same shopping list items together
 		include_guild = false,	-- Use the contents of the Guild Bank

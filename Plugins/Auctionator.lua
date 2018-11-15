@@ -69,6 +69,21 @@ plugin.options =
 			end,
 			order = 3
 		},
+		reagentPrices = {
+			type = "toggle",
+			name = "reagentPrices",
+			desc = "Show prices for reagents",
+			get = function()
+				return Skillet.db.profile.plugins.ATR.reagentPrices
+			end,
+			set = function(self,value)
+				Skillet.db.profile.plugins.ATR.reagentPrices = value
+				if value then
+					Skillet.db.profile.plugins.ATR.reagentPrices = value
+				end
+			end,
+			order = 4
+		},
 	},
 }
 
@@ -89,7 +104,33 @@ function plugin.GetExtraText(skill, recipe)
 		local value = ( Atr_GetAuctionBuyout(itemID) or 0 ) * recipe.numMade
 		if value then
 			extra_text = Skillet:FormatMoneyFull(value, true)
-			label = L["Buyout"]..":"
+			label = "|r".. L["Buyout"]..":"
+		end
+		if Skillet.db.profile.plugins.ATR.reagentPrices then
+			local toConcatLabel = {}
+			local toConcatExtra = {}
+			local total = 0
+			for i=1, #recipe.reagentData, 1 do
+				local reagent = recipe.reagentData[i]
+				if not reagent then
+					break
+				end
+				local needed = reagent.numNeeded
+				local id = reagent.reagentID
+				local itemName = GetItemInfo(reagent.reagentID) or reagent.reagentID
+				local text
+				if Skillet:VendorSellsReagent(reagent.reagentID) then
+					toConcatLabel[#toConcatLabel+1] = string.format("   %d x %s  |cff808080(%s)|r", reagent.numNeeded, itemName, L["buyable"])
+					toConcatExtra[#toConcatExtra+1] = ""
+				else
+					local value = ( Atr_GetAuctionBuyout(reagent.reagentID) or 0 ) * reagent.numNeeded
+					total = total + value
+					toConcatLabel[#toConcatLabel+1] = string.format("   %d x %s", reagent.numNeeded, itemName)
+					toConcatExtra[#toConcatExtra+1] = Skillet:FormatMoneyFull(value, true)
+				end
+			end
+			label = label .. "\n" .. table.concat(toConcatLabel,"\n") .. "\n   " .. L["Reagents"] .. ":\n"
+			extra_text =  extra_text .. "\n" .. table.concat(toConcatExtra,"\n") .. "\n" .. Skillet:FormatMoneyFull(total, true) .. "\n"
 		end
 	end
 	return label, extra_text
