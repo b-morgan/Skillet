@@ -1206,7 +1206,14 @@ function Skillet:InitializeDatabase(player)
 		if not self.db.realm.auctionData[player] then
 			self.db.realm.auctionData[player] = {}
 		end
+		if not self.db.realm.faction then
+			self.db.realm.faction = {}
+		end
+		if not self.db.realm.tradeSkills then
+			self.db.realm.tradeSkills = {}
+		end
 		if player == UnitName("player") then
+			self.db.realm.faction[player] = UnitFactionGroup("player")
 			if not self.db.realm.inventoryData then
 				self.db.realm.inventoryData = {}
 			end
