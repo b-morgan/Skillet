@@ -180,17 +180,23 @@ end
 function Skillet:GetShoppingList(player, sameFaction, includeGuildbank)
 	--DA.DEBUG(0,"GetShoppingList("..tostring(player)..", "..tostring(sameFaction)..", "..tostring(includeGuildbank)..")")
 	self:InventoryScan()
-	if not Skillet.db.global.cachedGuildbank then
-		Skillet.db.global.cachedGuildbank = {}
+	local curPlayer = self.currentPlayer
+	if not self.db.realm.faction then
+		self.db.realm.faction = {}
 	end
- 	local cachedGuildbank = Skillet.db.global.cachedGuildbank
+	if not self.db.realm.faction[curPlayer] then
+		self.db.realm.faction[curPlayer] = UnitFactionGroup("player")
+	end
+	local curFaction = self.db.realm.faction[curPlayer] 
+	local curGuild = GetGuildInfo("player")
+	if not self.db.global.cachedGuildbank then
+		self.db.global.cachedGuildbank = {}
+	end
+	local cachedGuildbank = Skillet.db.global.cachedGuildbank
 	local list = {}
 	local playerList
 	local usedInventory = {}  -- only use the items from each player once
 	local usedGuild = {}
-	local curPlayer = self.currentPlayer
-	local curFaction = self.db.realm.faction[curPlayer] 
-	local curGuild = GetGuildInfo("player")
 	if player then
 		playerList = { player }
 	else
