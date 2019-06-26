@@ -32,8 +32,10 @@ Skillet.L = L
 -- Get version info from the .toc file
 local MAJOR_VERSION = GetAddOnMetadata("Skillet", "Version");
 local PACKAGE_VERSION = GetAddOnMetadata("Skillet", "X-Curse-Packaged-Version");
+local ADDON_BUILD = (select(4, GetBuildInfo())) < 20000 and "Classic" or "Retail"
 Skillet.version = MAJOR_VERSION
 Skillet.package = PACKAGE_VERSION
+Skillet.build = ADDON_BUILD
 
 local nonLinkingTrade = { [2656] = true, [53428] = true }				-- smelting, runeforging
 
@@ -1206,14 +1208,22 @@ function Skillet:InitializeDatabase(player)
 		if not self.db.realm.auctionData[player] then
 			self.db.realm.auctionData[player] = {}
 		end
-		if not self.db.realm.faction then
-			self.db.realm.faction = {}
-		end
 		if not self.db.realm.tradeSkills then
 			self.db.realm.tradeSkills = {}
 		end
+		if not self.db.realm.faction then
+			self.db.realm.faction = {}
+		end
+		if not self.db.realm.guid then
+			self.db.realm.guid = {}
+		end
+		if not self.db.global.faction then
+			self.db.global.faction = {}
+		end
+		if not self.db.global.server then
+			self.db.global.server = {}
+		end
 		if player == UnitName("player") then
-			self.db.realm.faction[player] = UnitFactionGroup("player")
 			if not self.db.realm.inventoryData then
 				self.db.realm.inventoryData = {}
 			end
@@ -1289,6 +1299,8 @@ function Skillet:OnEnable()
 	self:RegisterEvent("GUILDBANKFRAME_CLOSED")
 	self:RegisterEvent("AUCTION_HOUSE_SHOW")
 	self:RegisterEvent("AUCTION_HOUSE_CLOSED")
+	self:RegisterEvent("PLAYER_LOGIN")
+	self:RegisterEvent("PLAYER_ENTERING_WORLD")
 	self:RegisterEvent("PLAYER_LOGOUT")
 --	self:RegisterEvent("UNIT_SPELLCAST_START")
 --	self:RegisterEvent("UNIT_SPELLCAST_SENT")
@@ -1317,6 +1329,33 @@ function Skillet:OnEnable()
 	self:CollectTradeSkillData()
 	self:CollectCurrencyData()
 	self:EnablePlugins()
+end
+
+function Skillet:PLAYER_LOGIN()
+	DA.DEBUG(0,"PLAYER_LOGIN")
+end
+
+function Skillet:PLAYER_ENTERING_WORLD()
+	DA.DEBUG(0,"PLAYER_ENTERING_WORLD")
+	local player, realm = UnitFullName("player")
+	local faction = UnitFactionGroup("player")
+	local guid = UnitGUID("player") or ""	-- example: guid="Player-970-0002FD64" kind=="Player" server=="970" ID="0002FD64" 
+	local kind, server, ID = strsplit("-", guid)
+	DA.DEBUG(1,"player="..tostring(player)..", faction="..tostring(faction)..", guid="..tostring(guid)..", server="..tostring(server))
+	self.db.realm.guid[player]= guid
+	self.db.realm.faction[player] = faction
+	if (server) then
+		self.data.server = server
+		self.data.realm = realm
+		if not self.db.global.server[server] then
+			self.db.global.server[server] = {}
+		end
+		self.db.global.server[server][realm] = player
+		if not self.db.global.faction[server] then
+			self.db.global.faction[server] = {}
+		end
+		self.db.global.faction[server][player] = faction
+	end
 end
 
 function Skillet:PLAYER_LOGOUT()
@@ -1776,6 +1815,7 @@ end
 
 -- Show the options window
 function Skillet:ShowOptions()
+	InterfaceOptionsFrame_Show()
 	InterfaceOptionsFrame_OpenToCategory("Skillet")
 end
 
