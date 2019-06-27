@@ -693,6 +693,31 @@ Skillet.scrollData = {
 	[255040] = 153431, -- Enchant Gloves - Kul Tiran Mining
 	[255065] = 153434, -- Enchant Gloves - Kul Tiran Skinning
 	[255066] = 153435, -- Enchant Gloves - Kul Tiran Surveying}
+-- Added in 8.2. Rise of Azshara (thanks to Tarkumi)
+	[298009] = 168446, -- Enchant Ring - Accord of Critical Strike Rank 1
+	[298010] = 168446, -- Enchant Ring - Accord of Critical Strike Rank 2
+	[298011] = 168446, -- Enchant Ring - Accord of Critical Strike Rank 3
+	[298989] = 168447, -- Enchant Ring - Accord of Haste Rank 1
+	[297994] = 168447, -- Enchant Ring - Accord of Haste Rank 2
+	[298016] = 168447, -- Enchant Ring - Accord of Haste Rank 3
+	[297995] = 168448, -- Enchant Ring - Accord of Mastery Rank 1
+	[298001] = 168448, -- Enchant Ring - Accord of Mastery Rank 2
+	[298002] = 168448, -- Enchant Ring - Accord of Mastery Rank 3
+	[297993] = 168449, -- Enchant Ring - Accord of Versatility Rank 1
+	[297991] = 168449, -- Enchant Ring - Accord of Versatility Rank 2
+	[297999] = 168449, -- Enchant Ring - Accord of Versatility Rank 3
+	[298440] = 168596, -- Enchant Weapon - Force Multiplier Rank 1
+	[298439] = 168596, -- Enchant Weapon - Force Multiplier Rank 2
+	[300788] = 168596, -- Enchant Weapon - Force Multiplier Rank 3
+	[298433] = 168593, -- Enchant Weapon - Machinist's Brilliance Rank 1
+	[300769] = 168593, -- Enchant Weapon - Machinist's Brilliance Rank 2
+	[300770] = 168593, -- Enchant Weapon - Machinist's Brilliance Rank 3
+	[298442] = 168598, -- Enchant Weapon - Naga Hide Rank 1
+	[298441] = 168598, -- Enchant Weapon - Naga Hide Rank 2
+	[300789] = 168598, -- Enchant Weapon - Naga Hide Rank 3
+	[298438] = 168592, -- Enchant Weapon - Oceanic Restoration Rank 1
+	[298437] = 168592, -- Enchant Weapon - Oceanic Restoration Rank 2
+	[298515] = 168592, -- Enchant Weapon - Oceanic Restoration Rank 3
 }
 
 --[[ == Local Tables == ]]--
