@@ -36,6 +36,7 @@ local ADDON_BUILD = (select(4, GetBuildInfo())) < 20000 and "Classic" or "Retail
 Skillet.version = MAJOR_VERSION
 Skillet.package = PACKAGE_VERSION
 Skillet.build = ADDON_BUILD
+Skillet.project = WOW_PROJECT_ID
 
 local nonLinkingTrade = { [2656] = true, [53428] = true }				-- smelting, runeforging
 
