@@ -17,7 +17,7 @@
 #### X-RelSite-UI.WoW:
 ## SavedVariables: SkilletDB
 ## SavedVariablesPerCharacter: SkilletDBPC, SkilletMemory, SkilletProfile
-## OptionalDeps: Ace3, LibDialog-1.0, LibWindow-1.1, LibPeriodicTable-3.1, TheUndermineJournal, TradeSkillInfo, Auctionator, BeanCounter
+## OptionalDeps: Ace3, LibDialog-1.0, LibWindow-1.1, LibPeriodicTable-3.1, TradeSkillMaster, TheUndermineJournal, TradeSkillInfo, Auctionator, BeanCounter
 ## X-Embeds: Ace3, LibStub, CallbackHandler-1.0, LibDialog-1.0, LibWindow-1.1, LibPeriodicTable-3.1
 
 ## LoadManagers: AddonLoader
@@ -60,6 +60,7 @@ Locale\Locale-zhTW.lua
 
 #### Main files
 Skillet.lua
+SkilletOptions.lua
 SkilletData.lua
 TradeskillInfo.lua
 SkilletQueue.lua
@@ -85,6 +86,7 @@ Plugins\CanIMogIt.lua
 #### UI files
 UI\Utils.lua
 UI\Sorting.lua
+UI\Filtering.lua
 UI\QueueMgt.lua
 UI\MainFrame.lua
 UI\MainFrame.xml

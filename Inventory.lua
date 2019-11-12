@@ -200,14 +200,18 @@ function Skillet:InventoryScan()
 	end
 	self.visited = {} -- this is a simple infinite loop avoidance scheme: basically, don't visit the same node twice
 	if inventoryData then
-		-- now calculate the craftability of these same reagents
+--
+-- now calculate the craftability of these same reagents
+--
 		for reagentID,inventory in pairs(inventoryData) do
 			numCrafted, numCraftedVendor = self:InventoryReagentCraftability(reagentID)
 			if numCraftedVendor > 0 then
 				inventoryData[reagentID] = tostring(inventoryData[reagentID]).." "..tostring(numCrafted).." "..tostring(numCraftedVendor)
 			end
 		end
-		-- remove any reagents that don't show up in our inventory
+--
+-- remove any reagents that don't show up in our inventory
+--
 		for reagentID,inventory in pairs(inventoryData) do
 			if inventoryData[reagentID] == 0 or inventoryData[reagentID] == "0" or inventoryData[reagentID] == "0 0" or inventoryData[reagentID] == "0 0 0" then
 				inventoryData[reagentID] = nil
@@ -221,23 +225,33 @@ function Skillet:InventoryScan()
 end
 
 function Skillet:GetInventory(player, reagentID)
+	--DA.DEBUG(0,"GetInventory("..tostring(player)..", "..tostring(reagentID)..")")
+	local numCanUse
 	if player and reagentID then
+		if player == self.currentPlayer then			-- UnitName("player")
+			numCanUse = GetItemCount(reagentID,true)
+		end
 		if self.db.realm.inventoryData[player] and self.db.realm.inventoryData[player][reagentID] then
+			--DA.DEBUG(1,"inventoryData= "..tostring(self.db.realm.inventoryData[player][reagentID]))
 			local data = { string.split(" ", self.db.realm.inventoryData[player][reagentID]) }
+			if numCanUse and data[1] and tonumber(numCanUse) ~= tonumber(data[1]) then
+				DA.DEBUG(0,"inventoryData is stale")
+			end
 			if #data == 1 then			-- no craftability info yet
 				return tonumber(data[1]) or 0, 0, 0
 			else
 				return tonumber(data[1]) or 0, tonumber(data[2]) or 0, tonumber(data[3]) or 0
 			end
-		elseif player == UnitName("player") then
-			local numInBoth = GetItemCount(reagentID,true)		-- both bank and bags
-			return tonumber(numInBoth) or 0, 0, 0
+		elseif player == self.currentPlayer then	-- UnitName("player")
+			return tonumber(numCanUse) or 0, 0, 0
 		end
 	end
 	return 0, 0, 0		-- have, make, make with vendor
 end
 
+--
 -- queries for vendor info for a particular itemID
+--
 function Skillet:VendorSellsReagent(itemID)
 	--DA.DEBUG(0,"VendorSellsReagent("..tostring(itemID)..")")
 	if self.db.global.MissingVendorItems[itemID] then
@@ -249,7 +263,9 @@ function Skillet:VendorSellsReagent(itemID)
 			return true
 		end
 	end
+--
 -- Check the LibPeriodicTable data next
+--
 	if PT then
 		if itemID~=0 and PT:ItemInSet(itemID,"Tradeskill.Mat.BySource.Vendor") then
 			return true
@@ -258,7 +274,9 @@ function Skillet:VendorSellsReagent(itemID)
 	return false
 end
 
+--
 -- returns the number of items that can be bought limited by the amount of currency available
+--
 function Skillet:VendorItemAvailable(itemID)
 	--DA.DEBUG(0,"VendorItemAvailable("..tostring(itemID)..")")
 	local _, divider, currency, currencyAvailable
@@ -285,7 +303,9 @@ function Skillet:VendorItemAvailable(itemID)
 					_, currencyAvailable = GetCurrencyInfo(-1 * MissingVendorItem[4])
 				end
 				--DA.DEBUG(1,"currencyAvailable="..tostring(currencyAvailable))
+--
 -- compute how many this player can buy with alternate currency and return 0 for alts
+--
 				return math.floor(MissingVendorItem[2] * currencyAvailable / (MissingVendorItem[5] or 1)), 0
 			else
 				return 0, 0		-- vendor sells item for an alternate currency and we are ignoring it.
@@ -299,6 +319,7 @@ function Skillet:VendorItemAvailable(itemID)
 end
 
 function Skillet:AuctionScan()
+	--DA.DEBUG(0,"AuctionScan()")
 	local player = Skillet.currentPlayer
 	local auctionData = {}
 	for i = 1, GetNumAuctionItems("owner") do
