@@ -19,7 +19,9 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
 local L = Skillet.L
 
-Skillet.displayDetailPlugins = {}		-- each plugin will register if it has something to add
+Skillet.registeredPlugins = {}		-- plugins that have registered a function
+Skillet.updatePlugins = {}			-- each plugin will register if it has an Update function
+Skillet.displayDetailPlugins = {}	-- each plugin will register if it has a GetExtraText function
 Skillet.RecipeNamePrefixes = {}			-- each plugin will register, only one can be active
 Skillet.RecipeNameSuffixes = {}			-- each plugin will register, only one can be active
 
@@ -81,10 +83,12 @@ function Skillet:RegisterRecipeNamePlugin(moduleName, priority)
 		if module and type(module) == "table" then
 			if module.RecipeNamePrefix then
 				Skillet.RecipeNamePrefixes[moduleName] = module
+				Skillet.registeredPlugins[moduleName] = module
 				Skillet.pluginsOptions.args.RecipeNamePrefix.values[module.options.name] = module.options.name
 			end
 			if module.RecipeNameSuffix then
 				Skillet.RecipeNameSuffixes[moduleName] = module
+				Skillet.registeredPlugins[moduleName] = module
 				Skillet.pluginsOptions.args.RecipeNameSuffix.values[module.options.name] = module.options.name
 			end
 		end
@@ -104,6 +108,7 @@ function Skillet:RegisterDisplayDetailPlugin(moduleName, priority)
 		local module = Skillet[moduleName]
 		if module and type(module) == "table" and module.GetExtraText then
 			Skillet.displayDetailPlugins[moduleName] = module
+			Skillet.registeredPlugins[moduleName] = module
 		end
 	end
 end
@@ -111,6 +116,30 @@ end
 function Skillet:IsDisplayDetailPluginRegistered(moduleName)
 	if type(moduleName)	 == "string" then
 		return Skillet.displayDetailPlugins[moduleName] ~= nil
+	end
+end
+
+function Skillet:RegisterUpdatePlugin(moduleName, priority)
+	DA.DEBUG(0,"RegisterUpdatePlugin("..tostring(moduleName)..", "..tostring(priority))
+	if not priority then priority = 100 end
+	if type(moduleName) == "string" then
+		local module = Skillet[moduleName]
+		if module and type(module) == "table" and module.Update then
+			Skillet.updatePlugins[moduleName] = module
+			Skillet.registeredPlugins[moduleName] = module
+		end
+	end
+end
+
+function Skillet:IsUpdatePluginRegistered(moduleName)
+	if type(moduleName)	 == "string" then
+		return Skillet.updatePlugins[moduleName] ~= nil
+	end
+end
+
+function Skillet:UpdatePlugins()
+	for k,v in pairs(Skillet.updatePlugins) do
+		v.Update()
 	end
 end
 
@@ -135,24 +164,6 @@ function Skillet:GetExtraText(skill, recipe)
 			output_text = output_text..text
 		end
 	end
---	call the ThirdPartyHooks function and process any returns
-	local label,text = Skillet:GetExtraItemDetailText(skill, recipe)
-	if label and label ~= "" then
-		if output_label then
-			output_label = output_label.."\n\n"
-		else
-			output_label = ""
-		end
-		output_label = output_label..label
-	end
-	if text and text ~= "" then
-		if output_text then
-			output_text = output_text.."\n\n"
-		else
-			output_text = ""
-		end
-		output_text = output_text..text
-	end
 	return output_label, output_text
 end
 
@@ -168,9 +179,6 @@ function Skillet:RecipeNamePrefix(skill, recipe)
 				break
 			end
 		end
-	else
---		call the ThirdPartyHooks function and process any returns
-		text = Skillet:GetRecipeNamePrefix(skill, recipe)
 	end
 	return text
 end
@@ -187,17 +195,14 @@ function Skillet:RecipeNameSuffix(skill, recipe)
 				break
 			end
 		end
-	else
---		call the ThirdPartyHooks function and process any returns
-		text = Skillet:GetRecipeNameSuffix(skill, recipe)
 	end
 	return text
 end
 
 function Skillet:InitializePlugins()
 	DA.DEBUG(0,"InitializePlugins()")
-	for k,v in pairs(Skillet.displayDetailPlugins) do
-		DA.DEBUG(1,"k= "..tostring(k)..", v= "..tostring(v))
+	for k,v in pairs(Skillet.registeredPlugins) do
+		--DA.DEBUG(1,"k= "..tostring(k)..", v= "..tostring(v))
 		if v and v.OnInitialize then
 			v.OnInitialize()
 		end
@@ -206,7 +211,7 @@ end
 
 function Skillet:EnablePlugins()
 	DA.DEBUG(0,"EnablePlugins()")
-	for k,v in pairs(Skillet.displayDetailPlugins) do
+	for k,v in pairs(Skillet.registeredPlugins) do
 		DA.DEBUG(1,"k= "..tostring(k)..", v= "..tostring(v))
 		if v and v.OnEnable then
 			v.OnEnable()

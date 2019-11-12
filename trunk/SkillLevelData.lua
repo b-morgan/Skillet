@@ -28,12 +28,46 @@ local skillColors = {
 	["header"]		= { r = 1.00, g = 0.82, b = 0,    level = 0, alttext="",    cstring = "|cffffc800"},
 }
 
+--
+-- Our own table of skill levels
+--   1) can be maintained manually
+--   2) can be scrapped from an external website like https://classic.wowhead.com/
+--   3) can be maintained with an external addon (using AddTradeSkillLevels, DelTradeSkillLevels)
+--
+-- Note: this is local for now but could be made global,
+--   (Skillet.db.global.skillLevels or Skillet.skillLevels)?
+--
+-- each entry is: [spellID] = "orange/yellow/green/gray"
+--   spellID is the itemID made by the recipe or the recipeID of the Enchant
+--   orange is the (numeric) skill level below which recipe is orange
+--   yellow is the (numeric) skill level below which the recipe is yellow
+--   green  is the (numeric) skill level below which the recipe is green
+--   gray   is the (numeric) skill level above which the recipe is gray
+--
+local skillLevels = {
+	[0] = "orange/yellow/green/gray"
+}
+
 function Skillet:GetTradeSkillLevels(spellID)
+	--DA.DEBUG(0,"GetTradeSkillLevels("..tostring(spellID)..")")
 	local a,b,c,d
-	--DA.DEBUG(0,"Skillet:GetTradeSkillLevels("..tostring(spellID)..")")
 	if spellID then 
-		if spellID ~= 0 then
--- TradeskillInfo seems to be more accurate than LibPeriodicTable-3.1
+		if tonumber(spellID) ~= nil and spellID ~= 0 then
+--
+-- If there is an entry in our own table, use it
+--
+			if skillLevels and skillLevels[spellID] then
+				--DA.DEBUG(0,"levels= "..tostring(skillLevels[spellID]))
+				a,b,c,d = string.split("/", skillLevels[spellID])
+				a = tonumber(a) or 0
+				b = tonumber(b) or 0
+				c = tonumber(c) or 0
+				d = tonumber(d) or 0
+				return a, b, c, d
+			end
+--
+-- The TradeskillInfo addon seems to be more accurate than LibPeriodicTable-3.1
+--
 			if TradeskillInfo then
 				local recipeSource = Skillet.db.global.itemRecipeSource[spellID]
 				if type(recipeSource) == 'table' then
@@ -72,6 +106,7 @@ function Skillet:GetTradeSkillLevels(spellID)
 end
 
 function Skillet:GetTradeSkillLevelColor(spellID, rank)
+	--DA.DEBUG(0,"GetTradeSkillLevelColor("..tostring(spellID)..", "..tostring(rank)")")
 	if spellID then
 		local orange, yellow, green, gray = self:GetTradeSkillLevels(spellID)
 		if rank >= gray then return skillColors["trivial"] end
@@ -80,4 +115,25 @@ function Skillet:GetTradeSkillLevelColor(spellID, rank)
 		if rank >= orange then return skillColors["optimal"] end
 	end
 	return skillColors["unknown"]
+end
+
+function Skillet:AddTradeSkillLevels(spellID, orange, yellow, green, gray)
+	--DA.DEBUG(0,"AddTradeSkillLevels("..tostring(spellID)..
+	  --", "..tostring(orange)..", "..tostring(yellow)..", "..tostring(green)..", "..tostring(gray)..")")
+	if spellID then
+--
+-- should add some sanity checking 
+--
+		skillLevels[spellID] = tostring(orange).."/"..tostring(yellow).."/"..tostring(green).."/"..tostring(gray)
+	end
+end
+
+function Skillet:DelTradeSkillLevels(spellID)
+	--DA.DEBUG(0,"DelTradeSkillLevels("..tostring(spellID)..")")
+	if spellID then
+--
+-- we could add some additional checking
+--
+		skillLevels[spellID] = nil
+	end
 end

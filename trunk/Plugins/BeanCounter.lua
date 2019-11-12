@@ -1,3 +1,5 @@
+local addonName,addonTable = ...
+local DA = _G[addonName] -- for DebugAids.lua
 --[[
 Skillet: A tradeskill window replacement.
 
@@ -124,10 +126,10 @@ function plugin.GetBCValues(itemID)
 					for i, text in pairs(playerData["failedAuctions"][itemID][key]) do
 						local stack, _, deposit, _, _, _, _, auctime = strsplit(";", text)
 						auctime, stack, deposit = tonumber(auctime), tonumber(stack), tonumber(deposit)
-						if (now - auctime) < (days) then
+						if (now - (auctime or 0)) < (days) then
 							failed = failed + 1
-							failedStack = failedStack + stack
-							earned = earned - deposit
+							failedStack = failedStack + (stack or 0)
+							earned = earned - (deposit or 0)
 						end
 					end
 				end

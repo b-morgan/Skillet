@@ -114,29 +114,39 @@ local function update_merchant_inventory()
 	end
 end
 
+--
 -- Inserts/updates a button in the merchant frame that allows
 -- you to automatically buy reagents.
+-- returns true if the button is displayed
+-- returns false if the button is hidden
+--
 local function update_merchant_buy_button()
 	Skillet:InventoryScan()
 	local list = Skillet:GetShoppingList(Skillet.currentPlayer, Skillet.db.char.same_faction)
 	if not list or #list == 0 then
+		DA.DEBUG(0,"ShoppingList is empty")
 		SkilletMerchantBuyFrame:Hide()
-		return
+		return false
 	elseif does_merchant_sell_required_items(list) == false then
+		DA.DEBUG(0,"Merchant does not sell required items")
 		SkilletMerchantBuyFrame:Hide()
-		return
+		return false
 	end
 	if Skillet.db.profile.display_shopping_list_at_merchant then
+		DA.DEBUG(0,"Shopping List should be displayed")
 		Skillet:DisplayShoppingList(false)
 	end
 	if SkilletMerchantBuyFrame:IsVisible() then
+		DA.DEBUG(0,"Merchant Buy Button should already be there")
 		-- already inserted the button
-		return
+		return true
 	end
+	DA.DEBUG(0,"Create and show the Merchant Buy Button")
 	SkilletMerchantBuyFrameButton:SetText(L["Reagents"]);
 	SkilletMerchantBuyFrame:SetPoint("TOPLEFT", "MerchantFrame", "TOPLEFT" , 55, -5) -- May need to be adjusted for each WoW build
 	SkilletMerchantBuyFrame:SetFrameStrata("HIGH");
 	SkilletMerchantBuyFrame:Show();
+	return true
 end
 
 -- Removes the merchant buy button
@@ -144,8 +154,10 @@ local function remove_merchant_buy_button()
 	SkilletMerchantBuyFrame:Hide()
 end
 
--- Updates the merchant frame, it is it visible, this method can be called
+--
+-- Updates the merchant frame, if it is visible, this method can be called
 -- many times
+--
 function Skillet:UpdateMerchantFrame()
 	Skillet:MERCHANT_SHOW()
 end
@@ -174,23 +186,31 @@ function Skillet:MERCHANT_SHOW()
 	end
 end
 
+--
 -- Merchant window updated
+--
 function Skillet:MERCHANT_UPDATE()
 	if Skillet.db.profile.vendor_buy_button or Skillet.db.profile.vendor_auto_buy then
 		update_merchant_inventory()
 	end
 end
 
+--
 -- Merchant window closed
+--
 function Skillet:MERCHANT_CLOSED()
 	remove_merchant_buy_button()
 	merchant_inventory = {}
 	self.autoPurchaseComplete = nil
+	self:HideShoppingList()
 end
 
+--
 -- If at a vendor with the window open, buy anything that they
 -- sell that is required by any queued recipe.
+--
 function Skillet:BuyRequiredReagents()
+	--DA.DEBUG(0,"BuyRequiredReagents()")
 	local list = Skillet:GetShoppingList(Skillet.currentPlayer, Skillet.db.char.same_faction)
 	if #list == 0 then
 		return
@@ -201,7 +221,9 @@ function Skillet:BuyRequiredReagents()
 	end
 	local totalspent = 0
 	local purchased = 0
+--
 -- for each item they sell, see if we need it and if so, buy it.
+--
 	local numItems = GetMerchantNumItems()
 	for i=1, numItems, 1 do
 		local link = GetMerchantItemLink(i)
@@ -209,7 +231,9 @@ function Skillet:BuyRequiredReagents()
 			local name, texture, price, quantity, numAvailable, isUsable, extendedCost = GetMerchantItemInfo(i)
 			if numAvailable == -1 then			-- only buy unlimited items automatically.
 				local id = self:GetItemIDFromLink(link)
-				-- OK, lets see if we need it.
+--
+-- OK, lets see if we need it.
+--
 				local count = 0
 				for j=1,#list,1 do
 					if list[j].id == id then

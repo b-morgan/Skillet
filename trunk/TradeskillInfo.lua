@@ -17,7 +17,7 @@ You should have received a copy of the GNU General Public License
 along with this program.  If not, see <http://www.gnu.org/licenses/>.
 ]]--
 
--- This file contains all the code I use to access recipe/tradeskill information
+-- This file contains code used to access recipe/tradeskill information
 
 -- If an item requires a specific level before it can be used, then
 -- the level is returned, otherwise 0 is returned
@@ -32,12 +32,12 @@ function Skillet:GetLevelRequiredToUse(item)
 end
 
 function Skillet:GetItemIDFromLink(link)	-- works with items or enchants
+	--DA.DEBUG(3,"GetItemIDFromLink("..tostring(DA.PLINK(link))..")")
 	if (link) then
 		local linktype, id = string.match(link, "|H([^:]+):(%d+)")
+		--DA.DEBUG(3,"linktype= "..tostring(linktype)..", id= "..tostring(id))
 		if id then
-			return tonumber(id);
-		else
-			return nil
+			return tonumber(id), tostring(linktype)
 		end
 	end
 end
