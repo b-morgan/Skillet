@@ -474,8 +474,8 @@ end
 -- hide UI components that cannot be used for crafts and show that
 -- that are only applicable to trade skills, as needed
 --
-function Skillet:ConfigureRecipeControls()
-	DA.DEBUG(0,"ConfigureRecipeControls()")
+function Skillet:ConfigureRecipeControls(enchant)
+	DA.DEBUG(0,"ConfigureRecipeControls("..tostring(enchant)..")")
 	if enchant then
 		SkilletQueueAllButton:Hide()
 		SkilletQueueButton:Hide()
@@ -562,6 +562,7 @@ function Skillet:TradeButton_OnEnter(button)
 end
 
 function Skillet:TradeButtonAdditional_OnEnter(button)
+	--DA.DEBUG(0,"TradeButtonAdditional_OnEnter("..tostring(button)..")")
 	GameTooltip:SetOwner(button, "ANCHOR_TOPLEFT")
 	GameTooltip:ClearLines()
 	local spellID = button:GetID()
@@ -977,9 +978,13 @@ function Skillet:UpdateTradeSkillWindow()
 			local buttonExpand = _G[button:GetName() .. "Expand"]
 			local buttonFavorite = _G[button:GetName() .. "Favorite"]
 			local subSkillRankBar = _G[button:GetName() .. "SubSkillRankBar"]
+--
 -- Blizzard's Cooking database is FUBAR, fix it
+--
 			if self.FixBugs and skill.name == "Food of Draenor - Header" then skill.name = "Food of Draenor" end
+--
 -- end of FUBAR fixes
+--
 			local hasProgressBar = Skillet.hasProgressBar[skill.name]
 			buttonText:SetText("")
 			levelText:SetText("")
@@ -1056,6 +1061,7 @@ function Skillet:UpdateTradeSkillWindow()
 					show_button(button, self.currentTrade, skillIndex, i)
 				end
 			else
+				--DA.DEBUG(0,"Process "..tostring(skill.name).."("..tostring(skill.recipeID).."), skillIndex= "..tostring(skillIndex))
 				local recipe = self:GetRecipe(skill.recipeID)
 				buttonExpand.group = nil
 				button.skill = skill
@@ -1208,9 +1214,11 @@ function Skillet:UpdateTradeSkillWindow()
 					button:SetBackdropColor(0.8, 0.2, 0.2)
 					button:UnlockHighlight()
 				end
+				--DA.DEBUG(0,"show_button, skillIndex= "..tostring(skillIndex))
 				show_button(button, self.currentTrade, skillIndex, i, skill.recipeID)
 			end
 		else -- rawSkillIndex > numTradeSkills 
+			--DA.DEBUG(0,"hide_button, skillIndex= "..tostring(skillIndex))
 			hide_button(button, self.currentTrade, skillIndex, i)
 			button:UnlockHighlight()
 		end

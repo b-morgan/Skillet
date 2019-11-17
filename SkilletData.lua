@@ -1191,7 +1191,7 @@ function Skillet:GetRecipeName(id)
 end
 
 function Skillet:GetRecipe(id)
-	--DA.DEBUG(0,"Skillet:GetRecipe("..tostring(id)..")")
+	--DA.DEBUG(0,"GetRecipe("..tostring(id)..")")
 	if id and id ~= 0 then
 		if Skillet.data.recipeList[id] then
 			return Skillet.data.recipeList[id]

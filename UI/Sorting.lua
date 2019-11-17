@@ -149,7 +149,9 @@ local function SkillIsFilteredOut(skillIndex)
 	--DA.DEBUG(1,"recipe = "..DA.DUMP1(recipe,1))
 	local recipeID = recipe.spellID or 0
 	if recipeID == 0 then
-		-- it's a header, don't filter here
+--
+-- it's a header, don't filter here
+--
 		return false
 	end
 
@@ -172,13 +174,17 @@ local function SkillIsFilteredOut(skillIndex)
 	if Skillet:GetTradeSkillOption("favoritesOnly") and not Skillet:IsFavorite(recipeID) then
 		return true
 	end
-		-- are we hiding anything that is trivial (has no chance of giving a skill point)
+--
+-- are we hiding anything that is trivial (has no chance of giving a skill point)
+--
 	if skill_style_type[skill.difficulty] then
 		if skill_style_type[skill.difficulty].level < (Skillet:GetTradeSkillOption("filterLevel") or 4) then
 			return true
 		end
 	end
-	-- are we hiding anything that can't be created with the mats on this character?
+--
+-- are we hiding anything that can't be created with the mats on this character?
+--
 	if Skillet:GetTradeSkillOption("hideuncraftable") then
 		if not (skill.numCraftable > 0 and Skillet:GetTradeSkillOption("filterInventory-bag")) and
 		   not (skill.numRecursive > 0 and Skillet:GetTradeSkillOption("filterInventory-crafted")) and
@@ -194,7 +200,9 @@ local function SkillIsFilteredOut(skillIndex)
 			end
 		end
 	end
-	-- string search
+--
+-- string search
+--
 	local searchtext = Skillet:GetTradeSkillOption("searchtext")
 	if searchtext and searchtext ~= "" then
 		local filter = string.lower(searchtext)
@@ -306,10 +314,10 @@ function Skillet:CollapseAll()
 	Skillet:UpdateTradeSkillWindow()
 end
 
+--
 -- Builds a sorted and filtered list of recipes for the
 -- currently selected tradekskill and sorting method
 -- if no sorting, then headers will be included
-
 --
 -- Adds the sorting routine to the list of sorting routines.
 --
@@ -322,9 +330,11 @@ function Skillet:AddRecipeSorter(text, sorter)
 end
 
 function Skillet:InitializeSorting()
-	-- Default sorting methods
-	-- We don't go through the public API for this as we want our methods
-	-- to appear first in the list, no matter what.
+--
+-- Default sorting methods
+-- We don't go through the public API for this as we want our methods
+-- to appear first in the list, no matter what.
+--
 	table.insert(sorters, 1, {["name"]=L["None"], ["sorter"]=sort_recipe_by_index})
 	table.insert(sorters, 2, {["name"]=L["By Name"], ["sorter"]=sort_recipe_by_name})
 	table.insert(sorters, 3, {["name"]=L["By Difficulty"], ["sorter"]=sort_recipe_by_skill_level})
@@ -361,6 +371,7 @@ function Skillet:InitializeSorting()
 		GameTooltip:Hide()
 	end)
 end
+
 --
 -- Causes the list of recipes to be resorted
 --
@@ -390,11 +401,18 @@ function Skillet:SortAndFilterRecipes()
 			if skill then
 				local recipe = Skillet:GetRecipe(skill.id)
 				if skill.id ~= 0 then							-- not a header
-					if not SkillIsFilteredOut(i) then		-- skill is not filtered out
+					local filtered = SkillIsFilteredOut(i)
+					--DA.DEBUG(1,"SkillIsFilteredOut("..tostring(i)..")= "..tostring(filtered))
+					if not filtered then
+--
+-- skill is not filtered out
+--
 						button_index = button_index + 1
 						sortedSkillList[button_index] = {["recipeID"] = skill.id, ["spellID"] = recipe.spellID, ["name"] = recipe.name, ["skillIndex"] = i, ["recipeData"] = recipe, ["skillData"] = skill, ["depth"] = 0}
 					elseif i == Skillet.selectedSkill then
-						--if filtered out and selected - deselect
+--
+-- if filtered out and selected - deselect
+--
 						Skillet.selectedSkill = nil
 					end
 				end

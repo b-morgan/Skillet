@@ -393,6 +393,12 @@ function Skillet:RecipeGroupFlatten(group, depth, list, index)
 				if entry.subGroup.expanded then
 					inSub = self:RecipeGroupFlatten(entry.subGroup, depth+1, list, num+index)
 				end
+				if inSub == 0 and entry.subGroup.expanded then -- empty group - remove the header
+				  table.remove(list, num + index)
+				  num = num - 1
+				else
+				  num = num + inSub
+				end
 			else
 				local skillData = self:GetSkill(self.currentPlayer, self.currentTrade, entry.skillIndex)
 				local recipe = self:GetRecipe(entry.recipeID)
