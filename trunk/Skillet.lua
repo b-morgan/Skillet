@@ -37,7 +37,7 @@ Skillet.version = MAJOR_VERSION
 Skillet.package = PACKAGE_VERSION
 Skillet.build = ADDON_BUILD
 Skillet.project = WOW_PROJECT_ID
-local isClassic = WOW_PROJECT_ID == 2
+local isClassic = WOW_PROJECT_ID == WOW_PROJECT_CLASSIC
 
 local nonLinkingTrade = { [2656] = true, [53428] = true }				-- smelting, runeforging
 
@@ -484,8 +484,7 @@ function Skillet:InitializeDatabase(player)
 				self.db.realm.bagDetails[player] = {}
 			end
 --
--- In Classic, you can't craft from the bank but
--- for debugging, having the contents of the bank could be useful.
+-- For debugging, having the contents of the bank could be useful.
 --
 			if not self.db.realm.bankData then
 				self.db.realm.bankData = {}
@@ -499,7 +498,7 @@ function Skillet:InitializeDatabase(player)
 			if not self.db.realm.bankDetails[player] then
 				self.db.realm.bankDetails[player] = {}
 			end
---
+
 			if not self.db.realm.reagentsInQueue then
 				self.db.realm.reagentsInQueue = {}
 			end
