@@ -77,6 +77,16 @@ Skillet.FollowerNPC = {
 	[77365] = true,  -- Zaren Hoffle (Engineering, Alliance)
 }
 
+--
+-- Table of additional abilities used to create more buttons
+-- after the trade skill buttons on the Skillet main frame.
+--
+-- Each entry is {spellID, "Name", isToy, isKnown}
+--   isToy is true if the spellID is a toyID instead
+--   isKnown is true if the spellID must be known by the player.
+-- use for testing:
+--				{883,"Call Pet",false,true},	-- Hunter skill
+--
 Skillet.TradeSkillAdditionalAbilities = {
 	[7411]	=	{13262,"Disenchant"},		-- enchanting = disenchant
 	[2550]	=	{
@@ -87,7 +97,7 @@ Skillet.TradeSkillAdditionalAbilities = {
 	[25229] =	{31252,"Prospecting"},		-- jewelcrafting = prospecting
 	[2018]	=	{
 				{126462,"Thermal_Anvil"},	-- blacksmithing = thermal anvil (item:87216)
-				{255650,"Forge of Light",false,true}, -- Lightforged Draenei radical
+				{255650,"Forge_of_Light",false,true}, -- Lightforged Draenei racial skill
 				},
 	[4036]	=	{126462,"Thermal_Anvil"},	-- engineering = thermal anvil (item:87216)
 	[2575]	=	{126462,"Thermal_Anvil"},	-- smelting = thermal anvil (item:87216)

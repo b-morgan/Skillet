@@ -847,7 +847,6 @@ function Skillet:SkilletShow()
 		self.tradeSkillFrame = frame
 	end
 	self:ScanPlayerTradeSkills(self.currentPlayer)
-	self:UpdateAutoTradeButtons()
 	local skillLineID, skillLineName, skillLineRank, skillLineMaxRank, skillLineModifier, parentSkillLineID, parentSkillLineName =
 		C_TradeSkillUI.GetTradeSkillLine()
 	DA.DEBUG(0,"SkilletShow: skillLineID= "..tostring(skillLineID)..", skillLineName= "..tostring(skillLineName)..
