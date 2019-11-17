@@ -19,8 +19,6 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
 local L = LibStub("AceLocale-3.0"):GetLocale("Skillet")
 
-Skillet.AutoButtonsList = {}			-- define here because it is used before it is filled
-
 SKILLET_TRADE_SKILL_HEIGHT = 16
 SKILLET_NUM_REAGENT_BUTTONS = 8
 
@@ -632,6 +630,48 @@ function Skillet:TradeButton_OnClick(this,button)
 	GameTooltip:Hide()
 end
 
+function Skillet:CreateAdditionalButtonsList()
+	DA.DEBUG(0,"CreateAdditionalButtonsList()")
+	Skillet.AdditionalButtonsList = {}
+	local seenButtons = {}
+	local tradeSkillList = self.tradeSkillList
+	for i=1,#tradeSkillList,1 do
+		local tradeID = tradeSkillList[i]
+		local ranks = self:GetSkillRanks(Skillet.currentPlayer, tradeID)
+		if ranks then	-- this player knows this skill
+			local additionalSpellTab = Skillet.TradeSkillAdditionalAbilities[tradeID]
+			if additionalSpellTab then -- this skill has additional abilities
+				if type(additionalSpellTab[1]) == "table" then
+					for j=1,#additionalSpellTab,1 do
+						DA.DEBUG(0,"CreateAdditionalButtonsList: tradeID= "..tostring(tradeID)..", additionalSpellTab["..tostring(j).."]= "..DA.DUMP1(additionalSpellTab[j]))
+						local spellID = additionalSpellTab[j][1]
+						if not seenButtons[spellID] then
+							if additionalSpellTab[j][4] then
+								local name = GetSpellInfo(spellID)	-- always returns data
+								local name = GetSpellInfo(name)		-- only returns data if you have this spell in your spellbook
+								DA.DEBUG(0,"CreateAdditionalButtonsList: name= "..tostring(name))
+								if name then
+									table.insert(Skillet.AdditionalButtonsList, additionalSpellTab[j])
+								end
+							else
+								table.insert(Skillet.AdditionalButtonsList, additionalSpellTab[j])
+							end
+							seenButtons[spellID] = true
+						end
+					end
+				else
+					local spellID = additionalSpellTab[1]
+					if not seenButtons[spellID] then
+						DA.DEBUG(0,"CreateAdditionalButtonsList: tradeID= "..tostring(tradeID)..", additionalSpellTab= "..DA.DUMP1(additionalSpellTab))
+						table.insert(Skillet.AdditionalButtonsList, additionalSpellTab)
+						seenButtons[spellID] = true
+					end
+				end
+			end
+		end
+	end
+end
+
 function Skillet:UpdateTradeButtons(player)
 	DA.DEBUG(3,"UpdateTradeButtons("..tostring(player)..")")
 	local position = 0 -- pixels
@@ -689,12 +729,22 @@ function Skillet:UpdateTradeButtons(player)
 		end
 	end		-- for
 --
--- Add some space and then go through the list created by UpdateAutoTradeButtons()
+-- Add some space
 --
 	position = position + 10
-	--DA.DEBUG(0,"doing "..tostring(#Skillet.AutoButtonsList).." AutoButtonsList entries")
-	for i=1,#Skillet.AutoButtonsList,1 do	-- iterate thru all skills in defined order for neatness (professions, secondary, class skills)
-		local additionalSpellTab = Skillet.AutoButtonsList[i]
+--
+-- Create list of additional skills (if it doesn't exist)
+--
+	if not Skillet.AdditionalButtonsList then
+		self:CreateAdditionalButtonsList()
+	end
+--
+-- Iterate thru the list of additional skills and
+-- add buttons for each one
+--
+	DA.DEBUG(0,"doing "..tostring(#Skillet.AdditionalButtonsList).." AdditionalButtonsList entries")
+	for i=1,#Skillet.AdditionalButtonsList,1 do
+		local additionalSpellTab = Skillet.AdditionalButtonsList[i]
 		local additionalSpellId = additionalSpellTab[1]
 		local additionalSpellName = additionalSpellTab[2]
 		local additionalToy = additionalSpellTab[3]
@@ -726,45 +776,14 @@ function Skillet:UpdateTradeButtons(player)
 		position = position + button:GetWidth()
 		button:Show()
 		if additionalToy then
-			--DA.DEBUG(0,"IsToyUsable= "..tostring(C_ToyBox.IsToyUsable(additionalSpellId)))
-			if C_ToyBox.IsToyUsable(additionalSpellId) then
+			local isToyUsable = C_ToyBox.IsToyUsable(additionalSpellId)
+			--DA.DEBUG(0,"IsToyUsable("..tostring(additionalSpellId)..")= "..tostring(isToyUsable))
+			if isToyUsable then
 				button:Enable()
 				button:SetAlpha(1.0)
 			else
 				button:Disable()
 				button:SetAlpha(0.2)
-			end
-		end
-	end
-end
-
-function Skillet:UpdateAutoTradeButtons()
-	--DA.DEBUG(0,"UpdateAutoTradeButtons()")
-	local tradeSkillList = self.tradeSkillList
-	Skillet.AutoButtonsList = {}
-	for i=1,#tradeSkillList,1 do
-		local tradeID = tradeSkillList[i]
-		local ranks = self:GetSkillRanks(UnitName("player"), tradeID)
-		if ranks then	-- this player knows this skill
-			local additionalSpellTab = Skillet.TradeSkillAdditionalAbilities[tradeID]
-			if additionalSpellTab then -- this skill has additional abilities
-				if type(additionalSpellTab[1]) == "table" then
-					for j=1,#additionalSpellTab,1 do
-						--DA.DEBUG(0,"UpdateAutoTradeButtons: additionalSpellTab["..tostring(j).."]= "..DA.DUMP1(additionalSpellTab[j]))
-						if additionalSpellTab[j][4] then
-							local name = GetSpellInfo(additionalSpellTab[j][1])	-- always returns data
-							local _, rankName, icon = GetSpellInfo(name)	-- only returns data if you have this spell in your spellbook
-							if rankName then
-								table.insert(Skillet.AutoButtonsList, additionalSpellTab[j])
-							end
-						else
-							table.insert(Skillet.AutoButtonsList, additionalSpellTab[j])
-						end
-					end
-				else
-					--DA.DEBUG(0,"UpdateAutoTradeButtons: additionalSpellTab= "..DA.DUMP1(additionalSpellTab))
-					table.insert(Skillet.AutoButtonsList, additionalSpellTab)
-				end
 			end
 		end
 	end
@@ -2469,13 +2488,13 @@ end
 --
 
 local skillMenuSelection = {
---[===[@alpha@
+--@alpha@
 	{
 		text = "skillMenuSelection",
 		isTitle = true,
 		notCheckable = true,
 	},
---@end-alpha@]===]
+--@end-alpha@
 	{
 		text = L["Select All"],
 		func = function() Skillet:SkillButton_SetAllSelections(true) Skillet:UpdateTradeSkillWindow() end,
@@ -2487,13 +2506,13 @@ local skillMenuSelection = {
 }
 
 local skillMenuGroup = {
---[===[@alpha@
+--@alpha@
 	{
 		text = "skillMenuGroup",
 		isTitle = true,
 		notCheckable = true,
 	},
---@end-alpha@]===]
+--@end-alpha@
 	{
 		text = L["Empty Group"],
 		func = function() Skillet:SkillButton_NewGroup() end,
@@ -2505,13 +2524,13 @@ local skillMenuGroup = {
 }
 
 local favoriteMenu = {
---[===[@alpha@
+--@alpha@
 	{
 		text = "favoriteMenu",
 		isTitle = true,
 		notCheckable = true,
 	},
---@end-alpha@]===]
+--@end-alpha@
 		text = "",
 		func = function()
 					local recipeID = Skillet.menuButton.skill.recipeID
@@ -2522,13 +2541,13 @@ local favoriteMenu = {
 }
 
 local skillMenuIgnore = {
---[===[@alpha@
+--@alpha@
 	{
 		text = "skillMenuIgnore",
 		isTitle = true,
 		notCheckable = true,
 	},
---@end-alpha@]===]
+--@end-alpha@
 	{
 		text = L["Add Recipe to Ignored List"],
 		func = function()
@@ -2558,13 +2577,13 @@ local skillMenuIgnore = {
 }
 
 local skillMenuList = {
---[===[@alpha@
+--@alpha@
 	{
 		text = "skillMenuList",
 		isTitle = true,
 		notCheckable = true,
 	},
---@end-alpha@]===]
+--@end-alpha@
 	{
 		text = L["Link Recipe"],
 		func = function()
@@ -2623,13 +2642,13 @@ local skillMenuList = {
 }
 
 local skillMenuListLocked = {
---[===[@alpha@
+--@alpha@
 	{
 		text = "skillMenuListLocked",
 		isTitle = true,
 		notCheckable = true,
 	},
---@end-alpha@]===]
+--@end-alpha@
 	{
 		text = L["Link Recipe"],
 		func = function()
@@ -2669,13 +2688,13 @@ local skillMenuListLocked = {
 }
 
 local headerMenuList = {
---[===[@alpha@
+--@alpha@
 	{
 		text = "headerMenuList",
 		isTitle = true,
 		notCheckable = true,
 	},
---@end-alpha@]===]
+--@end-alpha@
 	{
 		text = L["Rename Group"],
 		func = function() Skillet:SkillButton_NameEditEnable(Skillet.menuButton) end,
@@ -2715,13 +2734,13 @@ local headerMenuList = {
 }
 
 local headerMenuListLocked = {
---[===[@alpha@
+--@alpha@
 	{
 		text = "headerMenuListLocked",
 		isTitle = true,
 		notCheckable = true,
 	},
---@end-alpha@]===]
+--@end-alpha@
 	{
 		text = L["Selection"],
 		hasArrow = true,
@@ -2734,13 +2753,13 @@ local headerMenuListLocked = {
 }
 
 local headerMenuListMainGroup = {
---[===[@alpha@
+--@alpha@
 	{
 		text = "headerMenuListMainGroup",
 		isTitle = true,
 		notCheckable = true,
 	},
---@end-alpha@]===]
+--@end-alpha@
 	{
 		text = L["New Group"],
 		hasArrow = true,
@@ -2776,13 +2795,13 @@ local headerMenuListMainGroup = {
 }
 
 local headerMenuListMainGroupLocked = {
---[===[@alpha@
+--@alpha@
 	{
 		text = "headerMenuListMainGroupLocked",
 		isTitle = true,
 		notCheckable = true,
 	},
---@end-alpha@]===]
+--@end-alpha@
 	{
 		text = L["Copy"],
 		func = function() Skillet:SkillButton_CopySelected() end,
