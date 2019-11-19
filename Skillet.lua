@@ -1027,8 +1027,9 @@ function Skillet:SetTradeSkill(player, tradeID, skillIndex)
 			local spell = self:GetTradeName(spellID)
 			DA.DEBUG(0,"SetTradeSkill: orig= "..tostring(orig).." ("..tostring(tradeID).."), spell= "..tostring(spell).." ("..tostring(spellID)..")")
 			CastSpellByName(spell)		-- this will trigger the whole rescan process via a TRADE_SKILL_SHOW event
-			Skillet.delaySelectedSkill = true
-			Skillet.delaySkillIndex = skillIndex
+			self.delaySelectedSkill = true
+			self.delaySkillIndex = skillIndex
+			self.dataScanned = false
 		else
 			self.dataSource = "cache"
 			CloseTradeSkill()
@@ -1042,11 +1043,15 @@ function Skillet:SetTradeSkill(player, tradeID, skillIndex)
 			if not self.data.skillList[tradeID] then
 				self.data.skillList[tradeID] = {}
 			end
-			-- remove any filters currently in place
+--
+-- remove any filters currently in place
+--
 			local searchbox = _G["SkilletSearchBox"]
 			local oldtext = searchbox:GetText()
 			local searchText = self:GetTradeSkillOption("searchtext")
-			-- if the text is changed, set the new text (which fires off an update) otherwise just do the update
+--
+-- if the text is changed, set the new text (which fires off an update) otherwise just do the update
+--
 			if searchText ~= oldtext then
 				searchbox:SetText(searchText)
 			else
@@ -1054,10 +1059,14 @@ function Skillet:SetTradeSkill(player, tradeID, skillIndex)
 			end
 		end
 	end
-	self:SetSelectedSkill(skillIndex)
+	if not self.delaySelectedSkill then
+		self:SetSelectedSkill(skillIndex)
+	end
 end
 
+--
 -- Updates the tradeskill window, if the current trade has changed.
+--
 function Skillet:UpdateTradeSkill()
 	DA.DEBUG(0,"UpdateTradeSkill()")
 	local new_trade = self:GetTradeSkillLine()
