@@ -1053,7 +1053,9 @@ function Skillet:IsNotSupportedFollower(tradeID)
 	return false -- Use Skillet frame
 end
 
+--
 -- resets the blizzard tradeskill search filters just to make sure no other addon has monkeyed with them
+--
 function Skillet:ResetTradeSkillFilter()
 	--DA.PROFILE("Skillet:ResetTradeSkillFilter()")
 	C_TradeSkillUI.ClearInventorySlotFilter()
@@ -1065,7 +1067,6 @@ function Skillet:ResetTradeSkillFilter()
 	Skillet:SetTradeSkillOption("hideuncraftable", false)
 	C_TradeSkillUI.SetOnlyShowSkillUpRecipes(false)
 	Skillet:SetTradeSkillOption("filterLevel", 1)
-
 end
 
 function Skillet:SetTradeSkillLearned()

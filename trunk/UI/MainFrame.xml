@@ -1184,11 +1184,12 @@
 				<Scripts>
 					<OnClick>
 						Skillet:InventoryFilterButtons_Hide()
-						ToggleDropDownMenu(1, nil, SkilletFilterDropDown, self, self:GetWidth(), 0)
+						UIDropDownMenu_Initialize(SkilletFilterDropMenu, Skillet.InitializeDropdown, "MENU")
+						ToggleDropDownMenu(1, nil, SkilletFilterDropMenu, self, self:GetWidth(), 0)
 					</OnClick>
 				</Scripts>
 			</Button>
-			<Frame name="SkilletFilterDropDown" inherits="UIDropDownMenuTemplate">
+			<Frame name="SkilletFilterDropMenu" inherits="UIDropDownMenuTemplate">
 				<Scripts>
 					<OnLoad>
 						self.Text:SetJustifyH("CENTER")

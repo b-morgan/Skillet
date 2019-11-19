@@ -312,7 +312,6 @@ function Skillet:CreateTradeSkillWindow()
 	self:InitializeSorting()
 	self:ConfigureRecipeControls(false)				-- initial setting
 	self.skilletStandaloneQueue=Skillet:CreateStandaloneQueueFrame()
-	UIDropDownMenu_Initialize(SkilletFilterDropDown, Skillet.InitializeDropdown, "MENU");
 	self.fullView = true
 	self.saved_full_button_count = 0
 	self.saved_SA_button_count = 0
@@ -3316,7 +3315,7 @@ function Skillet.InitializeDropdown(self, level)
 		info.func = function()
 			TradeSkillFrame_SetAllSourcesFiltered(true)
 			Skillet:ResetTradeSkillFilter() -- verify the search filter is blank (so we get all skills)
-			UIDropDownMenu_RefreshAll(SkilletFilterDropDown, 3)
+			UIDropDownMenu_RefreshAll(SkilletFilterDropMenu, 3)
 			SkilletFilterText:SetText("")
 			Skillet.dataScanned = false
 			Skillet:UpdateTradeSkillWindow()
@@ -3407,7 +3406,7 @@ function Skillet.InitializeDropdown(self, level)
 			info.text = CHECK_ALL
 			info.func = function()
 				TradeSkillFrame_SetAllSourcesFiltered(false)
-				UIDropDownMenu_Refresh(SkilletFilterDropDown, 3, 2)
+				UIDropDownMenu_Refresh(SkilletFilterDropMenu, 3, 2)
 				Skillet.dataScanned = false
 				Skillet:UpdateTradeSkillWindow()
 			end
@@ -3416,7 +3415,7 @@ function Skillet.InitializeDropdown(self, level)
 			info.text = UNCHECK_ALL
 			info.func = function()
 				TradeSkillFrame_SetAllSourcesFiltered(true)
-				UIDropDownMenu_Refresh(SkilletFilterDropDown, 3, 2)
+				UIDropDownMenu_Refresh(SkilletFilterDropMenu, 3, 2)
 				Skillet.dataScanned = false
 				Skillet:UpdateTradeSkillWindow()
 			end
