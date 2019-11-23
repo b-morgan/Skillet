@@ -211,12 +211,12 @@ function Skillet:ProcessQueue(altMode)
 	if command and craftable then
 		if command.op == "iterate" then
 			if self.currentTrade ~= command.tradeID then
-				DA.CHAT("Changing profession to "..tostring(command.tradeName)..". Press Process again") -- should be Skillet:Print and localized
+				self:Print(L["Changing profession to"],tradeName,L["Press Process to continue"])
+				local tradeID = command.tradeID
 				local tradeName = command.tradeName
-				if tradeName == "Mining" then tradeName = "Mining Skills" end
-				CastSpellByName(tradeName)		-- switch professions
 				self.queuecasting = false
-				self:QueueMoveToTop(qpos)		-- will this fix the changing profession loop?
+				self:ChangeTradeSkill(tradeID, tradeName)
+				self:QueueMoveToTop(qpos)
 				return
 			end
 			local recipeInfo = C_TradeSkillUI.GetRecipeInfo(command.recipeID)

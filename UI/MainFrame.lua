@@ -788,8 +788,8 @@ function Skillet:UpdateTradeButtons(player)
 	end
 end
 
-function SkilletPluginDropdown_OnClick(this)
-	--DA.DEBUG(0,"SkilletPluginDropdown_OnClick()")
+function Skillet.PluginDropdown_OnClick(this)
+	--DA.DEBUG(0,"PluginDropdown_OnClick()")
 	local oldScript = this.oldButton:GetScript("OnClick")
 	oldScript(this)
 	for i=1,#SkilletFrame.added_buttons do
@@ -817,7 +817,7 @@ function Skillet:PluginButton_OnClick(button)
 			button:SetWidth(100)
 			button:SetHeight(22)
 			button:SetFrameLevel(SkilletFrame:GetFrameLevel()+10)
-			button:SetScript("OnClick", SkilletPluginDropdown_OnClick)
+			button:SetScript("OnClick", Skillet.PluginDropdown_OnClick)
 			button:SetPoint("TOPLEFT", 0, -i*20)
 			button.oldButton = oldButton
 			oldButton:Hide()
@@ -2394,30 +2394,6 @@ function Skillet:SkilletFrameForceClose()
 	return self:HideAllWindows()
 
 
-end
-
---
--- Called when the trade skill window is shown
---
-local old_CloseSpecialWindows
-function Skillet:Tradeskill_OnShow()
-	--DA.DEBUG(0,"Tradeskill_OnShow()")
---
--- Need to hook this so that hitting [ESC] will close the Skillet window(s).
---
-	if not old_CloseSpecialWindows then
-		old_CloseSpecialWindows = CloseSpecialWindows
-		CloseSpecialWindows = function()
-			local found = old_CloseSpecialWindows()
-			return self:SkilletFrameForceClose() or found
-		end
-	end
-end
-
---
--- Called when the trade skill window is hidden
---
-function Skillet:Tradeskill_OnHide()
 end
 
 function Skillet:InventoryFilterButton_OnClick(button)

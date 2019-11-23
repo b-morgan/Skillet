@@ -204,7 +204,7 @@ function Skillet:InventoryScan()
 -- now calculate the craftability of these same reagents
 --
 		for reagentID,inventory in pairs(inventoryData) do
-			numCrafted, numCraftedVendor = self:InventoryReagentCraftability(reagentID)
+			local numCrafted, numCraftedVendor = self:InventoryReagentCraftability(reagentID)
 			if numCraftedVendor > 0 then
 				inventoryData[reagentID] = tostring(inventoryData[reagentID]).." "..tostring(numCrafted).." "..tostring(numCraftedVendor)
 			end

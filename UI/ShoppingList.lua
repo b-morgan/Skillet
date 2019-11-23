@@ -482,6 +482,7 @@ end
 -- Called when the auction frame is opened
 --
 function Skillet:AUCTION_HOUSE_SHOW()
+	DA.TRACE("AUCTION_HOUSE_SHOW")
 	self.auctionOpen = true
 	self:AuctionScan()
 	self:RegisterEvent("AUCTION_OWNED_LIST_UPDATE")
@@ -492,9 +493,6 @@ function Skillet:AUCTION_HOUSE_SHOW()
 	if #self.cachedShoppingList == 0 then
 		return
 	end
-	if AuctionatorLoaded and self.ATRPlugin and self.db.profile.plugins.ATR.enabled then
-		SkilletSLAuctionatorButton:Show()
-	end
 	self:DisplayShoppingList(false) -- false -> not at a bank
 end
 
@@ -502,11 +500,9 @@ end
 -- Called when the auction frame is closed
 --
 function Skillet:AUCTION_HOUSE_CLOSED()
+	DA.TRACE("AUCTION_HOUSE_CLOSED")
 	self.auctionOpen = false
 	self:UnregisterEvent("AUCTION_OWNED_LIST_UPDATE")
-	if AuctionatorLoaded and self.ATRPlugin and self.db.profile.plugins.ATR.enabled then
-		SkilletSLAuctionatorButton:Hide()
-	end
 	self:HideShoppingList()
 end
 
@@ -514,6 +510,7 @@ end
 --	Called when the auction list updates and the auction frame is opened.
 --
 function Skillet:AUCTION_OWNED_LIST_UPDATE()
+	DA.TRACE("AUCTION_OWNED_LIST_UPDATE")
 	self:AuctionScan()
  end
 
@@ -1065,13 +1062,18 @@ function Skillet:DisplayShoppingList(atBank)
 	if not self.shoppingList then
 		self.shoppingList = createShoppingListFrame(self)
 	end
-	local frame = self.shoppingList
+	if self.auctionOpen and AuctionatorLoaded and self.ATRPlugin and self.db.profile.plugins.ATR.enabled then
+		SkilletSLAuctionatorButton:Show()
+	else
+		SkilletSLAuctionatorButton:Hide()
+	end
 	if atBank then
 		SkilletShoppingListRetrieveButton:Show()
 	else
 		SkilletShoppingListRetrieveButton:Hide()
 	end
 	cache_list(self)
+	local frame = self.shoppingList
 	if not frame:IsVisible() then
 		frame:Show()
 	end
@@ -1097,6 +1099,8 @@ end
 function Skillet:HideShoppingList()
 	if self.shoppingList then
 		self.shoppingList:Hide()
+		SkilletSLAuctionatorButton:Hide()
+		SkilletShoppingListRetrieveButton:Hide()
 	end
 	self.cachedShoppingList = nil
 end

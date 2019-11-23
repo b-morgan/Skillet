@@ -1725,7 +1725,7 @@ function Skillet:ScanTrade()
 	Skillet:RecipeGroupClearEntries(mainGroup)
 	local groupList = {}
 	local numHeaders = 0
-	local parentGroup
+	local parent, parentGroup
 	local i = 1
 	for j = 1, numSkills, 1 do
 		local recipeID = Skillet.data.Filtered[tradeID][j]
