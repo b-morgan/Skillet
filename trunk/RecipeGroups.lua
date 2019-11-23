@@ -574,7 +574,7 @@ end
 
 -- Called when the grouping drop down is displayed
 function Skillet:RecipeGroupDropdown_OnShow()
-	UIDropDownMenu_Initialize(SkilletRecipeGroupDropdown, SkilletRecipeGroupDropdown_Initialize)
+	UIDropDownMenu_Initialize(SkilletRecipeGroupDropdown, Skillet.RecipeGroupDropdown_Initialize)
 	SkilletRecipeGroupDropdown.displayMode = "MENU"
 	Skillet:RecipeGroupDeconstructDBStrings()
 	local groupLabel = self:GetTradeSkillOption("grouping") or self.currentGroupLabel
@@ -583,8 +583,8 @@ function Skillet:RecipeGroupDropdown_OnShow()
 end
 
 -- The method we use the initialize the grouping drop down.
-function SkilletRecipeGroupDropdown_Initialize(menuFrame,level)
-	--DA.DEBUG(0,"SkilletRecipeGroupDropdown_Initialize("..tostring(menuFrame)..", "..tostring(level)..")")
+function Skillet.RecipeGroupDropdown_Initialize(menuFrame,level)
+	--DA.DEBUG(0,"RecipeGroupDropdown_Initialize("..tostring(menuFrame)..", "..tostring(level)..")")
 	if level == 1 then  -- group labels
 		local entry = {}
 		entry.text = "Flat"
@@ -654,15 +654,15 @@ end
 
 -- Called when the grouping operators drop down is displayed
 function Skillet:RecipeGroupOperations_OnClick(this)
-	if not RecipeGroupOpsMenu then
-		RecipeGroupOpsMenu = CreateFrame("Frame", "RecipeGroupOpsMenu", _G["UIParent"], "UIDropDownMenuTemplate")
+	if not Skillet.RecipeGroupOpsMenu then
+		Skillet.RecipeGroupOpsMenu = CreateFrame("Frame", "RecipeGroupOpsMenu", _G["UIParent"], "UIDropDownMenuTemplate")
 	end
-	UIDropDownMenu_Initialize(RecipeGroupOpsMenu, SkilletRecipeGroupOpsMenu_Init, "MENU")
-	ToggleDropDownMenu(1, nil, RecipeGroupOpsMenu, this, this:GetWidth(), 0)
+	UIDropDownMenu_Initialize(Skillet.RecipeGroupOpsMenu, Skillet.RecipeGroupOpsMenu_Init, "MENU")
+	ToggleDropDownMenu(1, nil, Skillet.RecipeGroupOpsMenu, this, this:GetWidth(), 0)
 end
 
 -- The method we use the initialize the group ops drop down.
-function SkilletRecipeGroupOpsMenu_Init(menuFrame,level)
+function Skillet.RecipeGroupOpsMenu_Init(menuFrame,level)
 	if level == 1 then
 		local entry = {}
 		local null = {}

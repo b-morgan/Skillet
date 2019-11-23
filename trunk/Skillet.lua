@@ -68,6 +68,7 @@ local defaults = {
 		enhanced_recipe_display = false,
 		confirm_queue_clear = false,
 		queue_only_view = true,
+		dialog_switch = false,
 		transparency = 1.0,
 		scale = 1.0,
 		plugins = {},
@@ -321,6 +322,50 @@ function Skillet:OnInitialize()
 		Skillet.db.profile.FixBugs = true
 	end
 	Skillet.FixBugs = Skillet.db.profile.FixBugs
+
+--
+-- Fix InterfaceOptionsFrame_OpenToCategory not actually opening the category (and not even scrolling to it)
+--
+	if Skillet.FixBugs then
+		Skillet:FixOpenToCategory()
+	end
+
+--
+-- Create static popups for changing professions
+--
+StaticPopupDialogs["SKILLET_CONTINUE_CHANGE"] = {
+	text = "Skillet-Classic\n"..L["Press Okay to continue changing professions"],
+	button1 = OKAY,
+	OnAccept = function( self )
+		Skillet:ContinueChange()
+		return
+	end,
+	timeout = 0,
+	exclusive = 1,
+	whileDead = 1,
+	hideOnEscape = 1
+};
+
+StaticPopupDialogs["SKILLET_MANUAL_CHANGE"] = {
+	text = "Skillet\n"..L["Press your button which opens %s"],
+--	button1 = OKAY,
+--	OnAccept = function( self )
+--		Skillet:ContinueChange(true)
+--		return
+--	end,
+	OnCancel = function( self )
+		Skillet:FinishChange()
+		return
+	end,
+	OnHide = function( self )
+		Skillet:FinishChange()
+		return
+	end,
+	timeout = 30,
+	exclusive = 1,
+	whileDead = 1,
+	hideOnEscape = 1
+};
 
 --
 -- Now do the character initialization
@@ -834,6 +879,7 @@ end
 function Skillet:SkilletShow()
 	DA.DEBUG(0,"SkilletShow: (was showing "..tostring(self.currentTrade)..")");
 	self.linkedSkill, self.currentPlayer, self.isGuild = self:IsTradeSkillLinked()
+	StaticPopup_Hide("SKILLET_MANUAL_CHANGE")
 	if self.linkedSkill then
 		if not self.currentPlayer then
 			return -- Wait for TRADE_SKILL_NAME_UPDATE
@@ -845,6 +891,7 @@ function Skillet:SkilletShow()
 	if not frame then
 		frame = self:CreateTradeSkillWindow()
 		self.tradeSkillFrame = frame
+		tinsert(UISpecialFrames, frame:GetName())
 	end
 	self:ScanPlayerTradeSkills(self.currentPlayer)
 	local skillLineID, skillLineName, skillLineRank, skillLineMaxRank, skillLineModifier, parentSkillLineID, parentSkillLineName =
@@ -916,7 +963,6 @@ function Skillet:SkilletShowWindow()
 	end
 	self.currentGroup = nil
 	self.currentGroupLabel = self:GetTradeSkillOption("grouping")
-	self.dataSource = "api"
 	self:RecipeGroupDropdown_OnShow()
 	self:ShowTradeSkillWindow()
 	local searchbox = _G["SkilletSearchBox"]
@@ -933,13 +979,11 @@ end
 function Skillet:SkilletClose()
 	DA.DEBUG(0,"SKILLET CLOSE")
 	self.tradeSkillOpen = false
-	if self.dataSource == "api" then -- if the skillet system is using the api for data access, then close the skillet window
-		self:HideAllWindows()
-		if Skillet.wasNPCCrafting then
-			DA.DEBUG(0,"wasNPCCrafting")
-			C_Garrison.CloseGarrisonTradeskillNPC()
-			C_Garrison.CloseTradeskillCrafter()
-		end
+	self:HideAllWindows()
+	if Skillet.wasNPCCrafting then
+		DA.DEBUG(0,"wasNPCCrafting")
+		C_Garrison.CloseGarrisonTradeskillNPC()
+		C_Garrison.CloseTradeskillCrafter()
 	end
 end
 
@@ -1000,85 +1044,102 @@ function Skillet:BAG_CLOSED(event, bagID)        -- Fires when the whole bag is 
 	DA.TRACE("BAG_CLOSED( "..tostring(bagID).." )") -- inventory or bank. We don't really care.
 end
 
+--
 -- Trade window close, the counts may need to be updated.
 -- This could be because an enchant has used up mats or the player
 -- may have received more mats.
+--
 function Skillet:TRADE_CLOSED()
 	self:BAG_UPDATE("FAKE_BAG_UPDATE", 0)
 end
 
+--
+-- Make sure profession changes are spaced out
+--
+function Skillet:DelayChange()
+	Skillet.delayChange = false
+	if Skillet.needChange then
+		Skillet.needChange = false
+		Skillet:ChangeTradeSkill(Skillet.changingTrade, Skillet.changingName)
+	end
+end
+
+--
+-- Change to a different profession but
+-- not more often than once every .5 seconds
+--
+function Skillet:ChangeTradeSkill(tradeID, tradeName)
+	DA.DEBUG(0,"ChangeTradeSkill("..tostring(tradeID)..", "..tostring(tradeName)..")")
+	if not self.delayChange then
+		if self.db.profile.dialog_switch and not self.dialogSwitch then
+			self:HideAllWindows()
+			C_TradeSkillUI.CloseTradeSkill()
+			self.changingTrade = tradeID
+			self.changingName = self.tradeSkillNamesByID[tradeID]
+			self.dialogSwitch = true
+			if tradeName == "Mining" then tradeName = "Mining Skills" end
+			DA.DEBUG(0,"ChangeTradeSkill: changingTrade= "..tostring(self.changingTrade)..", changingName= "..tostring(self.changingName))
+			StaticPopup_Show("SKILLET_MANUAL_CHANGE", self.changingName)
+		else
+			if tradeName == "Mining" then tradeName = "Mining Skills" end
+			DA.DEBUG(1,"ChangeTradeSkill: executing CastSpellByName("..tostring(tradeName)..")")
+			CastSpellByName(tradeName) -- trigger the whole rescan process via a TRADE_SKILL_SHOW event
+			self.changingTrade = tradeID
+			self.changingName = tradeName
+			self.delayChange = true
+			self.dialogSwitch = false
+			Skillet:ScheduleTimer("DelayChange", 0.5)
+		end
+	else
+		DA.DEBUG(1,"ChangeTradeSkill: waiting for callback")
+		Skillet.needChange = true
+	end
+end
+
+--
+-- Called from the static popups to change professions
+--
+function Skillet:ContinueChange(manual)
+	DA.DEBUG(0,"ContinueChange("..tostring(manual)..")")
+	if not manual then
+		self.currentTrade = Skillet.changingTrade
+		Skillet:ChangeTradeSkill(Skillet.changingTrade, Skillet.changingName)
+	end
+end
+
+--
+-- Called from the static popup when hidden or canceled
+--
+function Skillet:FinishChange()
+	DA.DEBUG(0,"FinishChange()")
+	self.changingTrade = nil
+	self.changingName = nil
+	self.dialogSwitch = nil
+end
+
+--
+-- Either change to a different profession or change the currently selected recipe
+--
 function Skillet:SetTradeSkill(player, tradeID, skillIndex)
 	DA.DEBUG(0,"SetTradeSkill("..tostring(player)..", "..tostring(tradeID)..", "..tostring(skillIndex)..")")
 	if not self.db.realm.queueData[player] then
 		self.db.realm.queueData[player] = {}
 	end
-	if player ~= self.currentPlayer or tradeID ~= self.currentTrade then
-		self.currentPlayer = player
+	if tradeID ~= self.currentTrade then
 		local oldTradeID = self.currentTrade
-		if player == (UnitName("player")) then	-- we can update the tradeskills if this toon is the current one
-			self.dataSource = "api"
-			self.dataScanned = false
-			self.currentGroup = nil
-			self.currentGroupLabel = self:GetTradeSkillOption("grouping")
-			self:RecipeGroupDropdown_OnShow()
-			local orig = self:GetTradeName(tradeID)
-			local spellID = tradeID
-			if tradeID == 2575 then spellID = 2656 end		-- Ye old Mining vs. Smelting issue
-			local spell = self:GetTradeName(spellID)
-			DA.DEBUG(0,"SetTradeSkill: orig= "..tostring(orig).." ("..tostring(tradeID).."), spell= "..tostring(spell).." ("..tostring(spellID)..")")
-			CastSpellByName(spell)		-- this will trigger the whole rescan process via a TRADE_SKILL_SHOW event
-			self.delaySelectedSkill = true
-			self.delaySkillIndex = skillIndex
-			self.dataScanned = false
-		else
-			self.dataSource = "cache"
-			CloseTradeSkill()
-			self.dataScanned = false
-			self:HideNotesWindow();
-			self.currentTrade = tradeID
-			self.currentGroup = nil
-			self.currentGroupLabel = self:GetTradeSkillOption("grouping")
-			self:RecipeGroupGenerateAutoGroups()
-			self:RecipeGroupDropdown_OnShow()
-			if not self.data.skillList[tradeID] then
-				self.data.skillList[tradeID] = {}
-			end
---
--- remove any filters currently in place
---
-			local searchbox = _G["SkilletSearchBox"]
-			local oldtext = searchbox:GetText()
-			local searchText = self:GetTradeSkillOption("searchtext")
---
--- if the text is changed, set the new text (which fires off an update) otherwise just do the update
---
-			if searchText ~= oldtext then
-				searchbox:SetText(searchText)
-			else
-				self:UpdateTradeSkillWindow()
-			end
-		end
+		local tradeName = self:GetTradeName(tradeID)
+		self.currentPlayer = player
+		self.currentTrade = nil
+		self.selectedSkill = nil
+		self.currentGroup = nil
+		self:ChangeTradeSkill(tradeID, tradeName)
+		self.delaySelectedSkill = true
+		self.delaySkillIndex = skillIndex
+		self.dataScanned = false
 	end
 	if not self.delaySelectedSkill then
 		self:SetSelectedSkill(skillIndex)
 	end
-end
-
---
--- Updates the tradeskill window, if the current trade has changed.
---
-function Skillet:UpdateTradeSkill()
-	DA.DEBUG(0,"UpdateTradeSkill()")
-	local new_trade = self:GetTradeSkillLine()
-	self:HideNotesWindow();
-	self.sortedRecipeList = {}
-	-- And start the update sequence through the rest of the mod
-	self:SetSelectedTrade(new_trade)
-	-- remove any filters currently in place
-	local searchbox = _G["SkilletSearchBox"]
-	local searchtext = self:GetTradeSkillOption("searchtext", self.currentPlayer, new_trade)
-	-- this fires off a redraw event, so only change after data has been acquired
-	searchbox:SetText(searchtext);
 end
 
 --
@@ -1100,6 +1161,7 @@ function Skillet:ShowTradeSkillWindow()
 	if not frame then
 		frame = self:CreateTradeSkillWindow()
 		self.tradeSkillFrame = frame
+		tinsert(UISpecialFrames, frame:GetName())
 	end
 	self:ResetTradeSkillWindow()
 	Skillet:ShowFullView()
@@ -1153,14 +1215,18 @@ function Skillet:ShowOptions()
 	InterfaceOptionsFrame_OpenToCategory("Skillet")
 end
 
+--
 -- Notes when a new trade has been selected
+--
 function Skillet:SetSelectedTrade(newTrade)
 	DA.DEBUG(0,"SetSelectedTrade("..tostring(newTrade)..")")
 	self.currentTrade = newTrade;
 	self:SetSelectedSkill(nil)
 end
 
+--
 -- Sets the specific trade skill that the user wants to see details on.
+--
 function Skillet:SetSelectedSkill(skillIndex)
 	--DA.DEBUG(0,"SetSelectedSkill("..tostring(skillIndex)..")")
 	self:HideNotesWindow()
@@ -1312,16 +1378,6 @@ function Skillet:AddItemNotesToTooltip(tooltip)
 				end
 			end
 		end
---[[
-		local inBoth = self:GetInventory(self.currentPlayer, id)
-		local surplus = inBoth - numNeeded * numCraftable
-		if inBoth < 0 then
-			tooltip:AddDoubleLine("in shopping list:",(-inBoth),1,1,0)
-		end
-		if surplus < 0 then
-			tooltip:AddDoubleLine("to craft "..numCraftable.." you need:",(-surplus),1,0,0)
-		end
---]]
 		if self.db.realm.reagentsInQueue[self.currentPlayer] then
 			local inQueue = self.db.realm.reagentsInQueue[self.currentPlayer][id]
 			if inQueue then

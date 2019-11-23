@@ -358,6 +358,19 @@ Skillet.options =
 					width = "double",
 					order = 5,
 				},
+				dialog_switch = {
+					type = "toggle",
+					name = L["DIALOGSWITCHNAME"],
+					desc = L["DIALOGSWITCHDESC"],
+					get = function()
+						return Skillet.db.profile.dialog_switch
+					end,
+					set = function(self,value)
+						Skillet.db.profile.dialog_switch = value
+					end,
+					width = "double",
+					order = 6,
+				},
 				transparency = {
 					type = "range",
 					name = L["Transparency"],
@@ -1067,3 +1080,80 @@ function Skillet:ConfigureOptions()
 	acedia:AddToBlizOptions("Skillet Profiles", "Profiles", "Skillet")
 	acedia:AddToBlizOptions("Skillet Plugins", "Plugins", "Skillet")
 end
+
+local function get_panel_name(panel)
+	local tp = type(panel)
+	local cat = INTERFACEOPTIONS_ADDONCATEGORIES
+	if tp == "string" then
+		for i = 1, #cat do
+			local p = cat[i]
+			if p.name == panel then
+				if p.parent then
+					return get_panel_name(p.parent)
+				else
+					return panel
+				end
+			end
+		end
+	elseif tp == "table" then
+		for i = 1, #cat do
+			local p = cat[i]
+			if p == panel then
+				if p.parent then
+					return get_panel_name(p.parent)
+				else
+					return panel.name
+				end
+			end
+		end
+	end
+end
+
+local doNotRun
+local function InterfaceOptionsFrame_OpenToCategory_Fix(panel)
+	if doNotRun or InCombatLockdown() then return end
+	local panelName = get_panel_name(panel)
+	if not panelName then return end -- if its not part of our list return early
+	local noncollapsedHeaders = {}
+	local shownpanels = 0
+	local mypanel
+	local t = {}
+	local cat = INTERFACEOPTIONS_ADDONCATEGORIES
+	for i = 1, #cat do
+		local panel = cat[i]
+		if not panel.parent or noncollapsedHeaders[panel.parent] then
+			if panel.name == panelName then
+				panel.collapsed = true
+				t.element = panel
+				InterfaceOptionsListButton_ToggleSubCategories(t)
+				noncollapsedHeaders[panel.name] = true
+				mypanel = shownpanels + 1
+			end
+			if not panel.collapsed then
+				noncollapsedHeaders[panel.name] = true
+			end
+			shownpanels = shownpanels + 1
+		end
+	end
+	local Smin, Smax = InterfaceOptionsFrameAddOnsListScrollBar:GetMinMaxValues()
+	if shownpanels > 15 and Smin < Smax then
+		local val = (Smax/(shownpanels-15))*(mypanel-2)
+		InterfaceOptionsFrameAddOnsListScrollBar:SetValue(val)
+	end
+	doNotRun = true
+	InterfaceOptionsFrame_OpenToCategory(panel)
+	doNotRun = false
+end
+
+--
+-- Fix InterfaceOptionsFrame_OpenToCategory not actually opening the category (and not even scrolling to it)
+--
+function Skillet:FixOpenToCategory()
+	if (not IsAddOnLoaded("!BlizzBugsSuck")) then
+		DA.DEBUG(0,"FixOpenToCategory executed")
+		hooksecurefunc("InterfaceOptionsFrame_OpenToCategory", InterfaceOptionsFrame_OpenToCategory_Fix)
+	else
+		DA.DEBUG(0,"FixOpenToCategory skipped")
+	end
+end
+

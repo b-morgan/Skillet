@@ -1025,11 +1025,6 @@
 						</FontString>
 					</Layer>
 				</Layers>
-				<Scripts>
-					<OnShow>
-						Skillet:RecipeGroupDropdown_OnShow()
-					</OnShow>
-				</Scripts>
 			</Frame>
 			<Button name="SkilletRecipeGroupOperations">
 				<Size>
@@ -1079,14 +1074,6 @@
 						</FontString>
 					</Layer>
 				</Layers>
-				<Scripts>
-					<OnLoad>
-						Skillet:SortDropdown_OnLoad()
-					</OnLoad>
-					<OnShow>
-						Skillet:SortDropdown_OnShow()
-					</OnShow>
-				</Scripts>
 			</Frame>
 			<!--
 			#
@@ -1144,14 +1131,6 @@
 						</FontString>
 					</Layer>
 				</Layers>
-				<Scripts>
-					<OnLoad>
-						Skillet:FilterDropDown_OnLoad()
-					</OnLoad>
-					<OnShow>
-						Skillet:FilterDropDown_OnShow()
-					</OnShow>
-				</Scripts>
 			</Frame>
 			<Button name="SkilletFilterOperations">
 				<Size>
@@ -1190,12 +1169,6 @@
 				</Scripts>
 			</Button>
 			<Frame name="SkilletFilterDropMenu" inherits="UIDropDownMenuTemplate">
-				<Scripts>
-					<OnLoad>
-						self.Text:SetJustifyH("CENTER")
-						self.Button:Show()
-					</OnLoad>
-				</Scripts>
 			</Frame>
 			<!--
 			#
@@ -2948,7 +2921,6 @@
 			</OnKeyDown>
 			<OnShow>
 				PlaySound(SOUNDKIT.IG_BACKPACK_OPEN) -- "igBackPackOpen"
-				Skillet:Tradeskill_OnShow()
 				self:EnableKeyboard(false)
 			</OnShow>
 			<OnHide>
