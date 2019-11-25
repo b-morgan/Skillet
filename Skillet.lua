@@ -1055,18 +1055,23 @@ end
 
 --
 -- Make sure profession changes are spaced out
+--   delayChange is set when ChangeTradeSkill is called
+--     and cleared here when the timer expires.
 --
 function Skillet:DelayChange()
+	DA.DEBUG(0,"DelayChange()")
 	Skillet.delayChange = false
-	if Skillet.needChange then
-		Skillet.needChange = false
-		Skillet:ChangeTradeSkill(Skillet.changingTrade, Skillet.changingName)
+	if Skillet.delayNeeded then
+		Skillet.delayNeeded = false
+		Skillet:ChangeTradeSkill(Skillet.delayTrade, Skillet.changingName)
 	end
 end
 
 --
 -- Change to a different profession but
 -- not more often than once every .5 seconds
+-- If called too quickly, delayNeeded is set and
+--   the change is deferred until DelayChange is called.
 --
 function Skillet:ChangeTradeSkill(tradeID, tradeName)
 	DA.DEBUG(0,"ChangeTradeSkill("..tostring(tradeID)..", "..tostring(tradeName)..")")
@@ -1084,23 +1089,26 @@ function Skillet:ChangeTradeSkill(tradeID, tradeName)
 			if tradeName == "Mining" then tradeName = "Mining Skills" end
 			DA.DEBUG(1,"ChangeTradeSkill: executing CastSpellByName("..tostring(tradeName)..")")
 			CastSpellByName(tradeName) -- trigger the whole rescan process via a TRADE_SKILL_SHOW event
-			self.changingTrade = tradeID
-			self.changingName = tradeName
+			self.delayTrade = tradeID
+			self.delayName = tradeName
 			self.delayChange = true
 			self.dialogSwitch = false
 			Skillet:ScheduleTimer("DelayChange", 0.5)
 		end
 	else
 		DA.DEBUG(1,"ChangeTradeSkill: waiting for callback")
-		Skillet.needChange = true
+		Skillet.delayNeeded = true
 	end
 end
 
 --
 -- Called from the static popups to change professions
+--   changingTrade and changingName should be set to
+--   the target profession.
 --
 function Skillet:ContinueChange(manual)
 	DA.DEBUG(0,"ContinueChange("..tostring(manual)..")")
+	DA.DEBUG(1,"ContinueChange: changingTrade= "..tostring(self.changingTrade)..", changingName= "..tostring(self.changingName))
 	if not manual then
 		self.currentTrade = Skillet.changingTrade
 		Skillet:ChangeTradeSkill(Skillet.changingTrade, Skillet.changingName)

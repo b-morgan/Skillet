@@ -317,22 +317,23 @@ function Skillet:CreateAllItems(mouse)
 end
 
 function Skillet:UNIT_SPELLCAST_SENT(event, unit, spell, rank, target, lineID)
+	DA.TRACE("UNIT_SPELLCAST_SENT("..tostring(unit)..", "..tostring(spell)..", "..tostring(rank)..", "..tostring(target)..", "..tostring(lineID)..")")
 	if (not target) then
 		target = spell
 		lineID = rank
 	end
-	--DA.DEBUG(0,"UNIT_SPELLCAST_SENT("..tostring(unit)..", "..tostring(target)..", "..tostring(lineID)..")")
 end
 
 function Skillet:UNIT_SPELLCAST_START(event, unit, spell, rank, lineID, spellID)
+	DA.TRACE("UNIT_SPELLCAST_START("..tostring(unit)..", "..tostring(spell)..", "..tostring(rank)..", "..tostring(lineID)..", "..tostring(spellID)..")")
 	if (not lineID) then
 		lineID = spell
 		spellID = rank
 	end
-	--DA.DEBUG(0,"UNIT_SPELLCAST_START("..tostring(unit)..", "..tostring(spell)..", "..tostring(rank)..", "..tostring(lineID)..", "..tostring(spellID)..")")
 end
 
 function Skillet:UNIT_SPELLCAST_SUCCEEDED(event, unit, spell, rank, lineID, spellID)
+	DA.TRACE("UNIT_SPELLCAST_SUCCEEDED("..tostring(unit)..", "..tostring(spell)..", "..tostring(rank)..", "..tostring(lineID)..", "..tostring(spellID)..")")
 	if (not lineID) then
 		lineID = spell
 		spellID = rank
@@ -344,54 +345,52 @@ function Skillet:UNIT_SPELLCAST_SUCCEEDED(event, unit, spell, rank, lineID, spel
 end
 
 function Skillet:UNIT_SPELLCAST_FAILED(event, unit, spell, rank, lineID, spellID)
+	DA.TRACE("UNIT_SPELLCAST_FAILED("..tostring(unit)..", "..tostring(spell)..", "..tostring(rank)..", "..tostring(lineID)..", "..tostring(spellID)..")")
 	if (not lineID) then
 		lineID = spell
 		spellID = rank
 	end
 	if unit == "player" and spellID == self.processingSpellID then
-		DA.DEBUG(0,"UNIT_SPELLCAST_FAILED("..tostring(unit)..", "..tostring(lineID)..", "..tostring(spellID)..")")
 		self:StopCast(SpellID)
 	end
 end
 
 function Skillet:UNIT_SPELLCAST_FAILED_QUIET(event, unit, spell, rank, lineID, spellID)
+	DA.TRACE("UNIT_SPELLCAST_FAILED_QUIET("..tostring(unit)..", "..tostring(spell)..", "..tostring(rank)..", "..tostring(lineID)..", "..tostring(spellID)..")")
 	if (not lineID) then
 		lineID = spell
 		spellID = rank
 	end
 	if unit == "player" and spellID == self.processingSpellID then
-		DA.DEBUG(0,"UNIT_SPELLCAST_FAILED_QUIET("..tostring(unit)..", "..tostring(lineID)..", "..tostring(spellID)..")")
 		self:StopCast(spellID)
 	end
 end
 
 function Skillet:UNIT_SPELLCAST_INTERRUPTED(event, unit, spell, rank, lineID, spellID)
+	DA.TRACE("UNIT_SPELLCAST_INTERRUPTED("..tostring(unit)..", "..tostring(spell)..", "..tostring(rank)..", "..tostring(lineID)..", "..tostring(spellID)..")")
 	if (not lineID) then
 		lineID = spell
 		spellID = rank
 	end
 	if unit == "player" and spellID == self.processingSpellID then
-		DA.DEBUG(0,"UNIT_SPELLCAST_INTERRUPTED("..tostring(unit)..", "..tostring(lineID)..", "..tostring(spellID)..")")
 		self:StopCast(spellID)
 	end
 end
 
 function Skillet:UNIT_SPELLCAST_DELAYED(event, unit, spell, rank, lineID, spellID)
+	DA.TRACE("UNIT_SPELLCAST_DELAYED("..tostring(unit)..", "..tostring(spell)..", "..tostring(rank)..", "..tostring(lineID)..", "..tostring(spellID)..")")
 	if (not lineID) then
 		lineID = spell
 		spellID = rank
 	end
---	DA.DEBUG(0,"UNIT_SPELLCAST_DELAYED("..tostring(unit)..", "..tostring(lineID)..", "..tostring(spellID)..")")
 end
 
 function Skillet:UNIT_SPELLCAST_STOP(event, unit, spell, rank, lineID, spellID)
+	DA.TRACE("UNIT_SPELLCAST_STOP("..tostring(unit)..", "..tostring(spell)..", "..tostring(rank)..", "..tostring(lineID)..", "..tostring(spellID)..")")
 	if (not lineID) then
 		lineID = spell
 		spellID = rank
 	end
---	DA.DEBUG(0,"UNIT_SPELLCAST_STOP("..tostring(unit)..", "..tostring(lineID)..", "..tostring(spellID)..")")
---	if unit == "player" and spellID == self.processingSpellID then
---		self:ContinueCast(spellID)
 --	end
 end
 
