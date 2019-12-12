@@ -767,11 +767,7 @@
 				_G[self:GetName() .. "Icon"]:SetFrameLevel(self:GetFrameLevel() - 1)
 			</OnLoad>
 			<OnEnter>
---				GameTooltip:SetOwner(self, "ANCHOR_TOPLEFT")
---				Skillet:SetTradeSkillToolTip(SkilletFrame.selectedSkill, self:GetID())
 				Skillet:ReagentButtonOnEnter(self, SkilletFrame.selectedSkill, self:GetID())
---				GameTooltip:Show()
---				CursorUpdate(self)
 			</OnEnter>
 			<OnLeave>
 				Skillet:ReagentButtonOnLeave(self, SkilletFrame.selectedSkill, self:GetID())
