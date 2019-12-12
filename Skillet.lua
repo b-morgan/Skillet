@@ -368,6 +368,14 @@ StaticPopupDialogs["SKILLET_MANUAL_CHANGE"] = {
 };
 
 --
+-- Create our frame
+--
+	if not Skillet.tradeSkillFrame then
+		Skillet.tradeSkillFrame = Skillet:CreateTradeSkillWindow()
+		tinsert(UISpecialFrames, Skillet.tradeSkillFrame:GetName())
+	end
+
+--
 -- Now do the character initialization
 --
 	self:InitializeDatabase(UnitName("player"))

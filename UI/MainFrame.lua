@@ -1417,8 +1417,8 @@ end
 --
 -- Sets the game tooltip item to the selected skill
 --
-function Skillet:SetTradeSkillToolTip(button, skillIndex)
-	--DA.DEBUG(0,"SetTradeSkillToolTip("..tostring(button)..", "..tostring(skillIndex)..")")
+function Skillet:SetTradeSkillToolTip(skillIndex)
+	--DA.DEBUG(2,"SetTradeSkillToolTip("..tostring(skillIndex)..")")
 	GameTooltip:ClearLines()
 	local recipe, recipeID = self:GetRecipeDataByTradeIndex(self.currentTrade, skillIndex)
 	if recipe then
@@ -1580,6 +1580,9 @@ function Skillet:UpdateDetailsWindow(skillIndex)
 			end
 			SkilletReagentParent.StarsFrame:Show();
 		end
+--
+-- Description
+--
 		local description = C_TradeSkillUI.GetRecipeDescription(skill.id)
 		--DA.DEBUG(0,"description="..tostring(description))
 		if description then
@@ -1609,31 +1612,21 @@ function Skillet:UpdateDetailsWindow(skillIndex)
 		else
 			SkilletSkillCooldown:SetText("")
 		end
-	else
-		recipe = Skillet.UnknownRecipe
-		SkilletSkillName:SetText("unknown")
-	end
 --
 -- Are special tools needed for this skill?
 --
-	if recipe.tools then
-		local toolList = {}
-		for i=1,#recipe.tools do
-			--DA.DEBUG(0,"tool: "..(recipe.tools[i] or "nil"))can 
-			toolList[i*2-1] = recipe.tools[i]
-			if skill.tools then
-			--DA.DEBUG(0,"arg: "..(skill.tools[i] or "nil"))
-				toolList[i*2] = skill.tools[i]
-			else
-				toolList[i*2] = 1
-			end
+		local tools = BuildColoredListString(C_TradeSkillUI.GetRecipeTools(skill.id))
+		if tools then
+			SkilletRequirementText:SetText(tools)
+			SkilletRequirementText:Show()
+			SkilletRequirementLabel:Show()
+		else
+			SkilletRequirementText:Hide()
+			SkilletRequirementLabel:Hide()
 		end
-		SkilletRequirementText:SetText(BuildColoredListString(unpack(toolList)))
-		SkilletRequirementText:Show()
-		SkilletRequirementLabel:Show()
 	else
-		SkilletRequirementText:Hide()
-		SkilletRequirementLabel:Hide()
+		recipe = Skillet.UnknownRecipe
+		SkilletSkillName:SetText("unknown")
 	end
 	if recipeInfo and recipeInfo.alternateVerb then
 		texture = recipeInfo.icon
