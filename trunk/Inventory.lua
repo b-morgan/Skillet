@@ -317,16 +317,3 @@ function Skillet:VendorItemAvailable(itemID)
 		return 100000, 100000	-- vendor sells item for gold, price is not available so assume lots of gold
 	end
 end
-
-function Skillet:AuctionScan()
-	--DA.DEBUG(0,"AuctionScan()")
-	local player = Skillet.currentPlayer
-	local auctionData = {}
-	for i = 1, GetNumAuctionItems("owner") do
-		local _, _, count, _, _, _, _, _, _, _, _, _, _, _, _, saleStatus, itemID, _ =  GetAuctionItemInfo("owner", i);
-		if saleStatus ~= 1 then
-			auctionData[itemID] = (auctionData[itemID] or 0) + count
-		end
-	end
-	self.db.realm.auctionData[player] = auctionData
-end
