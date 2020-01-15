@@ -485,7 +485,7 @@ function Skillet:AUCTION_HOUSE_SHOW()
 	DA.TRACE("AUCTION_HOUSE_SHOW")
 	self.auctionOpen = true
 	self:AuctionScan()
---	self:RegisterEvent("AUCTION_OWNED_LIST_UPDATE")
+	self:RegisterEvent("OWNED_AUCTIONS_UPDATED")
 	if not self.db.profile.display_shopping_list_at_auction then
 		return
 	end
@@ -502,15 +502,15 @@ end
 function Skillet:AUCTION_HOUSE_CLOSED()
 	DA.TRACE("AUCTION_HOUSE_CLOSED")
 	self.auctionOpen = false
---	self:UnregisterEvent("AUCTION_OWNED_LIST_UPDATE")
+	self:UnregisterEvent("OWNED_AUCTIONS_UPDATED")
 	self:HideShoppingList()
 end
 
 --
---	Called when the auction list updates and the auction frame is opened.
+--	Called when the auction list updates and the auction frame is open.
 --
-function Skillet:AUCTION_OWNED_LIST_UPDATE()
-	DA.TRACE("AUCTION_OWNED_LIST_UPDATE")
+function Skillet:OWNED_AUCTIONS_UPDATED()
+	DA.TRACE("OWNED_AUCTIONS_UPDATED")
 	self:AuctionScan()
  end
 
@@ -518,9 +518,12 @@ function Skillet:AuctionScan()
 	--DA.DEBUG(0,"AuctionScan()")
 	local player = Skillet.currentPlayer
 	local auctionData = {}
-	if GetNumAuctionItems then
-		for i = 1, GetNumAuctionItems("owner") do
-			local _, _, count, _, _, _, _, _, _, _, _, _, _, _, _, saleStatus, itemID, _ =  GetAuctionItemInfo("owner", i);
+	if C_AuctionHouse.GetNumOwnedAuctions() then
+		for i = 1, C_AuctionHouse.GetNumOwnedAuctions() do
+			local ownedAuction = C_AuctionHouse.GetOwnedAuctionInfo(i)
+			local count = ownedAuction and ownedAuction.quantity
+			local itemID = tonumber(string.match(ownedAuction and ownedAuction.itemLink,"item:(%d+)"))
+			local saleStatus = ownedAuction and ownedAuction.status
 			if saleStatus ~= 1 then
 				auctionData[itemID] = (auctionData[itemID] or 0) + count
 			end
