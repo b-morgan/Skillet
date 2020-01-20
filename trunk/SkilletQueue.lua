@@ -160,6 +160,42 @@ function Skillet:ClearQueue()
 	end
 end
 
+--
+-- Prints a list of saved queues
+--
+function Skillet:PrintSaved()
+	DA.DEBUG(0,"PrintSaved()");
+	local saved = self.db.profile.SavedQueues
+	if saved then
+		for name,queue in pairs(saved) do
+			local size = 0
+			for qpos,command in pairs(queue) do
+				size = size + 1
+			end
+			print("name= "..tostring(name)..", size= "..tostring(size))
+		end
+	end
+end
+
+--
+-- Prints the contents of the queue name or the current queue
+--
+function Skillet:PrintQueue(name)
+	DA.DEBUG(0,"PrintQueue("..tostring(name)..")");
+	local queue
+	if name then
+		print("name= "..tostring(name))
+		queue = self.db.profile.SavedQueues[name].queue
+	else
+		queue = self.db.realm.queueData[self.currentPlayer]
+	end
+	if queue then
+		for qpos,command in pairs(queue) do
+			print("qpos= "..tostring(qpos)..", command= "..DA.DUMP1(command))
+		end
+	end
+end
+
 function Skillet:ProcessQueue(altMode)
 	DA.DEBUG(0,"ProcessQueue("..tostring(altMode)..")");
 	local queue = self.db.realm.queueData[self.currentPlayer]

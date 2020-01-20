@@ -521,15 +521,33 @@ function Skillet:AuctionScan()
 	if C_AuctionHouse.GetNumOwnedAuctions() then
 		for i = 1, C_AuctionHouse.GetNumOwnedAuctions() do
 			local ownedAuction = C_AuctionHouse.GetOwnedAuctionInfo(i)
-			local count = ownedAuction and ownedAuction.quantity
-			local itemID = tonumber(string.match(ownedAuction and ownedAuction.itemLink,"item:(%d+)"))
-			local saleStatus = ownedAuction and ownedAuction.status
-			if saleStatus ~= 1 then
-				auctionData[itemID] = (auctionData[itemID] or 0) + count
+			if ownedAuction then
+				local count = ownedAuction.quantity
+				local saleStatus = ownedAuction.status
+				local itemLink = ownedAuction.itemLink
+				local itemID = self:GetItemIDFromLink(itemLink)
+				if itemID and saleStatus ~= 1 then
+					auctionData[itemID] = (auctionData[itemID] or 0) + count
+				end
 			end
 		end
 	end
 	self.db.realm.auctionData[player] = auctionData
+end
+
+--
+-- Prints the contents of auctionData for this player
+--
+function Skillet:PrintAuctionData()
+	DA.DEBUG(0,"PrintAuctionData()");
+	local player = Skillet.currentPlayer
+	local auctionData = self.db.realm.auctionData[player]
+	if auctionData then
+		for itemID,count in pairs(auctionData) do
+			local itemName = GetItemInfo(itemID)
+			print("itemID= "..tostring(itemID).." ("..tostring(itemName).."), count= "..tostring(count))
+		end
+	end
 end
 
 --
