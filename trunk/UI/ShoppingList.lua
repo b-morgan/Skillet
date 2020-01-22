@@ -518,14 +518,17 @@ function Skillet:AuctionScan()
 	--DA.DEBUG(0,"AuctionScan()")
 	local player = Skillet.currentPlayer
 	local auctionData = {}
-	if C_AuctionHouse.GetNumOwnedAuctions() then
-		for i = 1, C_AuctionHouse.GetNumOwnedAuctions() do
+	local owned = C_AuctionHouse.GetNumOwnedAuctions()
+	--DA.DEBUG(1,"AuctionScan: owned= "..tostring(owned))
+	if owned then
+		for i = 1, owned do
 			local ownedAuction = C_AuctionHouse.GetOwnedAuctionInfo(i)
+			--DA.DEBUG(2,"AuctionScan: ownedAuction= "..DA.DUMP1(ownedAuction))
 			if ownedAuction then
-				local count = ownedAuction.quantity
+				local itemID = ownedAuction.itemKey.itemID
 				local saleStatus = ownedAuction.status
-				local itemLink = ownedAuction.itemLink
-				local itemID = self:GetItemIDFromLink(itemLink)
+				local count = ownedAuction.quantity
+				--DA.DEBUG(2,"AuctionScan: itemID= "..tostring(itemID)..", saleStatus= "..tostring(saleStatus)..", count= "..tostring(count))
 				if itemID and saleStatus ~= 1 then
 					auctionData[itemID] = (auctionData[itemID] or 0) + count
 				end
