@@ -558,13 +558,25 @@ end
 -- I borrowed this code from ClosetGnome.
 --
 local function isNormalBag(bagId)
-	-- backpack and bank are always normal
+	--DA.DEBUG(0, "isNormalBag("..tostring(bagId)..")")
+--
+-- backpack and bank are always normal
+--
 	if bagId == 0 or bagId == -1 then return true end
 	local id = GetInventoryItemID("player", ContainerIDToInventoryID(bagId))
 	if not id then return false end
-	local bagType = select(7, GetItemInfo(id))
-	-- INVTYPE_BAG is defined by Blizzard
-	if bagType and bagType == INVTYPE_BAG then return true end
+	local itemName, itemLink, itemRarity, itemLevel, itemMinLevel, itemType, itemSubType, itemStackCount,
+	  itemEquipLoc, itemIcon, itemSellPrice, itemClassID, itemSubClassID, bindType, expacID, itemSetID, 
+	  isCraftingReagent = GetItemInfo(id)
+--
+-- is this one normal?
+--
+	if itemClassID and itemSubClassID and itemClassID == LE_ITEM_CLASS_CONTAINER and itemSubClassID == 0 then return true end
+--
+-- not a normal bag
+--
+	--DA.DEBUG(1, "isNormalBag: bagId= "..tostring(bagId)..", itemClassID= "..tostring(itemClassID)..", itemSubClassID= "..tostring(itemSubClassID))
+	--DA.DEBUG(1, "isNormalBag: itemType= "..tostring(itemType)..", itemSubType= "..tostring(itemSubType))
 	return false
 end
 
@@ -572,30 +584,40 @@ end
 -- Returns a bag that the item can be placed in.
 --
 local function findBagForItem(itemID, count)
+	--DA.DEBUG(0, "findBagForItem("..tostring(itemID)..", "..tostring(count)..")")
 	if not itemID then return nil end
 	local _, _, _, _, _, _, _, itemStackCount = GetItemInfo(itemID)
 	for container = 0, 4, 1 do
 		if isNormalBag(container) then
 			local bag_size = GetContainerNumSlots(container) -- 0 if there is no bag
+			--DA.DEBUG(1, "findBagForItem: container= "..tostring(container)..", bag_size= "..tostring(bag_size))
 			for slot = 1, bag_size, 1 do
 				local bagitem = GetContainerItemID(container, slot)
 				if bagitem then
 					if itemID == bagitem then
-						-- found some of the same, it is a full stack or locked?
+--
+-- found some of the same, it is a full stack or locked?
+--
 						local _, num_in_bag, locked  = GetContainerItemInfo(container, slot)
 						local space_available = itemStackCount - num_in_bag
 						if space_available >= count and not locked then
+							--DA.DEBUG(1, "findBagForItem: container= "..tostring(container)..", slot= "..tostring(slot)..", true")
 							return container, slot, true
 						end
 					end
 				else
-					-- no item there, this looks like a good place to put something.
+--
+-- no item there, this looks like a good place to put something.
+--
+					--DA.DEBUG(1, "findBagForItem: container= "..tostring(container)..", slot= "..tostring(slot)..", false")
 					return container, slot, false
 				end
 			end
+		else
+			DA.DEBUG(0, "findBagForItem: container= "..tostring(container).." is not a normal bag")
 		end
 	end
-	return nil, nil
+	return nil, nil, nil
 end
 
 local function getItemFromBank(itemID, bag, slot, count)

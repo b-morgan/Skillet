@@ -1453,8 +1453,10 @@ end
 
 function Skillet:ToggleFavorite(recipeID)
 	local recipeInfo = self.data.recipeInfo[self.currentTrade][recipeID]
-	recipeInfo.favorite = not recipeInfo.favorite
-	C_TradeSkillUI.SetRecipeFavorite(recipeID, recipeInfo.favorite);
+	if C_TradeSkillUI.GetOnlyShowLearnedRecipes() then
+		recipeInfo.favorite = not recipeInfo.favorite
+		C_TradeSkillUI.SetRecipeFavorite(recipeID, recipeInfo.favorite)
+	end
 end
 
 function Skillet:IsUpgradeHidden(recipeID)
@@ -1525,6 +1527,8 @@ local function GetRecipeList()
 	local isCurrentCategoryEnabled, isCurrentParentCategoryEnabled = true, true
 	local filteredRecipeIDs = C_TradeSkillUI.GetFilteredRecipeIDs()
 	DA.DEBUG(0,"#filteredRecipeIDs= "..tostring(#filteredRecipeIDs))
+--	local allRecipeIDs = C_TradeSkillUI.GetAllRecipeIDs()
+--	DA.DEBUG(0,"#allRecipeIDs= "..tostring(#allRecipeIDs))
 	for i, recipeID in ipairs(filteredRecipeIDs) do
 		local recipeInfo = C_TradeSkillUI.GetRecipeInfo(recipeID)
 		if recipeInfo.categoryID ~= currentCategoryID then

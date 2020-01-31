@@ -2803,7 +2803,11 @@ function Skillet:SkilletSkillMenu_Show(button)
 		end
 	else
 		GameTooltip:Hide() --hide tooltip, because it may be over the menu, sometimes it still fails
-		favoriteMenu["text"] = L["Set Favorite"]
+		if C_TradeSkillUI.GetOnlyShowLearnedRecipes() then
+			favoriteMenu["text"] = L["Set Favorite"]
+		else
+			favoriteMenu["text"] = L["Cannot Set Favorite"]
+		end
 		if Skillet:IsFavorite(button.skill.recipeID) then
 			favoriteMenu["text"] = L["Remove Favorite"]
 		end
