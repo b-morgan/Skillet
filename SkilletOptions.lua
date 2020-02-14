@@ -371,6 +371,19 @@ Skillet.options =
 					width = "double",
 					order = 6,
 				},
+				scale_tooltip = {
+					type = "toggle",
+					name = L["SCALETOOLTIPNAME"],
+					desc = L["SCALETOOLTIPDESC"],
+					get = function()
+						return Skillet.db.profile.scale_tooltip
+					end,
+					set = function(self,value)
+						Skillet.db.profile.scale_tooltip = value
+					end,
+					width = "double",
+					order = 7,
+				},
 				transparency = {
 					type = "range",
 					name = L["Transparency"],

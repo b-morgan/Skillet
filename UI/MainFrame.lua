@@ -1417,9 +1417,20 @@ end
 --
 -- Sets the game tooltip item to the selected skill
 --
-function Skillet:SetTradeSkillToolTip(skillIndex)
-	--DA.DEBUG(2,"SetTradeSkillToolTip("..tostring(skillIndex)..")")
+function Skillet:SetTradeSkillToolTip(skillIndex, onEvent)
+	--DA.DEBUG(2,"SetTradeSkillToolTip("..tostring(skillIndex)..", "..tostring(onEvent)..")")
+	if onEvent then
+		DA.DEBUG(0,"SetTradeSkillToolTip("..tostring(skillIndex)..", "..tostring(onEvent)..")")
+	end
 	GameTooltip:ClearLines()
+	if Skillet.db.profile.scale_tooltip then
+		Skillet.gttScale = GameTooltip:GetScale()
+		local uiScale = 1.0;
+		if ( GetCVar("useUiScale") == "1" ) then
+			uiScale = tonumber(GetCVar("uiscale"))
+		end
+		GameTooltip:SetScale(uiScale)
+	end
 	local recipe, recipeID = self:GetRecipeDataByTradeIndex(self.currentTrade, skillIndex)
 	if recipe then
 		if recipe.itemID ~= 0 then
@@ -1438,6 +1449,19 @@ function Skillet:SetTradeSkillToolTip(skillIndex)
 			GameTooltip:SetHyperlink("enchant:"..recipe.spellID)				-- doesn't create an item, just tell us about the recipe
 		end
 	end
+	GameTooltip:Show()
+	CursorUpdate(self)
+end
+
+--
+-- Clears any changes and hides the game tooltip
+--
+function Skillet:ClearTradeSkillToolTip(skillIndex)
+	if Skillet.db.profile.scale_tooltip then
+		GameTooltip:SetScale(Skillet.gttScale)
+	end
+	GameTooltip:Hide()
+	ResetCursor()
 end
 
 function Skillet:SetReagentToolTip(reagentID, numNeeded, numCraftable)
@@ -2270,6 +2294,14 @@ end
 function Skillet:ReagentButtonOnEnter(button, skillIndex, reagentIndex)
 	--DA.DEBUG(1,"ReagentButtonOnEnter("..tostring(button)..", "..tostring(skillIndex)..", "..tostring(reagentIndex)..")")
 	GameTooltip:SetOwner(button, "ANCHOR_TOPLEFT")
+	if Skillet.db.profile.scale_tooltip then
+		Skillet.gttScale = GameTooltip:GetScale()
+		local uiScale = 1.0;
+		if ( GetCVar("useUiScale") == "1" ) then
+			uiScale = tonumber(GetCVar("uiscale"))
+		end
+		GameTooltip:SetScale(uiScale)
+	end
 	local skill = self:GetSkill(self.currentPlayer, self.currentTrade, skillIndex)
 	if skill then
 		local recipe = self:GetRecipe(skill.id)
@@ -2300,6 +2332,11 @@ end
 --
 function Skillet:ReagentButtonOnLeave(button, skillIndex, reagentIndex)
 	gearTexture:Hide()
+	if Skillet.db.profile.scale_tooltip then
+		GameTooltip:SetScale(Skillet.gttScale)
+	end
+	GameTooltip:Hide()
+	ResetCursor()
 end
 
 function Skillet:ReagentButtonSkillSelect(player, id)

@@ -69,6 +69,7 @@ local defaults = {
 		confirm_queue_clear = false,
 		queue_only_view = true,
 		dialog_switch = false,
+		scale_tooltip = false,
 		transparency = 1.0,
 		scale = 1.0,
 		plugins = {},
