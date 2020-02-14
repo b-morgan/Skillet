@@ -771,8 +771,6 @@
 			</OnEnter>
 			<OnLeave>
 				Skillet:ReagentButtonOnLeave(self, SkilletFrame.selectedSkill, self:GetID())
-				GameTooltip:Hide()
-				ResetCursor()
 			</OnLeave>
 			<OnUpdate>
 				CursorOnUpdate(self)
@@ -2312,13 +2310,10 @@
 						if ( Skillet.selectedSkill ~= -1 ) then
 							GameTooltip:SetOwner(self, "ANCHOR_TOPLEFT")
 							Skillet:SetTradeSkillToolTip(SkilletFrame.selectedSkill)
-							GameTooltip:Show()
-							CursorUpdate(self)
 						end
 					</OnEnter>
 					<OnLeave>
-						GameTooltip:Hide()
-						ResetCursor()
+						Skillet:ClearTradeSkillToolTip(SkilletFrame.selectedSkill)
 					</OnLeave>
 					<OnUpdate>
 						CursorOnUpdate(self)
@@ -2327,9 +2322,7 @@
 						if GameTooltip:IsVisible() and GameTooltip:IsOwned(self) then
 							if ( Skillet.selectedSkill ~= -1 ) then
 								GameTooltip:SetOwner(self, "ANCHOR_TOPLEFT")
-								Skillet:SetTradeSkillToolTip(SkilletFrame.selectedSkill)
-								GameTooltip:Show()
-								CursorUpdate(self)
+								Skillet:SetTradeSkillToolTip(SkilletFrame.selectedSkill,true)
 							end
 						end
 					</OnEvent>
