@@ -72,6 +72,7 @@ local defaults = {
 		scale_tooltip = false,
 		transparency = 1.0,
 		scale = 1.0,
+		ttscale = 1.0,
 		plugins = {},
 		SavedQueues = {},
 	},
