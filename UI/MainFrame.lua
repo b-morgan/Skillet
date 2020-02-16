@@ -1321,6 +1321,9 @@ function Skillet:SkillButton_OnEnter(button)
 	if ( GetCVar("useUiScale") == "1" ) then
 		uiScale = tonumber(GetCVar("uiscale"))
 	end
+	if Skillet.db.profile.ttscale then
+		uiScale = uiScale * Skillet.db.profile.ttscale
+	end
 	tip:SetScale(uiScale)
 --
 -- If not displaying full tooltips you have to press Ctrl to see them
@@ -1428,6 +1431,9 @@ function Skillet:SetTradeSkillToolTip(skillIndex, onEvent)
 		local uiScale = 1.0;
 		if ( GetCVar("useUiScale") == "1" ) then
 			uiScale = tonumber(GetCVar("uiscale"))
+		end
+		if Skillet.db.profile.ttscale then
+			uiScale = uiScale * Skillet.db.profile.ttscale
 		end
 		GameTooltip:SetScale(uiScale)
 	end
@@ -2299,6 +2305,9 @@ function Skillet:ReagentButtonOnEnter(button, skillIndex, reagentIndex)
 		local uiScale = 1.0;
 		if ( GetCVar("useUiScale") == "1" ) then
 			uiScale = tonumber(GetCVar("uiscale"))
+		end
+		if Skillet.db.profile.ttscale then
+			uiScale = uiScale * Skillet.db.profile.ttscale
 		end
 		GameTooltip:SetScale(uiScale)
 	end

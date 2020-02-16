@@ -418,6 +418,23 @@ Skillet.options =
 					width = "double",
 					order = 11,
 				},
+				ttscale = {
+					type = "range",
+					name = L["Tooltip Scale"],
+					desc = L["TOOLTIPSCALEDESC"],
+					min = 0.1, max = 1.25, step = 0.05, isPercent = true,
+					get = function()
+						return Skillet.db.profile.ttscale
+					end,
+					set = function(self,t)
+						Skillet.db.profile.ttscale = t
+						Skillet:UpdateTradeSkillWindow()
+						Skillet:UpdateShoppingListWindow(false)
+						Skillet:UpdateStandaloneQueueWindow()
+					end,
+					width = "double",
+					order = 12,
+				},
 			},
 		},
 		config = {
