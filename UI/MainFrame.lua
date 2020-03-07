@@ -1420,14 +1420,10 @@ end
 --
 -- Sets the game tooltip item to the selected skill
 --
-function Skillet:SetTradeSkillToolTip(skillIndex, onEvent)
+function Skillet:SetTradeSkillToolTip(skillIndex)
 	--DA.DEBUG(2,"SetTradeSkillToolTip("..tostring(skillIndex)..", "..tostring(onEvent)..")")
-	if onEvent then
-		DA.DEBUG(0,"SetTradeSkillToolTip("..tostring(skillIndex)..", "..tostring(onEvent)..")")
-	end
 	GameTooltip:ClearLines()
 	if Skillet.db.profile.scale_tooltip then
-		Skillet.gttScale = GameTooltip:GetScale()
 		local uiScale = 1.0;
 		if ( GetCVar("useUiScale") == "1" ) then
 			uiScale = tonumber(GetCVar("uiscale"))
@@ -2301,7 +2297,6 @@ function Skillet:ReagentButtonOnEnter(button, skillIndex, reagentIndex)
 	--DA.DEBUG(1,"ReagentButtonOnEnter("..tostring(button)..", "..tostring(skillIndex)..", "..tostring(reagentIndex)..")")
 	GameTooltip:SetOwner(button, "ANCHOR_TOPLEFT")
 	if Skillet.db.profile.scale_tooltip then
-		Skillet.gttScale = GameTooltip:GetScale()
 		local uiScale = 1.0;
 		if ( GetCVar("useUiScale") == "1" ) then
 			uiScale = tonumber(GetCVar("uiscale"))

@@ -2322,7 +2322,7 @@
 						if GameTooltip:IsVisible() and GameTooltip:IsOwned(self) then
 							if ( Skillet.selectedSkill ~= -1 ) then
 								GameTooltip:SetOwner(self, "ANCHOR_TOPLEFT")
-								Skillet:SetTradeSkillToolTip(SkilletFrame.selectedSkill,true)
+								Skillet:SetTradeSkillToolTip(SkilletFrame.selectedSkill)
 							end
 						end
 					</OnEvent>
