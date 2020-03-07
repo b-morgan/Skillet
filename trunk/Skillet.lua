@@ -39,6 +39,8 @@ Skillet.build = ADDON_BUILD
 Skillet.project = WOW_PROJECT_ID
 local isClassic = WOW_PROJECT_ID == WOW_PROJECT_CLASSIC
 
+Skillet.gttScale = GameTooltip:GetScale()
+
 local nonLinkingTrade = { [2656] = true, [53428] = true }				-- smelting, runeforging
 
 local defaults = {
