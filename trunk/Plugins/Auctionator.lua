@@ -1,5 +1,11 @@
 local addonName,addonTable = ...
-local DA = _G[addonName] -- for DebugAids.lua
+local isClassic = WOW_PROJECT_ID == WOW_PROJECT_CLASSIC
+local DA
+if isClassic then
+	DA = LibStub("AceAddon-3.0"):GetAddon("Skillet") -- for DebugAids.lua
+else
+	DA = _G[addonName] -- for DebugAids.lua
+end
 --[[
 Skillet: A tradeskill window replacement.
 
@@ -171,11 +177,16 @@ function plugin.GetExtraText(skill, recipe)
 	local label, extra_text
 	if not recipe then return end
 	local itemID = recipe.itemID
-	if Atr_GetAuctionBuyout and Skillet.db.profile.plugins.ATR.enabled and itemID then
-		local buyout = ( Atr_GetAuctionBuyout(itemID) or 0 ) * recipe.numMade
+	if Skillet.db.profile.plugins.ATR.enabled and itemID then
+		local buyout
+		if isClassic and Atr_GetAuctionBuyout then
+			buyout = (Atr_GetAuctionBuyout(itemID) or 0) * recipe.numMade
+		elseif Auctionator.API.v1.GetAuctionPriceByItemID then
+			buyout = (Auctionator.API.v1.GetAuctionPriceByItemID(addonName, itemID) or 0) * recipe.numMade
+		end
 		if buyout then
 			extra_text = Skillet:FormatMoneyFull(buyout, true)
-			label = "|r".. L["Buyout"]..":"
+			label = "|r".."ATR "..L["Buyout"]..":"
 		end
 		if Skillet.db.profile.plugins.ATR.reagentPrices then
 			local toConcatLabel = {}
@@ -187,7 +198,12 @@ function plugin.GetExtraText(skill, recipe)
 					break
 				end
 				local needed = reagent.numNeeded or 0
-				local id = reagent.reagentID
+				local id
+				if isClassic then
+					id = reagent.id
+				else
+					id = reagent.reagentID
+				end
 				local itemName
 				if id then
 					itemName = GetItemInfo(id)
@@ -195,18 +211,23 @@ function plugin.GetExtraText(skill, recipe)
 					itemName = tostring(id)
 				end
 				local text
-				local value = ( Atr_GetAuctionBuyout(id) or 0 ) * needed
+				local value
+				if isClassic and Atr_GetAuctionBuyout then
+					value = (Atr_GetAuctionBuyout(id) or 0) * needed
+				elseif Auctionator.API.v1.GetAuctionPriceByItemID then
+					value = (Auctionator.API.v1.GetAuctionPriceByItemID(addonName, id) or 0) * needed
+				end
 				local buyFactor = Skillet.db.profile.plugins.ATR.buyFactor or buyFactorDef
 				if Skillet:VendorSellsReagent(id) then
 					toConcatLabel[#toConcatLabel+1] = string.format("   %d x %s  |cff808080(%s)|r", needed, itemName, L["buyable"])
-					if Skillet.db.profile.plugins.ATR.buyablePrices then
+					if isClassic and Skillet.db.profile.plugins.ATR.buyablePrices then
 						if Skillet.db.profile.plugins.ATR.useVendorCalc then
-							value = ( Atr_GetSellValue(id) or 0 ) * needed * buyFactor
+							value = ( select(11,GetItemInfo(id)) or 0 ) * needed * buyFactor
 						end
 						toConcatExtra[#toConcatExtra+1] = Skillet:FormatMoneyFull(value, true)
 					else
 						value = 0
-					toConcatExtra[#toConcatExtra+1] = ""
+						toConcatExtra[#toConcatExtra+1] = ""
 					end
 				else
 					toConcatExtra[#toConcatExtra+1] = Skillet:FormatMoneyFull(value, true)
@@ -235,8 +256,13 @@ function plugin.RecipeNameSuffix(skill, recipe)
 	DA.DEBUG(0,"RecipeNameSuffix: itemID= "..tostring(itemID)..", type= "..type(itemID))
 	local itemName = GetItemInfo(itemID)
 	DA.DEBUG(0,"RecipeNameSuffix: itemName= "..tostring(itemName)..", type= "..type(itemName))
-	if Atr_GetAuctionBuyout and Skillet.db.profile.plugins.ATR.enabled and itemID then
-		local value = Atr_GetAuctionBuyout(itemID) or 0
+	if Skillet.db.profile.plugins.ATR.enabled and itemID then
+		local value
+		if isClassic and Atr_GetAuctionBuyout then
+			value = Atr_GetAuctionBuyout(itemID) or 0
+		elseif Auctionator.API.v1.GetAuctionPriceByItemID then
+			value = Auctionator.API.v1.GetAuctionPriceByItemID(addonName, itemID) or 0
+		end
 		DA.DEBUG(0,"RecipeNameSuffix: value= "..tostring(value))
 		local buyout = value * recipe.numMade
 		if Skillet.db.profile.plugins.ATR.reagentPrices then
@@ -244,12 +270,17 @@ function plugin.RecipeNameSuffix(skill, recipe)
 			for i=1, #recipe.reagentData, 1 do
 				local needed = recipe.reagentData[i].numNeeded or 0
 				local id = recipe.reagentData[i].id
-				local value = ( Atr_GetAuctionBuyout(id) or 0 ) * needed
+				local value
+				if isClassic and Atr_GetAuctionBuyout then
+					value = (Atr_GetAuctionBuyout(id) or 0) * needed
+				elseif Auctionator.API.v1.GetAuctionPriceByItemID then
+					value = (Auctionator.API.v1.GetAuctionPriceByItemID(addonName, id) or 0) * needed
+				end
 				local buyFactor = Skillet.db.profile.plugins.ATR.buyFactor or buyFactorDef
 				if Skillet:VendorSellsReagent(id) then
 					if Skillet.db.profile.plugins.ATR.buyablePrices then
 						if Skillet.db.profile.plugins.ATR.useVendorCalc then
-							value = ( Atr_GetSellValue(id) or 0 ) * needed * buyFactor
+							value = ( select(11,GetItemInfo(id)) or 0 ) * needed * buyFactor
 						end
 					else
 						value = 0
@@ -275,7 +306,7 @@ function plugin.RecipeNameSuffix(skill, recipe)
 	return text
 end
 
--- Skillet:RegisterRecipeNamePlugin("ATRPlugin")		-- we have a RecipeNamePrefix or a RecipeNameSuffix function
+Skillet:RegisterRecipeNamePlugin("ATRPlugin")		-- we have a RecipeNamePrefix or a RecipeNameSuffix function
 
 Skillet:RegisterDisplayDetailPlugin("ATRPlugin")	-- we have a GetExtraText function
 
@@ -339,7 +370,11 @@ function Skillet:AuctionatorSearch(whichOne)
 			end
 		end
 	end
-	local BUY_TAB = 3;
-	Atr_SelectPane(BUY_TAB)
-	Atr_SearchAH(shoppingListName, items)
+	if isClassic then
+		local BUY_TAB = 3;
+		Atr_SelectPane(BUY_TAB)
+		Atr_SearchAH(shoppingListName, items)
+	else
+		Auctionator.API.v1.MultiSearch(addonName, terms)
+	end
 end

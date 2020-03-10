@@ -1662,7 +1662,7 @@ function Skillet:UpdateDetailsWindow(skillIndex)
 	end
 	SkilletSkillIcon:SetNormalTexture(texture)
 	SkilletSkillIcon:Show()
-	if AuctionFrame and AuctionatorLoaded and self.ATRPlugin and self.db.profile.plugins.ATR.enabled and self.auctionOpen then
+	if AuctionHouseFrame and Auctionator and self.ATRPlugin and self.db.profile.plugins.ATR.enabled and self.auctionOpen then
 		SkilletAuctionatorButton:Show()
 	else
 		SkilletAuctionatorButton:Hide()
