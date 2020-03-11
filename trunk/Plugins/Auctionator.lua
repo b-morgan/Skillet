@@ -181,8 +181,10 @@ function plugin.GetExtraText(skill, recipe)
 		local buyout
 		if isClassic and Atr_GetAuctionBuyout then
 			buyout = (Atr_GetAuctionBuyout(itemID) or 0) * recipe.numMade
-		elseif Auctionator.API.v1.GetAuctionPriceByItemID then
+		elseif Auctionator and Auctionator.API.v1.GetAuctionPriceByItemID then
 			buyout = (Auctionator.API.v1.GetAuctionPriceByItemID(addonName, itemID) or 0) * recipe.numMade
+		else
+			return
 		end
 		if buyout then
 			extra_text = Skillet:FormatMoneyFull(buyout, true)
@@ -212,9 +214,9 @@ function plugin.GetExtraText(skill, recipe)
 				end
 				local text
 				local value
-				if isClassic and Atr_GetAuctionBuyout then
+				if isClassic then
 					value = (Atr_GetAuctionBuyout(id) or 0) * needed
-				elseif Auctionator.API.v1.GetAuctionPriceByItemID then
+				else
 					value = (Auctionator.API.v1.GetAuctionPriceByItemID(addonName, id) or 0) * needed
 				end
 				local buyFactor = Skillet.db.profile.plugins.ATR.buyFactor or buyFactorDef
@@ -260,8 +262,10 @@ function plugin.RecipeNameSuffix(skill, recipe)
 		local value
 		if isClassic and Atr_GetAuctionBuyout then
 			value = Atr_GetAuctionBuyout(itemID) or 0
-		elseif Auctionator.API.v1.GetAuctionPriceByItemID then
+		elseif Auctionator and Auctionator.API.v1.GetAuctionPriceByItemID then
 			value = Auctionator.API.v1.GetAuctionPriceByItemID(addonName, itemID) or 0
+		else
+			return
 		end
 		DA.DEBUG(0,"RecipeNameSuffix: value= "..tostring(value))
 		local buyout = value * recipe.numMade
@@ -281,9 +285,9 @@ function plugin.RecipeNameSuffix(skill, recipe)
 				end
 				local name = GetItemInfo(id)
 				local value
-				if isClassic and Atr_GetAuctionBuyout then
+				if isClassic then
 					value = (Atr_GetAuctionBuyout(id) or 0) * needed
-				elseif Auctionator.API.v1.GetAuctionPriceByItemID then
+				else
 					value = (Auctionator.API.v1.GetAuctionPriceByItemID(addonName, id) or 0) * needed
 				end
 				local buyFactor = Skillet.db.profile.plugins.ATR.buyFactor or buyFactorDef
