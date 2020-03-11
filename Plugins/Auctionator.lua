@@ -268,8 +268,18 @@ function plugin.RecipeNameSuffix(skill, recipe)
 		if Skillet.db.profile.plugins.ATR.reagentPrices then
 			local cost = 0
 			for i=1, #recipe.reagentData, 1 do
-				local needed = recipe.reagentData[i].numNeeded or 0
-				local id = recipe.reagentData[i].id
+				local reagent = recipe.reagentData[i]
+				if not reagent then
+					break
+				end
+				local needed = reagent.numNeeded or 0
+				local id
+				if isClassic then
+					id = reagent.id
+				else
+					id = reagent.reagentID
+				end
+				local name = GetItemInfo(id)
 				local value
 				if isClassic and Atr_GetAuctionBuyout then
 					value = (Atr_GetAuctionBuyout(id) or 0) * needed
@@ -286,6 +296,7 @@ function plugin.RecipeNameSuffix(skill, recipe)
 						value = 0
 					end
 				end
+				DA.DEBUG(1, "RecipeNameSuffix: reagent["..i.."] ("..id..") "..tostring(name)..", value= "..tostring(value))
 				cost = cost + value
 			end
 			if Skillet.db.profile.plugins.ATR.useVendorCalc then
@@ -311,30 +322,19 @@ Skillet:RegisterRecipeNamePlugin("ATRPlugin")		-- we have a RecipeNamePrefix or 
 Skillet:RegisterDisplayDetailPlugin("ATRPlugin")	-- we have a GetExtraText function
 
 --
--- Auctionator support
+-- Auctionator button support
 --  whichOne:
 --    false (or nil) will search for the item and reagents in the MainFrame
 --    true will search for the items in the ShoppingList
 --
 function Skillet:AuctionatorSearch(whichOne)
-	if not AuctionatorLoaded or not AuctionFrame then
-		return
-	end
-	if not AuctionFrame:IsShown() then
-		if whichOne then
-			Atr_Error_Display("When the Auction House is open\nclicking this button tells Auctionator\nto scan for the items in the Shopping List.")
-		else
-			Atr_Error_Display("When the Auction House is open\nclicking this button tells Auctionator\nto scan for the item and all its reagents.")
-		end
-		return
-	end
 	local shoppingListName
 	local items = {}
 	if whichOne then
 		shoppingListName = L["Shopping List"]
 		local list = Skillet:GetShoppingList(Skillet.currentPlayer, false)
 		if not list or #list == 0 then
-			--DA.DEBUG(0,"Shopping List is empty")
+			DA.DEBUG(0,"AuctionatorSearch: Shopping List is empty")
 			return
 		end
 		for i=1,#list,1 do
@@ -342,7 +342,7 @@ function Skillet:AuctionatorSearch(whichOne)
 			local name = GetItemInfo(id)
 			if name and not Skillet:VendorSellsReagent(id) then
 				table.insert (items, name)
-				--DA.DEBUG(0, "Item["..tostring(i).."] "..name.." ("..tostring(id)..") added")
+				DA.DEBUG(1, "AuctionatorSearch: Item["..tostring(i).."] "..name.." ("..tostring(id)..") added")
 			end
 		end
 	else
@@ -357,24 +357,36 @@ function Skillet:AuctionatorSearch(whichOne)
 		if (shoppingListName) then
 			table.insert (items, shoppingListName)
 		end
-		local numReagents = #recipe.reagentData
-		local reagentIndex
-		for reagentIndex = 1, numReagents do
-			local reagentId = recipe.reagentData[reagentIndex].id
-			if reagentId and not Skillet:VendorSellsReagent(reagentId) then
-				local reagentName = GetItemInfo(reagentId)
+		local i
+		for i=1, #recipe.reagentData, 1 do
+			local reagent = recipe.reagentData[i]
+			if not reagent then
+				break
+			end
+			local needed = reagent.numNeeded or 0
+			local id
+			if isClassic then
+				id = reagent.id
+			else
+				id = reagent.reagentID
+			end
+			if id and not Skillet:VendorSellsReagent(id) then
+				local reagentName = GetItemInfo(id)
 				if (reagentName) then
 					table.insert (items, reagentName)
-					--DA.DEBUG(0, "Reagent num "..reagentIndex.." ("..reagentId..") "..reagentName.." added")
+					DA.DEBUG(1, "AuctionatorSearch: Reagent["..i.."] ("..id..") "..reagentName.." added")
 				end
 			end
 		end
 	end
+	DA.DEBUG(0, "AuctionatorSearch: items= "..DA.DUMP1(items))
 	if isClassic then
+		DA.DEBUG(0, "AuctionatorSearch: shoppingListName= "..tostring(shoppingListName)..", items= "..DA.DUMP1(items))
 		local BUY_TAB = 3;
 		Atr_SelectPane(BUY_TAB)
 		Atr_SearchAH(shoppingListName, items)
 	else
-		Auctionator.API.v1.MultiSearch(addonName, terms)
+		DA.DEBUG(0, "AuctionatorSearch: addonName= "..tostring(addonName)..", items= "..DA.DUMP1(items))
+		Auctionator.API.v1.MultiSearch(addonName, items)
 	end
 end
