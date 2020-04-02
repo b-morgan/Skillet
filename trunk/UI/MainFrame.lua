@@ -3149,6 +3149,7 @@ end
 function Skillet:ShowFullView()
 	Skillet.fullView = true
 	SkilletQueueParentBase:SetParent(SkilletFrame)
+	SkilletQueueParentBase:ClearAllPoints()
 	SkilletQueueParentBase:SetPoint("TOPLEFT",SkilletCreateAllButton,"BOTTOMLEFT",0,-3)
 	SkilletQueueParentBase:SetPoint("BOTTOMRIGHT",SkilletFrame,"BOTTOMRIGHT",-10,32)
 	SkilletStandaloneQueue:Hide()
@@ -3160,6 +3161,7 @@ function Skillet:ShowQueueView()
 	--DA.DEBUG(0,"ShowQueueView()")
 	Skillet.fullView = false
 	SkilletQueueParentBase:SetParent(SkilletStandaloneQueue)
+	SkilletQueueParentBase:ClearAllPoints()
 	SkilletQueueParentBase:SetPoint("TOPLEFT",SkilletStandaloneQueue,"TOPLEFT",5,-32)
 	SkilletQueueParentBase:SetPoint("BOTTOMRIGHT",SkilletStandaloneQueue,"BOTTOMRIGHT",-5,30)
 	SkilletStandaloneQueue:Show()
