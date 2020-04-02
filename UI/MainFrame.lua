@@ -1299,7 +1299,7 @@ function Skillet:SkillButton_OnEnter(button)
 		return
 	end
 	buttonName:SetTextColor(HIGHLIGHT_FONT_COLOR.r, HIGHLIGHT_FONT_COLOR.g, HIGHLIGHT_FONT_COLOR.b)
-	local recipe = self:GetRecipe(skill.recipeID) or Skillet.UnknownRecipe
+	local recipe = self:GetRecipe(skill.recipeID) or Skillet.unknownRecipe
 	if not self.db.profile.show_detailed_recipe_tooltip then
 --
 -- user does not want the tooltip displayed, it can get a bit big after all
@@ -1576,10 +1576,10 @@ function Skillet:UpdateDetailsWindow(skillIndex)
 		self.recipeNotesFrame:Hide()
 	end
 	local skill = self:GetSkill(self.currentPlayer, self.currentTrade, skillIndex)
-	local recipe = Skillet.UnknownRecipe
+	local recipe = Skillet.unknownRecipe
 	if skill then
 		lastUpdateSpellID = skill.id
-		recipe = self:GetRecipe(skill.id) or Skillet.UnknownRecipe
+		recipe = self:GetRecipe(skill.id) or Skillet.unknownRecipe
 		--DA.DEBUG(0,"skill= "..DA.DUMP1(skill))
 		--DA.DEBUG(0,"recipe= "..DA.DUMP1(recipe))
 --
@@ -1651,7 +1651,7 @@ function Skillet:UpdateDetailsWindow(skillIndex)
 			SkilletRequirementLabel:Hide()
 		end
 	else
-		recipe = Skillet.UnknownRecipe
+		recipe = Skillet.unknownRecipe
 		SkilletSkillName:SetText("unknown")
 	end
 	if recipeInfo and recipeInfo.alternateVerb then
