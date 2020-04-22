@@ -126,6 +126,21 @@ plugin.options =
 			end,
 			order = 6
 		},
+		useSearchExact = {
+			type = "toggle",
+			name = "useSearchExact",
+			desc = "Use MultiSearchExact instead of MultSearch in Auction House shopping list (retail only)",
+			get = function()
+				return Skillet.db.profile.plugins.ATR.useSearchExact
+			end,
+			set = function(self,value)
+				Skillet.db.profile.plugins.ATR.useSearchExact = value
+				if value then
+					Skillet.db.profile.plugins.ATR.useSearchExact = value
+				end
+			end,
+			order = 7
+		},
 		buyFactor = {
 			type = "range",
 			name = "buyFactor",
@@ -383,14 +398,18 @@ function Skillet:AuctionatorSearch(whichOne)
 			end
 		end
 	end
-	DA.DEBUG(0, "AuctionatorSearch: items= "..DA.DUMP1(items))
 	if isClassic then
 		DA.DEBUG(0, "AuctionatorSearch: shoppingListName= "..tostring(shoppingListName)..", items= "..DA.DUMP1(items))
 		local BUY_TAB = 3;
 		Atr_SelectPane(BUY_TAB)
 		Atr_SearchAH(shoppingListName, items)
 	else
-		DA.DEBUG(0, "AuctionatorSearch: addonName= "..tostring(addonName)..", items= "..DA.DUMP1(items))
-		Auctionator.API.v1.MultiSearch(addonName, items)
+		if Skillet.db.profile.plugins.ATR.useSearchExact and Auctionator.API.v1.MultiSearchExact then
+			DA.DEBUG(0, "AuctionatorSearch: (exact) addonName= "..tostring(addonName)..", items= "..DA.DUMP1(items))
+			Auctionator.API.v1.MultiSearchExact(addonName, items)
+		else
+			DA.DEBUG(0, "AuctionatorSearch: addonName= "..tostring(addonName)..", items= "..DA.DUMP1(items))
+			Auctionator.API.v1.MultiSearch(addonName, items)
+		end
 	end
 end
