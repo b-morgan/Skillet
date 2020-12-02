@@ -56,7 +56,7 @@ function Skillet:ShowRecipeNotes()
 end
 
 local function get_edit_box()
-	local editbox = CreateFrame("EditBox", nil, nil)
+	local editbox = CreateFrame("EditBox", nil, nil, "BackdropTemplate")
 	editbox:SetTextInsets(5,5,3,3)
 	editbox:SetMaxLetters(256)
 	editbox:SetAutoFocus(true)

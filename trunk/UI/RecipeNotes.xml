@@ -87,7 +87,7 @@
  # A frame for displaying the recipe notes
  #
 -->
-<Frame name="SkilletRecipeNotesFrame" parent="SkilletFrame">
+<Frame name="SkilletRecipeNotesFrame" parent="SkilletFrame" inherits="BackdropTemplate">
 	<Size>
 		<AbsDimension x="200" y="380"/>
 	</Size>

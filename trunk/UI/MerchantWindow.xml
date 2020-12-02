@@ -25,7 +25,7 @@
  # for currently queued recipes.
  #
 -->
-<Frame name="SkilletMerchantBuyFrame" parent="UIParent" hidden="true">
+<Frame name="SkilletMerchantBuyFrame" parent="UIParent" hidden="true" inherits="BackdropTemplate">
 	<Size>
 		<AbsDimension x="120" y="50"/>
 	</Size>

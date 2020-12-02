@@ -371,6 +371,19 @@ Skillet.options =
 					width = "double",
 					order = 6,
 				},
+				tsm_compatibility = {
+					type = "toggle",
+					name = L["TSMCOMPATNAME"],
+					desc = L["TSMCOMPATDESC"],
+					get = function()
+						return Skillet.db.profile.tsm_compat
+					end,
+					set = function(self,value)
+						Skillet.db.profile.tsm_compat = value
+					end,
+					width = "double",
+					order = 7,
+				},
 				scale_tooltip = {
 					type = "toggle",
 					name = L["SCALETOOLTIPNAME"],

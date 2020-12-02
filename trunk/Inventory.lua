@@ -278,8 +278,9 @@ end
 -- returns the number of items that can be bought limited by the amount of currency available
 --
 function Skillet:VendorItemAvailable(itemID)
-	--DA.DEBUG(0,"VendorItemAvailable("..tostring(itemID)..")")
-	local _, divider, currency, currencyAvailable
+	DA.DEBUG(0,"VendorItemAvailable("..tostring(itemID)..")")
+	local _, divider, currency
+	local currencyAvailable = 0
 	local currencyAvailableAlts = 0
 	if self.SpecialVendorItems[itemID] then
 		divider = self.SpecialVendorItems[itemID][1]
@@ -296,13 +297,17 @@ function Skillet:VendorItemAvailable(itemID)
 		local MissingVendorItem = self.db.global.MissingVendorItems[itemID]
 		if type(MissingVendorItem) == 'table' then	-- table entries are {name, quantity, currencyName, currencyID, currencyCount}
 			if Skillet.db.profile.use_altcurrency_vendor_items then
-				--DA.DEBUG(1,"MissingVendorItem="..DA.DUMP1(MissingVendorItem))
+				DA.DEBUG(1,"MissingVendorItem="..DA.DUMP1(MissingVendorItem))
 				if MissingVendorItem[4] > 0 then
 					currencyAvailable = self:GetInventory(self.currentPlayer, MissingVendorItem[4])
 				else
-					_, currencyAvailable = GetCurrencyInfo(-1 * MissingVendorItem[4])
+					local cinfo = C_CurrencyInfo.GetCurrencyInfo(-1 * MissingVendorItem[4])
+					if cinfo then
+						DA.DEBUG(1,"cinfo="..DA.DUMP1(cinfo))
+						currencyAvailable = cinfo.quantity
+					end
 				end
-				--DA.DEBUG(1,"currencyAvailable="..tostring(currencyAvailable))
+				DA.DEBUG(1,"currencyAvailable="..tostring(currencyAvailable))
 --
 -- compute how many this player can buy with alternate currency and return 0 for alts
 --

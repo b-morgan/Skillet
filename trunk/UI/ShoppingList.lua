@@ -66,7 +66,10 @@ local function createShoppingListFrame(self)
 	if not frame then
 		return nil
 	end
-	if TSMAPI_FOUR then
+	if not frame.SetBackdrop then
+		Mixin(frame, BackdropTemplateMixin)
+	end
+	if TSM_API and Skillet.db.profile.tsm_compat then
 		frame:SetFrameStrata("HIGH")
 	end
 	frame:SetBackdrop(FrameBackdrop)
@@ -130,7 +133,10 @@ local function createShoppingListFrame(self)
 -- The frame enclosing the scroll list needs a border and a background
 --
 	local backdrop = SkilletShoppingListParent
-	if TSMAPI_FOUR then
+	if not backdrop.SetBackdrop then
+		Mixin(backdrop, BackdropTemplateMixin)
+	end
+	if TSM_API and Skillet.db.profile.tsm_compat then
 		backdrop:SetFrameStrata("HIGH")
 	end
 	backdrop:SetBackdrop(ControlBackdrop)
