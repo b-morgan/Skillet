@@ -72,6 +72,7 @@ local defaults = {
 		queue_only_view = true,
 		dialog_switch = false,
 		scale_tooltip = false,
+		tsm_compat = false,
 		transparency = 1.0,
 		scale = 1.0,
 		ttscale = 1.0,
@@ -119,6 +120,7 @@ Skillet.unknownRecipe = {
 	name = "unknown",
 	tools = {},
 	reagentData = {},
+	numOptional = 0,
 	cooldown = 0,
 	itemID = 0,
 	numMade = 0,
@@ -687,22 +689,24 @@ function Skillet:PLAYER_ENTERING_WORLD()
 	DA.TRACE("PLAYER_ENTERING_WORLD")
 	local player, realm = UnitFullName("player")
 	local faction = UnitFactionGroup("player")
-	local guid = UnitGUID("player") or ""	-- example: guid="Player-970-0002FD64" kind=="Player" server=="970" ID="0002FD64" 
-	local kind, server, ID = strsplit("-", guid)
-	DA.DEBUG(1,"player="..tostring(player)..", faction="..tostring(faction)..", guid="..tostring(guid)..", server="..tostring(server))
-	self.db.realm.guid[player]= guid
-	self.db.realm.faction[player] = faction
-	if (server) then
-		self.data.server = server
-		self.data.realm = realm
-		if not self.db.global.server[server] then
-			self.db.global.server[server] = {}
+	local guid = UnitGUID("player")		-- example: guid="Player-970-0002FD64" kind=="Player" server=="970" ID="0002FD64" 
+	if guid then
+		local kind, server, ID = strsplit("-", guid)
+		DA.DEBUG(1,"player="..tostring(player)..", faction="..tostring(faction)..", guid="..tostring(guid)..", server="..tostring(server))
+		self.db.realm.guid[player]= guid
+		self.db.realm.faction[player] = faction
+		if (server) then
+			self.data.server = server
+			self.data.realm = realm
+			if not self.db.global.server[server] then
+				self.db.global.server[server] = {}
+			end
+			self.db.global.server[server][realm] = player
+			if not self.db.global.faction[server] then
+				self.db.global.faction[server] = {}
+			end
+			self.db.global.faction[server][player] = faction
 		end
-		self.db.global.server[server][realm] = player
-		if not self.db.global.faction[server] then
-			self.db.global.faction[server] = {}
-		end
-		self.db.global.faction[server][player] = faction
 	end
 end
 
@@ -802,7 +806,7 @@ function Skillet:TRADE_SKILL_DATA_SOURCE_CHANGED()
 	DA.TRACE("tradeSkillOpen= "..tostring(Skillet.tradeSkillOpen))
 	if Skillet.tradeSkillOpen then
 		Skillet.dataSourceChanged = true
-		Skillet:SkilletShowWindow()
+		Skillet:SkilletShowWindow("CHANGED")
 		if Skillet.delaySelectedSkill then
 			self:SetSelectedSkill(Skillet.delaySkillIndex)
 			Skillet.delaySelectedSkill = false
@@ -841,7 +845,7 @@ function Skillet:TRADE_SKILL_LIST_UPDATE()
 		Skillet.dataSourceChanged = false
 		Skillet.adjustInventory = false
 		Skillet.skillListUpdate = true
-		Skillet:SkilletShowWindow()
+		Skillet:SkilletShowWindow("UPDATE")
 	end
 	if Skillet.tradeSkillOpen and Skillet.adjustInventory then
 		Skillet.skillListUpdate = true
@@ -922,7 +926,9 @@ function Skillet:SkilletShow()
 	if not link then
 		DA.DEBUG(0,"SkilletShow: "..tostring(skillLineName).." not linkable")
 	end
-	-- Use the Blizzard UI for any garrison follower that can't use ours.
+--
+-- Use the Blizzard UI for any garrison follower that can't use ours.
+--
 	if self:IsNotSupportedFollower(self.currentTrade) then
 		DA.DEBUG(3,"SkilletShow: "..tostring(self.currentTrade).." IsNotSupportedFollower")
 		self:HideAllWindows()
@@ -946,16 +952,21 @@ function Skillet:SkilletShow()
 end
 
 --
--- Only called from SkilletShow() after a short delay
+-- Called from events TRADE_SKILL_DATA_SOURCE_CHANGED and TRADE_SKILL_LIST_UPDATE
 --
-function Skillet:SkilletShowWindow()
-	DA.DEBUG(0,"SkilletShowWindow: "..tostring(self.currentTrade))
+function Skillet:SkilletShowWindow(where)
+	DA.DEBUG(0,"SkilletShowWindow("..tostring(where).."), "..tostring(self.currentTrade))
+	if not Skillet.db.profile.tsm_compat then
+		if TSM_API and where == "CHANGED" then
+			if TSM_API.IsUIVisible("CRAFTING") then
+				DA.CHAT(L["TradeSkillMaster must be in 'WOW UI' mode to use Skillet"])
+				return
+			end
+		end
+	end
 	if self.tradeSkillOpen then
 		HideUIPanel(TradeSkillFrame)
 	end
---	if not self.currentPlayer or not self.currentTrade then
---		return
---	end
 	if not self:RescanTrade() then
 		if self.useBlizzard then
 			self.useBlizzard = false
@@ -964,9 +975,9 @@ function Skillet:SkilletShowWindow()
 		DA.DEBUG(0,"No headers, reset filter")
 		self.ResetTradeSkillFilter()
 		if not self:RescanTrade() then
-			if TSMAPI_FOUR then
+			if TSM_API then
 				DA.CHAT(L["Conflict with the addon TradeSkillMaster"])
-				self.db.profile.TSMAPI_FOUR = true
+				self.db.profile.TSM_API = true
 			else
 				DA.CHAT(L["No headers, try again"])
 			end

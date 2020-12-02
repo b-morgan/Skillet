@@ -126,7 +126,7 @@
 	</Scripts>
 </Frame>
 
-<Frame name="SkilletIgnoreList" parent="UIParent" toplevel="true" movable="true" enableMouse="true" resizable="true" hidden="true">
+<Frame name="SkilletIgnoreList" parent="UIParent" toplevel="true" movable="true" enableMouse="true" resizable="true" hidden="true" inherits="BackdropTemplate">
 	<Size><AbsDimension x="320" y="150"/></Size>
 	<Anchors>
 		<Anchor point="CENTER"/>

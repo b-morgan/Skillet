@@ -149,7 +149,10 @@ function Skillet:CreateTradeSkillWindow()
 	if frame:GetHeight() < 545 then
 		frame:SetHeight(545)
 	end
-	if TSMAPI_FOUR then
+	if not frame.SetBackdrop then
+		Mixin(frame, BackdropTemplateMixin)
+	end
+	if TSM_API and Skillet.db.profile.tsm_compat then
 		frame:SetFrameStrata("HIGH")
 		frame:SetBackdrop(TSMBackdrop)
 	else
@@ -248,6 +251,9 @@ function Skillet:CreateTradeSkillWindow()
 -- The frame enclosing the scroll list needs a border and a background .....
 --
 	local backdrop = SkilletSkillListParent
+	if not backdrop.SetBackdrop then
+		Mixin(backdrop, BackdropTemplateMixin)
+	end
 	backdrop:SetBackdrop(ControlBackdrop)
 	backdrop:SetBackdropBorderColor(0.6, 0.6, 0.6)
 	backdrop:SetBackdropColor(0.05, 0.05, 0.05)
@@ -256,6 +262,9 @@ function Skillet:CreateTradeSkillWindow()
 -- Frame enclosing the reagent list
 --
 	backdrop = SkilletReagentParent
+	if not backdrop.SetBackdrop then
+		Mixin(backdrop, BackdropTemplateMixin)
+	end
 	backdrop:SetBackdrop(ControlBackdrop)
 	backdrop:SetBackdropBorderColor(0.6, 0.6, 0.6)
 	backdrop:SetBackdropColor(0.05, 0.05, 0.05)
@@ -264,6 +273,9 @@ function Skillet:CreateTradeSkillWindow()
 -- Frame enclosing the queue
 --
 	backdrop = SkilletQueueParent
+	if not backdrop.SetBackdrop then
+		Mixin(backdrop, BackdropTemplateMixin)
+	end
 	backdrop:SetBackdrop(ControlBackdrop)
 	backdrop:SetBackdropBorderColor(0.6, 0.6, 0.6)
 	backdrop:SetBackdropColor(0.05, 0.05, 0.05)
@@ -272,12 +284,18 @@ function Skillet:CreateTradeSkillWindow()
 -- frame enclosing the pop out notes panel
 --
 	backdrop = SkilletRecipeNotesFrame
+	if not backdrop.SetBackdrop then
+		Mixin(backdrop, BackdropTemplateMixin)
+	end
 	backdrop:SetBackdrop(ControlBackdrop)
 	backdrop:SetBackdropColor(0.1, 0.1, 0.1)
 	backdrop:SetBackdropBorderColor(0.6, 0.6, 0.6)
 	backdrop:SetResizable(true)
 	backdrop:Hide() -- initially hidden
 	backdrop = SkilletQueueManagementParent
+	if not backdrop.SetBackdrop then
+		Mixin(backdrop, BackdropTemplateMixin)
+	end
 	backdrop:SetBackdrop(ControlBackdrop)
 	backdrop:SetBackdropBorderColor(0.6, 0.6, 0.6)
 	backdrop:SetBackdropColor(0.05, 0.05, 0.05)
@@ -964,6 +982,7 @@ function Skillet:UpdateTradeSkillWindow()
 		width = width - 20
 	end
 	local text, color, skillIndex
+	local pretext, preid, prelink
 	local max_text_width = width
 	local showOwned = self:GetTradeSkillOption("filterInventory-owned") -- count from Altoholic
 	local showBag = self:GetTradeSkillOption("filterInventory-bag")
@@ -1111,7 +1130,27 @@ function Skillet:UpdateTradeSkillWindow()
 						levelText:SetText(level)
 					end
 				end
-				text = (self:RecipeNamePrefix(skill, recipe) or "") .. (skill.name or "")
+--
+-- Check for prefix information returned from a plugin. Most will return just text (which could be an icon)
+-- Some may return additional information so store that in the button for later use.
+--
+				pretext, preid, prelink = self:RecipeNamePrefix(skill, recipe)
+				if pretext then
+					button.pretext = pretext
+				end
+				if preid then
+					button.preid = preid
+				end
+				if prelink then
+					button.prelink = prelink
+				end
+--
+-- Set the prefix and name of the recipe
+--
+				text = (pretext or "") .. (skill.name or "")
+--
+-- Prepare the counts (displayed on the right)
+--
 				if recipe.reagentData and #recipe.reagentData > 0 then
 					local num, numrecursive, numwvendor, numwalts = get_craftable_counts(skill.skillData, recipe.numMade)
 					if (num > 0 and showBag) or (numrecursive > 0 and showCraft) or (numwvendor > 0 and showVendor) or (numwalts > 0 and showAlts) then
@@ -1164,7 +1203,7 @@ function Skillet:UpdateTradeSkillWindow()
 					countText:Hide()
 				end
 --
--- show the count of the item currently owned that the recipe will produce
+-- Show the count of the item currently owned that the recipe will produce
 --
 				if showOwned and self.currentPlayer == UnitName("player") then
 					local numowned = (self.db.realm.auctionData[self.currentPlayer][recipe.itemID] or 0) + GetItemCount(recipe.itemID,true)
@@ -1206,6 +1245,9 @@ function Skillet:UpdateTradeSkillWindow()
 						text = text .. " ("..tostring(recipeInfo.recipeUpgrade)..")"
 					end
 				end
+--
+-- Check for suffix information returned from a plugin
+--
 				suffixText:SetText(self:RecipeNameSuffix(skill, recipe) or "")
 				suffixText:Show()
 				buttonText:SetText(text)
@@ -1221,15 +1263,16 @@ function Skillet:UpdateTradeSkillWindow()
 						SkilletHighlight:SetColorTexture(0.7, 0.7, 0.7, 0.4)
 					end
 --
--- And update the details for this skill, just in case something
+-- Update the details for this skill, just in case something
 -- has changed (mats consumed, etc)
 --
 					self:UpdateDetailsWindow(self.selectedSkill)
 					SkilletHighlightFrame:Show()
 					button:LockHighlight()
 				else
-					-- not selected
-					button:SetBackdropColor(0.8, 0.2, 0.2)
+--
+-- Not selected
+--
 					button:UnlockHighlight()
 				end
 				--DA.DEBUG(0,"show_button, skillIndex= "..tostring(skillIndex))
@@ -1533,6 +1576,7 @@ function Skillet:HideDetailWindow()
 	SkilletRequirementText:SetText("")
 	SkilletSkillIcon:Hide()
 	SkilletReagentLabel:Hide()
+	SkilletOptionalLabel:Hide()
 	SkilletRecipeNotesButton:Hide()
 	SkilletPreviousItemButton:Hide()
 	SkilletExtraDetailTextLeft:Hide()
@@ -1696,6 +1740,7 @@ function Skillet:UpdateDetailsWindow(skillIndex)
 	SkilletReagentLabel:Show();
 	local width = SkilletReagentParent:GetWidth()
 	local lastReagentButton = _G["SkilletReagent1"]
+	local lastReagentIndex = 1
 	for i=1, SKILLET_NUM_REAGENT_BUTTONS, 1 do
 		local button = _G["SkilletReagent"..i]
 		local   text = _G[button:GetName() .. "Text"]
@@ -1742,6 +1787,7 @@ function Skillet:UpdateDetailsWindow(skillIndex)
 			button:SetWidth(width - 20)
 			button:Show()
 			lastReagentButton = button
+			lastReagentIndex = i
 		else
 --
 -- out of necessary reagents, don't need to show the button,
@@ -1750,6 +1796,15 @@ function Skillet:UpdateDetailsWindow(skillIndex)
 			button:Hide()
 		end
 	end
+	if recipe.numOptional and recipe.numOptional ~= "0" then
+		SkilletOptionalLabel:SetText(SPELL_REAGENTS_OPTIONAL.."  (Not Implemented)")
+		SkilletOptionalLabel:SetPoint("TOPLEFT",lastReagentButton,"BOTTOMLEFT",0,-10)
+		SkilletOptionalLabel:Show();
+		lastReagentButton = _G["SkilletReagent"..tostring(lastReagentIndex+1)]
+	else
+		SkilletOptionalLabel:Hide()
+	end
+
 	if #skillStack > 0 then
 		SkilletPreviousItemButton:Show()
 	else
@@ -2136,28 +2191,34 @@ function Skillet:SkillButton_OnClick(button, mouse)
 			if IsShiftKeyDown() and self.skillMainSelection then
 				self:SkillButton_ClearSelections()
 				self:SkillButton_SetSelections(self.skillMainSelection, button.rawIndex)
-			else
-				if not IsControlKeyDown() then
-					if not button.skill.subGroup then
-						if not button.skill.selected then
-							self:SkillButton_ClearSelections()
-						end
-						self:SetSelectedSkill(button:GetID())
-						button.skill.selected = true
-					else
-						if button.skill.selected and not self:RecipeGroupIsLocked() then
-							self:SkillButton_NameEditEnable(button)
-							return			-- avoid window update
-						else
-							self:SkillButton_ClearSelections()
-							self.selectedSkill = nil
-							button.skill.selected = true
-						end
-					end
-					self.skillMainSelection = button.rawIndex
-				else
-					button.skill.selected = not button.skill.selected
+			elseif IsControlKeyDown() then
+				button.skill.selected = not button.skill.selected
+			elseif IsAltKeyDown() then
+--
+-- Some plugins may return extra information from RecipeNamePrefix so deal with it here
+-- Currently, only the Overachiever plugin returns the achievement id and a link
+--
+				if button.prelink then
+					DA.CHAT(button.prelink)
 				end
+			else
+				if not button.skill.subGroup then
+					if not button.skill.selected then
+						self:SkillButton_ClearSelections()
+					end
+					self:SetSelectedSkill(button:GetID())
+					button.skill.selected = true
+				else
+					if button.skill.selected and not self:RecipeGroupIsLocked() then
+						self:SkillButton_NameEditEnable(button)
+						return			-- avoid window update
+					else
+						self:SkillButton_ClearSelections()
+						self.selectedSkill = nil
+						button.skill.selected = true
+					end
+				end
+				self.skillMainSelection = button.rawIndex
 			end
 		end
 		self:UpdateTradeSkillWindow()
@@ -2422,8 +2483,45 @@ function Skillet:ReagentButtonOnClick(button, skillIndex, reagentIndex)
 	end
 end
 
+--
+-- Called when the icon button is clicked
+--
+function Skillet:ReagentsLinkOnClick(button, skillIndex, reagentIndex)
+	DA.DEBUG(0,"ReagentLinkOnClick("..tostring(button)..", "..tostring(skillIndex)..", "..tostring(reagentIndex)..")")
+	if not self.db.profile.link_craftable_reagents then
+		--DA.DEBUG(1,"link_craftable_reagents= "..tostring(self.db.profile.link_craftable_reagents))
+		return
+	end
+	local recipe = self:GetRecipeDataByTradeIndex(self.currentTrade, skillIndex)
+	--DA.DEBUG(1,"recipe= "..DA.DUMP1(recipe))
+	local sep = " "
+	for i = 1, #recipe.reagentData, 1 do
+		local reagent = recipe.reagentData[i]
+		--DA.DEBUG(1,"reagent= "..DA.DUMP1(reagent))
+		if reagent then
+			local reagentName, reagentLink
+			if reagent.reagentID then
+				reagentName, reagentLink = GetItemInfo(reagent.reagentID)
+			end
+			--DA.DEBUG(1,"reagentLink= "..DA.DUMP1(reagentLink))
+			if reagentLink then
+				ChatEdit_InsertLink(sep .. reagent.numNeeded .. "x" .. reagentLink)
+			end
+		sep = ", "
+		end
+	end
+end
+
 function Skillet:SkilletFrameForceClose()
 	DA.DEBUG(0,"SkilletFrameForceClose()")
+--
+-- Skillet's Close (X) button just hides our frames to avoid crashing TSM
+--
+	if TSM_API and Skillet.db.profile.tsm_compat then
+		if TSM_API.IsUIVisible("CRAFTING") then
+			return self:HideAllWindows()
+		end
+	end
 	C_TradeSkillUI.CloseTradeSkill()
 	return self:HideAllWindows()
 
@@ -3213,7 +3311,10 @@ function Skillet:CreateStandaloneQueueFrame()
 	if not frame then
 		return nil
 	end
-	if TSMAPI_FOUR then
+	if not frame.SetBackdrop then
+		Mixin(frame, BackdropTemplateMixin)
+	end
+	if TSM_API and Skillet.db.profile.tsm_compat then
 		frame:SetFrameStrata("HIGH")
 	end
 	frame:SetBackdrop(FrameBackdrop);

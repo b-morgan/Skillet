@@ -124,6 +124,14 @@ Skillet.TradeSkillAutoTarget = {
 		[72092] = 5, -- Ghost Iron Ore
 		[72103] = 5, -- White Trillium Ore
 		[72094] = 5, -- Black Trillium Ore
+		[152512] = 5, -- Monelite Ore
+		[152513] = 5, -- Platinum Ore
+		[152579] = 5, -- Storm Silver-ore
+		[168185] = 5, -- Osmenite Ore
+		[171829] = 5, -- Solenium Ore
+		[171830] = 5, -- Oxxein Ore
+		[171831] = 5, -- Phaedrum Ore
+		[171832] = 5, -- Sinvyr Ore
 	},
 	[51005] = {	  -- Milling
 		[765]  = 5, -- Silverleaf
@@ -200,10 +208,26 @@ Skillet.TradeSkillAutoTarget = {
 		[124102] = 5, -- Dreamleaf
 		[124103] = 5, -- Foxflower
 		[124104] = 5, -- Fjarnskaggl
-		[124105] = 5, -- Starlight-rose
+		[124105] = 5, -- Starlight Rose
 		[124106] = 5, -- Felwort
-		[128304] = 5, -- Yseralline-seed
+		[128304] = 5, -- Yseralline Seed
 -- Added in Battle for Azeroth
+		[152505] = 5, -- Riverbud
+		[152511] = 5, -- Sea Stalk
+		[152506] = 5, -- Star Moss
+		[152507] = 5, -- Akunda's Bite
+		[152508] = 5, -- Winter's Kiss
+		[152509] = 5, -- Siren's Pollen
+		[152510] = 5, -- Anchor Weed
+-- Added Rise of Azshara
+		[168487] = 5, -- Zinanthid
+-- Added in Shadowlands
+		[168586] = 5, -- Rising Glory
+		[168589] = 5, -- Marrowroot
+		[170554] = 5, -- Vigils Torch
+		[168583] = 5, -- Widowbloom
+		[169701] = 5, -- Death Blossom
+		[171315] = 5, -- Nightshade
 	}
 }
 
@@ -728,6 +752,39 @@ Skillet.scrollData = {
 	[298438] = 168592, -- Enchant Weapon - Oceanic Restoration Rank 1
 	[298437] = 168592, -- Enchant Weapon - Oceanic Restoration Rank 2
 	[298515] = 168592, -- Enchant Weapon - Oceanic Restoration Rank 3
+-- Added in 9.0.2 Shadowlands (thanks to Tarkumi)
+	[309524] = 172406, -- Enchant Gloves - Shadowlands Gathering
+	[309525] = 172407, -- Enchant Gloves - Strength of Soul
+	[309526] = 172408, -- Enchant Gloves - Eternal Strength
+	[309528] = 172410, -- Enchant Cloak - Fortified Speed
+	[309530] = 172411, -- Enchant Cloak - Fortified Avoidance
+	[309531] = 172412, -- Enchant Cloak - Fortified Leech
+	[309532] = 172413, -- Enchant Boots - Agile Soulwalker
+	[309534] = 172419, -- Enchant Boots - Eternal Agility
+	[309535] = 172418, -- Enchant Chest - Eternal Bulwark
+	[309608] = 172414, -- Enchant Bracers - Illuminated Soul
+	[309609] = 172415, -- Enchant Bracers - Eternal Intellect
+	[309610] = 172416, -- Enchant Bracers - Shaded Hearthing
+	[309612] = 172357, -- Enchant Ring - Bargain of Critical Strike
+	[309613] = 172358, -- Enchant Ring - Bargain of Haste
+	[309614] = 172359, -- Enchant Ring - Bargain of Mastery
+	[309615] = 172360, -- Enchant Ring - Bargain of Versatility
+	[309616] = 172361, -- Enchant Ring - Tenet of Critical Strike
+	[309617] = 172362, -- Enchant Ring - Tenet of Haste
+	[309618] = 172363, -- Enchant Ring - Tenet of Mastery
+	[309619] = 172364, -- Enchant Ring - Tenet of Versatility
+	[309620] = 172370, -- Enchant Weapon - Lightless Force
+	[309621] = 172367, -- Enchant Weapon - Eternal Grace
+	[309622] = 172365, -- Enchant Weapon - Ascended Vigor
+	[309623] = 172368, -- Enchant Weapon - Sinful Revelation
+	[309627] = 172366, -- Enchant Weapon - Celestial Guidance
+	[323609] = 177661, -- Enchant Boots - Speed of Soul
+	[323755] = 177660, -- Enchant Cloak - Soul Vitality
+	[323760] = 177659, -- Enchant Chest - Eternal Skirmish
+	[323761] = 177715, -- Enchant Chest - Eternal Bounds
+	[323762] = 177716, -- Enchant Chest - Sacred Stats
+	[324773] = 177962, -- Enchant Chest - Eternal Stats
+	[342316] = 183738, -- Enchant Chest - Eternal Insight
 }
 
 --[[ == Local Tables == ]]--
@@ -842,9 +899,9 @@ local skill_style_type = {
 	["unavailable"]		= { r = 0.3, g = 0.3, b = 0.3,	  level = 6, alttext="",	cstring = "|cff606060"},
 }
 
-local topink = 129032				-- Roseate Pigment
+local topink = 311404				-- Umbral Ink
 local specialVendorItems = {
-	[37101] = {1, topink},			--Ivory Ink
+	[37101] = {1, topink},			--Ivory Ink (obsolete?)
 	[39469] = {1, topink},			--Moonglow Ink
 	[39774] = {1, topink},			--Midnight Ink
 	[43116] = {1, topink},			--Lions Ink
@@ -856,10 +913,17 @@ local specialVendorItems = {
 	[61978] = {1, topink},			--Blackfallow Ink
 	[79254] = {1, topink},			--Ink of Dreams
 	[113111] = {1, topink},			--Warbinder's Ink
+	[129032] = {1, topink},			--Roseate Pigment
+	[129034] = {1, topink},			--Sallow Pigment
+	[168663] = {1, topink},			--Maroon Ink
+	[158188] = {1, topink},			--Crimson Ink
+	[158187] = {1, topink},			--Ultramarine Ink
 
+	[43125] = {10, topink},			-- Darkflame Ink
 	[43127] = {10, topink},			--Snowfall Ink
 	[61981] = {10, topink},			--Inferno Ink
 	[79255] = {10, topink},			--Starlight Ink
+	[158189] = {10, topink},		--Viridescent Ink
 }
 Skillet.SpecialVendorItems = specialVendorItems
 
@@ -947,7 +1011,7 @@ end
 -- goes thru the stored recipe list and collects reagent and item information as well as skill lookups
 function Skillet:CollectRecipeInformation()
 	for recipeID, recipeString in pairs(self.db.global.recipeDB) do
-		local tradeID, itemString, reagentString, toolString = string.split(" ",recipeString)
+		local tradeID, itemString, reagentString, toolString, numOptional = string.split(" ",recipeString)
 		local itemID = 0
 		local numMade = 1
 		if itemString ~= "0" then
@@ -1202,15 +1266,16 @@ function Skillet:GetRecipeName(id)
 end
 
 function Skillet:GetRecipe(id)
-	--DA.DEBUG(0,"GetRecipe("..tostring(id)..")")
+	DA.DEBUG(0,"GetRecipe("..tostring(id)..")")
 	if id and id ~= 0 then
-		if Skillet.data.recipeList[id] then
-			return Skillet.data.recipeList[id]
-		end
+--		if Skillet.data.recipeList[id] then
+--			return Skillet.data.recipeList[id]
+--		end
 		if Skillet.db.global.recipeDB[id] then
 			local recipeString = Skillet.db.global.recipeDB[id]
-			--DA.DEBUG(0,"recipeString= "..tostring(recipeString))
-			local tradeID, itemString, reagentString, toolString = string.split(" ",recipeString)
+			DA.DEBUG(0,"recipeString= "..tostring(recipeString))
+			local tradeID, itemString, reagentString, toolString, numOptional = string.split(" ",recipeString)
+			DA.DEBUG(0,"numOptional= "..tostring(numOptional))
 			local itemID, numMade = 0, 1
 			local slot = nil
 			if itemString then
@@ -1264,6 +1329,12 @@ function Skillet:GetRecipe(id)
 						Skillet.data.recipeList[id].tools[i] = string.gsub(toolList[i],"_"," ")
 					end
 				end
+			else
+				DA.DEBUG(0,"id= "..tostring(id)..", recipeString= "..tostring(recipeString))
+			end
+			if numOptional then
+				Skillet.data.recipeList[id].numOptional = numOptional
+				DA.DEBUG(0,"id= "..tostring(id)..", recipeString= "..DA.DUMP1(Skillet.data.recipeList[id]))
 			else
 				DA.DEBUG(0,"id= "..tostring(id)..", recipeString= "..tostring(recipeString))
 			end
@@ -1357,15 +1428,18 @@ end
 
 -- collects currency data (id to name and name to id)
 function Skillet:CollectCurrencyData()
-	--DA.DEBUG(0,"CollectCurrencyData()")
+	DA.DEBUG(0,"CollectCurrencyData()")
 	self.currencyIDsByName = {}
 	self.currencyNamesByID = {}
-	local maxCurrency = GetCurrencyListSize()
+	local maxCurrency = C_CurrencyInfo.GetCurrencyListSize()
 	for i=1,maxCurrency,1 do
-		local name, isHeader, isExpanded, isUnused, isWatched, count, icon, maximum, hasWeeklyLimit, currentWeeklyAmount, unknown = GetCurrencyListInfo(i)
-		local currencyLink = GetCurrencyListLink(i)
+		local info = C_CurrencyInfo.GetCurrencyListInfo(i)
+		DA.DEBUG(1,"CollectCurrencyData: info= "..DA.DUMP1(info))
+		local name = info.name
+		local isHeader = info.isHeader
+		local currencyLink = C_CurrencyInfo.GetCurrencyListLink(i)
 		local currencyID = Skillet:GetItemIDFromLink(currencyLink)
-		if not isHeader then
+		if not isHeader and currencyID and name then
 			self.currencyIDsByName[name] = currencyID
 			self.currencyNamesByID[currencyID] = name
 		end
@@ -1936,6 +2010,16 @@ function Skillet:ScanTrade()
 			end
 		end
 		recipeString = recipeString.." "..toolString
+
+		local optionalReagentSlots = C_TradeSkillUI.GetOptionalReagentInfo(recipeID)
+		local numOptionalReagentSlots = #optionalReagentSlots
+		local hasOptionalReagentSlots = numOptionalReagentSlots > 0
+		if hasOptionalReagentSlots then
+			--DA.DEBUG(2,"recipeDB["..tostring(recipeID).."] ("..tostring(recipeInfo.name)..") optionalReagents: "..DA.DUMP1(optionalReagentSlots))
+			recipeString = recipeString.." "..tostring(numOptionalReagentSlots)
+		else
+			recipeString = recipeString.." 0"
+		end
 
 		recipeDB[recipeID] = recipeString
 		nameDB[recipeID] = recipeInfo.name		-- for debugging

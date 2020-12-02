@@ -1,4 +1,4 @@
-## Interface: 80300
+## Interface: 90002
 ## Title: Skillet |cff7fff7f -Ace3-|r
 ## Notes: A replacement tradeskill window
 ## Notes-esES: Una sustitucion de la ventana de Habilidades de Comercio
@@ -6,15 +6,11 @@
 ## Author: yossa, bsmorgan
 ## Version: @project-version@
 ## X-Category: Tradeskill
-## X-eMail: yossa.addons@googlemail.com
 ## X-License GPL v3 or later
 ## X-Credits lilsparky, nogudnik (creator of Skillet), Slartie (for ASTW)
-## X-RelSite-WoWI: 7571
-#### X-AceForum: 9179
-## X-WoWIPortal: yossa
-## X-Website: http://www.wowace.com/addons/skillet/
-## X-RelSite-Curse: http://wow.curse.com/downloads/wow-addons/details/skillet.aspx
-#### X-RelSite-UI.WoW:
+## X-Curse-Project-ID: 14660
+## X-WoWI-ID: 7571
+## X-Website: https://www.curseforge.com/wow/addons/skillet
 ## SavedVariables: SkilletDB
 ## SavedVariablesPerCharacter: SkilletDBPC, SkilletMemory, SkilletProfile
 ## OptionalDeps: Ace3, LibDialog-1.0, LibWindow-1.1, LibPeriodicTable-3.1, TradeSkillMaster, TheUndermineJournal, TradeSkillInfo, Auctionator, BeanCounter
@@ -82,6 +78,7 @@ Plugins\BeanCounter.lua
 Plugins\TheUndermineJournal.lua
 Plugins\Auctionator.lua
 Plugins\CanIMogIt.lua
+Plugins\Overachiever.lua
 
 #### UI files
 UI\Utils.lua

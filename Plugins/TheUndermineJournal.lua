@@ -123,7 +123,7 @@ function plugin.GetExtraText(skill, recipe)
 		local value = o['market']
 		if value then
 			extra_text = Skillet:FormatMoneyFull(value, true);
-			label = L["Market"]..":"
+			label = "|r"..L["Market"]..":"
 		end
 	end
 	return label, extra_text

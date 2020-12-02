@@ -837,7 +837,7 @@
 	# Tool tip to be used when hovering over recipe lines in the skill list
 	#
 	-->
-	<GameTooltip name="SkilletTradeskillTooltip" frameStrata="TOOLTIP" hidden="true">
+	<GameTooltip name="SkilletTradeskillTooltip" frameStrata="TOOLTIP" hidden="true" inherits="GameTooltipTemplate">
 		<Backdrop bgFile="Interface\Tooltips\UI-Tooltip-Background" edgeFile="Interface\Tooltips\UI-Tooltip-Border" tile="true">
 			<EdgeSize>
 				<AbsValue val="16"/>
@@ -878,7 +878,7 @@
 	#
 	# Don't change the name 'SkilletFrame' as other addons may depend on it
 	-->
-	<Frame name="SkilletFrame" toplevel="true" movable="true" clampedToScreen="true" resizable="true" parent="UIParent" enableMouse="true" hidden="true">
+	<Frame name="SkilletFrame" toplevel="true" movable="true" clampedToScreen="true" resizable="true" parent="UIParent" enableMouse="true" hidden="true" inherits="BackdropTemplate">
 		<Size>
 			<AbsDimension x="750" y="580"/>
 		</Size>
@@ -953,44 +953,6 @@
 				<NormalTexture file="Interface\Buttons\UI-MicroButton-Help-Up"/>
 				<PushedTexture file="Interface\Buttons\UI-MicroButton-Help-Down"/>
 				<HighlightTexture file="Interface\Buttons\UI-MicroButton-Hilight" alphaMode="ADD"/>
-			</Button>
-			<!-- A button to link the current trade skill -->
-			<Button name="SkilletTradeSkillLinkButton">
-				<Size>
-					<AbsDimension x="32" y="16"/>
-				</Size>
-				<Anchors>
-					<Anchor point="RIGHT" relativeTo="SkilletShowOptionsButton" relativePoint="LEFT">
-						<Offset>
-							<AbsDimension x="-5" y="-6"/>
-						</Offset>
-					</Anchor>
-				</Anchors>
-				<Scripts>
-					<OnClick>
-						local activeEditBox =  ChatEdit_GetActiveWindow()
-						if activeEditBox then
-							local link=C_TradeSkillUI.GetTradeSkillListLink()
-							if (not ChatEdit_InsertLink(link) ) then
-								assert(activeEditBox:GetName(), "Failed to add tradeskill link")
-							end
-						end
-					</OnClick>
-					<OnEnter>
-						GameTooltip:SetOwner(self,"ANCHOR_TOPLEFT")
-						GameTooltip:SetText(LINK_TRADESKILL_TOOLTIP, nil, nil, nil, nil, true)
-						GameTooltip:Show()
-					</OnEnter>
-					<OnLeave>
-						GameTooltip:Hide()
-					</OnLeave>
-				</Scripts>
-				<NormalTexture file="Interface\TradeSkillFrame\UI-TradeSkill-LinkButton">
-					<TexCoords left="0" right="1.0" top="0" bottom="0.5"/>
-				</NormalTexture>
-				<HighlightTexture file="Interface\TradeSkillFrame\UI-TradeSkill-LinkButton" alphaMode="ADD">
-					<TexCoords left="0" right="1.0" top="0.5" bottom="1.0"/>
-				</HighlightTexture>
 			</Button>
 			<!--
 			#
@@ -1337,7 +1299,7 @@
 			# The list of known recipes on the left hand side
 			#
 			-->
-			<Frame name="SkilletSkillListParent" parent="SkilletFrame">
+			<Frame name="SkilletSkillListParent" parent="SkilletFrame" inherits="BackdropTemplate">
 				<Size>
 					<AbsDimension x="320" y="430"/>
 				</Size>
@@ -1765,7 +1727,7 @@
 			# A frame to hold the reagent list and associated details on the right hand side
 			#
 			-->
-			<Frame name="SkilletReagentParent" parent="SkilletFrame">
+			<Frame name="SkilletReagentParent" parent="SkilletFrame" inherits="BackdropTemplate">
 				<Size>
 					<AbsDimension x="280" y="300"/>
 				</Size>
@@ -1843,6 +1805,15 @@
 								</Anchor>
 							</Anchors>
 						</FontString>
+						<FontString name="SkilletOptionalLabel" inherits="GameFontNormalSmall" justifyH="LEFT" text="SPELL_REAGENTS_OPTIONAL">
+							<Anchors>
+								<Anchor point="TOPLEFT" relativeTo="SkilletReagentLabel" relativePoint="BOTTOMLEFT">
+									<Offset>
+										<AbsDimension x="-47" y="-20"/>
+									</Offset>
+								</Anchor>
+							</Anchors>
+						</FontString>
 						<!-- If there is extra info about a recipe that a mod wants to print, this is where they would
 							 put the text -->
 						<FontString name="SkilletExtraDetailTextLeft" inherits="GameFontHighlightSmall" justifyV="TOP" justifyH="LEFT">
@@ -1905,7 +1876,7 @@
 					<OnLeave function="GameTooltip_Hide" />
 				</Scripts>
 			</Frame>
-			<Frame name="SkilletQueueManagementParent" parent="SkilletFrame" hidden="true">
+			<Frame name="SkilletQueueManagementParent" parent="SkilletFrame" hidden="true" inherits="BackdropTemplate">
 				<Size>
 					<AbsDimension x="280" y="260"/>
 				</Size>
@@ -2057,7 +2028,7 @@
 					</EditBox>
 				</Frames>
 			</Frame>
-			<Frame name="SkilletViewCraftersParent" parent="SkilletFrame" hidden="true">
+			<Frame name="SkilletViewCraftersParent" parent="SkilletFrame" hidden="true" inherits="BackdropTemplate">
 				<Size>
 					<AbsDimension x="280" y="260"/>
 				</Size>
@@ -2297,6 +2268,10 @@
 							<!-- This put a link to the *item* that can be created with this trade skill
 								 into the current chat  box -->
 							ChatEdit_InsertLink(link)
+						elseif ( button == "LeftButton" and IsAltKeyDown() ) then
+						<!-- This will put a link to the *reagents* required by this *item*
+							 into the current chat edit box -->
+							Skillet:ReagentsLinkOnClick(self, Skillet.selectedSkill, self:GetID())
 						elseif ( button == "RightButton" ) then
 							<!-- right clicking allow adjusting numCreated -->
 							if ( IsShiftKeyDown() ) then
@@ -2399,6 +2374,16 @@
 			<Button name="SkilletReagent8" inherits="SkilletItemTemplate" id="8" parent="SkilletReagentParent">
 				<Anchors>
 					<Anchor point="TOPLEFT" relativeTo="SkilletReagent7" relativePoint="BOTTOMLEFT">
+						<Offset>
+							<AbsDimension x="0" y="0"/>
+						</Offset>
+					</Anchor>
+				</Anchors>
+			</Button>
+			<!-- Define one more just in case the recipe has 8 reagents -->
+			<Button name="SkilletReagent9" inherits="SkilletItemTemplate" id="9" parent="SkilletReagentParent">
+				<Anchors>
+					<Anchor point="TOPLEFT" relativeTo="SkilletReagent8" relativePoint="BOTTOMLEFT">
 						<Offset>
 							<AbsDimension x="0" y="0"/>
 						</Offset>
@@ -2746,7 +2731,7 @@
 			# A frame to hold the queue and buttons
 			#
 			-->
-			<Frame name="SkilletQueueParentBase" parent="SkilletFrame">
+			<Frame name="SkilletQueueParentBase" parent="SkilletFrame" inherits="BackdropTemplate">
 				<Anchors>
 					<Anchor point="TOPLEFT" relativeTo="SkilletCreateAllButton" relativePoint="BOTTOMLEFT">
 						<Offset>
@@ -2923,7 +2908,7 @@
 			</OnUpdate>
 		</Scripts>
 	</Frame> <!-- main trade skill frame -->
-	<Frame name="SkilletStandaloneQueue" toplevel="true" movable="true" clampedToScreen="true" resizable="true" parent="UIParent" enableMouse="true" hidden="true">
+	<Frame name="SkilletStandaloneQueue" toplevel="true" movable="true" clampedToScreen="true" resizable="true" parent="UIParent" enableMouse="true" hidden="true" inherits="BackdropTemplate">
 		<Size>
 			<AbsDimension x="385" y="170"/>
 		</Size>

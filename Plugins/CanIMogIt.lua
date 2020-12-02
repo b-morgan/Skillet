@@ -69,7 +69,7 @@ end
 
 function plugin.GetExtraText(skill, recipe)
 	if CanIMogIt and CanIMogIt.GetIconText and Skillet.db.profile.plugins.CIMI.enabled then
-		return "CanIMogIt:", (plugin.RecipeNamePrefix(skill, recipe) or "No")
+		return "|rCanIMogIt:", (plugin.RecipeNamePrefix(skill, recipe) or "No")
 	end
 end
 

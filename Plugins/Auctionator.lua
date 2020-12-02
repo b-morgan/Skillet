@@ -268,11 +268,11 @@ end
 function plugin.RecipeNameSuffix(skill, recipe)
 	local text
 	if not recipe then return end
-	DA.DEBUG(0,"RecipeNameSuffix: recipe= "..DA.DUMP1(recipe,1))
+	--DA.DEBUG(0,"RecipeNameSuffix: recipe= "..DA.DUMP1(recipe,1))
 	local itemID = recipe.itemID
-	DA.DEBUG(0,"RecipeNameSuffix: itemID= "..tostring(itemID)..", type= "..type(itemID))
+	--DA.DEBUG(0,"RecipeNameSuffix: itemID= "..tostring(itemID)..", type= "..type(itemID))
 	local itemName = GetItemInfo(itemID)
-	DA.DEBUG(0,"RecipeNameSuffix: itemName= "..tostring(itemName)..", type= "..type(itemName))
+	--DA.DEBUG(0,"RecipeNameSuffix: itemName= "..tostring(itemName)..", type= "..type(itemName))
 	if Skillet.db.profile.plugins.ATR.enabled and itemID then
 		local value
 		if isClassic and Atr_GetAuctionBuyout then
@@ -282,7 +282,7 @@ function plugin.RecipeNameSuffix(skill, recipe)
 		else
 			return
 		end
-		DA.DEBUG(0,"RecipeNameSuffix: value= "..tostring(value))
+		--DA.DEBUG(0,"RecipeNameSuffix: value= "..tostring(value))
 		local buyout = value * recipe.numMade
 		if Skillet.db.profile.plugins.ATR.reagentPrices then
 			local cost = 0
@@ -315,7 +315,7 @@ function plugin.RecipeNameSuffix(skill, recipe)
 						value = 0
 					end
 				end
-				DA.DEBUG(1, "RecipeNameSuffix: reagent["..i.."] ("..id..") "..tostring(name)..", value= "..tostring(value))
+				--DA.DEBUG(1, "RecipeNameSuffix: reagent["..i.."] ("..id..") "..tostring(name)..", value= "..tostring(value))
 				cost = cost + value
 			end
 			if Skillet.db.profile.plugins.ATR.useVendorCalc then

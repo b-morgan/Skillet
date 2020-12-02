@@ -207,7 +207,7 @@
  #  The shopping list window ....
  #
 -->
-<Frame name="SkilletShoppingList" toplevel="true" movable="true" clampedToScreen="true" resizable="true" parent="UIParent" enableMouse="true" hidden="true">
+<Frame name="SkilletShoppingList" toplevel="true" movable="true" clampedToScreen="true" resizable="true" parent="UIParent" enableMouse="true" hidden="true" inherits="BackdropTemplate">
 	<Size>
 		<AbsDimension x="385" y="240"/>
 	</Size>
