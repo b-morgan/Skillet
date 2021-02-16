@@ -20,7 +20,6 @@
 ## X-LoadOn-Always: delayed
 
 #### List of embedded libraries
-#@no-lib-strip@
 Libs\LibStub\LibStub.lua
 Libs\CallbackHandler-1.0\CallbackHandler-1.0.xml
 Libs\AceAddon-3.0\AceAddon-3.0.xml
@@ -39,11 +38,9 @@ Libs\LibPeriodicTable-3.1\LibPeriodicTable-3.1.lua
 Libs\LibPeriodicTable-3.1\LibPeriodicTable-3.1-Tradeskill\LibPeriodicTable-3.1-Tradeskill.lua
 Libs\LibPeriodicTable-3.1\LibPeriodicTable-3.1-TradeskillResultMats\LibPeriodicTable-3.1-TradeskillResultMats.lua
 Libs\LibPeriodicTable-3.1\LibPeriodicTable-3.1-TradeskillLevels\LibPeriodicTable-3.1-TradeskillLevels.lua
-#@end-no-lib-strip@
 
 #### Localization files
 Locale\Locale-enUS.lua
-
 Locale\Locale-deDE.lua
 Locale\Locale-esES.lua
 Locale\Locale-frFR.lua

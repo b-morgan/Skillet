@@ -1,0 +1,197 @@
+<Ui xmlns="http://www.blizzard.com/wow/ui/" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://www.blizzard.com/wow/ui/
+..\..\FrameXML\UI.xsd">
+
+	<!--
+	Skillet: A tradeskill window replacement.
+
+	This program is free software: you can redistribute it and/or modify
+	it under the terms of the GNU General Public License as published by
+	the Free Software Foundation, either version 3 of the License, or
+	(at your option) any later version.
+
+	This program is distributed in the hope that it will be useful,
+	but WITHOUT ANY WARRANTY; without even the implied warranty of
+	MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+	GNU General Public License for more details.
+
+	You should have received a copy of the GNU General Public License
+	along with this program.  If not, see <http://www.gnu.org/licenses/>.
+	-->
+
+<!--
+#
+#  Template for all the buttons we use to display items in the optional list
+#
+-->
+	<Frame name="SkilletOptionalListItemTemplate" hidden="false" virtual="true">
+		<Size>
+			<AbsDimension x="190" y="20"/>
+		</Size>
+		<Layers>
+			<Layer level="OVERLAY">
+				<FontString name="$parentText" inherits="GameFontNormal" justifyH="LEFT" justifyV="MIDDLE">
+					<Size>
+						<AbsDimension x="150" y="16"/>
+					</Size>
+					<Anchors>
+						<Anchor point="TOPLEFT" relativeTo="$parent" relativePoint="TOPLEFT">
+							<Offset>
+								<AbsDimension x="54" y="0"/>
+							</Offset>
+						</Anchor>
+					</Anchors>
+					<Color r="1" g="1" b="1" a="1"/>
+				</FontString>
+				<FontString name="$parentCount" inherits="GameFontNormalSmall" justifyH="RIGHT" justifyV="MIDDLE">
+					<Size>
+						<AbsDimension x="80" y="16"/>
+					</Size>
+					<Anchors>
+						<Anchor point="TOPRIGHT" relativeTo="$parent" relativePoint="TOPRIGHT">
+							<Offset>
+								<AbsDimension x="0" y="0"/>
+							</Offset>
+						</Anchor>
+					</Anchors>
+					<Color r="1" g="1" b="1" a="1"/>
+				</FontString>
+				<FontString name="$parentNeeded" inherits="GameFontNormalSmall" justifyH="RIGHT" justifyV="MIDDLE">
+					<Size>
+						<AbsDimension x="34" y="16"/>
+					</Size>
+					<Anchors>
+						<Anchor point="TOPLEFT" relativeTo="$parent" relativePoint="TOPLEFT">
+							<Offset>
+								<AbsDimension x="18" y="0"/>
+							</Offset>
+						</Anchor>
+					</Anchors>
+				<Color r="1" g="1" b="1" a="1"/>
+				</FontString>
+			</Layer>
+		</Layers>
+		<Frames>
+			<!-- A button for the icon -->
+			<button name="$parentIcon">
+				<Size>
+					<AbsDimension x="16" y="16"/>
+				</Size>
+				<Layers>
+					<Layer level="BACKGROUND">
+						<Texture name="$parentTexture"/>
+					</Layer>
+				</Layers>
+				<Anchors>
+					<Anchor point="TOPLEFT" relativeTo="$parent" relativePoint="TOPLEFT">
+						<Offset>
+							<AbsDimension x="0" y="0"/>
+						</Offset>
+					</Anchor>
+				</Anchors>
+			</button>
+		</Frames>
+		<Scripts>
+			<OnLoad>
+				self:RegisterForClicks("LeftButtonUp", "RightButtonUp")
+			</OnLoad>
+			<OnEnter>
+				Skillet:OptionalButtonOnEnter(self, SkilletFrame.selectedSkill, self:GetID())
+			</OnEnter>
+			<OnLeave>
+				Skillet:OptionalButtonOnLeave(self, SkilletFrame.selectedSkill, self:GetID())
+			</OnLeave>
+			<OnUpdate>
+				CursorOnUpdate(self)
+			</OnUpdate>
+			<OnClick>
+				local link = Skillet:GetOptionalItemLink(Skillet.selectedSkill, self:GetID())
+				if ( button == "LeftButton" and IsShiftKeyDown() ) then
+				<!-- Put a link to the *item* in chat
+					 into the current chat edit box -->
+					ChatEdit_InsertLink(link)
+				else
+				<!-- generic click action -->
+					Skillet:OptionalButtonOnClick(self, button, Skillet.selectedSkill, self:GetID())
+				end
+			</OnClick>
+		</Scripts>
+	</Frame>
+
+<Frame name="SkilletOptionalList" parent="UIParent" toplevel="true" movable="true" enableMouse="true" resizable="true" hidden="true" inherits="BackdropTemplate">
+	<Size><AbsDimension x="320" y="230"/></Size>
+	<Anchors>
+		<Anchor point="CENTER"/>
+	</Anchors>
+	<Backdrop bgFile="Interface\Tooltips\UI-Tooltip-Background" edgeFile="Interface\Tooltips\UI-Tooltip-Border" tile="true">
+		<EdgeSize>
+			<AbsValue val="16"/>
+		</EdgeSize>
+		<TileSize>
+			<AbsValue val="16"/>
+		</TileSize>
+		<BackgroundInsets>
+			<AbsInset left="3" right="3" top="3" bottom="3"/>
+		</BackgroundInsets>
+	</Backdrop>
+	<Frames>
+		<Button name="SkilletOptionalListCloseButton" inherits="UIPanelCloseButton" parent="SkilletOptionalList">
+			<Anchors>
+				<Anchor point="TOPRIGHT" relativeTo="SkilletOptionalList" relativePoint="TOPRIGHT">
+					<Offset>
+						<AbsDimension x="-2" y="-2"/>
+					</Offset>
+				</Anchor>
+			</Anchors>
+			<Scripts>
+				<OnClick>
+					HideUIPanel(SkilletOptionalList)
+				</OnClick>
+			</Scripts>
+		</Button>
+		<Frame name="SkilletOptionalListParent" parent="SkilletOptionalList">
+			<Anchors>
+				<Anchor point="TOPLEFT" relativeTo="SkilletOptionalList" relativePoint="TOPLEFT">
+					<Offset>
+						<AbsDimension x="5" y="-35"/>
+					</Offset>
+				</Anchor>
+				<Anchor point="BOTTOMRIGHT" relativeTo="SkilletOptionalList" relativePoint="BOTTOMRIGHT">
+					<Offset>
+						<AbsDimension x="-5" y="30"/>
+					</Offset>
+				</Anchor>
+			</Anchors>
+		</Frame>
+		<ScrollFrame name="SkilletOptionalListList" inherits="FauxScrollFrameTemplate" parent="SkilletOptionalListParent">
+			<Anchors>
+				<Anchor point="TOPLEFT" relativeTo="SkilletOptionalListParent" relativePoint="TOPLEFT">
+					<Offset>
+						<AbsDimension x="5" y="-5"/>
+					</Offset>
+				</Anchor>
+				<Anchor point="BOTTOMRIGHT" relativeTo="SkilletOptionalListParent" relativePoint="BOTTOMRIGHT">
+					<Offset>
+						<AbsDimension x="-27" y="5"/>
+					</Offset>
+				</Anchor>
+			</Anchors>
+			<Scripts>
+				<OnVerticalScroll>
+					FauxScrollFrame_OnVerticalScroll(self, offset, SKILLET_OPTIONAL_LIST_HEIGHT, Skillet.OptionalList_OnScroll)
+				</OnVerticalScroll>
+			</Scripts>
+		</ScrollFrame>
+		<Button name="SkilletOptionalListButton1" inherits="SkilletOptionalListItemTemplate">
+			<Anchors>
+				<Anchor point="TOPLEFT" relativeTo="SkilletOptionalListList" relativePoint="TOPLEFT">
+					<Offset>
+						<AbsDimension x="1" y="-1"/>
+					</Offset>
+				</Anchor>
+			</Anchors>
+		</Button>
+		<!-- rest of the buttons are created dynamically -->
+	</Frames>
+</Frame>
+</Ui>
+
