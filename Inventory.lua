@@ -173,7 +173,7 @@ function Skillet:InventorySkillIterations(tradeID, recipe)
 end
 
 function Skillet:InventoryScan()
-	DA.DEBUG(0,"InventoryScan()")
+	--DA.DEBUG(0,"InventoryScan()")
 	local player = self.currentPlayer
 	if self.linkedSkill or self.isGuild or player ~= UnitName("player") then
 		return
@@ -235,7 +235,7 @@ function Skillet:GetInventory(player, reagentID)
 			--DA.DEBUG(1,"inventoryData= "..tostring(self.db.realm.inventoryData[player][reagentID]))
 			local data = { string.split(" ", self.db.realm.inventoryData[player][reagentID]) }
 			if numCanUse and data[1] and tonumber(numCanUse) ~= tonumber(data[1]) then
-				DA.DEBUG(0,"inventoryData is stale")
+				--DA.DEBUG(0,"inventoryData is stale")
 			end
 			if #data == 1 then			-- no craftability info yet
 				return tonumber(data[1]) or 0, 0, 0
@@ -278,7 +278,7 @@ end
 -- returns the number of items that can be bought limited by the amount of currency available
 --
 function Skillet:VendorItemAvailable(itemID)
-	DA.DEBUG(0,"VendorItemAvailable("..tostring(itemID)..")")
+	--DA.DEBUG(0,"VendorItemAvailable("..tostring(itemID)..")")
 	local _, divider, currency
 	local currencyAvailable = 0
 	local currencyAvailableAlts = 0
@@ -297,7 +297,7 @@ function Skillet:VendorItemAvailable(itemID)
 		local MissingVendorItem = self.db.global.MissingVendorItems[itemID]
 		if type(MissingVendorItem) == 'table' then	-- table entries are {name, quantity, currencyName, currencyID, currencyCount}
 			if Skillet.db.profile.use_altcurrency_vendor_items then
-				DA.DEBUG(1,"MissingVendorItem="..DA.DUMP1(MissingVendorItem))
+				--DA.DEBUG(1,"MissingVendorItem="..DA.DUMP1(MissingVendorItem))
 				if MissingVendorItem[4] > 0 then
 					currencyAvailable = self:GetInventory(self.currentPlayer, MissingVendorItem[4])
 				else
@@ -307,7 +307,7 @@ function Skillet:VendorItemAvailable(itemID)
 						currencyAvailable = cinfo.quantity
 					end
 				end
-				DA.DEBUG(1,"currencyAvailable="..tostring(currencyAvailable))
+				--DA.DEBUG(1,"currencyAvailable="..tostring(currencyAvailable))
 --
 -- compute how many this player can buy with alternate currency and return 0 for alts
 --

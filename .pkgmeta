@@ -18,6 +18,3 @@ externals:
     Libs/LibPeriodicTable-3.1/LibPeriodicTable-3.1-Tradeskill:   https://repos.wowace.com/wow/libperiodictable-3-1/trunk/LibPeriodicTable-3.1-Tradeskill
     Libs/LibPeriodicTable-3.1/LibPeriodicTable-3.1-TradeskillLevels:   https://repos.wowace.com/wow/libperiodictable-3-1/trunk/LibPeriodicTable-3.1-TradeskillLevels
     Libs/LibPeriodicTable-3.1/LibPeriodicTable-3.1-TradeskillResultMats:   https://repos.wowace.com/wow/libperiodictable-3-1/trunk/LibPeriodicTable-3.1-TradeskillResultMats
-
-ignore:
-    - Old # old classic skillet

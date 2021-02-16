@@ -56,6 +56,7 @@ local defaults = {
 		display_full_tooltip = true,			-- show full blizzards tooltip
 		link_craftable_reagents = true,
 		queue_craftable_reagents = true,
+		queue_more_than_one = false,
 		queue_glyph_reagents = false,
 		display_required_level = false,
 		display_shopping_list_at_bank = true,
@@ -72,6 +73,7 @@ local defaults = {
 		queue_only_view = true,
 		dialog_switch = false,
 		scale_tooltip = false,
+		use_blizzard_for_optional = false,
 		tsm_compat = false,
 		transparency = 1.0,
 		scale = 1.0,
@@ -140,9 +142,11 @@ function Skillet:DisableBlizzardFrame()
 		self.tradeSkillHide = TradeSkillFrame:GetScript("OnHide")
 		TradeSkillFrame:SetScript("OnHide", nil)
 		HideUIPanel(TradeSkillFrame)
+		Skillet.BlizzardUIshowing = false
 	else
 		TradeSkillFrame:SetScript("OnHide", nil)
 		HideUIPanel(TradeSkillFrame)
+		Skillet.BlizzardUIshowing = false
 	end
 end
 
@@ -155,8 +159,38 @@ function Skillet:EnableBlizzardFrame()
 		self.BlizzardTradeSkillFrame = nil
 		TradeSkillFrame:SetScript("OnHide", Skillet.tradeSkillHide)
 		Skillet.tradeSkillHide = nil
-		--ShowUIPanel(TradeSkillFrame)
 	end
+end
+
+function Skillet:EmptyBlizzardFrame()
+	DA.DEBUG(0,"EmptyBlizzardFrame()")
+	if Skillet.db.profile.BlizzOR then
+		TradeSkillFrame.RankFrame:Hide()
+		TradeSkillFrame.FilterButton:Hide()
+		TradeSkillFrame.SearchBox:Hide()
+		TradeSkillFrame.RecipeList.LearnedTab:Hide()
+		TradeSkillFrame.RecipeList.UnlearnedTab:Hide()
+		if not Skillet.TSFRLwidth then
+			Skillet.TSFRLwidth = TradeSkillFrame.RecipeList:GetWidth()
+		end
+		TradeSkillFrame.RecipeList:SetWidth(0)
+		TradeSkillFrame:SetTitle("Skillet Optional Reagents Helper")
+	end
+end
+
+function Skillet:RestoreBlizzardFrame()
+	DA.DEBUG(0,"RestoreBlizzardFrame()")
+	if Skillet.db.profile.BlizzOR then
+		TradeSkillFrame.RankFrame:Show()
+		TradeSkillFrame.FilterButton:Show()
+		TradeSkillFrame.SearchBox:Show()
+		TradeSkillFrame.RecipeList.LearnedTab:Show()
+		TradeSkillFrame.RecipeList.UnlearnedTab:Show()
+		if Skillet.TSFRLwidth then
+			TradeSkillFrame.RecipeList:SetWidth(Skillet.TSFRLwidth)
+		end
+	end
+	Skillet.BlizzardUIshowing = false
 end
 
 --
@@ -645,6 +679,11 @@ function Skillet:OnEnable()
 	self:RegisterEvent("UNIT_SPELLCAST_FAILED_QUIET")
 	self:RegisterEvent("UNIT_SPELLCAST_INTERRUPTED")
 --
+-- Events needed to handle caching of item info
+--
+	self:RegisterEvent("ITEM_DATA_LOAD_RESULT")
+	self:RegisterEvent("GET_ITEM_INFO_RECEIVED")
+--
 -- Not sure these are needed for crafting but they
 -- are useful for debugging.
 --
@@ -865,6 +904,18 @@ function Skillet:GARRISON_TRADESKILL_NPC_CLOSED()
 	DA.TRACE("GARRISON_TRADESKILL_NPC_CLOSED")
 end
 
+function Skillet:ITEM_DATA_LOAD_RESULT()
+	DA.TRACE("ITEM_DATA_LOAD_RESULT")
+	if Skillet.optionalDataNeeded then
+		Skillet:UpdateOptionalListWindow()
+		Skillet.optionalDataNeeded = nil
+	end
+end
+
+function Skillet:GET_ITEM_INFO_RECEIVED()
+	DA.TRACE("GET_ITEM_INFO_RECEIVED")
+end
+
 --
 -- Called when the addon is disabled
 --
@@ -934,6 +985,7 @@ function Skillet:SkilletShow()
 		self:HideAllWindows()
 		self:EnableBlizzardFrame()
 		ShowUIPanel(TradeSkillFrame)
+		Skillet.BlizzardUIshowing = true
 	elseif self:IsSupportedTradeskill(self.currentTrade) then
 		DA.DEBUG(3,"SkilletShow: "..tostring(self.currentTrade).." IsSupportedTradeskill")
 		self:DisableBlizzardFrame()
@@ -948,6 +1000,7 @@ function Skillet:SkilletShow()
 		self:HideAllWindows()
 		self:EnableBlizzardFrame()
 		ShowUIPanel(TradeSkillFrame)
+		Skillet.BlizzardUIshowing = true
 	end
 end
 
@@ -1195,7 +1248,7 @@ function Skillet:ShowTradeSkillWindow()
 		tinsert(UISpecialFrames, frame:GetName())
 	end
 	self:ResetTradeSkillWindow()
-	Skillet:ShowFullView()
+	self:ShowFullView()
 	if not frame:IsVisible() then
 		frame:Show()
 	end
@@ -1211,6 +1264,10 @@ function Skillet:HideTradeSkillWindow()
 	if frame and frame:IsVisible() then
 		frame:Hide()
 		closed = true
+		if Skillet.db.profile.use_blizzard_for_optional and TradeSkillFrame then
+			self:RestoreBlizzardFrame()
+			Skillet.BlizzardUIshowing = false
+		end
 	end
 	return closed
 end
@@ -1220,7 +1277,6 @@ end
 --
 function Skillet:HideAllWindows()
 	local closed -- was anything closed?
-	-- Cancel anything currently being created
 	if self:HideTradeSkillWindow() then
 		closed = true
 	end
@@ -1231,6 +1287,12 @@ function Skillet:HideAllWindows()
 		closed = true
 	end
 	if self:HideStandaloneQueue() then
+		closed = true
+	end
+	if self:HideIgnoreList() then
+		closed = true
+	end
+	if self:HideOptionalList() then
 		closed = true
 	end
 	self.currentTrade = nil

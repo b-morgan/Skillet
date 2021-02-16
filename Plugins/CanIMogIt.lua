@@ -56,7 +56,7 @@ end
 
 function plugin.RecipeNamePrefix(skill, recipe)
 	if not skill or not recipe then return end
-	if CanIMogIt and CanIMogIt.GetIconText then
+	if CanIMogIt and CanIMogIt.GetIconText and Skillet.db.profile.plugins.CIMI.enabled then
 		local itemLink = select(2, GetItemInfo(recipe.itemID))
 		if itemLink then
 			local icon = CanIMogIt:GetIconText(itemLink)

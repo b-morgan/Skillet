@@ -132,7 +132,7 @@ Skillet.options =
 						Skillet.db.profile.link_craftable_reagents = value
 					end,
 					width = "double",
-					order = 19
+					order = 18
 				},
 				queue_craftable_reagents = {
 					type = "toggle",
@@ -143,6 +143,19 @@ Skillet.options =
 					end,
 					set = function(self,value)
 						Skillet.db.profile.queue_craftable_reagents = value
+					end,
+					width = "double",
+					order = 19
+				},
+				queue_more_than_one = {
+					type = "toggle",
+					name = L["QUEUEMORETHANONENAME"],
+					desc = L["QUEUEMORETHANONEDESC"],
+					get = function()
+						return Skillet.db.profile.queue_more_than_one
+					end,
+					set = function(self,value)
+						Skillet.db.profile.queue_more_than_one = value
 					end,
 					width = "double",
 					order = 20
@@ -212,33 +225,6 @@ Skillet.options =
 					width = "double",
 					order = 25
 				},
-				show_craft_counts = {
-					type = "toggle",
-					name = L["SHOWCRAFTCOUNTSNAME"],
-					desc = L["SHOWCRAFTCOUNTSDESC"],
-					get = function()
-						return Skillet.db.profile.show_craft_counts
-					end,
-					set = function(self,value)
-						Skillet.db.profile.show_craft_counts = value
-						Skillet:UpdateTradeSkillWindow()
-					end,
-					width = "double",
-					order = 26,
-				},
-				show_recipe_source_for_learned = {
-					type = "toggle",
-					name = L["SHOWRECIPESOURCEFORLEARNEDNAME"],
-					desc = L["SHOWRECIPESOURCEFORLEARNEDDESC"],
-					get = function()
-						return Skillet.db.profile.show_recipe_source_for_learned
-					end,
-					set = function(self,value)
-						Skillet.db.profile.show_recipe_source_for_learned = value
-					end,
-					width = "double",
-					order = 28
-				},
 				use_guildbank_as_alt = {
 					type = "toggle",
 					name = L["USEGUILDBANKASALTNAME"],
@@ -303,6 +289,33 @@ Skillet.options =
 					width = "double",
 					order = 2
 				},
+				show_craft_counts = {
+					type = "toggle",
+					name = L["SHOWCRAFTCOUNTSNAME"],
+					desc = L["SHOWCRAFTCOUNTSDESC"],
+					get = function()
+						return Skillet.db.profile.show_craft_counts
+					end,
+					set = function(self,value)
+						Skillet.db.profile.show_craft_counts = value
+						Skillet:UpdateTradeSkillWindow()
+					end,
+					width = "double",
+					order = 3
+				},
+				show_recipe_source_for_learned = {
+					type = "toggle",
+					name = L["SHOWRECIPESOURCEFORLEARNEDNAME"],
+					desc = L["SHOWRECIPESOURCEFORLEARNEDDESC"],
+					get = function()
+						return Skillet.db.profile.show_recipe_source_for_learned
+					end,
+					set = function(self,value)
+						Skillet.db.profile.show_recipe_source_for_learned = value
+					end,
+					width = "double",
+					order = 4
+				},
 				use_blizzard_for_followers = {
 					type = "toggle",
 					name = L["USEBLIZZARDFORFOLLOWERSNAME"],
@@ -314,7 +327,20 @@ Skillet.options =
 						Skillet.db.profile.use_blizzard_for_followers = value
 					end,
 					width = "double",
-					order = 3
+					order = 5
+				},
+				use_blizzard_for_optional = {
+					type = "toggle",
+					name = L["USEBLIZZFOROPTIONNAME"],
+					desc = L["USEBLIZZFOROPTIONDESC"],
+					get = function()
+						return Skillet.db.profile.use_blizzard_for_optional
+					end,
+					set = function(self,value)
+						Skillet.db.profile.use_blizzard_for_optional = value
+					end,
+					width = "double",
+					order = 6
 				},
 				enhanced_recipe_display = {
 					type = "toggle",
@@ -328,7 +354,7 @@ Skillet.options =
 						Skillet:UpdateTradeSkillWindow()
 					end,
 					width = "double",
-					order = 4,
+					order = 7
 				},
 				confirm_queue_clear = {
 					type = "toggle",
@@ -342,7 +368,7 @@ Skillet.options =
 						Skillet:UpdateTradeSkillWindow()
 					end,
 					width = "double",
-					order = 5,
+					order = 8
 				},
 				queue_only_view = {
 					type = "toggle",
@@ -356,7 +382,7 @@ Skillet.options =
 						Skillet:UpdateTradeSkillWindow()
 					end,
 					width = "double",
-					order = 5,
+					order = 9
 				},
 				dialog_switch = {
 					type = "toggle",
@@ -369,7 +395,7 @@ Skillet.options =
 						Skillet.db.profile.dialog_switch = value
 					end,
 					width = "double",
-					order = 6,
+					order = 10
 				},
 				tsm_compatibility = {
 					type = "toggle",
@@ -382,7 +408,7 @@ Skillet.options =
 						Skillet.db.profile.tsm_compat = value
 					end,
 					width = "double",
-					order = 7,
+					order = 11
 				},
 				scale_tooltip = {
 					type = "toggle",
@@ -395,7 +421,7 @@ Skillet.options =
 						Skillet.db.profile.scale_tooltip = value
 					end,
 					width = "double",
-					order = 7,
+					order = 12
 				},
 				transparency = {
 					type = "range",
@@ -412,7 +438,7 @@ Skillet.options =
 						Skillet:UpdateStandaloneQueueWindow()
 					end,
 					width = "double",
-					order = 10,
+					order = 20
 				},
 				scale = {
 					type = "range",
@@ -429,7 +455,7 @@ Skillet.options =
 						Skillet:UpdateStandaloneQueueWindow()
 					end,
 					width = "double",
-					order = 11,
+					order = 21
 				},
 				ttscale = {
 					type = "range",
@@ -446,7 +472,7 @@ Skillet.options =
 						Skillet:UpdateStandaloneQueueWindow()
 					end,
 					width = "double",
-					order = 12,
+					order = 22
 				},
 			},
 		},
@@ -696,8 +722,10 @@ Skillet.options =
 				Skillet.data.btsui = value
 				if value then
 					ShowUIPanel(TradeSkillFrame)
+					Skillet.BlizzardUIshowing = true
 				else
 					HideUIPanel(TradeSkillFrame)
+					Skillet.BlizzardUIshowing = false
 				end
 			end,
 			order = 68
@@ -793,6 +821,20 @@ Skillet.options =
 				end
 			end,
 			order = 75
+		},
+		flushplayerdata = {
+			type = 'execute',
+			name = L["Flush Player Data"],
+			desc = L["Flush Player Data"],
+			func = function()
+				if not (UnitAffectingCombat("player")) then
+					Skillet:InitializeDatabase(UnitName("player"), true)
+				else
+					DA.DEBUG(0,"|cff8888ffSkillet|r: Combat lockdown restriction." ..
+												  " Leave combat and try again.")
+				end
+			end,
+			order = 76
 		},
 
 --
@@ -1094,7 +1136,7 @@ Skillet.options =
 						SkilletFrame:SetPoint("TOPLEFT",200,-100);
 						windowManager.SavePosition(SkilletFrame)
 					end
-						if SkilletStandaloneQueue and SkilletStandaloneQueue:IsVisible() then
+					if SkilletStandaloneQueue and SkilletStandaloneQueue:IsVisible() then
 						SkilletStandaloneQueue:SetWidth(385);
 						SkilletStandaloneQueue:SetHeight(170);
 						SkilletStandaloneQueue:SetPoint("TOPLEFT",950,-100);
@@ -1102,9 +1144,21 @@ Skillet.options =
 					end
 					if SkilletShoppingList and SkilletShoppingList:IsVisible() then
 						SkilletShoppingList:SetWidth(385);
-						SkilletShoppingList:SetHeight(170);
+						SkilletShoppingList:SetHeight(240);
 						SkilletShoppingList:SetPoint("TOPLEFT",950,-400);
 						windowManager.SavePosition(SkilletShoppingList)
+					end
+					if SkilletIgnoreList and SkilletIgnoreList:IsVisible() then
+						SkilletIgnoreList:SetWidth(320);
+						SkilletIgnoreList:SetHeight(150);
+						SkilletIgnoreList:SetPoint("TOPLEFT",950,-400);
+						windowManager.SavePosition(SkilletIgnoreList)
+					end
+					if SkilletOptionalList and SkilletOptionalList:IsVisible() then
+						SkilletOptionalList:SetWidth(320);
+						SkilletOptionalList:SetHeight(230);
+						SkilletOptionalList:SetPoint("TOPLEFT",950,-400);
+						windowManager.SavePosition(SkilletOptionalList)
 					end
 				else
 					DA.DEBUG(0,"|cff8888ffSkillet|r: Combat lockdown restriction." ..
@@ -1112,6 +1166,19 @@ Skillet.options =
 				end
 			end,
 			order = 99
+		},
+		BlizzOR = {
+			type = "toggle",
+			name = "BlizzOR",
+			desc = "Option for debugging",
+			get = function()
+				return Skillet.db.profile.BlizzOR
+			end,
+			set = function(self,value)
+				Skillet.db.profile.BlizzOR = value
+				Skillet.BlizzOR = value
+			end,
+			order = 100
 		},
 	}
 }

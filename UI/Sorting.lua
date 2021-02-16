@@ -32,6 +32,10 @@ Skillet.skill_style_type = skill_style_type
 local sorters = {}
 local recipe_sort_method = nil
 
+local function NOSORT(tradeskill, a, b)
+	return (a.skillIndex or 0) < (b.skillIndex or 0)
+end
+
 local function sort_recipe_by_name(tradeskill, a, b)
 	if a.name == b.name then
 		return (a.skillIndex or 0) < (b.skillIndex or 0)
@@ -137,16 +141,38 @@ local function sort_recipe_by_index(tradeskill, a, b)
 	end
 end
 
-local function NOSORT(tradeskill, a, b)
-	return (a.skillIndex or 0) < (b.skillIndex or 0)
+local function get_suffix(recipe, first)
+	local ret = recipe.suffix
+	if not ret and recipe.recipeData then
+		ret = recipe.recipeData.suffix
+	end
+	if first and ret == nil and recipe.recipeID then
+		actualRecipe = Skillet:GetRecipe(recipe.recipeID)
+		Skillet:RecipeNameSuffix(tradeskill, actualRecipe)
+		ret = get_suffix(actualRecipe, false)
+	end
+	return ret
+end
+
+local function sort_recipe_by_suffix(tradeskill, a, b)
+	if a.subGroup or b.subGroup then
+		return NOSORT(tradeskill, a, b)
+	end
+	local as = get_suffix(a, true)
+	local bs = get_suffix(b, true)
+	if as == bs then
+		return (a.skillIndex or 0) < (b.skillIndex or 0)
+	else
+		return (as or 0) > (bs or 0)
+	end
 end
 
 local function SkillIsFilteredOut(skillIndex)
 	--DA.DEBUG(0,"SkillIsFilteredOut("..tostring(skillIndex)..")")
 	local skill = Skillet:GetSkill(Skillet.currentPlayer, Skillet.currentTrade, skillIndex)
-	--DA.DEBUG(1,"skill = "..DA.DUMP1(skill,1))
+	--DA.DEBUG(1,"SkillIsFilteredOut: skill = "..DA.DUMP1(skill,1))
 	local recipe = Skillet:GetRecipe(skill.id)
-	--DA.DEBUG(1,"recipe = "..DA.DUMP1(recipe,1))
+	--DA.DEBUG(1,"SkillIsFilteredOut: recipe = "..DA.DUMP1(recipe,1))
 	local recipeID = recipe.spellID or 0
 	if recipeID == 0 then
 --
@@ -157,7 +183,7 @@ local function SkillIsFilteredOut(skillIndex)
 
 	local recipeInfo = Skillet.data.recipeInfo[Skillet.currentTrade][recipeID]
 	if recipeInfo then
-		--DA.DEBUG(1,"unlearnedRecipes= "..tostring(Skillet.unlearnedRecipes)..", recipeInfo = "..DA.DUMP1(recipeInfo,1))
+		--DA.DEBUG(1,"SkillIsFilteredOut: unlearnedRecipes= "..tostring(Skillet.unlearnedRecipes)..", recipeInfo = "..DA.DUMP1(recipeInfo,1))
 		if Skillet.unlearnedRecipes then
 			if recipeInfo.learned then
 				return true
@@ -341,6 +367,8 @@ function Skillet:InitializeSorting()
 --	table.insert(sorters, 4, {["name"]=L["By Skill Level"], ["sorter"]=sort_recipe_by_skill_level})
 	table.insert(sorters, 4, {["name"]=L["By Item Level"], ["sorter"]=sort_recipe_by_item_level})
 	table.insert(sorters, 5, {["name"]=L["By Quality"], ["sorter"]=sort_recipe_by_item_quality})
+	table.insert(sorters, 6, {["name"]=L["By Suffix"], ["sorter"]=sort_recipe_by_suffix})
+
 	recipe_sort_method = sort_recipe_by_index
 	SkilletSortAscButton:SetScript("OnClick", function()
 		-- clicked the button will toggle sort ascending off
@@ -376,33 +404,33 @@ end
 -- Causes the list of recipes to be resorted
 --
 function Skillet:SortAndFilterRecipes()
-	--DA.DEBUG(0,"SortAndFilterRecipes()")
+	DA.DEBUG(0,"SortAndFilterRecipes()")
 	local skillListKey = Skillet.currentPlayer..":"..Skillet.currentTrade..":"..Skillet.currentGroupLabel
 	local numSkills = Skillet:GetNumSkills(Skillet.currentPlayer, Skillet.currentTrade)
 	if not Skillet.data.sortedSkillList then
-		--DA.DEBUG(1,"Skillet.data.sortedSkillList = {}")
+		--DA.DEBUG(1,"SortAndFilterRecipes: Skillet.data.sortedSkillList = {}")
 		Skillet.data.sortedSkillList = {}
 	end
 	if not Skillet.data.sortedSkillList[skillListKey] then
-		--DA.DEBUG(1,"Skillet.data.sortedSkillList[skillListKey] = {}")
+		--DA.DEBUG(1,"SortAndFilterRecipes: Skillet.data.sortedSkillList[skillListKey] = {}")
 		Skillet.data.sortedSkillList[skillListKey] = {}
 	end
 	local sortedSkillList = Skillet.data.sortedSkillList[skillListKey]
 	local oldLength = #sortedSkillList
-	--DA.DEBUG(1,"numSkills= "..tostring(numSkills)..", oldLength= ",tostring(oldLength))
+	--DA.DEBUG(1,"SortAndFilterRecipes: numSkills= "..tostring(numSkills)..", oldLength= ",tostring(oldLength))
 	local button_index = 0
 	local searchtext = Skillet:GetTradeSkillOption("searchtext")
 	local groupLabel = Skillet.currentGroupLabel
-	--DA.DEBUG(1,"searchtext="..tostring(searchtext)..", groupLabel="..tostring(groupLabel))
+	--DA.DEBUG(1,"SortAndFilterRecipes: searchtext="..tostring(searchtext)..", groupLabel="..tostring(groupLabel))
 	if searchtext and searchtext ~= "" or groupLabel == "Flat" then
-		--DA.DEBUG(1,"SortAndFilterRecipes Flat")
+		--DA.DEBUG(1,"SortAndFilterRecipes: Flat")
 		for i=1, numSkills, 1 do
 			local skill = Skillet:GetSkill(Skillet.currentPlayer, Skillet.currentTrade, i)
 			if skill then
 				local recipe = Skillet:GetRecipe(skill.id)
 				if skill.id ~= 0 then							-- not a header
 					local filtered = SkillIsFilteredOut(i)
-					--DA.DEBUG(1,"SkillIsFilteredOut("..tostring(i)..")= "..tostring(filtered))
+					--DA.DEBUG(1,"SortAndFilterRecipes: SkillIsFilteredOut("..tostring(i)..")= "..tostring(filtered))
 					if not filtered then
 --
 -- skill is not filtered out
@@ -434,8 +462,11 @@ function Skillet:SortAndFilterRecipes()
 			end)
 		end
 	else
+--
+-- No search string and not Flat (i.e. Blizzard)
+--
 		local group = Skillet:RecipeGroupFind(Skillet.currentPlayer, Skillet.currentTrade, Skillet.currentGroupLabel, Skillet.currentGroup)
-		--DA.DEBUG(1,"current grouping "..Skillet.currentGroupLabel.." "..(Skillet.currentGroup or "nil"))
+		--DA.DEBUG(1,"SortAndFilterRecipes: current grouping "..Skillet.currentGroupLabel.." "..(Skillet.currentGroup or "nil"))
 		if recipe_sort_method ~= NOSORT then
 			Skillet:RecipeGroupSort(group, recipe_sort_method, is_sort_desc())
 		end
@@ -446,12 +477,14 @@ function Skillet:SortAndFilterRecipes()
 			button_index = Skillet:RecipeGroupFlatten(group, 0, sortedSkillList, 0)
 		end
 	end
-	--DA.DEBUG(1,"sorted "..button_index.." skills")
+	DA.DEBUG(1,"SortAndFilterRecipes: sorted "..button_index.." skills")
 	sortedSkillList.count = button_index
 	return button_index
 end
 
+--
 -- called when the sort drop down is first loaded
+--
 function Skillet:SortDropdown_OnLoad()
 	UIDropDownMenu_Initialize(SkilletSortDropdown, Skillet.SortDropdown_Initialize)
 	SkilletSortDropdown.displayMode = "MENU"  -- changes the pop-up borders to be rounded instead of square
@@ -462,10 +495,15 @@ function Skillet:SortDropdown_OnLoad()
 			break
 		end
 	end
---	show_sort_toggle()
+--
+-- Can't call show_sort_toggle() here as the sort
+-- buttons have not been created yet
+--
 end
 
+--
 -- Called when the sort drop down is displayed
+--
 function Skillet:SortDropdown_OnShow()
 	UIDropDownMenu_Initialize(SkilletSortDropdown, Skillet.SortDropdown_Initialize)
 	SkilletSortDropdown.displayMode = "MENU"  -- changes the pop-up borders to be rounded instead of square
@@ -478,7 +516,9 @@ function Skillet:SortDropdown_OnShow()
 	show_sort_toggle()
 end
 
+--
 -- The method we use the initialize the sorting drop down.
+--
 function Skillet:SortDropdown_Initialize()
 	recipe_sort_method = NOSORT
 	local info
@@ -496,11 +536,15 @@ function Skillet:SortDropdown_Initialize()
 		end
 		UIDropDownMenu_AddButton(info)
 	end
-	-- can't calls show_sort_toggle() here as the sort
-	-- buttons have not been created yet
+--
+-- Can't call show_sort_toggle() here as the sort
+-- buttons have not been created yet
+--
 end
 
+--
 -- Called when the user selects an item in the sorting drop down
+--
 function Skillet:SortDropdown_OnClick()
 	UIDropDownMenu_SetSelectedID(SkilletSortDropdown, self:GetID())
 	local entry = sorters[self:GetID()]

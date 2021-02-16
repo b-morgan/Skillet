@@ -97,8 +97,10 @@ function Skillet:GetTradeSkillNumReagents(skillIndex)
 	end
 end
 
+--
 -- Returns a link for the reagent required to create the specified
 -- item, the index'th reagent required for the item is returned
+--
 function Skillet:GetRecipeReagentItemLink(skillIndex, index)
 	if skillIndex and index then
 		local recipe = self:GetRecipeDataByTradeIndex(self.currentTrade, skillIndex)

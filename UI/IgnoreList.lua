@@ -281,8 +281,12 @@ function Skillet:DisplayIgnoreList()
 end
 
 function Skillet:HideIgnoreList()
-	if self.ignoreList then
+	--DA.DEBUG(0,"HideIgnoreList()")
+	local closed
+	if self.ignoreList and self.ignoreList:IsVisible() then
 		self.ignoreList:Hide()
+		closed = true
 	end
 	self.cachedIgnoreList = nil
+	return closed
 end

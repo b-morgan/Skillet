@@ -101,6 +101,21 @@ plugin.options =
 			end,
 			order = 3
 		},
+		colorCode = {
+			type = "toggle",
+			name = "colorCode",
+			desc = "Add color to the results",
+			get = function()
+				return Skillet.db.profile.plugins.TUJ.colorCode
+			end,
+			set = function(self,value)
+				Skillet.db.profile.plugins.TUJ.colorCode = value
+				if value then
+					Skillet.db.profile.plugins.TUJ.colorCode = value
+				end
+			end,
+			order = 4
+		},
 	},
 }
 
@@ -135,6 +150,9 @@ local function TUJMarketValue(itemID)
 	return o['market']
 end
 
+--
+-- Returns a text representation of value, numerical value (for sorting purposes)
+--
 function plugin.RecipeNameSuffix(skill, recipe)
 	local text
 	if recipe then
@@ -152,9 +170,9 @@ function plugin.RecipeNameSuffix(skill, recipe)
 				end
 				value = value - matsum
 				if Skillet.db.profile.plugins.TUJ.useShort then
-					text = Skillet:FormatMoneyShort(value, true)
+					text = Skillet:FormatMoneyShort(value, true, Skillet.db.profile.plugins.TUJ.colorCode)
 				else
-					text = Skillet:FormatMoneyFull(value, true)
+					text = Skillet:FormatMoneyFull(value, true, Skillet.db.profile.plugins.TUJ.colorCode)
 				end
 				if Skillet.db.profile.plugins.TUJ.onlyPositive and value <= 0 then
 					text = nil
@@ -162,7 +180,8 @@ function plugin.RecipeNameSuffix(skill, recipe)
 			end
 		end
 	end
-	return text
+	recipe.suffix = value
+	return text, value
 end
 
 Skillet:RegisterRecipeNamePlugin("TUJPlugin")		-- we have a RecipeNamePrefix or a RecipeNameSuffix function

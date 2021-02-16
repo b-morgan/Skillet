@@ -186,6 +186,7 @@ end
 -- Hide the Skillet notes window, it it was open
 --
 function Skillet:HideNotesWindow()
+	--DA.DEBUG(0,"HideNotesWindow()")
 	local closed
 	if self.recipeNotesFrame and self.recipeNotesFrame:IsVisible() then
 		HideUIPanel(self.recipeNotesFrame);

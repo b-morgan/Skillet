@@ -186,7 +186,7 @@
 			</Anchors>
 			<Scripts>
 				<OnVerticalScroll>
-					FauxScrollFrame_OnVerticalScroll(SKILLET_IGNORE_LIST_HEIGHT, Skillet.IgnoreList_OnScroll)
+					FauxScrollFrame_OnVerticalScroll(self, offset, SKILLET_IGNORE_LIST_HEIGHT, Skillet.IgnoreList_OnScroll)
 				</OnVerticalScroll>
 			</Scripts>
 		</ScrollFrame>

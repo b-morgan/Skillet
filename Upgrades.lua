@@ -31,7 +31,7 @@ function Skillet:UpgradeDataAndOptions()
 	local player = self.currentPlayer
 	local options = self.db.realm.options[player]
 	if options then
-		DA.DEBUG(0,"options= "..DA.DUMP1(options))
+		--DA.DEBUG(0,"UpgradeDataAndOptions: options= "..DA.DUMP1(options))
 		for trade in pairs(options) do
 			if options[trade].filtertext then
 				options[trade].searchtext = options[trade].filtertext

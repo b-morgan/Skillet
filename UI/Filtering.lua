@@ -20,15 +20,6 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
 local L = LibStub("AceLocale-3.0"):GetLocale("Skillet")
 
 --
--- called when the new filter drop down is first loaded
---
-function Skillet:FilterDropDown_OnLoad()
-	--DA.DEBUG(0,"FilterDropDown_OnLoad()")
-	UIDropDownMenu_Initialize(SkilletFilterDropdown, Skillet.FilterDropDown_Initialize)
-	SkilletFilterDropdown.displayMode = "MENU"  -- changes the pop-up borders to be rounded instead of square
-end
-
---
 -- Called when the new filter drop down is displayed
 --
 function Skillet:FilterDropDown_OnShow()
@@ -85,5 +76,169 @@ function Skillet:FilterDropDown_OnClick()
 	end
 	Skillet.dataScanned = false
 	Skillet:RescanTrade()
+	Skillet:UpdateTradeSkillWindow()
+end
+
+function Skillet.InitializeFilterDropdown(self, level)
+	local info = UIDropDownMenu_CreateInfo()
+	if level == 1 then
+		info.text = L["Reset"]
+		info.notCheckable = true
+		info.func = function()
+			TradeSkillFrame_SetAllSourcesFiltered(true)
+			Skillet:ResetTradeSkillFilter() -- verify the search filter is blank (so we get all skills)
+			UIDropDownMenu_RefreshAll(SkilletFilterDropMenu, 3)
+			SkilletFilterText:SetText("")
+			Skillet.dataScanned = false
+			Skillet:UpdateTradeSkillWindow()
+		end
+		UIDropDownMenu_AddButton(info, level)
+		info.notCheckable = false
+
+		info.text = CRAFT_IS_MAKEABLE
+		info.func = function()
+			C_TradeSkillUI.SetOnlyShowMakeableRecipes(not C_TradeSkillUI.GetOnlyShowMakeableRecipes())
+			Skillet:SetTradeSkillOption("hideuncraftable", C_TradeSkillUI.GetOnlyShowMakeableRecipes())
+			Skillet.dataScanned = false
+			Skillet:UpdateTradeSkillWindow()
+		end
+		info.keepShownOnClick = true
+		info.checked = C_TradeSkillUI.GetOnlyShowMakeableRecipes()
+		info.isNotRadio = true
+		UIDropDownMenu_AddButton(info, level)
+
+		if not C_TradeSkillUI.IsTradeSkillGuild() and not C_TradeSkillUI.IsNPCCrafting() then
+			info.text = TRADESKILL_FILTER_HAS_SKILL_UP
+			info.func = function()
+				C_TradeSkillUI.SetOnlyShowSkillUpRecipes(not C_TradeSkillUI.GetOnlyShowSkillUpRecipes())
+				if C_TradeSkillUI.GetOnlyShowSkillUpRecipes() then
+					Skillet:SetTradeSkillOption("filterLevel", 2)
+				else
+					Skillet:SetTradeSkillOption("filterLevel", 1)
+				end
+				Skillet.dataScanned = false
+				Skillet:UpdateTradeSkillWindow()
+			end
+			info.keepShownOnClick = true
+			info.checked = C_TradeSkillUI.GetOnlyShowSkillUpRecipes()
+			info.isNotRadio = true
+			UIDropDownMenu_AddButton(info, level)
+		end
+
+		info.checked = 	nil
+		info.isNotRadio = nil
+		info.func =  nil
+		info.notCheckable = true
+		info.keepShownOnClick = false
+		info.hasArrow = true
+
+		info.text = TRADESKILL_FILTER_SLOTS
+		info.value = 1
+		UIDropDownMenu_AddButton(info, level)
+
+		info.text = TRADESKILL_FILTER_CATEGORY
+		info.value = 2
+		UIDropDownMenu_AddButton(info, level)
+
+		info.text = SOURCES
+		info.value = 3
+		UIDropDownMenu_AddButton(info, level)
+
+	elseif level == 2 then
+		if UIDROPDOWNMENU_MENU_VALUE == 1 then
+			local inventorySlots = {C_TradeSkillUI.GetAllFilterableInventorySlots()}
+			for i, inventorySlot in ipairs(inventorySlots) do
+				info.text = inventorySlot
+				info.func = function()
+					Skillet.SetSlotFilter(i)
+				end
+				info.notCheckable = true
+				info.hasArrow = false
+				UIDropDownMenu_AddButton(info, level)
+			end
+		elseif UIDROPDOWNMENU_MENU_VALUE == 2 then
+			local categories = {C_TradeSkillUI.GetCategories()}
+			for i, categoryId in ipairs(categories) do
+				local categoryData = C_TradeSkillUI.GetCategoryInfo(categoryId)
+				info.text = categoryData.name
+				info.func = function()
+					Skillet.SetSlotFilter(nil, categoryId, nil)
+				end
+				info.notCheckable = true
+				info.hasArrow = select("#", C_TradeSkillUI.GetSubCategories(categoryId)) > 0
+				info.keepShownOnClick = true;
+				info.value = categoryId
+				UIDropDownMenu_AddButton(info, level)
+			end
+		elseif UIDROPDOWNMENU_MENU_VALUE == 3 then
+			info.hasArrow = false
+			info.isNotRadio = true
+			info.notCheckable = true
+			info.keepShownOnClick = true
+			info.text = CHECK_ALL
+			info.func = function()
+				TradeSkillFrame_SetAllSourcesFiltered(false)
+				UIDropDownMenu_Refresh(SkilletFilterDropMenu, 3, 2)
+				Skillet.dataScanned = false
+				Skillet:UpdateTradeSkillWindow()
+			end
+			UIDropDownMenu_AddButton(info, level)
+
+			info.text = UNCHECK_ALL
+			info.func = function()
+				TradeSkillFrame_SetAllSourcesFiltered(true)
+				UIDropDownMenu_Refresh(SkilletFilterDropMenu, 3, 2)
+				Skillet.dataScanned = false
+				Skillet:UpdateTradeSkillWindow()
+			end
+			UIDropDownMenu_AddButton(info, level)
+
+			info.notCheckable = false
+			for i = 1, C_PetJournal.GetNumPetSources() do
+				if C_TradeSkillUI.IsAnyRecipeFromSource(i) then
+					info.text = _G["BATTLE_PET_SOURCE_" .. i]
+					info.func = function(_, _, _, value)
+						C_TradeSkillUI.SetRecipeSourceTypeFilter(i, not value)
+						Skillet.dataScanned = false
+						Skillet:UpdateTradeSkillWindow()
+					end
+					info.checked = function()
+						return not C_TradeSkillUI.IsRecipeSourceTypeFiltered(i)
+					end
+					UIDropDownMenu_AddButton(info, level)
+				end
+			end
+		end
+
+	elseif level == 3 then
+		local categoryID = UIDROPDOWNMENU_MENU_VALUE
+		local categoryData = C_TradeSkillUI.GetCategoryInfo(categoryID)
+		local subCategories = { C_TradeSkillUI.GetSubCategories(categoryID) }
+		for i, subCategoryID in ipairs(subCategories) do
+			local subCategoryData = C_TradeSkillUI.GetCategoryInfo(subCategoryID)
+			info.text = subCategoryData.name
+			info.func = function()
+				Skillet.SetSlotFilter(nil, categoryID, subCategoryId)
+			end
+			info.notCheckable = true
+			info.keepShownOnClick = true
+			info.value = subCategoryId
+			UIDropDownMenu_AddButton(info, level)
+		end
+	end
+end
+
+function Skillet.SetSlotFilter(inventorySlotIndex, categoryId, subCategoryId)
+	C_TradeSkillUI.ClearInventorySlotFilter()
+	C_TradeSkillUI.ClearRecipeCategoryFilter()
+
+	if inventorySlotIndex then
+		C_TradeSkillUI.SetInventorySlotFilter(inventorySlotIndex, true, true)
+	end
+
+	if categoryId or subCategoryId then
+		C_TradeSkillUI.SetRecipeCategoryFilter(categoryId, subCategoryId)
+	end
+	Skillet.dataScanned = false
 	Skillet:UpdateTradeSkillWindow()
 end

@@ -95,6 +95,30 @@
 		</Scripts>
 		<HighlightTexture alphaMode="ADD" file="Interface\Buttons\ButtonHilight-Square"/>
 	</Button>
+	<CheckButton name="SkilletBlizzardUITemplate" virtual="true" hidden="true">
+		<Size>
+			<AbsDimension x="25" y="25"/>
+		</Size>
+		<Layers>
+			<Layer level="BACKGROUND">
+				<Texture name="$parentIcon"/>
+			</Layer>
+		</Layers>
+		<Scripts>
+			<OnEnter>
+				Skillet:BlizzardUIButton_OnEnter(self)
+			</OnEnter>
+			<OnLeave>
+				GameTooltip:Hide()
+			</OnLeave>
+			<OnClick>
+				Skillet:BlizzardUIButton_OnClick(self,button)
+			</OnClick>
+		</Scripts>
+		<PushedTexture file="Interface\Buttons\UI-Quickslot-Depress"/>
+		<HighlightTexture alphaMode="ADD" file="Interface\Buttons\ButtonHilight-Square"/>
+		<CheckedTexture alphaMode="ADD" file="Interface\Buttons\CheckButtonHilight"/>
+	</CheckButton>
 	<StatusBar name="SkilletRankFrameTemplate" drawLayer="BACKGROUND" minValue="0" maxValue="1" defaultValue="0" virtual="true">
 		<Size>
 			<AbsDimension x="297" y="5"/>
@@ -624,7 +648,7 @@
 			<Layer level="OVERLAY">
 				<FontString name="$parentText" inherits="GameFontNormalSmall" justifyH="LEFT">
 					<Size>
-						<AbsDimension x="280" y="0"/>
+						<AbsDimension x="360" y="0"/>
 					</Size>
 					<Anchors>
 						<Anchor point="LEFT">
@@ -762,6 +786,7 @@
 		</Frames>
 		<Scripts>
 			<OnLoad>
+				self:RegisterForClicks("LeftButtonUp", "RightButtonUp")
 				<!-- want the icon to be under the main button so the enter and leave
 					 events for the button are triggered over the icon -->
 				_G[self:GetName() .. "Icon"]:SetFrameLevel(self:GetFrameLevel() - 1)
@@ -778,17 +803,18 @@
 			<OnClick>
 				Skillet:InventoryFilterButtons_Hide()
 				local link = Skillet:GetRecipeReagentItemLink(Skillet.selectedSkill, self:GetID())
-				if ( IsControlKeyDown() ) then
+				if ( button == "LeftButton" and IsControlKeyDown() ) then
 				<!-- This opens up the dressing room window and display the character
 					 wearing the item (if that is possible) -->
 					DressUpItemLink(link)
-				elseif ( IsShiftKeyDown() ) then
+				elseif ( button == "LeftButton" and IsShiftKeyDown() ) then
 				<!-- This put a link to the *item* that can be created with this trade skill
 					 into the current chat edit box -->
 					ChatEdit_InsertLink(link)
+				<!-- elseif ( button == "RightButton" ) then -->
 				else
 				<!-- generic click action -->
-					Skillet:ReagentButtonOnClick(self, Skillet.selectedSkill, self:GetID())
+					Skillet:ReagentButtonOnClick(self, button, Skillet.selectedSkill, self:GetID())
 				end
 			</OnClick>
 		</Scripts>
@@ -1075,7 +1101,7 @@
 				</Anchors>
 				<Layers>
 					<Layer level="ARTWORK">
-						<FontString name="SkilletFilterLabel" inherits="GameFontNormal" text="Sorting">
+						<FontString name="SkilletFilterLabel" inherits="GameFontNormal" text="Filter">
 							<Anchors>
 								<Anchor point="RIGHT" relativeTo="$parent" relativePoint="LEFT">
 									<Offset>
@@ -1119,7 +1145,7 @@
 				<Scripts>
 					<OnClick>
 						Skillet:InventoryFilterButtons_Hide()
-						UIDropDownMenu_Initialize(SkilletFilterDropMenu, Skillet.InitializeDropdown, "MENU")
+						UIDropDownMenu_Initialize(SkilletFilterDropMenu, Skillet.InitializeFilterDropdown, "MENU")
 						ToggleDropDownMenu(1, nil, SkilletFilterDropMenu, self, self:GetWidth(), 0)
 					</OnClick>
 				</Scripts>
@@ -1301,7 +1327,7 @@
 			-->
 			<Frame name="SkilletSkillListParent" parent="SkilletFrame" inherits="BackdropTemplate">
 				<Size>
-					<AbsDimension x="320" y="430"/>
+					<AbsDimension x="360" y="430"/>
 				</Size>
 				<Anchors>
 					<Anchor point="TOPLEFT" relativeTo="SkilletFrame" relativePoint="TOPLEFT">
@@ -1722,6 +1748,7 @@
 				</Anchors>
 			</Button>
 			<!-- The rest of the buttons are created dynamically -->
+
 			<!--
 			#
 			# A frame to hold the reagent list and associated details on the right hand side
@@ -1729,7 +1756,7 @@
 			-->
 			<Frame name="SkilletReagentParent" parent="SkilletFrame" inherits="BackdropTemplate">
 				<Size>
-					<AbsDimension x="280" y="300"/>
+					<AbsDimension x="360" y="300"/>
 				</Size>
 				<Anchors>
 					<Anchor point="TOPRIGHT" relativeTo="SkilletFrame" relativePoint="TOPRIGHT">
@@ -1759,7 +1786,7 @@
 							<Anchors>
 								<Anchor point="TOPLEFT" relativeTo="SkilletSkillName" relativePoint="BOTTOMLEFT" >
 									<Offset>
-										<AbsDimension x="4" y="0"/>
+										<AbsDimension x="4" y="-3"/>
 									</Offset>
 								</Anchor>
 							</Anchors>
@@ -1807,7 +1834,7 @@
 						</FontString>
 						<FontString name="SkilletOptionalLabel" inherits="GameFontNormalSmall" justifyH="LEFT" text="SPELL_REAGENTS_OPTIONAL">
 							<Anchors>
-								<Anchor point="TOPLEFT" relativeTo="SkilletReagentLabel" relativePoint="BOTTOMLEFT">
+								<Anchor point="TOPLEFT" relativeTo="SkilletSkillCooldown" relativePoint="BOTTOMLEFT">
 									<Offset>
 										<AbsDimension x="-47" y="-20"/>
 									</Offset>
@@ -1876,9 +1903,101 @@
 					<OnLeave function="GameTooltip_Hide" />
 				</Scripts>
 			</Frame>
+			<Frame name="SkilletRecipeRankFrame" parent="SkilletReagentParent" enableMouse="true">
+				<Size x="80" y="20"/>
+				<Anchors>
+					<Anchor point="TOPRIGHT" relativeTo="SkilletReagentParent" relativePoint="TOPRIGHT" x="-5" y="-6"/>
+				</Anchors>
+				<Frames>
+					<Button name="SkilletRecipeRankSelector">
+						<Size>
+							<AbsDimension x="20" y="20"/>
+						</Size>
+						<Anchors>
+							<Anchor point="TOPRIGHT" relativeTo="SkilletRecipeRankFrame" relativePoint="TOPRIGHT" x="0" y="0"/>
+						</Anchors>
+						<Layers>
+							<Layer level="ARTWORK">
+								<FontString name="SkilletRecipeRankLabel" inherits="GameFontNormal" text="Rank 1">
+									<Anchors>
+										<Anchor point="RIGHT" relativeTo="$parent" relativePoint="LEFT">
+											<Offset>
+												<AbsDimension x="0" y="0"/>
+											</Offset>
+										</Anchor>
+									</Anchors>
+									<Color r="1" g="1" b="1" a="1"/>
+								</FontString>
+							</Layer>
+						</Layers>
+						<NormalTexture file="Interface\Buttons\UI-SpellbookIcon-NextPage-Up"/>
+						<PushedTexture file="Interface\Buttons\UI-SpellbookIcon-NextPage-Down"/>
+						<HighlightTexture file="Interface\Buttons\ButtonHilight-Round" alphaMode="ADD"/>
+						<Scripts>
+							<OnClick>
+								Skillet:RecipeRankSelector_OnClick(self)
+							</OnClick>
+						</Scripts>
+					</Button>
+					<StatusBar name="SkilletRecipeRankSkill" drawLayer="BACKGROUND" minValue="0" maxValue="1" defaultValue="1">
+					<Size x="60" y="16"/>
+					<Anchors>
+						<Anchor point="TOPRIGHT" relativeTo="SkilletRecipeRankSelector" relativePoint="TOPLEFT" x="-50" y="-2"/>
+					</Anchors>
+					<Layers>
+						<Layer level="ARTWORK">
+							<Texture parentKey="BorderLeft" file="Interface\PaperDollInfoFrame\UI-Character-Skills-BarBorder">
+								<Size x="9" y="18"/>
+								<TexCoords left="0.007843" right="0.043137" top="0.193548" bottom="0.774193"/>
+								<Anchors>
+									<Anchor point="LEFT" x="-2" y="0"/>
+								</Anchors>
+							</Texture>
+							<Texture parentKey="BorderRight" file="Interface\PaperDollInfoFrame\UI-Character-Skills-BarBorder">
+								<Size x="9" y="18"/>
+								<TexCoords left="0.043137" right="0.007843" top="0.193548" bottom="0.774193"/>
+								<Anchors>
+									<Anchor point="RIGHT" x="2" y="0"/>
+								</Anchors>
+							</Texture>
+							<Texture parentKey="BorderMid" file="Interface\PaperDollInfoFrame\UI-Character-Skills-BarBorder">
+								<TexCoords left="0.113726" right="0.1490196" top="0.193548" bottom="0.774193"/>
+								<Anchors>
+									<Anchor point="TOPLEFT" relativeKey="$parent.BorderLeft" relativePoint="TOPRIGHT"/>
+									<Anchor point="BOTTOMRIGHT" relativeKey="$parent.BorderRight" relativePoint="BOTTOMLEFT"/>
+								</Anchors>
+							</Texture>
+							<FontString parentKey="Rank" inherits="GameFontHighlightSmall">
+								<Anchors>
+									<Anchor point="CENTER"/>
+								</Anchors>
+							</FontString>
+						</Layer>
+					</Layers>
+					<BarTexture file="Interface\PaperDollInfoFrame\UI-Character-Skills-Bar"/>
+					<BarColor r=".25" g=".25" b=".75"/>
+					</StatusBar>
+				</Frames>
+				<Scripts>
+					<OnEnter>
+						Skillet:RecipeRankOnEnter(self)
+					</OnEnter>
+					<OnLeave>
+						Skillet:RecipeRankOnLeave(self)
+					</OnLeave>
+				</Scripts>
+			</Frame>
+			<Frame name="SkilletRecipeRankDropMenu" inherits="UIDropDownMenuTemplate">
+			</Frame>
+
+			<!--
+			#
+			# A frame to hold the Queue
+			#
+			-->
 			<Frame name="SkilletQueueManagementParent" parent="SkilletFrame" hidden="true" inherits="BackdropTemplate">
 				<Size>
-					<AbsDimension x="280" y="260"/>
+					<AbsDimension x="360" y="260"/>
 				</Size>
 				<Anchors>
 					<Anchor point="TOPRIGHT" relativeTo="SkilletFrame" relativePoint="TOPRIGHT">
@@ -2030,7 +2149,7 @@
 			</Frame>
 			<Frame name="SkilletViewCraftersParent" parent="SkilletFrame" hidden="true" inherits="BackdropTemplate">
 				<Size>
-					<AbsDimension x="280" y="260"/>
+					<AbsDimension x="360" y="260"/>
 				</Size>
 				<Anchors>
 					<Anchor point="TOPRIGHT" relativeTo="SkilletFrame" relativePoint="TOPRIGHT">
@@ -2381,7 +2500,7 @@
 				</Anchors>
 			</Button>
 			<!-- Define one more just in case the recipe has 8 reagents -->
-			<Button name="SkilletReagent9" inherits="SkilletItemTemplate" id="9" parent="SkilletReagentParent">
+			<Button name="SkilletReagent9" inherits="SkilletItemTemplate" id="0" parent="SkilletReagentParent">
 				<Anchors>
 					<Anchor point="TOPLEFT" relativeTo="SkilletReagent8" relativePoint="BOTTOMLEFT">
 						<Offset>
@@ -2469,55 +2588,6 @@
 					<OnClick>
 						Skillet:InventoryFilterButtons_Hide()
 						Skillet:CreateAllItems(button)
-					</OnClick>
-				</Scripts>
-			</Button>
-			<!--
-			#
-			# A button to queue a specific number of items
-			#
-			-->
-			<Button name="SkilletQueueButton" inherits="UIPanelButtonTemplate" text="Queue" parent="SkilletFrame">
-				<Size>
-					<AbsDimension x="105" y="22"/>
-				</Size>
-				<Anchors>
-					<Anchor point="TOPRIGHT" relativeTo="SkilletReagentParent" relativePoint="BOTTOMRIGHT">
-						<Offset>
-							<AbsDimension x="0" y="-2"/>
-						</Offset>
-					</Anchor>
-				</Anchors>
-				<Scripts>
-					<OnClick>
-						Skillet:InventoryFilterButtons_Hide()
-						Skillet:QueueItems(SkilletItemCountInputBox:GetNumber())
-					</OnClick>
-				</Scripts>
-			</Button>
-			<!--
-			#
-			# A button to create a specific number of items
-			#
-			-->
-			<Button name="SkilletCreateButton" inherits="UIPanelButtonTemplate" text="Create" parent="SkilletFrame">
-				<Size>
-					<AbsDimension x="105" y="22"/>
-				</Size>
-				<Anchors>
-					<Anchor point="TOPRIGHT" relativeTo="SkilletQueueButton" relativePoint="BOTTOMRIGHT">
-						<Offset>
-							<AbsDimension x="0" y="-1"/>
-						</Offset>
-					</Anchor>
-				</Anchors>
-				<Scripts>
-					<OnLoad>
-						self:RegisterForClicks("LeftButtonUp", "RightButtonUp")
-					</OnLoad>
-					<OnClick>
-						Skillet:InventoryFilterButtons_Hide()
-						Skillet:CreateItems(SkilletItemCountInputBox:GetNumber(),button)
 					</OnClick>
 				</Scripts>
 			</Button>
@@ -2725,6 +2795,55 @@
 				<NormalTexture file="Interface\Buttons\CancelButton-Up"/>
 				<PushedTexture file="Interface\Buttons\CancelButton-Down"/>
 				<HighlightTexture file="Interface\Buttons\CancelButton-Highlight" alphaMode="ADD"/>
+			</Button>
+			<!--
+			#
+			# A button to queue a specific number of items
+			#
+			-->
+			<Button name="SkilletQueueButton" inherits="UIPanelButtonTemplate" text="Queue" parent="SkilletFrame">
+				<Size>
+					<AbsDimension x="105" y="22"/>
+				</Size>
+				<Anchors>
+					<Anchor point="TOPLEFT" relativeTo="SkilletClearNumButton" relativePoint="TOPRIGHT">
+						<Offset>
+							<AbsDimension x="11" y="-4"/>
+						</Offset>
+					</Anchor>
+				</Anchors>
+				<Scripts>
+					<OnClick>
+						Skillet:InventoryFilterButtons_Hide()
+						Skillet:QueueItems(SkilletItemCountInputBox:GetNumber())
+					</OnClick>
+				</Scripts>
+			</Button>
+			<!--
+			#
+			# A button to create a specific number of items
+			#
+			-->
+			<Button name="SkilletCreateButton" inherits="UIPanelButtonTemplate" text="Create" parent="SkilletFrame">
+				<Size>
+					<AbsDimension x="105" y="22"/>
+				</Size>
+				<Anchors>
+					<Anchor point="TOPRIGHT" relativeTo="SkilletQueueButton" relativePoint="BOTTOMRIGHT">
+						<Offset>
+							<AbsDimension x="0" y="-1"/>
+						</Offset>
+					</Anchor>
+				</Anchors>
+				<Scripts>
+					<OnLoad>
+						self:RegisterForClicks("LeftButtonUp", "RightButtonUp")
+					</OnLoad>
+					<OnClick>
+						Skillet:InventoryFilterButtons_Hide()
+						Skillet:CreateItems(SkilletItemCountInputBox:GetNumber(), button)
+					</OnClick>
+				</Scripts>
 			</Button>
 			<!--
 			#

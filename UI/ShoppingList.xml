@@ -120,16 +120,6 @@
 				ChatEdit_InsertLink(self.count .. "x" .. link)
 			end
 
-			<!-- alt clicking will insert the item name into the Auction House. -->
-			if button == "LeftButton" and IsAltKeyDown() then
-				if(CanSendAuctionQuery()) then
-					local name,link = GetItemInfo(self.id)
-					BrowseName:SetText(name)
-					AuctionFrameBrowse_Search()
-					BrowseNoResultsText:SetText(BROWSE_NO_RESULTS)
-				end
-			end
-
 			<!-- control clicking will remove this player's entries. -->
 			if button == "LeftButton" and IsControlKeyDown() then
 				Skillet:ClearShoppingList(self.player)

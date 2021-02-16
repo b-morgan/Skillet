@@ -124,24 +124,24 @@ local function update_merchant_buy_button()
 	Skillet:InventoryScan()
 	local list = Skillet:GetShoppingList(Skillet.currentPlayer, Skillet.db.char.same_faction)
 	if not list or #list == 0 then
-		DA.DEBUG(0,"ShoppingList is empty")
+		--DA.DEBUG(0,"ShoppingList is empty")
 		SkilletMerchantBuyFrame:Hide()
 		return false
 	elseif does_merchant_sell_required_items(list) == false then
-		DA.DEBUG(0,"Merchant does not sell required items")
+		--DA.DEBUG(0,"Merchant does not sell required items")
 		SkilletMerchantBuyFrame:Hide()
 		return false
 	end
 	if Skillet.db.profile.display_shopping_list_at_merchant then
-		DA.DEBUG(0,"Shopping List should be displayed")
+		--DA.DEBUG(0,"Shopping List should be displayed")
 		Skillet:DisplayShoppingList(false)
 	end
 	if SkilletMerchantBuyFrame:IsVisible() then
-		DA.DEBUG(0,"Merchant Buy Button should already be there")
+		--DA.DEBUG(0,"Merchant Buy Button should already be there")
 		-- already inserted the button
 		return true
 	end
-	DA.DEBUG(0,"Create and show the Merchant Buy Button")
+	--DA.DEBUG(0,"Create and show the Merchant Buy Button")
 	SkilletMerchantBuyFrameButton:SetText(L["Reagents"]);
 	SkilletMerchantBuyFrame:SetPoint("TOPLEFT", "MerchantFrame", "TOPLEFT" , 55, -5) -- May need to be adjusted for each WoW build
 	SkilletMerchantBuyFrame:SetFrameStrata("HIGH");

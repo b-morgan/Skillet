@@ -297,7 +297,7 @@ local function cache_list(self)
 end
 
 local function indexBank()
-	DA.DEBUG(0,"indexBank()")
+	--DA.DEBUG(0,"indexBank()")
 --
 -- bank contains detailed contents of each tab,slot which 
 -- is only needed while the bank is open.
@@ -343,7 +343,7 @@ local function indexBank()
 end
 
 local function indexGuildBank(tab)
-	DA.DEBUG(0,"indexGuildBank("..tostring(tab)..")")
+	--DA.DEBUG(0,"indexGuildBank("..tostring(tab)..")")
 --
 -- Build a current view of the contents of the Guildbank (one tab at a time).
 --
@@ -399,7 +399,7 @@ end
 -- Called when the bank frame is opened
 --
 function Skillet:BANKFRAME_OPENED()
-	DA.DEBUG(0,"BANKFRAME_OPENED")
+	--DA.DEBUG(0,"BANKFRAME_OPENED")
 	bankFrameOpen = true
 	local player = self.currentPlayer
 --
@@ -426,7 +426,7 @@ end
 -- Called when the bank frame is closed
 --
 function Skillet:BANKFRAME_CLOSED()
-	DA.DEBUG(0,"BANKFRAME_CLOSED")
+	--DA.DEBUG(0,"BANKFRAME_CLOSED")
 	local player = self.currentPlayer
 	self.db.realm.bankData[player] = {}
 	bank = {}
@@ -442,7 +442,7 @@ end
 -- When all the tabs have been queried, the event GUILDBANK_UPDATE_TEXT will query for contents.
 --
 function Skillet:GUILDBANKFRAME_OPENED()
-	DA.DEBUG(0,"GUILDBANKFRAME_OPENED")
+	--DA.DEBUG(0,"GUILDBANKFRAME_OPENED")
 	guildbankFrameOpen = true
 	Skillet.guildbankText = true
 	Skillet.guildbankOnce = false
@@ -471,7 +471,7 @@ end
 -- Called when the guild bank frame is closed
 --
 function Skillet:GUILDBANKFRAME_CLOSED()
-	DA.DEBUG(0,"GUILDBANKFRAME_CLOSED")
+	--DA.DEBUG(0,"GUILDBANKFRAME_CLOSED")
 	guildbankFrameOpen = false
 	self:HideShoppingList()
 end
@@ -548,7 +548,7 @@ end
 -- Prints the contents of auctionData for this player
 --
 function Skillet:PrintAuctionData()
-	DA.DEBUG(0,"PrintAuctionData()");
+	--DA.DEBUG(0,"PrintAuctionData()");
 	local player = Skillet.currentPlayer
 	local auctionData = self.db.realm.auctionData[player]
 	if auctionData then
@@ -627,7 +627,7 @@ local function findBagForItem(itemID, count)
 end
 
 local function getItemFromBank(itemID, bag, slot, count)
-	DA.DEBUG(0,"getItemFromBank(", itemID, bag, slot, count,")")
+	--DA.DEBUG(0,"getItemFromBank(", itemID, bag, slot, count,")")
 	ClearCursor()
 	local _, available = GetContainerItemInfo(bag, slot)
 	local num_moved = 0
@@ -661,7 +661,7 @@ local function getItemFromBank(itemID, bag, slot, count)
 end
 
 local function getItemFromGuildBank(itemID, bag, slot, count)
-	DA.DEBUG(0,"getItemFromGuildBank(",itemID, bag, slot, count,")")
+	--DA.DEBUG(0,"getItemFromGuildBank(",itemID, bag, slot, count,")")
 	ClearCursor()
 	local _, available = GetGuildBankItemInfo(bag, slot)
 	local num_moved = 0
@@ -695,7 +695,7 @@ end
 -- BANK_UPDATE (subset of BAG_UPDATE) and BAG_UPDATE_DELAYED events have fired.
 --
 local function processBankQueue(where)
-	DA.DEBUG(0,"processBankQueue("..where..")")
+	--DA.DEBUG(0,"processBankQueue("..where..")")
 	local bankQueue = Skillet.bankQueue
 	if Skillet.bankBusy then
 		--DA.DEBUG(1,"BANK_UPDATE and bankBusy")
@@ -748,7 +748,7 @@ end
 -- GUILDBANKBAGSLOTS_CHANGED and BAG_UPDATE_DELAYED events have fired.
 --
 local function processGuildQueue(where)
-	DA.DEBUG(0,"processGuildQueue("..where..")")
+	--DA.DEBUG(0,"processGuildQueue("..where..")")
 	local guildQueue = Skillet.guildQueue
 	if Skillet.guildBusy then
 		while true do
@@ -881,7 +881,7 @@ end
 -- Gets all the reagents possible for queued recipes from the bank
 --
 function Skillet:GetReagentsFromBanks()
-	DA.DEBUG(0,"GetReagentsFromBanks")
+	--DA.DEBUG(0,"GetReagentsFromBanks")
 	local list = self.cachedShoppingList
 	local incAlts = Skillet.db.char.include_alts
 	local name = UnitName("player")
@@ -997,7 +997,7 @@ end
 -- Called to update the shopping list window
 --
 function Skillet:UpdateShoppingListWindow(use_cached_recipes)
-	DA.DEBUG(0,"UpdateShoppingListWindow("..tostring(use_cached_recipes)..")")
+	--DA.DEBUG(0,"UpdateShoppingListWindow("..tostring(use_cached_recipes)..")")
 	local num_buttons = 0
 	if not self.shoppingList or not self.shoppingList:IsVisible() then
 		return
@@ -1151,23 +1151,17 @@ function Skillet:DisplayShoppingList(atBank)
 end
 
 --
--- Tests for shopping list window visible
---
-function Skillet:IsShoppingListVisible()
-	if self.shoppingList then
-		return self.shoppingList:IsVisible()
-	end
-	return false
-end
-
---
 -- Hides the shopping list window
 --
 function Skillet:HideShoppingList()
-	if self.shoppingList then
+	--DA.DEBUG(0,"HideShoppingList()")
+	local closed
+	if self.shoppingList and self.shoppingList:IsVisible() then
 		self.shoppingList:Hide()
 		SkilletSLAuctionatorButton:Hide()
 		SkilletShoppingListRetrieveButton:Hide()
+		closed = true
 	end
 	self.cachedShoppingList = nil
+	return closed
 end
