@@ -8,7 +8,7 @@
 ## X-Category: Tradeskill
 ## X-License GPL v3 or later
 ## X-Credits nogudnik (creator of Skillet), Slartie (for ASTW)
-## X-Curse-Project-ID: 14660
+## X-Curse-Project-ID: 445339
 ## X-WoWI-ID: 7571
 ## X-Website: https://www.curseforge.com/wow/addons/skillet
 ## SavedVariables: SkilletDB
