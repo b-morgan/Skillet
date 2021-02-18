@@ -1,6 +1,6 @@
 # Skillet
 World of Warcraft addon which replaces the default tradeskill and craft UI.
-<p>To report bugs and request new features check:&nbsp;<a href="https://www.curseforge.com/wow/addons/skillet/localization">https://www.curseforge.com/wow/addons/skillet/issues</a><br/>
+<p>To report bugs and request new features check:&nbsp;<a href="https://www.curseforge.com/wow/addons/skillet/issues">https://www.curseforge.com/wow/addons/skillet/issues</a><br/>
 To help with Localization see:&nbsp;<a href="https://www.curseforge.com/wow/addons/skillet/localization">https://www.curseforge.com/wow/addons/skillet/localization</a></p>
 <p><strong>Other than "Please open an issue" I won't be responding to bug reports in comments.</strong></p>
 <h3><strong>Features:</strong></h3>
