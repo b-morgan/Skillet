@@ -147,6 +147,7 @@ Skillet.options =
 					width = "double",
 					order = 19
 				},
+--[[
 				queue_more_than_one = {
 					type = "toggle",
 					name = L["QUEUEMORETHANONENAME"],
@@ -160,6 +161,7 @@ Skillet.options =
 					width = "double",
 					order = 20
 				},
+--]]
 				queue_glyph_reagents = {
 					type = "toggle",
 					name = L["QUEUEGLYPHREAGENTSNAME"],
@@ -329,6 +331,7 @@ Skillet.options =
 					width = "double",
 					order = 5
 				},
+--[[
 				use_blizzard_for_optional = {
 					type = "toggle",
 					name = L["USEBLIZZFOROPTIONNAME"],
@@ -342,6 +345,7 @@ Skillet.options =
 					width = "double",
 					order = 6
 				},
+--]]
 				enhanced_recipe_display = {
 					type = "toggle",
 					name = L["ENHANCHEDRECIPEDISPLAYNAME"],

@@ -1264,10 +1264,12 @@ function Skillet:HideTradeSkillWindow()
 	if frame and frame:IsVisible() then
 		frame:Hide()
 		closed = true
+--[[
 		if Skillet.db.profile.use_blizzard_for_optional and TradeSkillFrame then
 			self:RestoreBlizzardFrame()
 			Skillet.BlizzardUIshowing = false
 		end
+--]]
 	end
 	return closed
 end

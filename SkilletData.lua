@@ -297,11 +297,13 @@ end
 
 function Skillet:SetTradeSkillUnlearned()
 	Skillet:SetGroupSelection(nil)
+--[[
 	if Skillet.db.profile.use_blizzard_for_optional and TradeSkillFrame and TradeSkillFrame:IsVisible() then
 		Skillet:RestoreBlizzardFrame()
 		HideUIPanel(TradeSkillFrame)
 		Skillet.BlizzardUIshowing = false
 	end
+--]]
 	C_TradeSkillUI.SetOnlyShowLearnedRecipes(false);
 	C_TradeSkillUI.SetOnlyShowUnlearnedRecipes(true);
 	Skillet.unlearnedRecipes = true

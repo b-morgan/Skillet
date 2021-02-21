@@ -92,9 +92,9 @@ local function queueAppendReagent(command, reagentID, need, queueCraftables)
 					if not Skillet.TradeSkillIgnoredMats[recipeSourceID] and
 					  not Skillet.db.realm.userIgnoredMats[Skillet.currentPlayer][recipeSourceID] then
 						Skillet:QueueAppendCommand(newCommand, queueCraftables, true)
-						if not Skillet.db.profile.queue_more_than_one then
+--						if not Skillet.db.profile.queue_more_than_one then
 							break
-						end
+--						end
 					else
 						DA.DEBUG(3,"Did Not Queue "..tostring(recipeSourceID).." ("..tostring(recipeSource.name)..")")
 					end
@@ -394,6 +394,7 @@ function Skillet:ProcessQueue(altMode)
 					craftCount = numAvailable
 				end
 				local recipe = self:GetRecipe(command.recipeID)
+--[[
 				if self.db.profile.use_blizzard_for_optional and recipe.numOptional and recipe.numOptional ~= "0" then
 --
 -- Temporarily skip crafting if the recipe needs optional reagents
@@ -402,6 +403,7 @@ function Skillet:ProcessQueue(altMode)
 					self:RemoveFromQueue(qpos)
 					return
 				end
+--]]
 				DA.DEBUG(1,"Crafting: "..tostring(command.count).." of "..tostring(self.processingSpell).." ("..tostring(command.recipeID)..")")
 				self.queuecasting = true
 				self.processingCount = craftCount
@@ -657,7 +659,7 @@ function Skillet:ScanQueuedReagents()
 			end
 			for i=1,#recipe.reagentData do
 				local reagent = recipe.reagentData[i]
-				if command.recipeLevel > 0 then
+				if command.recipeLevel and command.recipeLevel > 0 then
 					--DA.DEBUG(2,"ScanQueuedReagents: recipeID= "..tostring(command.recipeID)..", recipeLevel= "..tostring(command.recipeLevel))
 					local reagentName, reagentTexture, reagentCount, playerReagentCount = C_TradeSkillUI.GetRecipeReagentInfo(command.recipeID, i, command.recipeLevel)
 					--DA.DEBUG(2,"ScanQueuedReagents: reagentName= "..tostring(reagentName)..", reagentCount= "..tostring(reagentCount))

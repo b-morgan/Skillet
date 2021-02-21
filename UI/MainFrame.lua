@@ -825,6 +825,7 @@ function Skillet:UpdateTradeButtons(player)
 			end
 		end
 	end
+--[[
 --
 -- One more button to toggle the Blizzard TradeSkillFrame
 --
@@ -843,6 +844,7 @@ function Skillet:UpdateTradeButtons(player)
 		position = position + button:GetWidth()
 		button:Show()
 	end
+--]]
 end
 
 function Skillet.PluginDropdown_OnClick(this)
@@ -1951,6 +1953,7 @@ function Skillet:UpdateDetailsWindow(skillIndex)
 				button:Hide()
 			end
 		end
+--[[
 --
 -- Temporarily, show the Blizzard UI with this recipe selected (unless this is an unlearned recipe).
 --
@@ -1967,6 +1970,7 @@ function Skillet:UpdateDetailsWindow(skillIndex)
 				TradeSkillFrame:SelectRecipe(skill.id)
 			end
 		end
+--]]
 	else
 --
 -- Recipe has no optional reagents.
@@ -2710,13 +2714,13 @@ function Skillet:SkilletFrameForceClose()
 			return self:HideAllWindows()
 		end
 	end
+--[[
 	if Skillet.db.profile.use_blizzard_for_optional and TradeSkillFrame and TradeSkillFrame:IsVisible() then
 		Skillet.RestoreBlizzardFrame()
 	end
+--]]
 	C_TradeSkillUI.CloseTradeSkill()
 	return self:HideAllWindows()
-
-
 end
 
 function Skillet:InventoryFilterButton_OnClick(button)
@@ -2786,13 +2790,13 @@ end
 --
 
 local skillMenuSelection = {
---@alpha@
+--[=[@alpha@
 	{
 		text = "skillMenuSelection",
 		isTitle = true,
 		notCheckable = true,
 	},
---@end-alpha@
+--@end-alpha@]=]
 	{
 		text = L["Select All"],
 		func = function() Skillet:SkillButton_SetAllSelections(true) Skillet:UpdateTradeSkillWindow() end,
@@ -2804,13 +2808,13 @@ local skillMenuSelection = {
 }
 
 local skillMenuGroup = {
---@alpha@
+--[=[@alpha@
 	{
 		text = "skillMenuGroup",
 		isTitle = true,
 		notCheckable = true,
 	},
---@end-alpha@
+--@end-alpha@]=]
 	{
 		text = L["Empty Group"],
 		func = function() Skillet:SkillButton_NewGroup() end,
@@ -2822,13 +2826,13 @@ local skillMenuGroup = {
 }
 
 local favoriteMenu = {
---@alpha@
+--[=[@alpha@
 	{
 		text = "favoriteMenu",
 		isTitle = true,
 		notCheckable = true,
 	},
---@end-alpha@
+--@end-alpha@]=]
 		text = "",
 		func = function()
 					local recipeID = Skillet.menuButton.skill.recipeID
@@ -2839,13 +2843,13 @@ local favoriteMenu = {
 }
 
 local skillMenuIgnore = {
---@alpha@
+--[=[@alpha@
 	{
 		text = "skillMenuIgnore",
 		isTitle = true,
 		notCheckable = true,
 	},
---@end-alpha@
+--@end-alpha@]=]
 	{
 		text = L["Add Recipe to Ignored List"],
 		func = function()
@@ -2875,13 +2879,13 @@ local skillMenuIgnore = {
 }
 
 local skillMenuList = {
---@alpha@
+--[=[@alpha@
 	{
 		text = "skillMenuList",
 		isTitle = true,
 		notCheckable = true,
 	},
---@end-alpha@
+--@end-alpha@]=]
 	{
 		text = L["Link Recipe"],
 		func = function()
@@ -2940,13 +2944,13 @@ local skillMenuList = {
 }
 
 local skillMenuListLocked = {
---@alpha@
+--[=[@alpha@
 	{
 		text = "skillMenuListLocked",
 		isTitle = true,
 		notCheckable = true,
 	},
---@end-alpha@
+--@end-alpha@]=]
 	{
 		text = L["Link Recipe"],
 		func = function()
@@ -2986,13 +2990,13 @@ local skillMenuListLocked = {
 }
 
 local headerMenuList = {
---@alpha@
+--[=[@alpha@
 	{
 		text = "headerMenuList",
 		isTitle = true,
 		notCheckable = true,
 	},
---@end-alpha@
+--@end-alpha@]=]
 	{
 		text = L["Rename Group"],
 		func = function() Skillet:SkillButton_NameEditEnable(Skillet.menuButton) end,
@@ -3032,13 +3036,13 @@ local headerMenuList = {
 }
 
 local headerMenuListLocked = {
---@alpha@
+--[=[@alpha@
 	{
 		text = "headerMenuListLocked",
 		isTitle = true,
 		notCheckable = true,
 	},
---@end-alpha@
+--@end-alpha@]=]
 	{
 		text = L["Selection"],
 		hasArrow = true,
@@ -3051,13 +3055,13 @@ local headerMenuListLocked = {
 }
 
 local headerMenuListMainGroup = {
---@alpha@
+--[=[@alpha@
 	{
 		text = "headerMenuListMainGroup",
 		isTitle = true,
 		notCheckable = true,
 	},
---@end-alpha@
+--@end-alpha@]=]
 	{
 		text = L["New Group"],
 		hasArrow = true,
@@ -3093,13 +3097,13 @@ local headerMenuListMainGroup = {
 }
 
 local headerMenuListMainGroupLocked = {
---@alpha@
+--[=[@alpha@
 	{
 		text = "headerMenuListMainGroupLocked",
 		isTitle = true,
 		notCheckable = true,
 	},
---@end-alpha@
+--@end-alpha@]=]
 	{
 		text = L["Copy"],
 		func = function() Skillet:SkillButton_CopySelected() end,
