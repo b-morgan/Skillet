@@ -118,7 +118,7 @@ function Skillet:QueueAppendCommand(command, queueCraftables, noWindowRefresh)
 		local queueGlyph = Skillet.db.profile.queue_glyph_reagents or not recipe.name:match(Skillet.L["Glyph "])
 		for i=1,#recipe.reagentData do
 			local reagent = recipe.reagentData[i]
-			if command.recipeLevel > 0 then
+			if command.recipeLevel and command.recipeLevel > 0 then
 				--DA.DEBUG(2,"QueueAppendCommand: recipeID= "..tostring(command.recipeID)..", recipeLevel= "..tostring(command.recipeLevel))
 				local reagentName, reagentTexture, reagentCount, playerReagentCount = C_TradeSkillUI.GetRecipeReagentInfo(command.recipeID, i, command.recipeLevel)
 				--DA.DEBUG(2,"QueueAppendCommand: reagentName= "..tostring(reagentName)..", reagentCount= "..tostring(reagentCount))
@@ -297,7 +297,7 @@ function Skillet:ProcessQueue(altMode)
 --
 				for i=1,#recipe.reagentData do
 					local reagent = recipe.reagentData[i]
-					if command.recipeLevel > 0 then
+					if command.recipeLevel and command.recipeLevel > 0 then
 						--DA.DEBUG(2,"ProcessQueue: recipeID= "..tostring(command.recipeID)..", recipeLevel= "..tostring(command.recipeLevel))
 						local reagentName, reagentTexture, reagentCount, playerReagentCount = C_TradeSkillUI.GetRecipeReagentInfo(command.recipeID, i, command.recipeLevel)
 						--DA.DEBUG(2,"ProcessQueue: reagentName= "..tostring(reagentName)..", reagentCount= "..tostring(reagentCount))
