@@ -231,10 +231,13 @@ function plugin.OnInitialize()
 		Skillet.db.profile.plugins.ATR.buyFactor = buyFactorDef
 		Skillet.db.profile.plugins.ATR.markup = markupDef
 	end
+	if Skillet.db.profile.plugins.ATR.showProfitValue == nil then
+		Skillet.db.profile.plugins.ATR.showProfitValue = true
+	end
 	Skillet:AddPluginOptions(plugin.options)
 end
 
-function profitPctText(profit,cost,limit)
+local function profitPctText(profit,cost,limit)
 	local profitPct, proPctTxt
 	if cost then
 		profitPct = profit * 100 / cost
@@ -292,6 +295,9 @@ function plugin.GetExtraText(skill, recipe)
 			local itemName = ""
 			if id then
 				itemName = GetItemInfo(id)
+				if not itemName then
+					itemName = ""
+				end
 			end
 --
 -- Default value for a reagent is the Auctionator price
