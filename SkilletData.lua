@@ -843,7 +843,6 @@ end
 
 --
 -- Builds a list of categories and recipes based on the current filter
--- Top level empty categories (with progress bars) are included
 --
 local function GetRecipeList(player, tradeID)
 	DA.DEBUG(0,"GetRecipeList("..tostring(player)..", "..tostring(tradeID)..")")
@@ -862,36 +861,16 @@ local function GetRecipeList(player, tradeID)
 			currentCategoryID = recipeInfo.categoryID
 			categoryData = Skillet.db.global.Categories[tradeID][currentCategoryID]
 			--DA.DEBUG(3,"GetRecipeList: categoryData= "..DA.DUMP1(categoryData))
-			DA.DEBUG(3,"GetRecipeList: categoryData.name= "..tostring(categoryData.name)..", type= "..tostring(categoryData.type))
+			DA.DEBUG(3,"GetRecipeList: categoryData.name= "..tostring(categoryData.name)..", type= "..tostring(categoryData.type)..", uiOrder= "..tostring(categoryData.uiOrder))
 			isCurrentCategoryEnabled = categoryData.enabled
-
 			if categoryData.parentCategoryID ~= currentParentCategoryID then
 				DA.DEBUG(3,"GetRecipeList: categoryData.parentCategoryID= "..tostring(categoryData.parentCategoryID))
 				currentParentCategoryID = categoryData.parentCategoryID
 				if currentParentCategoryID then
 					parentCategoryData = Skillet.db.global.Categories[tradeID][currentParentCategoryID]
 					--DA.DEBUG(3,"GetRecipeList: parentCategoryData= "..DA.DUMP1(parentCategoryData))
-					DA.DEBUG(3,"GetRecipeList: parentCategoryData.name= "..tostring(parentCategoryData.name)..", type= "..tostring(parentCategoryData.type))
+					DA.DEBUG(3,"GetRecipeList: parentCategoryData.name= "..tostring(parentCategoryData.name)..", type= "..tostring(parentCategoryData.type)..", uiOrder= "..tostring(parentCategoryData.uiOrder))
 					isCurrentParentCategoryEnabled = parentCategoryData.enabled
---[[
---
--- Make sure any base-level empty categories with higher priority are added first.
--- (Note: this inserts tables into the dataList)
--- (Possible solution, insert a dummy recipeID which has this category as a parent)
---
-					if isCurrentParentCategoryEnabled then
-						while (#emptyCategoriesToAdd > 0) and (emptyCategoriesToAdd[1].uiOrder < parentCategoryData.uiOrder) do
-							--DA.DEBUG(3,"GetRecipeList: adding emptyCategory= "..DA.DUMP1(emptyCategoriesToAdd[1]))
-							DA.DEBUG(3,"GetRecipeList: adding emptyCategory= "..tostring(emptyCategoriesToAdd[1].name)..", type= "..tostring(emptyCategoriesToAdd[1].type))
-							table.insert(dataList, emptyCategoriesToAdd[1])
-							table.remove(emptyCategoriesToAdd, 1)
-						end
-						Skillet.db.global.Categories[tradeID][currentParentCategoryID].type = "header"
-						parentCategoryData.type = "header"
-						DA.DEBUG(3,"GetRecipeList: insert parentCategoryData.name= "..tostring(parentCategoryData.name)..", type= "..tostring(parentCategoryData.type))
-						table.insert(dataList, parentCategoryData)
-					end
---]]
 				else
 					isCurrentParentCategoryEnabled = true
 				end
@@ -904,18 +883,6 @@ local function GetRecipeList(player, tradeID)
 			table.insert(dataList, recipeID)
 		end
 	end
---[[
---
--- Make sure any base-level empty categories left are added.
--- (Note: this inserts tables into the dataList)
--- (Possible solution, insert a dummy recipeID which has this category as a parent)
---
-	for i, emptyCategory in ipairs(emptyCategoriesToAdd) do
-		--DA.DEBUG(3,"GetRecipeList: adding emptyCategory= "..DA.DUMP1(emptyCategory))
-		DA.DEBUG(3,"GetRecipeList: adding emptyCategory= "..tostring(emptyCategory.name)..", type= "..tostring(emptyCategory.type))
-		table.insert(dataList, emptyCategory)
-	end
---]]
 	Skillet.dataList = dataList
 	return dataList
 end
@@ -1069,10 +1036,11 @@ local function ScanTrade()
 --
 -- This category (header) hasn't been seen yet. Stack it (and its unseen parents)
 --
-			headerUsed[recipeInfo.categoryID] = true
-			local headerType = Skillet.db.global.Categories[tradeID][recipeInfo.categoryID].type
-			local headerName = Skillet.db.global.Categories[tradeID][recipeInfo.categoryID].name
 			local category = recipeInfo.categoryID
+			headerUsed[category] = true
+			local headerType = Skillet.db.global.Categories[tradeID][category].type
+			local headerName = Skillet.db.global.Categories[tradeID][category].name
+			local headerUIOrder = Skillet.db.global.Categories[tradeID][category].uiOrder
 			--DA.DEBUG(2,"ScanTrade: category="..tostring(category))
 			local numCat = 1
 			local catStack = {}
@@ -1096,30 +1064,28 @@ local function ScanTrade()
 				end
 				category = parent
 			end -- while
-			--DA.DEBUG(2,"ScanTrade: numCat= "..tostring(numCat)..", catStack= "..DA.DUMP1(catStack))
---[[
+			DA.DEBUG(2,"ScanTrade: numCat= "..tostring(numCat)..", catStack= "..DA.DUMP1(catStack))
 --
 -- Make sure any base-level empty categories with higher priority are added.
--- (Note: this code requires catStack to contain tables instead of categoryIDs)
 --
-			DA.DEBUG(2,"ScanTrade: tradeID= "..tostring(tradeID)..", catStack= "..DA.DUMP1(catStack))
-			DA.DEBUG(2,"ScanTrade: emptyCategory= "..DA.DUMP1(emptyCategoriesToAdd[1]))
-			local lastCat = catStack[numCat][1]
-			DA.DEBUG(2,"ScanTrade: catStack["..tostring(numCat).."]= "..DA.DUMP1(Skillet.db.global.Categories[tradeID][lastCat]))
-			while (#emptyCategoriesToAdd > 0) and (emptyCategoriesToAdd[1].uiOrder < Skillet.db.global.Categories[tradeID][lastCat].uiOrder) do
-				catStack[numCat][2] = "header"
-				DA.DEBUG(3,"ScanTrade: adding emptyCategory= "..tostring(emptyCategoriesToAdd[1].name)..", type= "..tostring(emptyCategoriesToAdd[1].type))
-				parent = emptyCategoriesToAdd[1].categoryID
-				if not headerUsed[parent] then
-					headerUsed[parent] = true
-					numCat = numCat + 1
-					catStack[numCat] = { parent, "header" }
+			local emptyCategoriesToAdd = Skillet.emptyCategoriesToAdd
+			if emptyCategoriesToAdd then
+				DA.DEBUG(2,"ScanTrade: emptyCategory= "..DA.DUMP1(emptyCategoriesToAdd[1]))
+				local lastCat = catStack[numCat]
+				DA.DEBUG(2,"ScanTrade: catStack["..tostring(numCat).."]= "..DA.DUMP1(Skillet.db.global.Categories[tradeID][lastCat]))
+				while (#emptyCategoriesToAdd > 0) and (emptyCategoriesToAdd[1].uiOrder < Skillet.db.global.Categories[tradeID][lastCat].uiOrder) do
+					DA.DEBUG(3,"ScanTrade: adding emptyCategory= "..tostring(emptyCategoriesToAdd[1].name)..", type= "..tostring(emptyCategoriesToAdd[1].type))
+					parent = emptyCategoriesToAdd[1].categoryID
+					if not headerUsed[parent] then
+						headerUsed[parent] = true
+						numCat = numCat + 1
+						catStack[numCat] = parent
+					end
+					table.remove(emptyCategoriesToAdd, 1)
 				end
-				table.remove(emptyCategoriesToAdd, 1)
+				DA.DEBUG(2,"ScanTrade: emptyCat= "..tostring(numCat)..", catStack= "..DA.DUMP1(catStack))
 			end
 
-			DA.DEBUG(2,"ScanTrade: numCat= "..tostring(numCat)..", catStack= "..DA.DUMP1(catStack))
---]]
 			while numCat > 0 do
 --
 -- We have a stack of headers. Output them to the skillDB.
