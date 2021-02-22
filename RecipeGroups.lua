@@ -397,13 +397,21 @@ function Skillet:RecipeGroupFlatten(group, depth, list, index)
 				if entry.subGroup.expanded then
 					inSub = self:RecipeGroupFlatten(entry.subGroup, depth+1, list, num+index)
 				end
-				if inSub == 0 and entry.subGroup.expanded then -- empty group - remove the header
+				if inSub == 0 and entry.subGroup.expanded then
+--
+-- Group is empty so remove the header unless
+-- it has a progress bar and the option to keep them is set.
+--
 					if Skillet.hasProgressBar[entry.subGroup.name] then
 						DA.DEBUG(0,"RecipeGroupFlatten: empty hasProgressBar group= "..tostring(entry.subGroup.name))
+						if not Skillet.db.profile.always_show_progress_bar then
+							table.remove(list, num + index)
+							num = num - 1
+						end
 					else
 						DA.DEBUG(0,"RecipeGroupFlatten: empty group= "..tostring(entry.subGroup.name))
---						table.remove(list, num + index)
---						num = num - 1
+						table.remove(list, num + index)
+						num = num - 1
 					end
 				else
 					num = num + inSub

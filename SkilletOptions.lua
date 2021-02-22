@@ -346,6 +346,19 @@ Skillet.options =
 					order = 6
 				},
 --]]
+				always_show_progress_bar = {
+					type = "toggle",
+					name = L["SHOWPROGRESSBARNAME"],
+					desc = L["SHOWPROGRESSBARDESC"],
+					get = function()
+						return Skillet.db.profile.always_show_progress_bar
+					end,
+					set = function(self,value)
+						Skillet.db.profile.always_show_progress_bar = value
+					end,
+					width = "double",
+					order = 6
+				},
 				enhanced_recipe_display = {
 					type = "toggle",
 					name = L["ENHANCHEDRECIPEDISPLAYNAME"],
