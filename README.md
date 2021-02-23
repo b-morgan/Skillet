@@ -29,8 +29,8 @@ To help with Localization see:&nbsp;<a href="https://www.curseforge.com/wow/addo
 <li><strong>TradeSkillMaster</strong></li>
 <ul>
 <li>Skillet can be used with TSM</li>
-<li>If the TSM Crafting UI is set to 'WOW UI' mode (use the 'WOW UI' button and then close the TSM UI)</li>
-<li>If the Skillet Appearance option TradeSkill Compatibility is checked. Note: Skillet frames have strata and background changes in this mode</li>
+<li>If the TSM Crafting UI is set to 'WOW UI' mode (use the 'WOW UI' button and then close the TSM UI) or</li>
+<li>If the Skillet Appearance option 'TradeSkillMaster Compatibility' is checked (requires a /reload). Note: Skillet frames have strata and background changes in this mode</li>
 </ul>
 </ul>
 <h3><strong>FAQ:</strong></h3>
