@@ -1668,21 +1668,24 @@ function Skillet:UpdateDetailsWindow(skillIndex)
 		self:HideOptionalList()
 	end
 	local texture
+	local recipe
+	local newInfo
 	SkilletFrame.selectedSkill = skillIndex
 	self.numItemsToCraft = 1
 	if self.recipeNotesFrame then
 		self.recipeNotesFrame:Hide()
 	end
 	local skill = self:GetSkill(self.currentPlayer, self.currentTrade, skillIndex)
-	local recipe
-	local newInfo
-	if not skill then
-		recipe = Skillet.unknownRecipe
-		newInfo = {}
-		SkilletSkillName:SetText("unknown")
+	if not skill or skill.spellID == 0 then
+		self:HideDetailWindow()
+		return
 	else
 		--DA.DEBUG(0,"UpdateDetailsWindow: name= "..tostring(recipe.name)..", skill= "..DA.DUMP1(skill))
-		recipe = self:GetRecipe(skill.id) or Skillet.unknownRecipe
+		recipe = self:GetRecipe(skill.id)
+		if not recipe or recipe.spellID == 0 then
+			self:HideDetailWindow()
+			return
+		end
 		--DA.DEBUG(0,"UpdateDetailsWindow: name= "..tostring(recipe.name)..", recipe= "..DA.DUMP1(recipe))
 		newInfo = C_TradeSkillUI.GetRecipeInfo(recipe.spellID)
 		--DA.DEBUG(0,"UpdateDetailsWindow: name= "..tostring(recipe.name)..", newInfo= "..DA.DUMP1(newInfo))
@@ -1953,24 +1956,6 @@ function Skillet:UpdateDetailsWindow(skillIndex)
 				button:Hide()
 			end
 		end
---[[
---
--- Temporarily, show the Blizzard UI with this recipe selected (unless this is an unlearned recipe).
---
-		if not Skillet.unlearnedRecipes and Skillet.db.profile.use_blizzard_for_optional and TradeSkillFrame then
-			if not TradeSkillFrame:IsVisible() then
-				ShowUIPanel(TradeSkillFrame)
-				TradeSkillFrame:Lower()
-				Skillet.BlizzardUIshowing = true
-			end
-			local skill = self:GetSkill(self.currentPlayer, self.currentTrade, skillIndex)
-			if skill then
-				--DA.DEBUG(0,"UpdateDetailsWindow: skill= "..DA.DUMP1(skill))
-				self:EmptyBlizzardFrame()
-				TradeSkillFrame:SelectRecipe(skill.id)
-			end
-		end
---]]
 	else
 --
 -- Recipe has no optional reagents.
