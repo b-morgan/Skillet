@@ -288,8 +288,8 @@ end
 
 function Skillet:SetTradeSkillLearned()
 	Skillet:SetGroupSelection(nil)
-	C_TradeSkillUI.SetOnlyShowLearnedRecipes(true);
-	C_TradeSkillUI.SetOnlyShowUnlearnedRecipes(false);
+	C_TradeSkillUI.SetOnlyShowLearnedRecipes(true)
+	C_TradeSkillUI.SetOnlyShowUnlearnedRecipes(false)
 	Skillet.unlearnedRecipes = false
 	Skillet.selectedSkill = nil
 	Skillet:FilterDropDown_OnShow()
@@ -297,58 +297,60 @@ end
 
 function Skillet:SetTradeSkillUnlearned()
 	Skillet:SetGroupSelection(nil)
---[[
-	if Skillet.db.profile.use_blizzard_for_optional and TradeSkillFrame and TradeSkillFrame:IsVisible() then
-		Skillet:RestoreBlizzardFrame()
-		HideUIPanel(TradeSkillFrame)
-		Skillet.BlizzardUIshowing = false
-	end
---]]
-	C_TradeSkillUI.SetOnlyShowLearnedRecipes(false);
-	C_TradeSkillUI.SetOnlyShowUnlearnedRecipes(true);
+	C_TradeSkillUI.SetOnlyShowLearnedRecipes(false)
+	C_TradeSkillUI.SetOnlyShowUnlearnedRecipes(true)
 	Skillet.unlearnedRecipes = true
 	Skillet.selectedSkill = nil
 	Skillet:FilterDropDown_OnShow()
 end
 
 local function GetUnfilteredSubCategoryName(categoryID, ...)
-	local areAllUnfiltered = true;
+	local anyAreFiltered = false
 	for i = 1, select("#", ...) do
-		local subCategoryID = select(i, ...);
+		local subCategoryID = select(i, ...)
 		if C_TradeSkillUI.IsRecipeCategoryFiltered(categoryID, subCategoryID) then
-			areAllUnfiltered = false;
-			break;
+			anyAreFiltered = true
+			break
 		end
 	end
-	if areAllUnfiltered then
-		return nil;
-	end
-	for i = 1, select("#", ...) do
-		local subCategoryID = select(i, ...);
-		if not C_TradeSkillUI.IsRecipeCategoryFiltered(categoryID, subCategoryID) then
-			local subCategoryData = Skillet.db.global.Categories[tradeID][subCategoryID];
-			return subCategoryData.name;
+	if anyAreFiltered then
+		for i = 1, select("#", ...) do
+			local subCategoryID = select(i, ...)
+			if not C_TradeSkillUI.IsRecipeCategoryFiltered(categoryID, subCategoryID) then
+				local subCategoryData
+				if Skillet.db.global.Categories and tradeID then
+					subCategoryData = Skillet.db.global.Categories[tradeID][subCategoryID]
+				else
+					subCategoryData = C_TradeSkillUI.GetCategoryInfo(subCategoryID)
+				end
+				return subCategoryData.name
+			end
 		end
 	end
+	return nil
 end
 
 local function GetUnfilteredCategoryName(...)
-	-- Try subCategories first
 	for i = 1, select("#", ...) do
-		local categoryID = select(i, ...);
-		local subCategoryName = GetUnfilteredSubCategoryName(categoryID, C_TradeSkillUI.GetSubCategories(categoryID));
+		local categoryID = select(i, ...)
+		local subCategoryName = GetUnfilteredSubCategoryName(categoryID, C_TradeSkillUI.GetSubCategories(categoryID))
 		if subCategoryName then
-			return subCategoryName;
+			return subCategoryName
 		end
 	end
 	for i = 1, select("#", ...) do
-		local categoryID = select(i, ...);
+		local categoryID = select(i, ...)
 		if not C_TradeSkillUI.IsRecipeCategoryFiltered(categoryID) then
-			local categoryData = Skillet.db.global.Categories[tradeID][categoryID];
-			return categoryData.name;
+			local categoryData
+			if Skillet.db.global.Categories and tradeID then
+				categoryData = Skillet.db.global.Categories[tradeID][categoryID]
+			else
+				categoryData = C_TradeSkillUI.GetCategoryInfo(categoryID)
+			end
+			return categoryData.name
 		end
 	end
-	return nil;
+	return nil
 end
 
 local function GetUnfilteredInventorySlotName(...)
@@ -804,24 +806,6 @@ local function GetMyCategories(player, tradeID)
 			end
 		end
 	end
---[[
-	for i, category in pairs(Skillet.db.global.Categories[tradeID]) do
-		DA.DEBUG(0,"GetMyCategories: i= "..tostring(i)..", category= "..tostring(category.name)..", "..DA.DUMP1(category))
-		if i ~= category.categoryID then
-			DA.DEBUG(0,"GetMyCategories: Category MisMatch")
-		end
-		if category.parentCategoryID and not Skillet.db.global.Categories[tradeID][category.parentCategoryID] then
-			parent = C_TradeSkillUI.GetCategoryInfo(category.parentCategoryID)
-			local rest
-			if parent then
-				rest = tostring(parent.name)
-			else
-				rest = "does not exist"
-			end
-			DA.DEBUG(0,"GetMyCategories: Parent Category "..tostring(category.parentCategoryID).." not collected, "..tostring(rest))
-		end
-	end
---]]
 end
 
 local function GetEmptyCategories(player,tradeID)
