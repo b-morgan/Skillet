@@ -198,6 +198,9 @@ end
 -- Called when the addon is loaded
 --
 function Skillet:OnInitialize()
+	if not SkilletWho then
+		SkilletWho = {}
+	end
 	if not SkilletDBPC then
 		SkilletDBPC = {}
 	end
@@ -730,6 +733,13 @@ function Skillet:PLAYER_ENTERING_WORLD()
 	local player, realm = UnitFullName("player")
 	local faction = UnitFactionGroup("player")
 	local guid = UnitGUID("player")		-- example: guid="Player-970-0002FD64" kind=="Player" server=="970" ID="0002FD64" 
+--
+-- Store some identifying data in the per character saved variables file
+--
+	SkilletWho.player = player
+	SkilletWho.realm = realm
+	SkilletWho.faction = faction
+	SkilletWho.guid = guid
 	if guid then
 		local kind, server, ID = strsplit("-", guid)
 		DA.DEBUG(1,"player="..tostring(player)..", faction="..tostring(faction)..", guid="..tostring(guid)..", server="..tostring(server))
