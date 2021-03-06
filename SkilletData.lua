@@ -399,11 +399,11 @@ function Skillet:PrintTradeSkillFilter()
 	end
 	if filters == nil then
 		self.FilterBarText = nil
-		DA.DEBUG(0,"filter= "..tostring(self.FilterBarText))
+		DA.DEBUG(0,"PrintTradeSkillFilter: filter= "..tostring(self.FilterBarText))
 		SkilletFilterText:SetText("")
 	else
 		self.FilterBarText = table.concat(filters, PLAYER_LIST_DELIMITER)
-		DA.DEBUG(0,"filter= "..tostring(self.FilterBarText))
+		DA.DEBUG(0,"PrintTradeSkillFilter: filter= "..tostring(self.FilterBarText))
 		SkilletFilterText:SetFormattedText("%s: %s", FILTER, self.FilterBarText)
 		if SkilletFrame:IsVisible() then
 			local offset = SkilletFilterText:GetLeft() - SkilletFrame:GetLeft()
@@ -822,7 +822,7 @@ local function GetEmptyCategories(player,tradeID)
 			end
 		end
 	end
-	DA.DEBUG(0,"GetEmptyCategories: emptyCategoriesToAdd= "..DA.DUMP(Skillet.emptyCategoriesToAdd))
+	DA.DEBUG(0,"GetEmptyCategories: "..tostring(#emptyCategoriesToAdd).." emptyCategoriesToAdd= "..DA.DUMP(Skillet.emptyCategoriesToAdd))
 end
 
 --
@@ -835,35 +835,35 @@ local function GetRecipeList(player, tradeID)
 	local categoryData, parentCategoryData
 	local isCurrentCategoryEnabled, isCurrentParentCategoryEnabled = true, true
 	local filteredRecipeIDs = C_TradeSkillUI.GetFilteredRecipeIDs()
-	--DA.DEBUG(0,"GetRecipeList: #filteredRecipeIDs= "..tostring(#filteredRecipeIDs))
+	DA.DEBUG(0,"GetRecipeList: #filteredRecipeIDs= "..tostring(#filteredRecipeIDs))
 
 	for i, recipeID in ipairs(filteredRecipeIDs) do
 		local recipeInfo = C_TradeSkillUI.GetRecipeInfo(recipeID)
 		--DA.DEBUG(3,"GetRecipeList: i= "..tostring(i)..", recipeID= "..tostring(recipeID)..", recipeInfo= "..DA.DUMP1(recipeInfo))
-		DA.DEBUG(3,"GetRecipeList: i= "..tostring(i)..", recipeID= "..tostring(recipeID)..", recipeInfo.name= "..tostring(recipeInfo.name))
+		--DA.DEBUG(3,"GetRecipeList: i= "..tostring(i)..", recipeID= "..tostring(recipeID)..", recipeInfo.name= "..tostring(recipeInfo.name))
 		if recipeInfo.categoryID ~= currentCategoryID then
 			currentCategoryID = recipeInfo.categoryID
 			categoryData = Skillet.db.global.Categories[tradeID][currentCategoryID]
 			--DA.DEBUG(3,"GetRecipeList: categoryData= "..DA.DUMP1(categoryData))
-			DA.DEBUG(3,"GetRecipeList: categoryData.name= "..tostring(categoryData.name)..", type= "..tostring(categoryData.type)..", uiOrder= "..tostring(categoryData.uiOrder))
+			--DA.DEBUG(3,"GetRecipeList: categoryData.name= "..tostring(categoryData.name)..", type= "..tostring(categoryData.type)..", uiOrder= "..tostring(categoryData.uiOrder))
 			isCurrentCategoryEnabled = categoryData.enabled
 			if categoryData.parentCategoryID ~= currentParentCategoryID then
-				DA.DEBUG(3,"GetRecipeList: categoryData.parentCategoryID= "..tostring(categoryData.parentCategoryID))
+				--DA.DEBUG(3,"GetRecipeList: categoryData.parentCategoryID= "..tostring(categoryData.parentCategoryID))
 				currentParentCategoryID = categoryData.parentCategoryID
 				if currentParentCategoryID then
 					parentCategoryData = Skillet.db.global.Categories[tradeID][currentParentCategoryID]
 					--DA.DEBUG(3,"GetRecipeList: parentCategoryData= "..DA.DUMP1(parentCategoryData))
-					DA.DEBUG(3,"GetRecipeList: parentCategoryData.name= "..tostring(parentCategoryData.name)..", type= "..tostring(parentCategoryData.type)..", uiOrder= "..tostring(parentCategoryData.uiOrder))
+					--DA.DEBUG(3,"GetRecipeList: parentCategoryData.name= "..tostring(parentCategoryData.name)..", type= "..tostring(parentCategoryData.type)..", uiOrder= "..tostring(parentCategoryData.uiOrder))
 					isCurrentParentCategoryEnabled = parentCategoryData.enabled
 				else
 					isCurrentParentCategoryEnabled = true
 				end
 			else
-				DA.DEBUG(3,"GetRecipeList: categoryData.parentCategoryID equals currentParentCategoryID")
+				--DA.DEBUG(3,"GetRecipeList: categoryData.parentCategoryID equals currentParentCategoryID")
 			end
 		end
 		if isCurrentCategoryEnabled and isCurrentParentCategoryEnabled then
-			DA.DEBUG(3,"GetRecipeList: insert recipeID= "..tostring(recipeID)..", recipeInfo.name= "..tostring(recipeInfo.name))
+			--DA.DEBUG(3,"GetRecipeList: insert recipeID= "..tostring(recipeID)..", recipeInfo.name= "..tostring(recipeInfo.name))
 			table.insert(dataList, recipeID)
 		end
 	end
@@ -1048,7 +1048,7 @@ local function ScanTrade()
 				end
 				category = parent
 			end -- while
-			DA.DEBUG(2,"ScanTrade: numCat= "..tostring(numCat)..", catStack= "..DA.DUMP1(catStack))
+			--DA.DEBUG(2,"ScanTrade: numCat= "..tostring(numCat)..", catStack= "..DA.DUMP1(catStack))
 --
 -- Make sure any base-level empty categories with higher priority are added.
 --

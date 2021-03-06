@@ -31,10 +31,8 @@ Skillet.L = L
 
 -- Get version info from the .toc file
 local MAJOR_VERSION = GetAddOnMetadata("Skillet", "Version");
-local PACKAGE_VERSION = GetAddOnMetadata("Skillet", "X-Curse-Packaged-Version");
 local ADDON_BUILD = (select(4, GetBuildInfo())) < 20000 and "Classic" or "Retail"
 Skillet.version = MAJOR_VERSION
-Skillet.package = PACKAGE_VERSION
 Skillet.build = ADDON_BUILD
 Skillet.project = WOW_PROJECT_ID
 local isClassic = WOW_PROJECT_ID == WOW_PROJECT_CLASSIC
@@ -286,8 +284,10 @@ function Skillet:OnInitialize()
 --
 -- Initialize global data
 --
-	self.db.global.version = self.version	-- save a copy for
-	self.db.global.package = self.package	-- post-mortem purposes
+	self.db.global.locale = GetLocale()
+	self.db.global.version = self.version
+	self.db.global.build = self.build
+	self.db.global.project = self.project
 	if not self.db.global.recipeDB then
 		self.db.global.recipeDB = {}
 	end
@@ -743,6 +743,11 @@ function Skillet:PLAYER_ENTERING_WORLD()
 	if guid then
 		local kind, server, ID = strsplit("-", guid)
 		DA.DEBUG(1,"player="..tostring(player)..", faction="..tostring(faction)..", guid="..tostring(guid)..", server="..tostring(server))
+--
+-- If we support data sharing across connected realms, then
+-- Skillet.db.realm.* data needs to move to 
+-- Skillet.db.global.* data indexed by server.
+--
 		self.db.realm.guid[player]= guid
 		self.db.realm.faction[player] = faction
 		if (server) then
