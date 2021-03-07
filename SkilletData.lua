@@ -811,7 +811,7 @@ end
 local function GetEmptyCategories(player,tradeID)
 	DA.DEBUG(0,"GetEmptyCategories("..tostring(player)..", "..tostring(tradeID)..")")
 	Skillet.emptyCategoriesToAdd = {}
-	local count
+	local count = 0
 	if (not C_TradeSkillUI.GetOnlyShowUnlearnedRecipes()) then
 		local categories = {C_TradeSkillUI.GetCategories()}
 		for i, categoryID in ipairs(categories) do
