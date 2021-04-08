@@ -31,8 +31,10 @@ Skillet.L = L
 
 -- Get version info from the .toc file
 local MAJOR_VERSION = GetAddOnMetadata("Skillet", "Version");
-local ADDON_BUILD = (select(4, GetBuildInfo())) < 20000 and "Classic" or "Retail"
+local PACKAGE_VERSION = GetAddOnMetadata("Skillet", "X-Curse-Project-ID");
+local ADDON_BUILD = ((select(4, GetBuildInfo())) < 20000 and "Classic") or ((select(4, GetBuildInfo())) < 80000 and "TBC") or "Retail"
 Skillet.version = MAJOR_VERSION
+Skillet.package = PACKAGE_VERSION
 Skillet.build = ADDON_BUILD
 Skillet.project = WOW_PROJECT_ID
 local isClassic = WOW_PROJECT_ID == WOW_PROJECT_CLASSIC
