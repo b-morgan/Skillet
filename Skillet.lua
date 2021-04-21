@@ -38,6 +38,7 @@ Skillet.package = PACKAGE_VERSION
 Skillet.build = ADDON_BUILD
 Skillet.project = WOW_PROJECT_ID
 local isClassic = WOW_PROJECT_ID == WOW_PROJECT_CLASSIC
+local isBCClassic = WOW_PROJECT_ID == WOW_PROJECT_BURNING_CRUSADE_CLASSIC
 
 Skillet.gttScale = GameTooltip:GetScale()
 
