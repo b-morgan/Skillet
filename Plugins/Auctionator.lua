@@ -1,10 +1,12 @@
 local addonName,addonTable = ...
+local isRetail = WOW_PROJECT_ID == WOW_PROJECT_MAINLINE
 local isClassic = WOW_PROJECT_ID == WOW_PROJECT_CLASSIC
+local isBCC = WOW_PROJECT_ID == WOW_PROJECT_BURNING_CRUSADE_CLASSIC
 local DA
-if isClassic then
-	DA = LibStub("AceAddon-3.0"):GetAddon("Skillet") -- for DebugAids.lua
-else
+if isRetail then
 	DA = _G[addonName] -- for DebugAids.lua
+else
+	DA = LibStub("AceAddon-3.0"):GetAddon("Skillet") -- for DebugAids.lua
 end
 --[[
 Skillet: A tradeskill window replacement.
@@ -239,7 +241,7 @@ end
 
 local function profitPctText(profit,cost,limit)
 	local profitPct, proPctTxt
-	if cost then
+	if cost and cost ~= 0 then
 		profitPct = profit * 100 / cost
 		if profitPct > limit then
 			proPctTxt = ">"..tostring(limit)
@@ -263,7 +265,7 @@ function plugin.GetExtraText(skill, recipe)
 -- buyout is Auctionator's price (for one) times the number this recipe makes
 --
 		local buyout
-		if isClassic and Atr_GetAuctionBuyout then
+		if Atr_GetAuctionBuyout then
 			buyout = (Atr_GetAuctionBuyout(itemID) or 0) * recipe.numMade
 		elseif Auctionator and Auctionator.API.v1.GetAuctionPriceByItemID then
 			buyout = (Auctionator.API.v1.GetAuctionPriceByItemID(addonName, itemID) or 0) * recipe.numMade
@@ -287,10 +289,10 @@ function plugin.GetExtraText(skill, recipe)
 			end
 			local needed = reagent.numNeeded or 0
 			local id
-			if isClassic then
-				id = reagent.id
-			else
+			if isRetail then
 				id = reagent.reagentID
+			else
+				id = reagent.id
 			end
 			local itemName = ""
 			if id then
@@ -303,10 +305,10 @@ function plugin.GetExtraText(skill, recipe)
 -- Default value for a reagent is the Auctionator price
 --
 			local value
-			if isClassic then
-				value = (Atr_GetAuctionBuyout(id) or 0) * needed
-			else
+			if isRetail then
 				value = (Auctionator.API.v1.GetAuctionPriceByItemID(addonName, id) or 0) * needed
+			else
+				value = (Atr_GetAuctionBuyout(id) or 0) * needed
 			end
 			if not Skillet:VendorSellsReagent(id) then
 --
@@ -390,7 +392,7 @@ function plugin.RecipeNameSuffix(skill, recipe)
 	--DA.DEBUG(0,"RecipeNameSuffix: itemName= "..tostring(itemName)..", type= "..type(itemName))
 	if Skillet.db.profile.plugins.ATR.enabled and itemID then
 		local value
-		if isClassic and Atr_GetAuctionBuyout then
+		if Atr_GetAuctionBuyout then
 			value = Atr_GetAuctionBuyout(itemID) or 0
 		elseif Auctionator and Auctionator.API.v1.GetAuctionPriceByItemID then
 			value = Auctionator.API.v1.GetAuctionPriceByItemID(addonName, itemID) or 0
@@ -407,17 +409,17 @@ function plugin.RecipeNameSuffix(skill, recipe)
 			end
 			local needed = reagent.numNeeded or 0
 			local id
-			if isClassic then
-				id = reagent.id
-			else
+			if isRetail then
 				id = reagent.reagentID
+			else
+				id = reagent.id
 			end
 			local name = GetItemInfo(id) or id
 			local value
-			if isClassic then
-				value = (Atr_GetAuctionBuyout(id) or 0) * needed
-			else
+			if isRetail then
 				value = (Auctionator.API.v1.GetAuctionPriceByItemID(addonName, id) or 0) * needed
+			else
+				value = (Atr_GetAuctionBuyout(id) or 0) * needed
 			end
 			if Skillet:VendorSellsReagent(id) then
 				if Skillet.db.profile.plugins.ATR.buyablePrices then
@@ -475,7 +477,7 @@ function Skillet:AuctionatorSearch(whichOne)
 	local items = {}
 	if whichOne then
 		shoppingListName = L["Shopping List"]
-		local list = Skillet:GetShoppingList(Skillet.currentPlayer, false)
+		local list = Skillet:GetShoppingList(nil, false)
 		if not list or #list == 0 then
 			DA.DEBUG(0,"AuctionatorSearch: Shopping List is empty")
 			return
@@ -508,10 +510,10 @@ function Skillet:AuctionatorSearch(whichOne)
 			end
 			local needed = reagent.numNeeded or 0
 			local id
-			if isClassic then
-				id = reagent.id
-			else
+			if isRetail then
 				id = reagent.reagentID
+			else
+				id = reagent.id
 			end
 			if id and not Skillet:VendorSellsReagent(id) then
 				local reagentName = GetItemInfo(id)
@@ -522,12 +524,7 @@ function Skillet:AuctionatorSearch(whichOne)
 			end
 		end
 	end
-	if isClassic then
-		DA.DEBUG(0, "AuctionatorSearch: shoppingListName= "..tostring(shoppingListName)..", items= "..DA.DUMP1(items))
-		local BUY_TAB = 3;
-		Atr_SelectPane(BUY_TAB)
-		Atr_SearchAH(shoppingListName, items)
-	else
+	if isRetail then
 		if Skillet.db.profile.plugins.ATR.useSearchExact and Auctionator.API.v1.MultiSearchExact then
 			DA.DEBUG(0, "AuctionatorSearch: (exact) addonName= "..tostring(addonName)..", items= "..DA.DUMP1(items))
 			Auctionator.API.v1.MultiSearchExact(addonName, items)
@@ -535,5 +532,10 @@ function Skillet:AuctionatorSearch(whichOne)
 			DA.DEBUG(0, "AuctionatorSearch: addonName= "..tostring(addonName)..", items= "..DA.DUMP1(items))
 			Auctionator.API.v1.MultiSearch(addonName, items)
 		end
+	else
+		DA.DEBUG(0, "AuctionatorSearch: shoppingListName= "..tostring(shoppingListName)..", items= "..DA.DUMP1(items))
+		local BUY_TAB = 3;
+		Atr_SelectPane(BUY_TAB)
+		Atr_SearchAH(shoppingListName, items)
 	end
 end

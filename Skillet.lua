@@ -1,5 +1,4 @@
 local addonName,addonTable = ...
-local DA = _G[addonName] -- for DebugAids.lua
 --[[
 Skillet: A tradeskill window replacement.
 
@@ -31,14 +30,13 @@ Skillet.L = L
 
 -- Get version info from the .toc file
 local MAJOR_VERSION = GetAddOnMetadata("Skillet", "Version");
-local PACKAGE_VERSION = GetAddOnMetadata("Skillet", "X-Curse-Project-ID");
-local ADDON_BUILD = ((select(4, GetBuildInfo())) < 20000 and "Classic") or ((select(4, GetBuildInfo())) < 80000 and "TBC") or "Retail"
+local ADDON_BUILD = (select(4, GetBuildInfo())) < 20000 and "Classic" or "Retail"
 Skillet.version = MAJOR_VERSION
-Skillet.package = PACKAGE_VERSION
 Skillet.build = ADDON_BUILD
 Skillet.project = WOW_PROJECT_ID
+local isRetail = WOW_PROJECT_ID == WOW_PROJECT_MAINLINE
 local isClassic = WOW_PROJECT_ID == WOW_PROJECT_CLASSIC
-local isBCClassic = WOW_PROJECT_ID == WOW_PROJECT_BURNING_CRUSADE_CLASSIC
+local isBCC = WOW_PROJECT_ID == WOW_PROJECT_BURNING_CRUSADE_CLASSIC
 
 Skillet.gttScale = GameTooltip:GetScale()
 
@@ -271,10 +269,10 @@ function Skillet:OnInitialize()
 		self:FlushAllData()
 	elseif not self.db.global.customVersion or self.db.global.customVersion ~= customVersion then
 		self.db.global.customVersion = customVersion
---		self:FlushCustomData()			-- allow one release before doing anything
+		self:FlushCustomData()
 	elseif not self.db.global.queueVersion or self.db.global.queueVersion ~= queueVersion then
 		self.db.global.queueVersion = queueVersion
---		self:FlushQueueData()			-- allow one release before doing anything
+		self:FlushQueueData()
 	elseif not self.db.global.recipeVersion or self.db.global.recipeVersion ~= recipeVersion then
 		self.db.global.recipeVersion = recipeVersion
 		self:FlushRecipeData()
@@ -285,12 +283,16 @@ function Skillet:OnInitialize()
 	end
 
 --
--- Initialize global data
+-- Information useful for debugging
 --
 	self.db.global.locale = GetLocale()
 	self.db.global.version = self.version
 	self.db.global.build = self.build
 	self.db.global.project = self.project
+
+--
+-- Initialize global data
+--
 	if not self.db.global.recipeDB then
 		self.db.global.recipeDB = {}
 	end

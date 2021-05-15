@@ -226,24 +226,13 @@ end
 
 function Skillet:GetInventory(player, reagentID)
 	--DA.DEBUG(0,"GetInventory("..tostring(player)..", "..tostring(reagentID)..")")
-	local numCanUse
 	if player and reagentID then
-		if player == self.currentPlayer then			-- UnitName("player")
-			numCanUse = GetItemCount(reagentID,true)
-		end
 		if self.db.realm.inventoryData[player] and self.db.realm.inventoryData[player][reagentID] then
 			--DA.DEBUG(1,"inventoryData= "..tostring(self.db.realm.inventoryData[player][reagentID]))
-			local data = { string.split(" ", self.db.realm.inventoryData[player][reagentID]) }
-			if numCanUse and data[1] and tonumber(numCanUse) ~= tonumber(data[1]) then
-				--DA.DEBUG(0,"inventoryData is stale")
-			end
-			if #data == 1 then			-- no craftability info yet
-				return tonumber(data[1]) or 0, 0, 0
-			else
-				return tonumber(data[1]) or 0, tonumber(data[2]) or 0, tonumber(data[3]) or 0
-			end
+			local have, make, wven = string.split(" ", self.db.realm.inventoryData[player][reagentID])
+			return tonumber(have) or 0, tonumber(make) or 0, tonumber(wven) or 0
 		elseif player == self.currentPlayer then	-- UnitName("player")
-			return tonumber(numCanUse) or 0, 0, 0
+			return GetItemCount(reagentID,true) or 0, 0, 0
 		end
 	end
 	return 0, 0, 0		-- have, make, make with vendor

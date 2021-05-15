@@ -514,7 +514,11 @@ Skillet.options =
 			desc = L["SHOPPINGLISTDESC"],
 			func = function()
 				if not (UnitAffectingCombat("player")) then
-					Skillet:DisplayShoppingList(false)
+					if Skillet:IsShoppingListVisible() then
+						Skillet:HideShoppingList()
+					else
+						Skillet:DisplayShoppingList(false)
+					end
 				else
 					DA.DEBUG(0,"|cff8888ffSkillet|r: Combat lockdown restriction." ..
 												  " Leave combat and try again.")
