@@ -99,7 +99,7 @@ function DA.WARN(...)
 			text = text..comma.."(unknown)"
 		end
 	end
-	if (DA.WarnShow) then
+	if (DA.WarnShow or DA.DebugShow) then
 		print(DA.WARN_COLOR..addonName..": "..text)
 	end
 	table.insert(DA.DebugLog,date().."(W): "..text)
