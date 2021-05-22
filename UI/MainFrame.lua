@@ -20,7 +20,7 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
 local L = LibStub("AceLocale-3.0"):GetLocale("Skillet")
 
 SKILLET_TRADE_SKILL_HEIGHT = 16
-SKILLET_NUM_REAGENT_BUTTONS = 8
+SKILLET_NUM_REAGENT_BUTTONS = 12
 
 local COLORORANGE = "|cffff8040"
 local COLORYELLOW = "|cffffff00"

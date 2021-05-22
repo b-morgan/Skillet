@@ -2499,10 +2499,46 @@
 					</Anchor>
 				</Anchors>
 			</Button>
-			<!-- Define one more just in case the recipe has 8 reagents -->
-			<Button name="SkilletReagent9" inherits="SkilletItemTemplate" id="0" parent="SkilletReagentParent">
+			<Button name="SkilletReagent9" inherits="SkilletItemTemplate" id="9" parent="SkilletReagentParent">
 				<Anchors>
 					<Anchor point="TOPLEFT" relativeTo="SkilletReagent8" relativePoint="BOTTOMLEFT">
+						<Offset>
+							<AbsDimension x="0" y="0"/>
+						</Offset>
+					</Anchor>
+				</Anchors>
+			</Button>
+			<Button name="SkilletReagent10" inherits="SkilletItemTemplate" id="10" parent="SkilletReagentParent">
+				<Anchors>
+					<Anchor point="TOPLEFT" relativeTo="SkilletReagent9" relativePoint="BOTTOMLEFT">
+						<Offset>
+							<AbsDimension x="0" y="0"/>
+						</Offset>
+					</Anchor>
+				</Anchors>
+			</Button>
+			<Button name="SkilletReagent11" inherits="SkilletItemTemplate" id="11" parent="SkilletReagentParent">
+				<Anchors>
+					<Anchor point="TOPLEFT" relativeTo="SkilletReagent10" relativePoint="BOTTOMLEFT">
+						<Offset>
+							<AbsDimension x="0" y="0"/>
+						</Offset>
+					</Anchor>
+				</Anchors>
+			</Button>
+			<Button name="SkilletReagent12" inherits="SkilletItemTemplate" id="12" parent="SkilletReagentParent">
+				<Anchors>
+					<Anchor point="TOPLEFT" relativeTo="SkilletReagent11" relativePoint="BOTTOMLEFT">
+						<Offset>
+							<AbsDimension x="0" y="0"/>
+						</Offset>
+					</Anchor>
+				</Anchors>
+			</Button>
+			<!-- Define one more just in case the recipe has 12 reagents -->
+			<Button name="SkilletReagent13" inherits="SkilletItemTemplate" id="0" parent="SkilletReagentParent">
+				<Anchors>
+					<Anchor point="TOPLEFT" relativeTo="SkilletReagent12" relativePoint="BOTTOMLEFT">
 						<Offset>
 							<AbsDimension x="0" y="0"/>
 						</Offset>
