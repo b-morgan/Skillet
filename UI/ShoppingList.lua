@@ -1153,6 +1153,16 @@ function Skillet:DisplayShoppingList(atBank)
 end
 
 --
+-- Tests for shopping list window visible
+--
+function Skillet:IsShoppingListVisible()
+	if self.shoppingList then
+		return self.shoppingList:IsVisible()
+	end
+	return false
+end
+
+--
 -- Hides the shopping list window
 --
 function Skillet:HideShoppingList()
