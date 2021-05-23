@@ -857,6 +857,18 @@ Skillet.options =
 			end,
 			order = 76
 		},
+		nomodkeys = {
+			type = "toggle",
+			name = "NoModKeys",
+			desc = "Disable/Enable Mod Keys to open the Blizzard frames",
+			get = function()
+				return Skillet.db.profile.nomodkeys
+			end,
+			set = function(self,value)
+				Skillet.db.profile.nomodkeys = value
+			end,
+			order = 77
+		},
 
 --
 -- commands to manipulate the state of debugging code flags

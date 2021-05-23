@@ -962,6 +962,96 @@ function Skillet:IsTradeSkillLinked()
 end
 
 --
+-- Allow modifier keys that change initial frame behavior to be disabled.
+-- Modifier keys within the Skillet frame are not effected.
+-- Type "/skillet nomodkeys" to toggle.
+--
+-- Make modifier key to open Blizzard frame optional.
+--
+function Skillet:IsModKey1Down()
+	if not Skillet.db.profile.nomodkeys and IsShiftKeyDown() then
+		return true
+	end
+	return false
+end
+
+--
+-- Make modifier key to alter some behaviors optional.
+--
+function Skillet:IsModKey2Down()
+	if not Skillet.db.profile.nomodkeys and IsControlKeyDown() then
+		return true
+	end
+	return false
+end
+
+--
+-- Checks to see if the current trade is one that we support.
+-- Control key says we do (even if we don't, debugging)
+-- Shift key says we don't support it (even if we do)
+--
+function Skillet:IsSupportedTradeskill(tradeID)
+	--DA.DEBUG(0,"IsSupportedTradeskill("..tostring(tradeID)..")")
+	if self:IsModKey2Down() then
+		return true
+	end
+	if self:IsModKey1Down() then
+		return false
+	end
+	if not tradeID or self.BlizzardSkillList[tradeID] or self.currentPlayer ~= UnitName("player") then
+		--DA.DEBUG(3,"IsSupportedTradeskill: BlizzardSkillList="..tostring(self.BlizzardSkillList[tradeID]))
+		return false
+	end
+	local ranks = self:GetSkillRanks(self.currentPlayer, tradeID)
+	if not ranks then
+		--DA.DEBUG(3,"IsSupportedTradeskill: not ranks")
+		return false
+	end
+	return true
+end
+
+--
+-- Checks to see if this trade follower can not use Skillet frame.
+--
+function Skillet:IsNotSupportedFollower(tradeID)
+	--DA.DEBUG(0,"IsNotSupportedFollower("..tostring(tradeID)..")")
+	Skillet.wasNPCCrafting = false
+	if self:IsModKey1Down() then
+		Skillet.wasNPCCrafting = true
+		--DA.DEBUG(3,"IsNotSupportedFollower: ShiftKeyDown")
+		return true -- Use Blizzard frame
+	end
+	if not tradeID then
+		Skillet.wasNPCCrafting = true
+		--DA.DEBUG(3,"IsNotSupportedFollower: not tradeID")
+		return true -- Unknown tradeskill, play it safe and use Blizzard frame
+	end
+	if C_TradeSkillUI.IsNPCCrafting() and Skillet.FollowerSkillList[tradeID] then
+		Skillet.wasNPCCrafting = true
+		--DA.DEBUG(3,"IsNotSupportedFollower: IsNPCCrafting and FollowerSkillList")
+		return true -- Any NPC for this tradeskill uses Blizzard Frame
+	end
+	local guid = UnitGUID("target")
+	if guid then
+		local gtype, zero, server_id, instance_id, zone_uid, npc_id, spawn_uid = strsplit("-",guid);
+		--DA.DEBUG(0,"IsNotSupportedFollower: IsNPCCrafting="..tostring(C_TradeSkillUI.IsNPCCrafting())..", gtype="..tostring(gtype)..", npc_id="..tostring(npc_id))
+		if self:IsModKey2Down() then
+			Skillet.wasNPCCrafting = true
+			return false -- Use Skillet frame (mostly for debugging)
+		end
+		if gtype and gtype == "Creature" and Skillet.FollowerNPC[npc_id] then
+			Skillet.wasNPCCrafting = true
+			return true -- This specific NPC crafts things Skillet can't process, use Blizzard frame
+		end
+		if C_TradeSkillUI.IsNPCCrafting() and Skillet.db.profile.use_blizzard_for_followers then
+			Skillet.wasNPCCrafting = true
+			return true -- Option makes this easy, use Blizzard frame
+		end
+	end
+	return false -- Use Skillet frame
+end
+
+--
 -- Show the tradeskill window, called from TRADE_SKILL_SHOW event, clicking on links, or clicking on guild professions
 --
 function Skillet:SkilletShow()
