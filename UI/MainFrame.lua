@@ -1868,6 +1868,7 @@ function Skillet:UpdateDetailsWindow(skillIndex)
 			icon:SetNormalTexture(texture)
 			needed:SetText(reagent.numNeeded.."x")
 			button:SetWidth(width - 20)
+			button:Enable()
 			button:Show()
 			lastReagentButton = button
 			lastReagentIndex = i
@@ -1877,6 +1878,7 @@ function Skillet:UpdateDetailsWindow(skillIndex)
 -- or any of the text.
 --
 			button:Hide()
+			button:Disable()
 		end
 	end
 
@@ -1944,6 +1946,7 @@ function Skillet:UpdateDetailsWindow(skillIndex)
 				needed:SetText("")
 				button:SetID(j * -1)
 				button:SetWidth(width - 20)
+				button:Enable()
 				button:Show()
 				lastReagentButton = button
 				lastReagentIndex = i
@@ -1954,6 +1957,7 @@ function Skillet:UpdateDetailsWindow(skillIndex)
 -- or any of the text.
 --
 				button:Hide()
+				button:Disable()
 			end
 		end
 	else
@@ -2604,7 +2608,16 @@ function Skillet:ReagentButtonOnClick(button, mouse, skillIndex, reagentIndex)
 		return
 	end
 	local recipe = self:GetRecipeDataByTradeIndex(self.currentTrade, skillIndex)
+	if not recipe then
+		--DA.WARN("ReagentButtonOnClick: recipe is nil. "..tostring(button)..", "..tostring(mouse)..", "..tostring(skillIndex)..", "..tostring(reagentIndex))
+		return
+	end
 	local reagent = recipe.reagentData[reagentIndex]
+	if not reagent then
+		--DA.DEBUG(0,"ReagentButtonOnClick: recipe= "..DA.DUMP1(recipe))
+		--DA.WARN("ReagentButtonOnClick: reagent is nil. "..tostring(button)..", "..tostring(mouse)..", "..tostring(skillIndex)..", "..tostring(reagentIndex))
+		return
+	end
 	local newRecipeTable = self.db.global.itemRecipeSource[reagent.reagentID]
 	local skillIndexLookup = self.data.skillIndexLookup
 	local player = self.currentPlayer

@@ -790,6 +790,7 @@
 				<!-- want the icon to be under the main button so the enter and leave
 					 events for the button are triggered over the icon -->
 				_G[self:GetName() .. "Icon"]:SetFrameLevel(self:GetFrameLevel() - 1)
+				self:Disable()
 			</OnLoad>
 			<OnEnter>
 				Skillet:ReagentButtonOnEnter(self, SkilletFrame.selectedSkill, self:GetID())
