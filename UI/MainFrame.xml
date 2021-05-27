@@ -2583,6 +2583,9 @@
 					</Anchor>
 				</Anchors>
 				<Scripts>
+					<OnLoad>
+						self:SetFrameLevel(self:GetFrameLevel()+2)
+					</OnLoad>
 					<OnClick>
 						Skillet:InventoryFilterButtons_Hide()
 						Skillet:QueueAllItems()
@@ -2601,6 +2604,9 @@
 					</Anchor>
 				</Anchors>
 				<Scripts>
+					<OnLoad>
+						self:SetFrameLevel(self:GetFrameLevel()+2)
+					</OnLoad>
 					<OnClick>
 						Skillet:InventoryFilterButtons_Hide()
 						Skillet:EnchantItem()
@@ -2620,6 +2626,7 @@
 				</Anchors>
 				<Scripts>
 					<OnLoad>
+						self:SetFrameLevel(self:GetFrameLevel()+2)
 						self:RegisterForClicks("LeftButtonUp", "RightButtonUp")
 					</OnLoad>
 					<OnClick>
@@ -2685,6 +2692,9 @@
 					</Layer>
 				</Layers>
 				<Scripts>
+					<OnLoad>
+						self:SetFrameLevel(self:GetFrameLevel()+2)
+					</OnLoad>
 					<OnEnterPressed>
 						self:ClearFocus()
 					</OnEnterPressed>
@@ -2705,6 +2715,29 @@
 				</Scripts>
 				<FontString inherits="ChatFontNormal"/>
 			</EditBox>
+			<Button name="SkilletClearNumButton" parent="SkilletFrame">
+				<Size>
+					<AbsDimension x="32" y="32"/>
+				</Size>
+				<Anchors>
+					<Anchor point="LEFT" relativeTo="SkilletItemCountInputBox" relativePoint="RIGHT">
+						<Offset>
+							<AbsDimension x="-8" y="-2"/>
+						</Offset>
+					</Anchor>
+				</Anchors>
+				<Scripts>
+					<OnLoad>
+						self:SetFrameLevel(self:GetFrameLevel()+2)
+					</OnLoad>
+					<OnClick>
+						SkilletItemCountInputBox:SetText(1)
+					</OnClick>
+				</Scripts>
+				<NormalTexture file="Interface\Buttons\CancelButton-Up"/>
+				<PushedTexture file="Interface\Buttons\CancelButton-Down"/>
+				<HighlightTexture file="Interface\Buttons\CancelButton-Highlight" alphaMode="ADD"/>
+			</Button>
 			<Button name="SkilletSub10Button" parent="SkilletFrame">
 				<Size>
 					<AbsDimension x="31" y="23"/>
@@ -2718,6 +2751,7 @@
 				</Anchors>
 				<Scripts>
 					<OnLoad>
+						self:SetFrameLevel(self:GetFrameLevel()+2)
 						self:RegisterForClicks("LeftButtonUp", "RightButtonUp")
 					</OnLoad>
 					<OnClick>
@@ -2748,6 +2782,7 @@
 				</Anchors>
 				<Scripts>
 					<OnLoad>
+						self:SetFrameLevel(self:GetFrameLevel()+2)
 						self:RegisterForClicks("LeftButtonUp", "RightButtonUp")
 					</OnLoad>
 					<OnClick>
@@ -2772,6 +2807,7 @@
 				</Anchors>
 				<Scripts>
 					<OnLoad>
+						self:SetFrameLevel(self:GetFrameLevel()+2)
 						self:RegisterForClicks("LeftButtonUp", "RightButtonUp")
 					</OnLoad>
 					<OnClick>
@@ -2796,6 +2832,7 @@
 				</Anchors>
 				<Scripts>
 					<OnLoad>
+						self:SetFrameLevel(self:GetFrameLevel()+2)
 						self:RegisterForClicks("LeftButtonUp", "RightButtonUp")
 					</OnLoad>
 					<OnClick>
@@ -2812,26 +2849,6 @@
 					<TexCoords left="0" right="0.640625" top="0" bottom="0.5"/>
 				</DisabledTexture>
 				<HighlightTexture file="Interface\Buttons\UI-Common-MouseHilight" alphaMode="ADD"/>
-			</Button>
-			<Button name="SkilletClearNumButton" parent="SkilletFrame">
-				<Size>
-					<AbsDimension x="32" y="32"/>
-				</Size>
-				<Anchors>
-					<Anchor point="LEFT" relativeTo="SkilletItemCountInputBox" relativePoint="RIGHT">
-						<Offset>
-							<AbsDimension x="-8" y="-2"/>
-						</Offset>
-					</Anchor>
-				</Anchors>
-				<Scripts>
-					<OnClick>
-						SkilletItemCountInputBox:SetText(1)
-					</OnClick>
-				</Scripts>
-				<NormalTexture file="Interface\Buttons\CancelButton-Up"/>
-				<PushedTexture file="Interface\Buttons\CancelButton-Down"/>
-				<HighlightTexture file="Interface\Buttons\CancelButton-Highlight" alphaMode="ADD"/>
 			</Button>
 			<!--
 			#
@@ -2850,6 +2867,9 @@
 					</Anchor>
 				</Anchors>
 				<Scripts>
+					<OnLoad>
+						self:SetFrameLevel(self:GetFrameLevel()+2)
+					</OnLoad>
 					<OnClick>
 						Skillet:InventoryFilterButtons_Hide()
 						Skillet:QueueItems(SkilletItemCountInputBox:GetNumber())
@@ -2874,6 +2894,7 @@
 				</Anchors>
 				<Scripts>
 					<OnLoad>
+						self:SetFrameLevel(self:GetFrameLevel()+2)
 						self:RegisterForClicks("LeftButtonUp", "RightButtonUp")
 					</OnLoad>
 					<OnClick>
