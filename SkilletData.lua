@@ -77,6 +77,7 @@ local skill_style_type = {
 	["header"]			= { r = 1.00, g = 0.82, b = 0,	  level = 0, alttext="",	cstring = "|cffffc800"},
 	["unavailable"]		= { r = 0.3, g = 0.3, b = 0.3,	  level = 6, alttext="",	cstring = "|cff606060"},
 }
+Skillet.skill_style_type = skill_style_type
 
 function Skillet:GetTradeSkillInfo(index)
 	--DA.PROFILE("Skillet:GetTradeSkillInfo("..tostring(index)..")")

@@ -18,17 +18,13 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
 ]]--
 
 local L = LibStub("AceLocale-3.0"):GetLocale("Skillet")
-local skill_style_type = {
-	["unavailable"]		= { r = 1.00, g = 0.00, b = 0.00, level = 6},
-	["unknown"]			= { r = 1.00, g = 0.00, b = 0.00, level = 5},
-	["optimal"]			= { r = 1.00, g = 0.50, b = 0.25, level = 4},
-	["medium"]			= { r = 1.00, g = 1.00, b = 0.00, level = 3},
-	["easy"]			= { r = 0.25, g = 0.75, b = 0.25, level = 2},
-	["trivial"]			= { r = 0.50, g = 0.50, b = 0.50, level = 1},
-	["header"]			= { r = 1.00, g = 0.82, b = 0,    level = 0},
-}
-Skillet.skill_style_type = skill_style_type
--- list of possible sorting methods
+--
+-- Table of difficulty colors defined in SkilletData.lua
+--
+local skill_style_type = Skillet.skill_style_type
+--
+-- List of possible sorting methods
+--
 local sorters = {}
 local recipe_sort_method = nil
 
@@ -60,8 +56,6 @@ local function sort_recipe_by_skill_level(tradeskill, a, b)
 		rightDifficulty = skill_style_type[b.skillData.difficulty].level
 	end
 	if leftDifficulty == rightDifficulty then
---		DA.CHAT("a: "..(a.spellID or "nil"))
---		DA.CHAT("b: "..(b.spellID or "nil"))
 		local left = Skillet:GetTradeSkillLevels(a.spellID)
 		local right = Skillet:GetTradeSkillLevels(b.spellID)
 		if left == right then
@@ -92,11 +86,15 @@ local function sort_recipe_by_item_level(tradeskill, a, b)
 	if not left  then  left = 0 end
 	if not right then right = 0 end
 	if left == right then
-		-- same level, try iLevel next
+--
+-- Same level, try iLevel next
+--
 		local left = select(4,GetItemInfo(left_r.itemID)) or 0
 		local right = select(4,GetItemInfo(right_r.itemID)) or 0
 		if left == right then
-			-- same level, sort by difficulty
+--
+-- Same level, sort by difficulty
+--
 			return sort_recipe_by_skill_level(tradeskill, a, b)
 		else
 			return left > right
@@ -120,7 +118,9 @@ local function sort_recipe_by_item_quality(tradeskill, a, b)
 	if not left  then  left = 0 end
 	if not right then right = 0 end
 	if left == right then
-		-- same level, sort by level required to use
+--
+-- Same level, sort by level required to use
+--
 		return sort_recipe_by_item_level(tradeskill, a, b)
 	else
 		return left > right
@@ -176,7 +176,7 @@ local function SkillIsFilteredOut(skillIndex)
 	local recipeID = recipe.spellID or 0
 	if recipeID == 0 then
 --
--- it's a header, don't filter here
+-- It's a header, don't filter here
 --
 		return false
 	end
@@ -201,7 +201,7 @@ local function SkillIsFilteredOut(skillIndex)
 		return true
 	end
 --
--- are we hiding anything that is trivial (has no chance of giving a skill point)
+-- Are we hiding anything that is trivial (has no chance of giving a skill point)
 --
 	if skill_style_type[skill.difficulty] then
 		if skill_style_type[skill.difficulty].level < (Skillet:GetTradeSkillOption("filterLevel") or 4) then
@@ -209,7 +209,7 @@ local function SkillIsFilteredOut(skillIndex)
 		end
 	end
 --
--- are we hiding anything that can't be created with the mats on this character?
+-- Are we hiding anything that can't be created with the mats on this character?
 --
 	if Skillet:GetTradeSkillOption("hideuncraftable") then
 		if not (skill.numCraftable > 0 and Skillet:GetTradeSkillOption("filterInventory-bag")) and
@@ -227,7 +227,7 @@ local function SkillIsFilteredOut(skillIndex)
 		end
 	end
 --
--- string search
+-- String search
 --
 	local searchtext = Skillet:GetTradeSkillOption("searchtext")
 	if searchtext and searchtext ~= "" then
@@ -292,7 +292,6 @@ local function is_sort_desc()
 			return Skillet:GetTradeSkillOption("sortdesc-" .. entry.name)
 		end
 	end
-	-- default to true
 	return true
 end
 

@@ -2283,7 +2283,7 @@
 			</Button>
 			<Button name="SkilletQueueManagementButton" inherits="UIPanelButtonTemplate" parent="SkilletFrame">
 				<Size>
-					<AbsDimension x="110" y="20"/>
+					<AbsDimension x="100" y="20"/>
 				</Size>
 				<Anchors>
 					<Anchor point="RIGHT" relativeTo="SkilletRecipeNotesButton" relativePoint="LEFT">
@@ -2300,7 +2300,7 @@
 			</Button>
 			<Button name="SkilletIgnoredMatsButton" inherits="UIPanelButtonTemplate" parent="SkilletFrame">
 				<Size>
-					<AbsDimension x="100" y="20"/>
+					<AbsDimension x="120" y="20"/>
 				</Size>
 				<Anchors>
 					<Anchor point="RIGHT" relativeTo="SkilletQueueManagementButton" relativePoint="LEFT">
