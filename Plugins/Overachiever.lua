@@ -67,8 +67,6 @@ function plugin.RecipeNamePrefix(skill, recipe)
 		if icon ~= "" then
 			return icon, id, link
 		end
-	else
-		DA.DEBUG(0,"Overachiever is missing")
 	end
 end
 
