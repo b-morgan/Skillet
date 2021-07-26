@@ -36,7 +36,7 @@ local skillColors = {
 -- function InitializeSkillLevels (which loads Skillet.db.global.SkillLevels) is 
 -- at the end of this file.
 --
--- The table was scraped from https://wowhead.com/
+-- Skillet-Classic table was scraped from https://tbc.wowhead.com/, Skillet from https://www.wowhead.com/
 -- using ScrapeWowhead.js (follow instructions in file)
 -- provided and maintained by Matthew Hively, https://github.com/matthewhively
 --

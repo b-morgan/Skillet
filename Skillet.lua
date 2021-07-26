@@ -320,6 +320,12 @@ function Skillet:OnInitialize()
 	if not self.db.global.spellIDtoName then
 		self.db.global.spellIDtoName = {}
 	end
+	if not self.db.global.MissingSkillLevels then
+		self.db.global.MissingSkillLevels = {}
+	end
+	if not self.db.global.SkillLevels then
+		self:InitializeSkillLevels()
+	end
 
 --
 -- Hook default tooltips
