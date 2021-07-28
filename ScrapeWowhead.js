@@ -177,10 +177,10 @@ function main_loop() {
     print_skill_levels();
 }
 
-// [/paste]
-
-// run this to get all skill levels from this page's profession
+// This will start the scanning process
 main_loop();
+
+// [/paste]
 
 /*
 5) Wait for execution to complete, it will show progress indicator how many recipes have been scanned so far.
