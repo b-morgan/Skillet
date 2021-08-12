@@ -688,7 +688,7 @@ function Skillet:OnEnable()
 -- the tradeskill window to update the number of items
 -- that can be crafted as we consume reagents.
 --
---	self:RegisterEvent("UNIT_SPELLCAST_START")
+	self:RegisterEvent("UNIT_SPELLCAST_START")
 	self:RegisterEvent("UNIT_SPELLCAST_SUCCEEDED")
 	self:RegisterEvent("UNIT_SPELLCAST_FAILED")
 	self:RegisterEvent("UNIT_SPELLCAST_FAILED_QUIET")
@@ -702,9 +702,9 @@ function Skillet:OnEnable()
 -- Not sure these are needed for crafting but they
 -- are useful for debugging.
 --
---	self:RegisterEvent("UNIT_SPELLCAST_SENT")
---	self:RegisterEvent("UNIT_SPELLCAST_DELAYED")
---	self:RegisterEvent("UNIT_SPELLCAST_STOP")
+	self:RegisterEvent("UNIT_SPELLCAST_SENT")
+	self:RegisterEvent("UNIT_SPELLCAST_DELAYED")
+	self:RegisterEvent("UNIT_SPELLCAST_STOP")
 --	self:RegisterEvent("CHAT_MSG_SKILL")
 	self:RegisterEvent("SKILL_LINES_CHANGED") -- replacement for CHAT_MSG_SKILL?
 	self:RegisterEvent("LEARNED_SPELL_IN_TAB") -- arg1 = professionID

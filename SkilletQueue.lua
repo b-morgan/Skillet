@@ -364,7 +364,7 @@ function Skillet:ProcessQueue(altMode)
 				return
 			end
 			local recipeInfo = C_TradeSkillUI.GetRecipeInfo(command.recipeID)
-			--DA.DEBUG(1,"recipeInfo= "..DA.DUMP1(recipeInfo))
+			DA.DEBUG(1,"recipeInfo= "..DA.DUMP1(recipeInfo))
 			local numAvailable = recipeInfo.numAvailable or 0
 			if numAvailable > 0 then
 				self.processingSpell = self:GetRecipeName(command.recipeID)
@@ -410,16 +410,17 @@ function Skillet:ProcessQueue(altMode)
 				local optionalReagentsArray = {}
 				local recipeLevel = 0
 				if command.recipeLevel then
-					--DA.DEBUG(1,"Optional: level= "..tostring(command.recipeLevel))
+					DA.DEBUG(1,"Optional: level= "..tostring(command.recipeLevel))
 					recipeLevel = command.recipeLevel
 				end
+				self.processingLevel = recipeLevel
 				if command.optionalReagents then
 					for i,reagentID in pairs(command.optionalReagents) do
-						--DA.DEBUG(2,"i= "..tostring(i)..", reagentID= "..tostring(reagentID))
+						DA.DEBUG(2,"i= "..tostring(i)..", reagentID= "..tostring(reagentID))
 						table.insert(optionalReagentsArray, { itemID = reagentID, count = 1, slot = i, })
 					end -- for
 				end
-					--DA.DEBUG(1,"Optional: recipeLevel= "..tostring(recipeLevel)..", optionalReagentsArray= "..DA.DUMP1(optionalReagentsArray))
+					DA.DEBUG(1,"Optional: recipeLevel= "..tostring(recipeLevel)..", optionalReagentsArray= "..DA.DUMP1(optionalReagentsArray))
 					C_TradeSkillUI.SetRecipeRepeatCount(command.recipeID, craftCount)
 					C_TradeSkillUI.CraftRecipe(command.recipeID, craftCount, optionalReagentsArray, recipeLevel)
 			else
@@ -518,9 +519,14 @@ function Skillet:UNIT_SPELLCAST_SUCCEEDED(event, unit, spell, rank, lineID, spel
 		lineID = spell
 		spellID = rank
 	end
-	if unit == "player" and spellID == self.processingSpellID then
-		DA.DEBUG(0,"UNIT_SPELLCAST_SUCCEEDED("..tostring(unit)..", "..tostring(lineID)..", "..tostring(spellID)..")")
-		self:ContinueCast(spellID)
+	if unit == "player" then
+		if self.processingLevel and self.processingLevel ~= 0 and self.processingSpellID then
+			DA.DEBUG(0,"UNIT_SPELLCAST_SUCCEEDED: "..tostring(unit)..", "..tostring(lineID)..", "..tostring(self.processingSpellID))
+			self:ContinueCast(self.processingSpellID)
+		elseif spellID == self.processingSpellID then
+			DA.DEBUG(0,"UNIT_SPELLCAST_SUCCEEDED: "..tostring(unit)..", "..tostring(lineID)..", "..tostring(spellID))
+			self:ContinueCast(spellID)
+		end
 	end
 end
 
@@ -530,8 +536,8 @@ function Skillet:UNIT_SPELLCAST_FAILED(event, unit, spell, rank, lineID, spellID
 		lineID = spell
 		spellID = rank
 	end
-	if unit == "player" and spellID == self.processingSpellID then
-		self:StopCast(SpellID)
+	if unit == "player" and self.processingSpellID then
+		self:StopCast(self.processingSpellID)
 	end
 end
 
@@ -541,8 +547,8 @@ function Skillet:UNIT_SPELLCAST_FAILED_QUIET(event, unit, spell, rank, lineID, s
 		lineID = spell
 		spellID = rank
 	end
-	if unit == "player" and spellID == self.processingSpellID then
-		self:StopCast(spellID)
+	if unit == "player" and self.processingSpellID then
+		self:StopCast(self.processingSpellID)
 	end
 end
 
@@ -552,8 +558,8 @@ function Skillet:UNIT_SPELLCAST_INTERRUPTED(event, unit, spell, rank, lineID, sp
 		lineID = spell
 		spellID = rank
 	end
-	if unit == "player" and spellID == self.processingSpellID then
-		self:StopCast(spellID)
+	if unit == "player" and self.processingSpellID then
+		self:StopCast(self.processingSpellID)
 	end
 end
 
@@ -571,7 +577,6 @@ function Skillet:UNIT_SPELLCAST_STOP(event, unit, spell, rank, lineID, spellID)
 		lineID = spell
 		spellID = rank
 	end
---	end
 end
 
 --
@@ -600,6 +605,7 @@ function Skillet:ContinueCast(spellID)
 			self.processingSpellID = nil
 			self.processingPosition = nil
 			self.processingCommand = nil
+			self.processingLevel = nil
 		end
 --		Skillet:AdjustInventory()	-- Adjustment of the inventory and updating the window will happen via other events
 	end
@@ -610,14 +616,13 @@ end
 --
 function Skillet:StopCast(spellID)
 	DA.DEBUG(0,"StopCast("..tostring(spellID)..")")
-	if spell == self.processingSpell then
-		self.queuecasting = false
-		self.processingSpell = nil
-		self.processingSpellID = nil
-		self.processingPosition = nil
-		self.processingCommand = nil
-		self.processingCount = nil
-	end
+	self.queuecasting = false
+	self.processingSpell = nil
+	self.processingSpellID = nil
+	self.processingPosition = nil
+	self.processingCommand = nil
+	self.processingLevel = nil
+	self.processingCount = nil
 end
 
 --
