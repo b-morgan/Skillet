@@ -487,11 +487,17 @@ function Skillet:CreateAllItems(mouse)
 	end
 end
 
+--
+-- Events associated with crafting spells
+--
 function Skillet:UNIT_SPELLCAST_SENT(event, unit, spell, rank, target, lineID)
 	DA.TRACE("UNIT_SPELLCAST_SENT("..tostring(unit)..", "..tostring(spell)..", "..tostring(rank)..", "..tostring(target)..", "..tostring(lineID)..")")
 	if (not target) then
 		target = spell
 		lineID = rank
+	end
+	if unit == "player" then
+		self:IgnoreCast(spellID)
 	end
 end
 
@@ -500,6 +506,9 @@ function Skillet:UNIT_SPELLCAST_START(event, unit, spell, rank, lineID, spellID)
 	if (not lineID) then
 		lineID = spell
 		spellID = rank
+	end
+	if unit == "player" then
+		self:IgnoreCast(spellID)
 	end
 end
 
@@ -516,6 +525,8 @@ function Skillet:UNIT_SPELLCAST_SUCCEEDED(event, unit, spell, rank, lineID, spel
 		elseif spellID == self.processingSpellID then
 			DA.DEBUG(0,"UNIT_SPELLCAST_SUCCEEDED: "..tostring(unit)..", "..tostring(lineID)..", "..tostring(spellID))
 			self:ContinueCast(spellID)
+		else
+			self:IgnoreCast(spellID)
 		end
 	end
 end
@@ -533,6 +544,8 @@ function Skillet:UNIT_SPELLCAST_FAILED(event, unit, spell, rank, lineID, spellID
 		elseif spellID == self.processingSpellID then
 			DA.DEBUG(0,"UNIT_SPELLCAST_FAILED: "..tostring(unit)..", "..tostring(lineID)..", "..tostring(spellID))
 			self:StopCast(spellID)
+		else
+			self:IgnoreCast(spellID)
 		end
 	end
 end
@@ -550,6 +563,8 @@ function Skillet:UNIT_SPELLCAST_FAILED_QUIET(event, unit, spell, rank, lineID, s
 		elseif spellID == self.processingSpellID then
 			DA.DEBUG(0,"UNIT_SPELLCAST_FAILED_QUIET: "..tostring(unit)..", "..tostring(lineID)..", "..tostring(spellID))
 			self:StopCast(spellID)
+		else
+			self:IgnoreCast(spellID)
 		end
 	end
 end
@@ -567,6 +582,8 @@ function Skillet:UNIT_SPELLCAST_INTERRUPTED(event, unit, spell, rank, lineID, sp
 		elseif spellID == self.processingSpellID then
 			DA.DEBUG(0,"UNIT_SPELLCAST_INTERRUPTED: "..tostring(unit)..", "..tostring(lineID)..", "..tostring(spellID))
 			self:StopCast(spellID)
+		else
+			self:IgnoreCast(spellID)
 		end
 	end
 end
@@ -577,6 +594,9 @@ function Skillet:UNIT_SPELLCAST_DELAYED(event, unit, spell, rank, lineID, spellI
 		lineID = spell
 		spellID = rank
 	end
+	if unit == "player" then
+		self:IgnoreCast(spellID)
+	end
 end
 
 function Skillet:UNIT_SPELLCAST_STOP(event, unit, spell, rank, lineID, spellID)
@@ -585,6 +605,9 @@ function Skillet:UNIT_SPELLCAST_STOP(event, unit, spell, rank, lineID, spellID)
 		lineID = spell
 		spellID = rank
 	end
+	if unit == "player" then
+		self:IgnoreCast(spellID)
+	end
 end
 
 --
@@ -592,7 +615,8 @@ end
 -- Counts down each successful completion of the current command and does finish processing when the count reaches zero
 --
 function Skillet:ContinueCast(spellID)
-	DA.DEBUG(0,"ContinueCast("..tostring(spellID)..")")
+	name = GetSpellInfo(spellID)
+	DA.DEBUG(0,"ContinueCast("..tostring(spellID).."), "..tostring(name))
 	if spellID == self.processingSpellID then
 		DA.DEBUG(0,"ContinueCast: processingCount= "..tostring(Skillet.processingCount))
 		local queue = self.db.realm.queueData[self.currentPlayer]
@@ -615,7 +639,6 @@ function Skillet:ContinueCast(spellID)
 			self.processingCommand = nil
 			self.processingLevel = nil
 		end
---		Skillet:AdjustInventory()	-- Adjustment of the inventory and updating the window will happen via other events
 	end
 end
 
@@ -623,7 +646,8 @@ end
 -- Stop a trade skill currently in progress. Called from UNIT_SPELLCAST_* events that indicate failure
 --
 function Skillet:StopCast(spellID)
-	DA.DEBUG(0,"StopCast("..tostring(spellID)..")")
+	name = GetSpellInfo(spellID)
+	DA.DEBUG(0,"StopCast("..tostring(spellID).."), "..tostring(name))
 	self.queuecasting = false
 	self.processingSpell = nil
 	self.processingSpellID = nil
@@ -631,6 +655,15 @@ function Skillet:StopCast(spellID)
 	self.processingCommand = nil
 	self.processingLevel = nil
 	self.processingCount = nil
+end
+
+--
+-- Ignore a trade skill event directed at the player. Called from UNIT_SPELLCAST_* events that 
+-- don't meet expected criteria
+--
+function Skillet:IgnoreCast(spellID)
+	name = GetSpellInfo(spellID)
+	DA.DEBUG(4,"IgnoreCast("..tostring(spellID).."), "..tostring(name))
 end
 
 --

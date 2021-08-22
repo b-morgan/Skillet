@@ -931,16 +931,17 @@ function Skillet:GARRISON_TRADESKILL_NPC_CLOSED()
 	DA.TRACE("GARRISON_TRADESKILL_NPC_CLOSED")
 end
 
-function Skillet:ITEM_DATA_LOAD_RESULT()
-	DA.TRACE("ITEM_DATA_LOAD_RESULT")
+function Skillet:ITEM_DATA_LOAD_RESULT(event, itemID, result)
+	DA.TRACE("ITEM_DATA_LOAD_RESULT("..tostring(itemID)..", "..tostring(result)..")")
 	if Skillet.optionalDataNeeded then
 		Skillet:UpdateOptionalListWindow()
 		Skillet.optionalDataNeeded = nil
 	end
 end
 
-function Skillet:GET_ITEM_INFO_RECEIVED()
-	DA.TRACE("GET_ITEM_INFO_RECEIVED")
+function Skillet:GET_ITEM_INFO_RECEIVED(event, itemID, result)
+--	name = GetItemInfo(itemID)
+--	DA.TRACE("GET_ITEM_INFO_RECEIVED("..tostring(itemID)..", "..tostring(result).."), "..tostring(name))
 end
 
 --
