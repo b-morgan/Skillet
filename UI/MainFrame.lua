@@ -282,7 +282,7 @@ function Skillet:CreateTradeSkillWindow()
 	backdrop:SetBackdropColor(0.05, 0.05, 0.05)
 	backdrop:SetResizable(true)
 --
--- frame enclosing the pop out notes panel
+-- Frame enclosing the pop out notes panel
 --
 	backdrop = SkilletRecipeNotesFrame
 	if not backdrop.SetBackdrop then
@@ -317,7 +317,7 @@ function Skillet:CreateTradeSkillWindow()
 	windowManager.RestorePosition(frame)  -- restores scale also
 	windowManager.MakeDraggable(frame)
 --
--- lets play the resize me game!
+-- Lets play the resize me game!
 --
 	local minwidth = SKILLET_SKILLLIST_MIN_WIDTH
 	minwidth = minwidth +                  -- minwidth of scroll button
@@ -457,7 +457,7 @@ local function get_recipe_button(i)
 end
 
 --
--- shows a recipe button (in the scrolling list) after doing the
+-- Shows a recipe button (in the scrolling list) after doing the
 -- required callbacks.
 --
 local function show_button(button, trade, skill, index, recipeID)
@@ -472,7 +472,7 @@ local function show_button(button, trade, skill, index, recipeID)
 end
 
 --
--- hides a recipe button (in the scrolling list) after doing the
+-- Hides a recipe button (in the scrolling list) after doing the
 -- required callbacks.
 --
 local function hide_button(button, trade, skill, index)
@@ -487,7 +487,7 @@ local function hide_button(button, trade, skill, index)
 end
 
 --
--- hide UI components that cannot be used for crafts and show that
+-- Hide UI components that cannot be used for crafts and show that
 -- that are only applicable to trade skills, as needed
 --
 function Skillet:ConfigureRecipeControls(enchant)
@@ -528,7 +528,7 @@ function Skillet:ConfigureRecipeControls(enchant)
 	self:InitRecipeFilterButtons()
 	if self.currentPlayer ~= (UnitName("player")) then
 --
--- disable processing because this is not the current player
+-- Disable processing because this is not the current player
 --
 		SkilletStartQueueButton:Disable()
 		SkilletCreateAllButton:Disable()
@@ -1014,7 +1014,7 @@ function Skillet:UpdateTradeSkillWindow()
 	width = SkilletSkillListParent:GetWidth() - 10
 	if SkilletSkillList:IsVisible() then
 --
--- adjust for the width of the scroll bar, if it is visible.
+-- Adjust for the width of the scroll bar, if it is visible.
 --
 		width = width - 20
 	end
@@ -1157,7 +1157,7 @@ function Skillet:UpdateTradeSkillWindow()
 				buttonFavorite:SetFavorite(Skillet:IsFavorite(skill.recipeID))
 				buttonFavorite:Show()
 --
--- if the item has a minimum level requirement, then print that here
+-- If the item has a minimum level requirement, then print that here
 --
 				if self.db.profile.display_required_level then
 					local level = self:GetLevelRequiredToUse(recipe.itemID)
@@ -1391,7 +1391,7 @@ function Skillet:SkillButton_OnEnter(button)
 	local recipe = self:GetRecipe(skill.recipeID) or Skillet.unknownRecipe
 	if not self.db.profile.show_detailed_recipe_tooltip then
 --
--- user does not want the tooltip displayed, it can get a bit big after all
+-- User does not want the tooltip displayed, it can get a bit big after all
 --
 		button.locked = false
 		return
@@ -1437,28 +1437,28 @@ function Skillet:SkillButton_OnEnter(button)
 	end
 	numowned = GetItemCount(recipe.itemID,true)
 --
--- how many are there already
+-- How many are there already
 --
 	if numowned > 0 then
 		local text = "\n" .. COWNED..numowned .. "|r " .. L["in your inventory"];
 		tip:AddLine(text, 1, 1, 1, false); -- (text, r, g, b, wrap)
 	end
 --
--- how many can be created with the reagents in the inventory
+-- How many can be created with the reagents in the inventory
 --
 	if num > 0 then
 		local text = "\n" .. CBAG..num .. "|r " .. L["can be created from reagents in your inventory"];
 		tip:AddLine(text, 1, 1, 1, false); -- (text, r, g, b, wrap)
 	end
 --
--- how many can be created by crafting the reagents
+-- How many can be created by crafting the reagents
 --
 	if numrecursive > 0 then
 		local text = "\n" .. CCRAFT..numrecursive .. "|r " .. L["can be created by crafting reagents"];
 		tip:AddLine(text, 1, 1, 1, false); -- (text, r, g, b, wrap)
 	end
 --
--- how many can be created with reagents bought at vendor
+-- How many can be created with reagents bought at vendor
 --
 	if numwvendor and numwvendor > 0 and numwvendor ~= num then
 		if numwvendor >= 1000 then
@@ -1468,7 +1468,7 @@ function Skillet:SkillButton_OnEnter(button)
 		tip:AddLine(text, 1, 1, 1, false); -- (text, r, g, b, wrap)
 	end
 --
--- how many can be crafted with reagents on *all* alts, including this one.
+-- How many can be crafted with reagents on *all* alts, including this one.
 --
 	if numwalts and numwalts > 0 and numwalts ~= num then
 		if numwalts >= 1000 then
@@ -1478,7 +1478,7 @@ function Skillet:SkillButton_OnEnter(button)
 		tip:AddLine(text, 1, 1, 1, false);	-- (text, r, g, b, wrap)
 	end
 --
--- now the list of regents for this recipe and some info about them
+-- Now the list of regents for this recipe and some info about them
 --
 	tip:AddLine("\n" .. SPELL_REAGENTS)
 	for i=1,#recipe.reagentData do
@@ -1844,7 +1844,7 @@ function Skillet:UpdateDetailsWindow(skillIndex)
 			end
 			if num < reagent.numNeeded then
 --
--- grey it out if we don't have it
+-- Grey it out if we don't have it
 --
 				count:SetText(GRAY_FONT_COLOR_CODE .. count_text .. FONT_COLOR_CODE_CLOSE)
 				text:SetText(GRAY_FONT_COLOR_CODE .. reagentName .. FONT_COLOR_CODE_CLOSE)
@@ -1855,7 +1855,7 @@ function Skillet:UpdateDetailsWindow(skillIndex)
 				end
 			else
 --
--- ungrey it
+-- Ungrey it
 --
 				count:SetText(count_text)
 				text:SetText(reagentName)
@@ -1871,7 +1871,7 @@ function Skillet:UpdateDetailsWindow(skillIndex)
 			lastReagentIndex = i
 		else
 --
--- out of necessary reagents, don't need to show the button,
+-- Out of necessary reagents, don't need to show the button,
 -- or any of the text.
 --
 			button:Hide()
@@ -2415,7 +2415,7 @@ function Skillet:SkillExpandButton_OnClick(button, mouse, doubleClicked)
 end
 
 --
--- this function assures that a recipe that is indirectly selected (via reagent clicks, for example)
+-- This function assures that a recipe that is indirectly selected (via reagent clicks, for example)
 -- will be visible in the skill list (ie, not scrolled off the top/bottom)
 --
 function Skillet:ScrollToSkillIndex(skillIndex)
@@ -2424,7 +2424,7 @@ function Skillet:ScrollToSkillIndex(skillIndex)
 		return
 	end
 --
--- scroll the skill list to make sure the new skill is revealed
+-- Scroll the skill list to make sure the new skill is revealed
 --
 	if SkilletSkillList:IsVisible() then
 		local skillListKey = self.currentPlayer..":"..self.currentTrade..":"..self.currentGroupLabel
@@ -2569,7 +2569,7 @@ function Skillet:ReagentButtonOnEnter(button, skillIndex, reagentIndex)
 end
 
 --
--- called then the mouse leaves a reagent button
+-- Called then the mouse leaves a reagent button
 --
 function Skillet:ReagentButtonOnLeave(button, skillIndex, reagentIndex)
 	--DA.DEBUG(1,"ReagentButtonOnLeave("..tostring(button)..", "..tostring(skillIndex)..", "..tostring(reagentIndex)..")")
@@ -2637,7 +2637,7 @@ function Skillet:ReagentButtonOnClick(button, mouse, skillIndex, reagentIndex)
 			self.recipeMenu = CreateFrame("Frame", "SkilletRecipeMenu", _G["UIParent"], "UIDropDownMenuTemplate")
 		end
 --
--- popup with selection if there is more than 1 potential recipe source for the reagent (small prismatic shards, for example)
+-- Popup with selection if there is more than 1 potential recipe source for the reagent (small prismatic shards, for example)
 --
 		for id in pairs(newRecipeTable) do
 			if skillIndexLookup[id] then
@@ -3248,12 +3248,13 @@ local queueMenuList = {
 	},
 }
 
+--
 -- The start/pause queue button.
+--
 function Skillet:StartQueue_OnClick(button,mouse)
 	if self.queuecasting then
 		DA.CHAT("Cancel incomplete processing")
-		self:CancelCast() -- next update will reset the text
---		button:Disable()
+		self:CancelCast()
 		self.queuecasting = false
 	else
 		button:SetText(L["Pause"])
