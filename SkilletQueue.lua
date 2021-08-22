@@ -394,16 +394,6 @@ function Skillet:ProcessQueue(altMode)
 					craftCount = numAvailable
 				end
 				local recipe = self:GetRecipe(command.recipeID)
---[[
-				if self.db.profile.use_blizzard_for_optional and recipe.numOptional and recipe.numOptional ~= "0" then
---
--- Temporarily skip crafting if the recipe needs optional reagents
---
-					DA.CHAT("Crafting skipped because of optional reagents")
-					self:RemoveFromQueue(qpos)
-					return
-				end
---]]
 				DA.DEBUG(1,"Crafting: "..tostring(command.count).." of "..tostring(self.processingSpell).." ("..tostring(command.recipeID)..")")
 				self.queuecasting = true
 				self.processingCount = craftCount
@@ -536,8 +526,14 @@ function Skillet:UNIT_SPELLCAST_FAILED(event, unit, spell, rank, lineID, spellID
 		lineID = spell
 		spellID = rank
 	end
-	if unit == "player" and self.processingSpellID then
-		self:StopCast(self.processingSpellID)
+	if unit == "player" then
+		if self.processingLevel and self.processingLevel ~= 0 and self.processingSpellID then
+			DA.DEBUG(0,"UNIT_SPELLCAST_FAILED: "..tostring(unit)..", "..tostring(lineID)..", "..tostring(self.processingSpellID))
+			self:StopCast(self.processingSpellID)
+		elseif spellID == self.processingSpellID then
+			DA.DEBUG(0,"UNIT_SPELLCAST_FAILED: "..tostring(unit)..", "..tostring(lineID)..", "..tostring(spellID))
+			self:StopCast(spellID)
+		end
 	end
 end
 
@@ -547,8 +543,14 @@ function Skillet:UNIT_SPELLCAST_FAILED_QUIET(event, unit, spell, rank, lineID, s
 		lineID = spell
 		spellID = rank
 	end
-	if unit == "player" and self.processingSpellID then
-		self:StopCast(self.processingSpellID)
+	if unit == "player" then
+		if self.processingLevel and self.processingLevel ~= 0 and self.processingSpellID then
+			DA.DEBUG(0,"UNIT_SPELLCAST_FAILED_QUIET: "..tostring(unit)..", "..tostring(lineID)..", "..tostring(self.processingSpellID))
+			self:StopCast(self.processingSpellID)
+		elseif spellID == self.processingSpellID then
+			DA.DEBUG(0,"UNIT_SPELLCAST_FAILED_QUIET: "..tostring(unit)..", "..tostring(lineID)..", "..tostring(spellID))
+			self:StopCast(spellID)
+		end
 	end
 end
 
@@ -558,8 +560,14 @@ function Skillet:UNIT_SPELLCAST_INTERRUPTED(event, unit, spell, rank, lineID, sp
 		lineID = spell
 		spellID = rank
 	end
-	if unit == "player" and self.processingSpellID then
-		self:StopCast(self.processingSpellID)
+	if unit == "player" then
+		if self.processingLevel and self.processingLevel ~= 0 and self.processingSpellID then
+			DA.DEBUG(0,"UNIT_SPELLCAST_INTERRUPTED: "..tostring(unit)..", "..tostring(lineID)..", "..tostring(self.processingSpellID))
+			self:StopCast(self.processingSpellID)
+		elseif spellID == self.processingSpellID then
+			DA.DEBUG(0,"UNIT_SPELLCAST_INTERRUPTED: "..tostring(unit)..", "..tostring(lineID)..", "..tostring(spellID))
+			self:StopCast(spellID)
+		end
 	end
 end
 
