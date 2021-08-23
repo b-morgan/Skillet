@@ -497,7 +497,7 @@ function Skillet:UNIT_SPELLCAST_SENT(event, unit, spell, rank, target, lineID)
 		lineID = rank
 	end
 	if unit == "player" then
-		self:IgnoreCast(spellID)
+		self:IgnoreCast(lineID)
 	end
 end
 
@@ -520,10 +520,10 @@ function Skillet:UNIT_SPELLCAST_SUCCEEDED(event, unit, spell, rank, lineID, spel
 	end
 	if unit == "player" then
 		if self.processingLevel and self.processingLevel ~= 0 and self.processingSpellID then
-			DA.DEBUG(0,"UNIT_SPELLCAST_SUCCEEDED: "..tostring(unit)..", "..tostring(lineID)..", "..tostring(self.processingSpellID))
+			--DA.DEBUG(0,"UNIT_SPELLCAST_SUCCEEDED: "..tostring(unit)..", "..tostring(lineID)..", "..tostring(self.processingSpellID))
 			self:ContinueCast(self.processingSpellID)
 		elseif spellID == self.processingSpellID then
-			DA.DEBUG(0,"UNIT_SPELLCAST_SUCCEEDED: "..tostring(unit)..", "..tostring(lineID)..", "..tostring(spellID))
+			--DA.DEBUG(0,"UNIT_SPELLCAST_SUCCEEDED: "..tostring(unit)..", "..tostring(lineID)..", "..tostring(spellID))
 			self:ContinueCast(spellID)
 		else
 			self:IgnoreCast(spellID)
@@ -539,10 +539,10 @@ function Skillet:UNIT_SPELLCAST_FAILED(event, unit, spell, rank, lineID, spellID
 	end
 	if unit == "player" then
 		if self.processingLevel and self.processingLevel ~= 0 and self.processingSpellID then
-			DA.DEBUG(0,"UNIT_SPELLCAST_FAILED: "..tostring(unit)..", "..tostring(lineID)..", "..tostring(self.processingSpellID))
+			--DA.DEBUG(0,"UNIT_SPELLCAST_FAILED: "..tostring(unit)..", "..tostring(lineID)..", "..tostring(self.processingSpellID))
 			self:StopCast(self.processingSpellID)
 		elseif spellID == self.processingSpellID then
-			DA.DEBUG(0,"UNIT_SPELLCAST_FAILED: "..tostring(unit)..", "..tostring(lineID)..", "..tostring(spellID))
+			--DA.DEBUG(0,"UNIT_SPELLCAST_FAILED: "..tostring(unit)..", "..tostring(lineID)..", "..tostring(spellID))
 			self:StopCast(spellID)
 		else
 			self:IgnoreCast(spellID)
@@ -558,10 +558,10 @@ function Skillet:UNIT_SPELLCAST_FAILED_QUIET(event, unit, spell, rank, lineID, s
 	end
 	if unit == "player" then
 		if self.processingLevel and self.processingLevel ~= 0 and self.processingSpellID then
-			DA.DEBUG(0,"UNIT_SPELLCAST_FAILED_QUIET: "..tostring(unit)..", "..tostring(lineID)..", "..tostring(self.processingSpellID))
+			--DA.DEBUG(0,"UNIT_SPELLCAST_FAILED_QUIET: "..tostring(unit)..", "..tostring(lineID)..", "..tostring(self.processingSpellID))
 			self:StopCast(self.processingSpellID)
 		elseif spellID == self.processingSpellID then
-			DA.DEBUG(0,"UNIT_SPELLCAST_FAILED_QUIET: "..tostring(unit)..", "..tostring(lineID)..", "..tostring(spellID))
+			--DA.DEBUG(0,"UNIT_SPELLCAST_FAILED_QUIET: "..tostring(unit)..", "..tostring(lineID)..", "..tostring(spellID))
 			self:StopCast(spellID)
 		else
 			self:IgnoreCast(spellID)
@@ -577,10 +577,10 @@ function Skillet:UNIT_SPELLCAST_INTERRUPTED(event, unit, spell, rank, lineID, sp
 	end
 	if unit == "player" then
 		if self.processingLevel and self.processingLevel ~= 0 and self.processingSpellID then
-			DA.DEBUG(0,"UNIT_SPELLCAST_INTERRUPTED: "..tostring(unit)..", "..tostring(lineID)..", "..tostring(self.processingSpellID))
+			--DA.DEBUG(0,"UNIT_SPELLCAST_INTERRUPTED: "..tostring(unit)..", "..tostring(lineID)..", "..tostring(self.processingSpellID))
 			self:StopCast(self.processingSpellID)
 		elseif spellID == self.processingSpellID then
-			DA.DEBUG(0,"UNIT_SPELLCAST_INTERRUPTED: "..tostring(unit)..", "..tostring(lineID)..", "..tostring(spellID))
+			--DA.DEBUG(0,"UNIT_SPELLCAST_INTERRUPTED: "..tostring(unit)..", "..tostring(lineID)..", "..tostring(spellID))
 			self:StopCast(spellID)
 		else
 			self:IgnoreCast(spellID)
@@ -618,7 +618,7 @@ function Skillet:ContinueCast(spellID)
 	name = GetSpellInfo(spellID)
 	DA.DEBUG(0,"ContinueCast("..tostring(spellID).."), "..tostring(name))
 	if spellID == self.processingSpellID then
-		DA.DEBUG(0,"ContinueCast: processingCount= "..tostring(Skillet.processingCount))
+		DA.DEBUG(2,"ContinueCast: processingCount= "..tostring(Skillet.processingCount))
 		local queue = self.db.realm.queueData[self.currentPlayer]
 		local qpos = self.processingPosition
 		if queue[qpos] and queue[qpos] == self.processingCommand then
