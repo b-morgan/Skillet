@@ -363,7 +363,7 @@ function Skillet:ProcessQueue(altMode)
 				self:QueueMoveToTop(qpos)
 				return
 			end
-			local recipeInfo = C_TradeSkillUI.GetRecipeInfo(command.recipeID)
+			local recipeInfo = C_TradeSkillUI.GetRecipeInfo(command.recipeID, command.recipeLevel)
 			DA.DEBUG(1,"recipeInfo= "..DA.DUMP1(recipeInfo))
 			local numAvailable = recipeInfo.numAvailable or 0
 			if numAvailable > 0 then
