@@ -1399,6 +1399,9 @@ function Skillet:SkillButton_OnEnter(button)
 	local tip = SkilletTradeskillTooltip
 	ShoppingTooltip1:Hide()
 	ShoppingTooltip2:Hide()
+	if not tip.SetBackdrop then
+		Mixin(tip, BackdropTemplateMixin)
+	end
 	tip:SetOwner(button, "ANCHOR_BOTTOMRIGHT",-300);
 	tip:SetBackdropColor(0,0,0,1);
 	tip:ClearLines();
