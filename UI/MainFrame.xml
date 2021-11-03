@@ -295,7 +295,6 @@
 			<OnLeave>
 				self:UnregisterEvent("MODIFIER_STATE_CHANGED")
 				Skillet.mouseOver = nil
-				SkilletSkillTooltip:Hide()
 				ShoppingTooltip1:Hide()
 				ShoppingTooltip2:Hide()
 			</OnLeave>
@@ -464,7 +463,6 @@
 				_G[self:GetName().."Name"]:SetTextColor(r, g, b)
 				SkilletTradeskillTooltip:Hide()
 				Skillet.mouseOver = nil
-				SkilletSkillTooltip:Hide()
 				ShoppingTooltip1:Hide()
 				ShoppingTooltip2:Hide()
 			</OnLeave>
@@ -1373,26 +1371,6 @@
 					</OnLoad>
 				</Scripts>
 			</ScrollFrame>
-			<!--
-			#
-			# Locked Tooltip for quick reference
-			#
-			-->
-			<GameTooltip name="SkilletSkillTooltip" frameStrata="TOOLTIP" hidden="true" parent="UIParent" inherits="GameTooltipTemplate">
-				<Anchors>
-					<Anchor point="TOPRIGHT" relativeTo="SkilletSkillListParent" relativePoint="TOPLEFT">
-						<Offset>
-							<AbsDimension x="-10" y="0"/>
-						</Offset>
-					</Anchor>
-				</Anchors>
-				<Scripts>
-					<OnLoad>
-						self:SetBackdropBorderColor(TOOLTIP_DEFAULT_COLOR.r, TOOLTIP_DEFAULT_COLOR.g, TOOLTIP_DEFAULT_COLOR.b)
-						self:SetBackdropColor(TOOLTIP_DEFAULT_BACKGROUND_COLOR.r, TOOLTIP_DEFAULT_BACKGROUND_COLOR.g, TOOLTIP_DEFAULT_BACKGROUND_COLOR.b)
-					</OnLoad>
-				</Scripts>
-			</GameTooltip>
 			<!--
 			#
 			# Check boxes for various recipe filtering options.
