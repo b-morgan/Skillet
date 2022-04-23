@@ -560,6 +560,12 @@ function Skillet:InitializeDatabase(player)
 		if not self.db.realm.faction then
 			self.db.realm.faction = {}
 		end
+		if not self.db.realm.race then
+			self.db.realm.race = {}
+		end
+		if not self.db.realm.class then
+			self.db.realm.class = {}
+		end
 		if not self.db.realm.guid then
 			self.db.realm.guid = {}
 		end
@@ -710,6 +716,7 @@ function Skillet:OnEnable()
 	self:RegisterEvent("LEARNED_SPELL_IN_TAB") -- arg1 = professionID
 	self:RegisterEvent("NEW_RECIPE_LEARNED") -- arg1 = recipeID
 --	self:RegisterEvent("SPELL_NAME_UPDATE") -- arg1 = spellID, arg2 = spellName
+--	self:RegisterEvent("ADDON_ACTION_BLOCKED")
 --
 -- Debugging cleanup if enabled
 --
@@ -743,6 +750,10 @@ function Skillet:PLAYER_ENTERING_WORLD()
 	DA.TRACE("PLAYER_ENTERING_WORLD")
 	local player, realm = UnitFullName("player")
 	local faction = UnitFactionGroup("player")
+	local raceName, raceFile, raceID = UnitRace("player")
+	local className, classFile, classId = UnitClass("player")
+	local locale = GetLocale()
+	local _,wowBuild,_,wowVersion = GetBuildInfo();
 	local guid = UnitGUID("player")		-- example: guid="Player-970-0002FD64" kind=="Player" server=="970" ID="0002FD64" 
 --
 -- Store some identifying data in the per character saved variables file
@@ -750,6 +761,14 @@ function Skillet:PLAYER_ENTERING_WORLD()
 	SkilletWho.player = player
 	SkilletWho.realm = realm
 	SkilletWho.faction = faction
+	SkilletWho.raceFile = raceFile
+	SkilletWho.classFile = classFile
+	self.db.realm.faction[player] = faction
+	self.db.realm.race[player] = raceFile
+	self.db.realm.class[player] = classFile
+	SkilletWho.locale = locale
+	SkilletWho.wowBuild = wowBuild
+	SkilletWho.wowVersion = wowVersion
 	SkilletWho.guid = guid
 	if guid then
 		local kind, server, ID = strsplit("-", guid)
@@ -760,7 +779,6 @@ function Skillet:PLAYER_ENTERING_WORLD()
 -- Skillet.db.global.* data indexed by server.
 --
 		self.db.realm.guid[player]= guid
-		self.db.realm.faction[player] = faction
 		if (server) then
 			self.data.server = server
 			self.data.realm = realm
@@ -774,6 +792,13 @@ function Skillet:PLAYER_ENTERING_WORLD()
 			self.db.global.faction[server][player] = faction
 		end
 	end
+end
+
+function Skillet:ADDON_ACTION_BLOCKED()
+	DA.TRACE("ADDON_ACTION_BLOCKED")
+--	print("|cf0f00000Skillet-Classic|r: Combat lockdown restriction." ..
+--								  " Leave combat and try again.")
+--	self:HideAllWindows()
 end
 
 function Skillet:PLAYER_LOGOUT()
