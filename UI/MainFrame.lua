@@ -664,7 +664,7 @@ function Skillet:BlizzardUIButton_OnClick(this,button)
 end
 
 function Skillet:CreateAdditionalButtonsList()
-	--DA.DEBUG(0,"CreateAdditionalButtonsList()")
+	DA.DEBUG(0,"CreateAdditionalButtonsList()")
 	Skillet.AdditionalButtonsList = {}
 	local seenButtons = {}
 	local tradeSkillList = self.tradeSkillList
@@ -676,13 +676,13 @@ function Skillet:CreateAdditionalButtonsList()
 			if additionalSpellTab then -- this skill has additional abilities
 				if type(additionalSpellTab[1]) == "table" then
 					for j=1,#additionalSpellTab,1 do
-						--DA.DEBUG(0,"CreateAdditionalButtonsList: tradeID= "..tostring(tradeID)..", additionalSpellTab["..tostring(j).."]= "..DA.DUMP1(additionalSpellTab[j]))
+						DA.DEBUG(0,"CreateAdditionalButtonsList: tradeID= "..tostring(tradeID)..", additionalSpellTab["..tostring(j).."]= "..DA.DUMP1(additionalSpellTab[j]))
 						local spellID = additionalSpellTab[j][1]
 						if not seenButtons[spellID] then
-							if additionalSpellTab[j][4] then
+							if additionalSpellTab[j][5] then
 								local name = GetSpellInfo(spellID)	-- always returns data
 								local name = GetSpellInfo(name)		-- only returns data if you have this spell in your spellbook
-								--DA.DEBUG(0,"CreateAdditionalButtonsList: name= "..tostring(name))
+								DA.DEBUG(0,"CreateAdditionalButtonsList: name= "..tostring(name))
 								if name then
 									table.insert(Skillet.AdditionalButtonsList, additionalSpellTab[j])
 								end
@@ -695,7 +695,7 @@ function Skillet:CreateAdditionalButtonsList()
 				else
 					local spellID = additionalSpellTab[1]
 					if not seenButtons[spellID] then
-						--DA.DEBUG(0,"CreateAdditionalButtonsList: tradeID= "..tostring(tradeID)..", additionalSpellTab= "..DA.DUMP1(additionalSpellTab))
+						DA.DEBUG(0,"CreateAdditionalButtonsList: tradeID= "..tostring(tradeID)..", additionalSpellTab= "..DA.DUMP1(additionalSpellTab))
 						table.insert(Skillet.AdditionalButtonsList, additionalSpellTab)
 						seenButtons[spellID] = true
 					end
@@ -772,53 +772,83 @@ function Skillet:UpdateTradeButtons(player)
 		self:CreateAdditionalButtonsList()
 	end
 --
--- Iterate thru the list of additional skills and
--- add buttons for each one
+-- Iterate thru the list of additional skills and add buttons for each one
+--
+-- Each entry is {spellID, "Name", isToy, isPet, isKnown}
+--   isToy is true if the spellID is a toyID instead
+--   isPet is true if the name is a pet
+--   isKnown is true if the spellID must be known by the player.
 --
 	--DA.DEBUG(0,"UpdateTradeButtons: doing "..tostring(#Skillet.AdditionalButtonsList).." AdditionalButtonsList entries")
 	for i=1,#Skillet.AdditionalButtonsList,1 do
-		local additionalSpellTab = Skillet.AdditionalButtonsList[i]
-		local additionalSpellId = additionalSpellTab[1]
-		local additionalSpellName = additionalSpellTab[2]
-		local additionalToy = additionalSpellTab[3]
-		local spellName, _, spellIcon
-		if additionalToy then
-			_, spellName, spellIcon = C_ToyBox.GetToyInfo(additionalSpellId)
-		else
-			spellName, _, spellIcon = GetSpellInfo(additionalSpellId)
-		end
-		--DA.DEBUG(0,"UpdateTradeButtons: additionalSpellId= "..tostring(additionalSpellId)..", spellName= "..tostring(spellName)..", spellIcon= "..tostring(spellIcon))
-		local buttonName = "SkilletDo"..additionalSpellName
-		local button = _G[buttonName]
-		if not button then
-			--DA.DEBUG(0,"UpdateTradeButtons: CreateFrame for "..tostring(buttonName))
-			button = CreateFrame("Button", buttonName, frame, "SkilletTradeButtonAdditionalTemplate")
-			button:SetID(additionalSpellId)
+		(function()
+			local additionalSpellTab = Skillet.AdditionalButtonsList[i]
+			local additionalSpellId = additionalSpellTab[1]
+			local additionalSpellName = additionalSpellTab[2]
+			local additionalToy = additionalSpellTab[3]
+			local additionalPet = additionalSpellTab[4]
+			local spellName, _, spellIcon, petGUID
 			if additionalToy then
-				button.Toy = true
-			end
-		end
-		button:SetAttribute("type", "macro");
-		local macrotext = Skillet:GetAutoTargetMacro(additionalSpellId, button.Toy)
-		--DA.DEBUG(0,"UpdateTradeButtons: macrotext= "..tostring(macrotext))
-		button:SetAttribute("macrotext", macrotext)
-		button:ClearAllPoints()
-		button:SetPoint("BOTTOMLEFT", SkilletRankFrame, "TOPLEFT", position, 3)
-		local buttonIcon = _G[buttonName.."Icon"]
-		buttonIcon:SetTexture(spellIcon)
-		position = position + button:GetWidth()
-		button:Show()
-		if additionalToy then
-			local isToyUsable = C_ToyBox.IsToyUsable(additionalSpellId)
-			--DA.DEBUG(0,"UpdateTradeButtons: IsToyUsable("..tostring(additionalSpellId)..")= "..tostring(isToyUsable))
-			if isToyUsable then
-				button:Enable()
-				button:SetAlpha(1.0)
+				_, spellName, spellIcon = C_ToyBox.GetToyInfo(additionalSpellId)
 			else
-				button:Disable()
-				button:SetAlpha(0.2)
+				spellName, _, spellIcon = GetSpellInfo(additionalSpellId)
 			end
-		end
+			if additionalPet then
+				_, petGUID = C_PetJournal.FindPetIDByName(additionalSpellName)
+				spellName = additionalSpellName
+				if not petGUID then
+					return -- continue with the next one
+				end
+			end
+			DA.DEBUG(0,"UpdateTradeButtons: additionalSpellId= "..tostring(additionalSpellId)..", spellName= "..tostring(spellName)..", spellIcon= "..tostring(spellIcon))
+			local buttonName = "SkilletDo"..additionalSpellName
+			local button = _G[buttonName]
+			if not button then
+				DA.DEBUG(0,"UpdateTradeButtons: CreateFrame for "..tostring(buttonName))
+				button = CreateFrame("Button", buttonName, frame, "SkilletTradeButtonAdditionalTemplate")
+				button:SetID(additionalSpellId)
+				if additionalToy then
+					button.Toy = true
+				end
+				if additionalPet then
+					button.Pet = true
+					button.PetGUID = petGUID
+				end
+			end
+			button:SetAttribute("type", "macro");
+			local macrotext = Skillet:GetAutoTargetMacro(additionalSpellId, button.Toy, button.Pet, petGUID)
+			DA.DEBUG(0,"UpdateTradeButtons: macrotext= "..tostring(macrotext))
+			button:SetAttribute("macrotext", macrotext)
+			button:ClearAllPoints()
+			button:SetPoint("BOTTOMLEFT", SkilletRankFrame, "TOPLEFT", position, 3)
+			local buttonIcon = _G[buttonName.."Icon"]
+			buttonIcon:SetTexture(spellIcon)
+			position = position + button:GetWidth()
+			button:Show()
+			if additionalToy then
+				local isToyUsable = C_ToyBox.IsToyUsable(additionalSpellId)
+				DA.DEBUG(0,"UpdateTradeButtons: IsToyUsable("..tostring(additionalSpellId)..")= "..tostring(isToyUsable))
+				if isToyUsable then
+					button:Enable()
+					button:SetAlpha(1.0)
+				else
+					button:Disable()
+					button:SetAlpha(0.2)
+				end
+			end
+--[[
+			if additionalPet then
+				DA.DEBUG(0,"UpdateTradeButtons: petName= "..tostring(additionalSpellName)..", petGUID= "..tostring(petGUID))
+				if petGUID then
+					button:Enable()
+					button:SetAlpha(1.0)
+				else
+					button:Disable()
+					button:SetAlpha(0.2)
+				end
+			end
+--]]
+		end)()
 	end
 --[[
 --
@@ -1055,7 +1085,15 @@ function Skillet:UpdateTradeSkillWindow()
 --
 -- Blizzard's Cooking database is FUBAR, fix it
 --
-			if self.FixBugs and skill.name == "Food of Draenor - Header" then skill.name = "Food of Draenor" end
+			if self.FixBugs then
+				if skill.name == "Food of Draenor - Header" then 
+					DA.DEBUG(3,"UpdateTradeSkillWindow: skill= "..DA.DUMP(skill,1))
+					skill.name = "Food of Draenor"
+				elseif skill.name == "Cucina di Draenor - Titolo" then 
+					DA.DEBUG(3,"UpdateTradeSkillWindow: skill= "..DA.DUMP(skill,1))
+					skill.name = "Cucina di Draenor"
+				end
+			end
 --
 -- end of FUBAR fixes
 --
