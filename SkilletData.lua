@@ -118,11 +118,13 @@ function Skillet:GetAutoTargetItem(addSpellID)
 	end
 end
 
-function Skillet:GetAutoTargetMacro(addSpellID, toy)
-	--DA.DEBUG(0,"GetAutoTargetMacro("..tostring(addSpellID)..", "..tostring(toy)..")")
+function Skillet:GetAutoTargetMacro(addSpellID, toy, pet, petGUID)
+	DA.DEBUG(0,"GetAutoTargetMacro("..tostring(addSpellID)..", "..tostring(toy)..", "..tostring(pet)..", "..tostring(petGUID)..")")
 	if toy then
 		local _, name = C_ToyBox.GetToyInfo(addSpellID)
 		return "/cast "..(name or "")
+	elseif pet then
+		return "/run C_PetJournal.SummonPetByGUID('"..tostring(petGUID).."')"
 	else
 		local itemID = Skillet:GetAutoTargetItem(addSpellID)
 		if itemID then
@@ -718,7 +720,7 @@ end
 -- (should probably be moved to the realm database)
 --
 local function GetMyCategories(player, tradeID)
-	--DA.DEBUG(0,"GetMyCategories("..tostring(player)..", "..tostring(tradeID)..")")
+	DA.DEBUG(0,"GetMyCategories("..tostring(player)..", "..tostring(tradeID)..")")
 	if not Skillet.db.global.Categories[tradeID] then
 		Skillet.db.global.Categories[tradeID] = {}
 	end
