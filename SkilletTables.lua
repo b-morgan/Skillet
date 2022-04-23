@@ -86,8 +86,9 @@ Skillet.FollowerNPC = {
 -- Table of additional abilities used to create more buttons
 -- after the trade skill buttons on the Skillet main frame.
 --
--- Each entry is {spellID, "Name", isToy, isKnown}
+-- Each entry is {spellID, "Name", isToy, isPet, isKnown}
 --   isToy is true if the spellID is a toyID instead
+--   isPet is true if the name is a pet
 --   isKnown is true if the spellID must be known by the player.
 -- use for testing:
 --				{883,"Call Pet",false,true},	-- Hunter skill
@@ -95,14 +96,17 @@ Skillet.FollowerNPC = {
 Skillet.TradeSkillAdditionalAbilities = {
 	[7411]	=	{13262,"Disenchant"},		-- enchanting = disenchant
 	[2550]	=	{
-				{818,"Basic_Campfire"},		-- cooking = basic campfire
-				{134020,"Chef's_Hat",true},	-- cooking = Chef's Hat (toy)
+				{818,"Basic_Campfire"},			-- cooking = basic campfire
+				{117573,"Wayfarer's Bonfire",true,false}, -- cooking bonfire
+				{138824,"Pierre",false,true},	-- cooking pet
+				{95787,"Lil' Ragnaros",false,true}, -- cooking pet
+				{134020,"Chef's_Hat",true,false}, -- cooking = Chef's Hat (toy)
 				},
 	[45357] =	{51005,"Milling"},			-- inscription = milling
 	[25229] =	{31252,"Prospecting"},		-- jewelcrafting = prospecting
 	[2018]	=	{
 				{126462,"Thermal_Anvil"},	-- blacksmithing = thermal anvil (item:87216)
-				{255650,"Forge_of_Light",false,true}, -- Lightforged Draenei racial skill
+				{255650,"Forge_of_Light",false,false,true}, -- Lightforged Draenei racial skill
 				},
 	[4036]	=	{126462,"Thermal_Anvil"},	-- engineering = thermal anvil (item:87216)
 	[2575]	=	{126462,"Thermal_Anvil"},	-- smelting = thermal anvil (item:87216)
