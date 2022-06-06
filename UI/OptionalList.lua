@@ -190,6 +190,7 @@ function Skillet:UpdateOptionalListWindow()
 			needed:SetText("")
 			texture = GetItemIcon(oreagentID)
 			icon:SetNormalTexture(texture)
+			icon:Show()
 			button:SetID(itemIndex)
 			button:Show()
 		else
