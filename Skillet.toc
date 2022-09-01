@@ -1,4 +1,4 @@
-## Interface: 90205
+## Interface: 90207
 ## Title: Skillet |cff7fff7f -Ace3-|r
 ## Notes: A replacement tradeskill window
 ## Notes-esES: Una sustitucion de la ventana de Habilidades de Comercio
