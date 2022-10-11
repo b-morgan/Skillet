@@ -462,7 +462,7 @@ Skillet.options =
 					width = "full",
 					order = 11
 				},
-				tsm_compatibility = {
+				tsm_compat = {
 					type = "toggle",
 					name = L["TSMCOMPATNAME"],
 					desc = L["TSMCOMPATDESC"],
