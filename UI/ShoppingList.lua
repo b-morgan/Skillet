@@ -25,6 +25,11 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
 #
 ]]--
 
+local isRetail = WOW_PROJECT_ID == WOW_PROJECT_MAINLINE
+local isClassic = WOW_PROJECT_ID == WOW_PROJECT_CLASSIC
+local isBCC = WOW_PROJECT_ID == WOW_PROJECT_BURNING_CRUSADE_CLASSIC
+local isWrath = WOW_PROJECT_ID == WOW_PROJECT_WRATH_CLASSIC
+
 SKILLET_SHOPPING_LIST_HEIGHT = 16
 
 local L = LibStub("AceLocale-3.0"):GetLocale("Skillet")
@@ -1020,7 +1025,10 @@ function Skillet:UpdateShoppingListWindow(use_cached_recipes)
 -- sort by item
 --
 		table.sort(self.cachedShoppingList, function(a,b)
-			return (a.id > b.id)
+			local na, nb
+			na = GetItemInfo(a.id)
+			nb = GetItemInfo(b.id)
+			return nb > na
 		end)
 		if Skillet.db.char.merge_items then
 --
