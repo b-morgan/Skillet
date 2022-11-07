@@ -77,7 +77,7 @@ function Skillet:RecipeRankChange(rank, text)
 	DA.DEBUG(0,"RecipeRankChange("..tostring(rank)..", '"..tostring(text).."')")
 	Skillet.recipeRank = rank
 	SkilletRecipeRankLabel:SetText(text)
-	Skillet:UpdateDetailsWindow(Skillet.currentSkillIndex)
+	Skillet:UpdateDetailWindow(Skillet.currentSkillIndex)
 end
 
 function Skillet:RecipeRankOnEnter(frame)

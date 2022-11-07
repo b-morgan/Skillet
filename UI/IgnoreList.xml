@@ -131,17 +131,6 @@
 	<Anchors>
 		<Anchor point="CENTER"/>
 	</Anchors>
-	<Backdrop bgFile="Interface\Tooltips\UI-Tooltip-Background" edgeFile="Interface\Tooltips\UI-Tooltip-Border" tile="true">
-		<EdgeSize>
-			<AbsValue val="16"/>
-		</EdgeSize>
-		<TileSize>
-			<AbsValue val="16"/>
-		</TileSize>
-		<BackgroundInsets>
-			<AbsInset left="3" right="3" top="3" bottom="3"/>
-		</BackgroundInsets>
-	</Backdrop>
 	<Frames>
 		<Button name="SkilletIgnoreListCloseButton" inherits="UIPanelCloseButton" parent="SkilletIgnoreList">
 			<Anchors>

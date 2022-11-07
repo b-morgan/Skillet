@@ -67,11 +67,12 @@ function Skillet:AskFor(msg, handler)
 	})
 end
 
+--
 -- Adds resizing to a window. Resizing is both width and height from the
 -- lower right corner only
+--
 function Skillet:EnableResize(frame, min_width, min_height, refresh_method)
-	-- lets play the resize me game!
-	frame:SetMinResize(min_width,min_height) -- magic numbers
+	frame:SetResizeBounds(min_width, min_height) -- magic numbers
 	local sizer_se = CreateFrame("Frame", frame:GetName() .. "_SizerSoutheast", frame)
 	sizer_se:SetPoint("BOTTOMRIGHT",frame,"BOTTOMRIGHT",0,0)
 	sizer_se:SetWidth(25)
@@ -82,16 +83,16 @@ function Skillet:EnableResize(frame, min_width, min_height, refresh_method)
 	end)
 	sizer_se:SetScript("OnMouseUp", function(self)
 		self:GetParent():StopMovingOrSizing()
-		-- 'Skillet' is passed for the hidden 'self' variable
-		pcall(refresh_method, Skillet)
+		pcall(refresh_method, Skillet)	-- 'Skillet' is passed for the hidden 'self' variable
 	end)
 	frame:SetScript("OnSizeChanged", function()
-		-- 'Skillet' is passed for the hidden 'self' variable
-		pcall(refresh_method, Skillet)
+		pcall(refresh_method, Skillet)	-- 'Skillet' is passed for the hidden 'self' variable
 	end)
 
-	-- Stole this from LibRockConfig (ya ckkinght!). Draws 3 diagonal lines in the
-	-- lower right corner of the window
+--
+-- Stole this from LibRockConfig (ya ckkinght!). Draws 3 diagonal lines in the
+-- lower right corner of the window
+--
 	local line1 = sizer_se:CreateTexture(sizer_se:GetName() .. "_Line1", "BACKGROUND")
 	line1:SetWidth(14)
 	line1:SetHeight(14)

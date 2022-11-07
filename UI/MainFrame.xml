@@ -809,7 +809,7 @@
 				elseif ( button == "LeftButton" and IsShiftKeyDown() ) then
 				<!-- This put a link to the *item* that can be created with this trade skill
 					 into the current chat edit box -->
-					ChatEdit_InsertLink(link)
+					Skillet:ReagentButtonShiftClick(self, button, Skillet.selectedSkill, self:GetID())
 				<!-- elseif ( button == "RightButton" ) then -->
 				else
 				<!-- generic click action -->
@@ -863,17 +863,6 @@
 	#
 	-->
 	<GameTooltip name="SkilletTradeskillTooltip" frameStrata="TOOLTIP" hidden="true" inherits="GameTooltipTemplate">
-		<Backdrop bgFile="Interface\Tooltips\UI-Tooltip-Background" edgeFile="Interface\Tooltips\UI-Tooltip-Border" tile="true">
-			<EdgeSize>
-				<AbsValue val="16"/>
-			</EdgeSize>
-			<TileSize>
-				<AbsValue val="16"/>
-			</TileSize>
-			<BackgroundInsets>
-				<AbsInset left="5" right="5" top="5" bottom="5"/>
-			</BackgroundInsets>
-		</Backdrop>
 		<Layers>
 			<Layer level="ARTWORK">
 				<FontString name="$parentTextLeft1" inherits="GameTooltipTextSmall" hidden="true">
@@ -1461,7 +1450,7 @@
 					<OnLoad>
 						self:SetFrameLevel(self:GetFrameLevel()+5)
 						self.slot = "owned"
-						_G[self:GetName().."Checked"]:SetGradient("vertical",1,.5,1, 1,.5,1)
+						<!-- _G[self:GetName().."Checked"]:SetGradient("vertical",1,.5,1, 1,.5,1) -->
 					</OnLoad>
 				</Scripts>
 			</CheckButton>
@@ -1478,7 +1467,6 @@
 					<OnLoad>
 						self:SetFrameLevel(self:GetFrameLevel()+5)
 						self.slot = "bag"
-						_G[self:GetName().."Checked"]:SetGradient("vertical",1,1,.5, 1,1,.5)
 					</OnLoad>
 				</Scripts>
 			</CheckButton>
@@ -1495,7 +1483,6 @@
 					<OnLoad>
 						self:SetFrameLevel(self:GetFrameLevel()+5)
 						self.slot = "crafted"
-						_G[self:GetName().."Checked"]:SetGradient("vertical",.5,1,.5, .5,1,.5)
 					</OnLoad>
 				</Scripts>
 			</CheckButton>
@@ -1512,7 +1499,6 @@
 					<OnLoad>
 						self:SetFrameLevel(self:GetFrameLevel()+5)
 						self.slot = "vendor"
-						_G[self:GetName().."Checked"]:SetGradient("vertical",.5,1,.5, .5,1,.5)
 					</OnLoad>
 				</Scripts>
 			</CheckButton>
@@ -1529,7 +1515,6 @@
 					<OnLoad>
 						self:SetFrameLevel(self:GetFrameLevel()+5)
 						self.slot = "alts"
-						_G[self:GetName().."Checked"]:SetGradient("vertical",1,.5,1, 1,.5,1)
 					</OnLoad>
 				</Scripts>
 			</CheckButton>

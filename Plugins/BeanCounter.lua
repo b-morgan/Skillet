@@ -1,5 +1,5 @@
 local addonName,addonTable = ...
-local DA = _G[addonName] -- for DebugAids.lua
+local DA = LibStub("AceAddon-3.0"):GetAddon("Skillet") -- for DebugAids.lua
 --[[
 Skillet: A tradeskill window replacement.
 
@@ -43,7 +43,7 @@ plugin.options =
 		},
 		days = {
 			type = "range",
-			name = L["Sells for "].."x"..L[" days"],
+			name = L["Sales for "].."x"..L[" days"],
 			min = 1, max = 180, step = 1, isPercent = false,
 			get = function()
 				return Skillet.db.profile.plugins.beancounter.days
@@ -154,7 +154,7 @@ function plugin.GetExtraText(skill, recipe)
 		label=label..L["Sold amount"]..":\n";
 		label=label..L["Gold earned"]..":"..FONT_COLOR_CODE_CLOSE;
 		local success, failed, sucessStack, failedStack, earned  = plugin.GetBCValues(itemID)
-		extra_text = L["Sells for "]..(Skillet.db.profile.plugins.beancounter.days or 0)..L[" days"].."\n"
+		extra_text = L["Sales for "]..(Skillet.db.profile.plugins.beancounter.days or 0)..L[" days"].."\n"
 		extra_text = extra_text..GREEN_FONT_COLOR_CODE..sucessStack..FONT_COLOR_CODE_CLOSE.." / "..RED_FONT_COLOR_CODE..failedStack.."\n"
 		extra_text = extra_text..FONT_COLOR_CODE_CLOSE..Skillet:FormatMoneyFull(earned, true);
 	end

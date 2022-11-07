@@ -450,7 +450,7 @@ function Skillet:QueueItems(count)
 				self:QueueAppendCommand(queueCommand, Skillet.db.profile.queue_craftable_reagents)
 				self.optionalSelected = {}
 				self:HideOptionalList()
-				self:UpdateDetailsWindow(self.selectedSkill)
+				self:UpdateDetailWindow(self.selectedSkill)
 			end
 		end
 		return count

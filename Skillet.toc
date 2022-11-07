@@ -13,7 +13,7 @@
 ## X-Website: https://www.curseforge.com/wow/addons/skillet
 ## SavedVariables: SkilletDB
 ## SavedVariablesPerCharacter: SkilletWho, SkilletDBPC, SkilletMemory, SkilletProfile
-## OptionalDeps: Ace3, LibDialog-1.0, LibWindow-1.1, LibPeriodicTable-3.1, TradeSkillMaster, TheUndermineJournal, TradeSkillInfo, Auctionator, BeanCounter
+## OptionalDeps: Ace3, LibDialog-1.0, LibWindow-1.1, LibPeriodicTable-3.1, TradeSkillMaster, TheUndermineJournal, TradeSkillInfo, Auctionator, BeanCounter, Journalator
 ## X-Embeds: Ace3, LibStub, CallbackHandler-1.0, LibDialog-1.0, LibWindow-1.1, LibPeriodicTable-3.1
 
 ## LoadManagers: AddonLoader

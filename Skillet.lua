@@ -138,14 +138,14 @@ function Skillet:DisableBlizzardFrame()
 		if (not IsAddOnLoaded("Blizzard_TradeSkillUI")) then
 			LoadAddOn("Blizzard_TradeSkillUI");
 		end
-		self.BlizzardTradeSkillFrame = TradeSkillFrame
-		self.tradeSkillHide = TradeSkillFrame:GetScript("OnHide")
-		TradeSkillFrame:SetScript("OnHide", nil)
-		HideUIPanel(TradeSkillFrame)
+		self.BlizzardTradeSkillFrame = ProfessionsFrame
+		self.tradeSkillHide = ProfessionsFrame:GetScript("OnHide")
+		ProfessionsFrame:SetScript("OnHide", nil)
+		HideUIPanel(ProfessionsFrame)
 		Skillet.BlizzardUIshowing = false
 	else
-		TradeSkillFrame:SetScript("OnHide", nil)
-		HideUIPanel(TradeSkillFrame)
+		ProfessionsFrame:SetScript("OnHide", nil)
+		HideUIPanel(ProfessionsFrame)
 		Skillet.BlizzardUIshowing = false
 	end
 end
@@ -157,7 +157,7 @@ function Skillet:EnableBlizzardFrame()
 			LoadAddOn("Blizzard_TradeSkillUI");
 		end
 		self.BlizzardTradeSkillFrame = nil
-		TradeSkillFrame:SetScript("OnHide", Skillet.tradeSkillHide)
+		ProfessionsFrame:SetScript("OnHide", Skillet.tradeSkillHide)
 		Skillet.tradeSkillHide = nil
 	end
 end
@@ -165,29 +165,29 @@ end
 function Skillet:EmptyBlizzardFrame()
 	DA.DEBUG(0,"EmptyBlizzardFrame()")
 	if Skillet.db.profile.BlizzOR then
-		TradeSkillFrame.RankFrame:Hide()
-		TradeSkillFrame.FilterButton:Hide()
-		TradeSkillFrame.SearchBox:Hide()
-		TradeSkillFrame.RecipeList.LearnedTab:Hide()
-		TradeSkillFrame.RecipeList.UnlearnedTab:Hide()
+		ProfessionsFrame.RankFrame:Hide()
+		ProfessionsFrame.FilterButton:Hide()
+		ProfessionsFrame.SearchBox:Hide()
+		ProfessionsFrame.RecipeList.LearnedTab:Hide()
+		ProfessionsFrame.RecipeList.UnlearnedTab:Hide()
 		if not Skillet.TSFRLwidth then
-			Skillet.TSFRLwidth = TradeSkillFrame.RecipeList:GetWidth()
+			Skillet.TSFRLwidth = ProfessionsFrame.RecipeList:GetWidth()
 		end
-		TradeSkillFrame.RecipeList:SetWidth(0)
-		TradeSkillFrame:SetTitle("Skillet Optional Reagents Helper")
+		ProfessionsFrame.RecipeList:SetWidth(0)
+		ProfessionsFrame:SetTitle("Skillet Optional Reagents Helper")
 	end
 end
 
 function Skillet:RestoreBlizzardFrame()
 	DA.DEBUG(0,"RestoreBlizzardFrame()")
 	if Skillet.db.profile.BlizzOR then
-		TradeSkillFrame.RankFrame:Show()
-		TradeSkillFrame.FilterButton:Show()
-		TradeSkillFrame.SearchBox:Show()
-		TradeSkillFrame.RecipeList.LearnedTab:Show()
-		TradeSkillFrame.RecipeList.UnlearnedTab:Show()
+		ProfessionsFrame.RankFrame:Show()
+		ProfessionsFrame.FilterButton:Show()
+		ProfessionsFrame.SearchBox:Show()
+		ProfessionsFrame.RecipeList.LearnedTab:Show()
+		ProfessionsFrame.RecipeList.UnlearnedTab:Show()
 		if Skillet.TSFRLwidth then
-			TradeSkillFrame.RecipeList:SetWidth(Skillet.TSFRLwidth)
+			ProfessionsFrame.RecipeList:SetWidth(Skillet.TSFRLwidth)
 		end
 	end
 	Skillet.BlizzardUIshowing = false
@@ -1018,6 +1018,16 @@ function Skillet:IsModKey2Down()
 end
 
 --
+-- Make modifier key to alter some behaviors optional.
+--
+function Skillet:IsModKey3Down()
+	if not Skillet.db.profile.nomodkeys and IsAltKeyDown() then
+		return true
+	end
+	return false
+end
+
+--
 -- Checks to see if the current trade is one that we support.
 -- Control key says we do (even if we don't, debugging)
 -- Shift key says we don't support it (even if we do)
@@ -1048,9 +1058,9 @@ end
 function Skillet:IsNotSupportedFollower(tradeID)
 	--DA.DEBUG(0,"IsNotSupportedFollower("..tostring(tradeID)..")")
 	Skillet.wasNPCCrafting = false
-	if self:IsModKey1Down() then
+	if self:IsModKey3Down() then
 		Skillet.wasNPCCrafting = true
-		--DA.DEBUG(3,"IsNotSupportedFollower: ShiftKeyDown")
+		--DA.DEBUG(3,"IsNotSupportedFollower: AltKeyDown")
 		return true -- Use Blizzard frame
 	end
 	if not tradeID then
@@ -1104,17 +1114,13 @@ function Skillet:SkilletShow()
 		tinsert(UISpecialFrames, frame:GetName())
 	end
 	self:ScanPlayerTradeSkills(self.currentPlayer)
-	local skillLineID, skillLineName, skillLineRank, skillLineMaxRank, skillLineModifier, parentSkillLineID, parentSkillLineName =
-		C_TradeSkillUI.GetTradeSkillLine()
-	DA.DEBUG(0,"SkilletShow: skillLineID= "..tostring(skillLineID)..", skillLineName= "..tostring(skillLineName)..
-		", skillLineRank= "..tostring(skillLineRank)..", skillLineMaxRank= "..tostring(skillLineMaxRank)..
-		", skillLineModifier= "..tostring(skillLineModifier)..
-		", parentSkillLineID= "..tostring(parentSkillLineID)..", parentSkillLineName= "..tostring(parentSkillLineName))
-	if (parentSkillLineID) then
-		self.currentTrade = self.SkillLineIDList[parentSkillLineID]	-- names are localized so use a table to translate
-	else
-		self.currentTrade = self.SkillLineIDList[skillLineID]		-- names are localized so use a table to translate
-	end
+	local baseinfo = C_TradeSkillUI.GetBaseProfessionInfo()
+	DA.DEBUG(3,"ScanPlayerTradeSkills: GetBaseProfessionInfo info= "..DA.DUMP1(baseinfo))
+	local childinfo = C_TradeSkillUI.GetChildProfessionInfos()
+	--DA.DEBUG(3,"ScanPlayerTradeSkills: GetChildProfessionInfos info= "..DA.DUMP(childinfo))
+
+	self.currentTrade = self.tradeSkillIDsByName[baseinfo.professionName]	-- names are localized so use a table to translate
+
 	DA.DEBUG(0,"SkilletShow: trade= "..tostring(self.currentTrade))
 	local link = C_TradeSkillUI.GetTradeSkillListLink()
 	if not link then
@@ -1127,7 +1133,7 @@ function Skillet:SkilletShow()
 		DA.DEBUG(3,"SkilletShow: "..tostring(self.currentTrade).." IsNotSupportedFollower")
 		self:HideAllWindows()
 		self:EnableBlizzardFrame()
-		ShowUIPanel(TradeSkillFrame)
+		ShowUIPanel(ProfessionsFrame)
 		Skillet.BlizzardUIshowing = true
 	elseif self:IsSupportedTradeskill(self.currentTrade) then
 		DA.DEBUG(3,"SkilletShow: "..tostring(self.currentTrade).." IsSupportedTradeskill")
@@ -1142,7 +1148,7 @@ function Skillet:SkilletShow()
 		DA.DEBUG(3,"SkilletShow: "..tostring(self.currentTrade).." not IsSupportedTradeskill")
 		self:HideAllWindows()
 		self:EnableBlizzardFrame()
-		ShowUIPanel(TradeSkillFrame)
+		ShowUIPanel(ProfessionsFrame)
 		Skillet.BlizzardUIshowing = true
 	end
 end
@@ -1161,7 +1167,9 @@ function Skillet:SkilletShowWindow(where)
 		end
 	end
 	if self.tradeSkillOpen then
-		HideUIPanel(TradeSkillFrame)
+		if not Skillet.db.profile.use_blizzard_for_optional then
+			self:DisableBlizzardFrame()
+		end
 	end
 	if not self:RescanTrade() then
 		if self.useBlizzard then
@@ -1203,6 +1211,7 @@ function Skillet:SkilletClose()
 		DA.DEBUG(0,"wasNPCCrafting")
 		C_Garrison.CloseGarrisonTradeskillNPC()
 		C_Garrison.CloseTradeskillCrafter()
+		Skillet.wasNPCCrafting = false
 	end
 end
 
@@ -1407,12 +1416,10 @@ function Skillet:HideTradeSkillWindow()
 	if frame and frame:IsVisible() then
 		frame:Hide()
 		closed = true
---[[
-		if Skillet.db.profile.use_blizzard_for_optional and TradeSkillFrame then
+		if Skillet.db.profile.use_blizzard_for_optional and ProfessionsFrame then
 			self:RestoreBlizzardFrame()
 			Skillet.BlizzardUIshowing = false
 		end
---]]
 	end
 	return closed
 end
@@ -1449,7 +1456,6 @@ end
 -- Show the options window
 --
 function Skillet:ShowOptions()
-	InterfaceOptionsFrame_Show()
 	InterfaceOptionsFrame_OpenToCategory("Skillet")
 end
 
@@ -1471,7 +1477,7 @@ function Skillet:SetSelectedSkill(skillIndex)
 	self:ConfigureRecipeControls(false)
 	self.selectedSkill = skillIndex
 	self:ScrollToSkillIndex(skillIndex)
-	self:UpdateDetailsWindow(skillIndex)
+	self:UpdateDetailWindow(skillIndex)
 	self:ClickSkillButton(skillIndex)
 end
 

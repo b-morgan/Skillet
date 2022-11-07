@@ -2,6 +2,7 @@ local addonName,addonTable = ...
 local isRetail = WOW_PROJECT_ID == WOW_PROJECT_MAINLINE
 local isClassic = WOW_PROJECT_ID == WOW_PROJECT_CLASSIC
 local isBCC = WOW_PROJECT_ID == WOW_PROJECT_BURNING_CRUSADE_CLASSIC
+local isWrath = WOW_PROJECT_ID == WOW_PROJECT_WRATH_CLASSIC
 local DA
 if isRetail then
 	DA = _G[addonName] -- for DebugAids.lua
@@ -132,7 +133,7 @@ plugin.options =
 		useSearchExact = {
 			type = "toggle",
 			name = "useSearchExact",
-			desc = "Use MultiSearchExact instead of MultSearch in Auction House shopping list (retail only)",
+			desc = "Use MultiSearchExact instead of MultSearch in Auction House shopping list",
 			get = function()
 				return Skillet.db.profile.plugins.ATR.useSearchExact
 			end,
@@ -189,6 +190,81 @@ plugin.options =
 			end,
 			order = 10
 		},
+		alwaysEnchanting = {
+			type = "toggle",
+			name = "alwaysEnchanting",
+			desc = "Always show Enchanting profit (loss)",
+			get = function()
+				return Skillet.db.profile.plugins.ATR.alwaysEnchanting
+			end,
+			set = function(self,value)
+				Skillet.db.profile.plugins.ATR.alwaysEnchanting = value
+				if value then
+					Skillet.db.profile.plugins.ATR.alwaysEnchanting = value
+				end
+			end,
+			order = 11
+		},
+		calcProfitAhTax = {
+			type = "toggle",
+			name = "calcProfitAhTax",
+			desc = "Calc profit after AH Tax(5%)",
+			get = function()
+				return Skillet.db.profile.plugins.ATR.calcProfitAhTax
+			end,
+			set = function(self,value)
+				Skillet.db.profile.plugins.ATR.calcProfitAhTax = value
+				if value then
+					Skillet.db.profile.plugins.ATR.calcProfitAhTax = value
+				end
+			end,
+			order = 12,
+		},
+		journalatorE = {
+			type = "toggle",
+			name = "Journalator Extra",
+			desc = "Show Journalator statistics",
+			get = function()
+				return Skillet.db.profile.plugins.ATR.journalatorE
+			end,
+			set = function(self,value)
+				Skillet.db.profile.plugins.ATR.journalatorE = value
+				if value then
+					Skillet.db.profile.plugins.ATR.journalatorE = value
+				end
+			end,
+			order = 13,
+		},
+		journalatorS = {
+			type = "toggle",
+			name = "Journalator Suffix",
+			desc = "Show Journalator sales rate",
+			get = function()
+				return Skillet.db.profile.plugins.ATR.journalatorS
+			end,
+			set = function(self,value)
+				Skillet.db.profile.plugins.ATR.journalatorS = value
+				if value then
+					Skillet.db.profile.plugins.ATR.journalatorS = value
+				end
+			end,
+			order = 14,
+		},
+		journalatorC = {
+			type = "toggle",
+			name = "Journalator Count",
+			desc = "Show Journalator success count",
+			get = function()
+				return Skillet.db.profile.plugins.ATR.journalatorC
+			end,
+			set = function(self,value)
+				Skillet.db.profile.plugins.ATR.journalatorC = value
+				if value then
+					Skillet.db.profile.plugins.ATR.journalatorC = value
+				end
+			end,
+			order = 15,
+		},
 		buyFactor = {
 			type = "range",
 			name = "buyFactor",
@@ -225,6 +301,7 @@ plugin.options =
 --
 local buyFactorDef = 4
 local markupDef = 1.05
+local ahtaxDef = 0.95
 
 function plugin.OnInitialize()
 	if not Skillet.db.profile.plugins.ATR then
@@ -260,6 +337,22 @@ function plugin.GetExtraText(skill, recipe)
 	local label, extra_text
 	if not recipe then return end
 	local itemID = recipe.itemID
+--
+-- Check for Enchanting. 
+--   In Classic Era, Most recipes don't produce an item but we still should get reagent prices.
+--   In Wrath, Enchants can be applied to vellum to produce scrolls so use the scroll price instead.
+--
+	if Skillet.isCraft then
+		--DA.DEBUG(0,"GetExtraText: itemID= "..tostring(itemID)..", type= "..type(itemID))
+		--DA.DEBUG(0,"GetExtraText: recipe.name= "..tostring(recipe.name)..", recipe.spellID= "..tostring(recipe.spellID)..", recipe.scrollID= "..tostring(recipe.scrollID))
+		if itemID then
+			itemID = Skillet.EnchantSpellToItem[itemID] or 0
+			--DA.DEBUG(0,"GetExtraText: Change via EnchantSpellToItem, itemID= "..tostring(itemID))
+		end
+	elseif recipe.tradeID == 7411 and itemID == 0 then
+		itemID = recipe.scrollID
+		--DA.DEBUG(0,"GetExtraText: Change to scrollID, itemID= "..tostring(itemID))
+	end
 	if Skillet.db.profile.plugins.ATR.enabled and itemID then
 --
 -- buyout is Auctionator's price (for one) times the number this recipe makes
@@ -305,10 +398,12 @@ function plugin.GetExtraText(skill, recipe)
 -- Default value for a reagent is the Auctionator price
 --
 			local value
-			if isRetail then
+			if Atr_GetAuctionBuyout then
+				value = (Atr_GetAuctionBuyout(id) or 0) * needed
+			elseif Auctionator and Auctionator.API.v1.GetAuctionPriceByItemID then
 				value = (Auctionator.API.v1.GetAuctionPriceByItemID(addonName, id) or 0) * needed
 			else
-				value = (Atr_GetAuctionBuyout(id) or 0) * needed
+				value = 0
 			end
 			if not Skillet:VendorSellsReagent(id) then
 --
@@ -360,7 +455,8 @@ function plugin.GetExtraText(skill, recipe)
 -- If we craft this item, will we make a profit?
 --
 		if buyout then
-			local profit = buyout - cost
+			local ah_tax = Skillet.db.profile.plugins.ATR.calcProfitAhTax and ahtaxDef or 1
+			local profit = buyout * ah_tax - cost
 			if Skillet.db.profile.plugins.ATR.showProfitValue or Skillet.db.profile.plugins.ATR.showProfitPercentage then
 				label = label.."\n"
 				extra_text = extra_text.."\n"
@@ -371,6 +467,50 @@ function plugin.GetExtraText(skill, recipe)
 				extra_text = extra_text..Skillet:FormatMoneyFull(profit, true).."\n"
 				label = label.."   Profit percentage:\n"
 				extra_text = extra_text..profitPctText(profit,cost,9999).."%\n"
+			end
+		end
+--
+-- Show Journalator sales info
+--
+		if Journalator and Skillet.db.profile.plugins.ATR.journalatorE then
+			label = label.."\n"
+			extra_text = extra_text.."\n"
+			local itemName = GetItemInfo(itemID)
+			local salesRate, successCount, failedCount, lastSold, lastBought
+			if Journalator.API and itemName then
+				successCount = Journalator.API.v1.GetRealmSuccessCountByItemName(addonName, itemName)
+				failedCount = Journalator.API.v1.GetRealmFailureCountByItemName(addonName, itemName)
+				if successCount > 0 then
+					salesRate = string.format("%.0d", successCount / (successCount + failedCount) * 100).."%"
+				else
+					salesRate = nil
+				end
+				lastSold = Journalator.API.v1.GetRealmLastSoldByItemName(addonName, itemName)
+				lastBought = Journalator.API.v1.GetRealmLastBoughtByItemName(addonName, itemName)
+				--DA.DEBUG(0,"itemName= "..tostring(itemName)..", successCount= "..tostring(successCount)..", failedCount= "..tostring(failedCount)..", lastSold= "..tostring(lastSold)..", lastBought= "..tostring(lastBought))
+			else
+				salesRate, failedCount, lastSold, lastBought = Journalator.Tooltips.GetSalesInfo(itemName)
+				--DA.DEBUG(0,"itemName= "..tostring(itemName)..", salesRate= "..tostring(salesRate)..", failedCount= "..tostring(failedCount)..", lastSold= "..tostring(lastSold)..", lastBought= "..tostring(lastBought))
+			end
+			if salesRate and string.find(salesRate,"%%") then
+				label = label.."   salesRate:\n"
+				extra_text = extra_text..tostring(salesRate).."\n"
+			end
+			if successCount and successCount > 0 then
+				label = label.."   successCount:\n"
+				extra_text = extra_text..tostring(successCount).."\n"
+			end
+			if failedCount and failedCount > 0 then
+				label = label.."   failedCount:\n"
+				extra_text = extra_text..tostring(failedCount).."\n"
+			end
+			if lastSold and lastSold > 0 then
+				label = label.."   lastSold:\n"
+				extra_text = extra_text..Skillet:FormatMoneyFull(lastSold, true).."\n"
+			end
+			if lastBought and lastBought > 0 then
+				label = label.."   lastBought:\n"
+				extra_text = extra_text..Skillet:FormatMoneyFull(lastBought, true).."\n"
 			end
 		end
 	end
@@ -386,7 +526,21 @@ function plugin.RecipeNameSuffix(skill, recipe)
 	if not recipe then return end
 	--DA.DEBUG(0,"RecipeNameSuffix: recipe= "..DA.DUMP1(recipe,1))
 	local itemID = recipe.itemID
-	--DA.DEBUG(0,"RecipeNameSuffix: itemID= "..tostring(itemID)..", type= "..type(itemID))
+--
+-- Check for Enchanting. Most recipes don't produce an item but
+-- we still should get reagent prices.
+--
+	if Skillet.isCraft then
+		--DA.DEBUG(0,"RecipeNameSuffix: itemID= "..tostring(itemID)..", type= "..type(itemID))
+		--DA.DEBUG(0,"RecipeNameSuffix: recipe.name= "..tostring(recipe.name)..", recipe.spellID= "..tostring(recipe.spellID)..", recipe.scrollID= "..tostring(recipe.scrollID))
+		if itemID then
+			itemID = Skillet.EnchantSpellToItem[itemID] or 0
+			--DA.DEBUG(0,"RecipeNameSuffix: Change via EnchantSpellToItem, itemID= "..tostring(itemID))
+		end
+	elseif recipe.tradeID == 7411 and itemID == 0 then
+		itemID = recipe.scrollID
+		--DA.DEBUG(0,"RecipeNameSuffix: Change to scrollID, itemID= "..tostring(itemID))
+	end
 	local itemName
 	if itemID then itemName = GetItemInfo(itemID) end
 	--DA.DEBUG(0,"RecipeNameSuffix: itemName= "..tostring(itemName)..", type= "..type(itemName))
@@ -416,10 +570,12 @@ function plugin.RecipeNameSuffix(skill, recipe)
 			end
 			local name = GetItemInfo(id) or id
 			local value
-			if isRetail then
+			if Atr_GetAuctionBuyout then
+				value = (Atr_GetAuctionBuyout(id) or 0) * needed
+			elseif Auctionator and Auctionator.API.v1.GetAuctionPriceByItemID then
 				value = (Auctionator.API.v1.GetAuctionPriceByItemID(addonName, id) or 0) * needed
 			else
-				value = (Atr_GetAuctionBuyout(id) or 0) * needed
+				value = 0
 			end
 			if Skillet:VendorSellsReagent(id) then
 				if Skillet.db.profile.plugins.ATR.buyablePrices then
@@ -438,7 +594,8 @@ function plugin.RecipeNameSuffix(skill, recipe)
 			local markup = Skillet.db.profile.plugins.ATR.markup or markupDef
 			cost = cost * markup
 		end
-		profit = buyout - cost
+		local ah_tax = Skillet.db.profile.plugins.ATR.calcProfitAhTax and ahtaxDef or 1
+		profit = buyout * ah_tax - cost
 		if Skillet.db.profile.plugins.ATR.showProfitValue then
 			if Skillet.db.profile.plugins.ATR.useShort then
 				text = Skillet:FormatMoneyShort(profit, true, Skillet.db.profile.plugins.ATR.colorCode)
@@ -453,8 +610,53 @@ function plugin.RecipeNameSuffix(skill, recipe)
 				text = "("..profitPctText(profit,cost,999).."%)"
 			end
 		end
-		if Skillet.db.profile.plugins.ATR.onlyPositive and profit <= 0 then
+--
+-- Enchants don't have any profit so if checked, always display the (negative) cost.
+--
+		if recipe.tradeID == 7411 then
+			if not Skillet.db.profile.plugins.ATR.alwaysEnchanting then
+				if Skillet.db.profile.plugins.ATR.onlyPositive and profit <= 0 then
+					text = nil
+				end
+			end
+		elseif Skillet.db.profile.plugins.ATR.onlyPositive and profit <= 0 then
 			text = nil
+		end
+--
+-- Show Journalator salesRate or successCount
+--
+		if Journalator and Skillet.db.profile.plugins.ATR.journalatorS then
+			local salesRate, successCount, failedCount, lastSold, lastBought
+			if Journalator.API then
+				successCount = Journalator.API.v1.GetRealmSuccessCountByItemName(addonName, itemName)
+				failedCount = Journalator.API.v1.GetRealmFailureCountByItemName(addonName, itemName)
+				if successCount > 0 then
+					salesRate = string.format("%.0d", successCount / (successCount + failedCount) * 100).."%"
+				else
+					salesRate = nil
+				end
+				--DA.DEBUG(0,"itemName= "..tostring(itemName)..", successCount= "..tostring(successCount)..", failedCount= "..tostring(failedCount)..", salesRate= "..tostring(salesRate))
+			else
+				salesRate, failedCount, lastSold, lastBought = Journalator.Tooltips.GetSalesInfo(itemName)
+				--DA.DEBUG(0,"itemName= "..tostring(itemName)..", salesRate= "..tostring(salesRate)..", failedCount= "..tostring(failedCount)..", lastSold= "..tostring(lastSold)..", lastBought= "..tostring(lastBought))
+			end
+			if Skillet.db.profile.plugins.ATR.journalatorC then
+				if successCount and successCount > 0 then
+					if text then
+						text = text.." ["..tostring(successCount).."]"
+					else
+						text = "["..tostring(successCount).."]"
+					end
+				end
+			else
+				if salesRate and string.find(salesRate,"%%") then
+					if text then
+						text = text.." ["..tostring(salesRate).."]"
+					else
+						text = "["..tostring(salesRate).."]"
+					end
+				end
+			end
 		end
 	end
 	--DA.DEBUG(0,"RecipeNameSuffix: text= "..tostring(text)..", profit= "..tostring(profit))
@@ -469,15 +671,22 @@ Skillet:RegisterDisplayDetailPlugin("ATRPlugin")	-- we have a GetExtraText funct
 --
 -- Auctionator button support
 --  whichOne:
---    false (or nil) will search for the item and reagents in the MainFrame
 --    true will search for the items in the ShoppingList
+--    false (or nil) will search for the item and reagents in the MainFrame
 --
 function Skillet:AuctionatorSearch(whichOne)
+	DA.DEBUG(0, "AuctionatorSearch("..tostring(whichOne)..")")
 	local shoppingListName
 	local items = {}
+	local recipe = Skillet:GetRecipeDataByTradeIndex(Skillet.currentTrade, Skillet.selectedSkill)
+	DA.DEBUG(1,"AuctionatorSearch: recipe= "..DA.DUMP1(recipe))
 	if whichOne then
 		shoppingListName = L["Shopping List"]
-		local list = Skillet:GetShoppingList(nil, false)
+		local name = nil
+		if not Skillet.db.profile.include_alts then
+			name = Skillet.currentPlayer
+		end
+		local list = Skillet:GetShoppingList(name, Skillet.db.profile.same_faction, Skillet.db.profile.include_guild)
 		if not list or #list == 0 then
 			DA.DEBUG(0,"AuctionatorSearch: Shopping List is empty")
 			return
@@ -491,17 +700,34 @@ function Skillet:AuctionatorSearch(whichOne)
 			end
 		end
 	else
-		local recipe, recipeId = Skillet:GetRecipeDataByTradeIndex(Skillet.currentTrade, Skillet.selectedSkill)
 		if not recipe then
 			return
 		end
-		shoppingListName = GetItemInfo(recipe.itemID)
-		if (shoppingListName == nil) then
-			shoppingListName = Skillet:GetRecipeName(recipeId)
+		local itemID = recipe.itemID
+--
+-- Check for Enchanting. For Wrath, Add the scroll for the enchant instead
+--
+		if Skillet.isCraft and itemID then
+			itemID = Skillet.EnchantSpellToItem[itemID] or 0
+		end
+		if itemID ~= 0 then
+			shoppingListName = GetItemInfo(itemID)
+		else
+			shoppingListName = recipe.name
 		end
 		if (shoppingListName) then
-			table.insert (items, shoppingListName)
+			if recipe.tradeID == 7411 and not Skillet.isCraft then
+				if recipe.scrollID then
+					local scrollName = GetItemInfo(recipe.scrollID)
+					table.insert(items, scrollName)
+				end
+			else
+				table.insert(items, shoppingListName)
+			end
 		end
+--
+-- Add the reagent names
+--
 		local i
 		for i=1,#recipe.reagentData do
 			local reagent = recipe.reagentData[i]
@@ -515,27 +741,29 @@ function Skillet:AuctionatorSearch(whichOne)
 			else
 				id = reagent.id
 			end
-			if id and not Skillet:VendorSellsReagent(id) then
+			if id then
 				local reagentName = GetItemInfo(id)
 				if (reagentName) then
-					table.insert (items, reagentName)
-					DA.DEBUG(1, "AuctionatorSearch: Reagent["..i.."] ("..id..") "..reagentName.." added")
+					if not Skillet:VendorSellsReagent(id) then
+						table.insert (items, reagentName)
+						DA.DEBUG(1, "AuctionatorSearch:  Added  ["..i.."] ("..id..") "..reagentName)
+					else
+						DA.DEBUG(1, "AuctionatorSearch: Skipped ["..i.."] ("..id..") "..reagentName)
+					end
 				end
 			end
 		end
 	end
-	if isRetail then
-		if Skillet.db.profile.plugins.ATR.useSearchExact and Auctionator.API.v1.MultiSearchExact then
-			DA.DEBUG(0, "AuctionatorSearch: (exact) addonName= "..tostring(addonName)..", items= "..DA.DUMP1(items))
-			Auctionator.API.v1.MultiSearchExact(addonName, items)
-		else
-			DA.DEBUG(0, "AuctionatorSearch: addonName= "..tostring(addonName)..", items= "..DA.DUMP1(items))
-			Auctionator.API.v1.MultiSearch(addonName, items)
-		end
-	else
+	if Atr_SelectPane and Atr_SearchAH then
 		DA.DEBUG(0, "AuctionatorSearch: shoppingListName= "..tostring(shoppingListName)..", items= "..DA.DUMP1(items))
 		local BUY_TAB = 3;
 		Atr_SelectPane(BUY_TAB)
 		Atr_SearchAH(shoppingListName, items)
+	elseif Skillet.db.profile.plugins.ATR.useSearchExact and Auctionator.API.v1.MultiSearchExact then
+		DA.DEBUG(0, "AuctionatorSearch: (exact) addonName= "..tostring(addonName)..", items= "..DA.DUMP1(items))
+		Auctionator.API.v1.MultiSearchExact(addonName, items)
+	elseif Auctionator.API.v1.MultiSearch then
+		DA.DEBUG(0, "AuctionatorSearch: addonName= "..tostring(addonName)..", items= "..DA.DUMP1(items))
+		Auctionator.API.v1.MultiSearch(addonName, items)
 	end
 end

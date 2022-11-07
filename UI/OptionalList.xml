@@ -29,22 +29,9 @@
 		</Size>
 		<Layers>
 			<Layer level="OVERLAY">
-				<FontString name="$parentText" inherits="GameFontNormal" justifyH="LEFT" justifyV="MIDDLE">
-					<Size>
-						<AbsDimension x="150" y="16"/>
-					</Size>
-					<Anchors>
-						<Anchor point="TOPLEFT" relativeTo="$parent" relativePoint="TOPLEFT">
-							<Offset>
-								<AbsDimension x="54" y="0"/>
-							</Offset>
-						</Anchor>
-					</Anchors>
-					<Color r="1" g="1" b="1" a="1"/>
-				</FontString>
 				<FontString name="$parentCount" inherits="GameFontNormalSmall" justifyH="RIGHT" justifyV="MIDDLE">
 					<Size>
-						<AbsDimension x="80" y="16"/>
+						<AbsDimension x="48" y="16"/>
 					</Size>
 					<Anchors>
 						<Anchor point="TOPRIGHT" relativeTo="$parent" relativePoint="TOPRIGHT">
@@ -57,7 +44,7 @@
 				</FontString>
 				<FontString name="$parentNeeded" inherits="GameFontNormalSmall" justifyH="RIGHT" justifyV="MIDDLE">
 					<Size>
-						<AbsDimension x="34" y="16"/>
+						<AbsDimension x="32" y="16"/>
 					</Size>
 					<Anchors>
 						<Anchor point="TOPLEFT" relativeTo="$parent" relativePoint="TOPLEFT">
@@ -67,6 +54,13 @@
 						</Anchor>
 					</Anchors>
 				<Color r="1" g="1" b="1" a="1"/>
+				</FontString>
+				<FontString name="$parentText" inherits="GameFontNormal" justifyH="LEFT" justifyV="MIDDLE">
+					<Anchors>
+						<Anchor point="LEFT" relativeTo="$parentNeeded" relativePoint="RIGHT" />
+						<Anchor point="RIGHT" relativeTo="$parentCount" relativePoint="LEFT" />
+					</Anchors>
+					<Color r="1" g="1" b="1" a="1"/>
 				</FontString>
 			</Layer>
 		</Layers>
@@ -122,17 +116,6 @@
 	<Anchors>
 		<Anchor point="CENTER"/>
 	</Anchors>
-	<Backdrop bgFile="Interface\Tooltips\UI-Tooltip-Background" edgeFile="Interface\Tooltips\UI-Tooltip-Border" tile="true">
-		<EdgeSize>
-			<AbsValue val="16"/>
-		</EdgeSize>
-		<TileSize>
-			<AbsValue val="16"/>
-		</TileSize>
-		<BackgroundInsets>
-			<AbsInset left="3" right="3" top="3" bottom="3"/>
-		</BackgroundInsets>
-	</Backdrop>
 	<Frames>
 		<Button name="SkilletOptionalListCloseButton" inherits="UIPanelCloseButton" parent="SkilletOptionalList">
 			<Anchors>
@@ -157,7 +140,7 @@
 				</Anchor>
 				<Anchor point="BOTTOMRIGHT" relativeTo="SkilletOptionalList" relativePoint="BOTTOMRIGHT">
 					<Offset>
-						<AbsDimension x="-5" y="30"/>
+						<AbsDimension x="-5" y="15"/>
 					</Offset>
 				</Anchor>
 			</Anchors>

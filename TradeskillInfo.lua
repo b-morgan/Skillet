@@ -75,7 +75,10 @@ end
 function Skillet:AdjustNumberMade(index, adjust)
 	--DA.DEBUG(0,"AdjustNumberMade("..tostring(index)..", adjust= "..tostring(adjust)..")")
 	local recipe, recipeID = self:GetRecipeDataByTradeIndex(self.currentTrade, index)
-	local minMade,maxMade = C_TradeSkillUI.GetRecipeNumItemsProduced(recipeID)
+	local recipeSchematic = C_TradeSkillUI.GetRecipeSchematic(recipeID, false)
+	--DA.DEBUG(2,"recipeSchematic= "..DA.DUMP1(recipeSchematic))
+	local minMade = recipeSchematic.quantityMin
+	local maxMade = recipeSchematic.quantityMax
 	local origNumMade = (minMade + maxMade)/2
 	--DA.DEBUG(0,"recipe= "..DA.DUMP1(recipe,1))
 	if recipe then

@@ -790,10 +790,10 @@ Skillet.options =
 			set = function(self,value)
 				Skillet.data.btsui = value
 				if value then
-					ShowUIPanel(TradeSkillFrame)
+					ShowUIPanel(ProfessionsFrame)
 					Skillet.BlizzardUIshowing = true
 				else
-					HideUIPanel(TradeSkillFrame)
+					HideUIPanel(ProfessionsFrame)
 					Skillet.BlizzardUIshowing = false
 				end
 			end,
@@ -1346,11 +1346,13 @@ end
 -- Fix InterfaceOptionsFrame_OpenToCategory not actually opening the category (and not even scrolling to it)
 --
 function Skillet:FixOpenToCategory()
+--[[
 	if (not IsAddOnLoaded("!BlizzBugsSuck")) then
 		DA.DEBUG(0,"FixOpenToCategory executed")
 		hooksecurefunc("InterfaceOptionsFrame_OpenToCategory", InterfaceOptionsFrame_OpenToCategory_Fix)
 	else
 		DA.DEBUG(0,"FixOpenToCategory skipped")
 	end
+--]]
 end
 
