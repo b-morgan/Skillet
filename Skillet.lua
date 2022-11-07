@@ -1064,7 +1064,6 @@ function Skillet:IsNotSupportedFollower(tradeID)
 		return true -- Use Blizzard frame
 	end
 	if not tradeID then
-		Skillet.wasNPCCrafting = true
 		--DA.DEBUG(3,"IsNotSupportedFollower: not tradeID")
 		return true -- Unknown tradeskill, play it safe and use Blizzard frame
 	end
@@ -1115,9 +1114,9 @@ function Skillet:SkilletShow()
 	end
 	self:ScanPlayerTradeSkills(self.currentPlayer)
 	local baseinfo = C_TradeSkillUI.GetBaseProfessionInfo()
-	DA.DEBUG(3,"ScanPlayerTradeSkills: GetBaseProfessionInfo info= "..DA.DUMP1(baseinfo))
+	--DA.DEBUG(3,"ScanPlayerTradeSkills: GetBaseProfessionInfo info= "..DA.DUMP1(baseinfo))
 	local childinfo = C_TradeSkillUI.GetChildProfessionInfos()
-	--DA.DEBUG(3,"ScanPlayerTradeSkills: GetChildProfessionInfos info= "..DA.DUMP(childinfo))
+	DA.DEBUG(3,"ScanPlayerTradeSkills: GetChildProfessionInfos info= "..DA.DUMP(childinfo))
 
 	self.currentTrade = self.tradeSkillIDsByName[baseinfo.professionName]	-- names are localized so use a table to translate
 
@@ -1204,7 +1203,7 @@ function Skillet:SkilletShowWindow(where)
 end
 
 function Skillet:SkilletClose()
-	DA.DEBUG(0,"SKILLET CLOSE")
+	DA.DEBUG(0,"SkilletClose()")
 	self.tradeSkillOpen = false
 	self:HideAllWindows()
 	if Skillet.wasNPCCrafting then

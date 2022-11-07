@@ -314,7 +314,7 @@ function Skillet:PrintTradeSkillFilter()
 end
 
 function Skillet:ExpandTradeSkillSubClass(i)
-	--DA.DEBUG(0,"ExpandTradeSkillSubClass "..tostring(i))
+	--DA.DEBUG(0,"ExpandTradeSkillSubClass("..tostring(i)..")")
 end
 
 function Skillet:GetRecipeName(id)
@@ -406,6 +406,7 @@ function Skillet:GetRecipe(id)
 end
 
 function Skillet:GetNumSkills(player, trade)
+	--DA.DEBUG(0,"GetNumSkills("..tostring(player)..", "..tostring(trade)..")")
 	--DA.PROFILE("Skillet:GetNumSkills("..tostring(player)..", "..tostring(trade)..")")
 	local r
 	if not Skillet.data.skillDB then
@@ -420,6 +421,7 @@ function Skillet:GetNumSkills(player, trade)
 end
 
 function Skillet:GetSkillRanks(player, trade)
+	--DA.DEBUG(0,"Skillet:GetSkillRanks("..tostring(player)..", "..tostring(trade)..")")
 	--DA.PROFILE("Skillet:GetSkillRanks("..tostring(player)..", "..tostring(trade)..")")
 	if player and trade then
 		if Skillet.db.realm.tradeSkills[player] then
@@ -429,6 +431,7 @@ function Skillet:GetSkillRanks(player, trade)
 end
 
 function Skillet:GetSkill(player,trade,index)
+	--DA.DEBUG(0,"GetSkill("..tostring(player)..", "..tostring(trade)..", "..tostring(index)..")")
 	--DA.PROFILE("Skillet:GetSkill("..tostring(player)..", "..tostring(trade)..", "..tostring(index)..")")
 	if player and trade and index then
 		if not Skillet.data.skillList[trade] then
@@ -791,22 +794,21 @@ local function ScanTrade()
 	local link = C_TradeSkillUI.GetTradeSkillListLink()
 	local parentSkillLineID, parentSkillLineName, skillLineRank, skillLineMaxRank
 	local baseInfo = C_TradeSkillUI.GetBaseProfessionInfo()
+	local childInfo = C_TradeSkillUI.GetChildProfessionInfo()
 	DA.DEBUG(1,"ScanTrade: GetBaseProfessionInfo()= "..DA.DUMP1(baseInfo))
-	if not baseInfo or not baseInfo.professionID then
-		local professionInfo = C_TradeSkillUI.GetChildProfessionInfo()
-		DA.DEBUG(1,"ScanTrade: GetChildProfessionInfo()= "..DA.DUMP1(professionInfo))
-		if not professionInfo or not professionInfo.parentProfessionID then 
-			return false
-		end
-		parentSkillLineID = professionInfo.parentProfessionID
-		parentSkillLineName = professionInfo.parentProfessionName
-		skillLineRank = professionInfo.skillLevel
-		skillLineMaxRank = professionInfo.maxSkillLevel
-	else
+	DA.DEBUG(1,"ScanTrade: GetChildProfessionInfo()= "..DA.DUMP1(childInfo))
+	if childInfo and childInfo.parentProfessionID then 
+		parentSkillLineID = childInfo.parentProfessionID
+		parentSkillLineName = childInfo.parentProfessionName
+		skillLineRank = childInfo.skillLevel
+		skillLineMaxRank = childInfo.maxSkillLevel
+	elseif baseInfo and baseInfo.professionID then
 		parentSkillLineID = baseInfo.professionID
 		parentSkillLineName = baseInfo.professionName
 		skillLineRank = baseInfo.skillLevel
 		skillLineMaxRank = baseInfo.maxSkillLevel
+	else
+		return false
 	end
 
 	if Skillet.BlizzardSkillList[parentSkillLineID] then
@@ -850,6 +852,7 @@ local function ScanTrade()
 	end
 	Skillet.db.realm.tradeSkills[player][tradeID] = {}
 	Skillet.db.realm.tradeSkills[player][tradeID].link = link
+	--DA.DEBUG(1,"ScanTrade: skillLineRank= "..tostring(skillLineRank)..", skillLineMaxRank= "..tostring(skillLineMaxRank)..", profession= "..tostring(profession))
 	Skillet.db.realm.tradeSkills[player][tradeID].rank = skillLineRank
 	Skillet.db.realm.tradeSkills[player][tradeID].maxRank = skillLineMaxRank
 	Skillet.db.realm.tradeSkills[player][tradeID].name = profession
