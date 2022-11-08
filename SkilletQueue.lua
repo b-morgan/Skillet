@@ -363,9 +363,7 @@ function Skillet:ProcessQueue(altMode)
 				self:QueueMoveToTop(qpos)
 				return
 			end
-			local recipeInfo = C_TradeSkillUI.GetRecipeInfo(command.recipeID, command.recipeLevel)
-			DA.DEBUG(1,"recipeInfo= "..DA.DUMP1(recipeInfo))
-			local numAvailable = recipeInfo.numAvailable or 0
+			local numAvailable = C_TradeSkillUI.GetCraftableCount(command.recipeID) or 0
 			if numAvailable > 0 then
 				self.processingSpell = self:GetRecipeName(command.recipeID)
 				self.processingSpellID = command.recipeID
@@ -382,7 +380,7 @@ function Skillet:ProcessQueue(altMode)
 						DA.DEBUG(1,"altMode Crafting: "..tostring(self.processingSpell).." ("..tostring(command.recipeID)..") and using "..tostring(itemID))
 						self.queuecasting = true
 						self.processingCount = 1
-						C_TradeSkillUI.SetRecipeRepeatCount(command.recipeID, 1)
+--						C_TradeSkillUI.SetRecipeRepeatCount(command.recipeID, 1)
 						C_TradeSkillUI.CraftRecipe(command.recipeID, 1)
 						UseItemByName(itemID)
 						self.queuecasting = false
@@ -411,7 +409,6 @@ function Skillet:ProcessQueue(altMode)
 					end -- for
 				end
 					DA.DEBUG(1,"Optional: recipeLevel= "..tostring(recipeLevel)..", optionalReagentsArray= "..DA.DUMP1(optionalReagentsArray))
-					C_TradeSkillUI.SetRecipeRepeatCount(command.recipeID, craftCount)
 					C_TradeSkillUI.CraftRecipe(command.recipeID, craftCount, optionalReagentsArray, recipeLevel)
 			else
 				DA.CHAT("Insufficent Materials available, count= "..tostring(command.count)..", numAvailable= "..tostring(numAvailable))
