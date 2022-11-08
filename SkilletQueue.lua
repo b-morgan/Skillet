@@ -380,7 +380,6 @@ function Skillet:ProcessQueue(altMode)
 						DA.DEBUG(1,"altMode Crafting: "..tostring(self.processingSpell).." ("..tostring(command.recipeID)..") and using "..tostring(itemID))
 						self.queuecasting = true
 						self.processingCount = 1
---						C_TradeSkillUI.SetRecipeRepeatCount(command.recipeID, 1)
 						C_TradeSkillUI.CraftRecipe(command.recipeID, 1)
 						UseItemByName(itemID)
 						self.queuecasting = false
