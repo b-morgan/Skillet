@@ -869,7 +869,7 @@ Skillet.TradeSkillIgnoredMats = {
 --
 -- Table used by Inscription to convert inks
 --
-local topink = 311404				-- Umbral Ink
+local topink = 173058				-- Umbral Ink
 Skillet.SpecialVendorItems = {
 	[37101] = {1, topink},			--Ivory Ink (obsolete?)
 	[39469] = {1, topink},			--Moonglow Ink
