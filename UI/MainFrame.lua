@@ -3463,7 +3463,9 @@ function Skillet:UpdateQueueWindow()
 					for i,r in pairs(queueCommand.optionalReagents) do
 						c = c + 1
 					end
-					optionals = " +"..tostring(c)
+					if c > 0 then
+						optionals = " +"..tostring(c)
+					end
 				end
 				queueName:SetText((self:GetTradeName(recipe.tradeID) or recipe.tradeID)..":"..(recipe.name or recipe.recipeID)..optionals)
 				queueCount:SetText(queueCommand.count)
