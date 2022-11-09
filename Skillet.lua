@@ -980,8 +980,18 @@ end
 --
 function Skillet:PLAYER_INTERACTION_MANAGER_FRAME_SHOW(event,interactionType)
 	DA.TRACE("PLAYER_INTERACTION_MANAGER_FRAME_SHOW("..tostring(interactionType)..")")
-	if interactionType == Enum.PlayerInteractionType.Merchant then
+	if interactionType == Enum.PlayerInteractionType.Merchant then -- 5
+--		Skillet:Skillet:MERCHANT_SHOW()
 		Skillet:MerchantShow()
+	end
+	if interactionType == Enum.PlayerInteractionType.Banker then -- 8
+		Skillet:BANKFRAME_OPENED()
+	end
+	if interactionType == Enum.PlayerInteractionType.GuildBanker then -- 10
+		Skillet:GUILDBANKFRAME_OPENED()
+	end
+	if interactionType == Enum.PlayerInteractionType.Auctioneer then -- 21
+		Skillet:AUCTION_HOUSE_SHOW()
 	end
 end
 
@@ -990,6 +1000,18 @@ end
 --
 function Skillet:PLAYER_INTERACTION_MANAGER_FRAME_HIDE(event,interactionType)
 	DA.TRACE("PLAYER_INTERACTION_MANAGER_FRAME_HIDE("..tostring(interactionType)..")")
+	if interactionType == Enum.PlayerInteractionType.Merchant then -- 5
+--		Skillet:MERCHANT_CLOSED()
+	end
+	if interactionType == Enum.PlayerInteractionType.Banker then -- 8
+		Skillet:BANKFRAME_CLOSED()
+	end
+	if interactionType == Enum.PlayerInteractionType.GuildBanker then -- 10
+		Skillet:GUILDBANKFRAME_CLOSED()
+	end
+	if interactionType == Enum.PlayerInteractionType.Auctioneer then -- 21
+		Skillet:AUCTION_HOUSE_CLOSED()
+	end
 end
 
 --
