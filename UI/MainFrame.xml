@@ -92,6 +92,9 @@
 			<OnLeave>
 				GameTooltip:Hide()
 			</OnLeave>
+			<OnClick>
+				Skillet:TradeButtonAdditional_OnClick(self,button)
+			</OnClick>
 		</Scripts>
 		<HighlightTexture alphaMode="ADD" file="Interface\Buttons\ButtonHilight-Square"/>
 	</Button>
