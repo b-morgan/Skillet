@@ -404,7 +404,7 @@ end
 -- Called when the bank frame is opened
 --
 function Skillet:BANKFRAME_OPENED()
-	--DA.DEBUG(0,"BANKFRAME_OPENED")
+	DA.TRACE("BANKFRAME_OPENED")
 	bankFrameOpen = true
 	local player = self.currentPlayer
 --
@@ -431,7 +431,7 @@ end
 -- Called when the bank frame is closed
 --
 function Skillet:BANKFRAME_CLOSED()
-	--DA.DEBUG(0,"BANKFRAME_CLOSED")
+	DA.TRACE("BANKFRAME_CLOSED")
 	local player = self.currentPlayer
 	self.db.realm.bankData[player] = {}
 	bank = {}
@@ -447,7 +447,7 @@ end
 -- When all the tabs have been queried, the event GUILDBANK_UPDATE_TEXT will query for contents.
 --
 function Skillet:GUILDBANKFRAME_OPENED()
-	--DA.DEBUG(0,"GUILDBANKFRAME_OPENED")
+	DA.TRACE("GUILDBANKFRAME_OPENED")
 	guildbankFrameOpen = true
 	Skillet.guildbankText = true
 	Skillet.guildbankOnce = false
@@ -476,7 +476,7 @@ end
 -- Called when the guild bank frame is closed
 --
 function Skillet:GUILDBANKFRAME_CLOSED()
-	--DA.DEBUG(0,"GUILDBANKFRAME_CLOSED")
+	DA.TRACE("GUILDBANKFRAME_CLOSED")
 	guildbankFrameOpen = false
 	self:HideShoppingList()
 end
@@ -485,6 +485,7 @@ end
 -- Called when the cursor has changed (should only be needed while debugging)
 --
 function Skillet:CURSOR_UPDATE()
+	--DA.TRACE("CURSOR_UPDATE")
 	local type, data, subType, subData = GetCursorInfo()
 	DA.TRACE("CURSOR_UPDATE - type=",type,", data=",data,", subType=",subType)
 end
