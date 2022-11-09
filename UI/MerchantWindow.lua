@@ -23,8 +23,10 @@ local PT = LibStub("LibPeriodicTable-3.1")
 
 local merchant_inventory = {}
 
+--
 -- Get the name for the item in the specified merchant slot. Can
 -- only be called when the merchant window is open
+--
 local function get_merchant_item_name(slot)
 	local link = GetMerchantItemLink(slot);
 	if link then
@@ -35,9 +37,12 @@ local function get_merchant_item_name(slot)
 	end
 end
 
+--
 -- Checks to see if the cached list of items for this merchant
 -- included anything we need to buy.
+--
 local function does_merchant_sell_required_items(list)
+	DA.DEBUG(0,"does_merchant_sell_required_items("..tostring(list)..")")
 	for i=1,#list,1 do
 		local id  = list[i].id
 		if merchant_inventory[id] then
@@ -47,9 +52,12 @@ local function does_merchant_sell_required_items(list)
 	return false
 end
 
+--
 -- Scans everything the merchant has and adds it to a table
 -- that we can refer to when looking for items to buy.
+--
 local function update_merchant_inventory()
+	DA.DEBUG(0,"update_merchant_inventory()")
 	if MerchantFrame and MerchantFrame:IsVisible() then
 		local count = GetMerchantNumItems()
 		for i=1, count, 1 do
@@ -61,7 +69,7 @@ local function update_merchant_inventory()
 				if extendedCost then
 					itemCount = GetMerchantItemCostInfo(i)
 					if itemCount > 0 then
-						--DA.DEBUG(2,"itemCount for "..tostring(name).." ("..tostring(id)..")= "..tostring(itemCount))
+						DA.DEBUG(2,"itemCount for "..tostring(name).." ("..tostring(id)..")= "..tostring(itemCount))
 						itemTexture, itemValue, itemLink, currencyName = GetMerchantItemCostItem(i, 1)
 						if itemLink then
 							currencyName = GetItemInfo(itemLink)
@@ -69,7 +77,7 @@ local function update_merchant_inventory()
 						else
 							currencyID = -1 * tonumber(Skillet.currencyIDsByName[currencyName] or 0)
 						end
-						--DA.DEBUG(2,"Currency for "..tostring(name).." ("..tostring(id)..")= "..tostring(currencyName).." x "..tostring(itemValue))
+						DA.DEBUG(2,"Currency for "..tostring(name).." ("..tostring(id)..")= "..tostring(currencyName).." x "..tostring(itemValue))
 					end
 				end
 				if numAvailable == -1  then
@@ -79,9 +87,9 @@ local function update_merchant_inventory()
 					if Skillet.db.global.itemRecipeUsedIn[id] then		-- if this item is used in any recipes we know about then
 						if not Skillet:VendorSellsReagent(id) then		-- if its not a known vendor item then
 							if Skillet.db.global.MissingVendorItems[id] then
-								--DA.DEBUG(1,"updating "..tostring(name).." ("..tostring(id)..")")
+								DA.DEBUG(1,"updating "..tostring(name).." ("..tostring(id)..")")
 							else
-								--DA.DEBUG(1,"adding "..tostring(name).." ("..tostring(id)..")")
+								DA.DEBUG(1,"adding "..tostring(name).." ("..tostring(id)..")")
 							end
 							if itemCount and itemCount > 0 then
 								Skillet.db.global.MissingVendorItems[id] = {name or true, quantity, currencyName, currencyID, itemValue}		-- add it to our table
@@ -89,7 +97,7 @@ local function update_merchant_inventory()
 								Skillet.db.global.MissingVendorItems[id] = name or true		-- add it to our table
 							end
 						else
-							--DA.DEBUG(1,"known "..tostring(name).." ("..tostring(id)..")")
+							DA.DEBUG(1,"known "..tostring(name).." ("..tostring(id)..")")
 							if type(Skillet.db.global.MissingVendorItems[id]) == "table" then
 								if #Skillet.db.global.MissingVendorItems[id] ~= 5 then
 									Skillet.db.global.MissingVendorItems[id] = "Fix Me"
@@ -98,11 +106,11 @@ local function update_merchant_inventory()
 						end
 						if Skillet.db.global.MissingVendorItems[id] then
 							if itemCount and itemCount > 0 and type(Skillet.db.global.MissingVendorItems[id]) ~= "table" then
-								--DA.DEBUG(1,"converting "..tostring(name).." ("..tostring(id)..")")
+								DA.DEBUG(1,"converting "..tostring(name).." ("..tostring(id)..")")
 								Skillet.db.global.MissingVendorItems[id] = {name or true, quantity, currencyName, currencyID, itemValue}		-- convert it
 							elseif PT then
 								if id~=0 and PT:ItemInSet(id,"Tradeskill.Mat.BySource.Vendor") then
-									--DA.DEBUG(1,"removing "..tostring(name).." ("..tostring(id)..")")
+									DA.DEBUG(1,"removing "..tostring(name).." ("..tostring(id)..")")
 									Skillet.db.global.MissingVendorItems[id] = nil		-- remove it from our table
 								end
 							end
@@ -121,35 +129,37 @@ end
 -- returns false if the button is hidden
 --
 local function update_merchant_buy_button()
+	DA.DEBUG(0,"update_merchant_buy_button()")
 	Skillet:InventoryScan()
 	local list = Skillet:GetShoppingList(Skillet.currentPlayer, Skillet.db.char.same_faction)
 	if not list or #list == 0 then
-		--DA.DEBUG(0,"ShoppingList is empty")
+		DA.DEBUG(0,"ShoppingList is empty")
 		SkilletMerchantBuyFrame:Hide()
 		return false
 	elseif does_merchant_sell_required_items(list) == false then
-		--DA.DEBUG(0,"Merchant does not sell required items")
+		DA.DEBUG(0,"Merchant does not sell required items")
 		SkilletMerchantBuyFrame:Hide()
 		return false
 	end
 	if Skillet.db.profile.display_shopping_list_at_merchant then
-		--DA.DEBUG(0,"Shopping List should be displayed")
+		DA.DEBUG(0,"Shopping List should be displayed")
 		Skillet:DisplayShoppingList(false)
 	end
 	if SkilletMerchantBuyFrame:IsVisible() then
-		--DA.DEBUG(0,"Merchant Buy Button should already be there")
-		-- already inserted the button
-		return true
+		DA.DEBUG(0,"Merchant Buy Button should already be there")
+		return true		-- already inserted the button
 	end
-	--DA.DEBUG(0,"Create and show the Merchant Buy Button")
-	SkilletMerchantBuyFrameButton:SetText(L["Reagents"]);
+	DA.DEBUG(0,"Create and show the Merchant Buy Button")
+	SkilletMerchantBuyFrameButton:SetText(L["Reagents"])
 	SkilletMerchantBuyFrame:SetPoint("TOPLEFT", "MerchantFrame", "TOPLEFT" , 55, -5) -- May need to be adjusted for each WoW build
-	SkilletMerchantBuyFrame:SetFrameStrata("HIGH");
-	SkilletMerchantBuyFrame:Show();
+	SkilletMerchantBuyFrame:SetFrameStrata("HIGH")
+	SkilletMerchantBuyFrame:Show()
 	return true
 end
 
+--
 -- Removes the merchant buy button
+--
 local function remove_merchant_buy_button()
 	SkilletMerchantBuyFrame:Hide()
 end
@@ -159,15 +169,46 @@ end
 -- many times
 --
 function Skillet:UpdateMerchantFrame()
-	Skillet:MERCHANT_SHOW()
+	Skillet:MerchantShow()
 end
 
+--
+-- Merchant window opened
+--
+function Skillet:MERCHANT_SHOW()
+	DA.TRACE("MERCHANT_SHOW()")
+end
+
+--
+-- Merchant window updated
+--
+function Skillet:MERCHANT_UPDATE()
+	DA.TRACE("MERCHANT_UPDATE()")
+	if Skillet.db.profile.vendor_buy_button or Skillet.db.profile.vendor_auto_buy then
+		update_merchant_inventory()
+	end
+end
+
+--
+-- Merchant window closed
+--
+function Skillet:MERCHANT_CLOSED()
+	DA.TRACE("MERCHANT_CLOSED()")
+	remove_merchant_buy_button()
+	merchant_inventory = {}
+	self.autoPurchaseComplete = nil
+	self:HideShoppingList()
+end
+
+--
 -- Merchant window opened. This method can be called multiple
 -- times if needed, and it can be called even if a merchant window
 -- is not open.
-function Skillet:MERCHANT_SHOW()
+--
+function Skillet:MerchantShow()
+	DA.DEBUG(0,"MerchantShow()")
 	if MerchantFrame and not MerchantFrame:IsVisible() then
-		-- called when the merchant frame is not visible, this is a no-op
+		DA.DEBUG(1,"MerchantFrame= "..tostring(MerchantFrame)..", IsVisible= "..tostring(MerchantFrame:IsVisible()))
 		return
 	end
 	merchant_inventory = {}
@@ -187,30 +228,11 @@ function Skillet:MERCHANT_SHOW()
 end
 
 --
--- Merchant window updated
---
-function Skillet:MERCHANT_UPDATE()
-	if Skillet.db.profile.vendor_buy_button or Skillet.db.profile.vendor_auto_buy then
-		update_merchant_inventory()
-	end
-end
-
---
--- Merchant window closed
---
-function Skillet:MERCHANT_CLOSED()
-	remove_merchant_buy_button()
-	merchant_inventory = {}
-	self.autoPurchaseComplete = nil
-	self:HideShoppingList()
-end
-
---
 -- If at a vendor with the window open, buy anything that they
 -- sell that is required by any queued recipe.
 --
 function Skillet:BuyRequiredReagents()
-	--DA.DEBUG(0,"BuyRequiredReagents()")
+	DA.DEBUG(0,"BuyRequiredReagents()")
 	local list = Skillet:GetShoppingList(Skillet.currentPlayer, Skillet.db.char.same_faction)
 	if #list == 0 then
 		return
@@ -282,6 +304,7 @@ function Skillet:BuyRequiredReagents()
 end
 
 function Skillet:MerchantBuyButton_OnEnter(button)
+	DA.DEBUG(0,"BuyRequiredReagents("..tostring(button)..")")
 	GameTooltip:SetOwner(button, "ANCHOR_BOTTOMRIGHT")
 	GameTooltip:ClearLines()
 	GameTooltip:AddLine(L["Buy Reagents"])
@@ -302,5 +325,7 @@ function Skillet:MerchantBuyButton_OnEnter(button)
 end
 
 function Skillet:MerchantBuyButton_OnLeave(button)
+	DA.DEBUG(0,"TradeButtonAdditional_OnEnter("..tostring(button)..")")
+	DA.DEBUG(0,"MerchantBuyButton_OnLeave("..tostring(button)..")")
 	GameTooltip:Hide()
 end
