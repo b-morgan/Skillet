@@ -670,6 +670,12 @@ function Skillet:OnEnable()
 	self:RegisterEvent("GARRISON_TRADESKILL_NPC_CLOSED")
 	self:RegisterEvent("BAG_UPDATE") -- Fires for both bag and bank updates.
 	self:RegisterEvent("BAG_UPDATE_DELAYED") -- Fires after all applicable BAG_UPADTE events for a specific action have been fired.
+
+--
+-- Dragonflight events that replace *_SHOW and *_CLOSED by adding a PlayerInteractionType parameter
+--
+	self:RegisterEvent("PLAYER_INTERACTION_MANAGER_FRAME_SHOW")
+	self:RegisterEvent("PLAYER_INTERACTION_MANAGER_FRAME_HIDE")
 --
 -- MERCHANT_SHOW, MERCHANT_HIDE, MERCHANT_UPDATE events needed for auto buying.
 --
@@ -967,6 +973,23 @@ end
 function Skillet:GET_ITEM_INFO_RECEIVED(event, itemID, result)
 --	name = GetItemInfo(itemID)
 --	DA.TRACE("GET_ITEM_INFO_RECEIVED("..tostring(itemID)..", "..tostring(result).."), "..tostring(name))
+end
+
+--
+-- Dragonflight replacement for *_SHOW and *_CLOSED events
+--
+function Skillet:PLAYER_INTERACTION_MANAGER_FRAME_SHOW(event,interactionType)
+	DA.TRACE("PLAYER_INTERACTION_MANAGER_FRAME_SHOW("..tostring(interactionType)..")")
+	if interactionType == Enum.PlayerInteractionType.Merchant then
+		Skillet:MerchantShow()
+	end
+end
+
+--
+-- Dragonflight replacement for *_SHOW and *_CLOSED events
+--
+function Skillet:PLAYER_INTERACTION_MANAGER_FRAME_HIDE(event,interactionType)
+	DA.TRACE("PLAYER_INTERACTION_MANAGER_FRAME_HIDE("..tostring(interactionType)..")")
 end
 
 --
