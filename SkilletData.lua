@@ -609,10 +609,8 @@ end
 
 function Skillet:ToggleFavorite(recipeID)
 	local recipeInfo = self.data.recipeInfo[self.currentTrade][recipeID]
-	if C_TradeSkillUI.GetOnlyShowLearnedRecipes() then
-		recipeInfo.favorite = not recipeInfo.favorite
-		C_TradeSkillUI.SetRecipeFavorite(recipeID, recipeInfo.favorite)
-	end
+	recipeInfo.favorite = not recipeInfo.favorite
+	C_TradeSkillUI.SetRecipeFavorite(recipeID, recipeInfo.favorite)
 end
 
 function Skillet:IsUpgradeHidden(recipeID)
@@ -728,7 +726,7 @@ local function GetEmptyCategories(player,tradeID)
 end
 
 --
--- Builds a list of categories and recipes based on the current filter
+-- Builds a list of categories and recipes
 --
 local function GetRecipeList(player, tradeID)
 	DA.DEBUG(0,"GetRecipeList("..tostring(player)..", "..tostring(tradeID)..")")
@@ -739,9 +737,9 @@ local function GetRecipeList(player, tradeID)
 	local categoryData, parentCategoryData
 	local isCurrentCategoryEnabled, isCurrentParentCategoryEnabled = true, true
 	Skillet.recipeIDs = C_TradeSkillUI.GetAllRecipeIDs()
---	Skillet.invertedRecipeIDs = tInvert(recipeIDs)
+	Skillet.invertedRecipeIDs = tInvert(Skillet.recipeIDs)
 	local recipeIDs = Skillet.recipeIDs
---	local invertedRecipeIDs = Skillet.invertedRecipeIDs
+	local invertedRecipeIDs = Skillet.invertedRecipeIDs
 	DA.DEBUG(0,"GetRecipeList: #recipeIDs= "..tostring(#recipeIDs))
 	for i, recipeID in ipairs(recipeIDs) do
 		local recipeInfo = C_TradeSkillUI.GetRecipeInfo(recipeID)
@@ -781,7 +779,6 @@ local function GetRecipeList(player, tradeID)
 	DA.DEBUG(0,"GetRecipeList: numLearned= "..tostring(numLearned)..", numUnlearned= "..tostring(numUnlearned))
 	Skillet.dataList = dataList
 	return dataList
-	
 end
 
 --
