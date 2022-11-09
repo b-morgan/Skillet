@@ -745,7 +745,7 @@ local function GetRecipeList(player, tradeID)
 	DA.DEBUG(0,"GetRecipeList: #recipeIDs= "..tostring(#recipeIDs))
 	for i, recipeID in ipairs(recipeIDs) do
 		local recipeInfo = C_TradeSkillUI.GetRecipeInfo(recipeID)
-		DA.DEBUG(3,"GetRecipeList: i= "..tostring(i)..", recipeID= "..tostring(recipeID)..", recipeInfo.name= "..tostring(recipeInfo.name))
+		--DA.DEBUG(3,"GetRecipeList: i= "..tostring(i)..", recipeID= "..tostring(recipeID)..", recipeInfo.name= "..tostring(recipeInfo.name))
 		if recipeInfo.learned then
 			numLearned = numLearned + 1
 			--DA.DEBUG(3,"GetRecipeList: i= "..tostring(i)..", recipeID= "..tostring(recipeID)..", recipeInfo= "..DA.DUMP1(recipeInfo))
