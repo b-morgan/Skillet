@@ -623,8 +623,6 @@ function Skillet:ContinueCast(spellID)
 				command.count = command.count - 1
 				if command.count == 0 then
 					self:RemoveFromQueue(qpos)
-				else
-					C_TradeSkillUI.CraftRecipe(command.recipeID, command.count, command.optionalReagentsArray, command.recipeLevel)
 				end
 			end
 		end

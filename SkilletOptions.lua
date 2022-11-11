@@ -379,21 +379,6 @@ Skillet.options =
 					width = "full",
 					order = 5
 				},
---[[
-				use_blizzard_for_optional = {
-					type = "toggle",
-					name = L["USEBLIZZFOROPTIONNAME"],
-					desc = L["USEBLIZZFOROPTIONDESC"],
-					get = function()
-						return Skillet.db.profile.use_blizzard_for_optional
-					end,
-					set = function(self,value)
-						Skillet.db.profile.use_blizzard_for_optional = value
-					end,
-					width = "full",
-					order = 6
-				},
---]]
 				always_show_progress_bar = {
 					type = "toggle",
 					name = L["SHOWPROGRESSBARNAME"],

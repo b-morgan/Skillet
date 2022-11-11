@@ -72,7 +72,6 @@ local defaults = {
 		queue_only_view = true,
 		dialog_switch = false,
 		scale_tooltip = false,
---		use_blizzard_for_optional = false,
 		always_show_progress_bar = true,
 		tsm_compat = false,
 		transparency = 1.0,
@@ -669,7 +668,7 @@ function Skillet:OnEnable()
 	self:RegisterEvent("GUILD_RECIPE_KNOWN_BY_MEMBERS", "SkilletShowGuildCrafters")
 	self:RegisterEvent("GARRISON_TRADESKILL_NPC_CLOSED")
 	self:RegisterEvent("BAG_UPDATE") -- Fires for both bag and bank updates.
-	self:RegisterEvent("BAG_UPDATE_DELAYED") -- Fires after all applicable BAG_UPADTE events for a specific action have been fired.
+	self:RegisterEvent("BAG_UPDATE_DELAYED") -- Fires after all applicable BAG_UPDATE events for a specific action have been fired.
 
 --
 -- Dragonflight events that replace *_SHOW and *_CLOSED by adding a PlayerInteractionType parameter
@@ -963,7 +962,8 @@ function Skillet:GARRISON_TRADESKILL_NPC_CLOSED()
 end
 
 function Skillet:ITEM_DATA_LOAD_RESULT(event, itemID, result)
-	DA.TRACE("ITEM_DATA_LOAD_RESULT("..tostring(itemID)..", "..tostring(result)..")")
+--	name = GetItemInfo(itemID)
+	--DA.TRACE("ITEM_DATA_LOAD_RESULT("..tostring(itemID)..", "..tostring(result).."), "..tostring(name))
 	if Skillet.optionalDataNeeded then
 		Skillet:UpdateOptionalListWindow()
 		Skillet.optionalDataNeeded = nil
@@ -1211,9 +1211,7 @@ function Skillet:SkilletShowWindow(where)
 		end
 	end
 	if self.tradeSkillOpen then
-		if not Skillet.db.profile.use_blizzard_for_optional then
-			self:DisableBlizzardFrame()
-		end
+		self:DisableBlizzardFrame()
 	end
 	if not self:RescanTrade() then
 		if self.useBlizzard then
@@ -1460,10 +1458,6 @@ function Skillet:HideTradeSkillWindow()
 	if frame and frame:IsVisible() then
 		frame:Hide()
 		closed = true
-		if Skillet.db.profile.use_blizzard_for_optional and ProfessionsFrame then
-			self:RestoreBlizzardFrame()
-			Skillet.BlizzardUIshowing = false
-		end
 	end
 	return closed
 end
