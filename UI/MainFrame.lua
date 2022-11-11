@@ -607,15 +607,7 @@ function Skillet:TradeButtonAdditional_OnEnter(button)
 	GameTooltip:AddLine("type1= "..tostring(type1))
 	GameTooltip:AddLine("spell1= "..tostring(spell1))
 	GameTooltip:AddLine("macrotext= "..tostring(macrotext))
-	GameTooltip:Show()
 --]]
-end
-
-function Skillet:BlizzardUIButton_OnEnter(button)
-	DA.DEBUG(0,"BlizzardUIButton_OnEnter("..tostring(button)..")")
-	GameTooltip:SetOwner(button, "ANCHOR_TOPLEFT")
-	GameTooltip:ClearLines()
-	GameTooltip:AddLine("Toggle Blizzard UI")
 	GameTooltip:Show()
 end
 
@@ -675,18 +667,6 @@ function Skillet:TradeButtonAdditional_OnClick(this,button)
 	local name = this:GetName()
 	DA.DEBUG(0,"TradeButtonAdditional_OnClick: name= "..tostring(name))
 	GameTooltip:Hide()
-end
-
-function Skillet:BlizzardUIButton_OnClick(this,button)
-	DA.DEBUG(0,"BlizzardUIButton_OnClick")
-	GameTooltip:Hide()
-	if Skillet.BlizzardUIshowing then
-		HideUIPanel(ProfessionsFrame)
-		Skillet.BlizzardUIshowing = false
-	else
-		ShowUIPanel(ProfessionsFrame)
-		Skillet.BlizzardUIshowing = true
-	end
 end
 
 function Skillet:CreateAdditionalButtonsList()
