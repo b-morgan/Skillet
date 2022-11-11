@@ -84,7 +84,7 @@
 		</Layers>
 		<Scripts>
 			<OnLoad>
-				self:RegisterForClicks("LeftButtonUp", "RightButtonUp")
+				self:RegisterForClicks("AnyUp", "AnyDown")
 			</OnLoad>
 			<OnEnter>
 				Skillet:TradeButtonAdditional_OnEnter(self)
@@ -92,9 +92,6 @@
 			<OnLeave>
 				GameTooltip:Hide()
 			</OnLeave>
-			<OnClick>
-				Skillet:TradeButtonAdditional_OnClick(self,button)
-			</OnClick>
 		</Scripts>
 		<HighlightTexture alphaMode="ADD" file="Interface\Buttons\ButtonHilight-Square"/>
 	</Button>

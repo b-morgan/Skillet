@@ -576,7 +576,8 @@ function Skillet:TradeButton_OnEnter(button)
 end
 
 function Skillet:TradeButtonAdditional_OnEnter(button)
-	DA.DEBUG(0,"TradeButtonAdditional_OnEnter("..tostring(button)..")")
+--	DA.DEBUG(0,"TradeButtonAdditional_OnEnter("..tostring(button)..")")
+	DA.DEBUG(0,"TradeButtonAdditional_OnEnter: button= "..DA.DUMP1(button))
 	GameTooltip:SetOwner(button, "ANCHOR_TOPLEFT")
 	GameTooltip:ClearLines()
 	local spellID = button:GetID()
@@ -584,15 +585,30 @@ function Skillet:TradeButtonAdditional_OnEnter(button)
 	if button.Toy then
 		_, spellInfo = C_ToyBox.GetToyInfo(spellID)
 	end
-	DA.DEBUG(1,"spellInfo= "..tostring(spellInfo))
+	DA.DEBUG(1,"TradeButtonAdditional_OnEnter: spellInfo= "..tostring(spellInfo))
 	GameTooltip:AddLine(spellInfo)
 	if not button.Toy then
-		local itemID = Skillet:GetAutoTargetItem(spellID)
+		local itemID = Skillet:GetAutoTargetItem(self.currentTrade, spellID)
 		if itemID and IsAltKeyDown() then
 			GameTooltip:AddLine("/use "..GetItemInfo(itemID))
 		end
 	end
+--[[
+	local type0 = button:GetAttribute("type")
+	local type1 = button:GetAttribute("type1")
+	local spell = button:GetAttribute("spell")
+	local spell1 = button:GetAttribute("spell1")
+	local macrotext = button:GetAttribute("macrotext")
+	DA.DEBUG(1,"TradeButtonAdditional_OnEnter: type= "..tostring(type0)..", spell= "..tostring(spell))
+	DA.DEBUG(1,"TradeButtonAdditional_OnEnter: type1= "..tostring(type1)..", spell1= "..tostring(spell1))
+	DA.DEBUG(1,"TradeButtonAdditional_OnEnter: macrotext= "..tostring(macrotext))
+	GameTooltip:AddLine("type= "..tostring(type0))
+	GameTooltip:AddLine("spell= "..tostring(spell))
+	GameTooltip:AddLine("type1= "..tostring(type1))
+	GameTooltip:AddLine("spell1= "..tostring(spell1))
+	GameTooltip:AddLine("macrotext= "..tostring(macrotext))
 	GameTooltip:Show()
+--]]
 end
 
 function Skillet:BlizzardUIButton_OnEnter(button)
@@ -604,6 +620,7 @@ function Skillet:BlizzardUIButton_OnEnter(button)
 end
 
 function Skillet:TradeButton_OnClick(this,button)
+	DA.DEBUG(0,"TradeButton_OnClick("..DA.DUMP1(this)..", "..tostring(button)..")")
 	local name = this:GetName()
 	local _, player, tradeID = string.split("-", name)
 	tradeID = tonumber(tradeID)
@@ -649,8 +666,14 @@ function Skillet:TradeButton_OnClick(this,button)
 	GameTooltip:Hide()
 end
 
+--
+-- A SecureActionButtonTemplate button can't override the OnClick so 
+-- this function will never be called.
+--
 function Skillet:TradeButtonAdditional_OnClick(this,button)
-	DA.DEBUG(0,"TradeButtonAdditional_OnClick")
+	DA.DEBUG(0,"TradeButtonAdditional_OnClick("..DA.DUMP1(this)..", "..tostring(button)..")")
+	local name = this:GetName()
+	DA.DEBUG(0,"TradeButtonAdditional_OnClick: name= "..tostring(name))
 	GameTooltip:Hide()
 end
 
@@ -703,9 +726,10 @@ function Skillet:CreateAdditionalButtonsList()
 						seenButtons[spellID] = true
 					end
 				end
-			end
-		end
-	end
+			end		-- additionalSpellTab
+		end		-- ranks
+	end		-- for
+	DA.DEBUG(0,"CreateAdditionalButtonsList: AdditionalButtonsList= "..DA.DUMP(Skillet.AdditionalButtonsList))
 end
 
 function Skillet:UpdateTradeButtons(player)
@@ -784,95 +808,86 @@ function Skillet:UpdateTradeButtons(player)
 --
 	--DA.DEBUG(1,"UpdateTradeButtons: doing "..tostring(#Skillet.AdditionalButtonsList).." AdditionalButtonsList entries")
 	for i=1,#Skillet.AdditionalButtonsList,1 do
-		(function()
-			local additionalSpellTab = Skillet.AdditionalButtonsList[i]
-			local additionalSpellId = additionalSpellTab[1]
-			local additionalSpellName = additionalSpellTab[2]
-			local additionalToy = additionalSpellTab[3]
-			local additionalPet = additionalSpellTab[4]
-			local spellName, _, spellIcon, petGUID
-			if additionalToy then
-				_, spellName, spellIcon = C_ToyBox.GetToyInfo(additionalSpellId)
-			else
-				spellName, _, spellIcon = GetSpellInfo(additionalSpellId)
+		local additionalSpellTab = Skillet.AdditionalButtonsList[i]
+		local additionalSpellId = additionalSpellTab[1]
+		local additionalSpellName = additionalSpellTab[2]
+		local additionalToy = additionalSpellTab[3]
+		local additionalPet = additionalSpellTab[4]
+		local spellName, _, spellIcon, petGUID
+		if additionalToy then
+			_, spellName, spellIcon = C_ToyBox.GetToyInfo(additionalSpellId)
+		else
+			spellName, _, spellIcon = GetSpellInfo(additionalSpellId)
+		end
+		if additionalPet then
+			_, petGUID = C_PetJournal.FindPetIDByName(additionalSpellName)
+			spellName = additionalSpellName
+			if not petGUID then
+				return -- continue with the next one
 			end
-			if additionalPet then
-				_, petGUID = C_PetJournal.FindPetIDByName(additionalSpellName)
-				spellName = additionalSpellName
-				if not petGUID then
-					return -- continue with the next one
-				end
-			end
-			DA.DEBUG(1,"UpdateTradeButtons: additionalSpellId= "..tostring(additionalSpellId)..", spellName= "..tostring(spellName)..", spellIcon= "..tostring(spellIcon))
-			local buttonName = "SkilletDo"..additionalSpellName
-			local button = _G[buttonName]
-			if not button then
-				DA.DEBUG(0,"UpdateTradeButtons: CreateFrame for "..tostring(buttonName))
-				button = CreateFrame("Button", buttonName, frame, "SkilletTradeButtonAdditionalTemplate")
-				button:SetID(additionalSpellId)
-				if additionalToy then
-					button.Toy = true
-				end
-				if additionalPet then
-					button.Pet = true
-					button.PetGUID = petGUID
-				end
-			end
-			button:SetAttribute("type", "macro");
-			local macrotext = Skillet:GetAutoTargetMacro(additionalSpellId, button.Toy, button.Pet, petGUID)
-			DA.DEBUG(1,"UpdateTradeButtons: macrotext= "..tostring(macrotext))
-			button:SetAttribute("macrotext", macrotext)
-			button:ClearAllPoints()
-			button:SetPoint("BOTTOMLEFT", SkilletRankFrame, "TOPLEFT", position, 3)
-			local buttonIcon = _G[buttonName.."Icon"]
-			buttonIcon:SetTexture(spellIcon)
-			position = position + button:GetWidth()
-			button:Show()
-			if additionalToy then
-				local isToyUsable = C_ToyBox.IsToyUsable(additionalSpellId)
-				DA.DEBUG(1,"UpdateTradeButtons: IsToyUsable("..tostring(additionalSpellId)..")= "..tostring(isToyUsable))
-				if isToyUsable then
-					button:Enable()
-					button:SetAlpha(1.0)
-				else
-					button:Disable()
-					button:SetAlpha(0.2)
-				end
-			end
---[[
-			if additionalPet then
-				DA.DEBUG(1,"UpdateTradeButtons: petName= "..tostring(additionalSpellName)..", petGUID= "..tostring(petGUID))
-				if petGUID then
-					button:Enable()
-					button:SetAlpha(1.0)
-				else
-					button:Disable()
-					button:SetAlpha(0.2)
-				end
-			end
---]]
-		end)()
-	end
---[[
---
--- One more button to toggle the Blizzard ProfessionsFrame
---
-	if Skillet.db.profile.use_blizzard_for_optional then
-		local buttonName = "SkilletBlizzardUI"
+		end
+		DA.DEBUG(1,"UpdateTradeButtons: additionalSpellId= "..tostring(additionalSpellId)..", spellName= "..tostring(spellName)..", spellIcon= "..tostring(spellIcon))
+		local buttonName = "SkilletDo"..additionalSpellName
 		local button = _G[buttonName]
 		if not button then
-			--DA.DEBUG(0,"UpdateTradeButtons: CreateFrame for "..tostring(buttonName))
-			button = CreateFrame("Button", buttonName, frame, "SkilletBlizzardUITemplate")
-			button:SetID(2)
+			DA.DEBUG(0,"UpdateTradeButtons: CreateFrame for "..tostring(buttonName))
+			button = CreateFrame("Button", buttonName, frame, "SkilletTradeButtonAdditionalTemplate")
+			button:SetID(additionalSpellId)
+			if additionalToy then
+				button.Toy = true
+			end
+			if additionalPet then
+				button.Pet = true
+				button.PetGUID = petGUID
+			end
 		end
+--
+-- https://wowpedia.fandom.com/wiki/SecureActionButtonTemplate 
+--
+--[[
+--
+-- pure spell on left-click
+--
+			local spellName, _, texture = GetSpellInfo(additionalSpellId)
+			DA.DEBUG(1,"UpdateTradeButtons: additionalSpellId= "..tostring(additionalSpellId)..", spellName= "..tostring(spellName))
+			button:SetAttribute("type1", "spell")
+			button:SetAttribute("spell1", spellName)
+--]]
+--
+-- execute a macro on any click
+--
+		button:SetAttribute("type", "macro");
+		local macrotext = Skillet:GetAutoTargetMacro(additionalSpellId, button.Toy, button.Pet, petGUID)
+		DA.DEBUG(1,"UpdateTradeButtons: macrotext= "..tostring(macrotext))
+		button:SetAttribute("macrotext", macrotext)
 		button:ClearAllPoints()
 		button:SetPoint("BOTTOMLEFT", SkilletRankFrame, "TOPLEFT", position, 3)
 		local buttonIcon = _G[buttonName.."Icon"]
-		buttonIcon:SetTexture(3573824)
+		buttonIcon:SetTexture(spellIcon)
 		position = position + button:GetWidth()
 		button:Show()
+		if additionalToy then
+			local isToyUsable = C_ToyBox.IsToyUsable(additionalSpellId)
+			DA.DEBUG(1,"UpdateTradeButtons: IsToyUsable("..tostring(additionalSpellId)..")= "..tostring(isToyUsable))
+			if isToyUsable then
+				button:Enable()
+				button:SetAlpha(1.0)
+			else
+				button:Disable()
+				button:SetAlpha(0.2)
+			end
+		end
+		if additionalPet then
+			DA.DEBUG(1,"UpdateTradeButtons: petName= "..tostring(additionalSpellName)..", petGUID= "..tostring(petGUID))
+			if petGUID then
+				button:Enable()
+				button:SetAlpha(1.0)
+			else
+				button:Disable()
+				button:SetAlpha(0.2)
+			end
+		end
 	end
---]]
 end
 
 function Skillet.PluginDropdown_OnClick(this)
