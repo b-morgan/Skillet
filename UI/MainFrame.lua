@@ -2769,11 +2769,6 @@ function Skillet:SkilletFrameForceClose()
 			return self:HideAllWindows()
 		end
 	end
---[[
-	if Skillet.db.profile.use_blizzard_for_optional and ProfessionsFrame and ProfessionsFrame:IsVisible() then
-		Skillet.RestoreBlizzardFrame()
-	end
---]]
 	C_TradeSkillUI.CloseTradeSkill()
 	return self:HideAllWindows()
 end
