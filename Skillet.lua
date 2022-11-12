@@ -131,65 +131,48 @@ Skillet.unknownRecipe = {
 	numCraftableAlts = 0,
 }
 
+--[[ From @plusmouse on WoWUIDev Discord channel
+local craftingPage = CreateFrame("Frame", nil, nil, "ProfessionsCraftingPageTemplate")
+craftingPage:SetParent(nil)
+craftingPage:Hide()
+craftingPage:SetScript("OnShow", nil)
+craftingPage:SetScript("OnHide", nil)
+EventRegistry:UnregisterCallback("ProfessionsRecipeListMixin.Event.OnRecipeSelected", craftingPage)
+EventRegistry:UnregisterCallback("Professions.ProfessionSelected", craftingPage);
+EventRegistry:UnregisterCallback("Professions.ReagentClicked", craftingPage);
+EventRegistry:UnregisterCallback("Professions.TransactionUpdated", craftingPage)
+craftingPage:RegisterEvent("UPDATE_TRADESKILL_CAST_COMPLETE")
+--]]
+
 function Skillet:DisableBlizzardFrame()
 	DA.DEBUG(0,"DisableBlizzardFrame()")
 	if self.BlizzardTradeSkillFrame == nil then
-		if (not IsAddOnLoaded("Blizzard_TradeSkillUI")) then
-			LoadAddOn("Blizzard_TradeSkillUI");
-		end
 		self.BlizzardTradeSkillFrame = ProfessionsFrame
 		self.tradeSkillHide = ProfessionsFrame:GetScript("OnHide")
+		if not self.craftingFrame then
+			DA.DEBUG(1,"DisableBlizzardFrame: creating hack frames")
+			self.craftingFrame = CreateFrame("Frame", nil, nil, "ProfessionsCraftingPageTemplate")
+			self.craftingFrame:SetParent(nil)
+			self.craftingFrame:Hide()
+			EventRegistry:UnregisterCallback("ProfessionsRecipeListMixin.Event.OnRecipeSelected", self.craftingFrame)
+			EventRegistry:UnregisterCallback("Professions.ProfessionSelected", self.craftingFrame)
+			EventRegistry:UnregisterCallback("Professions.ReagentClicked", self.craftingFrame)
+			EventRegistry:UnregisterCallback("Professions.TransactionUpdated", self.craftingFrame)
+			self.craftingFrame:RegisterEvent("UPDATE_TRADESKILL_CAST_COMPLETE")
+		end
 		ProfessionsFrame:SetScript("OnHide", nil)
-		HideUIPanel(ProfessionsFrame)
-		Skillet.BlizzardUIshowing = false
-	else
-		ProfessionsFrame:SetScript("OnHide", nil)
-		HideUIPanel(ProfessionsFrame)
-		Skillet.BlizzardUIshowing = false
 	end
+	HideUIPanel(ProfessionsFrame)
+	self.BlizzardUIshowing = false
 end
 
 function Skillet:EnableBlizzardFrame()
 	DA.DEBUG(0,"EnableBlizzardFrame()")
 	if self.BlizzardTradeSkillFrame ~= nil then
-		if (not IsAddOnLoaded("Blizzard_TradeSkillUI")) then
-			LoadAddOn("Blizzard_TradeSkillUI");
-		end
 		self.BlizzardTradeSkillFrame = nil
-		ProfessionsFrame:SetScript("OnHide", Skillet.tradeSkillHide)
-		Skillet.tradeSkillHide = nil
+		ProfessionsFrame:SetScript("OnHide", self.tradeSkillHide)
+		self.tradeSkillHide = nil
 	end
-end
-
-function Skillet:EmptyBlizzardFrame()
-	DA.DEBUG(0,"EmptyBlizzardFrame()")
-	if Skillet.db.profile.BlizzOR then
-		ProfessionsFrame.RankFrame:Hide()
-		ProfessionsFrame.FilterButton:Hide()
-		ProfessionsFrame.SearchBox:Hide()
-		ProfessionsFrame.RecipeList.LearnedTab:Hide()
-		ProfessionsFrame.RecipeList.UnlearnedTab:Hide()
-		if not Skillet.TSFRLwidth then
-			Skillet.TSFRLwidth = ProfessionsFrame.RecipeList:GetWidth()
-		end
-		ProfessionsFrame.RecipeList:SetWidth(0)
-		ProfessionsFrame:SetTitle("Skillet Optional Reagents Helper")
-	end
-end
-
-function Skillet:RestoreBlizzardFrame()
-	DA.DEBUG(0,"RestoreBlizzardFrame()")
-	if Skillet.db.profile.BlizzOR then
-		ProfessionsFrame.RankFrame:Show()
-		ProfessionsFrame.FilterButton:Show()
-		ProfessionsFrame.SearchBox:Show()
-		ProfessionsFrame.RecipeList.LearnedTab:Show()
-		ProfessionsFrame.RecipeList.UnlearnedTab:Show()
-		if Skillet.TSFRLwidth then
-			ProfessionsFrame.RecipeList:SetWidth(Skillet.TSFRLwidth)
-		end
-	end
-	Skillet.BlizzardUIshowing = false
 end
 
 --
@@ -704,6 +687,7 @@ function Skillet:OnEnable()
 	self:RegisterEvent("UNIT_SPELLCAST_FAILED")
 	self:RegisterEvent("UNIT_SPELLCAST_FAILED_QUIET")
 	self:RegisterEvent("UNIT_SPELLCAST_INTERRUPTED")
+	self:RegisterEvent("UPDATE_TRADESKILL_CAST_COMPLETE")
 --
 -- Events needed to handle caching of item info
 --
@@ -1277,7 +1261,7 @@ end
 -- So we can track when the players inventory changes and update craftable counts
 --
 function Skillet:BAG_UPDATE(event, bagID)
-	DA.TRACE("BAG_UPDATE( "..bagID.." )")
+	--DA.TRACE("BAG_UPDATE( "..bagID.." )")
 	local showing = false
 	if self.tradeSkillFrame and self.tradeSkillFrame:IsVisible() then
 		showing = true
