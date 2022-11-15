@@ -26,7 +26,8 @@ local COLORORANGE = "|cffff8040"
 local COLORYELLOW = "|cffffff00"
 local COLORGREEN =  "|cff40c040"
 local COLORGRAY =   "|cff808080"
-
+local COLORRED =    "|cffff0000"
+local COLORWHITE =  "|cffffffff"
 --
 -- Colors used in the "0/0/0" strings and tooltips
 --
@@ -1790,18 +1791,24 @@ function Skillet:UpdateDetailWindow(skillIndex)
 --
 -- Are special tools needed for this skill?
 --
---		local tools = BuildColoredListString(C_TradeSkillUI.GetRecipeTools(skill.id))
-		if tools then
+		local requirements = C_TradeSkillUI.GetRecipeRequirements(skill.id)
+		if requirements then
+			local tools = ""
+			local sep = ""
+			for _, recipeRequirement in ipairs(requirements) do
+				toolName = recipeRequirement.name
+				if not recipeRequirement.met then
+					toolName = COLORRED..toolName.."|r"
+				end
+				tools = tools..sep..toolName
+				sep = ", "
+			end
 			SkilletRequirementText:SetText(tools)
 			SkilletRequirementText:Show()
 			SkilletRequirementLabel:Show()
 		else
 			SkilletRequirementText:Hide()
 			SkilletRequirementLabel:Hide()
-		end
-
-		local requirements = C_TradeSkillUI.GetRecipeRequirements(skill.id)
-		if requirements then
 		end
 	end
 
