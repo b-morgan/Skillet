@@ -1036,30 +1036,49 @@ local function ScanTrade()
 		skillData[i].color = skill_style_type[skillType]
 		--DA.DEBUG(0,"skillType= "..tostring(skillType)..", recipeID= "..tostring(recipeID))
 		local skillDBString = (DifficultyChar[skillType] or "")..tostring(recipeID)
-		local tools = { C_TradeSkillUI.GetRecipeTools(recipeID) }
-		recipeInfo.tools = tools	-- save a copy for our records
-		skillData[i].tools = {}
-		local slot = 1
-		for t=2,#tools,2 do
-			skillData[i].tools[slot] = (tools[t] or 0)
-			slot = slot + 1
-		end
-		local numTools = #tools+1
-		if numTools > 1 then
-			local toolString = ""
-			local toolsAbsent = false
+--		local tools = { C_TradeSkillUI.GetRecipeTools(recipeID) }
+		if tools then
+			recipeInfo.tools = tools	-- save a copy for our records
+			skillData[i].tools = {}
 			local slot = 1
-			for t=2,numTools,2 do
-				if not tools[t] then
-					toolsAbsent = true
-					toolString = toolString..slot
-				end
+			for t=2,#tools,2 do
+				skillData[i].tools[slot] = (tools[t] or 0)
 				slot = slot + 1
 			end
-			if toolsAbsent then										-- only point out missing tools
-				skillDBString = skillDBString.." t="..toolString
+			local numTools = #tools+1
+			if numTools > 1 then
+				local toolString = ""
+				local toolsAbsent = false
+				local slot = 1
+				for t=2,numTools,2 do
+					if not tools[t] then
+						toolsAbsent = true
+						toolString = toolString..slot
+					end
+					slot = slot + 1
+				end
+				if toolsAbsent then										-- only point out missing tools
+					skillDBString = skillDBString.." t="..toolString
+				end
 			end
 		end
+--[[
+		if #C_TradeSkillUI.GetRecipeRequirements(recipeInfo.recipeID) > 0 then
+			local fontString = isRecraft and self.RecraftingRequiredTools or self.RequiredTools;
+			fontString:Show();
+			
+			self.UpdateRequiredTools = function()
+				-- Requirements need to be fetched on every update because it contains the updated
+				-- .met field that we need to colorize the string correctly.
+				local requirements = C_TradeSkillUI.GetRecipeRequirements(recipeInfo.recipeID);
+				local requirementsText = BuildColoredListString(unpack(FormatRequirements(requirements)));
+				fontString:SetText(PROFESSIONS_REQUIRED_TOOLS:format(requirementsText));
+--]]
+		local requirements = C_TradeSkillUI.GetRecipeRequirements(recipeID)
+--		DA.DEBUG(0,"recipeID= "..tostring(recipeID)..", requirements= "..DA.DUMP1(requirements))
+		if requirements then
+		end
+		
 		skillDB[i] = skillDBString
 		Skillet.data.skillIndexLookup[recipeID] = i
 		Skillet.data.recipeList[recipeID] = {}
@@ -1168,7 +1187,7 @@ local function ScanTrade()
 		recipe.numOptional = numOptional
 		recipeString = tradeID.." "..itemString.." "..reagentString
 
-		if #tools >= 1 then
+		if tools and #tools >= 1 then
 			recipe.tools = { tools[1] }
 			toolString = string.gsub(tools[1]," ", "_")
 			for t=3,#tools,2 do

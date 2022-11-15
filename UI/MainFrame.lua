@@ -1790,7 +1790,7 @@ function Skillet:UpdateDetailWindow(skillIndex)
 --
 -- Are special tools needed for this skill?
 --
-		local tools = BuildColoredListString(C_TradeSkillUI.GetRecipeTools(skill.id))
+--		local tools = BuildColoredListString(C_TradeSkillUI.GetRecipeTools(skill.id))
 		if tools then
 			SkilletRequirementText:SetText(tools)
 			SkilletRequirementText:Show()
@@ -1799,7 +1799,12 @@ function Skillet:UpdateDetailWindow(skillIndex)
 			SkilletRequirementText:Hide()
 			SkilletRequirementLabel:Hide()
 		end
+
+		local requirements = C_TradeSkillUI.GetRecipeRequirements(skill.id)
+		if requirements then
+		end
 	end
+
 	if recipeInfo and recipeInfo.alternateVerb then
 		texture = recipeInfo.icon
 	end

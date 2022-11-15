@@ -310,17 +310,6 @@ function Skillet:OnInitialize()
 	end
 
 --
--- Hook default tooltips
---
-	local tooltipsToHook = { ItemRefTooltip, GameTooltip, ShoppingTooltip1, ShoppingTooltip2 };
-	for _, tooltip in pairs(tooltipsToHook) do
-		if tooltip then
-			tooltip:HookScript("OnTooltipSetItem", function(tooltip)
-				Skillet:AddItemNotesToTooltip(tooltip)
-			end)
-		end
-	end
---
 -- configure the addon options and the slash command handler
 -- (Skillet.options is defined in SkilletOptions.lua)
 --
@@ -769,6 +758,9 @@ function Skillet:PLAYER_ENTERING_WORLD()
 --
 		self.db.realm.guid[player]= guid
 		if (server) then
+			if not self.data then
+				self.data = {}
+			end
 			self.data.server = server
 			self.data.realm = realm
 			if not self.db.global.server[server] then
