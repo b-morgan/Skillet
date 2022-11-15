@@ -486,28 +486,39 @@ end
 --
 -- Events associated with crafting spells
 --
-function Skillet:UNIT_SPELLCAST_SENT(event, unit, spell, spellID)
-	DA.TRACE("UNIT_SPELLCAST_SENT("..tostring(unit)..", "..tostring(spell)..", "..tostring(spellID)..")")
+--[[
+	{ Name = "unit", Type = "string", Nilable = false },
+	{ Name = "target", Type = "string", Nilable = false },
+	{ Name = "castGUID", Type = "string", Nilable = false },
+	{ Name = "spellID", Type = "number", Nilable = false },
+--]]
+function Skillet:UNIT_SPELLCAST_SENT(event, unit, target, castGUID, spellID)
+	DA.TRACE("UNIT_SPELLCAST_SENT("..tostring(unit)..", "..tostring(target)..", "..tostring(castGUID)..", "..tostring(spellID)..")")
 	if unit == "player" then
 		self:IgnoreCast(spellID)
 	end
 end
 
-function Skillet:UNIT_SPELLCAST_START(event, unit, spell, spellID)
-	DA.TRACE("UNIT_SPELLCAST_START("..tostring(unit)..", "..tostring(spell)..", "..tostring(spellID)..")")
-	if unit == "player" then
+--[[
+	{ Name = "unitTarget", Type = "string", Nilable = false },
+	{ Name = "castGUID", Type = "string", Nilable = false },
+	{ Name = "spellID", Type = "number", Nilable = false },
+--]]
+function Skillet:UNIT_SPELLCAST_START(event, unitTarget, castGUID, spellID)
+	DA.TRACE("UNIT_SPELLCAST_START("..tostring(unitTarget)..", "..tostring(castGUID)..", "..tostring(spellID)..")")
+	if unitTarget == "player" then
 		self:IgnoreCast(spellID)
 	end
 end
 
-function Skillet:UNIT_SPELLCAST_SUCCEEDED(event, unit, spell, spellID)
-	DA.TRACE("UNIT_SPELLCAST_SUCCEEDED("..tostring(unit)..", "..tostring(spell)..", "..tostring(spellID)..")")
-	if unit == "player" then
+function Skillet:UNIT_SPELLCAST_SUCCEEDED(event, unitTarget, castGUID, spellID)
+	DA.TRACE("UNIT_SPELLCAST_SUCCEEDED("..tostring(unitTarget)..", "..tostring(castGUID)..", "..tostring(spellID)..")")
+	if unitTarget == "player" then
 		if self.processingLevel and self.processingLevel ~= 0 and self.processingSpellID then
-			DA.DEBUG(0,"UNIT_SPELLCAST_SUCCEEDED: "..tostring(unit)..", "..tostring(spellID)..", "..tostring(self.processingSpellID))
+			DA.DEBUG(0,"UNIT_SPELLCAST_SUCCEEDED: "..tostring(unitTarget)..", "..tostring(spellID)..", "..tostring(self.processingSpellID))
 			self:ContinueCast(self.processingSpellID)
 		elseif spellID == self.processingSpellID then
-			DA.DEBUG(0,"UNIT_SPELLCAST_SUCCEEDED: "..tostring(unit)..", "..tostring(spellID))
+			DA.DEBUG(0,"UNIT_SPELLCAST_SUCCEEDED: "..tostring(unitTarget)..", "..tostring(spellID))
 			self:ContinueCast(spellID)
 		else
 			self:IgnoreCast(spellID)
@@ -515,14 +526,14 @@ function Skillet:UNIT_SPELLCAST_SUCCEEDED(event, unit, spell, spellID)
 	end
 end
 
-function Skillet:UNIT_SPELLCAST_FAILED(event, unit, spell, spellID)
-	DA.TRACE("UNIT_SPELLCAST_FAILED("..tostring(unit)..", "..tostring(spell)..", "..tostring(spellID)..")")
-	if unit == "player" then
+function Skillet:UNIT_SPELLCAST_FAILED(event, unitTarget, castGUID, spellID)
+	DA.TRACE("UNIT_SPELLCAST_FAILED("..tostring(unitTarget)..", "..tostring(castGUID)..", "..tostring(spellID)..")")
+	if unitTarget == "player" then
 		if self.processingLevel and self.processingLevel ~= 0 and self.processingSpellID then
-			DA.DEBUG(0,"UNIT_SPELLCAST_FAILED: "..tostring(unit)..", "..tostring(spellID)..", "..tostring(self.processingSpellID))
+			DA.DEBUG(0,"UNIT_SPELLCAST_FAILED: "..tostring(castGUID)..", "..tostring(spellID)..", "..tostring(self.processingSpellID))
 			self:StopCast(self.processingSpellID)
 		elseif spellID == self.processingSpellID then
-			DA.DEBUG(0,"UNIT_SPELLCAST_FAILED: "..tostring(unit)..", "..tostring(spellID))
+			DA.DEBUG(0,"UNIT_SPELLCAST_FAILED: "..tostring(unitTarget)..", "..tostring(spellID))
 			self:StopCast(spellID)
 		else
 			self:IgnoreCast(spellID)
@@ -530,14 +541,14 @@ function Skillet:UNIT_SPELLCAST_FAILED(event, unit, spell, spellID)
 	end
 end
 
-function Skillet:UNIT_SPELLCAST_FAILED_QUIET(event, unit, spell, spellID)
-	DA.TRACE("UNIT_SPELLCAST_FAILED_QUIET("..tostring(unit)..", "..tostring(spell)..", "..tostring(spellID)..")")
-	if unit == "player" then
+function Skillet:UNIT_SPELLCAST_FAILED_QUIET(event, unitTarget, castGUID, spellID)
+	DA.TRACE("UNIT_SPELLCAST_FAILED_QUIET("..tostring(unitTarget)..", "..tostring(castGUID)..", "..tostring(spellID)..")")
+	if unitTarget == "player" then
 		if self.processingLevel and self.processingLevel ~= 0 and self.processingSpellID then
-			DA.DEBUG(0,"UNIT_SPELLCAST_FAILED_QUIET: "..tostring(unit)..", "..tostring(spellID)..", "..tostring(self.processingSpellID))
+			DA.DEBUG(0,"UNIT_SPELLCAST_FAILED_QUIET: "..tostring(unitTarget)..", "..tostring(spellID)..", "..tostring(self.processingSpellID))
 			self:StopCast(self.processingSpellID)
 		elseif spellID == self.processingSpellID then
-			DA.DEBUG(0,"UNIT_SPELLCAST_FAILED_QUIET: "..tostring(unit)..", "..tostring(spellID))
+			DA.DEBUG(0,"UNIT_SPELLCAST_FAILED_QUIET: "..tostring(unitTarget)..", "..tostring(spellID))
 			self:StopCast(spellID)
 		else
 			self:IgnoreCast(spellID)
@@ -545,14 +556,14 @@ function Skillet:UNIT_SPELLCAST_FAILED_QUIET(event, unit, spell, spellID)
 	end
 end
 
-function Skillet:UNIT_SPELLCAST_INTERRUPTED(event, unit, spell, spellID)
-	DA.TRACE("UNIT_SPELLCAST_INTERRUPTED("..tostring(unit)..", "..tostring(spell)..", "..tostring(spellID)..")")
-	if unit == "player" then
+function Skillet:UNIT_SPELLCAST_INTERRUPTED(event, unitTarget, castGUID, spellID)
+	DA.TRACE("UNIT_SPELLCAST_INTERRUPTED("..tostring(unitTarget)..", "..tostring(castGUID)..", "..tostring(spellID)..")")
+	if unitTarget == "player" then
 		if self.processingLevel and self.processingLevel ~= 0 and self.processingSpellID then
-			DA.DEBUG(0,"UNIT_SPELLCAST_INTERRUPTED: "..tostring(unit)..", "..tostring(spellID)..", "..tostring(self.processingSpellID))
+			DA.DEBUG(0,"UNIT_SPELLCAST_INTERRUPTED: "..tostring(unitTarget)..", "..tostring(spellID)..", "..tostring(self.processingSpellID))
 			self:StopCast(self.processingSpellID)
 		elseif spellID == self.processingSpellID then
-			DA.DEBUG(0,"UNIT_SPELLCAST_INTERRUPTED: "..tostring(unit)..", "..tostring(spellID))
+			DA.DEBUG(0,"UNIT_SPELLCAST_INTERRUPTED: "..tostring(unitTarget)..", "..tostring(spellID))
 			self:StopCast(spellID)
 		else
 			self:IgnoreCast(spellID)
@@ -560,16 +571,16 @@ function Skillet:UNIT_SPELLCAST_INTERRUPTED(event, unit, spell, spellID)
 	end
 end
 
-function Skillet:UNIT_SPELLCAST_DELAYED(event, unit, spell, spellID)
-	DA.TRACE("UNIT_SPELLCAST_DELAYED("..tostring(unit)..", "..tostring(spell)..", "..tostring(spellID)..")")
-	if unit == "player" then
+function Skillet:UNIT_SPELLCAST_DELAYED(event, unitTarget, castGUID, spellID)
+	DA.TRACE("UNIT_SPELLCAST_DELAYED("..tostring(unitTarget)..", "..tostring(castGUID)..", "..tostring(spellID)..")")
+	if unitTarget == "player" then
 		self:IgnoreCast(spellID)
 	end
 end
 
-function Skillet:UNIT_SPELLCAST_STOP(event, unit, spell, spellID)
-	DA.TRACE("UNIT_SPELLCAST_STOP("..tostring(unit)..", "..tostring(spell)..", "..tostring(spellID)..")")
-	if unit == "player" then
+function Skillet:UNIT_SPELLCAST_STOP(event, unitTarget, castGUID, spellID)
+	DA.TRACE("UNIT_SPELLCAST_STOP("..tostring(unitTarget)..", "..tostring(castGUID)..", "..tostring(spellID)..")")
+	if unitTarget == "player" then
 		self:IgnoreCast(spellID)
 	end
 end
