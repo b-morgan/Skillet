@@ -180,7 +180,7 @@ end
 --
 function Skillet:CollectRecipeInformation()
 	for recipeID, recipeString in pairs(self.db.global.recipeDB) do
-		local tradeID, itemString, reagentString, toolString, numOptional = string.split(" ",recipeString)
+		local tradeID, itemString, reagentString, numOptional = string.split(" ",recipeString)
 		local itemID = 0
 		local numMade = 1
 		if itemString ~= "0" then
@@ -335,7 +335,7 @@ function Skillet:GetRecipe(id)
 		if Skillet.db.global.recipeDB[id] then
 			local recipeString = Skillet.db.global.recipeDB[id]
 			--DA.DEBUG(0,"recipeString= "..tostring(recipeString))
-			local tradeID, itemString, reagentString, toolString, numOptional = string.split(" ",recipeString)
+			local tradeID, itemString, reagentString, numOptional = string.split(" ",recipeString)
 			--DA.DEBUG(0,"numOptional= "..tostring(numOptional))
 			local itemID, numMade = 0, 1
 			local slot = nil
@@ -377,17 +377,6 @@ function Skillet:GetRecipe(id)
 						Skillet.data.recipeList[id].reagentData[i] = {}
 						Skillet.data.recipeList[id].reagentData[i].reagentID = tonumber(reagentList[1 + (i-1)*2])
 						Skillet.data.recipeList[id].reagentData[i].numNeeded = tonumber(reagentList[2 + (i-1)*2])
-					end
-				end
-			else
-				--DA.DEBUG(0,"id= "..tostring(id)..", recipeString= "..tostring(recipeString))
-			end
-			if toolString then
-				if toolString ~= "-" then
-					Skillet.data.recipeList[id].tools = {}
-					local toolList = { string.split(":",toolString) }
-					for i=1,#toolList do
-						Skillet.data.recipeList[id].tools[i] = string.gsub(toolList[i],"_"," ")
 					end
 				end
 			else
@@ -456,13 +445,6 @@ function Skillet:GetSkill(player,trade,index)
 						local subData = { string.split("=",data[i]) }
 						if subData[1] == "cd" then
 							skill.cooldown = tonumber(subData[2])
-						elseif subData[1] == "t" then
-							local recipe = Skillet:GetRecipe(recipeID)
-							skill.tools = {}
-							for j=1,string.len(subData[2]) do
-								local missingTool = tonumber(string.sub(subData[2],j,j))
-								skill.tools[missingTool] = true
-							end
 						end
 					end
 				end
@@ -1036,55 +1018,29 @@ local function ScanTrade()
 		skillData[i].color = skill_style_type[skillType]
 		--DA.DEBUG(0,"skillType= "..tostring(skillType)..", recipeID= "..tostring(recipeID))
 		local skillDBString = (DifficultyChar[skillType] or "")..tostring(recipeID)
---		local tools = { C_TradeSkillUI.GetRecipeTools(recipeID) }
-		if tools then
-			recipeInfo.tools = tools	-- save a copy for our records
-			skillData[i].tools = {}
-			local slot = 1
-			for t=2,#tools,2 do
-				skillData[i].tools[slot] = (tools[t] or 0)
-				slot = slot + 1
-			end
-			local numTools = #tools+1
-			if numTools > 1 then
-				local toolString = ""
-				local toolsAbsent = false
-				local slot = 1
-				for t=2,numTools,2 do
-					if not tools[t] then
-						toolsAbsent = true
-						toolString = toolString..slot
-					end
-					slot = slot + 1
-				end
-				if toolsAbsent then										-- only point out missing tools
-					skillDBString = skillDBString.." t="..toolString
-				end
-			end
-		end
 --[[
-		if #C_TradeSkillUI.GetRecipeRequirements(recipeInfo.recipeID) > 0 then
-			local fontString = isRecraft and self.RecraftingRequiredTools or self.RequiredTools;
-			fontString:Show();
-			
-			self.UpdateRequiredTools = function()
-				-- Requirements need to be fetched on every update because it contains the updated
-				-- .met field that we need to colorize the string correctly.
-				local requirements = C_TradeSkillUI.GetRecipeRequirements(recipeInfo.recipeID);
-				local requirementsText = BuildColoredListString(unpack(FormatRequirements(requirements)));
-				fontString:SetText(PROFESSIONS_REQUIRED_TOOLS:format(requirementsText));
---]]
-		local requirements = C_TradeSkillUI.GetRecipeRequirements(recipeID)
---		DA.DEBUG(0,"recipeID= "..tostring(recipeID)..", requirements= "..DA.DUMP1(requirements))
+	recipeRequirement.type == Enum.RecipeRequirementType
+	requirements= { [1] = { ['met'] = false, ['name'] = Cooking Fire, ['type'] = 0 } }
+	requirements= { 
+		[1] = { ['met'] = true, ['name'] = Anvil, ['type'] = 0 }, 
+		[2] = { ['met'] = true, ['name'] = Blacksmith Hammer, ['type'] = 1 },
+		}
+	requirements= { [1] = { ['met'] = true, ['name'] = Forge, ['type'] = 0 } }
+
+		local requirements = C_TradeSkillUI.GetRecipeRequirements(skill.id)
 		if requirements then
+			for _, recipeRequirement in ipairs(requirements) do
+				toolName = recipeRequirement.name
+				if not recipeRequirement.met then
+				end
+			end
 		end
-		
+--]]
 		skillDB[i] = skillDBString
 		Skillet.data.skillIndexLookup[recipeID] = i
 		Skillet.data.recipeList[recipeID] = {}
 		local itemString = "-"
 		local reagentString = "-"
-		local toolString = "-"
 		local recipeString = "-"
 		local recipe = Skillet.data.recipeList[recipeID]
 		recipe.tradeID = tradeID
@@ -1186,16 +1142,6 @@ local function ScanTrade()
 		recipe.optionalData = optionalData
 		recipe.numOptional = numOptional
 		recipeString = tradeID.." "..itemString.." "..reagentString
-
-		if tools and #tools >= 1 then
-			recipe.tools = { tools[1] }
-			toolString = string.gsub(tools[1]," ", "_")
-			for t=3,#tools,2 do
-				table.insert(recipe.tools, tools[t])
-				toolString = toolString..":"..string.gsub(tools[t]," ", "_")
-			end
-		end
-		recipeString = recipeString.." "..toolString
 		recipeString = recipeString.." "..tostring(numOptionalReagentSlots)
 		recipeDB[recipeID] = recipeString
 		nameDB[recipeID] = recipeInfo.name		-- for debugging

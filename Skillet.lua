@@ -309,6 +309,19 @@ function Skillet:OnInitialize()
 		self:InitializeSkillLevels()
 	end
 
+--[[
+-- Hook default tooltips
+--
+	local tooltipsToHook = { ItemRefTooltip, GameTooltip, ShoppingTooltip1, ShoppingTooltip2 };
+	for _, tooltip in pairs(tooltipsToHook) do
+		if tooltip then
+			tooltip:HookScript("OnTooltipSetItem", function(tooltip)
+				Skillet:AddItemNotesToTooltip(tooltip)
+			end)
+		end
+	end
+--]]
+
 --
 -- configure the addon options and the slash command handler
 -- (Skillet.options is defined in SkilletOptions.lua)
