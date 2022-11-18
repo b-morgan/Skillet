@@ -48,14 +48,15 @@ local FrameBackdrop = {
 	insets = { left = 3, right = 3, top = 30, bottom = 3 }
 }
 
+local bags = {}					-- Detailed contents of player bags (debugging only)
+
+local bank = {}					-- Detailed contents of the bank.
 local bankFrameOpen = false
-local bank						-- Detailed contents of the bank.
-local bankData					-- By item contents of the bank.
 Skillet.bankBusy = false
 Skillet.bankQueue = {}
 
-local guildbankFrameOpen = false
 local guildbank = {}			-- Detailed contents of the guildbank
+local guildbankFrameOpen = false
 Skillet.guildQueue = {}
 Skillet.guildbankOnce = false	-- but only indexGuildBank once for each OPENED
 Skillet.guildbankText = false
@@ -301,28 +302,92 @@ local function cache_list(self)
 	self.cachedShoppingList = self:GetShoppingList(name, self.db.char.same_faction, self.db.char.include_guild)
 end
 
-local function indexBank()
-	--DA.DEBUG(0,"indexBank()")
+local function indexBags()
+	DA.DEBUG(0,"indexBags()")
 --
 -- bank contains detailed contents of each tab,slot which 
 -- is only needed while the bank is open.
 --
 -- bankData is a count by item.
 --
-	bank = {}
 	local player = Skillet.currentPlayer
-	local bankData = Skillet.db.realm.bankData[player]
-	local bankBags = {-1,5,6,7,8,9,10,11,-3}
-	for _, container in pairs(bankBags) do
-		--DA.DEBUG(1,"container="..tostring(container)..", slots="..tostring(GetContainerNumSlots(container)))
-		for i = 1, GetContainerNumSlots(container), 1 do
-			local item = GetContainerItemLink(container, i)
+	local bagData = Skillet.db.realm.bagData[player]
+	local Bags = {0,1,2,3,4,5}
+	DA.DEBUG(0,"indexBags: NUM_BAG_SLOTS= "..tostring(NUM_BAG_SLOTS))
+
+--	for container = NUM_BAG_SLOTS + 2, NUM_BAG_SLOTS + NUM_BANKBAGSLOTS + 1 do -- 6 to 12
+	for _, container in pairs(Bags) do
+		bags = {}
+		local slots = C_Container.GetContainerNumSlots(container)
+		local freeSlots, bagType = C_Container.GetContainerNumFreeSlots(container)
+		DA.DEBUG(1,"container="..tostring(container)..", slots="..tostring(slots))
+		for i = 1, slots, 1 do
+			local item = C_Container.GetContainerItemLink(container, i)
 			--DA.DEBUG(2,"item="..tostring(item))
 			if item then
-				local _,count = GetContainerItemInfo(container, i)
-				local id = Skillet:GetItemIDFromLink(item)
+				local info = C_Container.GetContainerItemInfo(container, i)
+				--DA.DEBUG(2,"info="..DA.DUMP1(info))
+				local id = info.itemID
+				local count = info.stackCount
 				--DA.DEBUG(2,"id="..tostring(id))
 				local name = string.match(item,"%[.+%]")
+				--DA.DEBUG(2,"name="..tostring(name))
+				if name then 
+					name = string.sub(name,2,-2)	-- remove the brackets
+				else
+					name = item						-- when all else fails, use the link
+				end
+				if id then
+					table.insert(bags, {
+						["bag"]   = container,
+						["slot"]  = i,
+						["id"]  = id,
+						["name"] = name,
+						["count"] = count,
+						["slots"] = slots,			-- for debugging only
+						["free"] = freeSlots,		-- for debugging only
+						["type"] = bagType,			-- for debugging only
+					})
+					if not bagData[id] then
+						bagData[id] = 0
+					end
+					bagData[id] = bagData[id] + count
+				end
+			end
+		end
+		Skillet.db.realm.bagDetails[player]["B"..tostring(container)] = bags
+	end
+end
+
+local function indexBank()
+	DA.DEBUG(0,"indexBank()")
+--
+-- bank contains detailed contents of each tab,slot which 
+-- is only needed while the bank is open.
+--
+-- bankData is a count by item.
+--
+	local player = Skillet.currentPlayer
+	local bankData = Skillet.db.realm.bankData[player]
+	local bankBags = {-1,6,7,8,9,10,11,12,-3}	-- -1 is main bank, -3 is reagent bank
+	DA.DEBUG(0,"indexBank: NUM_BAG_SLOTS= "..tostring(NUM_BAG_SLOTS)..", NUM_BANKGENERIC_SLOTS= "..tostring(NUM_BANKGENERIC_SLOTS)..", NUM_BANKBAGSLOTS= "..tostring(NUM_BANKBAGSLOTS))
+
+	for _, container in pairs(bankBags) do
+		bank = {}
+		local slots = C_Container.GetContainerNumSlots(container)
+		local freeSlots, bagType = C_Container.GetContainerNumFreeSlots(container)
+		DA.DEBUG(1,"container="..tostring(container)..", slots="..tostring(slots))
+		for i = 1, slots, 1 do
+			local item = C_Container.GetContainerItemLink(container, i)
+			--DA.DEBUG(2,"item="..tostring(item))
+			if item then
+				local info = C_Container.GetContainerItemInfo(container, i)
+				--DA.DEBUG(2,"info="..DA.DUMP1(info))
+				local id = info.itemID
+				local count = info.stackCount
+				--DA.DEBUG(2,"id="..tostring(id))
+				local name = string.match(item,"%[.+%]")
+				--DA.DEBUG(2,"name="..tostring(name))
 				if name then 
 					name = string.sub(name,2,-2)	-- remove the brackets
 				else
@@ -335,6 +400,9 @@ local function indexBank()
 						["id"]  = id,
 						["name"] = name,
 						["count"] = count,
+						["slots"] = slots,			-- for debugging only
+						["free"] = freeSlots,		-- for debugging only
+						["type"] = bagType,			-- for debugging only
 					})
 					if not bankData[id] then
 						bankData[id] = 0
@@ -343,12 +411,12 @@ local function indexBank()
 				end
 			end
 		end
+		Skillet.db.realm.bankDetails[player]["B"..tostring(container)] = bank
 	end
-	Skillet.db.realm.bankDetails[player] = bank
 end
 
 local function indexGuildBank(tab)
-	--DA.DEBUG(0,"indexGuildBank("..tostring(tab)..")")
+	DA.DEBUG(0,"indexGuildBank("..tostring(tab)..")")
 --
 -- Build a current view of the contents of the Guildbank (one tab at a time).
 --
@@ -362,10 +430,11 @@ local function indexGuildBank(tab)
 -- different realms (not connected) with the same name.
 --
 	if tab == 0 then return end		-- Something is wrong, don't make it worse.
+	guildbank = {}
 	local guildName = GetGuildInfo("player")
 	local cachedGuildbank = Skillet.db.global.cachedGuildbank
 	local name, icon, isViewable, canDeposit, numWithdrawals, remainingWithdrawals = GetGuildBankTabInfo(tab);
-	--DA.DEBUG(1,"indexGuildBank tab="..tab..", isViewable="..tostring(isViewable)..", canDeposit="..tostring(canDeposit)..", numWithdrawals="..tostring(numWithdrawals)..", remainingWithdrawals="..tostring(remainingWithdrawals))
+	DA.DEBUG(1,"indexGuildBank tab="..tab..", name="..tostring(name)..", isViewable="..tostring(isViewable)..", canDeposit="..tostring(canDeposit)..", numWithdrawals="..tostring(numWithdrawals)..", remainingWithdrawals="..tostring(remainingWithdrawals))
 	if isViewable then
 		if numWithdrawals~=0 then
 			for slot=1, MAX_GUILDBANK_SLOTS_PER_TAB or 98, 1 do
@@ -375,10 +444,18 @@ local function indexGuildBank(tab)
 					local _,count = GetGuildBankItemInfo(tab, slot)
 					local id = Skillet:GetItemIDFromLink(item)
 					if id then
+						local name = string.match(item,"%[.+%]")
+						--DA.DEBUG(2,"name="..tostring(name))
+						if name then 
+							name = string.sub(name,2,-2)	-- remove the brackets
+						else
+							name = item						-- when all else fails, use the link
+						end
 						table.insert(guildbank, {
 							["bag"]   = tab,
 							["slot"]  = slot,
 							["id"]  = id,
+							["name"] = name,
 							["count"] = count,
 						})
 						if not cachedGuildbank[guildName][id] then
@@ -390,14 +467,18 @@ local function indexGuildBank(tab)
 			end
 		end
 	end
+	if not Skillet.db.global.detailedGuildbank then
+		Skillet.db.global.detailedGuildbank = {}
+	end
+	Skillet.db.global.detailedGuildbank[name] = guildbank
 end
 
 function Skillet:indexAllGuildBankTabs()
+	DA.DEBUG(0,"indexAllGuildBankTabs()")
 	local numTabs = GetNumGuildBankTabs()
 	for tab=1, numTabs, 1 do
 		indexGuildBank(tab)
 	end
-	Skillet.db.global.detailedGuildbank = guildbank
 end
 
 --
@@ -436,6 +517,7 @@ function Skillet:BANKFRAME_CLOSED()
 	self.db.realm.bankData[player] = {}
 	bank = {}
 	indexBank()
+	indexBags()					-- for debugging only
 	bankFrameOpen = false
 	self:HideShoppingList()
 end
