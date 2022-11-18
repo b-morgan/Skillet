@@ -239,7 +239,7 @@ function Skillet:OnInitialize()
 -- recipes have changed (i.e. different reagent requirements) so
 -- we clear the saved variables recipe data just to be safe.
 --
-	local dataVersion = 9
+	local dataVersion = 10
 	local queueVersion = 1
 	local customVersion = 1
 	local recipeVersion = 1
@@ -437,6 +437,7 @@ function Skillet:FlushAllData()
 	Skillet.db.realm.bagDetails = {}
 	Skillet.db.realm.bankData = {}
 	Skillet.db.realm.bankDetails = {}
+	Skillet.db.global.detailedGuildbank = {}
 	Skillet.db.realm.userIgnoredMats = {}
 	Skillet:FlushCustomData()
 	Skillet:FlushQueueData()
