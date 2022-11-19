@@ -902,6 +902,33 @@ Skillet.options =
 			end,
 			order = 77
 		},
+		collectdetails = {
+			type = "toggle",
+			name = "Collect details",
+			desc = "Disable/Enable collecting bag, bank, guildbank details",
+			get = function()
+				return Skillet.db.profile.collectdetails
+			end,
+			set = function(self,value)
+				Skillet.db.profile.collectdetails = value
+			end,
+			order = 78
+		},
+		flushdetails = {
+			type = 'execute',
+			name = "Flush details",
+			desc = "Clear the collected bag, bank, guildbank details",
+			func = function()
+				if not (UnitAffectingCombat("player")) then
+					Skillet:FlushDetailData()
+					Skillet:InitializeDatabase(UnitName("player"))
+				else
+					DA.DEBUG(0,"|cff8888ffSkillet|r: Combat lockdown restriction." ..
+												  " Leave combat and try again.")
+				end
+			end,
+			order = 79
+		},
 
 --
 -- commands to manipulate the state of debugging code flags

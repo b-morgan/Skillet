@@ -243,6 +243,7 @@ function Skillet:OnInitialize()
 	local queueVersion = 1
 	local customVersion = 1
 	local recipeVersion = 1
+	local detailsVersion = 1
 	local _,wowBuild,_,wowVersion = GetBuildInfo();
 	self.wowBuild = wowBuild
 	self.wowVersion = wowVersion
@@ -258,6 +259,9 @@ function Skillet:OnInitialize()
 	elseif not self.db.global.recipeVersion or self.db.global.recipeVersion ~= recipeVersion then
 		self.db.global.recipeVersion = recipeVersion
 		self:FlushRecipeData()
+	elseif not self.db.global.detailsVersion or self.db.global.detailsVersion ~= detailsVersion then
+		self.db.global.detailsVersion = detailsVersion
+		self:FlushDetailData()
 	elseif not self.db.global.wowBuild or self.db.global.wowBuild ~= self.wowBuild then
 		self.db.global.wowBuild = self.wowBuild
 		self.db.global.wowVersion = self.wowVersion -- actually TOC version
@@ -433,15 +437,11 @@ function Skillet:FlushAllData()
 	Skillet.db.realm.tradeSkills = {}
 	Skillet.db.realm.auctionData = {}
 	Skillet.db.realm.inventoryData = {}
-	Skillet.db.realm.bagData = {}
-	Skillet.db.realm.bagDetails = {}
-	Skillet.db.realm.bankData = {}
-	Skillet.db.realm.bankDetails = {}
-	Skillet.db.global.detailedGuildbank = {}
 	Skillet.db.realm.userIgnoredMats = {}
 	Skillet:FlushCustomData()
 	Skillet:FlushQueueData()
 	Skillet:FlushRecipeData()
+	Skillet:FlushDetailData()
 	Skillet:InitializeMissingVendorItems()
 end
 
@@ -480,6 +480,19 @@ function Skillet:FlushRecipeData()
 	if Skillet.data and Skillet.data.recipeInfo then
 		Skillet.data.recipeInfo = {}
 	end
+end
+
+--
+-- Detailed contents of the bags, bank, and guildbank
+-- can take a lot of space so clearing these tables
+-- can free that up.
+--
+function Skillet:FlushDetailData()
+	Skillet.db.realm.bagData = {}
+	Skillet.db.realm.bagDetails = {}
+	Skillet.db.realm.bankData = {}
+	Skillet.db.realm.bankDetails = {}
+	Skillet.db.global.detailedGuildbank = {}
 end
 
 --
@@ -567,9 +580,6 @@ function Skillet:InitializeDatabase(player)
 			if not self.db.realm.inventoryData[player] then
 				self.db.realm.inventoryData[player] = {}
 			end
---
--- For debugging, having the contents of bags could be useful.
---
 			if not self.db.realm.bagData then
 				self.db.realm.bagData = {}
 			end
@@ -582,9 +592,6 @@ function Skillet:InitializeDatabase(player)
 			if not self.db.realm.bagDetails[player] then
 				self.db.realm.bagDetails[player] = {}
 			end
---
--- For debugging, having the contents of the bank could be useful.
---
 			if not self.db.realm.bankData then
 				self.db.realm.bankData = {}
 			end
