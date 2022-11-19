@@ -50,11 +50,13 @@ local FrameBackdrop = {
 
 local bags = {}					-- Detailed contents of player bags (debugging only)
 
+local banktab = {}
 local bank = {}					-- Detailed contents of the bank.
 local bankFrameOpen = false
 Skillet.bankBusy = false
 Skillet.bankQueue = {}
 
+local guildtab = {}
 local guildbank = {}			-- Detailed contents of the guildbank
 local guildbankFrameOpen = false
 Skillet.guildQueue = {}
@@ -355,7 +357,9 @@ local function indexBags()
 				end
 			end
 		end
-		Skillet.db.realm.bagDetails[player]["B"..tostring(container)] = bags
+		if Skillet.db.profile.collectdetails then
+			Skillet.db.realm.bagDetails[player]["B"..tostring(container)] = bags
+		end
 	end
 end
 
@@ -371,9 +375,9 @@ local function indexBank()
 	local bankData = Skillet.db.realm.bankData[player]
 	local bankBags = {-1,6,7,8,9,10,11,12,-3}	-- -1 is main bank, -3 is reagent bank
 	DA.DEBUG(0,"indexBank: NUM_BAG_SLOTS= "..tostring(NUM_BAG_SLOTS)..", NUM_BANKGENERIC_SLOTS= "..tostring(NUM_BANKGENERIC_SLOTS)..", NUM_BANKBAGSLOTS= "..tostring(NUM_BANKBAGSLOTS))
-
+	bank = {}
 	for _, container in pairs(bankBags) do
-		bank = {}
+		banktab = {}
 		local slots = C_Container.GetContainerNumSlots(container)
 		local freeSlots, bagType = C_Container.GetContainerNumFreeSlots(container)
 		DA.DEBUG(1,"container="..tostring(container)..", slots="..tostring(slots))
@@ -394,7 +398,7 @@ local function indexBank()
 					name = item						-- when all else fails, use the link
 				end
 				if id then
-					table.insert(bank, {
+					local slot = {
 						["bag"]   = container,
 						["slot"]  = i,
 						["id"]  = id,
@@ -403,7 +407,9 @@ local function indexBank()
 						["slots"] = slots,			-- for debugging only
 						["free"] = freeSlots,		-- for debugging only
 						["type"] = bagType,			-- for debugging only
-					})
+					}
+					table.insert(banktab, slot)
+					table.insert(bank, slot)
 					if not bankData[id] then
 						bankData[id] = 0
 					end
@@ -411,7 +417,9 @@ local function indexBank()
 				end
 			end
 		end
-		Skillet.db.realm.bankDetails[player]["B"..tostring(container)] = bank
+		if Skillet.db.profile.collectdetails then
+			Skillet.db.realm.bankDetails[player]["B"..tostring(container)] = banktab
+		end
 	end
 end
 
@@ -430,10 +438,10 @@ local function indexGuildBank(tab)
 -- different realms (not connected) with the same name.
 --
 	if tab == 0 then return end		-- Something is wrong, don't make it worse.
-	guildbank = {}
+	guildtab = {}
 	local guildName = GetGuildInfo("player")
 	local cachedGuildbank = Skillet.db.global.cachedGuildbank
-	local name, icon, isViewable, canDeposit, numWithdrawals, remainingWithdrawals = GetGuildBankTabInfo(tab);
+	local tabname, icon, isViewable, canDeposit, numWithdrawals, remainingWithdrawals = GetGuildBankTabInfo(tab);
 	DA.DEBUG(1,"indexGuildBank tab="..tab..", name="..tostring(name)..", isViewable="..tostring(isViewable)..", canDeposit="..tostring(canDeposit)..", numWithdrawals="..tostring(numWithdrawals)..", remainingWithdrawals="..tostring(remainingWithdrawals))
 	if isViewable then
 		if numWithdrawals~=0 then
@@ -451,13 +459,15 @@ local function indexGuildBank(tab)
 						else
 							name = item						-- when all else fails, use the link
 						end
-						table.insert(guildbank, {
+						local slot = {
 							["bag"]   = tab,
 							["slot"]  = slot,
 							["id"]  = id,
 							["name"] = name,
 							["count"] = count,
-						})
+						}
+						table.insert(guildtab, slot)
+						table.insert(guildbank, slot)
 						if not cachedGuildbank[guildName][id] then
 							cachedGuildbank[guildName][id] = 0
 						end
@@ -470,14 +480,11 @@ local function indexGuildBank(tab)
 	if not Skillet.db.global.detailedGuildbank then
 		Skillet.db.global.detailedGuildbank = {}
 	end
-	Skillet.db.global.detailedGuildbank[name] = guildbank
-end
-
-function Skillet:indexAllGuildBankTabs()
-	DA.DEBUG(0,"indexAllGuildBankTabs()")
-	local numTabs = GetNumGuildBankTabs()
-	for tab=1, numTabs, 1 do
-		indexGuildBank(tab)
+	if not Skillet.db.global.detailedGuildbank[guildName] then
+		Skillet.db.global.detailedGuildbank[guildName] = {}
+	end
+	if Skillet.db.profile.collectdetails then
+		Skillet.db.global.detailedGuildbank[guildName][tabname] = guildtab
 	end
 end
 
