@@ -315,9 +315,6 @@ local function indexBags()
 	local player = Skillet.currentPlayer
 	local bagData = Skillet.db.realm.bagData[player]
 	local Bags = {0,1,2,3,4,5}
-	DA.DEBUG(0,"indexBags: NUM_BAG_SLOTS= "..tostring(NUM_BAG_SLOTS))
-
---	for container = NUM_BAG_SLOTS + 2, NUM_BAG_SLOTS + NUM_BANKBAGSLOTS + 1 do -- 6 to 12
 	for _, container in pairs(Bags) do
 		bags = {}
 		local slots = C_Container.GetContainerNumSlots(container)
@@ -357,7 +354,7 @@ local function indexBags()
 				end
 			end
 		end
-		if Skillet.db.profile.collectdetails then
+		if Skillet.db.profile.collect_details then
 			Skillet.db.realm.bagDetails[player]["B"..tostring(container)] = bags
 		end
 	end
@@ -374,7 +371,7 @@ local function indexBank()
 	local player = Skillet.currentPlayer
 	local bankData = Skillet.db.realm.bankData[player]
 	local bankBags = {-1,6,7,8,9,10,11,12,-3}	-- -1 is main bank, -3 is reagent bank
-	DA.DEBUG(0,"indexBank: NUM_BAG_SLOTS= "..tostring(NUM_BAG_SLOTS)..", NUM_BANKGENERIC_SLOTS= "..tostring(NUM_BANKGENERIC_SLOTS)..", NUM_BANKBAGSLOTS= "..tostring(NUM_BANKBAGSLOTS))
+	--DA.DEBUG(0,"indexBank: NUM_BAG_SLOTS= "..tostring(NUM_BAG_SLOTS)..", NUM_BANKGENERIC_SLOTS= "..tostring(NUM_BANKGENERIC_SLOTS)..", NUM_BANKBAGSLOTS= "..tostring(NUM_BANKBAGSLOTS))
 	bank = {}
 	for _, container in pairs(bankBags) do
 		banktab = {}
@@ -417,7 +414,7 @@ local function indexBank()
 				end
 			end
 		end
-		if Skillet.db.profile.collectdetails then
+		if Skillet.db.profile.collect_details then
 			Skillet.db.realm.bankDetails[player]["B"..tostring(container)] = banktab
 		end
 	end
@@ -442,7 +439,7 @@ local function indexGuildBank(tab)
 	local guildName = GetGuildInfo("player")
 	local cachedGuildbank = Skillet.db.global.cachedGuildbank
 	local tabname, icon, isViewable, canDeposit, numWithdrawals, remainingWithdrawals = GetGuildBankTabInfo(tab);
-	DA.DEBUG(1,"indexGuildBank tab="..tab..", name="..tostring(name)..", isViewable="..tostring(isViewable)..", canDeposit="..tostring(canDeposit)..", numWithdrawals="..tostring(numWithdrawals)..", remainingWithdrawals="..tostring(remainingWithdrawals))
+	--DA.DEBUG(1,"indexGuildBank tab="..tab..", name="..tostring(name)..", isViewable="..tostring(isViewable)..", canDeposit="..tostring(canDeposit)..", numWithdrawals="..tostring(numWithdrawals)..", remainingWithdrawals="..tostring(remainingWithdrawals))
 	if isViewable then
 		if numWithdrawals~=0 then
 			for slot=1, MAX_GUILDBANK_SLOTS_PER_TAB or 98, 1 do
@@ -483,7 +480,7 @@ local function indexGuildBank(tab)
 	if not Skillet.db.global.detailedGuildbank[guildName] then
 		Skillet.db.global.detailedGuildbank[guildName] = {}
 	end
-	if Skillet.db.profile.collectdetails then
+	if Skillet.db.profile.collect_details then
 		Skillet.db.global.detailedGuildbank[guildName][tabname] = guildtab
 	end
 end
