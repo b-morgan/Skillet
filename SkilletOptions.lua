@@ -907,10 +907,10 @@ Skillet.options =
 			name = "Collect details",
 			desc = "Disable/Enable collecting bag, bank, guildbank details",
 			get = function()
-				return Skillet.db.profile.collectdetails
+				return Skillet.db.profile.collect_details
 			end,
 			set = function(self,value)
-				Skillet.db.profile.collectdetails = value
+				Skillet.db.profile.collect_details = value
 			end,
 			order = 78
 		},
