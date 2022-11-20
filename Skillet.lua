@@ -1083,12 +1083,12 @@ function Skillet:IsSupportedTradeskill(tradeID)
 		return false
 	end
 	if not tradeID or self.BlizzardSkillList[tradeID] or self.currentPlayer ~= UnitName("player") then
-		--DA.DEBUG(3,"IsSupportedTradeskill: BlizzardSkillList="..tostring(self.BlizzardSkillList[tradeID]))
+		DA.DEBUG(3,"IsSupportedTradeskill: BlizzardSkillList="..tostring(self.BlizzardSkillList[tradeID]))
 		return false
 	end
 	local ranks = self:GetSkillRanks(self.currentPlayer, tradeID)
 	if not ranks then
-		--DA.DEBUG(3,"IsSupportedTradeskill: not ranks")
+		DA.DEBUG(3,"IsSupportedTradeskill: not ranks")
 		return false
 	end
 	return true
@@ -1100,25 +1100,26 @@ end
 function Skillet:IsNotSupportedFollower(tradeID)
 	--DA.DEBUG(0,"IsNotSupportedFollower("..tostring(tradeID)..")")
 	Skillet.wasNPCCrafting = false
-	if self:IsModKey3Down() then
+	if self:IsModKey1Down() and self:IsModKey3Down() then
 		Skillet.wasNPCCrafting = true
-		--DA.DEBUG(3,"IsNotSupportedFollower: AltKeyDown")
+		DA.DEBUG(3,"IsNotSupportedFollower: ShiftKey and AltKey down")
 		return true -- Use Blizzard frame
 	end
 	if not tradeID then
-		--DA.DEBUG(3,"IsNotSupportedFollower: not tradeID")
+		DA.DEBUG(3,"IsNotSupportedFollower: not tradeID")
 		return true -- Unknown tradeskill, play it safe and use Blizzard frame
 	end
 	if C_TradeSkillUI.IsNPCCrafting() and Skillet.FollowerSkillList[tradeID] then
+		DA.DEBUG(3,"IsNotSupportedFollower: IsNPCCrafting and FollowerSkillList")
 		Skillet.wasNPCCrafting = true
-		--DA.DEBUG(3,"IsNotSupportedFollower: IsNPCCrafting and FollowerSkillList")
 		return true -- Any NPC for this tradeskill uses Blizzard Frame
 	end
 	local guid = UnitGUID("target")
 	if guid then
 		local gtype, zero, server_id, instance_id, zone_uid, npc_id, spawn_uid = strsplit("-",guid);
-		--DA.DEBUG(0,"IsNotSupportedFollower: IsNPCCrafting="..tostring(C_TradeSkillUI.IsNPCCrafting())..", gtype="..tostring(gtype)..", npc_id="..tostring(npc_id))
-		if self:IsModKey2Down() then
+		DA.DEBUG(3,"IsNotSupportedFollower: IsNPCCrafting="..tostring(C_TradeSkillUI.IsNPCCrafting())..", gtype="..tostring(gtype)..", npc_id="..tostring(npc_id))
+		if self:IsModKey2Down() and self:IsModKey3Down() then
+			DA.DEBUG(3,"IsNotSupportedFollower: CtrlKey and AltKey down")
 			Skillet.wasNPCCrafting = true
 			return false -- Use Skillet frame (mostly for debugging)
 		end
@@ -1248,9 +1249,9 @@ function Skillet:SkilletClose()
 	self:HideAllWindows()
 	if Skillet.wasNPCCrafting then
 		DA.DEBUG(0,"wasNPCCrafting")
+		Skillet.wasNPCCrafting = false
 		C_Garrison.CloseGarrisonTradeskillNPC()
 		C_Garrison.CloseTradeskillCrafter()
-		Skillet.wasNPCCrafting = false
 	end
 end
 
