@@ -1,5 +1,14 @@
 local addonName,addonTable = ...
-local DA = _G[addonName]
+local isRetail = WOW_PROJECT_ID == WOW_PROJECT_MAINLINE
+local isClassic = WOW_PROJECT_ID == WOW_PROJECT_CLASSIC
+local isBCC = WOW_PROJECT_ID == WOW_PROJECT_BURNING_CRUSADE_CLASSIC
+local isWrath = WOW_PROJECT_ID == WOW_PROJECT_WRATH_CLASSIC
+local DA
+if isRetail then
+	DA = _G[addonName] -- for DebugAids.lua
+else
+	DA = LibStub("AceAddon-3.0"):GetAddon("Skillet") -- for DebugAids.lua
+end
 --
 -- Chat and Debugging Aids
 --
@@ -66,8 +75,36 @@ function DA.CHAT(text)
 	print(DA.STATUS_COLOR..addonName..": "..text)
 end
 
+--
+-- If any logging is enabled, insert text into the debug log
+--
+function DA.MARK(text)
+	if DA.WarnLog or DA.DebugLogging or DA.TraceLog then
+		table.insert(DA.DebugLog,date().."(M): "..text)
+		if (table.getn(DA.DebugLog) > DA.MAXDEBUG) then
+			table.remove(DA.DebugLog,1)
+		end
+	end
+end
+
+--
+-- Print and MARK the text
+--
+function DA.MARK2(text)
+	print(text)
+	DA.MARK(text)
+end
+
+--
+-- CHAT and MARK the text
+--
+function DA.MARK3(text)
+	DA.CHAT(text)
+	DA.MARK(text)
+end
+
 function DA.WARN(...)
-	if not DA.WarnLog then return "" end
+	if not DA.WarnLog and not DA.DebugLogging then return "" end
 	local text = ""
 	local comma = ""
 	for i = 1, select("#", ...), 1 do
@@ -105,18 +142,6 @@ function DA.WARN(...)
 	table.insert(DA.DebugLog,date().."(W): "..text)
 	if (table.getn(DA.DebugLog) > DA.MAXDEBUG) then
 		table.remove(DA.DebugLog,1)
-	end
-end
-
---
--- If any logging is enabled, insert text into the debug log
---
-function DA.MARK(text)
-	if DA.WarnLog or DA.DebugLogging or DA.TraceLog then
-		table.insert(DA.DebugLog,date().."(M): "..text)
-		if (table.getn(DA.DebugLog) > DA.MAXDEBUG) then
-			table.remove(DA.DebugLog,1)
-		end
 	end
 end
 
