@@ -353,11 +353,11 @@ local function indexBags()
 					bagData[id] = bagData[id] + count
 				end
 			end
-		end
+		end  -- for slots
 		if Skillet.db.profile.collect_details then
 			Skillet.db.realm.bagDetails[player]["B"..tostring(container)] = bags
 		end
-	end
+	end -- for bags
 end
 
 local function indexBank()
