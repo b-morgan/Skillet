@@ -508,20 +508,30 @@ function Skillet:ScanPlayerTradeSkills(player)
 		if not self.db.realm.tradeSkills[player] then
 			self.db.realm.tradeSkills[player] = {}
 		end
+		self.spellOffset = {}
 		local prof1, prof2, archaeology, fishing, cooking, firstAid = GetProfessions()
 		--DA.DEBUG(3,"ScanPlayerTradeSkills: prof1= "..tostring(prof1)..", prof2= "..tostring(prof2)..", archaeology= "..tostring(archaeology)..", fishing= "..tostring(fishing)..", cooking= "..tostring(cooking)..", firstAid= "..tostring(firstAid))
 		if prof1 then
 			local name, icon, skillLevel, maxSkillLevel, numAbilities, spelloffset, skillLine, skillModifier, specializationIndex, specializationOffset = GetProfessionInfo(prof1)
 			--DA.DEBUG(3,"ScanPlayerTradeSkills: prof1 name= "..tostring(name)..", icon= "..tostring(icon)..", skillLevel= "..tostring(skillLevel)..", maxSkillLevel= "..tostring(maxSkillLevel)..", numAbilities= "..tostring(numAbilities)..", spelloffset= "..tostring(spelloffset)..", skillLine= "..tostring(skillLine)..", skillModifier= "..tostring(skillModifier)..", specializationIndex= "..tostring(specializationIndex)..", specializationOffset= "..tostring(specializationOffset))
+			self.spellOffset[name] = spelloffset
 		end
 		if prof2 then
 			local name, icon, skillLevel, maxSkillLevel, numAbilities, spelloffset, skillLine, skillModifier, specializationIndex, specializationOffset = GetProfessionInfo(prof2)
 			--DA.DEBUG(3,"ScanPlayerTradeSkills: prof2 name= "..tostring(name)..", icon= "..tostring(icon)..", skillLevel= "..tostring(skillLevel)..", maxSkillLevel= "..tostring(maxSkillLevel)..", numAbilities= "..tostring(numAbilities)..", spelloffset= "..tostring(spelloffset)..", skillLine= "..tostring(skillLine)..", skillModifier= "..tostring(skillModifier)..", specializationIndex= "..tostring(specializationIndex)..", specializationOffset= "..tostring(specializationOffset))
+			self.spellOffset[name] = spelloffset
+		end
+		if fishing then
+			local name, icon, skillLevel, maxSkillLevel, numAbilities, spelloffset, skillLine, skillModifier, specializationIndex, specializationOffset = GetProfessionInfo(fishing)
+			--DA.DEBUG(3,"ScanPlayerTradeSkills: fishing name= "..tostring(name)..", icon= "..tostring(icon)..", skillLevel= "..tostring(skillLevel)..", maxSkillLevel= "..tostring(maxSkillLevel)..", numAbilities= "..tostring(numAbilities)..", spelloffset= "..tostring(spelloffset)..", skillLine= "..tostring(skillLine)..", skillModifier= "..tostring(skillModifier)..", specializationIndex= "..tostring(specializationIndex)..", specializationOffset= "..tostring(specializationOffset))
+			self.spellOffset[name] = spelloffset
 		end
 		if cooking then
 			local name, icon, skillLevel, maxSkillLevel, numAbilities, spelloffset, skillLine, skillModifier, specializationIndex, specializationOffset = GetProfessionInfo(cooking)
 			--DA.DEBUG(3,"ScanPlayerTradeSkills: cooking name= "..tostring(name)..", icon= "..tostring(icon)..", skillLevel= "..tostring(skillLevel)..", maxSkillLevel= "..tostring(maxSkillLevel)..", numAbilities= "..tostring(numAbilities)..", spelloffset= "..tostring(spelloffset)..", skillLine= "..tostring(skillLine)..", skillModifier= "..tostring(skillModifier)..", specializationIndex= "..tostring(specializationIndex)..", specializationOffset= "..tostring(specializationOffset))
+			self.spellOffset[name] = spelloffset
 		end
+		--DA.DEBUG(3,"ScanPlayerTradeSkills: spellOffset= "..DA.DUMP1(self.spellOffset))
 		local skillRanksData = Skillet.db.realm.tradeSkills[player]
 		for i=1,#TradeSkillList,1 do
 			local id = TradeSkillList[i]
@@ -538,6 +548,7 @@ function Skillet:ScanPlayerTradeSkills(player)
 					skillRanksData[id].maxRank = 0
 					skillRanksData[id].name = name
 				end
+				skillRanksData[id].spellOffset = self.spellOffset[name]
 			end
 		end
 	end
@@ -726,8 +737,12 @@ local function GetRecipeList(player, tradeID)
 	for i, recipeID in ipairs(recipeIDs) do
 		local recipeInfo = C_TradeSkillUI.GetRecipeInfo(recipeID)
 		--DA.DEBUG(3,"GetRecipeList: i= "..tostring(i)..", recipeID= "..tostring(recipeID)..", recipeInfo.name= "..tostring(recipeInfo.name))
-		if recipeInfo.learned then
-			numLearned = numLearned + 1
+		if (not Skillet.unlearnedRecipes and recipeInfo.learned) or (Skillet.unlearnedRecipes and not recipeInfo.learned) then
+			if recipeInfo.learned then
+				numLearned = numLearned + 1
+			else
+				numUnlearned = numUnlearned + 1
+			end
 			--DA.DEBUG(3,"GetRecipeList: i= "..tostring(i)..", recipeID= "..tostring(recipeID)..", recipeInfo= "..DA.DUMP1(recipeInfo))
 			if recipeInfo.categoryID ~= currentCategoryID then
 				currentCategoryID = recipeInfo.categoryID
@@ -755,7 +770,11 @@ local function GetRecipeList(player, tradeID)
 				table.insert(dataList, recipeID)
 			end
 		else
-			numUnlearned = numUnlearned + 1
+			if recipeInfo.learned then
+				numLearned = numLearned + 1
+			else
+				numUnlearned = numUnlearned + 1
+			end
 		end
 	end
 	DA.DEBUG(0,"GetRecipeList: numLearned= "..tostring(numLearned)..", numUnlearned= "..tostring(numUnlearned))
