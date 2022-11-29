@@ -102,8 +102,8 @@ Skillet.TradeSkillAdditionalAbilities = {
 				{95787,"Lil' Ragnaros",false,true}, -- cooking pet
 				{134020,"Chef's_Hat",true,false}, -- cooking = Chef's Hat (toy)
 				},
-	[45357] =	{51005,"Milling"},			-- inscription = milling
-	[25229] =	{31252,"Prospecting"},		-- jewelcrafting = prospecting
+--	[45357] =	{51005,"Milling"},			-- inscription = milling
+--	[25229] =	{31252,"Prospecting"},		-- jewelcrafting = prospecting
 	[2018]	=	{
 				{126462,"Thermal_Anvil"},	-- blacksmithing = thermal anvil (item:87216)
 				{255650,"Forge_of_Light",false,false,true}, -- Lightforged Draenei racial skill
