@@ -1341,6 +1341,8 @@ end
 -- If called too quickly, delayNeeded is set and
 --   the change is deferred until DelayChange is called.
 --
+-- This triggers the whole rescan process via a TRADE_SKILL_SHOW event
+--
 function Skillet:ChangeTradeSkill(tradeID, tradeName)
 	DA.DEBUG(0,"ChangeTradeSkill("..tostring(tradeID)..", "..tostring(tradeName)..")")
 	if not self.delayChange then
@@ -1350,13 +1352,18 @@ function Skillet:ChangeTradeSkill(tradeID, tradeName)
 			self.changingTrade = tradeID
 			self.changingName = self.tradeSkillNamesByID[tradeID]
 			self.dialogSwitch = true
-			if tradeName == "Mining" then tradeName = "Mining Skills" end
+			if tradeName == "Mining" then tradeName = "Mining Journal" end
 			DA.DEBUG(0,"ChangeTradeSkill: changingTrade= "..tostring(self.changingTrade)..", changingName= "..tostring(self.changingName))
 			StaticPopup_Show("SKILLET_MANUAL_CHANGE", self.changingName)
 		else
-			if tradeName == "Mining" then tradeName = "Mining Skills" end
-			DA.DEBUG(1,"ChangeTradeSkill: executing CastSpellByName("..tostring(tradeName)..")")
-			CastSpellByName(tradeName) -- trigger the whole rescan process via a TRADE_SKILL_SHOW event
+			if self.spellOffset and self.spellOffset[tradeName] then
+				DA.DEBUG(1,"ChangeTradeSkill: executing CastSpell("..tostring(self.spellOffset[tradeName]+1)..",BOOKTYPE_PROFESSION)")
+				CastSpell(self.spellOffset[tradeName]+1,BOOKTYPE_PROFESSION)
+			else
+				if tradeName == "Mining" then tradeName = "Mining Journal" end
+				DA.DEBUG(1,"ChangeTradeSkill: executing CastSpellByName("..tostring(tradeName)..")")
+				CastSpellByName(tradeName)
+			end
 			self.delayTrade = tradeID
 			self.delayName = tradeName
 			self.delayChange = true
