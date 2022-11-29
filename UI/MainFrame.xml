@@ -3000,7 +3000,11 @@
 				<Scripts>
 					<OnClick>
 						Skillet:InventoryFilterButtons_Hide()
-						Skillet:DisplayShoppingList(false)
+						if Skillet:IsShoppingListVisible() then
+							Skillet:HideShoppingList()
+						else
+							Skillet:DisplayShoppingList(false)
+						end
 					</OnClick>
 				</Scripts>
 			</Button>
