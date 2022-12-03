@@ -1088,9 +1088,9 @@ end
 --
 -- Called to update the shopping list window
 --
+local num_buttons = 0
 function Skillet:UpdateShoppingListWindow(use_cached_recipes)
 	--DA.DEBUG(0,"UpdateShoppingListWindow("..tostring(use_cached_recipes)..")")
-	local num_buttons = 0
 	if not self.shoppingList or not self.shoppingList:IsVisible() then
 		return
 	end
