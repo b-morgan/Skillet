@@ -128,7 +128,7 @@ local function createIgnoreListFrame(self)
 end
 
 function Skillet:GetIgnoreList(player)
-	DA.DEBUG(0,"GetIgnoreList("..tostring(player)..")")
+	--DA.DEBUG(0,"GetIgnoreList("..tostring(player)..")")
 	local list = {}
 	local playerList
 	if player then
@@ -139,11 +139,11 @@ function Skillet:GetIgnoreList(player)
 			table.insert(playerList, player)
 		end
 	end
-	DA.DEBUG(0,"Ignored Mats list for: "..(player or "all players"))
+	--DA.DEBUG(0,"Ignored Mats list for: "..(player or "all players"))
 	for i=1,#playerList,1 do
 		local player = playerList[i]
 		local userIgnoredMats = self.db.realm.userIgnoredMats[player]
-		DA.DEBUG(1,"player: "..player)
+		--DA.DEBUG(1,"player: "..player)
 		if userIgnoredMats then
 			for id,link in pairs(userIgnoredMats) do
 				local entry = { ["player"] = player, ["id"] = id, ["link"] = link }
@@ -187,7 +187,7 @@ end
 -- Called to add a count to the Ignored List button in the main frame
 --
 function Skillet:UpdateIgnoredMatsButton()
-	DA.DEBUG(0,"UpdateIgnoredMatsButton()")
+	--DA.DEBUG(0,"UpdateIgnoredMatsButton()")
 	self.cachedIgnoreList = self:GetIgnoreList()
 	local numItems = #self.cachedIgnoreList
 	if numItems > 0 then
@@ -201,11 +201,11 @@ end
 -- Called to update the ignore list window
 --
 function Skillet:UpdateIgnoreListWindow()
-	DA.DEBUG(0,"UpdateIgnoreListWindow()")
+	--DA.DEBUG(0,"UpdateIgnoreListWindow()")
 	self.cachedIgnoreList = self:GetIgnoreList()
 	local numItems = #self.cachedIgnoreList
 	if not self.ignoreList or not self.ignoreList:IsVisible() then
-	    DA.DEBUG(0,"No ignoreList visible so return")
+		DA.DEBUG(0,"No ignoreList visible so return")
 		return
 	end
 	self:UpdateIgnoredMatsButton()
@@ -280,7 +280,7 @@ end
 -- Functions to show and hide the Ignorelist
 --
 function Skillet:DisplayIgnoreList()
-	DA.DEBUG(0,"DisplayIgnoreList()")
+	--DA.DEBUG(0,"DisplayIgnoreList()")
 	if not self.ignoreList then
 		self.ignoreList = createIgnoreListFrame(self)
 	end
