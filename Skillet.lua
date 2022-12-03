@@ -698,6 +698,8 @@ function Skillet:OnEnable()
 	self:RegisterEvent("UNIT_SPELLCAST_FAILED_QUIET")
 	self:RegisterEvent("UNIT_SPELLCAST_INTERRUPTED")
 	self:RegisterEvent("UPDATE_TRADESKILL_CAST_COMPLETE")
+	self:RegisterEvent("ITEM_COUNT_CHANGED")
+	self:RegisterEvent("TRADE_SKILL_ITEM_CRAFTED_RESULT")
 --
 -- Events needed to handle caching of item info
 --

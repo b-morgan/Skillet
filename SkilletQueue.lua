@@ -296,58 +296,62 @@ function Skillet:ProcessQueue(altMode)
 				Skillet:Print(L["Skipping"],recipe.name,"-",L["has cooldown of"],SecondsToTime(cooldown))
 				craftable = false
 			else
+				if command.recipeType == Enum.TradeskillRecipeType.Item then
 --
--- Required reagents
+-- Check required reagents
 --
-				for i=1,#recipe.reagentData do
-					local reagent = recipe.reagentData[i]
-					if command.recipeLevel and command.recipeLevel > 0 then
-						--DA.DEBUG(2,"ProcessQueue: recipeID= "..tostring(command.recipeID)..", recipeLevel= "..tostring(command.recipeLevel))
-						local reagentName, reagentTexture, reagentCount, playerReagentCount = C_TradeSkillUI.GetRecipeReagentInfo(command.recipeID, i, command.recipeLevel)
-						--DA.DEBUG(2,"ProcessQueue: reagentName= "..tostring(reagentName)..", reagentCount= "..tostring(reagentCount))
-						local reagentLink = C_TradeSkillUI.GetRecipeReagentItemLink(command.recipeID, i)
-						local reagentID = Skillet:GetItemIDFromLink(reagentLink)
-						if reagent.reagentID == reagentID then
-							reagent.numNeeded = reagentCount
-						else
-							DA.DEBUG(0,"ProcessQueue: Reagent Mismatch, i= "..tostring(i)..", reagentID= "..tostring(reagent.reagentID)..", mismatch= "..tostring(reagentID))
+					for i=1,#recipe.reagentData do
+						local reagent = recipe.reagentData[i]
+						if command.recipeLevel and command.recipeLevel > 0 then
+							--DA.DEBUG(2,"ProcessQueue: recipeID= "..tostring(command.recipeID)..", recipeLevel= "..tostring(command.recipeLevel))
+							local reagentName, reagentTexture, reagentCount, playerReagentCount = C_TradeSkillUI.GetRecipeReagentInfo(command.recipeID, i, command.recipeLevel)
+							--DA.DEBUG(2,"ProcessQueue: reagentName= "..tostring(reagentName)..", reagentCount= "..tostring(reagentCount))
+							local reagentLink = C_TradeSkillUI.GetRecipeReagentItemLink(command.recipeID, i)
+							local reagentID = Skillet:GetItemIDFromLink(reagentLink)
+							if reagent.reagentID == reagentID then
+								reagent.numNeeded = reagentCount
+							else
+								DA.DEBUG(0,"ProcessQueue: Reagent Mismatch, i= "..tostring(i)..", reagentID= "..tostring(reagent.reagentID)..", mismatch= "..tostring(reagentID))
+							end
 						end
-					end
-					local reagentName = GetItemInfo(reagent.reagentID) or reagent.reagentID
-					--DA.DEBUG(2,"id= "..tostring(reagent.reagentID)..", reagentName="..tostring(reagentName)..", numNeeded="..tostring(reagent.numNeeded))
-					local numInBoth = GetItemCount(reagent.reagentID,true)
-					local numInBags = GetItemCount(reagent.reagentID)
-					local numInBank =  numInBoth - numInBags
-					--DA.DEBUG(2,"numInBoth= "..tostring(numInBoth)..", numInBags="..tostring(numInBags)..", numInBank="..tostring(numInBank))
-					if numInBoth < reagent.numNeeded then
-						Skillet:Print(L["Skipping"],recipe.name,"-",L["need"],reagent.numNeeded*command.count,"x",reagentName,"("..L["have"],numInBoth..")")
-						craftable = false
-						break
-					end
-				end -- for
---
--- Optional reagents
---
-				if command.optionalReagents then
-					for i,reagentID in pairs(command.optionalReagents) do
-						--DA.DEBUG(2,"i= "..tostring(i)..", reagentID= "..tostring(reagentID))
-						local reagentName = GetItemInfo(reagentID) or reagentID
-						--DA.DEBUG(2,"oid= "..tostring(reagentID)..", reagentName="..tostring(reagentName)..", numNeeded="..tostring(command.count))
-						local numInBoth = GetItemCount(reagentID,true)
-						local numInBags = GetItemCount(reagentID)
+						local reagentName = GetItemInfo(reagent.reagentID) or reagent.reagentID
+						--DA.DEBUG(2,"id= "..tostring(reagent.reagentID)..", reagentName="..tostring(reagentName)..", numNeeded="..tostring(reagent.numNeeded))
+						local numInBoth = GetItemCount(reagent.reagentID,true)
+						local numInBags = GetItemCount(reagent.reagentID)
 						local numInBank =  numInBoth - numInBags
 						--DA.DEBUG(2,"numInBoth= "..tostring(numInBoth)..", numInBags="..tostring(numInBags)..", numInBank="..tostring(numInBank))
-						if numInBoth < command.count then
-							Skillet:Print(L["Skipping"],recipe.name,"-",L["need"],command.count,"x",reagentName,"("..L["have"],numInBoth..")")
+						if numInBoth < reagent.numNeeded then
+							Skillet:Print(L["Skipping"],recipe.name,"-",L["need"],reagent.numNeeded*command.count,"x",reagentName,"("..L["have"],numInBoth..")")
 							craftable = false
 							break
 						end
 					end -- for
-				end
+--
+-- Optional reagents
+--
+					if command.optionalReagents then
+						for i,reagentID in pairs(command.optionalReagents) do
+							--DA.DEBUG(2,"i= "..tostring(i)..", reagentID= "..tostring(reagentID))
+							local reagentName = GetItemInfo(reagentID) or reagentID
+							--DA.DEBUG(2,"oid= "..tostring(reagentID)..", reagentName="..tostring(reagentName)..", numNeeded="..tostring(command.count))
+							local numInBoth = GetItemCount(reagentID,true)
+							local numInBags = GetItemCount(reagentID)
+							local numInBank =  numInBoth - numInBags
+							--DA.DEBUG(2,"numInBoth= "..tostring(numInBoth)..", numInBags="..tostring(numInBags)..", numInBank="..tostring(numInBank))
+							if numInBoth < command.count then
+								Skillet:Print(L["Skipping"],recipe.name,"-",L["need"],command.count,"x",reagentName,"("..L["have"],numInBoth..")")
+								craftable = false
+								break
+							end
+						end -- for
+					end
 --
 -- Check for type Salvage
 --
-				if command.recipeType ~= Enum.TradeskillRecipeType.Salvage then
+--				elseif command.recipeType == Enum.TradeskillRecipeType.Enchant then
+--				elseif command.recipeType == Enum.TradeskillRecipeType.Recraft then
+--				elseif command.recipeType ~= Enum.TradeskillRecipeType.Salvage then
+				elseif command.recipeType ~= Enum.TradeskillRecipeType.Salvage then
 					craftable = false
 					break
 				end
@@ -375,72 +379,84 @@ function Skillet:ProcessQueue(altMode)
 				return
 			end
 			local recipe = self:GetRecipe(command.recipeID)
-			local numAvailable = C_TradeSkillUI.GetCraftableCount(command.recipeID) or 0
-			if numAvailable > 0 then
+			if command.recipeType == Enum.TradeskillRecipeType.Item then
+				local numAvailable = C_TradeSkillUI.GetCraftableCount(command.recipeID) or 0
+				if numAvailable > 0 then
+					self.processingSpell = self:GetRecipeName(command.recipeID)
+					self.processingSpellID = command.recipeID
+					self.processingPosition = qpos
+					self.processingCommand = command
+					self.adjustInventory = true
+	--
+	-- If alt down/right click - auto use items / like vellums
+	--
+					if altMode then
+						local itemID = Skillet:GetAutoTargetItem(command.tradeID)
+						if itemID then
+							self.processingCount = 1
+							DA.DEBUG(1,"altMode Crafting: "..tostring(self.processingSpell).." ("..tostring(command.recipeID)..") and using "..tostring(itemID))
+							self.queuecasting = true
+							self.processingCount = 1
+							C_TradeSkillUI.CraftRecipe(command.recipeID, 1)
+							UseItemByName(itemID)
+							self.queuecasting = false
+							return
+						end
+					end
+					if command.count > numAvailable then
+						command.count = numAvailable
+					end
+					DA.DEBUG(1,"Crafting: "..tostring(command.count).." of "..tostring(self.processingSpell).." ("..tostring(command.recipeID)..")")
+					self.queuecasting = true
+					self.processingCount = command.count
+					local recipeLevel = 0
+					if command.recipeLevel then
+						DA.DEBUG(1,"Optional: level= "..tostring(command.recipeLevel))
+						recipeLevel = command.recipeLevel
+					end
+					self.processingLevel = recipeLevel
+					local optionalReagentsArray = {}
+					if command.optionalReagents then
+						for i,reagentID in pairs(command.optionalReagents) do
+							--DA.DEBUG(2,"i= "..tostring(i)..", reagentID= "..tostring(reagentID))
+							table.insert(self.optionalReagentsArray, { itemID = reagentID, count = 1, slot = i, })
+						end -- for
+					end
+					--DA.DEBUG(1,"Optional: recipeLevel= "..tostring(recipeLevel)..", optionalReagentsArray= "..DA.DUMP1(optionalReagentsArray))
+					command.optionalReagentsArray = optionalReagentsArray
+					C_TradeSkillUI.CraftRecipe(command.recipeID, command.count, command.optionalReagentsArray, command.recipeLevel)
+				else
+--
+-- C_TradeSkillUI.GetCraftableCount failed
+--
+					DA.CHAT("Insufficent Materials available, count= "..tostring(command.count)..", numAvailable= "..tostring(numAvailable))
+					self.queuecasting = false
+				end
+			elseif command.recipeType == Enum.TradeskillRecipeType.Salvage then
+				local numAvailable
+				local itemLocation
+				DA.DEBUG(1,"salvageItem= "..tostring(command.salvageItem))
+				local targetItems = C_TradeSkillUI.GetCraftingTargetItems(recipe.salvage)
+				DA.DEBUG(2,"targetItems= "..DA.DUMP1(targetItems))
+				for i,targetItem in pairs(targetItems) do
+					if targetItem.itemID == command.salvageItem then
+						itemLocation = C_Item.GetItemLocation(targetItem.itemGUID)
+						numAvailable = targetItem.quantity / (recipe.numUsed or 1)
+					end
+				end
+				--DA.DEBUG(1,"itemLocation= "..DA.DUMP1(itemLocation))
+				command.itemLocation = itemLocation
+				if command.count > numAvailable then
+					command.count = numAvailable
+				end
 				self.processingSpell = self:GetRecipeName(command.recipeID)
 				self.processingSpellID = command.recipeID
 				self.processingPosition = qpos
 				self.processingCommand = command
-				self.adjustInventory = true
---
--- If alt down/right click - auto use items / like vellums
---
-				if altMode then
-					local itemID = Skillet:GetAutoTargetItem(command.tradeID)
-					if itemID then
-						self.processingCount = 1
-						DA.DEBUG(1,"altMode Crafting: "..tostring(self.processingSpell).." ("..tostring(command.recipeID)..") and using "..tostring(itemID))
-						self.queuecasting = true
-						self.processingCount = 1
-						C_TradeSkillUI.CraftRecipe(command.recipeID, 1)
-						UseItemByName(itemID)
-						self.queuecasting = false
-						return
-					end
-				end
-				if command.count > numAvailable then
-					command.count = numAvailable
-				end
-				DA.DEBUG(1,"Crafting: "..tostring(command.count).." of "..tostring(self.processingSpell).." ("..tostring(command.recipeID)..")")
-				self.queuecasting = true
 				self.processingCount = command.count
-				local optionalReagentsArray = {}
-				local recipeLevel = 0
-				if command.recipeLevel then
-					DA.DEBUG(1,"Optional: level= "..tostring(command.recipeLevel))
-					recipeLevel = command.recipeLevel
-				end
-				self.processingLevel = recipeLevel
-				if command.optionalReagents then
-					for i,reagentID in pairs(command.optionalReagents) do
-						--DA.DEBUG(2,"i= "..tostring(i)..", reagentID= "..tostring(reagentID))
-						table.insert(self.optionalReagentsArray, { itemID = reagentID, count = 1, slot = i, })
-					end -- for
-				end
-					--DA.DEBUG(1,"Optional: recipeLevel= "..tostring(recipeLevel)..", optionalReagentsArray= "..DA.DUMP1(optionalReagentsArray))
-					command.optionalReagentsArray = optionalReagentsArray
-					C_TradeSkillUI.CraftRecipe(command.recipeID, command.count, command.optionalReagentsArray, command.recipeLevel)
-			else
---
--- C_TradeSkillUI.GetCraftableCount failed
--- Check to see if this recipe is type Salvage
---
-				if command.recipeType == Enum.TradeskillRecipeType.Salvage then
-					local itemLocation
-					--DA.DEBUG(1,"salvageItem= "..tostring(command.salvageItem))
-					--DA.DEBUG(1,"target= "..DA.DUMP1(recipe.target))
-					for i,targetItem in pairs(recipe.target) do
-						if targetItem.itemID == command.salvageItem then
-							itemLocation = C_Item.GetItemLocation(targetItem.itemGUID)
-							break
-						end
-					end
-					--DA.DEBUG(1,"itemLocation= "..DA.DUMP1(itemLocation))
-					C_TradeSkillUI.CraftSalvage(command.recipeID, command.count, itemLocation)
-				else
-					DA.CHAT("Insufficent Materials available, count= "..tostring(command.count)..", numAvailable= "..tostring(numAvailable))
-					self.queuecasting = false
-				end
+				self.salvageItem = command.salvageItem
+				self.queuecasting = true
+				C_TradeSkillUI.CraftSalvage(command.recipeID, command.count, command.itemLocation)
 			end
 		else
 			DA.DEBUG(0,"Unsupported queue op: "..tostring(command.op))
@@ -515,12 +531,6 @@ end
 --
 -- Events associated with crafting spells
 --
---[[
-	{ Name = "unit", Type = "string", Nilable = false },
-	{ Name = "target", Type = "string", Nilable = false },
-	{ Name = "castGUID", Type = "string", Nilable = false },
-	{ Name = "spellID", Type = "number", Nilable = false },
---]]
 function Skillet:UNIT_SPELLCAST_SENT(event, unit, target, castGUID, spellID)
 	DA.TRACE("UNIT_SPELLCAST_SENT("..tostring(unit)..", "..tostring(target)..", "..tostring(castGUID)..", "..tostring(spellID)..")")
 	if unit == "player" then
@@ -528,11 +538,6 @@ function Skillet:UNIT_SPELLCAST_SENT(event, unit, target, castGUID, spellID)
 	end
 end
 
---[[
-	{ Name = "unitTarget", Type = "string", Nilable = false },
-	{ Name = "castGUID", Type = "string", Nilable = false },
-	{ Name = "spellID", Type = "number", Nilable = false },
---]]
 function Skillet:UNIT_SPELLCAST_START(event, unitTarget, castGUID, spellID)
 	DA.TRACE("UNIT_SPELLCAST_START("..tostring(unitTarget)..", "..tostring(castGUID)..", "..tostring(spellID)..")")
 	if unitTarget == "player" then
@@ -614,8 +619,24 @@ function Skillet:UNIT_SPELLCAST_STOP(event, unitTarget, castGUID, spellID)
 	end
 end
 
-function Skillet:UPDATE_TRADESKILL_CAST_COMPLETE(event)
-	DA.TRACE("UPDATE_TRADESKILL_CAST_COMPLETE()")
+function Skillet:UPDATE_TRADESKILL_CAST_COMPLETE(event, isScrapping)
+	DA.TRACE("UPDATE_TRADESKILL_CAST_COMPLETE("..tostring(isScrapping)..")")
+end
+
+function Skillet:ITEM_COUNT_CHANGED(event,itemID)
+	DA.TRACE("ITEM_COUNT_CHANGED("..tostring(itemID)..")")
+--[[
+	if itemID == self.salvageItem then
+		DA.DEBUG(0,"UNIT_SPELLCAST_SUCCEEDED: "..tostring(unitTarget)..", "..tostring(spellID))
+		self:ContinueCast(self.processingSpellID)
+	else
+		self:IgnoreCast(self.processingSpellID)
+	end
+--]]
+end
+
+function Skillet:TRADE_SKILL_ITEM_CRAFTED_RESULT(event, CraftingItemResultData)
+	DA.TRACE("TRADE_SKILL_ITEM_CRAFTED_RESULT("..DA.DUMP1(CraftingItemResultData)..")")
 end
 
 --
@@ -646,6 +667,7 @@ function Skillet:ContinueCast(spellID)
 			self.processingPosition = nil
 			self.processingCommand = nil
 			self.processingLevel = nil
+			self.salvageItem = nil
 		end
 	end
 end
@@ -663,6 +685,7 @@ function Skillet:StopCast(spellID)
 	self.processingCommand = nil
 	self.processingLevel = nil
 	self.processingCount = nil
+	self.salvageItem = nil
 end
 
 --
