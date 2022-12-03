@@ -128,7 +128,7 @@ function Skillet:GetAutoTargetItem(addSpellID)
 end
 
 function Skillet:GetAutoTargetMacro(addSpellID, toy, pet, petGUID)
-	DA.DEBUG(0,"GetAutoTargetMacro("..tostring(addSpellID)..", "..tostring(toy)..", "..tostring(pet)..", "..tostring(petGUID)..")")
+	--DA.DEBUG(0,"GetAutoTargetMacro("..tostring(addSpellID)..", "..tostring(toy)..", "..tostring(pet)..", "..tostring(petGUID)..")")
 	if toy then
 		local _, name = C_ToyBox.GetToyInfo(addSpellID)
 		return "/cast "..(name or "")
@@ -793,8 +793,8 @@ local function ScanTrade()
 	local parentSkillLineID, parentSkillLineName, skillLineRank, skillLineMaxRank
 	local baseInfo = C_TradeSkillUI.GetBaseProfessionInfo()
 	local childInfo = C_TradeSkillUI.GetChildProfessionInfo()
-	DA.DEBUG(1,"ScanTrade: GetBaseProfessionInfo()= "..DA.DUMP1(baseInfo))
-	DA.DEBUG(1,"ScanTrade: GetChildProfessionInfo()= "..DA.DUMP1(childInfo))
+	--DA.DEBUG(1,"ScanTrade: GetBaseProfessionInfo= "..DA.DUMP1(baseInfo))
+	--DA.DEBUG(1,"ScanTrade: GetChildProfessionInfo= "..DA.DUMP1(childInfo))
 	if childInfo and childInfo.parentProfessionID then 
 		parentSkillLineID = childInfo.parentProfessionID
 		parentSkillLineName = childInfo.parentProfessionName
@@ -1070,6 +1070,7 @@ local function ScanTrade()
 
 		local recipeSchematic = C_TradeSkillUI.GetRecipeSchematic(recipeID, false)
 		--DA.DEBUG(2,"recipeSchematic= "..DA.DUMP(recipeSchematic))
+		recipe.recipeType = recipeSchematic.recipeType
 		local itemLink = C_TradeSkillUI.GetRecipeItemLink(recipeID)
 		--DA.DEBUG(2,"recipeID= "..tostring(recipeID)..", itemLink = "..DA.PLINK(itemLink))
 		recipeInfo.itemLink = itemLink	-- save a copy for our records
@@ -1097,7 +1098,7 @@ local function ScanTrade()
 					end
 				end
 			elseif recipeInfo.alternateVerb == ENSCRIBE then -- use the itemID of the scroll created by using the enchant on vellum
-				DA.DEBUG(2,"ScanTrade: recipeID= "..tostring(recipeID)..", alternateVerb= "..tostring(recipeInfo.alternateVerb))
+				DA.DEBUG(2,"ScanTrade: recipeID= "..tostring(recipeID)..", name= "..tostring(recipeInfo.name)..", alternateVerb= "..tostring(recipeInfo.alternateVerb))
 				recipeInfo.numMade = 1		-- save a copy for our records
 				if Skillet.scrollData[recipeID] then					-- note that this table is maintained by datamining
 					recipeInfo.itemID = Skillet.scrollData[recipeID]	-- save a copy for our records
@@ -1107,7 +1108,7 @@ local function ScanTrade()
 					DA.DEBUG(0,"ScanTrade: recipeID= "..tostring(recipeID).." has no scrollData")
 				end
 			else
-				DA.DEBUG(2,"ScanTrade: recipeID= "..tostring(recipeID)..", alternateVerb= "..tostring(recipeInfo.alternateVerb))
+				DA.DEBUG(2,"ScanTrade: recipeID= "..tostring(recipeID)..", name= "..tostring(recipeInfo.name)..", alternateVerb= "..tostring(recipeInfo.alternateVerb))
 				recipeInfo.numMade = 1		-- save a copy for our records
 			end
 			if recipe.numMade > 1 then
@@ -1120,14 +1121,29 @@ local function ScanTrade()
 			end
 			Skillet:ItemDataAddRecipeSource(itemID,recipeID) -- add a cross reference for the source of this item
 		else
-			DA.DEBUG(2,"ScanTrade: recipeID= "..tostring(recipeID).." has no itemLink")
+			DA.DEBUG(0,"ScanTrade: recipeID= "..tostring(recipeID).." has no itemLink")
 		end
-
+--
+-- Process reagents
+--
 		local basicData = {}
 		local numBasic = 0
 		local optionalData = {}
 		local numOptional = 0
 		local reagentString = "-"
+		if recipeSchematic.recipeType == Enum.TradeskillRecipeType.Salvage then -- 2
+			DA.DEBUG(2,"ScanTrade: recipeID= "..tostring(recipeID)..", name= "..tostring(recipeInfo.name)..", recipeInfo= "..DA.DUMP(recipeInfo))
+			DA.DEBUG(2,"ScanTrade: recipeSchematic= "..DA.DUMP(recipeSchematic))
+			local salvageIDs = C_TradeSkillUI.GetSalvagableItemIDs(recipeID)
+			DA.DEBUG(2,"ScanTrade: recipeID= "..tostring(recipeID)..", salvageIDs= "..DA.DUMP1(salvageIDs))
+			recipe.salvage = salvageIDs
+			local targetItems = C_TradeSkillUI.GetCraftingTargetItems(salvageIDs)
+			DA.DEBUG(2,"ScanTrade: recipeID= "..tostring(recipeID)..", targetItems= "..DA.DUMP1(targetItems))
+			recipe.target = targetItems
+		end
+		if recipeSchematic.recipeType == Enum.TradeskillRecipeType.Enchant then -- 3
+			--DA.DEBUG(2,"ScanTrade: recipeID= "..tostring(recipeID)..", name= "..tostring(recipeInfo.name).." is type Enchant")
+		end
 		local numReagents = #recipeSchematic.reagentSlotSchematics
 		for k = 1, numReagents do
 			local schematic = recipeSchematic.reagentSlotSchematics[k]
