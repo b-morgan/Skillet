@@ -1159,7 +1159,7 @@ function Skillet:SkilletShow()
 	local baseinfo = C_TradeSkillUI.GetBaseProfessionInfo()
 	--DA.DEBUG(3,"ScanPlayerTradeSkills: GetBaseProfessionInfo info= "..DA.DUMP1(baseinfo))
 	local childinfo = C_TradeSkillUI.GetChildProfessionInfos()
-	DA.DEBUG(3,"ScanPlayerTradeSkills: GetChildProfessionInfos info= "..DA.DUMP(childinfo))
+	--DA.DEBUG(3,"ScanPlayerTradeSkills: GetChildProfessionInfos info= "..DA.DUMP(childinfo))
 
 	self.currentTrade = self.tradeSkillIDsByName[baseinfo.professionName]	-- names are localized so use a table to translate
 
