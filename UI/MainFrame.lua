@@ -1698,6 +1698,7 @@ function Skillet:UpdateDetailWindow(skillIndex)
 	if self.currentSkillIndex ~= skillIndex then
 		self.currentSkillIndex = skillIndex
 		self.optionalSelected = {}
+		self.salvageSelected = {}
 		self.recipeRank = 0
 		self:HideOptionalList()
 	end
@@ -1848,14 +1849,14 @@ function Skillet:UpdateDetailWindow(skillIndex)
 	SkilletItemCountInputBox:SetText("" .. self.numItemsToCraft);
 	SkilletItemCountInputBox:HighlightText()
 --
--- Reagents required ...
+-- Required Reagents
 --
+	local lastReagentIndex = 1
+	local lastReagentButton = _G["SkilletReagent1"]
+	local width = SkilletReagentParent:GetWidth()
+	local numReagents = #recipe.reagentData
 	SkilletReagentLabel:SetText(SPELL_REAGENTS)
 	SkilletReagentLabel:Show();
-	local width = SkilletReagentParent:GetWidth()
-	local lastReagentButton = _G["SkilletReagent1"]
-	local lastReagentIndex = 1
-	local numReagents = #recipe.reagentData
 	for i=1, SKILLET_NUM_REAGENT_BUTTONS, 1 do
 		local button = _G["SkilletReagent"..i]
 		local   text = _G[button:GetName() .. "Text"]
@@ -1925,12 +1926,11 @@ function Skillet:UpdateDetailWindow(skillIndex)
 		end
 	end
 
---	if recipe.numOptional and recipe.numOptional ~= "0" then
+--
+-- Optional reagents
+--
 	if recipe.numOptional and recipe.numOptional > 0 then
 		--DA.DEBUG(0,"UpdateDetailWindow: recipeID= "..tostring(recipe.spellID)..", name= "..tostring(recipe.name)..", numOptional="..tostring(recipe.numOptional))
---
--- Recipe has optional reagents.
---
 		local categoryInfo = C_TradeSkillUI.GetCategoryInfo(recipeInfo.categoryID)
 		while not categoryInfo.skillLineCurrentLevel and categoryInfo.parentCategoryID do
 			categoryInfo = C_TradeSkillUI.GetCategoryInfo(categoryInfo.parentCategoryID)
@@ -1982,14 +1982,16 @@ function Skillet:UpdateDetailWindow(skillIndex)
 -- Show the type of reagent that can be used. The icon reflects useability.
 -- (do we need to prevent locked slots from being filled?)
 --
-					--DA.DEBUG(0,"UpdateDetailWindow: slotText= "..tostring(oreagent.schematic.slotInfo.slotText)..", categorySkillRank="..tostring(categorySkillRank)..", requiredSkillRank= "..tostring(oreagent.schematic.slotInfo.requiredSkillRank))
-					text:SetText(oreagent.schematic.slotInfo.slotText or OPTIONAL_REAGENT_POSTFIX)
-					if categorySkillRank >= oreagent.schematic.slotInfo.requiredSkillRank then
-						icon:SetNormalAtlas("itemupgrade_greenplusicon")
-					else
-						icon:SetNormalAtlas("AdventureMapIcon-Lock")
+					if oreagent.schematic then
+						--DA.DEBUG(0,"UpdateDetailWindow: slotText= "..tostring(oreagent.schematic.slotInfo.slotText)..", categorySkillRank="..tostring(categorySkillRank)..", requiredSkillRank= "..tostring(oreagent.schematic.slotInfo.requiredSkillRank))
+						text:SetText(oreagent.schematic.slotInfo.slotText or OPTIONAL_REAGENT_POSTFIX)
+						if categorySkillRank >= oreagent.schematic.slotInfo.requiredSkillRank then
+							icon:SetNormalAtlas("itemupgrade_greenplusicon")
+						else
+							icon:SetNormalAtlas("AdventureMapIcon-Lock")
+						end
+						count:SetText("")
 					end
-					count:SetText("")
 				end
 				icon:Show()
 				needed:SetText("")
@@ -2013,12 +2015,96 @@ function Skillet:UpdateDetailWindow(skillIndex)
 --
 -- Recipe has no optional reagents.
 --
-		--DA.DEBUG(0,"UpdateDetailWindow: (none) recipeID= "..tostring(recipe.spellID)..", name= "..tostring(recipe.name)..", numOptional="..tostring(recipe.numOptional))
+		DA.DEBUG(0,"UpdateDetailWindow: (none) recipeID= "..tostring(recipe.spellID)..", name= "..tostring(recipe.name)..", numOptional="..tostring(recipe.numOptional))
 		SkilletOptionalLabel:SetText("")
 		SkilletOptionalLabel:Hide()
 		Skillet.optionalSelected = {}
 	end
 
+	if recipe.salvage then
+		local numSalvage = #recipe.salvage
+		DA.DEBUG(0,"UpdateDetailWindow: recipeID= "..tostring(recipe.spellID)..", name= "..tostring(recipe.name)..", numSalvage="..tostring(numSalvage))
+		local categoryInfo = C_TradeSkillUI.GetCategoryInfo(recipeInfo.categoryID)
+		while not categoryInfo.skillLineCurrentLevel and categoryInfo.parentCategoryID do
+			categoryInfo = C_TradeSkillUI.GetCategoryInfo(categoryInfo.parentCategoryID)
+		end
+		local categorySkillRank = categoryInfo.skillLineCurrentLevel or 0
+		DA.DEBUG(0,"UpdateDetailWindow: categorySkillRank="..tostring(categorySkillRank))
+		DA.DEBUG(0,"UpdateDetailWindow: lastReagentIndex="..tostring(lastReagentIndex))
+		lastReagentIndex = lastReagentIndex + 1
+		lastReagentButton = _G["SkilletReagent"..tostring(lastReagentIndex)]
+		local j = 1
+		for i= lastReagentIndex, SKILLET_NUM_REAGENT_BUTTONS, 1 do
+			local button = _G["SkilletReagent"..i]
+			local   text = _G[button:GetName() .. "Text"]
+			local   icon = _G[button:GetName() .. "Icon"]
+			local  count = _G[button:GetName() .. "Count"]
+			local needed = _G[button:GetName() .. "Needed"]
+--
+-- Each salvage reagent slot will be filled with the type of
+-- reagent or the reagent that has been selected for that slot
+--
+			if j == 1 then
+				DA.DEBUG(0,"UpdateDetailWindow: salvageSelected= "..DA.DUMP1(self.salvageSelected))
+				local oselected
+				if self.salvageSelected then
+					oselected = self.salvageSelected[j]
+				end
+				if oselected then
+--
+-- A salvage reagent has been selected for this slot
+--
+					DA.DEBUG(0,"UpdateDetailWindow: oselected= "..tostring(oselected))
+					local name = GetItemInfo(oselected)
+					text:SetText(name)
+					texture = GetItemIcon(oselected)
+					icon:SetNormalTexture(texture)
+					local num, craftable = self:GetInventory(self.currentPlayer, oselected)
+					local count_text
+					if craftable > 0 then
+						count_text = string.format("[%d/%d]", num, craftable)
+					else
+						count_text = string.format("[%d]", num)
+					end
+					count:SetText(count_text)
+				else
+--
+-- Show the type of reagent that can be used. The icon reflects useability.
+-- (do we need to prevent locked slots from being filled?)
+--
+					DA.DEBUG(0,"UpdateDetailWindow: salvage= "..DA.DUMP1(recipe.salvage))
+					text:SetText(PROFESSIONS_ADD_SALVAGE)
+					icon:SetNormalAtlas("itemupgrade_greenplusicon")
+					count:SetText("")
+				end
+				icon:Show()
+				needed:SetText("")
+				button:SetID(j * -1)
+				button:SetWidth(width - 20)
+				button:Enable()
+				button:Show()
+				lastReagentButton = button
+				lastReagentIndex = i
+				j = j + 1
+			else
+--
+-- Out of salvage reagents, don't need to show the button,
+-- or any of the text.
+--
+				button:Hide()
+				button:Disable()
+			end
+		end
+	else
+--
+-- Recipe has no salvage reagents
+--
+		DA.DEBUG(0,"UpdateDetailWindow: (no salvage) recipeID= "..tostring(recipe.spellID)..", name= "..tostring(recipe.name))
+		self.salvageSelected = {}
+	end
+--
+-- If we have stack of recipes, show the button pop the stack.
+--
 	if #skillStack > 0 then
 		SkilletPreviousItemButton:Show()
 	else

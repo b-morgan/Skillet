@@ -21,6 +21,11 @@ SKILLET_OPTIONAL_LIST_HEIGHT = 16
 
 local L = LibStub("AceLocale-3.0"):GetLocale("Skillet")
 
+function Skillet:OptionalListToggleHaveItems()
+	self.db.char.hide_unowned = not self.db.char.hide_unowned
+	self:HideOptionalList()
+end
+
 local num_buttons = 0
 
 -- ===========================================================================================
@@ -94,6 +99,8 @@ local function createOptionalListFrame(self)
 	titletext:SetShadowOffset(1,-1)
 	titletext:SetTextColor(1,1,1)
 	titletext:SetText("Skillet: Optional Reagents")
+	SkilletOptionalHaveItemsText:SetText(OPTIONAL_REAGENT_LIST_HIDE_UNOWNED)
+	SkilletOptionalHaveItems:SetChecked(Skillet.db.char.hide_unowned)
 --
 -- The frame enclosing the scroll list needs a border and a background .....
 --
@@ -111,7 +118,6 @@ local function createOptionalListFrame(self)
 	local OptionalListLocation = {
 		prefix = "OptionalListLocation_"
 	}
-
 --
 -- Ace Window manager library, allows the window position (and size)
 -- to be automatically saved
@@ -123,7 +129,7 @@ local function createOptionalListFrame(self)
 --
 -- lets play the resize me game!
 --
-	Skillet:EnableResize(frame, 320, 230, Skillet.UpdateOptionalListWindow)
+	Skillet:EnableResize(frame, 320, 240, Skillet.UpdateOptionalListWindow)
 --
 -- so hitting [ESC] will close the window
 --
@@ -148,7 +154,7 @@ function Skillet:UpdateOptionalListWindow()
 	DA.DEBUG(1,"UpdateOptionalListWindow: SkilletOptionalListParent height= "..tostring(height))
 	DA.DEBUG(1,"UpdateOptionalListWindow: SkilletOptionalListParent width= "..tostring(width))
 	local button_count = height / SKILLET_OPTIONAL_LIST_HEIGHT
-	button_count = math.floor(button_count)
+	button_count = math.floor(button_count) - 1
 	DA.DEBUG(1,"UpdateOptionalListWindow: numItems= "..tostring(numItems)..", button_count= "..tostring(button_count))
 --
 -- Update the scroll frame
@@ -163,6 +169,7 @@ function Skillet:UpdateOptionalListWindow()
 	local itemOffset = FauxScrollFrame_GetOffset(SkilletOptionalListList)
 	DA.DEBUG(1,"UpdateOptionalListWindow: itemOffset= "..tostring(itemOffset)..", width= "..tostring(width))
 	for i=1, button_count, 1 do
+		num_buttons = math.max(num_buttons, i)
 		local itemIndex = i + itemOffset
 		local  button = get_button(i)
 		local    text = _G[button:GetName() .. "Text"]
@@ -212,6 +219,13 @@ function Skillet:UpdateOptionalListWindow()
 			button:Hide()
 		end
 	end
+--
+-- Hide any of the buttons that we created, but don't need right now
+--
+	for i = button_count+1, num_buttons, 1 do
+		local button = get_button(i)
+		button:Hide()
+	end
 end
 
 --
@@ -245,19 +259,57 @@ end
 --
 -- Called when an optional reagent button in the Skillet detail frame is clicked
 --
+--[[
+	salvageIDs= { [1] = 89639, [2] = 87821, [3] = 79011, [4] = 79010, [5] = 72237, [6] = 72235, [7] = 72234 }
+	targetItems= { [1] = { ['hyperlink'] = |cffffffff|Hitem:72237::::::::49:64:::::::::|h[Rain Poppy]|h|r, ['quantity'] = 10, ['itemID'] = 72237, ['itemGUID'] = Item-71-0-4000000B6900DE09 } }", -- [306]
+
+	salvageIDs= { [1] = 13467, [2] = 13466, [3] = 13465, [4] = 13464, [5] = 13463, [6] = 8846, [7] = 8845, [8] = 8839, [9] = 8838, [10] = 8831, [11] = 4625, [12] = 3821, [13] = 3820, [14] = 3819, [15] = 3818, [16] = 3369, [17] = 3358, [18] = 3357, [19] = 3356, [20] = 3355, [21] = 2453, [22] = 2452, [23] = 2450, [24] = 2449, [25] = 2447, [26] = 785, [27] = 765 }
+	targetItems= { 
+	[1] = { ['hyperlink'] = |cffffffff|Hitem:765::::::::49:64:::::::::|h[Silverleaf]|h|r, ['quantity'] = 20, ['itemID'] = 2453, ['itemGUID'] = Item-71-0-4000000B83944D54 }, 
+	[2] = { ['hyperlink'] = |cffffffff|Hitem:765::::::::49:64:::::::::|h[Silverleaf]|h|r, ['quantity'] = 20, ['itemID'] = 3820, ['itemGUID'] = Item-71-0-4000000B839448CE }, 
+	[3] = { ['hyperlink'] = |cffffffff|Hitem:765::::::::49:64:::::::::|h[Silverleaf]|h|r, ['quantity'] = 20, ['itemID'] = 2447, ['itemGUID'] = Item-71-0-4000000B83AD6BB4 }, 
+	[4] = { ['hyperlink'] = |cffffffff|Hitem:765::::::::49:64:::::::::|h[Silverleaf]|h|r, ['quantity'] = 50, ['itemID'] = 765, ['itemGUID'] = Item-71-0-4000000B83AD5331 } }
+--]]
+
 function Skillet:OptionalReagentOnClick(button, mouse, skillIndex, reagentIndex)
 	DA.DEBUG(0,"OptionalReagentOnClick("..tostring(button)..", "..tostring(mouse)..", "..tostring(skillIndex)..", "..tostring(reagentIndex)..")")
 	local recipe = self:GetRecipeDataByTradeIndex(self.currentTrade, skillIndex)
-	local thisOptional = recipe.optionalData[reagentIndex * -1]
-	--DA.DEBUG(1,"OptionalReagentOnClick: thisOptional= "..DA.DUMP(thisOptional))
-	self.cachedOptionalList = thisOptional.schematic.reagents
-	self.cachedOptionalIndex = reagentIndex * -1
-	--DA.DEBUG(1,"OptionalReagentOnClick: cachedOptionalIndex= "..tostring(self.cachedOptionalIndex)..", cachedOptionalList= "..DA.DUMP1(self.cachedOptionalList))
+	if recipe.salvage then
+		SkilletOptionalHaveItems:Show()
+		self.cachedOptionalList = {}
+		DA.DEBUG(1,"OptionalReagentOnClick: salvage= "..DA.DUMP1(recipe.salvage))
+		local j = 1
+		for i=1, #recipe.salvage,1 do
+			if self.db.char.hide_unowned then
+				local num, craftable = self:GetInventory(self.currentPlayer, recipe.salvage[i])
+				if num > 0 or craftable > 0 then
+					self.cachedOptionalList[j] = {}
+					self.cachedOptionalList[j].itemID = recipe.salvage[i]
+					j = j + 1
+				end
+			else
+				self.cachedOptionalList[i] = {}
+				self.cachedOptionalList[i].itemID = recipe.salvage[i]
+			end
+		end
+		self.cachedOptionalIndex = reagentIndex * -1
+		DA.DEBUG(1,"OptionalReagentOnClick: cachedOptionalIndex= "..tostring(self.cachedOptionalIndex)..", cachedOptionalList= "..DA.DUMP1(self.cachedOptionalList))
+	else
+		SkilletOptionalHaveItems:Hide()
+		local thisOptional = recipe.optionalData[reagentIndex * -1]
+		DA.DEBUG(1,"OptionalReagentOnClick: thisOptional= "..DA.DUMP(thisOptional))
+		self.cachedOptionalList = thisOptional.schematic.reagents
+		self.cachedOptionalIndex = reagentIndex * -1
+		DA.DEBUG(1,"OptionalReagentOnClick: cachedOptionalIndex= "..tostring(self.cachedOptionalIndex)..", cachedOptionalList= "..DA.DUMP1(self.cachedOptionalList))
+	end
 	if mouse == "LeftButton" then
 		self:UpdateOptionalListWindow()
 	elseif mouse == "RightButton" then
 		if self.optionalSelected then
 			self.optionalSelected[self.cachedOptionalIndex] = nil
+		end
+		if self.salvageSelected then
+			self.salvageSelected[self.cachedOptionalIndex] = nil
 		end
 		self:UpdateDetailWindow(skillIndex)
 	end
@@ -316,17 +368,22 @@ function Skillet:OptionalButtonOnLeave(button, skillIndex, optionalIndex)
 end
 
 function Skillet:OptionalButtonOnClick(button, mouse, skillIndex, reagentIndex)
-	--DA.DEBUG(0,"OptionalButtonOnClick("..tostring(button)..", "..tostring(mouse)..", "..tostring(skillIndex)..", "..tostring(reagentIndex)..")")
+	DA.DEBUG(0,"OptionalButtonOnClick("..tostring(button)..", "..tostring(mouse)..", "..tostring(skillIndex)..", "..tostring(reagentIndex)..")")
 	local oreagentID = self.cachedOptionalList[reagentIndex].itemID
 	if not self.optionalSelected then
 		self.optionalSelected = {}
 	end
+	if not self.salvageSelected then
+		self.salvageSelected = {}
+	end
 	if mouse == "LeftButton" then
 		self.optionalSelected[self.cachedOptionalIndex] = oreagentID
+		self.salvageSelected[self.cachedOptionalIndex] = oreagentID
 --		self:HideOptionalList()
 	elseif mouse == "RightButton" then
 		self.optionalSelected[self.cachedOptionalIndex] = nil
+		self.salvageSelected[self.cachedOptionalIndex] = nil
 	end
-	--DA.DEBUG(1,"OptionalButtonOnClick: cachedOptionalIndex= "..tostring(self.cachedOptionalIndex)..", oreagentID= "..tostring(oreagentID)..", optionalSelected= "..DA.DUMP1(self.optionalSelected))
+	DA.DEBUG(1,"OptionalButtonOnClick: cachedOptionalIndex= "..tostring(self.cachedOptionalIndex)..", oreagentID= "..tostring(oreagentID)..", optionalSelected= "..DA.DUMP1(self.optionalSelected))
 	self:UpdateDetailWindow(skillIndex)
 end

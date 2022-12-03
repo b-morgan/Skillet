@@ -111,8 +111,56 @@
 		</Scripts>
 	</Frame>
 
-<Frame name="SkilletOptionalList" parent="UIParent" toplevel="true" movable="true" enableMouse="true" resizable="true" hidden="true" inherits="BackdropTemplate">
-	<Size><AbsDimension x="320" y="230"/></Size>
+<CheckButton name="SkilletOptionalListCheckButtonTemplate" virtual="true">
+	<Size>
+		<AbsDimension x="20" y="20"/>
+	</Size>
+	<Layers>
+		<Layer level="ARTWORK">
+			<FontString name="$parentText" inherits="GameFontHighlightSmall">
+				<Anchors>
+					<Anchor point="RIGHT" relativePoint="LEFT">
+						<Offset>
+							<AbsDimension x="0" y="1"/>
+						</Offset>
+					</Anchor>
+				</Anchors>
+			</FontString>
+		</Layer>
+	</Layers>
+	<NormalTexture file="Interface\Buttons\UI-CheckBox-Up"/>
+	<PushedTexture file="Interface\Buttons\UI-CheckBox-Down"/>
+	<HighlightTexture file="Interface\Buttons\UI-CheckBox-Highlight" alphaMode="ADD"/>
+	<CheckedTexture file="Interface\Buttons\UI-CheckBox-Check"/>
+	<DisabledCheckedTexture file="Interface\Buttons\UI-CheckBox-Check-Disabled"/>
+</CheckButton>
+
+<CheckButton name="SkilletOptionalListCheckButtonTemplate2" virtual="true">
+	<Size>
+		<AbsDimension x="20" y="20"/>
+	</Size>
+	<Layers>
+		<Layer level="ARTWORK">
+			<FontString name="$parentText" inherits="GameFontHighlightSmall">
+				<Anchors>
+					<Anchor point="LEFT" relativePoint="RIGHT">
+						<Offset>
+							<AbsDimension x="0" y="1"/>
+						</Offset>
+					</Anchor>
+				</Anchors>
+			</FontString>
+		</Layer>
+	</Layers>
+	<NormalTexture file="Interface\Buttons\UI-CheckBox-Up"/>
+	<PushedTexture file="Interface\Buttons\UI-CheckBox-Down"/>
+	<HighlightTexture file="Interface\Buttons\UI-CheckBox-Highlight" alphaMode="ADD"/>
+	<CheckedTexture file="Interface\Buttons\UI-CheckBox-Check"/>
+	<DisabledCheckedTexture file="Interface\Buttons\UI-CheckBox-Check-Disabled"/>
+</CheckButton>
+
+<Frame name="SkilletOptionalList" parent="UIParent" toplevel="true" movable="true" enableMouse="true" resizable="true" hidden="true" clampedToScreen="true" inherits="BackdropTemplate">
+	<Size><AbsDimension x="320" y="240"/></Size>
 	<Anchors>
 		<Anchor point="CENTER"/>
 	</Anchors>
@@ -131,6 +179,21 @@
 				</OnClick>
 			</Scripts>
 		</Button>
+		<CheckButton name="SkilletOptionalHaveItems" inherits="SkilletShoppingListCheckButtonTemplate2">
+			<Anchors>
+				<Anchor point="BOTTOMLEFT" relativeTo="SkilletOptionalList" relativePoint="BOTTOMLEFT">
+					<Offset>
+						<AbsDimension x="10" y="10"/>
+					</Offset>
+				</Anchor>
+			</Anchors>
+			<Scripts>
+				<OnClick>
+					Skillet:OptionalListToggleHaveItems()
+					Skillet:UpdateOptionalListWindow(false)
+				</OnClick>
+			</Scripts>
+		</CheckButton>
 		<Frame name="SkilletOptionalListParent" parent="SkilletOptionalList">
 			<Anchors>
 				<Anchor point="TOPLEFT" relativeTo="SkilletOptionalList" relativePoint="TOPLEFT">
@@ -140,7 +203,7 @@
 				</Anchor>
 				<Anchor point="BOTTOMRIGHT" relativeTo="SkilletOptionalList" relativePoint="BOTTOMRIGHT">
 					<Offset>
-						<AbsDimension x="-5" y="15"/>
+						<AbsDimension x="-5" y="35"/>
 					</Offset>
 				</Anchor>
 			</Anchors>
