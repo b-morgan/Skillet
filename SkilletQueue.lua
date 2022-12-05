@@ -468,26 +468,39 @@ end
 -- Adds the currently selected number of items to the queue
 --
 function Skillet:QueueItems(count)
-	DA.DEBUG(0,"QueueItems("..tostring(count)..")");
+	DA.DEBUG(0,"QueueItems("..tostring(count)..")")
 	if self.currentTrade and self.selectedSkill then
 		local skill = self:GetSkill(self.currentPlayer, self.currentTrade, self.selectedSkill)
 		if not skill then return 0 end
+		--DA.DEBUG(1,"QueueItems: skill= "..DA.DUMP1(skill))
 		local recipe = self:GetRecipe(skill.id)
-		local recipeID = skill.id
+		--DA.DEBUG(1,"QueueItems: recipe= "..DA.DUMP1(recipe))
 		if not count then
-			count = skill.numCraftable / (recipe.numMade or 1)
-			if count == 0 then
-				count = (skill.numCraftableVendor or 0)/ (recipe.numMade or 1)
-			end
-			if count == 0 then
-				count = (skill.numCraftableAlts or 0) / (recipe.numMade or 1)
+			if recipe.recipeType ~= Enum.TradeskillRecipeType.Salvage then
+				count = (skill.numCraftable or 0) / (recipe.numMade or 1)
+				if count == 0 then
+					count = (skill.numCraftableVendor or 0) / (recipe.numMade or 1)
+				end
+				if count == 0 then
+					count = (skill.numCraftableAlts or 0) / (recipe.numMade or 1)
+				end
+			else
+				count = 0
+				local salvageItem = self.salvageSelected[1]
+				local targetItems = C_TradeSkillUI.GetCraftingTargetItems(recipe.salvage)
+				--DA.DEBUG(2,"QueueItems: targetItems= "..DA.DUMP1(targetItems))
+				for i,targetItem in pairs(targetItems) do
+					if targetItem.itemID == salvageItem then
+						count = targetItem.quantity / (recipe.numUsed or 1)
+					end
+				end
 			end
 		end
 		count = math.min(count, 9999)
 		self.visited = {}
 		if count > 0 then
 			if recipe then
-				local queueCommand = self:QueueCommandIterate(recipeID, count)
+				local queueCommand = self:QueueCommandIterate(recipe.spellID, count)
 				self:QueueAppendCommand(queueCommand, Skillet.db.profile.queue_craftable_reagents)
 				self.optionalSelected = {}
 				self:HideOptionalList()
