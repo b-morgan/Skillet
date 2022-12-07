@@ -652,53 +652,26 @@ function Skillet:PrintAuctionData()
 end
 
 --
--- checks to see if this is a normal bag (not ammo, herb, enchanting, etc)
--- I borrowed this code from ClosetGnome.
---
-local function isNormalBag(bagId)
-	--DA.DEBUG(0, "isNormalBag("..tostring(bagId)..")")
---
--- backpack and bank are always normal
---
-	if bagId == 0 or bagId == -1 then return true end
-	local id = GetInventoryItemID("player", ContainerIDToInventoryID(bagId))
-	if not id then return false end
-	local itemName, itemLink, itemRarity, itemLevel, itemMinLevel, itemType, itemSubType, itemStackCount,
-	  itemEquipLoc, itemIcon, itemSellPrice, itemClassID, itemSubClassID, bindType, expacID, itemSetID, 
-	  isCraftingReagent = GetItemInfo(id)
---
--- is this one normal?
---
-	if itemClassID and itemSubClassID and itemClassID == LE_ITEM_CLASS_CONTAINER and itemSubClassID == 0 then return true end
---
--- not a normal bag
---
-	--DA.DEBUG(1, "isNormalBag: bagId= "..tostring(bagId)..", itemClassID= "..tostring(itemClassID)..", itemSubClassID= "..tostring(itemSubClassID))
-	--DA.DEBUG(1, "isNormalBag: itemType= "..tostring(itemType)..", itemSubType= "..tostring(itemSubType))
-	return false
-end
-
---
 -- Returns a bag that the item can be placed in.
 --
 local function findBagForItem(itemID, count)
-	--DA.DEBUG(0, "findBagForItem("..tostring(itemID)..", "..tostring(count)..")")
+	DA.DEBUG(0, "findBagForItem("..tostring(itemID)..", "..tostring(count)..")")
 	if not itemID then return nil end
 	local _, _, _, _, _, _, _, itemStackCount = GetItemInfo(itemID)
-	for container = 0, 4, 1 do
-		if isNormalBag(container) then
-			local bag_size = GetContainerNumSlots(container) -- 0 if there is no bag
-			--DA.DEBUG(1, "findBagForItem: container= "..tostring(container)..", bag_size= "..tostring(bag_size))
-			for slot = 1, bag_size, 1 do
-				local bagitem = GetContainerItemID(container, slot)
-				if bagitem then
-					if itemID == bagitem then
+	for container = 0, 5, 1 do
+		local bagSize = C_Container.GetContainerNumSlots(container)
+		local freeSlots, bagType = C_Container.GetContainerNumFreeSlots(container)
+		--DA.DEBUG(1, "findBagForItem: container= "..tostring(container)..", bagSize= "..tostring(bagSize)..", freeSlots= "..tostring(freeSlots)..", bagType= "..tostring(bagType))
+		if bagType == 0 then
+			for slot = 1, bagSize, 1 do
+				local bagItem = C_Container.GetContainerItemLink(container, slot)
+				if bagItem then
+					local info = C_Container.GetContainerItemInfo(container, slot)
+					if itemID == info.itemID then
 --
 -- found some of the same, it is a full stack or locked?
 --
-						local _, num_in_bag, locked  = GetContainerItemInfo(container, slot)
-						local space_available = itemStackCount - num_in_bag
-						if space_available >= count and not locked then
+						if (itemStackCount - info.stackCount) >= count and not info.isLocked then
 							--DA.DEBUG(1, "findBagForItem: container= "..tostring(container)..", slot= "..tostring(slot)..", true")
 							return container, slot, true
 						end
@@ -710,72 +683,73 @@ local function findBagForItem(itemID, count)
 					--DA.DEBUG(1, "findBagForItem: container= "..tostring(container)..", slot= "..tostring(slot)..", false")
 					return container, slot, false
 				end
-			end
-		else
-			DA.DEBUG(0, "findBagForItem: container= "..tostring(container).." is not a normal bag")
-		end
-	end
+			end -- for slot
+		end -- bagType
+	end -- for container
 	return nil, nil, nil
 end
 
 local function getItemFromBank(itemID, bag, slot, count)
-	--DA.DEBUG(0,"getItemFromBank(", itemID, bag, slot, count,")")
+	DA.DEBUG(0,"getItemFromBank("..tostring(itemID)..", "..tostring(bag)..", "..tostring(slot)..", "..tostring(count)..")")
 	ClearCursor()
-	local _, available = GetContainerItemInfo(bag, slot)
+	local info = C_Container.GetContainerItemInfo(bag, slot)
 	local num_moved = 0
+	local available = info.stackCount
 	if available then
 		if available == 1 or count >= available then
-			--DA.DEBUG(1,"PickupContainerItem(",bag,", ", slot,")")
-			PickupContainerItem(bag, slot)
+			--DA.DEBUG(1,"getItemFromBank: PickupContainerItem("..tostring(bag)..", "..tostring(slot)..")")
+			C_Container.PickupContainerItem(bag, slot)
 			num_moved = available
 		else
-			--DA.DEBUG(1,"SplitContainerItem(",bag, slot, count,")")
-			SplitContainerItem(bag, slot, count)
+			--DA.DEBUG(1,"getItemFromBank: SplitContainerItem("..tostring(bag)..", "..tostring(slot)..", "..tostring(count)..")")
+			C_Container.SplitContainerItem(bag, slot, count)
 			num_moved = count
 		end
 		local tobag, toslot = findBagForItem(itemID, num_moved)
-		--DA.DEBUG(1,"tobag=", tobag, " toslot=", toslot, " findBagForItem(", itemID, num_moved,")")
+		--DA.DEBUG(1,"getItemFromBank: tobag= "..tostring(tobag)..", toslot= "..tostring(toslot)..", findBagForItem("..tostring(itemID)..", "..tostring(num_moved)..")")
 		if not tobag then
-			Skillet:Print(L["Could not find bag space for"]..": "..GetContainerItemLink(bag, slot))
+			Skillet:Print(L["Could not find bag space for"]..": "..C_Container.GetContainerItemLink(bag, slot))
 			ClearCursor()
 			return 0
 		end
 		if tobag == 0 then
-			--DA.DEBUG(1,"PutItemInBackpack()")
+			--DA.DEBUG(1,"getItemFromBank: PutItemInBackpack()")
 			PutItemInBackpack()
 		else
-			--DA.DEBUG(1,"PutItemInBag(",ContainerIDToInventoryID(tobag),")")
-			PutItemInBag(ContainerIDToInventoryID(tobag))
+			DA.DEBUG(1,"PutItemInBag("..tostring(C_Container.ContainerIDToInventoryID(tobag))..")")
+			PutItemInBag(C_Container.ContainerIDToInventoryID(tobag))
 		end
+	else
+		--DA.DEBUG(1,"getItemFromBank: none available")
 	end
 	ClearCursor()
 	return num_moved
 end
 
 local function getItemFromGuildBank(itemID, bag, slot, count)
-	--DA.DEBUG(0,"getItemFromGuildBank(",itemID, bag, slot, count,")")
+	DA.DEBUG(0,"getItemFromGuildBank("..tostring(itemID)..", "..tostring(bag)..", "..tostring(slot)..", "..tostring(count)..")")
 	ClearCursor()
 	local _, available = GetGuildBankItemInfo(bag, slot)
 	local num_moved = 0
 	if available then
 		if available == 1 or count >= available then
-			--DA.DEBUG(1,"PickupGuildBankItem(",bag, slot,")")
+			--DA.DEBUG(1,"getItemFromGuildBank: PickupGuildBankItem("..tostring(bag)..", "..tostring(slot)..")")
 			PickupGuildBankItem(bag, slot)
 			num_moved = available
 		else
-			--DA.DEBUG(1,"SplitGuildBankItem(",bag, slot, count,")")
+			--DA.DEBUG(1,"getItemFromGuildBank: SplitGuildBankItem("..tostring(bag)..", "..tostring(slot)..", "..tostring(count)..")")
 			SplitGuildBankItem(bag, slot, count)
 			num_moved = count
 		end
 		local tobag, toslot = findBagForItem(itemID, num_moved)
-		--DA.DEBUG(1,"tobag=", tobag, " toslot=", toslot, " findBagForItem(", itemID, num_moved,")")
+		--DA.DEBUG(1,"getItemFromGuildBank: tobag= "..tostring(tobag)..", toslot= "..tostring(toslot)", findBagForItem("..tostring(itemID)..", "..tostring(num_moved)..")")
 		if not tobag then
 			Skillet:Print(L["Could not find bag space for"]..": "..GetGuildBankItemLink(bag, slot))
 			ClearCursor()
 			return 0
 		else
-			--DA.DEBUG(1,"PickupContainerItem(",tobag, toslot,")")
-			PickupContainerItem(tobag, toslot) -- actually puts the item in the bag
+			--DA.DEBUG(1,"getItemFromGuildBank: PickupContainerItem("..tostring(tobag)..", "..tostring(toslot)..")")
+			C_Container.PickupContainerItem(tobag, toslot) -- actually puts the item in the bag
 		end
 	end
 	ClearCursor()
@@ -787,7 +761,7 @@ end
 -- BANK_UPDATE (subset of BAG_UPDATE) and BAG_UPDATE_DELAYED events have fired.
 --
 local function processBankQueue(where)
-	--DA.DEBUG(0,"processBankQueue("..where..")")
+	--DA.DEBUG(0,"processBankQueue("..tostring(where)..")")
 	local bankQueue = Skillet.bankQueue
 	if Skillet.bankBusy then
 		--DA.DEBUG(1,"BANK_UPDATE and bankBusy")
@@ -816,6 +790,7 @@ local function processBankQueue(where)
 		end
 	end
 end
+
 function Skillet:UpdateBankQueue(where)
 	processBankQueue(where)
 end
@@ -973,7 +948,7 @@ end
 -- Gets all the reagents possible for queued recipes from the bank
 --
 function Skillet:GetReagentsFromBanks()
-	--DA.DEBUG(0,"GetReagentsFromBanks")
+	DA.DEBUG(0,"GetReagentsFromBanks()")
 	local list = self.cachedShoppingList
 	local incAlts = Skillet.db.char.include_alts
 	local name = UnitName("player")
