@@ -446,6 +446,25 @@ function Skillet:FlushAllData()
 end
 
 --
+-- Flush all data for the current player
+--
+function Skillet:FlushPlayerData()
+	local player = UnitName("player")
+	Skillet.db.realm.tradeSkills[player] = {}
+	Skillet.db.realm.auctionData[player] = {}
+	Skillet.db.realm.inventoryData[player] = {}
+	Skillet.db.realm.userIgnoredMats[player] = {}
+	Skillet.db.realm.bagData[player] = {}
+	Skillet.db.realm.bagDetails[player] = {}
+	Skillet.db.realm.bankData[player] = {}
+	Skillet.db.realm.bankDetails[player] = {}
+	Skillet.db.realm.queueData[player] = {}
+	Skillet.db.realm.reagentsInQueue[player] = {}
+	Skillet.db.realm.groupDB[player] = {}
+	Skillet.db.realm.options[player] = {}
+end
+
+--
 -- Custom Groups data could represent significant
 -- effort by the player so don't clear it without
 -- good cause.
@@ -1159,9 +1178,9 @@ function Skillet:SkilletShow()
 	end
 	self:ScanPlayerTradeSkills(self.currentPlayer)
 	local baseinfo = C_TradeSkillUI.GetBaseProfessionInfo()
-	--DA.DEBUG(3,"ScanPlayerTradeSkills: GetBaseProfessionInfo info= "..DA.DUMP1(baseinfo))
+	--DA.DEBUG(3,"SkilletShow: GetBaseProfessionInfo info= "..DA.DUMP1(baseinfo))
 	local childinfo = C_TradeSkillUI.GetChildProfessionInfos()
-	--DA.DEBUG(3,"ScanPlayerTradeSkills: GetChildProfessionInfos info= "..DA.DUMP(childinfo))
+	--DA.DEBUG(3,"SkilletShow: GetChildProfessionInfos info= "..DA.DUMP(childinfo))
 
 	self.currentTrade = self.tradeSkillIDsByName[baseinfo.professionName]	-- names are localized so use a table to translate
 

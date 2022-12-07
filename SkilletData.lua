@@ -505,9 +505,7 @@ function Skillet:ScanPlayerTradeSkills(player)
 		if not self.db.realm.tradeSkills then
 			self.db.realm.tradeSkills = {}
 		end
-		if not self.db.realm.tradeSkills[player] then
-			self.db.realm.tradeSkills[player] = {}
-		end
+		self.db.realm.tradeSkills[player] = {}
 		self.spellOffset = {}
 		local prof1, prof2, archaeology, fishing, cooking, firstAid = GetProfessions()
 		--DA.DEBUG(3,"ScanPlayerTradeSkills: prof1= "..tostring(prof1)..", prof2= "..tostring(prof2)..", archaeology= "..tostring(archaeology)..", fishing= "..tostring(fishing)..", cooking= "..tostring(cooking)..", firstAid= "..tostring(firstAid))
