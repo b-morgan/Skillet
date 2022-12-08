@@ -5,7 +5,6 @@ To help with Localization see:&nbsp;<a href="https://www.curseforge.com/wow/addo
 <p><strong>Other than "Please open an issue" I won't be responding to bug reports in comments.</strong></p>
 <h3><strong>Features:</strong></h3>
 <ul>
-<li>Larger the the standard tradeskill window</li>
 <li>Built-in queue for creating multiple, different items</li>
 <li>Queued items are saved when you log out and are restored on log in</li>
 <li>Automatically buy reagents for queued recipes when visiting a vendor</li>
