@@ -1715,15 +1715,17 @@ function Skillet:UpdateDetailWindow(skillIndex)
 		self:HideDetailWindow()
 		return
 	else
-		--DA.DEBUG(0,"UpdateDetailWindow: name= "..tostring(recipe.name)..", skill= "..DA.DUMP1(skill))
+		DA.DEBUG(0,"UpdateDetailWindow: skill= "..DA.DUMP1(skill))
 		recipe = self:GetRecipe(skill.id)
 		if not recipe or recipe.spellID == 0 then
 			self:HideDetailWindow()
 			return
 		end
-		--DA.DEBUG(0,"UpdateDetailWindow: name= "..tostring(recipe.name)..", recipe= "..DA.DUMP1(recipe))
+		DA.DEBUG(0,"UpdateDetailWindow: name= "..tostring(recipe.name)..", recipe= "..DA.DUMP(recipe))
 		newInfo = C_TradeSkillUI.GetRecipeInfo(recipe.spellID)
-		--DA.DEBUG(0,"UpdateDetailWindow: name= "..tostring(recipe.name)..", newInfo= "..DA.DUMP1(newInfo))
+		DA.DEBUG(0,"UpdateDetailWindow: name= "..tostring(recipe.name)..", newInfo= "..DA.DUMP(newInfo))
+		local recipeSchematic = C_TradeSkillUI.GetRecipeSchematic(recipe.spellID, false)
+		DA.DEBUG(0,"UpdateDetailWindow: name= "..tostring(recipe.name)..", recipeSchematic= "..DA.DUMP(recipeSchematic))
 --
 -- Name of the skill
 --
@@ -1864,8 +1866,12 @@ function Skillet:UpdateDetailWindow(skillIndex)
 		local  count = _G[button:GetName() .. "Count"]
 		local needed = _G[button:GetName() .. "Needed"]
 
+		button:SetID(i)
 		local reagent = recipe.reagentData[i]
 		--DA.DEBUG(0,"UpdateDetailWindow: reagent="..DA.DUMP(reagent))
+--
+-- Conditional debug output
+--
 		if reagent and newInfo.unlockedRecipeLevel and i <= numReagents then
 			--DA.DEBUG(0,"UpdateDetailWindow: recipeID= "..tostring(recipe.spellID)..", skill.id= "..tostring(skill.id)..", i= "..tostring(i)..", recipeRank= "..tostring(self.recipeRank))
 			local reagentName, reagentTexture, reagentCount
@@ -1874,7 +1880,9 @@ function Skillet:UpdateDetailWindow(skillIndex)
 			reagentCount = reagent.numNeeded
 			--DA.DEBUG(0,"UpdateDetailWindow: reagentName= "..tostring(reagentName)..", reagentCount= "..tostring(reagentCount)..", reagent= "..DA.DUMP(reagent))
 		end
-		button:SetID(i)
+--
+-- Normal reagent processing
+--
 		if reagent then
 			local reagentName
 			if reagent.reagentID then
@@ -1897,6 +1905,9 @@ function Skillet:UpdateDetailWindow(skillIndex)
 				text:SetText(GRAY_FONT_COLOR_CODE .. reagentName .. FONT_COLOR_CODE_CLOSE)
 				if self:VendorSellsReagent(reagent.reagentID) then
 					needed:SetTextColor(0,1,0)
+				elseif reagent.multiReagent then
+					SkilletDescriptionText:SetText("Can use multiple quality reagents")
+					needed:SetTextColor(1,0,1)
 				else
 					needed:SetTextColor(1,0,0)
 				end
@@ -1906,7 +1917,12 @@ function Skillet:UpdateDetailWindow(skillIndex)
 --
 				count:SetText(count_text)
 				text:SetText(reagentName)
-				needed:SetTextColor(1,1,1)
+				if reagent.multiReagent then
+					SkilletDescriptionText:SetText("Can use multiple quality reagents")
+					needed:SetTextColor(1,1,0)
+				else
+					needed:SetTextColor(1,1,1)
+				end
 			end
 			texture = GetItemIcon(reagent.reagentID)
 			icon:SetNormalTexture(texture)
@@ -2747,7 +2763,24 @@ function Skillet:ReagentButtonShiftClick(button, mouse, skillIndex, reagentIndex
 end
 
 --
--- Called when the reagent button is clicked
+-- Called when the reagent button is right-clicked
+--
+function Skillet:ReagentButtonRightClick(button, mouse, skillIndex, reagentIndex)
+	DA.DEBUG(0,"ReagentButtonRightClick("..tostring(button)..", "..tostring(skillIndex)..", "..tostring(reagentIndex)..")")
+	local recipe = self:GetRecipeDataByTradeIndex(self.currentTrade, skillIndex)
+	if not recipe then
+		--DA.WARN("ReagentButtonRightClick: recipe is nil. "..tostring(button)..", "..tostring(mouse)..", "..tostring(skillIndex)..", "..tostring(reagentIndex))
+		return
+	end
+	if mouse == "RightButton" then
+		DA.DEBUG(0,"ReagentButtonRightClick: RightButton, skillIndex= "..tostring(skillIndex)..", reagentIndex= "..tostring(reagentIndex))
+		return
+	end
+	local reagent = recipe.reagentData[reagentIndex]
+end
+
+--
+-- Called when the reagent button is left-clicked
 --
 function Skillet:ReagentButtonOnClick(button, mouse, skillIndex, reagentIndex)
 	--DA.DEBUG(0,"ReagentButtonOnClick("..tostring(button)..", "..tostring(mouse)..", "..tostring(skillIndex)..", "..tostring(reagentIndex)..")")
@@ -2756,15 +2789,16 @@ function Skillet:ReagentButtonOnClick(button, mouse, skillIndex, reagentIndex)
 		Skillet:OptionalReagentOnClick(button, mouse, skillIndex, reagentIndex)
 		return
 	end
-	if mouse == "RightButton" then
-		return
-	end
 	if not self.db.profile.link_craftable_reagents then
 		return
 	end
 	local recipe = self:GetRecipeDataByTradeIndex(self.currentTrade, skillIndex)
 	if not recipe then
 		--DA.WARN("ReagentButtonOnClick: recipe is nil. "..tostring(button)..", "..tostring(mouse)..", "..tostring(skillIndex)..", "..tostring(reagentIndex))
+		return
+	end
+	if mouse == "RightButton" then
+		DA.DEBUG(0,"ReagentButtonOnClick: RightButton, skillIndex= "..tostring(skillIndex)..", reagentIndex= "..tostring(reagentIndex))
 		return
 	end
 	local reagent = recipe.reagentData[reagentIndex]

@@ -786,7 +786,8 @@
 				<!-- This put a link to the *item* that can be created with this trade skill
 					 into the current chat edit box -->
 					Skillet:ReagentButtonShiftClick(self, button, Skillet.selectedSkill, self:GetID())
-				<!-- elseif ( button == "RightButton" ) then -->
+				elseif ( button == "RightButton" ) then
+					Skillet:ReagentButtonRightClick(self, button, Skillet.selectedSkill, self:GetID())
 				else
 				<!-- generic click action -->
 					Skillet:ReagentButtonOnClick(self, button, Skillet.selectedSkill, self:GetID())
