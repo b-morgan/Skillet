@@ -419,12 +419,18 @@ function Skillet:ProcessQueue(altMode)
 					if command.optionalReagents then
 						for i,reagentID in pairs(command.optionalReagents) do
 							--DA.DEBUG(2,"i= "..tostring(i)..", reagentID= "..tostring(reagentID))
-							table.insert(self.optionalReagentsArray, { itemID = reagentID, count = 1, slot = i, })
+							table.insert(self.optionalReagentsArray, { itemID = reagentID, quantity = 1, dataSlotIndex = i, })
 						end -- for
 					end
-					--DA.DEBUG(1,"Optional: recipeLevel= "..tostring(recipeLevel)..", optionalReagentsArray= "..DA.DUMP1(optionalReagentsArray))
+					DA.DEBUG(1,"Optional: recipeLevel= "..tostring(recipeLevel)..", optionalReagentsArray= "..DA.DUMP1(optionalReagentsArray))
 					command.optionalReagentsArray = optionalReagentsArray
-					C_TradeSkillUI.CraftRecipe(command.recipeID, command.count, command.optionalReagentsArray, command.recipeLevel)
+					if #command.optionalReagentsArray == 0 and recipeLevel == 0 then
+						C_TradeSkillUI.CraftRecipe(command.recipeID, command.count)
+					elseif #command.optionalReagentsArray == 0 then
+						C_TradeSkillUI.CraftRecipe(command.recipeID, command.count, nil, recipeLevel)
+					else
+						C_TradeSkillUI.CraftRecipe(command.recipeID, command.count, command.optionalReagentsArray, recipeLevel)
+					end
 				else
 --
 -- C_TradeSkillUI.GetCraftableCount failed
@@ -640,7 +646,7 @@ function Skillet:ITEM_COUNT_CHANGED(event,itemID)
 	DA.TRACE("ITEM_COUNT_CHANGED("..tostring(itemID)..")")
 --[[
 	if itemID == self.salvageItem then
-		DA.DEBUG(0,"UNIT_SPELLCAST_SUCCEEDED: "..tostring(unitTarget)..", "..tostring(spellID))
+		DA.DEBUG(0,"ITEM_COUNT_CHANGED: itemID= "..tostring(itemID))
 		self:ContinueCast(self.processingSpellID)
 	else
 		self:IgnoreCast(self.processingSpellID)
@@ -707,7 +713,7 @@ end
 --
 function Skillet:IgnoreCast(spellID)
 	name = GetSpellInfo(spellID)
-	DA.DEBUG(4,"IgnoreCast("..tostring(spellID).."), "..tostring(name))
+	--DA.DEBUG(4,"IgnoreCast("..tostring(spellID).."), "..tostring(name))
 end
 
 --
