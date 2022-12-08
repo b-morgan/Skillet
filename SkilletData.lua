@@ -1131,7 +1131,7 @@ local function ScanTrade()
 		local reagentString = "-"
 		if recipeSchematic.recipeType == Enum.TradeskillRecipeType.Salvage then -- 2
 			--DA.DEBUG(2,"ScanTrade: recipeID= "..tostring(recipeID)..", name= "..tostring(recipeInfo.name)..", recipeInfo= "..DA.DUMP(recipeInfo))
-			DA.DEBUG(2,"ScanTrade: recipeSchematic= "..DA.DUMP(recipeSchematic))
+			--DA.DEBUG(2,"ScanTrade: recipeSchematic= "..DA.DUMP(recipeSchematic))
 			local salvageIDs = C_TradeSkillUI.GetSalvagableItemIDs(recipeID)
 			--DA.DEBUG(2,"ScanTrade: recipeID= "..tostring(recipeID)..", salvageIDs= "..DA.DUMP1(salvageIDs))
 			recipe.salvage = salvageIDs
@@ -1143,14 +1143,20 @@ local function ScanTrade()
 		local numReagents = #recipeSchematic.reagentSlotSchematics
 		for k = 1, numReagents do
 			local schematic = recipeSchematic.reagentSlotSchematics[k]
-			local reagentID = schematic.reagents[1].itemID
+			local reagentID, multiReagent
+			reagentID = schematic.reagents[1].itemID
 			local numNeeded = schematic.quantityRequired
 			if schematic.reagentType == Enum.CraftingReagentType.Basic then
+				if #schematic.reagents ~= 1 then
+					multiReagent = #schematic.reagents
+					DA.DEBUG(2,"ScanTrade: recipeID= "..tostring(recipeID)..", name= "..tostring(recipeInfo.name)..", Multiple reagents= "..DA.DUMP(schematic.reagents))
+				end
 				numBasic = numBasic + 1
 				basicData[numBasic] = {}
 				basicData[numBasic].reagentID = reagentID
 				basicData[numBasic].numNeeded = numNeeded
 				basicData[numBasic].name = GetItemInfo(reagentID)
+				basicData[numBasic].multiReagent = multiReagent			-- so additional data can be shown in the detail frame
 				basicData[numBasic].schematic = schematic
 				if reagentString ~= "-" then
 					reagentString = reagentString..":"..reagentID..":"..numNeeded
@@ -1164,6 +1170,8 @@ local function ScanTrade()
 				optionalData[numOptional].numNeeded = numNeeded
 				optionalData[numOptional].name = schematic.slotInfo.slotText
 				optionalData[numOptional].schematic = schematic
+			elseif schematic.reagentType == Enum.CraftingReagentType.Finishing then
+				--DA.DEBUG(2,"ScanTrade: recipeID= "..tostring(recipeID)..", name= "..tostring(recipeInfo.name)..", Finishing reagents= "..DA.DUMP(schematic))
 			end
 		end
 		--DA.DEBUG(2,"ScanTrade: basicData= "..DA.DUMP(basicData))
