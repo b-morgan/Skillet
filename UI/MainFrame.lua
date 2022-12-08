@@ -1715,17 +1715,17 @@ function Skillet:UpdateDetailWindow(skillIndex)
 		self:HideDetailWindow()
 		return
 	else
-		DA.DEBUG(0,"UpdateDetailWindow: skill= "..DA.DUMP1(skill))
+		--DA.DEBUG(0,"UpdateDetailWindow: skill= "..DA.DUMP1(skill))
 		recipe = self:GetRecipe(skill.id)
 		if not recipe or recipe.spellID == 0 then
 			self:HideDetailWindow()
 			return
 		end
-		DA.DEBUG(0,"UpdateDetailWindow: name= "..tostring(recipe.name)..", recipe= "..DA.DUMP(recipe))
+		--DA.DEBUG(0,"UpdateDetailWindow: name= "..tostring(recipe.name)..", recipe= "..DA.DUMP(recipe))
 		newInfo = C_TradeSkillUI.GetRecipeInfo(recipe.spellID)
-		DA.DEBUG(0,"UpdateDetailWindow: name= "..tostring(recipe.name)..", newInfo= "..DA.DUMP(newInfo))
+		--DA.DEBUG(0,"UpdateDetailWindow: name= "..tostring(recipe.name)..", newInfo= "..DA.DUMP(newInfo))
 		local recipeSchematic = C_TradeSkillUI.GetRecipeSchematic(recipe.spellID, false)
-		DA.DEBUG(0,"UpdateDetailWindow: name= "..tostring(recipe.name)..", recipeSchematic= "..DA.DUMP(recipeSchematic))
+		--DA.DEBUG(0,"UpdateDetailWindow: name= "..tostring(recipe.name)..", recipeSchematic= "..DA.DUMP(recipeSchematic))
 --
 -- Name of the skill
 --
