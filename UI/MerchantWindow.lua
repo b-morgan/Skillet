@@ -68,24 +68,33 @@ local function update_merchant_inventory()
 				local name, texture, price, quantity, numAvailable, isUsable, extendedCost = GetMerchantItemInfo(i)
 				if extendedCost then
 					itemCount = GetMerchantItemCostInfo(i)
+--
+-- Loop through all the items for debugging but only use the first.
+--
 					if itemCount > 0 then
-						DA.DEBUG(2,"itemCount for "..tostring(name).." ("..tostring(id)..")= "..tostring(itemCount))
-						itemTexture, itemValue, itemLink, currencyName = GetMerchantItemCostItem(i, 1)
-						if itemLink then
-							currencyName = GetItemInfo(itemLink)
-							currencyID = Skillet:GetItemIDFromLink(itemLink)
-						else
-							currencyID = -1 * tonumber(Skillet.currencyIDsByName[currencyName] or 0)
+						DA.DEBUG(2,"For "..tostring(name).." ("..tostring(id)..") itemCount= "..tostring(itemCount))
+						for j=itemCount, 1, -1 do
+							itemTexture, itemValue, itemLink, currencyName = GetMerchantItemCostItem(i, j)
+							DA.DEBUG(2,"  ["..tostring(j).."]: itemValue= "..tostring(itemValue)..", itemLink= "..tostring(itemLink)..", currencyName= "..tostring(currencyName))
+							if currencyName then
+								currencyID = -1 * tonumber(Skillet.currencyIDsByName[currencyName] or 0)
+							elseif itemLink then
+								currencyName = GetItemInfo(itemLink)
+								currencyID = Skillet:GetItemIDFromLink(itemLink)
+							end
+							DA.DEBUG(2,"  currencyName= "..tostring(currencyName).." ("..tostring(currencyID)..") x "..tostring(itemValue))
 						end
-						DA.DEBUG(2,"Currency for "..tostring(name).." ("..tostring(id)..")= "..tostring(currencyName).." x "..tostring(itemValue))
 					end
 				end
+--
+-- Only check unlimited quantity items.
+--
 				if numAvailable == -1  then
 					merchant_inventory[id] = {}
 					merchant_inventory[id].price = price
 					merchant_inventory[id].quantity = quantity
-					if Skillet.db.global.itemRecipeUsedIn[id] then		-- if this item is used in any recipes we know about then
-						if not Skillet:VendorSellsReagent(id) then		-- if its not a known vendor item then
+					if Skillet.db.global.itemRecipeUsedIn[id] then		-- if this item is used in any recipes we know about
+						if not Skillet:VendorSellsReagent(id) then		-- if its not a known vendor item
 							if Skillet.db.global.MissingVendorItems[id] then
 								DA.DEBUG(1,"updating "..tostring(name).." ("..tostring(id)..")")
 							else
