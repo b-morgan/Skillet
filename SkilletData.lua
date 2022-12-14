@@ -1126,8 +1126,12 @@ local function ScanTrade()
 --
 		local basicData = {}
 		local numBasic = 0
+		local modifiedData = {}
+		local numModified = 0
 		local optionalData = {}
 		local numOptional = 0
+		local finishingData = {}
+		local numFinishing = 0
 		local reagentString = "-"
 		if recipeSchematic.recipeType == Enum.TradeskillRecipeType.Salvage then -- 2
 			--DA.DEBUG(2,"ScanTrade: recipeID= "..tostring(recipeID)..", name= "..tostring(recipeInfo.name)..", recipeInfo= "..DA.DUMP(recipeInfo))
@@ -1140,23 +1144,35 @@ local function ScanTrade()
 		if recipeSchematic.recipeType == Enum.TradeskillRecipeType.Enchant then -- 3
 			--DA.DEBUG(2,"ScanTrade: recipeID= "..tostring(recipeID)..", name= "..tostring(recipeInfo.name).." is type Enchant")
 		end
+		if recipeSchematic.recipeType == Enum.TradeskillRecipeType.Recraft then -- 4
+			--DA.DEBUG(2,"ScanTrade: recipeID= "..tostring(recipeID)..", name= "..tostring(recipeInfo.name).." is type Recraft")
+		end
+--
+-- recipeSchematic.recipeType == Enum.TradeskillRecipeType.Item (1)
+--
 		local numReagents = #recipeSchematic.reagentSlotSchematics
 		for k = 1, numReagents do
 			local schematic = recipeSchematic.reagentSlotSchematics[k]
-			local reagentID, multiReagent
+			local reagentID, modifiedReagent
 			reagentID = schematic.reagents[1].itemID
 			local numNeeded = schematic.quantityRequired
 			if schematic.reagentType == Enum.CraftingReagentType.Basic then
-				if #schematic.reagents ~= 1 then
-					multiReagent = #schematic.reagents
-					DA.DEBUG(2,"ScanTrade: recipeID= "..tostring(recipeID)..", name= "..tostring(recipeInfo.name)..", Multiple reagents= "..DA.DUMP(schematic.reagents))
+				if schematic.dataSlotType == Enum.TradeskillSlotDataType.ModifiedReagent then -- 2, others are Enum.TradeskillSlotDataType.Reagent (1) and Enum.TradeskillSlotDataType.Currency (3)
+					numModified = numModified + 1
+					modifiedData[numModified] = {}
+					modifiedData[numModified].reagentID = reagentID
+					modifiedData[numModified].numNeeded = numNeeded
+					modifiedData[numModified].name = GetItemInfo(reagentID)
+					modifiedData[numModified].schematic = schematic
+					modifiedReagent = #schematic.reagents
+					--DA.DEBUG(2,"ScanTrade: recipeID= "..tostring(recipeID)..", name= "..tostring(recipeInfo.name)..", Multiple reagents= "..DA.DUMP(schematic.reagents))
 				end
 				numBasic = numBasic + 1
 				basicData[numBasic] = {}
 				basicData[numBasic].reagentID = reagentID
 				basicData[numBasic].numNeeded = numNeeded
 				basicData[numBasic].name = GetItemInfo(reagentID)
-				basicData[numBasic].multiReagent = multiReagent			-- so additional data can be shown in the detail frame
+				basicData[numBasic].modifiedReagent = modifiedReagent			-- so additional data can be shown in the detail frame
 				basicData[numBasic].schematic = schematic
 				if reagentString ~= "-" then
 					reagentString = reagentString..":"..reagentID..":"..numNeeded
@@ -1165,28 +1181,42 @@ local function ScanTrade()
 				end
 				Skillet:ItemDataAddUsedInRecipe(reagentID, recipeID)	-- add a cross reference for where a particular item is used
 			elseif schematic.reagentType == Enum.CraftingReagentType.Optional then
+				--DA.DEBUG(2,"ScanTrade: recipeID= "..tostring(recipeID)..", name= "..tostring(recipeInfo.name)..", Optional reagent= "..DA.DUMP(schematic))
 				numOptional = numOptional + 1
 				optionalData[numOptional] = {}
 				optionalData[numOptional].numNeeded = numNeeded
 				optionalData[numOptional].name = schematic.slotInfo.slotText
 				optionalData[numOptional].schematic = schematic
 			elseif schematic.reagentType == Enum.CraftingReagentType.Finishing then
-				--DA.DEBUG(2,"ScanTrade: recipeID= "..tostring(recipeID)..", name= "..tostring(recipeInfo.name)..", Finishing reagents= "..DA.DUMP(schematic))
+				--DA.DEBUG(2,"ScanTrade: recipeID= "..tostring(recipeID)..", name= "..tostring(recipeInfo.name)..", Finishing reagent= "..DA.DUMP(schematic))
+				numFinishing = numFinishing + 1
+				finishingData[numFinishing] = {}
+				finishingData[numFinishing].reagentID = reagentID
+				finishingData[numFinishing].numNeeded = numNeeded
+				finishingData[numFinishing].name = GetItemInfo(reagentID)
+				finishingData[numFinishing].schematic = schematic
 			end
-		end
+		end -- for numReagents
 		--DA.DEBUG(2,"ScanTrade: basicData= "..DA.DUMP(basicData))
 		recipe.reagentData = basicData
 		recipe.numBasic = numBasic
+		--DA.DEBUG(2,"ScanTrade: modifiedData= "..DA.DUMP(modifiedData))
+		recipe.modifiedData = modifiedData
+		recipe.numModified = numModified
 		--DA.DEBUG(2,"ScanTrade: optionalData= "..DA.DUMP(optionalData))
 		recipe.optionalData = optionalData
 		recipe.numOptional = numOptional
+		--DA.DEBUG(2,"ScanTrade: finishingData= "..DA.DUMP(finishingData))
+		recipe.finishingData = finishingData
+		recipe.numFinishing = numFinishing
+
 		recipeString = tradeID.." "..itemString.." "..reagentString
 		recipeString = recipeString.." "..tostring(numOptionalReagentSlots)
 		recipeDB[recipeID] = recipeString
 		nameDB[recipeID] = recipeInfo.name		-- for debugging
 		--DA.DEBUG(2,"recipeDB["..tostring(recipeID).."] ("..tostring(recipeInfo.name)..") = "..tostring(recipeDB[recipeID]))
 		i = i + 1
-	end -- for
+	end -- for numSkills
 
 	Skillet.visited = {}
 	Skillet:ScanQueuedReagents()
