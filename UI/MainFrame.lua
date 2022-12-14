@@ -357,6 +357,7 @@ end
 -- sorting or filtering may need to be updated.
 --
 function Skillet:ResetTradeSkillWindow()
+	--DA.DEBUG(0,"ResetTradeSkillWindow()")
 	Skillet:SortDropdown_OnShow()
 	local buttons = SkilletFrame.added_buttons
 	if buttons then
@@ -612,6 +613,14 @@ function Skillet:TradeButtonAdditional_OnEnter(button)
 	GameTooltip:Show()
 end
 
+function Skillet:BlizzardUIButton_OnEnter(button)
+	DA.DEBUG(0,"BlizzardUIButton_OnEnter("..tostring(button)..")")
+	GameTooltip:SetOwner(button, "ANCHOR_TOPLEFT")
+	GameTooltip:ClearLines()
+	GameTooltip:AddLine("Toggle Blizzard UI")
+	GameTooltip:Show()
+end
+
 function Skillet:TradeButton_OnClick(this,button)
 	--DA.DEBUG(0,"TradeButton_OnClick("..DA.DUMP1(this)..", "..tostring(button)..")")
 	local name = this:GetName()
@@ -668,6 +677,18 @@ function Skillet:TradeButtonAdditional_OnClick(this,button)
 	local name = this:GetName()
 	DA.DEBUG(0,"TradeButtonAdditional_OnClick: name= "..tostring(name))
 	GameTooltip:Hide()
+end
+
+function Skillet:BlizzardUIButton_OnClick(this,button)
+	DA.DEBUG(0,"BlizzardUIButton_OnClick")
+	GameTooltip:Hide()
+	if Skillet.BlizzardUIshowing then
+		HideUIPanel(ProfessionsFrame)
+		Skillet.BlizzardUIshowing = false
+	else
+		ShowUIPanel(ProfessionsFrame)
+		Skillet.BlizzardUIshowing = true
+	end
 end
 
 function Skillet:CreateAdditionalButtonsList()
@@ -796,32 +817,38 @@ function Skillet:UpdateTradeButtons(player)
 		local additionalPet = additionalSpellTab[4]
 		local spellName, _, spellIcon, petGUID
 		if additionalToy then
-			_, spellName, spellIcon = C_ToyBox.GetToyInfo(additionalSpellId)
+			if (PlayerHasToy(additionalSpellId) and C_ToyBox.IsToyUsable(additionalSpellId)) then
+				_, spellName, spellIcon = C_ToyBox.GetToyInfo(additionalSpellId)
+			else
+				spellName = nil
+			end
 		else
 			spellName, _, spellIcon = GetSpellInfo(additionalSpellId)
 		end
 		if additionalPet then
 			_, petGUID = C_PetJournal.FindPetIDByName(additionalSpellName)
-			spellName = additionalSpellName
-			if not petGUID then
-				return -- continue with the next one
+			if petGUID then
+				spellName = additionalSpellName
+			else
+				spellName = nil
 			end
 		end
-		--DA.DEBUG(1,"UpdateTradeButtons: additionalSpellId= "..tostring(additionalSpellId)..", spellName= "..tostring(spellName)..", spellIcon= "..tostring(spellIcon))
-		local buttonName = "SkilletDo"..additionalSpellName
-		local button = _G[buttonName]
-		if not button then
-			--DA.DEBUG(0,"UpdateTradeButtons: CreateFrame for "..tostring(buttonName))
-			button = CreateFrame("Button", buttonName, frame, "SkilletTradeButtonAdditionalTemplate")
-			button:SetID(additionalSpellId)
-			if additionalToy then
-				button.Toy = true
+		if spellName then
+			--DA.DEBUG(1,"UpdateTradeButtons: i= "..tostring(i)..", additionalSpellId= "..tostring(additionalSpellId)..", spellName= "..tostring(spellName)..", spellIcon= "..tostring(spellIcon))
+			local buttonName = "SkilletDo"..additionalSpellName
+			local button = _G[buttonName]
+			if not button then
+				DA.DEBUG(0,"UpdateTradeButtons: CreateFrame for "..tostring(buttonName))
+				button = CreateFrame("Button", buttonName, frame, "SkilletTradeButtonAdditionalTemplate")
+				button:SetID(additionalSpellId)
+				if additionalToy then
+					button.Toy = true
+				end
+				if additionalPet then
+					button.Pet = true
+					button.PetGUID = petGUID
+				end
 			end
-			if additionalPet then
-				button.Pet = true
-				button.PetGUID = petGUID
-			end
-		end
 --
 -- https://wowpedia.fandom.com/wiki/SecureActionButtonTemplate 
 --
@@ -837,37 +864,57 @@ function Skillet:UpdateTradeButtons(player)
 --
 -- execute a macro on any click
 --
-		button:SetAttribute("type", "macro");
-		local macrotext = Skillet:GetAutoTargetMacro(additionalSpellId, button.Toy, button.Pet, petGUID)
-		--DA.DEBUG(1,"UpdateTradeButtons: macrotext= "..tostring(macrotext))
-		button:SetAttribute("macrotext", macrotext)
+			button:SetAttribute("type", "macro");
+			local macrotext = Skillet:GetAutoTargetMacro(additionalSpellId, button.Toy, button.Pet, petGUID)
+			--DA.DEBUG(1,"UpdateTradeButtons: macrotext= "..tostring(macrotext))
+			button:SetAttribute("macrotext", macrotext)
+			button:ClearAllPoints()
+			button:SetPoint("BOTTOMLEFT", SkilletRankFrame, "TOPLEFT", position, 3)
+			local buttonIcon = _G[buttonName.."Icon"]
+			buttonIcon:SetTexture(spellIcon)
+			position = position + button:GetWidth()
+			button:Show()
+			if additionalToy then
+				local isToyUsable = C_ToyBox.IsToyUsable(additionalSpellId)
+				--DA.DEBUG(1,"UpdateTradeButtons: IsToyUsable("..tostring(additionalSpellId)..")= "..tostring(isToyUsable))
+				if isToyUsable then
+					button:Enable()
+					button:SetAlpha(1.0)
+				else
+					button:Disable()
+					button:SetAlpha(0.2)
+				end
+			end
+			if additionalPet then
+				--DA.DEBUG(1,"UpdateTradeButtons: petName= "..tostring(additionalSpellName)..", petGUID= "..tostring(petGUID))
+				if petGUID then
+					button:Enable()
+					button:SetAlpha(1.0)
+				else
+					button:Disable()
+					button:SetAlpha(0.2)
+				end
+			end
+		end
+	end
+--
+-- One more button to toggle the Blizzard TradeSkillFrame
+--
+	if Skillet.db.profile.use_blizzard_for_optional then
+		position = position + 10	-- Add some space
+		local buttonName = "SkilletBlizzardUI"
+		local button = _G[buttonName]
+		if not button then
+			--DA.DEBUG(0,"UpdateTradeButtons: CreateFrame for "..tostring(buttonName))
+			button = CreateFrame("Button", buttonName, frame, "SkilletBlizzardUITemplate")
+			button:SetID(2)
+		end
 		button:ClearAllPoints()
 		button:SetPoint("BOTTOMLEFT", SkilletRankFrame, "TOPLEFT", position, 3)
 		local buttonIcon = _G[buttonName.."Icon"]
-		buttonIcon:SetTexture(spellIcon)
+		buttonIcon:SetTexture(3573824)
 		position = position + button:GetWidth()
 		button:Show()
-		if additionalToy then
-			local isToyUsable = C_ToyBox.IsToyUsable(additionalSpellId)
-			--DA.DEBUG(1,"UpdateTradeButtons: IsToyUsable("..tostring(additionalSpellId)..")= "..tostring(isToyUsable))
-			if isToyUsable then
-				button:Enable()
-				button:SetAlpha(1.0)
-			else
-				button:Disable()
-				button:SetAlpha(0.2)
-			end
-		end
-		if additionalPet then
-			--DA.DEBUG(1,"UpdateTradeButtons: petName= "..tostring(additionalSpellName)..", petGUID= "..tostring(petGUID))
-			if petGUID then
-				button:Enable()
-				button:SetAlpha(1.0)
-			else
-				button:Disable()
-				button:SetAlpha(0.2)
-			end
-		end
 	end
 end
 
@@ -1705,6 +1752,7 @@ function Skillet:UpdateDetailWindow(skillIndex)
 	local texture
 	local recipe
 	local newInfo
+	local recipeSchematic
 	SkilletFrame.selectedSkill = skillIndex
 	self.numItemsToCraft = 1
 	if self.recipeNotesFrame then
@@ -1715,17 +1763,20 @@ function Skillet:UpdateDetailWindow(skillIndex)
 		self:HideDetailWindow()
 		return
 	else
-		--DA.DEBUG(0,"UpdateDetailWindow: skill= "..DA.DUMP1(skill))
 		recipe = self:GetRecipe(skill.id)
 		if not recipe or recipe.spellID == 0 then
 			self:HideDetailWindow()
 			return
 		end
-		--DA.DEBUG(0,"UpdateDetailWindow: name= "..tostring(recipe.name)..", recipe= "..DA.DUMP(recipe))
 		newInfo = C_TradeSkillUI.GetRecipeInfo(recipe.spellID)
-		--DA.DEBUG(0,"UpdateDetailWindow: name= "..tostring(recipe.name)..", newInfo= "..DA.DUMP(newInfo))
-		local recipeSchematic = C_TradeSkillUI.GetRecipeSchematic(recipe.spellID, false)
-		--DA.DEBUG(0,"UpdateDetailWindow: name= "..tostring(recipe.name)..", recipeSchematic= "..DA.DUMP(recipeSchematic))
+		if not self.recipeDump[recipe.spellID] then
+			self.recipeDump[recipe.spellID] = true
+			DA.DEBUG(0,"UpdateDetailWindow: skill= "..DA.DUMP1(skill))
+			DA.DEBUG(0,"UpdateDetailWindow: name= "..tostring(recipe.name)..", recipe= "..DA.DUMP(recipe))
+--			DA.DEBUG(0,"UpdateDetailWindow: name= "..tostring(recipe.name)..", GetRecipeInfo= "..DA.DUMP(newInfo))
+--			recipeSchematic = C_TradeSkillUI.GetRecipeSchematic(recipe.spellID, false)
+--			DA.DEBUG(0,"UpdateDetailWindow: name= "..tostring(recipe.name)..", GetRecipeSchematic= "..DA.DUMP(recipeSchematic))
+		end
 --
 -- Name of the skill
 --
@@ -1762,7 +1813,7 @@ function Skillet:UpdateDetailWindow(skillIndex)
 -- Description
 --
 		local description
---		description = C_TradeSkillUI.GetRecipeDescription(skill.id)
+		description = C_TradeSkillUI.GetRecipeDescription(skill.id, {})
 		--DA.DEBUG(0,"UpdateDetailWindow: description="..tostring(description))
 		if description then
 			description = description:gsub("\r","")	-- Skillet frame has less space than Blizzard frame, so
@@ -1905,7 +1956,7 @@ function Skillet:UpdateDetailWindow(skillIndex)
 				text:SetText(GRAY_FONT_COLOR_CODE .. reagentName .. FONT_COLOR_CODE_CLOSE)
 				if self:VendorSellsReagent(reagent.reagentID) then
 					needed:SetTextColor(0,1,0)
-				elseif reagent.multiReagent then
+				elseif reagent.modifiedReagent then
 					SkilletDescriptionText:SetText("Can use multiple quality reagents")
 					needed:SetTextColor(1,0,1)
 				else
@@ -1917,7 +1968,7 @@ function Skillet:UpdateDetailWindow(skillIndex)
 --
 				count:SetText(count_text)
 				text:SetText(reagentName)
-				if reagent.multiReagent then
+				if reagent.modifiedReagent then
 					SkilletDescriptionText:SetText("Can use multiple quality reagents")
 					needed:SetTextColor(1,1,0)
 				else
