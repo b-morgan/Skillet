@@ -737,6 +737,41 @@ function Skillet:OnEnable()
 	self:RegisterEvent("NEW_RECIPE_LEARNED") -- arg1 = recipeID
 --	self:RegisterEvent("SPELL_NAME_UPDATE") -- arg1 = spellID, arg2 = spellName
 --	self:RegisterEvent("ADDON_ACTION_BLOCKED")
+
+--
+-- Dump the data passed to C_TradeSkillUI functions so we can learn how Blizzard handles the new stuff
+--
+-- C_TradeSkillUI.CraftRecipe(recipeSpellID [, numCasts, craftingReagents, recipeLevel, orderID])
+--
+	hooksecurefunc(C_TradeSkillUI,"CraftRecipe",function(...)
+		local recipeSpellID, numCasts, craftingReagents, recipeLevel, orderID = ...
+		DA.DEBUG(0, "C_TradeSkillUI.CraftRecipe: recipeSpellID= "..tostring(recipeSpellID)..", numCasts= "..tostring(numCasts)..", craftingReagents= "..DA.DUMP(craftingReagents)..", recipeLevel= "..tostring(recipeLevel)..", orderID= "..tostring(orderID))
+	end)
+
+--
+-- C_TradeSkillUI.CraftSalvage(recipeSpellID [, numCasts, itemTarget])
+--
+	hooksecurefunc(C_TradeSkillUI,"CraftSalvage",function(...)
+		local recipeSpellID, numCasts, itemTarget = ...
+		DA.DEBUG(0, "C_TradeSkillUI.CraftSalvage: recipeSpellID= "..tostring(recipeSpellID)..", numCasts= "..tostring(numCasts)..", itemTarget= "..DA.DUMP(itemTarget))
+	end)
+
+--
+-- C_TradeSkillUI.CraftEnchant(recipeSpellID [, numCasts, craftingReagents, itemTarget])
+--
+	hooksecurefunc(C_TradeSkillUI,"CraftEnchant",function(...)
+		local recipeSpellID, numCasts, craftingReagents, itemTarget = ...
+		DA.DEBUG(0, "C_TradeSkillUI.CraftEnchant: recipeSpellID= "..tostring(recipeSpellID)..", numCasts= "..tostring(numCasts)..", craftingReagents= "..DA.DUMP(craftingReagents)..", itemTarget= "..DA.DUMP(itemTarget))
+	end)
+
+--
+-- result = C_TradeSkillUI.RecraftRecipe(itemGUID [, craftingReagents])
+--
+	hooksecurefunc(C_TradeSkillUI,"RecraftRecipe",function(...)
+		local itemGUID, craftingReagents = ...
+		DA.DEBUG(0, "C_TradeSkillUI.RecraftRecipe: itemGUID= "..tostring(itemGUID)..", craftingReagents= "..DA.DUMP(craftingReagents))
+	end)
+
 --
 -- Debugging cleanup if enabled
 --
@@ -752,10 +787,11 @@ function Skillet:OnEnable()
 	self.currentGroupLabel = "Blizzard"
 	self.currentGroup = nil
 	self.dataScanned = false
+	self.recipeDump = {}
+
 --
 -- run the upgrade code to convert any old settings
 --
-
 	self:UpgradeDataAndOptions()
 	self:CollectTradeSkillData()
 	self:CollectCurrencyData()
@@ -1539,6 +1575,17 @@ function Skillet:SetSelectedSkill(skillIndex)
 	--DA.DEBUG(0,"SetSelectedSkill("..tostring(skillIndex)..")")
 	self:HideNotesWindow()
 	self:ConfigureRecipeControls(false)
+	if Skillet.BlizzardUIshowing then
+		local skill = self:GetSkill(self.currentPlayer, self.currentTrade, skillIndex)
+		local recipeInfo = C_TradeSkillUI.GetRecipeInfo(skill.id)
+		if recipeInfo then
+--[[
+			ProfessionsFrame.CraftingPage:SelectRecipe(recipeInfo)
+--]]
+			EventRegistry:TriggerEvent("ProfessionsRecipeListMixin.Event.OnRecipeSelected", recipeInfo, ProfessionsFrame.CraftingPage.RecipeList)
+			ProfessionsFrame.CraftingPage.RecipeList:SelectRecipe(recipeInfo, true)
+		end
+	end
 	self.selectedSkill = skillIndex
 	self:ScrollToSkillIndex(skillIndex)
 	self:UpdateDetailWindow(skillIndex)
