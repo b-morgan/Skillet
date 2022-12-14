@@ -96,11 +96,11 @@ Skillet.FollowerNPC = {
 Skillet.TradeSkillAdditionalAbilities = {
 	[7411]	=	{13262,"Disenchant"},		-- enchanting = disenchant
 	[2550]	=	{
-				{818,"Basic_Campfire"},			-- cooking = basic campfire
+				{818,"Basic_Campfire"},				-- cooking = basic campfire
 				{117573,"Wayfarer's Bonfire",true,false}, -- cooking bonfire
-				{138824,"Pierre",false,true},	-- cooking pet
-				{95787,"Lil' Ragnaros",false,true}, -- cooking pet
-				{134020,"Chef's_Hat",true,false}, -- cooking = Chef's Hat (toy)
+				{134020,"Chef's_Hat",true,false},	-- cooking = Chef's Hat (toy)
+				{138824,"Pierre",false,true},		-- cooking pet
+				{95787,"Lil' Ragnaros",false,true},	-- cooking pet
 				},
 --	[45357] =	{51005,"Milling"},			-- inscription = milling
 --	[25229] =	{31252,"Prospecting"},		-- jewelcrafting = prospecting
