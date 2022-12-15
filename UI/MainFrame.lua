@@ -688,6 +688,10 @@ function Skillet:BlizzardUIButton_OnClick(this,button)
 	else
 		ShowUIPanel(ProfessionsFrame)
 		Skillet.BlizzardUIshowing = true
+		ProfessionsFrame.CloseButton:HookScript("OnClick",function(...) Skillet.BlizzardUIshowing = false end)
+		if SkilletFrame.selectedSkill and SkilletFrame.selectedSkill ~= -1 then
+			Skillet:SetSelectedSkill(SkilletFrame.selectedSkill)
+		end
 	end
 end
 
