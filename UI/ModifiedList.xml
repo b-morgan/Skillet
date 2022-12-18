@@ -1,0 +1,385 @@
+<Ui xmlns="http://www.blizzard.com/wow/ui/" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://www.blizzard.com/wow/ui/
+..\..\FrameXML\UI.xsd">
+
+	<!--
+	Skillet: A tradeskill window replacement.
+
+	This program is free software: you can redistribute it and/or modify
+	it under the terms of the GNU General Public License as published by
+	the Free Software Foundation, either version 3 of the License, or
+	(at your option) any later version.
+
+	This program is distributed in the hope that it will be useful,
+	but WITHOUT ANY WARRANTY; without even the implied warranty of
+	MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+	GNU General Public License for more details.
+
+	You should have received a copy of the GNU General Public License
+	along with this program.  If not, see <http://www.gnu.org/licenses/>.
+	-->
+
+<!--
+#
+#  Template for all the buttons we use to display items in the optional list
+#
+-->
+	<Frame name="SkilletModifiedListItemTemplate" hidden="false" virtual="true">
+		<Size>
+			<AbsDimension x="190" y="20"/>
+		</Size>
+		<Layers>
+			<Layer level="OVERLAY">
+				<FontString name="$parentCount" inherits="GameFontNormal" justifyH="RIGHT" justifyV="MIDDLE">
+					<Size>
+						<AbsDimension x="48" y="20"/>
+					</Size>
+					<Anchors>
+						<Anchor point="TOPRIGHT" relativeTo="$parent" relativePoint="TOPRIGHT">
+							<Offset>
+								<AbsDimension x="0" y="0"/>
+							</Offset>
+						</Anchor>
+					</Anchors>
+					<Color r="1" g="1" b="1" a="1"/>
+				</FontString>
+				<FontString name="$parentNeeded" inherits="GameFontNormal" justifyH="RIGHT" justifyV="MIDDLE">
+					<Size>
+						<AbsDimension x="32" y="20"/>
+					</Size>
+					<Anchors>
+						<Anchor point="TOPLEFT" relativeTo="$parent" relativePoint="TOPLEFT">
+							<Offset>
+								<AbsDimension x="18" y="0"/>
+							</Offset>
+						</Anchor>
+					</Anchors>
+				<Color r="1" g="1" b="1" a="1"/>
+				</FontString>
+				<FontString name="$parentText" inherits="GameFontNormal" justifyH="LEFT" justifyV="MIDDLE">
+					<Anchors>
+						<Anchor point="LEFT" relativeTo="$parentNeeded" relativePoint="RIGHT" />
+						<Anchor point="RIGHT" relativeTo="$parentCount" relativePoint="LEFT" />
+					</Anchors>
+					<Color r="1" g="1" b="1" a="1"/>
+				</FontString>
+			</Layer>
+		</Layers>
+		<Frames>
+			<!-- A button for the icon -->
+			<button name="$parentIcon">
+				<Size>
+					<AbsDimension x="20" y="20"/>
+				</Size>
+				<Layers>
+					<Layer level="BACKGROUND">
+						<Texture name="$parentTexture"/>
+					</Layer>
+				</Layers>
+				<Anchors>
+					<Anchor point="TOPLEFT" relativeTo="$parent" relativePoint="TOPLEFT">
+						<Offset>
+							<AbsDimension x="0" y="0"/>
+						</Offset>
+					</Anchor>
+				</Anchors>
+			</button>
+			<Button name="$parentAdd">
+				<Size>
+					<AbsDimension x="20" y="20"/>
+				</Size>
+				<Anchors>
+					<Anchor point="RIGHT" relativeTo="$parentCount" relativePoint="LEFT" />
+				</Anchors>
+				<Scripts>
+					<OnLoad>
+						self:SetFrameLevel(self:GetFrameLevel()+2)
+						self:RegisterForClicks("LeftButtonUp", "RightButtonUp")
+					</OnLoad>
+					<OnClick>
+						Skillet:ModifiedItemCount(self, button, 1)
+					</OnClick>
+				</Scripts>
+				<NormalTexture file="Interface\Addons\Skillet\Icons\Buttons\NextPage-Up"/>
+				<PushedTexture file="Interface\Addons\Skillet\Icons\Buttons\NextPage-Down"/>
+				<DisabledTexture file="Interface\Addons\Skillet\Icons\Buttons\NextPage-Disabled"/>
+				<HighlightTexture file="Interface\Buttons\UI-Common-MouseHilight" alphaMode="ADD"/>
+			</Button>
+			<EditBox name="$parentInput" letters="3" historyLines="0" numeric="true" autoFocus="false">
+				<Size>
+					<AbsDimension x="30" y="20"/>
+				</Size>
+				<Anchors>
+					<Anchor point="RIGHT" relativeTo="$parentAdd" relativePoint="LEFT" />
+				</Anchors>
+				<Layers>
+					<Layer level="BACKGROUND">
+						<Texture name="$parentLeft" file="Interface\Common\Common-Input-Border">
+							<Size>
+								<AbsDimension x="8" y="20"/>
+							</Size>
+							<Anchors>
+								<Anchor point="TOPLEFT">
+									<Offset>
+										<AbsDimension x="-5" y="0"/>
+									</Offset>
+								</Anchor>
+							</Anchors>
+							<TexCoords left="0" right="0.0625" top="0" bottom="0.625"/>
+						</Texture>
+						<Texture name="$parentRight" file="Interface\Common\Common-Input-Border">
+							<Size>
+								<AbsDimension x="8" y="20"/>
+							</Size>
+							<Anchors>
+								<Anchor point="RIGHT">
+									<Offset>
+										<AbsDimension x="0" y="0"/>
+									</Offset>
+								</Anchor>
+							</Anchors>
+							<TexCoords left="0.9375" right="1.0" top="0" bottom="0.625"/>
+						</Texture>
+						<Texture name="$parentMiddle" file="Interface\Common\Common-Input-Border">
+							<Size>
+								<AbsDimension x="10" y="20"/>
+							</Size>
+							<Anchors>
+								<Anchor point="LEFT" relativeTo="$parentLeft" relativePoint="RIGHT"/>
+								<Anchor point="RIGHT" relativeTo="$parentRight" relativePoint="LEFT"/>
+							</Anchors>
+							<TexCoords left="0.0625" right="0.9375" top="0" bottom="0.625"/>
+						</Texture>
+					</Layer>
+				</Layers>
+				<Scripts>
+					<OnLoad>
+						self:SetFrameLevel(self:GetFrameLevel()+2)
+					</OnLoad>
+					<OnEnterPressed>
+						self:ClearFocus()
+					</OnEnterPressed>
+					<OnEscapePressed>
+						self:ClearFocus()
+					</OnEscapePressed>
+					<OnEditFocusLost>
+						self:HighlightText(0, 0)
+					</OnEditFocusLost>
+					<OnEditFocusGained>
+						self:HighlightText()
+					</OnEditFocusGained>
+				</Scripts>
+				<FontString inherits="ChatFontNormal"/>
+			</EditBox>
+			<Button name="$parentSub">
+				<Size>
+					<AbsDimension x="20" y="20"/>
+				</Size>
+				<Anchors>
+					<Anchor point="RIGHT" relativeTo="$parentInput" relativePoint="LEFT">
+						<Offset>
+							<AbsDimension x="-5" y="0"/>
+						</Offset>
+					</Anchor>
+				</Anchors>
+				<Scripts>
+					<OnLoad>
+						self:SetFrameLevel(self:GetFrameLevel()+2)
+						self:RegisterForClicks("LeftButtonUp", "RightButtonUp")
+					</OnLoad>
+					<OnClick>
+						Skillet:ModifiedItemCount(self, button, -1)
+					</OnClick>
+				</Scripts>
+				<NormalTexture file="Interface\Addons\Skillet\Icons\Buttons\PrevPage-Up"/>
+				<PushedTexture file="Interface\Addons\Skillet\Icons\Buttons\PrevPage-Down"/>
+				<DisabledTexture file="Interface\Addons\Skillet\Icons\Buttons\PrevPage-Disabled"/>
+				<HighlightTexture file="Interface\Buttons\UI-Common-MouseHilight" alphaMode="ADD"/>
+			</Button>
+		</Frames>
+		<Scripts>
+			<OnLoad>
+				self:RegisterForClicks("LeftButtonUp", "RightButtonUp")
+			</OnLoad>
+			<OnEnter>
+				Skillet:ModifiedButtonOnEnter(self, SkilletFrame.selectedSkill, self:GetID())
+			</OnEnter>
+			<OnLeave>
+				Skillet:ModifiedButtonOnLeave(self, SkilletFrame.selectedSkill, self:GetID())
+			</OnLeave>
+			<OnUpdate>
+				CursorOnUpdate(self)
+			</OnUpdate>
+			<OnClick>
+				local link = Skillet:GetModifiedItemLink(Skillet.selectedSkill, self:GetID())
+				if ( button == "LeftButton" and IsShiftKeyDown() ) then
+				<!-- Put a link to the *item* in chat
+					 into the current chat edit box -->
+					ChatEdit_InsertLink(link)
+				else
+				<!-- generic click action -->
+					Skillet:ModifiedButtonOnClick(self, button, Skillet.selectedSkill, self:GetID())
+				end
+			</OnClick>
+		</Scripts>
+	</Frame>
+
+<CheckButton name="SkilletModifiedListCheckButtonTemplate" virtual="true">
+	<Size>
+		<AbsDimension x="20" y="20"/>
+	</Size>
+	<Layers>
+		<Layer level="ARTWORK">
+			<FontString name="$parentText" inherits="GameFontHighlight">
+				<Anchors>
+					<Anchor point="RIGHT" relativePoint="LEFT">
+						<Offset>
+							<AbsDimension x="0" y="1"/>
+						</Offset>
+					</Anchor>
+				</Anchors>
+			</FontString>
+		</Layer>
+	</Layers>
+	<NormalTexture file="Interface\Buttons\UI-CheckBox-Up"/>
+	<PushedTexture file="Interface\Buttons\UI-CheckBox-Down"/>
+	<HighlightTexture file="Interface\Buttons\UI-CheckBox-Highlight" alphaMode="ADD"/>
+	<CheckedTexture file="Interface\Buttons\UI-CheckBox-Check"/>
+	<DisabledCheckedTexture file="Interface\Buttons\UI-CheckBox-Check-Disabled"/>
+</CheckButton>
+
+<CheckButton name="SkilletModifiedListCheckButtonTemplate2" virtual="true">
+	<Size>
+		<AbsDimension x="20" y="20"/>
+	</Size>
+	<Layers>
+		<Layer level="ARTWORK">
+			<FontString name="$parentText" inherits="GameFontHighlight">
+				<Anchors>
+					<Anchor point="LEFT" relativePoint="RIGHT">
+						<Offset>
+							<AbsDimension x="0" y="1"/>
+						</Offset>
+					</Anchor>
+				</Anchors>
+			</FontString>
+		</Layer>
+	</Layers>
+	<NormalTexture file="Interface\Buttons\UI-CheckBox-Up"/>
+	<PushedTexture file="Interface\Buttons\UI-CheckBox-Down"/>
+	<HighlightTexture file="Interface\Buttons\UI-CheckBox-Highlight" alphaMode="ADD"/>
+	<CheckedTexture file="Interface\Buttons\UI-CheckBox-Check"/>
+	<DisabledCheckedTexture file="Interface\Buttons\UI-CheckBox-Check-Disabled"/>
+</CheckButton>
+
+<Frame name="SkilletModifiedList" parent="UIParent" toplevel="true" movable="true" enableMouse="true" resizable="true" hidden="true" clampedToScreen="true" inherits="BackdropTemplate">
+	<Size><AbsDimension x="420" y="240"/></Size>
+	<Anchors>
+		<Anchor point="CENTER"/>
+	</Anchors>
+	<Layers>
+		<Layer level="OVERLAY">
+			<FontString name="SkilletModifiedNeeded" inherits="GameFontHighlight" justifyH="RIGHT" justifyV="MIDDLE">
+				<Size>
+					<AbsDimension x="30" y="20"/>
+				</Size>
+				<Anchors>
+					<Anchor point="BOTTOMRIGHT" relativeTo="SkilletModifiedList" relativePoint="BOTTOMRIGHT">
+						<Offset>
+							<AbsDimension x="-30" y="10"/>
+						</Offset>
+					</Anchor>
+				</Anchors>
+				<Color r="1" g="1" b="1" a="1"/>
+			</FontString>
+			<FontString name="SkilletModifiedLabel" inherits="GameFontHighlight" text="Needed:" justifyH="LEFT" justifyV="MIDDLE">
+				<Size>
+					<AbsDimension x="60" y="20"/>
+				</Size>
+				<Anchors>
+					<Anchor point="BOTTOMRIGHT" relativeTo="SkilletModifiedNeeded" relativePoint="BOTTOMLEFT">
+						<Offset>
+							<AbsDimension x="0" y="0"/>
+						</Offset>
+					</Anchor>
+				</Anchors>
+				<Color r="1" g="1" b="1" a="1"/>
+			</FontString>
+		</Layer>
+	</Layers>
+	<Frames>
+		<Button name="SkilletModifiedListCloseButton" inherits="UIPanelCloseButton" parent="SkilletModifiedList">
+			<Anchors>
+				<Anchor point="TOPRIGHT" relativeTo="SkilletModifiedList" relativePoint="TOPRIGHT">
+					<Offset>
+						<AbsDimension x="-2" y="-2"/>
+					</Offset>
+				</Anchor>
+			</Anchors>
+			<Scripts>
+				<OnClick>
+					HideUIPanel(SkilletModifiedList)
+				</OnClick>
+			</Scripts>
+		</Button>
+		<CheckButton name="SkilletModifiedBestQuality" inherits="SkilletModifiedListCheckButtonTemplate2">
+			<Anchors>
+				<Anchor point="BOTTOMLEFT" relativeTo="SkilletModifiedList" relativePoint="BOTTOMLEFT">
+					<Offset>
+						<AbsDimension x="10" y="10"/>
+					</Offset>
+				</Anchor>
+			</Anchors>
+			<Scripts>
+				<OnClick>
+					Skillet:ModifiedListToggleBestQuality()
+					Skillet:UpdateModifiedListWindow()
+				</OnClick>
+			</Scripts>
+		</CheckButton>
+		<Frame name="SkilletModifiedListParent" parent="SkilletModifiedList">
+			<Anchors>
+				<Anchor point="TOPLEFT" relativeTo="SkilletModifiedList" relativePoint="TOPLEFT">
+					<Offset>
+						<AbsDimension x="5" y="-35"/>
+					</Offset>
+				</Anchor>
+				<Anchor point="BOTTOMRIGHT" relativeTo="SkilletModifiedList" relativePoint="BOTTOMRIGHT">
+					<Offset>
+						<AbsDimension x="-5" y="35"/>
+					</Offset>
+				</Anchor>
+			</Anchors>
+		</Frame>
+		<ScrollFrame name="SkilletModifiedListList" inherits="FauxScrollFrameTemplate" parent="SkilletModifiedListParent">
+			<Anchors>
+				<Anchor point="TOPLEFT" relativeTo="SkilletModifiedListParent" relativePoint="TOPLEFT">
+					<Offset>
+						<AbsDimension x="5" y="-5"/>
+					</Offset>
+				</Anchor>
+				<Anchor point="BOTTOMRIGHT" relativeTo="SkilletModifiedListParent" relativePoint="BOTTOMRIGHT">
+					<Offset>
+						<AbsDimension x="-27" y="5"/>
+					</Offset>
+				</Anchor>
+			</Anchors>
+			<Scripts>
+				<OnVerticalScroll>
+					FauxScrollFrame_OnVerticalScroll(self, offset, SKILLET_MODIFIED_LIST_HEIGHT, Skillet.ModifiedList_OnScroll)
+				</OnVerticalScroll>
+			</Scripts>
+		</ScrollFrame>
+		<Button name="SkilletModifiedListButton1" inherits="SkilletModifiedListItemTemplate">
+			<Anchors>
+				<Anchor point="TOPLEFT" relativeTo="SkilletModifiedListList" relativePoint="TOPLEFT">
+					<Offset>
+						<AbsDimension x="1" y="-1"/>
+					</Offset>
+				</Anchor>
+			</Anchors>
+		</Button>
+		<!-- rest of the buttons are created dynamically -->
+	</Frames>
+</Frame>
+</Ui>
+
