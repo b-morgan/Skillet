@@ -741,7 +741,7 @@
 				</FontString>
 				<FontString name="$parentCount" inherits="GameFontNormalSmall" justifyH="RIGHT" justifyV="MIDDLE">
 					<Size>
-						<AbsDimension x="80" y="16"/>
+						<AbsDimension x="100" y="16"/>
 					</Size>
 					<Anchors>
 						<Anchor point="TOPRIGHT" relativeTo="$parent" relativePoint="TOPRIGHT">
@@ -1438,6 +1438,34 @@
 			# inventory filter selector
 			#
 			-->
+			<CheckButton name="SkilletUseHighestQuality" inherits="SkilletInvFilterButtonTemplate" hidden="true">
+				<Anchors>
+					<Anchor point="BOTTOMLEFT" relativeTo="SkilletHideUncraftableRecipes" relativePoint="TOPLEFT">
+						<Offset>
+							<AbsDimension x="0" y="0"/>
+						</Offset>
+					</Anchor>
+				</Anchors>
+				<NormalTexture atlas="Professions-ChatIcon-Quality-Tier1"/>
+				<CheckedTexture atlas="Professions-ChatIcon-Quality-Tier5"/>
+				<Scripts>
+					<OnLoad>
+						self:SetFrameLevel(self:GetFrameLevel()+5)
+					</OnLoad>
+					<OnClick>
+						Skillet:ModifiedListToggleBestQuality()
+						Skillet:UpdateDetailWindow(Skillet.selectedSkill)
+					</OnClick>
+					<OnEnter>
+						GameTooltip:SetOwner(self, "ANCHOR_TOPLEFT")
+						GameTooltip:SetText(PROFESSIONS_USE_BEST_QUALITY_REAGENTS, nil, nil, nil, nil, true)
+						GameTooltip:Show()
+					</OnEnter>
+					<OnLeave>
+						GameTooltip:Hide()
+					</OnLeave>
+				</Scripts>
+			</CheckButton>
 			<CheckButton name="SkilletInventoryFilterOwned" inherits="SkilletInvFilterButtonTemplate" hidden="true">
 				<Anchors>
 					<Anchor point="TOPLEFT" relativeTo="SkilletHideUncraftableRecipes" relativePoint="BOTTOMLEFT">
@@ -1451,7 +1479,6 @@
 					<OnLoad>
 						self:SetFrameLevel(self:GetFrameLevel()+5)
 						self.slot = "owned"
-						<!-- _G[self:GetName().."Checked"]:SetGradient("vertical",1,.5,1, 1,.5,1) -->
 					</OnLoad>
 				</Scripts>
 			</CheckButton>
@@ -1800,6 +1827,15 @@
 						<FontString name="SkilletOptionalLabel" inherits="GameFontNormalSmall" justifyH="LEFT" text="SPELL_REAGENTS_OPTIONAL">
 							<Anchors>
 								<Anchor point="TOPLEFT" relativeTo="SkilletSkillCooldown" relativePoint="BOTTOMLEFT">
+									<Offset>
+										<AbsDimension x="-47" y="-20"/>
+									</Offset>
+								</Anchor>
+							</Anchors>
+						</FontString>
+						<FontString name="SkilletFinishingLabel" inherits="GameFontNormalSmall" justifyH="LEFT" text="PROFESSIONS_CRAFTING_FINISHING_HEADER">
+							<Anchors>
+								<Anchor point="TOPLEFT" relativeTo="SkilletOptionalLabel" relativePoint="BOTTOMLEFT">
 									<Offset>
 										<AbsDimension x="-47" y="-20"/>
 									</Offset>
