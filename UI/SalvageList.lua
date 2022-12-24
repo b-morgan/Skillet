@@ -184,21 +184,21 @@ function Skillet:UpdateSalvageListWindow()
 		local  needed = _G[button:GetName() .. "Needed"]
 		button:SetWidth(width)
 		if itemIndex <= numItems then
-			oreagentID = self.cachedSalvageList[itemIndex].itemID
-			button.oreagentID = oreagentID
-			local oreagentName, oreagentLink = GetItemInfo(oreagentID)
-			local oreagentQuality
-			if not oreagentName then
+			sreagentID = self.cachedSalvageList[itemIndex].itemID
+			button.sreagentID = sreagentID
+			local sreagentName, sreagentLink = GetItemInfo(sreagentID)
+			local sreagentQuality
+			if not sreagentName then
 				Skillet.salvageDataNeeded = true
-				C_Item.RequestLoadItemDataByID(oreagentID)
-				oreagentName = "item:"..tostring(oreagentID)
+				C_Item.RequestLoadItemDataByID(sreagentID)
+				sreagentName = "item:"..tostring(sreagentID)
 			end
-			if oreagentLink then
-				oreagentQuality = C_TradeSkillUI.GetItemReagentQualityByItemInfo(oreagentLink)
+			if sreagentLink then
+				sreagentQuality = C_TradeSkillUI.GetItemReagentQualityByItemInfo(sreagentLink)
 			end
 			needed:SetText("")
 			needed:Show()
-			local num, craftable = self:GetInventory(self.currentPlayer, oreagentID)
+			local num, craftable = self:GetInventory(self.currentPlayer, sreagentID)
 			local count_text
 			if craftable > 0 then
 				count_text = string.format("[%d/%d]", num, craftable)
@@ -207,14 +207,14 @@ function Skillet:UpdateSalvageListWindow()
 			end
 			count:SetText(count_text)
 			count:Show()
-			if oreagentQuality then
-				oreagentName = oreagentName..C_Texture.GetCraftingReagentQualityChatIcon(oreagentQuality)
+			if sreagentQuality then
+				sreagentName = sreagentName..C_Texture.GetCraftingReagentQualityChatIcon(sreagentQuality)
 			end
-			text:SetText(oreagentName)
+			text:SetText(sreagentName)
 			text:SetWordWrap(false)
 			text:SetWidth(width - (needed:GetWidth() + count:GetWidth()))
 			text:Show()
-			local texture = GetItemIcon(oreagentID)
+			local texture = GetItemIcon(sreagentID)
 			icon:SetNormalTexture(texture)
 			icon:Show()
 			button:SetID(itemIndex)
@@ -322,8 +322,8 @@ function Skillet:GetSalvageItemLink(skillIndex, index)
 	if skillIndex and index then
 		local recipe = self:GetRecipeDataByTradeIndex(self.currentTrade, skillIndex)
 		if recipe and self.cachedSalvageList then
-			oreagentID = self.cachedSalvageList[index].itemID
-			local name, link = GetItemInfo(oreagentID)
+			sreagentID = self.cachedSalvageList[index].itemID
+			local name, link = GetItemInfo(sreagentID)
 			return link
 		end
 	end
@@ -346,8 +346,8 @@ function Skillet:SalvageButtonOnEnter(button, skillIndex, salvageIndex)
 		end
 		tip:SetScale(uiScale)
 	end
-	--DA.DEBUG(1,"SalvageButtonOnEnter: "..tostring(button.oreagentID))
-	tip:SetHyperlink("item:"..button.oreagentID)
+	--DA.DEBUG(1,"SalvageButtonOnEnter: "..tostring(button.sreagentID))
+	tip:SetHyperlink("item:"..button.sreagentID)
 	tip:Show()
 	CursorUpdate(button)
 end
@@ -374,16 +374,16 @@ end
 function Skillet:SalvageButtonOnClick(button, mouse, skillIndex, reagentIndex)
 	DA.DEBUG(0,"SalvageButtonOnClick("..tostring(button)..", "..tostring(mouse)..", "..tostring(skillIndex)..", "..tostring(reagentIndex)..")")
 	DA.DEBUG(1,"SalvageButtonOnClick: cachedSalvageIndex= "..tostring(self.cachedSalvageIndex)..", cachedSalvageList= "..DA.DUMP(self.cachedSalvageList))
-	local oreagentID = self.cachedSalvageList[reagentIndex].itemID
+	local sreagentID = self.cachedSalvageList[reagentIndex].itemID
 	if not self.salvageSelected then
 		self.salvageSelected = {}
 	end
 	if mouse == "LeftButton" then
-		self.salvageSelected[self.cachedSalvageIndex] = oreagentID
+		self.salvageSelected[self.cachedSalvageIndex] = sreagentID
 --		self:HideSalvageList()
 	elseif mouse == "RightButton" then
 		self.salvageSelected[self.cachedSalvageIndex] = nil
 	end
-	DA.DEBUG(1,"SalvageButtonOnClick: cachedSalvageIndex= "..tostring(self.cachedSalvageIndex)..", oreagentID= "..tostring(oreagentID)..", salvageSelected= "..DA.DUMP(self.salvageSelected))
+	DA.DEBUG(1,"SalvageButtonOnClick: cachedSalvageIndex= "..tostring(self.cachedSalvageIndex)..", sreagentID= "..tostring(sreagentID)..", salvageSelected= "..DA.DUMP(self.salvageSelected))
 	self:UpdateDetailWindow(skillIndex)
 end

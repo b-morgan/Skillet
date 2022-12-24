@@ -180,21 +180,21 @@ function Skillet:UpdateFinishingListWindow()
 		local  needed = _G[button:GetName() .. "Needed"]
 		button:SetWidth(width)
 		if itemIndex <= numItems then
-			oreagentID = self.cachedFinishingList.reagents[itemIndex].itemID
-			button.oreagentID = oreagentID
-			local oreagentName, oreagentLink = GetItemInfo(oreagentID)
-			local oreagentQuality
-			if not oreagentName then
+			freagentID = self.cachedFinishingList.reagents[itemIndex].itemID
+			button.freagentID = freagentID
+			local freagentName, freagentLink = GetItemInfo(freagentID)
+			local freagentQuality
+			if not freagentName then
 				Skillet.finishingDataNeeded = true
-				C_Item.RequestLoadItemDataByID(oreagentID)
-				oreagentName = "item:"..tostring(oreagentID)
+				C_Item.RequestLoadItemDataByID(freagentID)
+				freagentName = "item:"..tostring(freagentID)
 			end
-			if oreagentLink then
-				oreagentQuality = C_TradeSkillUI.GetItemReagentQualityByItemInfo(oreagentLink)
+			if freagentLink then
+				freagentQuality = C_TradeSkillUI.GetItemReagentQualityByItemInfo(freagentLink)
 			end
 			needed:SetText("")
 			needed:Show()
-			local num, craftable = self:GetInventory(self.currentPlayer, oreagentID)
+			local num, craftable = self:GetInventory(self.currentPlayer, freagentID)
 			local count_text
 			if craftable > 0 then
 				count_text = string.format("[%d/%d]", num, craftable)
@@ -203,14 +203,14 @@ function Skillet:UpdateFinishingListWindow()
 			end
 			count:SetText(count_text)
 			count:Show()
-			if oreagentQuality then
-				oreagentName = oreagentName..C_Texture.GetCraftingReagentQualityChatIcon(oreagentQuality)
+			if freagentQuality then
+				freagentName = freagentName..C_Texture.GetCraftingReagentQualityChatIcon(freagentQuality)
 			end
-			text:SetText(oreagentName)
+			text:SetText(freagentName)
 			text:SetWordWrap(false)
 			text:SetWidth(width - (needed:GetWidth() + count:GetWidth()))
 			text:Show()
-			local texture = GetItemIcon(oreagentID)
+			local texture = GetItemIcon(freagentID)
 			icon:SetNormalTexture(texture)
 			icon:Show()
 			button:SetID(itemIndex)
@@ -311,8 +311,8 @@ function Skillet:GetFinishingItemLink(skillIndex, index)
 	if skillIndex and index then
 		local recipe = self:GetRecipeDataByTradeIndex(self.currentTrade, skillIndex)
 		if recipe and self.cachedFinishingList then
-			oreagentID = self.cachedFinishingList.reagents[index].itemID
-			local name, link = GetItemInfo(oreagentID)
+			freagentID = self.cachedFinishingList.reagents[index].itemID
+			local name, link = GetItemInfo(freagentID)
 			return link
 		end
 	end
@@ -335,8 +335,8 @@ function Skillet:FinishingButtonOnEnter(button, skillIndex, finishingIndex)
 		end
 		tip:SetScale(uiScale)
 	end
-	--DA.DEBUG(1,"FinishingButtonOnEnter: "..tostring(button.oreagentID))
-	tip:SetHyperlink("item:"..button.oreagentID)
+	--DA.DEBUG(1,"FinishingButtonOnEnter: "..tostring(button.freagentID))
+	tip:SetHyperlink("item:"..button.freagentID)
 	tip:Show()
 	CursorUpdate(button)
 end
@@ -363,16 +363,16 @@ end
 function Skillet:FinishingButtonOnClick(button, mouse, skillIndex, reagentIndex)
 	DA.DEBUG(0,"FinishingButtonOnClick("..tostring(button)..", "..tostring(mouse)..", "..tostring(skillIndex)..", "..tostring(reagentIndex)..")")
 	DA.DEBUG(1,"FinishingButtonOnClick: cachedFinishingIndex= "..tostring(self.cachedFinishingIndex)..", cachedFinishingList= "..DA.DUMP(self.cachedFinishingList))
-	local oreagentID = self.cachedFinishingList.reagents[reagentIndex].itemID
-	local oreagentSlot = self.cachedFinishingList.dataSlotIndex
+	local freagentID = self.cachedFinishingList.reagents[reagentIndex].itemID
+	local freagentSlot = self.cachedFinishingList.dataSlotIndex
 	if not self.finishingSelected then
 		self.finishingSelected = {}
 	end
 	if mouse == "LeftButton" then
-		self.finishingSelected[self.cachedFinishingIndex] = { itemID = oreagentID, quantity = 1, dataSlotIndex = oreagentSlot, }
+		self.finishingSelected[self.cachedFinishingIndex] = { itemID = freagentID, quantity = 1, dataSlotIndex = freagentSlot, }
 	elseif mouse == "RightButton" then
 		self.finishingSelected[self.cachedFinishingIndex] = nil
 	end
-	DA.DEBUG(1,"FinishingButtonOnClick: cachedFinishingIndex= "..tostring(self.cachedFinishingIndex)..", oreagentID= "..tostring(oreagentID)..", finishingSelected= "..DA.DUMP(self.finishingSelected))
+	DA.DEBUG(1,"FinishingButtonOnClick: cachedFinishingIndex= "..tostring(self.cachedFinishingIndex)..", freagentID= "..tostring(freagentID)..", finishingSelected= "..DA.DUMP(self.finishingSelected))
 	self:UpdateDetailWindow(skillIndex)
 end

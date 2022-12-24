@@ -21,16 +21,11 @@ SKILLET_MODIFIED_LIST_HEIGHT = 24
 
 local L = LibStub("AceLocale-3.0"):GetLocale("Skillet")
 
-function Skillet:ModifiedListToggleBestQuality()
-	self.db.char.best_quality = not self.db.char.best_quality
-	self:HideModifiedList()
-end
-
-local num_buttons = 0
-
 -- ===========================================================================================
 --    Window creation and update methods
 -- ===========================================================================================
+local num_buttons = 0
+
 local function get_button(i)
 	local button = _G["SkilletModifiedListButton"..i]
 	if not button then
@@ -40,18 +35,6 @@ local function get_button(i)
 		button:SetFrameLevel(SkilletModifiedListParent:GetFrameLevel() + 1)
 	end
 	return button
-end
-
-function Skillet:ModifiedItemCount(this, button, count)
-	local parent = this:GetParent()
-	name = parent:GetName()
-	local input = _G[name.."Input"]
-	local val = input:GetNumber()
-	val = val + count
-	if val < 0 then
-		val = 0
-	end
-	input:SetText(tostring(val))
 end
 
 --
@@ -111,8 +94,9 @@ local function createModifiedListFrame(self)
 	titletext:SetShadowOffset(1,-1)
 	titletext:SetTextColor(1,1,1)
 	titletext:SetText("Skillet: Modified Reagents")
+	frame.titletext = titletext
 	SkilletModifiedBestQualityText:SetText(PROFESSIONS_USE_BEST_QUALITY_REAGENTS)
-	SkilletModifiedBestQuality:SetChecked(Skillet.db.char.best_quality)
+	SkilletModifiedHaveItems:SetChecked(Skillet.db.char.best_quality)
 --
 -- The frame enclosing the scroll list needs a border and a background .....
 --
@@ -177,7 +161,7 @@ function Skillet:UpdateModifiedListWindow()
 -- Where in the list of items to start counting.
 --
 	local itemOffset = FauxScrollFrame_GetOffset(SkilletModifiedListList)
-	DA.DEBUG(1,"UpdateModifiedListWindow: itemOffset= "..tostring(itemOffset)..", width= "..tostring(width))
+	--DA.DEBUG(1,"UpdateModifiedListWindow: itemOffset= "..tostring(itemOffset)..", width= "..tostring(width))
 	for i=1, button_count, 1 do
 		num_buttons = math.max(num_buttons, i)
 		local itemIndex = i + itemOffset
@@ -189,21 +173,21 @@ function Skillet:UpdateModifiedListWindow()
 		local   input = _G[button:GetName() .. "Input"]
 		button:SetWidth(width)
 		if itemIndex <= numItems then
-			local oreagentID = self.cachedModifiedList[itemIndex].itemID
-			button.oreagentID = oreagentID
-			local oreagentName, oreagentLink = GetItemInfo(oreagentID)
-			local oreagentQuality
-			if not oreagentName then
+			local mreagentID = self.cachedModifiedList[itemIndex].itemID
+			button.mreagentID = mreagentID
+			local mreagentName, mreagentLink = GetItemInfo(mreagentID)
+			local mreagentQuality
+			if not mreagentName then
 				Skillet.modifiedDataNeeded = true
-				C_Item.RequestLoadItemDataByID(oreagentID)
-				oreagentName = "item:"..tostring(oreagentID)
+				C_Item.RequestLoadItemDataByID(mreagentID)
+				mreagentName = "item:"..tostring(mreagentID)
 			end
-			if oreagentLink then
-				oreagentQuality = C_TradeSkillUI.GetItemReagentQualityByItemInfo(oreagentLink)
+			if mreagentLink then
+				mreagentQuality = C_TradeSkillUI.GetItemReagentQualityByItemInfo(mreagentLink)
 			end
 			needed:SetText("")
 			needed:Show()
-			local num, craftable = self:GetInventory(self.currentPlayer, oreagentID)
+			local num, craftable = self:GetInventory(self.currentPlayer, mreagentID)
 			local count_text
 			if craftable > 0 then
 				count_text = string.format("[%d/%d]", num, craftable)
@@ -215,20 +199,20 @@ function Skillet:UpdateModifiedListWindow()
 			local use = math.min(num,self.cachedModifiedNeeded)
 			input:SetText(use)
 			input:Show()
-			if oreagentQuality then
-				oreagentName = oreagentName..C_Texture.GetCraftingReagentQualityChatIcon(oreagentQuality)
+			if mreagentQuality then
+				mreagentName = mreagentName..C_Texture.GetCraftingReagentQualityChatIcon(mreagentQuality)
 			end
-			text:SetText(oreagentName)
+			text:SetText(mreagentName)
 			text:SetWordWrap(false)
 			text:SetWidth(width - (needed:GetWidth() + count:GetWidth()))
 			text:Show()
-			local texture = GetItemIcon(oreagentID)
+			local texture = GetItemIcon(mreagentID)
 			icon:SetNormalTexture(texture)
 			icon:Show()
 			button:SetID(itemIndex)
 			button:Show()
 		else
-			DA.DEBUG(1,"UpdateModifiedListWindow: Hide unused button")
+			--DA.DEBUG(1,"UpdateModifiedListWindow: Hide unused button")
 			text:SetText("")
 			text:Hide()
 			icon:Hide()
@@ -236,7 +220,7 @@ function Skillet:UpdateModifiedListWindow()
 			count:Hide()
 			needed:SetText("")
 			needed:Hide()
-			button:SetID(itemIndex * 100)
+			button:SetID(0)
 			button:Hide()
 		end
 	end
@@ -269,12 +253,14 @@ function Skillet:DisplayModifiedList()
 	end
 end
 
-function Skillet:HideModifiedList()
+function Skillet:HideModifiedList(clear)
 	--DA.DEBUG(0,"HideModifiedList()")
 	if self.ModifiedList then
 		self.ModifiedList:Hide()
 	end
-	self.cachedModifiedList = nil
+	if clear then
+		self.cachedModifiedList = nil
+	end
 end
 
 --
@@ -309,8 +295,8 @@ function Skillet:GetModifiedItemLink(skillIndex, index)
 	if skillIndex and index then
 		local recipe = self:GetRecipeDataByTradeIndex(self.currentTrade, skillIndex)
 		if recipe and self.cachedModifiedList then
-			oreagentID = self.cachedModifiedList[index].itemID
-			local name, link = GetItemInfo(oreagentID)
+			mreagentID = self.cachedModifiedList[index].itemID
+			local name, link = GetItemInfo(mreagentID)
 			return link
 		end
 	end
@@ -333,8 +319,8 @@ function Skillet:ModifiedButtonOnEnter(button, skillIndex, modifiedIndex)
 		end
 		tip:SetScale(uiScale)
 	end
-	--DA.DEBUG(1,"ModifiedButtonOnEnter: "..tostring(button.oreagentID))
-	tip:SetHyperlink("item:"..button.oreagentID)
+	--DA.DEBUG(1,"ModifiedButtonOnEnter: "..tostring(button.mreagentID))
+	tip:SetHyperlink("item:"..button.mreagentID)
 	tip:Show()
 	CursorUpdate(button)
 end
@@ -354,16 +340,80 @@ end
 
 function Skillet:ModifiedButtonOnClick(button, mouse, skillIndex, reagentIndex)
 	DA.DEBUG(0,"ModifiedButtonOnClick("..tostring(button)..", "..tostring(mouse)..", "..tostring(skillIndex)..", "..tostring(reagentIndex)..")")
-	local oreagentID = self.cachedModifiedList[reagentIndex].itemID
+	local mreagentID = self.cachedModifiedList[reagentIndex].itemID
 	if not self.modifiedSelected then
 		self.modifiedSelected = {}
 	end
 	if mouse == "LeftButton" then
-		self.modifiedSelected[self.cachedModifiedIndex] = oreagentID
+		self.modifiedSelected[self.cachedModifiedIndex] = mreagentID
 --		self:HideModifiedList()
 	elseif mouse == "RightButton" then
 		self.modifiedSelected[self.cachedModifiedIndex] = nil
 	end
-	DA.DEBUG(1,"ModifiedButtonOnClick: cachedModifiedIndex= "..tostring(self.cachedModifiedIndex)..", oreagentID= "..tostring(oreagentID)..", modifiedSelected= "..DA.DUMP1(self.modifiedSelected))
+	DA.DEBUG(1,"ModifiedButtonOnClick: cachedModifiedIndex= "..tostring(self.cachedModifiedIndex)..", mreagentID= "..tostring(mreagentID)..", modifiedSelected= "..DA.DUMP1(self.modifiedSelected))
 	self:UpdateDetailWindow(skillIndex)
+end
+
+function Skillet:ModifiedListToggleBestQuality()
+	self.db.char.best_quality = not self.db.char.best_quality
+	DA.DEBUG(0,"ModifiedListToggleBestQuality: best_quality= "..tostring(self.db.char.best_quality))
+	SkilletUseHighestQuality:SetChecked(self.db.char.best_quality)
+	self:UpdateDetailWindow(self.selectedSkill)
+end
+
+function Skillet:ModifiedItemCount(this, button, count)
+	local parent = this:GetParent()
+	name = parent:GetName()
+	local input = _G[name.."Input"]
+	local val = input:GetNumber()
+	val = val + count
+	if val < 0 then
+		val = 0
+	end
+	input:SetText(tostring(val))
+end
+
+--
+-- Called when there are enough reagents for this slot.
+-- Builds the self.modifiedSelected table of tables in the format needed by C_TradeSkillUI.CraftRecipe
+-- using self.db.char.best_quality to determine the order.
+--
+function Skillet:InitializeModifiedSelected(which, num, mreagent)
+	DA.DEBUG(0,"InitializeModifiedSelected("..tostring(which)..", "..DA.DUMP1(num)..", "..DA.DUMP(mreagent)..")")
+	modifiedSelected = {}
+	local total = 0
+	local this = 0
+	local used = 0
+	local need = mreagent.numNeeded
+	if self.db.char.best_quality then
+		for k=#mreagent.schematic.reagents, 1 , -1 do
+			if used < need then
+				this = math.min(num[k],(need-total))
+				total = total + this
+				if this > 0 then
+					table.insert(modifiedSelected, { itemID = mreagent.schematic.reagents[k].itemID, quantity = this, dataSlotIndex = mreagent.slot, })
+				end
+			end
+		end
+	else
+		for k=1, #mreagent.schematic.reagents, 1 do
+			if used < need then
+				this = math.min(num[k],(need-total))
+				total = total + this
+				if this > 0 then
+					table.insert(modifiedSelected, { itemID = mreagent.schematic.reagents[k].itemID, quantity = this, dataSlotIndex = mreagent.slot, })
+				end
+			end
+		end
+	end
+	if not self.modifiedSelected then
+		self.modifiedSelected = {}
+	end
+	self.modifiedSelected[which] = modifiedSelected
+	--DA.DEBUG(0,"InitializeModifiedSelected: modifiedSelected = "..DA.DUMP1(modifiedSelected))
+	DA.DEBUG(0,"InitializeModifiedSelected: self.modifiedSelected = "..DA.DUMP(self.modifiedSelected))
+end
+
+function Skillet:VerifyModifiedSelected()
+	DA.DEBUG(0,"VerifyModifiedSelected()")
 end
