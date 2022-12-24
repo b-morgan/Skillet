@@ -256,7 +256,7 @@ function DA.DUMP(o,m,n)
 		local s
 		local i = ""
 		if n then
-			i = string.rep(" ",n)
+			i = string.rep("  ",n)
 		else
 			n = 0
 		end
