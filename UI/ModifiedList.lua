@@ -96,7 +96,6 @@ local function createModifiedListFrame(self)
 	titletext:SetText("Skillet: Modified Reagents")
 	frame.titletext = titletext
 	SkilletModifiedBestQualityText:SetText(PROFESSIONS_USE_BEST_QUALITY_REAGENTS)
-	SkilletModifiedHaveItems:SetChecked(Skillet.db.char.best_quality)
 --
 -- The frame enclosing the scroll list needs a border and a background .....
 --

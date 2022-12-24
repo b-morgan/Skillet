@@ -409,7 +409,7 @@ function Skillet:UpdateDetailWindow(skillIndex)
 --
 			local mreagent = recipe.modifiedData[j]
 			if mreagent then
-				--DA.DEBUG(0,"UpdateDetailWindow: mreagent="..DA.DUMP(mreagent))
+				--DA.DEBUG(0,"UpdateDetailWindow: mreagent= "..DA.DUMP(mreagent))
 				needed:SetText(mreagent.numNeeded.."x")
 				local mselected
 				local mitem, name, link
@@ -498,7 +498,8 @@ function Skillet:UpdateDetailWindow(skillIndex)
 --
 					count:SetText(GRAY_FONT_COLOR_CODE .. count_text .. FONT_COLOR_CODE_CLOSE)
 					text:SetText(GRAY_FONT_COLOR_CODE .. name .. FONT_COLOR_CODE_CLOSE)
-					if self:VendorSellsReagent(mreagent.reagentID) then
+					DA.DEBUG(0,"UpdateDetailWindow: (need) mreagent= "..DA.DUMP(mreagent))
+					if mreagent.reagentID and self:VendorSellsReagent(mreagent.reagentID) then
 						needed:SetTextColor(0,1,0)
 					else
 						needed:SetTextColor(1,0,1)

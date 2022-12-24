@@ -100,7 +100,7 @@ local function createSalvageListFrame(self)
 	titletext:SetTextColor(1,1,1)
 	titletext:SetText("Skillet: Salvage Reagents")
 	frame.titletext = titletext
-	SkilletSalvageHaveItemsText:SetText(SALVAGE_REAGENT_LIST_HIDE_UNOWNED)
+	SkilletSalvageHaveItemsText:SetText(OPTIONAL_REAGENT_LIST_HIDE_UNOWNED)
 	SkilletSalvageHaveItems:SetChecked(Skillet.db.char.hide_unowned)
 --
 -- The frame enclosing the scroll list needs a border and a background .....
