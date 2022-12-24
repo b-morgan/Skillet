@@ -84,6 +84,7 @@ UI\Filtering.lua
 UI\QueueMgt.lua
 UI\MainFrame.lua
 UI\MainFrame.xml
+UI\DetailFrame.lua
 UI\RecipeNotes.lua
 UI\RecipeNotes.xml
 UI\MerchantWindow.lua
@@ -93,5 +94,11 @@ UI\ShoppingList.xml
 UI\IgnoreList.lua
 UI\IgnoreList.xml
 UI\RecipeRank.lua
+UI\FinishingList.lua
+UI\FinishingList.xml
+UI\ModifiedList.lua
+UI\ModifiedList.xml
 UI\OptionalList.lua
 UI\OptionalList.xml
+UI\SalvageList.lua
+UI\SalvageList.xml
