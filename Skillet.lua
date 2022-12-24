@@ -661,7 +661,9 @@ function Skillet:RegisterRecipeFilter(name, namespace, initMethod, filterMethod)
 	self.recipeFilters[name] = { namespace = namespace, initMethod = initMethod, filterMethod = filterMethod }
 end
 
+--
 -- Called when the addon is enabled
+--
 function Skillet:OnEnable()
 	DA.DEBUG(0,"OnEnable()");
 --
@@ -1016,21 +1018,35 @@ function Skillet:GARRISON_TRADESKILL_NPC_CLOSED()
 end
 
 function Skillet:ITEM_DATA_LOAD_RESULT(event, itemID, result)
---	name = GetItemInfo(itemID)
-	--DA.TRACE("ITEM_DATA_LOAD_RESULT("..tostring(itemID)..", "..tostring(result).."), "..tostring(name))
+	--DA.TRACE("ITEM_DATA_LOAD_RESULT("..tostring(itemID)..", "..tostring(result).."), "..tostring(GetItemInfo(itemID)))
+	if Skillet.salvageDataNeeded then
+		Skillet:UpdateSalvageListWindow()
+		Skillet.salvageDataNeeded = nil
+	end
+	if Skillet.finishingDataNeeded then
+		Skillet:UpdateFinishingListWindow()
+		Skillet.finishingDataNeeded = nil
+	end
 	if Skillet.optionalDataNeeded then
 		Skillet:UpdateOptionalListWindow()
 		Skillet.optionalDataNeeded = nil
 	end
+	if Skillet.modifiedDataNeeded then
+		Skillet:UpdateModifiedListWindow()
+		Skillet.modifiedDataNeeded = nil
+	end
+	if Skillet.detailDataNeeded then
+		Skillet:UpdateDetailWindow(self.selectedSkill)
+		Skillet.detailDataNeeded = nil
+	end
 end
 
 function Skillet:GET_ITEM_INFO_RECEIVED(event, itemID, result)
---	name = GetItemInfo(itemID)
---	DA.TRACE("GET_ITEM_INFO_RECEIVED("..tostring(itemID)..", "..tostring(result).."), "..tostring(name))
+	--DA.TRACE("GET_ITEM_INFO_RECEIVED("..tostring(itemID)..", "..tostring(result).."), "..tostring(GetItemInfo(itemID)))
 end
 
 --
--- Dragonflight replacement for *_SHOW and *_CLOSED events
+-- Dragonflight replacement for *_SHOW events
 --
 function Skillet:PLAYER_INTERACTION_MANAGER_FRAME_SHOW(event,interactionType)
 	DA.TRACE("PLAYER_INTERACTION_MANAGER_FRAME_SHOW("..tostring(interactionType)..")")
@@ -1050,7 +1066,7 @@ function Skillet:PLAYER_INTERACTION_MANAGER_FRAME_SHOW(event,interactionType)
 end
 
 --
--- Dragonflight replacement for *_SHOW and *_CLOSED events
+-- Dragonflight replacement for *_CLOSED events
 --
 function Skillet:PLAYER_INTERACTION_MANAGER_FRAME_HIDE(event,interactionType)
 	DA.TRACE("PLAYER_INTERACTION_MANAGER_FRAME_HIDE("..tostring(interactionType)..")")
@@ -1545,6 +1561,15 @@ function Skillet:HideAllWindows()
 		closed = true
 	end
 	if self:HideOptionalList() then
+		closed = true
+	end
+	if self:HideModifiedList() then
+		closed = true
+	end
+	if self:HideSalvageList() then
+		closed = true
+	end
+	if self:HideFinishingList() then
 		closed = true
 	end
 	self.currentTrade = nil
