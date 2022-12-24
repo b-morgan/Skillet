@@ -72,17 +72,17 @@ local function update_merchant_inventory()
 -- Loop through all the items for debugging but only use the first.
 --
 					if itemCount > 0 then
-						DA.DEBUG(2,"For "..tostring(name).." ("..tostring(id)..") itemCount= "..tostring(itemCount))
+						--DA.DEBUG(2,"For "..tostring(name).." ("..tostring(id)..") itemCount= "..tostring(itemCount))
 						for j=itemCount, 1, -1 do
 							itemTexture, itemValue, itemLink, currencyName = GetMerchantItemCostItem(i, j)
-							DA.DEBUG(2,"  ["..tostring(j).."]: itemValue= "..tostring(itemValue)..", itemLink= "..tostring(itemLink)..", currencyName= "..tostring(currencyName))
+							--DA.DEBUG(2,"  ["..tostring(j).."]: itemValue= "..tostring(itemValue)..", itemLink= "..tostring(itemLink)..", currencyName= "..tostring(currencyName))
 							if currencyName then
 								currencyID = -1 * tonumber(Skillet.currencyIDsByName[currencyName] or 0)
 							elseif itemLink then
 								currencyName = GetItemInfo(itemLink)
 								currencyID = Skillet:GetItemIDFromLink(itemLink)
 							end
-							DA.DEBUG(2,"  currencyName= "..tostring(currencyName).." ("..tostring(currencyID)..") x "..tostring(itemValue))
+							--DA.DEBUG(2,"  currencyName= "..tostring(currencyName).." ("..tostring(currencyID)..") x "..tostring(itemValue))
 						end
 					end
 				end
@@ -106,7 +106,7 @@ local function update_merchant_inventory()
 								Skillet.db.global.MissingVendorItems[id] = name or true		-- add it to our table
 							end
 						else
-							DA.DEBUG(1,"known "..tostring(name).." ("..tostring(id)..")")
+							--DA.DEBUG(1,"known "..tostring(name).." ("..tostring(id)..")")
 							if type(Skillet.db.global.MissingVendorItems[id]) == "table" then
 								if #Skillet.db.global.MissingVendorItems[id] ~= 5 then
 									Skillet.db.global.MissingVendorItems[id] = "Fix Me"
@@ -151,14 +151,14 @@ local function update_merchant_buy_button()
 		return false
 	end
 	if Skillet.db.profile.display_shopping_list_at_merchant then
-		DA.DEBUG(0,"Shopping List should be displayed")
+		--DA.DEBUG(0,"Shopping List should be displayed")
 		Skillet:DisplayShoppingList(false)
 	end
 	if SkilletMerchantBuyFrame:IsVisible() then
-		DA.DEBUG(0,"Merchant Buy Button should already be there")
+		--DA.DEBUG(0,"Merchant Buy Button should already be there")
 		return true		-- already inserted the button
 	end
-	DA.DEBUG(0,"Create and show the Merchant Buy Button")
+	--DA.DEBUG(0,"Create and show the Merchant Buy Button")
 	SkilletMerchantBuyFrameButton:SetText(L["Reagents"])
 	SkilletMerchantBuyFrame:SetPoint("TOPLEFT", "MerchantFrame", "TOPLEFT" , 55, -5) -- May need to be adjusted for each WoW build
 	SkilletMerchantBuyFrame:SetFrameStrata("HIGH")
