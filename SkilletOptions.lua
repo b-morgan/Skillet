@@ -1262,10 +1262,28 @@ Skillet.options =
 						windowManager.SavePosition(SkilletIgnoreList)
 					end
 					if SkilletOptionalList and SkilletOptionalList:IsVisible() then
-						SkilletOptionalList:SetWidth(320);
+						SkilletOptionalList:SetWidth(420);
 						SkilletOptionalList:SetHeight(230);
 						SkilletOptionalList:SetPoint("TOPLEFT",950,-400);
 						windowManager.SavePosition(SkilletOptionalList)
+					end
+					if SkilletModifiedList and SkilletModifiedList:IsVisible() then
+						SkilletModifiedList:SetWidth(420);
+						SkilletModifiedList:SetHeight(230);
+						SkilletModifiedList:SetPoint("TOPLEFT",950,-400);
+						windowManager.SavePosition(SkilletModifiedList)
+					end
+					if SkilletSalvageList and SkilletSalvageList:IsVisible() then
+						SkilletSalvageList:SetWidth(420);
+						SkilletSalvageList:SetHeight(230);
+						SkilletSalvageList:SetPoint("TOPLEFT",950,-400);
+						windowManager.SavePosition(SkilletSalvageList)
+					end
+					if SkilletFinishingList and SkilletFinishingList:IsVisible() then
+						SkilletFinishingList:SetWidth(420);
+						SkilletFinishingList:SetHeight(230);
+						SkilletFinishingList:SetPoint("TOPLEFT",950,-400);
+						windowManager.SavePosition(SkilletFinishingList)
 					end
 				else
 					DA.DEBUG(0,"|cff8888ffSkillet|r: Combat lockdown restriction." ..
@@ -1286,6 +1304,27 @@ Skillet.options =
 				Skillet.BlizzOR = value
 			end,
 			order = 100
+		},
+--
+-- If set, FakeIt will not execute C_TradeSkillUI.CraftRecipe
+-- FakeIt is not stored in the saved variables file.
+--
+		FakeIt = {
+			type = "toggle",
+			name = "FakeIt",
+			desc = "Option for debugging",
+			get = function()
+				return Skillet.FakeIt
+			end,
+			set = function(self,value)
+				Skillet.FakeIt = value
+				if Skillet.FakeIt then
+					Skillet:Print(RED_FONT_COLOR_CODE.."FakeIt is on"..FONT_COLOR_CODE_CLOSE)
+				else
+					Skillet:Print(GREEN_FONT_COLOR_CODE.."FakeIt is off"..FONT_COLOR_CODE_CLOSE)
+				end
+			end,
+			order = 101
 		},
 	}
 }
