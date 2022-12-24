@@ -305,7 +305,7 @@ local function cache_list(self)
 end
 
 local function indexBags()
-	DA.DEBUG(0,"indexBags()")
+	--DA.DEBUG(0,"indexBags()")
 --
 -- bank contains detailed contents of each tab,slot which 
 -- is only needed while the bank is open.
@@ -319,7 +319,7 @@ local function indexBags()
 		bags = {}
 		local slots = C_Container.GetContainerNumSlots(container)
 		local freeSlots, bagType = C_Container.GetContainerNumFreeSlots(container)
-		DA.DEBUG(1,"container="..tostring(container)..", slots="..tostring(slots))
+		--DA.DEBUG(1,"container="..tostring(container)..", slots="..tostring(slots))
 		for i = 1, slots, 1 do
 			local item = C_Container.GetContainerItemLink(container, i)
 			--DA.DEBUG(2,"item="..tostring(item))
@@ -361,7 +361,7 @@ local function indexBags()
 end
 
 local function indexBank()
-	DA.DEBUG(0,"indexBank()")
+	--DA.DEBUG(0,"indexBank()")
 --
 -- bank contains detailed contents of each tab,slot which 
 -- is only needed while the bank is open.
@@ -377,7 +377,7 @@ local function indexBank()
 		banktab = {}
 		local slots = C_Container.GetContainerNumSlots(container)
 		local freeSlots, bagType = C_Container.GetContainerNumFreeSlots(container)
-		DA.DEBUG(1,"container="..tostring(container)..", slots="..tostring(slots))
+		--DA.DEBUG(1,"container="..tostring(container)..", slots="..tostring(slots))
 		for i = 1, slots, 1 do
 			local item = C_Container.GetContainerItemLink(container, i)
 			--DA.DEBUG(2,"item="..tostring(item))
@@ -421,7 +421,7 @@ local function indexBank()
 end
 
 local function indexGuildBank(tab)
-	DA.DEBUG(0,"indexGuildBank("..tostring(tab)..")")
+	--DA.DEBUG(0,"indexGuildBank("..tostring(tab)..")")
 --
 -- Build a current view of the contents of the Guildbank (one tab at a time).
 --
