@@ -29,9 +29,9 @@
 		</Size>
 		<Layers>
 			<Layer level="OVERLAY">
-				<FontString name="$parentCount" inherits="GameFontNormalSmall" justifyH="RIGHT" justifyV="MIDDLE">
+				<FontString name="$parentCount" inherits="GameFontNormal" justifyH="RIGHT" justifyV="MIDDLE">
 					<Size>
-						<AbsDimension x="48" y="16"/>
+						<AbsDimension x="48" y="20"/>
 					</Size>
 					<Anchors>
 						<Anchor point="TOPRIGHT" relativeTo="$parent" relativePoint="TOPRIGHT">
@@ -42,7 +42,7 @@
 					</Anchors>
 					<Color r="1" g="1" b="1" a="1"/>
 				</FontString>
-				<FontString name="$parentNeeded" inherits="GameFontNormalSmall" justifyH="RIGHT" justifyV="MIDDLE">
+				<FontString name="$parentNeeded" inherits="GameFontNormal" justifyH="RIGHT" justifyV="MIDDLE">
 					<Size>
 						<AbsDimension x="32" y="16"/>
 					</Size>
@@ -117,7 +117,7 @@
 	</Size>
 	<Layers>
 		<Layer level="ARTWORK">
-			<FontString name="$parentText" inherits="GameFontHighlightSmall">
+			<FontString name="$parentText" inherits="GameFontHighlight">
 				<Anchors>
 					<Anchor point="RIGHT" relativePoint="LEFT">
 						<Offset>
@@ -141,7 +141,7 @@
 	</Size>
 	<Layers>
 		<Layer level="ARTWORK">
-			<FontString name="$parentText" inherits="GameFontHighlightSmall">
+			<FontString name="$parentText" inherits="GameFontHighlight">
 				<Anchors>
 					<Anchor point="LEFT" relativePoint="RIGHT">
 						<Offset>
@@ -160,7 +160,7 @@
 </CheckButton>
 
 <Frame name="SkilletOptionalList" parent="UIParent" toplevel="true" movable="true" enableMouse="true" resizable="true" hidden="true" clampedToScreen="true" inherits="BackdropTemplate">
-	<Size><AbsDimension x="320" y="240"/></Size>
+	<Size><AbsDimension x="420" y="240"/></Size>
 	<Anchors>
 		<Anchor point="CENTER"/>
 	</Anchors>
@@ -179,7 +179,7 @@
 				</OnClick>
 			</Scripts>
 		</Button>
-		<CheckButton name="SkilletOptionalHaveItems" inherits="SkilletShoppingListCheckButtonTemplate2">
+		<CheckButton name="SkilletOptionalHaveItems" inherits="SkilletOptionalListCheckButtonTemplate2">
 			<Anchors>
 				<Anchor point="BOTTOMLEFT" relativeTo="SkilletOptionalList" relativePoint="BOTTOMLEFT">
 					<Offset>
@@ -190,7 +190,7 @@
 			<Scripts>
 				<OnClick>
 					Skillet:OptionalListToggleHaveItems()
-					Skillet:UpdateOptionalListWindow(false)
+					Skillet:UpdateOptionalListWindow()
 				</OnClick>
 			</Scripts>
 		</CheckButton>
