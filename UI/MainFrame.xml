@@ -722,13 +722,13 @@
 	-->
 	<Frame name="SkilletItemTemplate" hidden="false" virtual="true">
 		<Size>
-			<AbsDimension x="190" y="20"/>
+			<AbsDimension x="210" y="20"/>
 		</Size>
 		<Layers>
 			<Layer level="OVERLAY">
 				<FontString name="$parentText" inherits="GameFontNormalSmall" justifyH="LEFT" justifyV="MIDDLE">
 					<Size>
-						<AbsDimension x="150" y="16"/>
+						<AbsDimension x="210" y="16"/>
 					</Size>
 					<Anchors>
 						<Anchor point="TOPLEFT" relativeTo="$parent" relativePoint="TOPLEFT">

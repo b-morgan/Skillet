@@ -54,8 +54,8 @@ local SKILLET_HEADER_HEIGHT = 145		-- 125 if Filter is removed under Search
 local SKILLET_SKILLLIST_MIN_WIDTH = 440
 
 -- min/max width for the reagent window
-local SKILLET_REAGENT_MIN_WIDTH = 280
-local SKILLET_REAGENT_MAX_WIDTH = 380
+local SKILLET_REAGENT_MIN_WIDTH = 350
+local SKILLET_REAGENT_MAX_WIDTH = 400
 local SKILLET_REAGENT_MIN_HEIGHT = 300
 local reagent_height
 
@@ -1025,10 +1025,10 @@ function Skillet:UpdateTradeSkillWindow()
 	local height = SkilletFrame:GetHeight()
 	local reagent_width = width / 2
 	reagent_height = SKILLET_REAGENT_MIN_HEIGHT + ((height - SKILLET_MIN_HEIGHT) * 2) / 3
-	--DA.DEBUG(0,"UpdateTradeSkillWindow: fullView="..tostring(self.fullView)..", reagent_height="..tostring(reagent_height))
+	--DA.DEBUG(0,"UpdateTradeSkillWindow: fullView="..tostring(self.fullView)..", reagent_height="..string.format("%.0d", reagent_height))
 	if not self.fullView then
 		reagent_height = SKILLET_REAGENT_MIN_HEIGHT + height - SKILLET_MIN_HEIGHT + 85
-		--DA.DEBUG(0,"UpdateTradeSkillWindow: new_reagent_height="..tostring(reagent_height))
+		--DA.DEBUG(0,"UpdateTradeSkillWindow: new_reagent_height="..string.format("%.0d", reagent_height))
 	end
 	if reagent_width < SKILLET_REAGENT_MIN_WIDTH then
 		reagent_width = SKILLET_REAGENT_MIN_WIDTH
@@ -1040,7 +1040,7 @@ function Skillet:UpdateTradeSkillWindow()
 	SkilletQueueManagementParent:SetWidth(reagent_width)
 	width = SkilletFrame:GetWidth() - reagent_width - 20 -- padding
 	SkilletSkillListParent:SetWidth(width)
-	--DA.DEBUG(0,"UpdateTradeSkillWindow: width= "..tostring(width)..", height= "..tostring(height)..", reagent_width= "..tostring(reagent_width)..", reagent_height= "..tostring(reagent_height))
+	DA.DEBUG(0,"UpdateTradeSkillWindow: width= "..string.format("%.0d", width)..", height= "..string.format("%.0d", height)..", reagent_width= "..string.format("%.0d", reagent_width)..", reagent_height= "..string.format("%.0d", reagent_height))
 --
 -- Set the state of any craft specific options
 --
