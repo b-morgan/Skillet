@@ -52,6 +52,7 @@ function Skillet:QueueCommandIterate(recipeID, count)
 	newCommand.recipeLevel = self.recipeRank or 0
 	if recipe.numModified and recipe.numModified ~= 0 and self.modifiedSelected then
 		newCommand.modifiedReagents = self.modifiedSelected
+		newCommand.complex = true
 	end
 	if recipe.numOptional and recipe.numOptional ~= 0 and self.optionalSelected then
 		newCommand.optionalReagents = self.optionalSelected
@@ -173,20 +174,46 @@ end
 
 local function sameOptionals(a, b)
 	--DA.DEBUG(0,"sameOptionals("..DA.DUMP1(a).."', "..DA.DUMP1(b)..")")
+	if a.modifiedReagents or b.modifiedReagents then
+		DA.DEBUG(0,"sameOptionals: modified reagents exist")
+		return false
+	end
+	local ao = ""
+	local bo = ""
+	local af = ""
+	local bf = ""
 	local as = ""
 	local bs = ""
 	if a.optionalReagents then
 		for i,reagentID in pairs(a.optionalReagents) do
-			as = as..tostring(i).."="..tostring(reagentID).." "
+			ao = ao..tostring(i).."="..tostring(reagentID).." "
 		end
 	end
 	if b.optionalReagents then
 		for i,reagentID in pairs(b.optionalReagents) do
-			bs = bs..tostring(i).."="..tostring(reagentID).." "
+			bo = bo..tostring(i).."="..tostring(reagentID).." "
 		end
 	end
+	if a.finishingReagents then
+		for i,reagentID in pairs(a.finishingReagents) do
+			af = af..tostring(i).."="..tostring(reagentID).." "
+		end
+	end
+	if b.finishingReagents then
+		for i,reagentID in pairs(b.finishingReagents) do
+			bf = bf..tostring(i).."="..tostring(reagentID).." "
+		end
+	end
+	if a.salvageItem then
+		as = a.salvageItem
+	end
+	if b.salvageItem then
+		bs = b.salvageItem
+	end
+	--DA.DEBUG(0,"sameOptionals: ao= '"..tostring(ao).."', bo= '"..tostring(bo).."' == "..tostring(ao == bo))
+	--DA.DEBUG(0,"sameOptionals: af= '"..tostring(af).."', bf= '"..tostring(bf).."' == "..tostring(af == bf))
 	--DA.DEBUG(0,"sameOptionals: as= '"..tostring(as).."', bs= '"..tostring(bs).."' == "..tostring(as == bs))
-	return (as == bs)
+	return (ao == bo and af == bf and as == bs)
 end
 
 --
@@ -484,7 +511,9 @@ function Skillet:ProcessQueue(altMode)
 						for i,items in pairs(command.modifiedReagents) do
 							for j,reagent in pairs(items) do
 								DA.DEBUG(2,"i= "..tostring(i)..", j= "..tostring(j)..", item= "..DA.DUMP1(reagent))
-								table.insert(self.optionalReagentsArray, reagent)
+								if reagent.quantity ~= 0 then
+									table.insert(self.optionalReagentsArray, reagent)
+								end
 							end
 						end -- for
 					end
