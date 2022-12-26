@@ -115,6 +115,23 @@ function Skillet:HideDetailWindow()
 	end
 end
 
+local function nameWithQuality(itemID)
+	local quality
+	local name, link = GetItemInfo(itemID)
+	if not name then
+		Skillet.detailDataNeeded = true
+		C_Item.RequestLoadItemDataByID(itemID)
+		name = "item:"..tostring(itemID)
+	end
+	if link then
+		quality = C_TradeSkillUI.GetItemReagentQualityByItemInfo(link)
+	end
+	if quality then
+		name = name..C_Texture.GetCraftingReagentQualityChatIcon(quality)
+	end
+	return name
+end
+
 --
 -- Updates the detail window with information about the currently selected skill
 --
@@ -128,6 +145,9 @@ function Skillet:UpdateDetailWindow(skillIndex)
 		self:HideDetailWindow()
 		return
 	end
+--
+-- If the skillIndex has changed, clear all the special lists
+--
 	if self.currentSkillIndex ~= skillIndex then
 		self.currentSkillIndex = skillIndex
 		self.salvageSelected = {}
@@ -162,11 +182,11 @@ function Skillet:UpdateDetailWindow(skillIndex)
 		newInfo = C_TradeSkillUI.GetRecipeInfo(recipe.spellID)
 		if not self.recipeDump[recipe.spellID] then
 			self.recipeDump[recipe.spellID] = true
-			DA.DEBUG(0,"UpdateDetailWindow: skill= "..DA.DUMP1(skill))
-			DA.DEBUG(0,"UpdateDetailWindow: name= "..tostring(recipe.name)..", recipe= "..DA.DUMP(recipe))
---			DA.DEBUG(0,"UpdateDetailWindow: name= "..tostring(recipe.name)..", GetRecipeInfo= "..DA.DUMP(newInfo))
+			--DA.DEBUG(0,"UpdateDetailWindow: skill= "..DA.DUMP1(skill))
+			--DA.DEBUG(0,"UpdateDetailWindow: name= "..tostring(recipe.name)..", recipe= "..DA.DUMP(recipe))
+			--DA.DEBUG(0,"UpdateDetailWindow: name= "..tostring(recipe.name)..", GetRecipeInfo= "..DA.DUMP(newInfo))
 --			recipeSchematic = C_TradeSkillUI.GetRecipeSchematic(recipe.spellID, false)
---			DA.DEBUG(0,"UpdateDetailWindow: name= "..tostring(recipe.name)..", GetRecipeSchematic= "..DA.DUMP(recipeSchematic))
+			--DA.DEBUG(0,"UpdateDetailWindow: name= "..tostring(recipe.name)..", GetRecipeSchematic= "..DA.DUMP(recipeSchematic))
 		end
 --
 -- Name of the skill
@@ -299,6 +319,7 @@ function Skillet:UpdateDetailWindow(skillIndex)
 	local lastReagentButton = _G["SkilletReagent1"]
 	local width = SkilletReagentParent:GetWidth()
 	local numReagents = #recipe.reagentData
+	DA.DEBUG(0,"UpdateDetailWindow: recipeID= "..tostring(recipe.spellID)..", name= "..tostring(recipe.name)..", numReagents="..tostring(numReagents))
 	SkilletReagentLabel:SetText(SPELL_REAGENTS)
 	SkilletReagentLabel:Show();
 	for i=1, SKILLET_NUM_REAGENT_BUTTONS, 1 do
@@ -348,7 +369,6 @@ function Skillet:UpdateDetailWindow(skillIndex)
 				if self:VendorSellsReagent(reagent.reagentID) then
 					needed:SetTextColor(0,1,0)
 				elseif reagent.modifiedReagent then
-					SkilletDescriptionText:SetText("Can use multiple quality reagents")
 					needed:SetTextColor(1,0,1)
 				else
 					needed:SetTextColor(1,0,0)
@@ -360,7 +380,6 @@ function Skillet:UpdateDetailWindow(skillIndex)
 				count:SetText(count_text)
 				text:SetText(reagentName)
 				if reagent.modifiedReagent then
-					SkilletDescriptionText:SetText("Can use multiple quality reagents")
 					needed:SetTextColor(1,1,0)
 				else
 					needed:SetTextColor(1,1,1)
@@ -406,6 +425,7 @@ function Skillet:UpdateDetailWindow(skillIndex)
 --
 -- Each modified reagent slot will be filled with the type of
 -- reagent or the reagent that has been selected for that slot
+-- This code assumes that the items are listed in quality order
 --
 			local mreagent = recipe.modifiedData[j]
 			if mreagent then
@@ -415,32 +435,11 @@ function Skillet:UpdateDetailWindow(skillIndex)
 				local mitem, name, link
 				local num = {}
 				local craftable = {}
-				local quality
---[[
-				local qa = {}
-				local lq = 99
-				local hq = -1
-				local lqi, hqi
---]]
 				local mtotal = 0
 				local count_text
 				for k=1, #mreagent.schematic.reagents, 1 do
 					mitem = mreagent.schematic.reagents[k].itemID
 					num[k], craftable[k] = self:GetInventory(self.currentPlayer, mitem)
---[[
-					name, link = GetItemInfo(mitem)
-					if link then
-						qa[k] = C_TradeSkillUI.GetItemReagentQualityByItemInfo(link)
-						if qa[k] < lq then
-							lq = qa[k]
-							lqi = k
-						end
-						if qa[k] > hq then
-							hq = qa[k]
-							hqi = k
-						end
-					end
---]]
 					if craftable[k] > 0 then
 						if count_text then
 							count_text = count_text .. string.format("+%d/%d", num[k], craftable[k])
@@ -456,14 +455,6 @@ function Skillet:UpdateDetailWindow(skillIndex)
 					end
 					mtotal = mtotal + num[k]
 				end
---[[
-				DA.DEBUG(0,"UpdateDetailWindow: qa="..DA.DUMP1(qa))
-				for i=1, #qa, 1 do
-					if i ~= qa[i] then
-					DA.WARN("UpdateDetailWindow: modifiedReagent items not in quality order")
-					end
-				end
---]]
 				if count_text then
 					count_text = count_text .."]"
 				end
@@ -483,22 +474,13 @@ function Skillet:UpdateDetailWindow(skillIndex)
 				if not mselected then
 					mselected = mreagent.schematic.reagents[1].itemID
 				end
-				local name, link = GetItemInfo(mselected)
-				if not name then
-					Skillet.detailDataNeeded = true
-					C_Item.RequestLoadItemDataByID(mselected)
-					name = "item:"..tostring(mselected)
-				end
-				if link then
-					quality = C_TradeSkillUI.GetItemReagentQualityByItemInfo(link)
-				end
 				if mtotal < mreagent.numNeeded then
 --
 -- Grey it out if we don't have it
 --
 					count:SetText(GRAY_FONT_COLOR_CODE .. count_text .. FONT_COLOR_CODE_CLOSE)
 					text:SetText(GRAY_FONT_COLOR_CODE .. name .. FONT_COLOR_CODE_CLOSE)
-					DA.DEBUG(0,"UpdateDetailWindow: (need) mreagent= "..DA.DUMP(mreagent))
+					--DA.DEBUG(0,"UpdateDetailWindow: (need) mreagent= "..DA.DUMP(mreagent))
 					if mreagent.reagentID and self:VendorSellsReagent(mreagent.reagentID) then
 						needed:SetTextColor(0,1,0)
 					else
@@ -509,14 +491,11 @@ function Skillet:UpdateDetailWindow(skillIndex)
 -- Ungrey it
 --
 					count:SetText(count_text)
-					if quality then
-						name = name..C_Texture.GetCraftingReagentQualityChatIcon(quality)
-					end
+					local name = nameWithQuality(mselected)
 					text:SetText(name)
 					needed:SetTextColor(1,1,0)
 					self:InitializeModifiedSelected(j, num, mreagent)
 				end
---				SkilletDescriptionText:SetText("Can use multiple quality reagents")
 				texture = GetItemIcon(mselected)
 				icon:SetNormalTexture(texture)
 				icon:Show()
@@ -584,7 +563,7 @@ function Skillet:UpdateDetailWindow(skillIndex)
 --
 -- An optional reagent has been selected for this slot
 --
-					local name = GetItemInfo(oselected.itemID)
+					local name = nameWithQuality(oselected.itemID)
 					text:SetText(name)
 					texture = GetItemIcon(oselected.itemID)
 					icon:SetNormalTexture(texture)
@@ -670,7 +649,7 @@ function Skillet:UpdateDetailWindow(skillIndex)
 --
 			local freagent = recipe.finishingData[j]
 			if freagent then
-				DA.DEBUG(0,"UpdateDetailWindow: freagent="..DA.DUMP(freagent))
+				--DA.DEBUG(0,"UpdateDetailWindow: freagent="..DA.DUMP(freagent))
 				local fselected
 				if self.finishingSelected then
 					fselected = self.finishingSelected[j]
@@ -680,7 +659,7 @@ function Skillet:UpdateDetailWindow(skillIndex)
 --
 -- A finishing reagent has been selected for this slot
 --
-					local name = GetItemInfo(fselected.itemID)
+					local name = nameWithQuality(fselected.itemID)
 					text:SetText(name)
 					texture = GetItemIcon(fselected.itemID)
 					icon:SetNormalTexture(texture)
@@ -764,7 +743,7 @@ function Skillet:UpdateDetailWindow(skillIndex)
 -- reagent or the reagent that has been selected for that slot
 --
 			if j == 1 then
-				DA.DEBUG(0,"UpdateDetailWindow: salvageSelected= "..DA.DUMP1(self.salvageSelected))
+				--DA.DEBUG(0,"UpdateDetailWindow: salvageSelected= "..DA.DUMP1(self.salvageSelected))
 				local sselected
 				if self.salvageSelected then
 					sselected = self.salvageSelected[j]
@@ -773,8 +752,8 @@ function Skillet:UpdateDetailWindow(skillIndex)
 --
 -- A salvage reagent has been selected for this slot
 --
-					DA.DEBUG(0,"UpdateDetailWindow: sselected= "..tostring(sselected))
-					local name = GetItemInfo(sselected)
+					--DA.DEBUG(0,"UpdateDetailWindow: sselected= "..tostring(sselected))
+					local name = nameWithQuality(sselected)
 					text:SetText(name)
 					texture = GetItemIcon(sselected)
 					icon:SetNormalTexture(texture)
@@ -791,7 +770,7 @@ function Skillet:UpdateDetailWindow(skillIndex)
 -- Show the type of reagent that can be used. The icon reflects useability.
 -- (do we need to prevent locked slots from being filled?)
 --
-					DA.DEBUG(0,"UpdateDetailWindow: salvage= "..DA.DUMP1(recipe.salvage))
+					--DA.DEBUG(0,"UpdateDetailWindow: salvage= "..DA.DUMP1(recipe.salvage))
 					text:SetText(PROFESSIONS_ADD_SALVAGE)
 					icon:SetNormalAtlas("itemupgrade_greenplusicon")
 					count:SetText("")
@@ -990,7 +969,7 @@ function Skillet:ReagentButtonRightClick(button, mouse, skillIndex, reagentIndex
 -- Salvage reagent (reagentIndex < 0 and recipe.salvage)
 --
 			Skillet:DisplaySalvageList()
-			Skillet:OptionalReagentOnClick(button, mouse, skillIndex, reagentIndex)
+			Skillet:SalvageReagentOnClick(button, mouse, skillIndex, reagentIndex)
 			return
 		else
 --
@@ -1012,7 +991,7 @@ function Skillet:ReagentButtonRightClick(button, mouse, skillIndex, reagentIndex
 -- Finishing reagent (reagentIndex + 200)
 --
 		Skillet:DisplayFinishingList()
-		Skillet:OptionalReagentOnClick(button, mouse, skillIndex, reagentIndex)
+		Skillet:FinishingReagentOnClick(button, mouse, skillIndex, reagentIndex)
 		return
 	end
 --
@@ -1028,7 +1007,7 @@ end
 -- Called when the reagent button is left-clicked
 --
 function Skillet:ReagentButtonOnClick(button, mouse, skillIndex, reagentIndex)
-	--DA.DEBUG(0,"ReagentButtonOnClick("..tostring(button)..", "..tostring(mouse)..", "..tostring(skillIndex)..", "..tostring(reagentIndex)..")")
+	DA.DEBUG(0,"ReagentButtonOnClick("..tostring(button)..", "..tostring(mouse)..", "..tostring(skillIndex)..", "..tostring(reagentIndex)..")")
 	local recipe = self:GetRecipeDataByTradeIndex(self.currentTrade, skillIndex)
 	if not recipe then
 		--DA.WARN("ReagentButtonRightClick: recipe is nil. "..tostring(button)..", "..tostring(mouse)..", "..tostring(skillIndex)..", "..tostring(reagentIndex))
