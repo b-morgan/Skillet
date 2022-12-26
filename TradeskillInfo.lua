@@ -42,7 +42,9 @@ function Skillet:GetItemIDFromLink(link)	-- works with items or enchants
 	end
 end
 
+--
 -- return GetItemInfo and automatically query server if not cached
+--
 function Skillet:GetItemInfo(id)
 	if id then
 		local name = GetItemInfo(id)
