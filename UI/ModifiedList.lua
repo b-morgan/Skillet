@@ -165,8 +165,8 @@ function Skillet:UpdateModifiedListWindow()
 	else
 		return
 	end
-
 	SkilletModifiedNeeded:SetText(self.cachedModifiedNeeded)
+	SkilletModifiedNeeded:SetTextColor(1,1,1)
 	local height = SkilletModifiedListParent:GetHeight() - 30 -- Allow for frame border
 	local width = SkilletModifiedListParent:GetWidth() - 30 -- Allow for scrollbars
 	local button_count = height / SKILLET_MODIFIED_LIST_HEIGHT
@@ -195,10 +195,13 @@ function Skillet:UpdateModifiedListWindow()
 		button:SetWidth(width)
 		if itemIndex <= numItems then
 			local mreagentID = self.cachedModifiedList[itemIndex].itemID
+			button.itemIndex = itemIndex
+			button:SetID(itemIndex)
 			button.mreagentID = mreagentID
 			needed:SetText("")
 			needed:Show()
 			local num, craftable = self:GetInventory(self.currentPlayer, mreagentID)
+			button.have = num
 			local count_text
 			if craftable > 0 then
 				count_text = string.format("[%d/%d]", num, craftable)
@@ -207,17 +210,6 @@ function Skillet:UpdateModifiedListWindow()
 			end
 			count:SetText(count_text)
 			count:Show()
---[[
-			for i,items in pairs(command.modifiedReagents) do
-				DA.DEBUG(2,"QueueAppendCommand: i= "..tostring(i)..", items= "..DA.DUMP1(items))
-				for j,reagent in pairs(items) do
-					DA.DEBUG(2,"QueueAppendCommand: i= "..tostring(i)..", j= "..tostring(j)..", reagent= "..DA.DUMP1(reagent))
-					queueAppendReagent(command, reagent.itemID, command.count, queueCraftables)
-				end
-			end -- for
-					table.insert(modifiedSelected, { itemID = mreagent.schematic.reagents[k].itemID, quantity = this, dataSlotIndex = mreagent.slot, })
-			local use = math.min(num,self.cachedModifiedNeeded)
---]]
 			local modifiedSelected = self.modifiedSelected[self.cachedModifiedIndex]
 			DA.DEBUG(1,"UpdateModifiedListWindow: modifiedSelected= "..DA.DUMP1(modifiedSelected))
 			local use = 0
@@ -226,6 +218,7 @@ function Skillet:UpdateModifiedListWindow()
 					use = reagent.quantity
 				end
 			end
+			button.use = use
 			input:SetText(use)
 			input:Show()
 			local mreagentName = nameWithQuality(mreagentID)
@@ -236,7 +229,6 @@ function Skillet:UpdateModifiedListWindow()
 			local texture = GetItemIcon(mreagentID)
 			icon:SetNormalTexture(texture)
 			icon:Show()
-			button:SetID(itemIndex)
 			button:Show()
 		else
 			--DA.DEBUG(1,"UpdateModifiedListWindow: Hide unused button")
@@ -308,9 +300,6 @@ function Skillet:ModifiedReagentOnClick(button, mouse, skillIndex, reagentIndex)
 	if mouse == "LeftButton" then
 		self:UpdateModifiedListWindow()
 	elseif mouse == "RightButton" then
---		if self.modifiedSelected then
---			self.modifiedSelected[self.cachedModifiedIndex] = nil
---		end
 		self:UpdateDetailWindow(skillIndex)
 	end
 end
@@ -394,15 +383,52 @@ function Skillet:ModifiedListToggleBestQuality()
 end
 
 function Skillet:ModifiedItemCount(this, button, count)
+	DA.DEBUG(0,"ModifiedItemCount("..tostring(this)..", "..tostring(button)..", "..tostring(count))
 	local parent = this:GetParent()
+	local itemID = parent.mreagentID
+	local have = parent.have
+	local use = parent.use
+	local itemIndex = parent.itemIndex
+	--DA.DEBUG(1,"ModifiedItemCount: itemID= "..tostring(itemID)..", have= "..tostring(have)..", use= "..tostring(use)..", itemIndex= "..tostring(itemIndex))
+	local mreagents = self.modifiedSelected[self.cachedModifiedIndex]
+	--DA.DEBUG(1,"ModifiedItemCount: (before) mreagents= "..DA.DUMP1(mreagents))
 	name = parent:GetName()
 	local input = _G[name.."Input"]
 	local val = input:GetNumber()
 	val = val + count
+--
+-- first (outer) limit checks
+--
 	if val < 0 then
 		val = 0
 	end
-	input:SetText(tostring(val))
+	if val > have then
+		val = have
+	end
+--
+-- now check if this change will exceeded the needed value
+--
+	local total = 0
+	for i,reagent in pairs(mreagents) do
+		--DA.DEBUG(2,"ModifiedItemCount: i= "..tostring(i)..", reagent= "..DA.DUMP1(reagent))
+		if reagent.itemID == itemID then
+			total = total + val
+			thisReagent = reagent
+		else
+			total = total + reagent.quantity
+		end
+	end
+	--DA.DEBUG(1,"ModifiedItemCount: total= "..tostring(total)..", needed= "..tostring(self.cachedModifiedNeeded)..", val= "..tostring(val)..", thisReagent= "..DA.DUMP1(thisReagent))
+	if total <= self.cachedModifiedNeeded then
+		input:SetText(tostring(val))
+		thisReagent.quantity = val
+		if total == self.cachedModifiedNeeded then
+			SkilletModifiedNeeded:SetTextColor(1,1,1)
+		else
+			SkilletModifiedNeeded:SetTextColor(1,0,0)
+		end
+	end
+	--DA.DEBUG(1,"ModifiedItemCount: (after) mreagents= "..DA.DUMP1(mreagents))
 end
 
 --
@@ -432,9 +458,9 @@ function Skillet:InitializeModifiedSelected(which, num, mreagent)
 			if used < need then
 				this = math.min(num[k],(need-total))
 				total = total + this
-				if this > 0 then
-					table.insert(modifiedSelected, { itemID = mreagent.schematic.reagents[k].itemID, quantity = this, dataSlotIndex = mreagent.slot, })
-				end
+				table.insert(modifiedSelected, { itemID = mreagent.schematic.reagents[k].itemID, quantity = this, dataSlotIndex = mreagent.slot, })
+			else
+				table.insert(modifiedSelected, { itemID = mreagent.schematic.reagents[k].itemID, quantity = 0, dataSlotIndex = mreagent.slot, })
 			end
 		end
 	end
@@ -444,8 +470,4 @@ function Skillet:InitializeModifiedSelected(which, num, mreagent)
 	self.modifiedSelected[which] = modifiedSelected
 	--DA.DEBUG(0,"InitializeModifiedSelected: modifiedSelected = "..DA.DUMP1(modifiedSelected))
 	--DA.DEBUG(0,"InitializeModifiedSelected: self.modifiedSelected = "..DA.DUMP(self.modifiedSelected))
-end
-
-function Skillet:VerifyModifiedSelected()
-	DA.DEBUG(0,"VerifyModifiedSelected()")
 end

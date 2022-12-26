@@ -494,7 +494,9 @@ function Skillet:UpdateDetailWindow(skillIndex)
 					local name = nameWithQuality(mselected)
 					text:SetText(name)
 					needed:SetTextColor(1,1,0)
-					self:InitializeModifiedSelected(j, num, mreagent)
+					if not self.modifiedSelected[j] then
+						self:InitializeModifiedSelected(j, num, mreagent)
+					end
 				end
 				texture = GetItemIcon(mselected)
 				icon:SetNormalTexture(texture)
