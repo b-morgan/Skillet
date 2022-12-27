@@ -157,9 +157,11 @@
 					</OnLoad>
 					<OnEnterPressed>
 						self:ClearFocus()
+						Skillet:ModifyItemCount(self, button)
 					</OnEnterPressed>
 					<OnEscapePressed>
 						self:ClearFocus()
+						Skillet:ResetItemCount(self, button)
 					</OnEscapePressed>
 					<OnEditFocusLost>
 						self:HighlightText(0, 0)

@@ -213,9 +213,11 @@ function Skillet:UpdateModifiedListWindow()
 			local modifiedSelected = self.modifiedSelected[self.cachedModifiedIndex]
 			DA.DEBUG(1,"UpdateModifiedListWindow: modifiedSelected= "..DA.DUMP1(modifiedSelected))
 			local use = 0
-			for j,reagent in pairs(modifiedSelected) do
-				if reagent.itemID == mreagentID then
-					use = reagent.quantity
+			if modifiedSelected then
+				for j,reagent in pairs(modifiedSelected) do
+					if reagent.itemID == mreagentID then
+						use = reagent.quantity
+					end
 				end
 			end
 			button.use = use
@@ -268,6 +270,7 @@ function Skillet:DisplayModifiedList()
 		self.ModifiedList = createModifiedListFrame(self)
 	end
 	if not self.ModifiedList:IsVisible() then
+		SkilletModifiedListCloseButton:Enable()
 		self.ModifiedList:Show()
 	end
 end
@@ -382,8 +385,16 @@ function Skillet:ModifiedListToggleBestQuality()
 	self:UpdateDetailWindow(self.selectedSkill)
 end
 
+function Skillet:ModifyItemCount(this,button)
+	DA.DEBUG(0,"ModifyItemCount("..tostring(this)..", "..tostring(button))
+end
+
+function Skillet:ResetItemCount(this,button)
+	DA.DEBUG(0,"ResetItemCount("..tostring(this)..", "..tostring(button))
+end
+
 function Skillet:ModifiedItemCount(this, button, count)
-	DA.DEBUG(0,"ModifiedItemCount("..tostring(this)..", "..tostring(button)..", "..tostring(count))
+	--DA.DEBUG(0,"ModifiedItemCount("..tostring(this)..", "..tostring(button)..", "..tostring(count))
 	local parent = this:GetParent()
 	local itemID = parent.mreagentID
 	local have = parent.have
@@ -395,6 +406,7 @@ function Skillet:ModifiedItemCount(this, button, count)
 	name = parent:GetName()
 	local input = _G[name.."Input"]
 	local val = input:GetNumber()
+	--DA.DEBUG(1,"ModifiedItemCount: val= "..tostring(val))
 	val = val + count
 --
 -- first (outer) limit checks
@@ -409,24 +421,37 @@ function Skillet:ModifiedItemCount(this, button, count)
 -- now check if this change will exceeded the needed value
 --
 	local total = 0
-	for i,reagent in pairs(mreagents) do
-		--DA.DEBUG(2,"ModifiedItemCount: i= "..tostring(i)..", reagent= "..DA.DUMP1(reagent))
-		if reagent.itemID == itemID then
-			total = total + val
-			thisReagent = reagent
-		else
-			total = total + reagent.quantity
+	local thisReagent
+	if mreagents then
+		for i,reagent in pairs(mreagents) do
+			--DA.DEBUG(2,"ModifiedItemCount: i= "..tostring(i)..", reagent= "..DA.DUMP1(reagent))
+			if reagent.itemID == itemID then
+				total = total + val
+				thisReagent = reagent
+			else
+				total = total + reagent.quantity
+			end
 		end
 	end
 	--DA.DEBUG(1,"ModifiedItemCount: total= "..tostring(total)..", needed= "..tostring(self.cachedModifiedNeeded)..", val= "..tostring(val)..", thisReagent= "..DA.DUMP1(thisReagent))
 	if total <= self.cachedModifiedNeeded then
 		input:SetText(tostring(val))
-		thisReagent.quantity = val
+		if thisReagent then
+			thisReagent.quantity = val
+		end
 		if total == self.cachedModifiedNeeded then
 			SkilletModifiedNeeded:SetTextColor(1,1,1)
+			SkilletModifiedListCloseButton:Enable()
 		else
 			SkilletModifiedNeeded:SetTextColor(1,0,0)
+			if mreagents then
+				SkilletModifiedListCloseButton:Disable()
+			end
 		end
+	else
+		input:SetText(tostring(val))
+		SkilletModifiedNeeded:SetTextColor(1,0,0)
+		SkilletModifiedListCloseButton:Disable()
 	end
 	--DA.DEBUG(1,"ModifiedItemCount: (after) mreagents= "..DA.DUMP1(mreagents))
 end

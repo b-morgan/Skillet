@@ -180,12 +180,12 @@ function Skillet:UpdateDetailWindow(skillIndex)
 			return
 		end
 		newInfo = C_TradeSkillUI.GetRecipeInfo(recipe.spellID)
+		recipeSchematic = C_TradeSkillUI.GetRecipeSchematic(recipe.spellID, false)
 		if not self.recipeDump[recipe.spellID] then
 			self.recipeDump[recipe.spellID] = true
 			--DA.DEBUG(0,"UpdateDetailWindow: skill= "..DA.DUMP1(skill))
 			--DA.DEBUG(0,"UpdateDetailWindow: name= "..tostring(recipe.name)..", recipe= "..DA.DUMP(recipe))
 			--DA.DEBUG(0,"UpdateDetailWindow: name= "..tostring(recipe.name)..", GetRecipeInfo= "..DA.DUMP(newInfo))
---			recipeSchematic = C_TradeSkillUI.GetRecipeSchematic(recipe.spellID, false)
 			--DA.DEBUG(0,"UpdateDetailWindow: name= "..tostring(recipe.name)..", GetRecipeSchematic= "..DA.DUMP(recipeSchematic))
 		end
 --
@@ -474,6 +474,7 @@ function Skillet:UpdateDetailWindow(skillIndex)
 				if not mselected then
 					mselected = mreagent.schematic.reagents[1].itemID
 				end
+				local name = nameWithQuality(mselected)
 				if mtotal < mreagent.numNeeded then
 --
 -- Grey it out if we don't have it
@@ -491,7 +492,6 @@ function Skillet:UpdateDetailWindow(skillIndex)
 -- Ungrey it
 --
 					count:SetText(count_text)
-					local name = nameWithQuality(mselected)
 					text:SetText(name)
 					needed:SetTextColor(1,1,0)
 					if not self.modifiedSelected[j] then
@@ -584,8 +584,10 @@ function Skillet:UpdateDetailWindow(skillIndex)
 --
 					if oreagent.schematic then
 						--DA.DEBUG(0,"UpdateDetailWindow: slotText= "..tostring(oreagent.schematic.slotInfo.slotText)..", categorySkillRank="..tostring(categorySkillRank)..", requiredSkillRank= "..tostring(oreagent.schematic.slotInfo.requiredSkillRank))
+						local locked, lockedReason = self:GetReagentSlotStatus(oreagent.schematic, newInfo)
+						DA.DEBUG(0,"UpdateDetailWindow: locked= "..tostring(locked)..", lockedReason="..tostring(lockedReason))
 						text:SetText(oreagent.schematic.slotInfo.slotText or OPTIONAL_REAGENT_POSTFIX)
-						if categorySkillRank >= oreagent.schematic.slotInfo.requiredSkillRank then
+						if not locked and categorySkillRank >= oreagent.schematic.slotInfo.requiredSkillRank then
 							icon:SetNormalAtlas("itemupgrade_greenplusicon")
 						else
 							icon:SetNormalAtlas("AdventureMapIcon-Lock")
@@ -679,9 +681,11 @@ function Skillet:UpdateDetailWindow(skillIndex)
 -- (do we need to prevent locked slots from being filled?)
 --
 					if freagent.schematic then
-						--DA.DEBUG(0,"UpdateDetailWindow: slotText= "..tostring(freagent.schematic.slotInfo.slotText)..", categorySkillRank="..tostring(categorySkillRank)..", requiredSkillRank= "..tostring(freagent.schematic.slotInfo.requiredSkillRank))
+						DA.DEBUG(0,"UpdateDetailWindow: slotText= "..tostring(freagent.schematic.slotInfo.slotText)..", categorySkillRank="..tostring(categorySkillRank)..", requiredSkillRank= "..tostring(freagent.schematic.slotInfo.requiredSkillRank))
+						local locked, lockedReason = self:GetReagentSlotStatus(freagent.schematic, newInfo)
+						DA.DEBUG(0,"UpdateDetailWindow: locked= "..tostring(locked)..", lockedReason="..tostring(lockedReason))
 						text:SetText(freagent.schematic.slotInfo.slotText or OPTIONAL_REAGENT_POSTFIX)
-						if categorySkillRank >= freagent.schematic.slotInfo.requiredSkillRank then
+						if not locked and categorySkillRank >= freagent.schematic.slotInfo.requiredSkillRank then
 							icon:SetNormalAtlas("itemupgrade_greenplusicon")
 						else
 							icon:SetNormalAtlas("AdventureMapIcon-Lock")
@@ -873,9 +877,6 @@ end
 --
 function Skillet:ReagentButtonOnEnter(button, skillIndex, reagentIndex)
 	--DA.DEBUG(0,"ReagentButtonOnEnter("..tostring(button)..", "..tostring(skillIndex)..", "..tostring(reagentIndex)..")")
-	if reagentIndex <= 0 or reagentIndex > 100 then
-		return
-	end
 	GameTooltip:SetOwner(button, "ANCHOR_TOPLEFT")
 	if Skillet.db.profile.scale_tooltip then
 		local uiScale = 1.0;
@@ -891,17 +892,35 @@ function Skillet:ReagentButtonOnEnter(button, skillIndex, reagentIndex)
 	if skill then
 		local recipe = self:GetRecipe(skill.id)
 		if recipe then
-			local reagent = recipe.reagentData[reagentIndex]
-			if reagent then
-				Skillet:SetReagentToolTip(reagent.reagentID, reagent.numNeeded, skill.numCraftable or 0)
-				if self.db.profile.link_craftable_reagents then
-					if self.db.global.itemRecipeSource[reagent.reagentID] then
-						local icon = _G[button:GetName() .. "Icon"]
-						self.gearTexture:SetParent(icon)
-						self.gearTexture:ClearAllPoints()
-						self.gearTexture:SetPoint("TOPLEFT", icon)
-						self.gearTexture:Show()
+			local reagent
+			if reagentIndex > 0 and reagentIndex < 100 then
+				reagent = recipe.reagentData[reagentIndex]
+				if reagent then
+					Skillet:SetReagentToolTip(reagent.reagentID, reagent.numNeeded, skill.numCraftable or 0)
+					if self.db.profile.link_craftable_reagents then
+						if self.db.global.itemRecipeSource[reagent.reagentID] then
+							local icon = _G[button:GetName() .. "Icon"]
+							self.gearTexture:SetParent(icon)
+							self.gearTexture:ClearAllPoints()
+							self.gearTexture:SetPoint("TOPLEFT", icon)
+							self.gearTexture:Show()
+						end
 					end
+				end
+			elseif reagentIndex <= 0 then
+				reagent = recipe.optionalData[-1 * reagentIndex]
+				if reagent.lockedReason then
+					GameTooltip:AddLine(reagent.lockedReason, 1,0,0)
+				end
+			elseif reagentIndex > 200 then
+				reagent = recipe.finishingData[reagentIndex - 200]
+				if reagent.lockedReason then
+					GameTooltip:AddLine(reagent.lockedReason, 1,0,0)
+				end
+			elseif reagentIndex > 100 then
+				reagent = recipe.modifiedData[reagentIndex - 100]
+				if reagent.lockedReason then
+					GameTooltip:AddLine(reagent.lockedReason, 1,0,0)
 				end
 			else
 				GameTooltip:AddLine("unknown", 1,0,0)
@@ -1150,4 +1169,25 @@ end
 function Skillet:ReagentStarsFrame_OnMouseEnter(starsFrame)
 	GameTooltip:SetOwner(starsFrame, "ANCHOR_TOPLEFT");
 	GameTooltip:SetRecipeRankInfo(self.currentRecipeInfo.recipeID, self.currentRecipeInfo.learnedUpgrade);
+end
+
+function Skillet:GetReagentSlotStatus(reagentSlotSchematic, recipeInfo)
+	--DA.DEBUG(0,"GetReagentSlotStatus("..tostring(reagentSlotSchematic)..", "..tostring(recipeInfo)..")")
+	--DA.DEBUG(1,"GetReagentSlotStatus("..DA.DUMP1(reagentSlotSchematic)..", "..DA.DUMP1(recipeInfo)..")")
+	local slotInfo = reagentSlotSchematic.slotInfo;
+	local locked, lockedReason = C_TradeSkillUI.GetReagentSlotStatus(slotInfo.mcrSlotID, recipeInfo.recipeID, recipeInfo.skillLineAbilityID);
+	if not locked then
+		local categoryInfo = C_TradeSkillUI.GetCategoryInfo(recipeInfo.categoryID);
+		while categoryInfo and not categoryInfo.skillLineCurrentLevel and categoryInfo.parentCategoryID do
+			categoryInfo = C_TradeSkillUI.GetCategoryInfo(categoryInfo.parentCategoryID);
+		end
+		if categoryInfo and categoryInfo.skillLineCurrentLevel then
+			local requiredSkillRank = slotInfo.requiredSkillRank;
+			locked = categoryInfo.skillLineCurrentLevel < requiredSkillRank;
+			if locked then
+				lockedReason = OPTIONAL_REAGENT_TOOLTIP_SLOT_LOCKED_FORMAT:format(requiredSkillRank);
+			end
+		end
+	end
+	return locked, lockedReason;
 end

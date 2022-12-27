@@ -1192,6 +1192,12 @@ local function ScanTrade()
 				optionalData[numOptional].slot = schematic.dataSlotIndex
 				optionalData[numOptional].name = schematic.slotInfo.slotText
 				optionalData[numOptional].schematic = schematic
+				local locked, lockedReason = Skillet:GetReagentSlotStatus(schematic, recipeInfo)
+				if locked then
+					DA.DEBUG(2,"ScanTrade: recipeID= "..tostring(recipeID)..", name= "..tostring(recipeInfo.name)..", Optional lockedReason= "..tostring(lockedReason))
+					optionalData[numOptional].locked = locked
+					optionalData[numOptional].lockedReason = lockedReason
+				end
 			elseif schematic.reagentType == Enum.CraftingReagentType.Finishing then
 				--DA.DEBUG(2,"ScanTrade: recipeID= "..tostring(recipeID)..", name= "..tostring(recipeInfo.name)..", Finishing reagent= "..DA.DUMP(schematic))
 				numFinishing = numFinishing + 1
@@ -1201,6 +1207,12 @@ local function ScanTrade()
 				finishingData[numFinishing].slot = schematic.dataSlotIndex
 				finishingData[numFinishing].name = schematic.slotInfo.slotText
 				finishingData[numFinishing].schematic = schematic
+				local locked, lockedReason = Skillet:GetReagentSlotStatus(schematic, recipeInfo)
+				if locked then
+					DA.DEBUG(2,"ScanTrade: recipeID= "..tostring(recipeID)..", name= "..tostring(recipeInfo.name)..", Finishing lockedReason= "..tostring(lockedReason))
+					finishingData[numFinishing].locked = locked
+					finishingData[numFinishing].lockedReason = lockedReason
+				end
 			end
 		end -- for numReagents
 		--DA.DEBUG(2,"ScanTrade: basicData= "..DA.DUMP(basicData))
