@@ -901,7 +901,7 @@ function Skillet:UpdateTradeButtons(player)
 --
 -- One more button to toggle the Blizzard TradeSkillFrame
 --
-	if Skillet.db.profile.use_blizzard_for_optional then
+--	if Skillet.db.profile.use_blizzard_for_optional then
 		position = position + 10	-- Add some space
 		local buttonName = "SkilletBlizzardUI"
 		local button = _G[buttonName]
@@ -916,7 +916,7 @@ function Skillet:UpdateTradeButtons(player)
 		buttonIcon:SetTexture(3573824)
 		position = position + button:GetWidth()
 		button:Show()
-	end
+--	end
 end
 
 function Skillet.PluginDropdown_OnClick(this)
