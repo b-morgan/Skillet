@@ -354,7 +354,7 @@ end
 -- sorting or filtering may need to be updated.
 --
 function Skillet:ResetTradeSkillWindow()
-	--DA.DEBUG(0,"ResetTradeSkillWindow()")
+	DA.DEBUG(0,"ResetTradeSkillWindow()")
 	Skillet:SortDropdown_OnShow()
 	local buttons = SkilletFrame.added_buttons
 	if buttons then
@@ -363,7 +363,7 @@ function Skillet:ResetTradeSkillWindow()
 			local button = buttons[i]
 			if button then
 				button:ClearAllPoints()
-				button:SetParent("SkilletFrame")
+				button:SetParent(SkilletFrame)
 				button:SetPoint("TOPLEFT", last_button, "BOTTOMLEFT", 0, -1)
 				button:Hide()
 				button:SetAlpha(0)
@@ -2005,7 +2005,7 @@ function Skillet:SkillButton_OnClick(button, mouse)
 -- Currently, only the Overachiever plugin returns the achievement id and a link
 --
 				if button.prelink then
-					DA.CHAT(button.prelink)
+					DA.MARK3(button.prelink)
 				end
 			else
 				if not button.skill.subGroup then
@@ -2690,7 +2690,7 @@ local queueMenuList = {
 --
 function Skillet:StartQueue_OnClick(button,mouse)
 	if self.queuecasting then
-		DA.CHAT("Cancel incomplete processing")
+		DA.MARK3("Cancel incomplete processing")
 		self:CancelCast()
 		self.queuecasting = false
 	else
@@ -3016,6 +3016,7 @@ end
 -- returned in case you need to pop up a frame attached to it.
 --
 function Skillet:AddButtonToTradeskillWindow(button)
+	DA.DEBUG(0,"AddButtonToTradeskillWindow("..tostring(button)..")")
 	if not SkilletFrame.added_buttons then
 		SkilletFrame.added_buttons = {}
 	end
