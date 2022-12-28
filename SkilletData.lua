@@ -808,7 +808,7 @@ local function ScanTrade()
 	end
 
 	if Skillet.BlizzardSkillList[parentSkillLineID] then
-		DA.CHAT("Skillet cannot display "..tostring(parentSkillLineName)..", use the Blizzard UI")
+		DA.MARK3("Skillet cannot display "..tostring(parentSkillLineName)..", use the Blizzard UI")
 		Skillet.useBlizzard = true
 		Skillet.currentTrade = nil
 		Skillet:SkilletClose()
@@ -824,7 +824,7 @@ local function ScanTrade()
 	end
 	local player = Skillet.currentPlayer
 	if not player or not tradeID then
-		DA.CHAT("ScanTrade: abort! player= "..tostring(player)..", tradeID= "..tostring(tradeID)..
+		DA.MARK3("ScanTrade: abort! player= "..tostring(player)..", tradeID= "..tostring(tradeID)..
 			", parentSkillLineID= "..tostring(parentSkillLineID)..", parentSkillLineName= "..tostring(parentSkillLineName))
 		Skillet.scanInProgress = false
 		Skillet.currentTrade = nil

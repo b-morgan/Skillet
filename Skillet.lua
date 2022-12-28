@@ -1276,7 +1276,7 @@ function Skillet:SkilletShowWindow(where)
 	if not Skillet.db.profile.tsm_compat then
 		if TSM_API and where == "CHANGED" then
 			if TSM_API.IsUIVisible("CRAFTING") then
-				DA.CHAT(L["TradeSkillMaster must be in 'WOW UI' mode to use Skillet"])
+				DA.MARK3(L["TradeSkillMaster must be in 'WOW UI' mode to use Skillet"])
 				return
 			end
 		end
@@ -1293,10 +1293,10 @@ function Skillet:SkilletShowWindow(where)
 		self.ResetTradeSkillFilter()
 		if not self:RescanTrade() then
 			if TSM_API then
-				DA.CHAT(L["Conflict with the addon TradeSkillMaster"])
+				DA.MARK3(L["Conflict with the addon TradeSkillMaster"])
 				self.db.profile.TSM_API = true
 			else
-				DA.CHAT(L["No headers, try again"])
+				DA.MARK3(L["No headers, try again"])
 			end
 			return
 		end

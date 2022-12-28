@@ -147,7 +147,7 @@ function Skillet:InventorySkillIterations(tradeID, recipe)
 				end
 				--DA.DEBUG(2,"     SkillIterations:      numCraft="..tostring(numCraft)..", numCraftable="..tostring(numCraftable)..", numCraftableVendor="..tostring(numCraftableVendor)..", numCraftVendor="..tostring(numCraftVendor)..", numCraftAlts="..tostring(numCraftAlts))
 			else								-- no data means no craftability
-				DA.CHAT("reagent id seems corrupt!")
+				DA.MARK3("reagent id seems corrupt!")
 				DA.DEBUG(0,"recipe= "..DA.DUMP1(recipe))
 				numCraft = 0
 				numCraftable = 0

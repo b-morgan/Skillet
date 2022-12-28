@@ -538,7 +538,7 @@ function Skillet:ProcessQueue(altMode)
 --
 -- C_TradeSkillUI.GetCraftableCount failed
 --
-					DA.CHAT("Insufficent Materials available, count= "..tostring(command.count)..", numAvailable= "..tostring(numAvailable))
+					DA.MARK3("Insufficent Materials available, count= "..tostring(command.count)..", numAvailable= "..tostring(numAvailable))
 					self.queuecasting = false
 				end
 			elseif command.recipeType == Enum.TradeskillRecipeType.Salvage then
