@@ -891,8 +891,8 @@ function Skillet:ReagentButtonOnEnter(button, skillIndex, reagentIndex)
 	local skill = self:GetSkill(self.currentPlayer, self.currentTrade, skillIndex)
 	if skill then
 		local recipe = self:GetRecipe(skill.id)
+		local reagent
 		if recipe then
-			local reagent
 			if reagentIndex > 0 and reagentIndex < 100 then
 				reagent = recipe.reagentData[reagentIndex]
 				if reagent then
@@ -907,7 +907,7 @@ function Skillet:ReagentButtonOnEnter(button, skillIndex, reagentIndex)
 						end
 					end
 				end
-			elseif reagentIndex <= 0 then
+			elseif reagentIndex <= 0 and not recipe.salvage then
 				reagent = recipe.optionalData[-1 * reagentIndex]
 				if reagent.lockedReason then
 					GameTooltip:AddLine(reagent.lockedReason, 1,0,0)
