@@ -50,9 +50,12 @@ function Skillet:QueueCommandIterate(recipeID, count)
 	newCommand.recipeType = recipe.recipeType
 	newCommand.count = count
 	newCommand.recipeLevel = self.recipeRank or 0
-	if recipe.numModified and recipe.numModified ~= 0 and self.modifiedSelected then
-		newCommand.modifiedReagents = self.modifiedSelected
+	if recipe.numModified and recipe.numModified ~= 0 then
 		newCommand.complex = true
+		newCommand.modified = true
+		if self.modifiedSelected then
+			newCommand.modifiedReagents = self.modifiedSelected
+		end
 	end
 	if recipe.numOptional and recipe.numOptional ~= 0 and self.optionalSelected then
 		newCommand.optionalReagents = self.optionalSelected
@@ -102,10 +105,15 @@ local function queueAppendReagent(command, reagentID, need, queueCraftables)
 --
 					if not Skillet.TradeSkillIgnoredMats[recipeSourceID] and
 					  not Skillet.db.realm.userIgnoredMats[Skillet.currentPlayer][recipeSourceID] then
-						Skillet:QueueAppendCommand(newCommand, queueCraftables, true)
---						if not Skillet.db.profile.queue_more_than_one then
-							break
---						end
+						if newCommand.modified then
+							newCommand.count = 1
+							for i=1, newCount, 1 do
+								Skillet:QueueAppendCommand(newCommand, queueCraftables, true)
+							end
+						else
+							Skillet:QueueAppendCommand(newCommand, queueCraftables, true)
+						end
+						break
 					else
 						DA.DEBUG(3,"Did Not Queue "..tostring(recipeSourceID).." ("..tostring(recipeSource.name)..")")
 					end
@@ -119,9 +127,9 @@ end
 -- Queue up the command and reserve reagents
 --
 function Skillet:QueueAppendCommand(command, queueCraftables, noWindowRefresh)
-	DA.DEBUG(0,"QueueAppendCommand("..DA.DUMP1(command)..", "..tostring(queueCraftables)..", "..tostring(noWindowRefresh).."), visited=  "..tostring(self.visited[command.recipeID]))
+	DA.DEBUG(0,"QueueAppendCommand("..DA.DUMP(command)..", "..tostring(queueCraftables)..", "..tostring(noWindowRefresh).."), visited=  "..tostring(self.visited[command.recipeID]))
 	local recipe = self:GetRecipe(command.recipeID)
-	--DA.DEBUG(0,"QueueAppendCommand: recipe= "..DA.DUMP1(recipe))
+	DA.DEBUG(0,"QueueAppendCommand: recipe= "..DA.DUMP(recipe))
 	if recipe and not self.visited[command.recipeID] then
 		self.visited[command.recipeID] = true
 		local reagentsInQueue = self.db.realm.reagentsInQueue[Skillet.currentPlayer]
@@ -130,9 +138,9 @@ function Skillet:QueueAppendCommand(command, queueCraftables, noWindowRefresh)
 		for i=1,#recipe.reagentData do
 			local reagent = recipe.reagentData[i]
 			if command.recipeLevel and command.recipeLevel > 0 then
-				--DA.DEBUG(2,"QueueAppendCommand: recipeID= "..tostring(command.recipeID)..", recipeLevel= "..tostring(command.recipeLevel))
+				DA.DEBUG(2,"QueueAppendCommand: recipeID= "..tostring(command.recipeID)..", recipeLevel= "..tostring(command.recipeLevel))
 				local reagentName, reagentTexture, reagentCount, playerReagentCount = C_TradeSkillUI.GetRecipeReagentInfo(command.recipeID, i, command.recipeLevel)
-				--DA.DEBUG(2,"QueueAppendCommand: reagentName= "..tostring(reagentName)..", reagentCount= "..tostring(reagentCount))
+				DA.DEBUG(2,"QueueAppendCommand: reagentName= "..tostring(reagentName)..", reagentCount= "..tostring(reagentCount))
 				local reagentLink = C_TradeSkillUI.GetRecipeReagentItemLink(command.recipeID, i)
 				local reagentID = Skillet:GetItemIDFromLink(reagentLink)
 				if reagent.reagentID == reagentID then
@@ -141,28 +149,25 @@ function Skillet:QueueAppendCommand(command, queueCraftables, noWindowRefresh)
 					DA.DEBUG(0,"QueueAppendCommand: Reagent Mismatch, i= "..tostring(i)..", reagentID= "..tostring(reagent.reagentID)..", mismatch= "..tostring(reagentID))
 				end
 			end
-			--DA.DEBUG(2,"QueueAppendCommand: reagent= "..DA.DUMP1(reagent))
+			DA.DEBUG(2,"QueueAppendCommand: reagent= "..DA.DUMP(reagent))
 			queueAppendReagent(command, reagent.reagentID, command.count * reagent.numNeeded, queueCraftables and queueGlyph)
 		end -- for
-		if command.modifiedReagents then
-			DA.DEBUG(2,"QueueAppendCommand: modifiedReagents= "..DA.DUMP(command.modifiedReagents))
-			for i,items in pairs(command.modifiedReagents) do
-				DA.DEBUG(2,"QueueAppendCommand: i= "..tostring(i)..", items= "..DA.DUMP1(items))
-				for j,reagent in pairs(items) do
-					DA.DEBUG(2,"QueueAppendCommand: i= "..tostring(i)..", j= "..tostring(j)..", reagent= "..DA.DUMP1(reagent))
-					queueAppendReagent(command, reagent.itemID, command.count, queueCraftables)
-				end
-			end -- for
+		if recipe.modifiedData then
+			for i=1,#recipe.modifiedData do
+				local reagent = recipe.modifiedData[i]
+				DA.DEBUG(2,"QueueAppendCommand: reagent= "..DA.DUMP(reagent))
+				queueAppendReagent(command, reagent.reagentID, command.count * reagent.numNeeded, queueCraftables and queueGlyph)
+			end
 		end
 		if command.optionalReagents then
 			for i,reagent in pairs(command.optionalReagents) do
-				DA.DEBUG(2,"QueueAppendCommand: i= "..tostring(i)..", reagent= "..DA.DUMP1(reagent))
+				DA.DEBUG(2,"QueueAppendCommand: i= "..tostring(i)..", reagent= "..DA.DUMP(reagent))
 				queueAppendReagent(command, reagent.itemID, command.count, queueCraftables)
 			end
 		end
 		if command.finishingReagents then
 			for i,reagent in pairs(command.finishingReagents) do
-				DA.DEBUG(2,"QueueAppendCommand: i= "..tostring(i)..", reagent= "..DA.DUMP1(reagent))
+				DA.DEBUG(2,"QueueAppendCommand: i= "..tostring(i)..", reagent= "..DA.DUMP(reagent))
 				queueAppendReagent(command, reagent.itemID, command.count, queueCraftables)
 			end
 		end
@@ -364,11 +369,11 @@ function Skillet:ProcessQueue(altMode)
 							end
 						end
 						local reagentName = GetItemInfo(reagent.reagentID) or reagent.reagentID
-						--DA.DEBUG(2,"id= "..tostring(reagent.reagentID)..", reagentName="..tostring(reagentName)..", numNeeded="..tostring(reagent.numNeeded))
+						--DA.DEBUG(2,"ProcessQueue: id= "..tostring(reagent.reagentID)..", reagentName="..tostring(reagentName)..", numNeeded="..tostring(reagent.numNeeded))
 						local numInBoth = GetItemCount(reagent.reagentID,true)
 						local numInBags = GetItemCount(reagent.reagentID)
 						local numInBank =  numInBoth - numInBags
-						--DA.DEBUG(2,"numInBoth= "..tostring(numInBoth)..", numInBags="..tostring(numInBags)..", numInBank="..tostring(numInBank))
+						--DA.DEBUG(2,"ProcessQueue: numInBoth= "..tostring(numInBoth)..", numInBags="..tostring(numInBags)..", numInBank="..tostring(numInBank))
 						if numInBoth < reagent.numNeeded then
 							Skillet:Print(L["Skipping"],recipe.name,"-",L["need"],reagent.numNeeded*command.count,"x",reagentName,"("..L["have"],numInBoth..")")
 							craftable = false
@@ -379,24 +384,16 @@ function Skillet:ProcessQueue(altMode)
 -- Modified reagents
 --
 					if command.modifiedReagents then
-						local numInBoth = 0
-						local numInBags = 0 
-						local numInBank = 0
-						for i,items in pairs(command.modifiedReagents) do
-							for j,reagent in pairs(items) do
-								DA.DEBUG(2,"i= "..tostring(i)..", j= "..tostring(j)..", item= "..DA.DUMP1(reagent))
-								local reagentID = reagent.itemID
-								local reagentName = GetItemInfo(reagentID) or reagentID
-								numInBoth = numInBoth + GetItemCount(reagentID,true)
-								numInBags = numInBags + GetItemCount(reagentID)
-								numInBank = numInBank + numInBoth - numInBags
-							end -- for
-							--DA.DEBUG(2,"numInBoth= "..tostring(numInBoth)..", numInBags="..tostring(numInBags)..", numInBank="..tostring(numInBank))
-							if numInBoth < command.count then
-								Skillet:Print(L["Skipping"],recipe.name,"-",L["need"],command.count,"("..L["have"],numInBoth..")")
-								craftable = false
-								break
+						if #command.modifiedReagents == 0 then
+							for j=1,recipe.numModified,1 do
+								command.modifiedReagents[j], craftable = self:InitializeModifiedSelected(recipe.modifiedData[j])
 							end
+						else
+							craftable = self:CheckModifiedSelected(command.modifiedReagents)
+						end
+						if not craftable then
+							Skillet:Print(L["Skipping"],recipe.name)
+							break
 						end
 					end
 --
@@ -404,14 +401,14 @@ function Skillet:ProcessQueue(altMode)
 --
 					if command.optionalReagents then
 						for i,reagent in pairs(command.optionalReagents) do
-							--DA.DEBUG(2,"i= "..tostring(i)..", reagent= "..DA.DUMP1(reagent))
+							--DA.DEBUG(2,"ProcessQueue(O): i= "..tostring(i)..", reagent= "..DA.DUMP1(reagent))
 							local reagentID = reagent.itemID
 							local reagentName = GetItemInfo(reagentID) or reagentID
-							--DA.DEBUG(2,"oid= "..tostring(reagentID)..", reagentName="..tostring(reagentName)..", numNeeded="..tostring(command.count))
+							--DA.DEBUG(2,"ProcessQueue(O): oid= "..tostring(reagentID)..", reagentName="..tostring(reagentName)..", numNeeded="..tostring(command.count))
 							local numInBoth = GetItemCount(reagentID,true)
 							local numInBags = GetItemCount(reagentID)
 							local numInBank =  numInBoth - numInBags
-							--DA.DEBUG(2,"numInBoth= "..tostring(numInBoth)..", numInBags="..tostring(numInBags)..", numInBank="..tostring(numInBank))
+							--DA.DEBUG(2,"ProcessQueue(O): numInBoth= "..tostring(numInBoth)..", numInBags="..tostring(numInBags)..", numInBank="..tostring(numInBank))
 							if numInBoth < command.count then
 								Skillet:Print(L["Skipping"],recipe.name,"-",L["need"],command.count,"x",reagentName,"("..L["have"],numInBoth..")")
 								craftable = false
@@ -421,14 +418,14 @@ function Skillet:ProcessQueue(altMode)
 					end
 					if command.finishingReagents then
 						for i,reagent in pairs(command.finishingReagents) do
-							--DA.DEBUG(2,"i= "..tostring(i)..", reagent= "..DA.DUMP1(reagent))
+							--DA.DEBUG(2,"ProcessQueue(F): i= "..tostring(i)..", reagent= "..DA.DUMP1(reagent))
 							local reagentID = reagent.itemID
 							local reagentName = GetItemInfo(reagentID) or reagentID
-							--DA.DEBUG(2,"oid= "..tostring(reagentID)..", reagentName="..tostring(reagentName)..", numNeeded="..tostring(command.count))
+							--DA.DEBUG(2,"ProcessQueue(F): oid= "..tostring(reagentID)..", reagentName="..tostring(reagentName)..", numNeeded="..tostring(command.count))
 							local numInBoth = GetItemCount(reagentID,true)
 							local numInBags = GetItemCount(reagentID)
 							local numInBank =  numInBoth - numInBags
-							--DA.DEBUG(2,"numInBoth= "..tostring(numInBoth)..", numInBags="..tostring(numInBags)..", numInBank="..tostring(numInBank))
+							--DA.DEBUG(2,"ProcessQueue(F): numInBoth= "..tostring(numInBoth)..", numInBags="..tostring(numInBags)..", numInBank="..tostring(numInBank))
 							if numInBoth < command.count then
 								Skillet:Print(L["Skipping"],recipe.name,"-",L["need"],command.count,"x",reagentName,"("..L["have"],numInBoth..")")
 								craftable = false
@@ -436,12 +433,11 @@ function Skillet:ProcessQueue(altMode)
 							end
 						end -- for
 					end
+--				elseif command.recipeType == Enum.TradeskillRecipeType.Enchant then
+--				elseif command.recipeType == Enum.TradeskillRecipeType.Recraft then
 --
 -- Check for type Salvage
 --
---				elseif command.recipeType == Enum.TradeskillRecipeType.Enchant then
---				elseif command.recipeType == Enum.TradeskillRecipeType.Recraft then
---				elseif command.recipeType ~= Enum.TradeskillRecipeType.Salvage then
 				elseif command.recipeType ~= Enum.TradeskillRecipeType.Salvage then
 					craftable = false
 					break
@@ -478,9 +474,9 @@ function Skillet:ProcessQueue(altMode)
 					self.processingPosition = qpos
 					self.processingCommand = command
 					self.adjustInventory = true
-	--
-	-- If alt down/right click - auto use items / like vellums
-	--
+--
+-- If alt down/right click - auto use items / like vellums
+--
 					if altMode then
 						local itemID = Skillet:GetAutoTargetItem(command.tradeID)
 						if itemID then
@@ -502,7 +498,6 @@ function Skillet:ProcessQueue(altMode)
 					self.processingCount = command.count
 					local recipeLevel = 0
 					if command.recipeLevel then
-						DA.DEBUG(1,"Optional: level= "..tostring(command.recipeLevel))
 						recipeLevel = command.recipeLevel
 					end
 					self.processingLevel = recipeLevel
@@ -510,7 +505,7 @@ function Skillet:ProcessQueue(altMode)
 					if command.modifiedReagents then
 						for i,items in pairs(command.modifiedReagents) do
 							for j,reagent in pairs(items) do
-								DA.DEBUG(2,"i= "..tostring(i)..", j= "..tostring(j)..", item= "..DA.DUMP1(reagent))
+								DA.DEBUG(2,"Modified: i= "..tostring(i)..", j= "..tostring(j)..", item= "..DA.DUMP1(reagent))
 								if reagent.quantity ~= 0 then
 									table.insert(self.optionalReagentsArray, reagent)
 								end
@@ -519,19 +514,26 @@ function Skillet:ProcessQueue(altMode)
 					end
 					if command.optionalReagents then
 						for i,reagent in pairs(command.optionalReagents) do
-							DA.DEBUG(2,"i= "..tostring(i)..", reagent= "..DA.DUMP1(reagent))
+							DA.DEBUG(2,"Optional: i= "..tostring(i)..", reagent= "..DA.DUMP1(reagent))
 							table.insert(self.optionalReagentsArray, reagent)
 						end -- for
 					end
 					if command.finishingReagents then
 						for i,reagent in pairs(command.finishingReagents) do
-							DA.DEBUG(2,"i= "..tostring(i)..", reagent= "..DA.DUMP1(reagent))
+							DA.DEBUG(2,"Finishing: i= "..tostring(i)..", reagent= "..DA.DUMP1(reagent))
 							table.insert(self.optionalReagentsArray, reagent)
 						end -- for
 					end
-					DA.DEBUG(1,"Optional: recipeLevel= "..tostring(recipeLevel)..", optionalReagentsArray= "..DA.DUMP(self.optionalReagentsArray))
+					DA.DEBUG(1,"ProcessQueue: recipeLevel= "..tostring(recipeLevel)..", optionalReagentsArray= "..DA.DUMP(self.optionalReagentsArray))
 					command.optionalReagentsArray = self.optionalReagentsArray
-					if not Skillet.FakeIt then
+--
+-- For debugging, save the command and TraceLog setting. Restored in ContinueCast.
+-- FakeIt is used to test the creation of the CraftRecipe parameters without wasting materials.
+--
+					self.command = command
+					self.oldTraceLog = DA.TraceLog
+					DA.TraceLog = true
+					if not self.FakeIt then
 						C_TradeSkillUI.CraftRecipe(command.recipeID, command.count, command.optionalReagentsArray, recipeLevel)
 					end
 				else
@@ -544,16 +546,16 @@ function Skillet:ProcessQueue(altMode)
 			elseif command.recipeType == Enum.TradeskillRecipeType.Salvage then
 				local numAvailable
 				local itemLocation
-				DA.DEBUG(1,"salvageItem= "..tostring(command.salvageItem))
+				DA.DEBUG(1,"ProcessQueue(S): salvageItem= "..tostring(command.salvageItem))
 				local targetItems = C_TradeSkillUI.GetCraftingTargetItems(recipe.salvage)
-				DA.DEBUG(2,"targetItems= "..DA.DUMP1(targetItems))
+				DA.DEBUG(2,"ProcessQueue(S): targetItems= "..DA.DUMP1(targetItems))
 				for i,targetItem in pairs(targetItems) do
 					if targetItem.itemID == command.salvageItem then
 						itemLocation = C_Item.GetItemLocation(targetItem.itemGUID)
 						numAvailable = targetItem.quantity / (recipe.numUsed or 1)
 					end
 				end
-				--DA.DEBUG(1,"itemLocation= "..DA.DUMP1(itemLocation))
+				--DA.DEBUG(1,"ProcessQueue(S): itemLocation= "..DA.DUMP1(itemLocation))
 				command.itemLocation = itemLocation
 				if command.count > numAvailable then
 					command.count = numAvailable
@@ -610,7 +612,14 @@ function Skillet:QueueItems(count)
 		if count > 0 then
 			if recipe then
 				local queueCommand = self:QueueCommandIterate(recipe.spellID, count)
-				self:QueueAppendCommand(queueCommand, Skillet.db.profile.queue_craftable_reagents)
+				if queueCommand.modified then
+					queueCommand.count = 1
+					for i=1, count, 1 do
+						self:QueueAppendCommand(queueCommand, Skillet.db.profile.queue_craftable_reagents)
+					end
+				else
+					self:QueueAppendCommand(queueCommand, Skillet.db.profile.queue_craftable_reagents)
+				end
 				self.optionalSelected = {}
 				self.finishingSelected = {}
 				self:HideOptionalList()
@@ -748,6 +757,10 @@ function Skillet:UPDATE_TRADESKILL_CAST_COMPLETE(event, isScrapping)
 	DA.TRACE("UPDATE_TRADESKILL_CAST_COMPLETE("..tostring(isScrapping)..")")
 end
 
+function Skillet:UPDATE_TRADESKILL_RECAST(event)
+	DA.TRACE("UPDATE_TRADESKILL_RECAST")
+end
+
 function Skillet:ITEM_COUNT_CHANGED(event,itemID)
 	DA.TRACE("ITEM_COUNT_CHANGED("..tostring(itemID)..")")
 --[[
@@ -761,7 +774,7 @@ function Skillet:ITEM_COUNT_CHANGED(event,itemID)
 end
 
 function Skillet:TRADE_SKILL_ITEM_CRAFTED_RESULT(event, CraftingItemResultData)
-	DA.TRACE("TRADE_SKILL_ITEM_CRAFTED_RESULT("..DA.DUMP1(CraftingItemResultData)..")")
+	DA.TRACE("TRADE_SKILL_ITEM_CRAFTED_RESULT("..DA.DUMP(CraftingItemResultData)..")")
 end
 
 --
@@ -772,7 +785,7 @@ function Skillet:ContinueCast(spellID)
 	name = GetSpellInfo(spellID)
 	DA.DEBUG(0,"ContinueCast("..tostring(spellID).."), "..tostring(name))
 	if spellID == self.processingSpellID then
-		DA.DEBUG(2,"ContinueCast: processingCount= "..tostring(Skillet.processingCount))
+		DA.DEBUG(1,"ContinueCast: processingCount= "..tostring(Skillet.processingCount))
 		local queue = self.db.realm.queueData[self.currentPlayer]
 		local qpos = self.processingPosition
 		if queue[qpos] and queue[qpos] == self.processingCommand then
@@ -781,8 +794,12 @@ function Skillet:ContinueCast(spellID)
 				command.count = command.count - 1
 				if command.count == 0 then
 					self:RemoveFromQueue(qpos)
+				elseif command.modifiedReagents then
+					DA.DEBUG(2,"ContinueCast: command= "..DA.DUMP(command))
 				end
 			end
+		else
+			DA.DEBUG(1,"ContinueCast: queued command and processingCommand don't match")
 		end
 		Skillet.processingCount = Skillet.processingCount - 1
 		if Skillet.processingCount == 0 then
@@ -793,6 +810,10 @@ function Skillet:ContinueCast(spellID)
 			self.processingCommand = nil
 			self.processingLevel = nil
 			self.salvageItem = nil
+--
+-- Restore the TraceLog setting.
+--
+			DA.TraceLog = self.oldTraceLog
 		end
 	end
 end
