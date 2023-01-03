@@ -64,6 +64,7 @@ local defaults = {
 		display_shopping_list_at_merchant = false,
 		use_blizzard_for_followers = false,
 		show_recipe_source_for_learned = false,
+		recipe_source_first = false,
 		use_guildbank_as_alt = false,
 		use_altcurrency_vendor_items = false,
 		show_max_upgrade = true,
@@ -719,6 +720,7 @@ function Skillet:OnEnable()
 	self:RegisterEvent("UNIT_SPELLCAST_FAILED_QUIET")
 	self:RegisterEvent("UNIT_SPELLCAST_INTERRUPTED")
 	self:RegisterEvent("UPDATE_TRADESKILL_CAST_COMPLETE")
+	self:RegisterEvent("UPDATE_TRADESKILL_RECAST")
 	self:RegisterEvent("ITEM_COUNT_CHANGED")
 	self:RegisterEvent("TRADE_SKILL_ITEM_CRAFTED_RESULT")
 --
