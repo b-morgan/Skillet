@@ -1004,15 +1004,6 @@ function Skillet:AuctionatorSearch(whichOne)
 --[[
 				for j=1, #recipe.modifiedData[i].schematic.reagents do
 					local id = recipe.modifiedData[i].schematic.reagents[j].itemID
-					local name, bname = self:nameWithQuality(id)
-					if (name) then
-						if not Skillet:VendorSellsReagent(id) then
-							table.insert (items, bname)
-							DA.DEBUG(1, "AuctionatorSearch:  Added  ["..i.."] ("..id..") "..name)
-						else
-							DA.DEBUG(1, "AuctionatorSearch: Skipped ["..i.."] ("..id..") "..name)
-						end
-					end
 				end
 --]]
 				local id = recipe.modifiedData[i].reagentID
