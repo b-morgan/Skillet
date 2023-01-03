@@ -48,7 +48,7 @@ local skillColors = {
 --   Old MainFrame.lua call: GetTradeSkillLevels((recipe.itemID>0 and recipe.itemID) or -recipe.spellID)
 --
 function Skillet:GetTradeSkillLevels(itemID, spellID)
-	DA.DEBUG(0,"GetTradeSkillLevels("..tostring(itemID)..", "..tostring(spellID)..")")
+	--DA.DEBUG(0,"GetTradeSkillLevels("..tostring(itemID)..", "..tostring(spellID)..")")
 	local a,b,c,d
 	local skillLevels = Skillet.db.global.SkillLevels
 	if itemID then 
@@ -78,7 +78,7 @@ function Skillet:GetTradeSkillLevels(itemID, spellID)
 						end
 					end
 				end
-				DA.DEBUG(0,"GetTradeSkillLevels: levels= "..tostring(levels))
+				--DA.DEBUG(0,"GetTradeSkillLevels: levels= "..tostring(levels))
 				if levels and type(levels) == 'string' then
 					a,b,c,d = string.split("/", levels)
 					a = tonumber(a) or 0
@@ -96,13 +96,13 @@ function Skillet:GetTradeSkillLevels(itemID, spellID)
 			if isRetail and TradeskillInfo then
 				local recipeSource = Skillet.db.global.itemRecipeSource[itemID]
 				if not recipeSource then
-					DA.DEBUG(0,"GetTradeSkillLevels: itemID= "..tostring(itemID)..", recipeSource= "..tostring(recipeSource))
+					--DA.DEBUG(0,"GetTradeSkillLevels: itemID= "..tostring(itemID)..", recipeSource= "..tostring(recipeSource))
 					recipeSource = Skillet.db.global.itemRecipeSource[-itemID]
 				end
 				if type(recipeSource) == 'table' then
-					DA.DEBUG(0,"GetTradeSkillLevels: itemID= "..tostring(itemID)..", recipeSource= "..DA.DUMP1(recipeSource))
+					--DA.DEBUG(0,"GetTradeSkillLevels: itemID= "..tostring(itemID)..", recipeSource= "..DA.DUMP1(recipeSource))
 					for recipeID in pairs(recipeSource) do
-						DA.DEBUG(1,"GetTradeSkillLevels: recipeID= "..tostring(recipeID))
+						--DA.DEBUG(1,"GetTradeSkillLevels: recipeID= "..tostring(recipeID))
 						local TSILevels = TradeskillInfo:GetCombineDifficulty(recipeID)
 						if type(TSILevels) == 'table' then
 							DA.DEBUG(1,"GetTradeSkillLevels: TSILevels="..DA.DUMP1(TSILevels))
@@ -115,7 +115,7 @@ function Skillet:GetTradeSkillLevels(itemID, spellID)
 						end
 					end
 				else
-					DA.DEBUG(0,"GetTradeSkillLevels: itemID= "..tostring(itemID)..", recipeSource= "..tostring(recipeSource))
+					--DA.DEBUG(0,"GetTradeSkillLevels: itemID= "..tostring(itemID)..", recipeSource= "..tostring(recipeSource))
 				end
 			end
 
@@ -125,11 +125,11 @@ function Skillet:GetTradeSkillLevels(itemID, spellID)
 --
 			if PT then
 				local levels = PT:ItemInSet(itemID,"TradeskillLevels")
-				DA.DEBUG(0,"GetTradeSkillLevels (PT): itemID= "..tostring(itemID)..", levels= "..tostring(levels))
+				--DA.DEBUG(0,"GetTradeSkillLevels (PT): itemID= "..tostring(itemID)..", levels= "..tostring(levels))
 				if not levels then
 					itemID = -itemID
 					levels = PT:ItemInSet(itemID,"TradeskillLevels")
-					DA.DEBUG(0,"GetTradeSkillLevels (PT): itemID= "..tostring(itemID)..", levels= "..tostring(levels))
+					--DA.DEBUG(0,"GetTradeSkillLevels (PT): itemID= "..tostring(itemID)..", levels= "..tostring(levels))
 				end
 				if levels then
 					a,b,c,d = string.split("/",levels)
@@ -142,13 +142,13 @@ function Skillet:GetTradeSkillLevels(itemID, spellID)
 				end
 			end
 		else
-			DA.DEBUG(0,"GetTradeSkillLevels: "..tostring(itemID).." is not a number")
+			--DA.DEBUG(0,"GetTradeSkillLevels: "..tostring(itemID).." is not a number")
 			self.sourceTradeSkillLevel = 4
 			self.indexTradeSkillLevel = nil
 			return 0, 0, 0, 0 
 		end
 	else
-		DA.DEBUG(0,"GetTradeSkillLevels: itemID is missing")
+		--DA.DEBUG(0,"GetTradeSkillLevels: itemID is missing")
 		self.sourceTradeSkillLevel = 4
 		self.indexTradeSkillLevel = nil
 		return 0, 0, 0, 0 
