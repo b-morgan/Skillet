@@ -136,7 +136,7 @@ end
 -- Updates the detail window with information about the currently selected skill
 --
 function Skillet:UpdateDetailWindow(skillIndex)
-	DA.DEBUG(0,"UpdateDetailWindow("..tostring(skillIndex)..")")
+	--DA.DEBUG(0,"UpdateDetailWindow("..tostring(skillIndex)..")")
 	SkilletReagentParent.StarsFrame:Hide()
 	SkilletRecipeRankFrame:Hide()
 	self.currentRecipeInfo = nil
@@ -319,7 +319,7 @@ function Skillet:UpdateDetailWindow(skillIndex)
 	local lastReagentButton = _G["SkilletReagent1"]
 	local width = SkilletReagentParent:GetWidth()
 	local numReagents = #recipe.reagentData
-	DA.DEBUG(0,"UpdateDetailWindow: recipeID= "..tostring(recipe.spellID)..", name= "..tostring(recipe.name)..", numReagents="..tostring(numReagents))
+	--DA.DEBUG(0,"UpdateDetailWindow: recipeID= "..tostring(recipe.spellID)..", name= "..tostring(recipe.name)..", numReagents="..tostring(numReagents))
 	SkilletReagentLabel:SetText(SPELL_REAGENTS)
 	SkilletReagentLabel:Show();
 	for i=1, SKILLET_NUM_REAGENT_BUTTONS, 1 do
@@ -407,7 +407,7 @@ function Skillet:UpdateDetailWindow(skillIndex)
 -- Modified reagents
 --
 	if recipe.numModified and recipe.numModified > 0 then
-		DA.DEBUG(0,"UpdateDetailWindow: recipeID= "..tostring(recipe.spellID)..", name= "..tostring(recipe.name)..", numModified="..tostring(recipe.numModified))
+		--DA.DEBUG(0,"UpdateDetailWindow: recipeID= "..tostring(recipe.spellID)..", name= "..tostring(recipe.name)..", numModified="..tostring(recipe.numModified))
 		local categoryInfo = C_TradeSkillUI.GetCategoryInfo(recipeInfo.categoryID)
 		while not categoryInfo.skillLineCurrentLevel and categoryInfo.parentCategoryID do
 			categoryInfo = C_TradeSkillUI.GetCategoryInfo(categoryInfo.parentCategoryID)
@@ -495,7 +495,7 @@ function Skillet:UpdateDetailWindow(skillIndex)
 					text:SetText(name)
 					needed:SetTextColor(1,1,0)
 					if not self.modifiedSelected[j] then
-						self:InitializeModifiedSelected(j, num, mreagent)
+						self.modifiedSelected[j] = self:InitializeModifiedSelected(mreagent)
 					end
 				end
 				texture = GetItemIcon(mselected)
@@ -517,19 +517,20 @@ function Skillet:UpdateDetailWindow(skillIndex)
 				button:Disable()
 			end
 		end
+		--DA.DEBUG(0,"UpdateDetailWindow: self.modifiedSelected = "..DA.DUMP(self.modifiedSelected))
 	else
 --
 -- Recipe has no modified reagents.
 --
-		DA.DEBUG(0,"UpdateDetailWindow: (none) recipeID= "..tostring(recipe.spellID)..", name= "..tostring(recipe.name)..", numModified="..tostring(recipe.numModified))
-		Skillet.modifiedSelected = {}
+		--DA.DEBUG(0,"UpdateDetailWindow: (none) recipeID= "..tostring(recipe.spellID)..", name= "..tostring(recipe.name)..", numModified="..tostring(recipe.numModified))
+		self.modifiedSelected = {}
 	end
 
 --
 -- Optional reagents
 --
 	if recipe.numOptional and recipe.numOptional > 0 then
-		DA.DEBUG(0,"UpdateDetailWindow: recipeID= "..tostring(recipe.spellID)..", name= "..tostring(recipe.name)..", numOptional="..tostring(recipe.numOptional))
+		--DA.DEBUG(0,"UpdateDetailWindow: recipeID= "..tostring(recipe.spellID)..", name= "..tostring(recipe.name)..", numOptional="..tostring(recipe.numOptional))
 		local categoryInfo = C_TradeSkillUI.GetCategoryInfo(recipeInfo.categoryID)
 		while not categoryInfo.skillLineCurrentLevel and categoryInfo.parentCategoryID do
 			categoryInfo = C_TradeSkillUI.GetCategoryInfo(categoryInfo.parentCategoryID)
@@ -585,7 +586,7 @@ function Skillet:UpdateDetailWindow(skillIndex)
 					if oreagent.schematic then
 						--DA.DEBUG(0,"UpdateDetailWindow: slotText= "..tostring(oreagent.schematic.slotInfo.slotText)..", categorySkillRank="..tostring(categorySkillRank)..", requiredSkillRank= "..tostring(oreagent.schematic.slotInfo.requiredSkillRank))
 						local locked, lockedReason = self:GetReagentSlotStatus(oreagent.schematic, newInfo)
-						DA.DEBUG(0,"UpdateDetailWindow: locked= "..tostring(locked)..", lockedReason="..tostring(lockedReason))
+						--DA.DEBUG(0,"UpdateDetailWindow: locked= "..tostring(locked)..", lockedReason="..tostring(lockedReason))
 						text:SetText(oreagent.schematic.slotInfo.slotText or OPTIONAL_REAGENT_POSTFIX)
 						if not locked and categorySkillRank >= oreagent.schematic.slotInfo.requiredSkillRank then
 							icon:SetNormalAtlas("itemupgrade_greenplusicon")
@@ -617,7 +618,7 @@ function Skillet:UpdateDetailWindow(skillIndex)
 --
 -- Recipe has no optional reagents.
 --
-		DA.DEBUG(0,"UpdateDetailWindow: (none) recipeID= "..tostring(recipe.spellID)..", name= "..tostring(recipe.name)..", numOptional="..tostring(recipe.numOptional))
+		--DA.DEBUG(0,"UpdateDetailWindow: (none) recipeID= "..tostring(recipe.spellID)..", name= "..tostring(recipe.name)..", numOptional="..tostring(recipe.numOptional))
 		SkilletOptionalLabel:SetText("")
 		SkilletOptionalLabel:Hide()
 		Skillet.optionalSelected = {}
@@ -627,7 +628,7 @@ function Skillet:UpdateDetailWindow(skillIndex)
 -- Finishing reagents
 --
 	if recipe.numFinishing and recipe.numFinishing > 0 then
-		DA.DEBUG(0,"UpdateDetailWindow: recipeID= "..tostring(recipe.spellID)..", name= "..tostring(recipe.name)..", numFinishing="..tostring(recipe.numFinishing))
+		--DA.DEBUG(0,"UpdateDetailWindow: recipeID= "..tostring(recipe.spellID)..", name= "..tostring(recipe.name)..", numFinishing="..tostring(recipe.numFinishing))
 		local categoryInfo = C_TradeSkillUI.GetCategoryInfo(recipeInfo.categoryID)
 		while not categoryInfo.skillLineCurrentLevel and categoryInfo.parentCategoryID do
 			categoryInfo = C_TradeSkillUI.GetCategoryInfo(categoryInfo.parentCategoryID)
@@ -681,9 +682,9 @@ function Skillet:UpdateDetailWindow(skillIndex)
 -- (do we need to prevent locked slots from being filled?)
 --
 					if freagent.schematic then
-						DA.DEBUG(0,"UpdateDetailWindow: slotText= "..tostring(freagent.schematic.slotInfo.slotText)..", categorySkillRank="..tostring(categorySkillRank)..", requiredSkillRank= "..tostring(freagent.schematic.slotInfo.requiredSkillRank))
+						--DA.DEBUG(0,"UpdateDetailWindow: slotText= "..tostring(freagent.schematic.slotInfo.slotText)..", categorySkillRank="..tostring(categorySkillRank)..", requiredSkillRank= "..tostring(freagent.schematic.slotInfo.requiredSkillRank))
 						local locked, lockedReason = self:GetReagentSlotStatus(freagent.schematic, newInfo)
-						DA.DEBUG(0,"UpdateDetailWindow: locked= "..tostring(locked)..", lockedReason="..tostring(lockedReason))
+						--DA.DEBUG(0,"UpdateDetailWindow: locked= "..tostring(locked)..", lockedReason="..tostring(lockedReason))
 						text:SetText(freagent.schematic.slotInfo.slotText or OPTIONAL_REAGENT_POSTFIX)
 						if not locked and categorySkillRank >= freagent.schematic.slotInfo.requiredSkillRank then
 							icon:SetNormalAtlas("itemupgrade_greenplusicon")
@@ -715,7 +716,7 @@ function Skillet:UpdateDetailWindow(skillIndex)
 --
 -- Recipe has no finishing reagents.
 --
-		DA.DEBUG(0,"UpdateDetailWindow: (none) recipeID= "..tostring(recipe.spellID)..", name= "..tostring(recipe.name)..", numFinishing="..tostring(recipe.numFinishing))
+		--DA.DEBUG(0,"UpdateDetailWindow: (none) recipeID= "..tostring(recipe.spellID)..", name= "..tostring(recipe.name)..", numFinishing="..tostring(recipe.numFinishing))
 		SkilletFinishingLabel:SetText("")
 		SkilletFinishingLabel:Hide()
 		self.finishingSelected = {}
@@ -727,14 +728,14 @@ function Skillet:UpdateDetailWindow(skillIndex)
 --
 	if recipe.salvage then
 		local numSalvage = #recipe.salvage
-		DA.DEBUG(0,"UpdateDetailWindow: recipeID= "..tostring(recipe.spellID)..", name= "..tostring(recipe.name)..", numSalvage="..tostring(numSalvage))
+		--DA.DEBUG(0,"UpdateDetailWindow: recipeID= "..tostring(recipe.spellID)..", name= "..tostring(recipe.name)..", numSalvage="..tostring(numSalvage))
 		local categoryInfo = C_TradeSkillUI.GetCategoryInfo(recipeInfo.categoryID)
 		while not categoryInfo.skillLineCurrentLevel and categoryInfo.parentCategoryID do
 			categoryInfo = C_TradeSkillUI.GetCategoryInfo(categoryInfo.parentCategoryID)
 		end
 		local categorySkillRank = categoryInfo.skillLineCurrentLevel or 0
-		DA.DEBUG(0,"UpdateDetailWindow: categorySkillRank="..tostring(categorySkillRank))
-		DA.DEBUG(0,"UpdateDetailWindow: lastReagentIndex="..tostring(lastReagentIndex))
+		--DA.DEBUG(0,"UpdateDetailWindow: categorySkillRank="..tostring(categorySkillRank))
+		--DA.DEBUG(0,"UpdateDetailWindow: lastReagentIndex="..tostring(lastReagentIndex))
 		lastReagentIndex = lastReagentIndex + 1
 		lastReagentButton = _G["SkilletReagent"..tostring(lastReagentIndex)]
 		local j = 1
@@ -803,7 +804,7 @@ function Skillet:UpdateDetailWindow(skillIndex)
 --
 -- Recipe has no salvage reagents
 --
-		DA.DEBUG(0,"UpdateDetailWindow: (no salvage) recipeID= "..tostring(recipe.spellID)..", name= "..tostring(recipe.name))
+		--DA.DEBUG(0,"UpdateDetailWindow: (no salvage) recipeID= "..tostring(recipe.spellID)..", name= "..tostring(recipe.name))
 		self.salvageSelected = {}
 	end
 --
@@ -815,9 +816,15 @@ function Skillet:UpdateDetailWindow(skillIndex)
 		SkilletPreviousItemButton:Hide()
 	end
 --
+-- Generate any extra text 
+--
+	local label, extra_text
+--
 --	Do any plugins want to add extra info to the details window?
 --
-	local label, extra_text = Skillet:GetExtraText(skill, recipe)
+	if not Skillet.db.profile.recipe_source_first then
+		label, extra_text = Skillet:GetExtraText(skill, recipe)
+	end
 --
 -- Is there any source info from the recipe?
 --
@@ -830,19 +837,48 @@ function Skillet:UpdateDetailWindow(skillIndex)
 			sourceText = C_TradeSkillUI.GetRecipeSourceText(skill.id)
 		end
 	end
-	if label then
-		if sourceText then
-			label = label.."\n\n"..sourceText
+	if sourceText then
+		local c = 0
+		local e = ""
+		for l in string.gmatch(sourceText,"|n") do
+			c = c + 1
+			e = e.."\n"
 		end
-	else
-		if sourceText then
+		--DA.DEBUG(0,"UpdateDetailWindow: sourceText= "..sourceText..", c= "..tostring(c))
+		if label then
+			label = label.."\n"..sourceText
+		else
 			label = sourceText
-			extra_text = ""
+		end
+		if extra_text then
+			extra_text = extra_text.."\n"..e
+		else
+			extra_text = e
 		end
 	end
+--
+--	Do any plugins want to add extra info to the details window?
+--
+	if Skillet.db.profile.recipe_source_first then
+		local l, e = Skillet:GetExtraText(skill, recipe)
+		if label then
+			label = label.."\n\n"..l
+		else
+			label = l
+		end
+		if extra_text then
+			extra_text = extra_text.."\n\n"..e
+		else
+			extra_text = e
+		end
+	end
+--
+-- Output any extra text 
+--
 	if label then
 		SkilletExtraDetailTextLeft:SetPoint("TOPLEFT",lastReagentButton,"BOTTOMLEFT",0,-10)
-		SkilletExtraDetailTextLeft:SetText(GRAY_FONT_COLOR_CODE..label)
+--		SkilletExtraDetailTextLeft:SetText(GRAY_FONT_COLOR_CODE..label)
+		SkilletExtraDetailTextLeft:SetText(label)
 		SkilletExtraDetailTextLeft:Show()
 	else
 		SkilletExtraDetailTextLeft:Hide()
@@ -854,7 +890,7 @@ function Skillet:UpdateDetailWindow(skillIndex)
 	else
 		SkilletExtraDetailTextRight:Hide()
 	end
-	DA.DEBUG(3,"UpdateDetailWindow Complete")
+	--DA.DEBUG(3,"UpdateDetailWindow Complete")
 end
 
 function Skillet:ChangeItemCount(this, button, count)
@@ -945,7 +981,7 @@ function Skillet:ReagentButtonOnLeave(button, skillIndex, reagentIndex)
 end
 
 function Skillet:ReagentButtonSkillSelect(player, id)
-	DA.DEBUG(0,"ReagentButtonSkillSelect("..tostring(player)..", "..tostring(id)..")")
+	--DA.DEBUG(0,"ReagentButtonSkillSelect("..tostring(player)..", "..tostring(id)..")")
 	if player == Skillet.currentPlayer then -- Blizzard's 5.4 update prevents us from changing away from the current player
 		local skillIndexLookup = Skillet.data.skillIndexLookup
 		self.gearTexture:Hide()
@@ -966,7 +1002,7 @@ function Skillet:ReagentButtonShiftClick(button, mouse, skillIndex, reagentIndex
 	--DA.DEBUG(0,"ReagentButtonShiftClick("..tostring(button)..", "..tostring(skillIndex)..", "..tostring(reagentIndex)..")")
 	local link = Skillet:GetRecipeReagentItemLink(skillIndex, reagentIndex)
 	if not ChatEdit_InsertLink(link) then
-		DA.DEBUG(1,"ReagentButtonShiftClick: ChatEdit_InsertLink returned false. link= "..tostring(link))
+		--DA.DEBUG(1,"ReagentButtonShiftClick: ChatEdit_InsertLink returned false. link= "..tostring(link))
 		local name = GetItemInfo(link)
 		if SkilletSearchBox:HasFocus() then
 			SkilletSearchBox:SetText(name)
@@ -978,7 +1014,7 @@ end
 -- Called when the reagent button is right-clicked
 --
 function Skillet:ReagentButtonRightClick(button, mouse, skillIndex, reagentIndex)
-	DA.DEBUG(0,"ReagentButtonRightClick("..tostring(button)..", "..tostring(skillIndex)..", "..tostring(reagentIndex)..")")
+	--DA.DEBUG(0,"ReagentButtonRightClick("..tostring(button)..", "..tostring(skillIndex)..", "..tostring(reagentIndex)..")")
 	local recipe = self:GetRecipeDataByTradeIndex(self.currentTrade, skillIndex)
 	if not recipe then
 		--DA.WARN("ReagentButtonRightClick: recipe is nil. "..tostring(button)..", "..tostring(mouse)..", "..tostring(skillIndex)..", "..tostring(reagentIndex))
@@ -1019,7 +1055,7 @@ function Skillet:ReagentButtonRightClick(button, mouse, skillIndex, reagentIndex
 -- Basic reagent (does nothing)
 --
 	if mouse == "RightButton" then
-		DA.DEBUG(0,"ReagentButtonRightClick: RightButton, skillIndex= "..tostring(skillIndex)..", reagentIndex= "..tostring(reagentIndex))
+		--DA.DEBUG(0,"ReagentButtonRightClick: RightButton, skillIndex= "..tostring(skillIndex)..", reagentIndex= "..tostring(reagentIndex))
 		return
 	end
 end
@@ -1028,7 +1064,7 @@ end
 -- Called when the reagent button is left-clicked
 --
 function Skillet:ReagentButtonOnClick(button, mouse, skillIndex, reagentIndex)
-	DA.DEBUG(0,"ReagentButtonOnClick("..tostring(button)..", "..tostring(mouse)..", "..tostring(skillIndex)..", "..tostring(reagentIndex)..")")
+	--DA.DEBUG(0,"ReagentButtonOnClick("..tostring(button)..", "..tostring(mouse)..", "..tostring(skillIndex)..", "..tostring(reagentIndex)..")")
 	local recipe = self:GetRecipeDataByTradeIndex(self.currentTrade, skillIndex)
 	if not recipe then
 		--DA.WARN("ReagentButtonRightClick: recipe is nil. "..tostring(button)..", "..tostring(mouse)..", "..tostring(skillIndex)..", "..tostring(reagentIndex))
@@ -1141,7 +1177,7 @@ end
 -- Called when the icon button is clicked
 --
 function Skillet:ReagentsLinkOnClick(button, skillIndex, reagentIndex)
-	DA.DEBUG(0,"ReagentLinkOnClick("..tostring(button)..", "..tostring(skillIndex)..", "..tostring(reagentIndex)..")")
+	--DA.DEBUG(0,"ReagentLinkOnClick("..tostring(button)..", "..tostring(skillIndex)..", "..tostring(reagentIndex)..")")
 	if not self.db.profile.link_craftable_reagents then
 		--DA.DEBUG(1,"ReagentsLinkOnClick: link_craftable_reagents= "..tostring(self.db.profile.link_craftable_reagents))
 		return
