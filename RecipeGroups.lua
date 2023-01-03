@@ -403,13 +403,13 @@ function Skillet:RecipeGroupFlatten(group, depth, list, index)
 -- it has a progress bar and the option to keep them is set.
 --
 					if Skillet.hasProgressBar[entry.subGroup.name] then
-						DA.DEBUG(0,"RecipeGroupFlatten: empty hasProgressBar group= "..tostring(entry.subGroup.name))
+						--DA.DEBUG(0,"RecipeGroupFlatten: empty hasProgressBar group= "..tostring(entry.subGroup.name))
 						if not Skillet.db.profile.always_show_progress_bar then
 							table.remove(list, num + index)
 							num = num - 1
 						end
 					else
-						DA.DEBUG(0,"RecipeGroupFlatten: empty group= "..tostring(entry.subGroup.name))
+						--DA.DEBUG(0,"RecipeGroupFlatten: empty group= "..tostring(entry.subGroup.name))
 						table.remove(list, num + index)
 						num = num - 1
 					end
