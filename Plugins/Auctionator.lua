@@ -975,7 +975,7 @@ function Skillet:AuctionatorSearch(whichOne)
 -- Add the reagent names
 --
 		local i
-		for i=1,#recipe.reagentData do
+		for i=1, #recipe.reagentData do
 			local reagent = recipe.reagentData[i]
 			if not reagent then
 				break
@@ -995,6 +995,34 @@ function Skillet:AuctionatorSearch(whichOne)
 						DA.DEBUG(1, "AuctionatorSearch:  Added  ["..i.."] ("..id..") "..reagentName)
 					else
 						DA.DEBUG(1, "AuctionatorSearch: Skipped ["..i.."] ("..id..") "..reagentName)
+					end
+				end
+			end
+		end
+		if recipe.numModified then
+			for i=1, recipe.numModified do
+--[[
+				for j=1, #recipe.modifiedData[i].schematic.reagents do
+					local id = recipe.modifiedData[i].schematic.reagents[j].itemID
+					local name, bname = self:nameWithQuality(id)
+					if (name) then
+						if not Skillet:VendorSellsReagent(id) then
+							table.insert (items, bname)
+							DA.DEBUG(1, "AuctionatorSearch:  Added  ["..i.."] ("..id..") "..name)
+						else
+							DA.DEBUG(1, "AuctionatorSearch: Skipped ["..i.."] ("..id..") "..name)
+						end
+					end
+				end
+--]]
+				local id = recipe.modifiedData[i].reagentID
+				local name, bname = self:nameWithQuality(id)
+				if (bname) then
+					if not Skillet:VendorSellsReagent(id) then
+						table.insert (items, bname)
+						DA.DEBUG(1, "AuctionatorSearch:  Added  ["..i.."] ("..id..") "..bname)
+					else
+						DA.DEBUG(1, "AuctionatorSearch: Skipped ["..i.."] ("..id..") "..bname)
 					end
 				end
 			end

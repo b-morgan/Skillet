@@ -115,21 +115,29 @@ function Skillet:HideDetailWindow()
 	end
 end
 
-local function nameWithQuality(itemID)
+--
+-- Called to get the item name appended with the quality icon (and the plain item name)
+-- The DetailFrame will be refreshed unless modified is true
+--
+function Skillet:nameWithQuality(itemID, modified)
 	local quality
-	local name, link = GetItemInfo(itemID)
-	if not name then
-		Skillet.detailDataNeeded = true
+	local bname, link = GetItemInfo(itemID)
+	if not bname then
+		if modified then
+			self.modifiedDataNeeded = true
+		else
+			self.detailDataNeeded = true
+		end
 		C_Item.RequestLoadItemDataByID(itemID)
-		name = "item:"..tostring(itemID)
+		bname = "item:"..tostring(itemID)
 	end
 	if link then
 		quality = C_TradeSkillUI.GetItemReagentQualityByItemInfo(link)
 	end
 	if quality then
-		name = name..C_Texture.GetCraftingReagentQualityChatIcon(quality)
+		name = bname..C_Texture.GetCraftingReagentQualityChatIcon(quality)
 	end
-	return name
+	return name, bname
 end
 
 --
@@ -474,7 +482,7 @@ function Skillet:UpdateDetailWindow(skillIndex)
 				if not mselected then
 					mselected = mreagent.schematic.reagents[1].itemID
 				end
-				local name = nameWithQuality(mselected)
+				local name = self:nameWithQuality(mselected)
 				if mtotal < mreagent.numNeeded then
 --
 -- Grey it out if we don't have it
@@ -566,7 +574,7 @@ function Skillet:UpdateDetailWindow(skillIndex)
 --
 -- An optional reagent has been selected for this slot
 --
-					local name = nameWithQuality(oselected.itemID)
+					local name = self:nameWithQuality(oselected.itemID)
 					text:SetText(name)
 					texture = GetItemIcon(oselected.itemID)
 					icon:SetNormalTexture(texture)
@@ -664,7 +672,7 @@ function Skillet:UpdateDetailWindow(skillIndex)
 --
 -- A finishing reagent has been selected for this slot
 --
-					local name = nameWithQuality(fselected.itemID)
+					local name = self:nameWithQuality(fselected.itemID)
 					text:SetText(name)
 					texture = GetItemIcon(fselected.itemID)
 					icon:SetNormalTexture(texture)
@@ -760,7 +768,7 @@ function Skillet:UpdateDetailWindow(skillIndex)
 -- A salvage reagent has been selected for this slot
 --
 					--DA.DEBUG(0,"UpdateDetailWindow: sselected= "..tostring(sselected))
-					local name = nameWithQuality(sselected)
+					local name = self:nameWithQuality(sselected)
 					text:SetText(name)
 					texture = GetItemIcon(sselected)
 					icon:SetNormalTexture(texture)

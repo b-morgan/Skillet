@@ -133,26 +133,6 @@ local function createModifiedListFrame(self)
 end
 
 --
--- Called to get the item name appended with the quality icon
---
-local function nameWithQuality(itemID)
-	local quality
-	local name, link = GetItemInfo(itemID)
-	if not name then
-		Skillet.modifiedDataNeeded = true
-		C_Item.RequestLoadItemDataByID(itemID)
-		name = "item:"..tostring(itemID)
-	end
-	if link then
-		quality = C_TradeSkillUI.GetItemReagentQualityByItemInfo(link)
-	end
-	if quality then
-		name = name..C_Texture.GetCraftingReagentQualityChatIcon(quality)
-	end
-	return name
-end
-
---
 -- Called to update the modified list window
 --
 function Skillet:UpdateModifiedListWindow()
@@ -223,7 +203,7 @@ function Skillet:UpdateModifiedListWindow()
 			button.use = use
 			input:SetText(use)
 			input:Show()
-			local mreagentName = nameWithQuality(mreagentID)
+			local mreagentName = self:nameWithQuality(mreagentID, true)
 			text:SetText(mreagentName)
 			text:SetWordWrap(false)
 			text:SetWidth(width - (needed:GetWidth() + count:GetWidth()))
