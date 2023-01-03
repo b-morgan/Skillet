@@ -458,30 +458,35 @@ end
 
 --
 -- Called when there are enough reagents for this slot.
--- Builds the self.modifiedSelected table of tables in the format needed by C_TradeSkillUI.CraftRecipe
+-- Builds a table in the format needed by C_TradeSkillUI.CraftRecipe
 -- using self.db.char.best_quality to determine the order.
 --
-function Skillet:InitializeModifiedSelected(which, num, mreagent)
-	--DA.DEBUG(0,"InitializeModifiedSelected("..tostring(which)..", "..DA.DUMP1(num)..", "..DA.DUMP(mreagent)..")")
+function Skillet:InitializeModifiedSelected(mreagent)
+	--DA.DEBUG(0,"InitializeModifiedSelected("..DA.DUMP(mreagent)..")")
 	modifiedSelected = {}
 	local total = 0
 	local this = 0
 	local used = 0
 	local need = mreagent.numNeeded
+	local num
 	if self.db.char.best_quality then
 		for k=#mreagent.schematic.reagents, 1 , -1 do
 			if used < need then
-				this = math.min(num[k],(need-total))
+				num = self:GetInventory(self.currentPlayer, mreagent.schematic.reagents[k].itemID)
+				this = math.min(num,(need-total))
 				total = total + this
 				if this > 0 then
 					table.insert(modifiedSelected, { itemID = mreagent.schematic.reagents[k].itemID, quantity = this, dataSlotIndex = mreagent.slot, })
 				end
+			else
+				table.insert(modifiedSelected, { itemID = mreagent.schematic.reagents[k].itemID, quantity = 0, dataSlotIndex = mreagent.slot, })
 			end
 		end
 	else
 		for k=1, #mreagent.schematic.reagents, 1 do
 			if used < need then
-				this = math.min(num[k],(need-total))
+				num = self:GetInventory(self.currentPlayer, mreagent.schematic.reagents[k].itemID)
+				this = math.min(num,(need-total))
 				total = total + this
 				table.insert(modifiedSelected, { itemID = mreagent.schematic.reagents[k].itemID, quantity = this, dataSlotIndex = mreagent.slot, })
 			else
@@ -489,10 +494,23 @@ function Skillet:InitializeModifiedSelected(which, num, mreagent)
 			end
 		end
 	end
-	if not self.modifiedSelected then
-		self.modifiedSelected = {}
-	end
-	self.modifiedSelected[which] = modifiedSelected
 	--DA.DEBUG(0,"InitializeModifiedSelected: modifiedSelected = "..DA.DUMP1(modifiedSelected))
-	--DA.DEBUG(0,"InitializeModifiedSelected: self.modifiedSelected = "..DA.DUMP(self.modifiedSelected))
+	return modifiedSelected, used < need
+end
+
+--
+-- Called to check if there still are enough reagents.
+--
+function Skillet:CheckModifiedSelected(modifiedSelected)
+	--DA.DEBUG(0,"CheckModifiedSelected()")
+	for i,items in pairs(modifiedSelected) do
+		for j,reagent in pairs(items) do
+			DA.DEBUG(2,"CheckModifiedSelected: i= "..tostring(i)..", j= "..tostring(j)..", item= "..DA.DUMP1(reagent))
+			local have = GetItemCount(reagent.itemID,true)
+			if have < reagent.quantity then
+				return false
+			end
+		end
+	end
+	return true
 end
