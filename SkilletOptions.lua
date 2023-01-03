@@ -366,6 +366,19 @@ Skillet.options =
 					width = "full",
 					order = 4
 				},
+				recipe_source_first = {
+					type = "toggle",
+					name = L["RECIPESOURCEFIRSTNAME"],
+					desc = L["RECIPESOURCEFIRSTDESC"],
+					get = function()
+						return Skillet.db.profile.recipe_source_first
+					end,
+					set = function(self,value)
+						Skillet.db.profile.recipe_source_first = value
+					end,
+					width = "full",
+					order = 5
+				},
 				use_blizzard_for_followers = {
 					type = "toggle",
 					name = L["USEBLIZZARDFORFOLLOWERSNAME"],
@@ -377,8 +390,9 @@ Skillet.options =
 						Skillet.db.profile.use_blizzard_for_followers = value
 					end,
 					width = "full",
-					order = 5
+					order = 6
 				},
+--[[
 				use_blizzard_for_optional = {
 					type = "toggle",
 					name = L["USEBLIZZFOROPTIONNAME"],
@@ -390,8 +404,9 @@ Skillet.options =
 						Skillet.db.profile.use_blizzard_for_optional = value
 					end,
 					width = "full",
-					order = 6
+					order = 7
 				},
+--]]
 				always_show_progress_bar = {
 					type = "toggle",
 					name = L["SHOWPROGRESSBARNAME"],
@@ -403,7 +418,7 @@ Skillet.options =
 						Skillet.db.profile.always_show_progress_bar = value
 					end,
 					width = "full",
-					order = 7
+					order = 8
 				},
 				enhanced_recipe_display = {
 					type = "toggle",
@@ -417,7 +432,7 @@ Skillet.options =
 						Skillet:UpdateTradeSkillWindow()
 					end,
 					width = "full",
-					order = 8
+					order = 9
 				},
 				confirm_queue_clear = {
 					type = "toggle",
@@ -431,7 +446,7 @@ Skillet.options =
 						Skillet:UpdateTradeSkillWindow()
 					end,
 					width = "full",
-					order = 9
+					order = 10
 				},
 				queue_only_view = {
 					type = "toggle",
@@ -445,7 +460,7 @@ Skillet.options =
 						Skillet:UpdateTradeSkillWindow()
 					end,
 					width = "full",
-					order = 10
+					order = 11
 				},
 				dialog_switch = {
 					type = "toggle",
@@ -458,7 +473,7 @@ Skillet.options =
 						Skillet.db.profile.dialog_switch = value
 					end,
 					width = "full",
-					order = 11
+					order = 12
 				},
 				tsm_compat = {
 					type = "toggle",
@@ -471,7 +486,7 @@ Skillet.options =
 						Skillet.db.profile.tsm_compat = value
 					end,
 					width = "full",
-					order = 12
+					order = 13
 				},
 				scale_tooltip = {
 					type = "toggle",
@@ -484,7 +499,7 @@ Skillet.options =
 						Skillet.db.profile.scale_tooltip = value
 					end,
 					width = "full",
-					order = 13
+					order = 14
 				},
 				transparency = {
 					type = "range",
