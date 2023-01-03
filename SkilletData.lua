@@ -1096,7 +1096,7 @@ local function ScanTrade()
 					end
 				end
 			elseif recipeInfo.alternateVerb == ENSCRIBE then -- use the itemID of the scroll created by using the enchant on vellum
-				DA.DEBUG(2,"ScanTrade: recipeID= "..tostring(recipeID)..", name= "..tostring(recipeInfo.name)..", alternateVerb= "..tostring(recipeInfo.alternateVerb))
+				--DA.DEBUG(2,"ScanTrade: recipeID= "..tostring(recipeID)..", name= "..tostring(recipeInfo.name)..", alternateVerb= "..tostring(recipeInfo.alternateVerb))
 				recipeInfo.numMade = 1		-- save a copy for our records
 				if Skillet.scrollData[recipeID] then					-- note that this table is maintained by datamining
 					recipeInfo.itemID = Skillet.scrollData[recipeID]	-- save a copy for our records
@@ -1106,7 +1106,7 @@ local function ScanTrade()
 					DA.DEBUG(0,"ScanTrade: recipeID= "..tostring(recipeID).." has no scrollData")
 				end
 			else
-				DA.DEBUG(2,"ScanTrade: recipeID= "..tostring(recipeID)..", name= "..tostring(recipeInfo.name)..", alternateVerb= "..tostring(recipeInfo.alternateVerb))
+				--DA.DEBUG(2,"ScanTrade: recipeID= "..tostring(recipeID)..", name= "..tostring(recipeInfo.name)..", alternateVerb= "..tostring(recipeInfo.alternateVerb))
 				recipeInfo.numMade = 1		-- save a copy for our records
 			end
 			if recipe.numMade > 1 then
@@ -1115,7 +1115,7 @@ local function ScanTrade()
 				itemString = tostring(itemID)
 			end
 			if itemID == recipeID then
-				DA.DEBUG(2,"ScanTrade: (itemID == recipeID)= "..tostring(itemID))
+				--DA.DEBUG(2,"ScanTrade: (itemID == recipeID)= "..tostring(itemID))
 			end
 			Skillet:ItemDataAddRecipeSource(itemID,recipeID) -- add a cross reference for the source of this item
 		else
@@ -1169,7 +1169,7 @@ local function ScanTrade()
 				elseif schematic.dataSlotType == Enum.TradeskillSlotDataType.ModifiedReagent then -- 2
 					numModified = numModified + 1
 					modifiedData[numModified] = {}
---					modifiedData[numModified].reagentID = reagentID		-- the first reagent in the list
+					modifiedData[numModified].reagentID = reagentID		-- the first reagent in the list
 					modifiedData[numModified].numNeeded = numNeeded
 					modifiedData[numModified].slot = schematic.dataSlotIndex
 					modifiedData[numModified].name = schematic.slotInfo.slotText
@@ -1188,13 +1188,14 @@ local function ScanTrade()
 				--DA.DEBUG(2,"ScanTrade: recipeID= "..tostring(recipeID)..", name= "..tostring(recipeInfo.name)..", Optional reagent= "..DA.DUMP(schematic))
 				numOptional = numOptional + 1
 				optionalData[numOptional] = {}
+				optionalData[numOptional].reagentID = reagentID		-- the first reagent in the list
 				optionalData[numOptional].numNeeded = numNeeded
 				optionalData[numOptional].slot = schematic.dataSlotIndex
 				optionalData[numOptional].name = schematic.slotInfo.slotText
 				optionalData[numOptional].schematic = schematic
 				local locked, lockedReason = Skillet:GetReagentSlotStatus(schematic, recipeInfo)
 				if locked then
-					DA.DEBUG(2,"ScanTrade: recipeID= "..tostring(recipeID)..", name= "..tostring(recipeInfo.name)..", Optional lockedReason= "..tostring(lockedReason))
+					--DA.DEBUG(2,"ScanTrade: recipeID= "..tostring(recipeID)..", name= "..tostring(recipeInfo.name)..", Optional lockedReason= "..tostring(lockedReason))
 					optionalData[numOptional].locked = locked
 					optionalData[numOptional].lockedReason = lockedReason
 				end
@@ -1202,14 +1203,14 @@ local function ScanTrade()
 				--DA.DEBUG(2,"ScanTrade: recipeID= "..tostring(recipeID)..", name= "..tostring(recipeInfo.name)..", Finishing reagent= "..DA.DUMP(schematic))
 				numFinishing = numFinishing + 1
 				finishingData[numFinishing] = {}
---				finishingData[numFinishing].reagentID = reagentID
+				finishingData[numFinishing].reagentID = reagentID		-- the first reagent in the list
 				finishingData[numFinishing].numNeeded = numNeeded
 				finishingData[numFinishing].slot = schematic.dataSlotIndex
 				finishingData[numFinishing].name = schematic.slotInfo.slotText
 				finishingData[numFinishing].schematic = schematic
 				local locked, lockedReason = Skillet:GetReagentSlotStatus(schematic, recipeInfo)
 				if locked then
-					DA.DEBUG(2,"ScanTrade: recipeID= "..tostring(recipeID)..", name= "..tostring(recipeInfo.name)..", Finishing lockedReason= "..tostring(lockedReason))
+					--DA.DEBUG(2,"ScanTrade: recipeID= "..tostring(recipeID)..", name= "..tostring(recipeInfo.name)..", Finishing lockedReason= "..tostring(lockedReason))
 					finishingData[numFinishing].locked = locked
 					finishingData[numFinishing].lockedReason = lockedReason
 				end
