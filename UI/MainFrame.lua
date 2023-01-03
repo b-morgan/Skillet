@@ -354,7 +354,7 @@ end
 -- sorting or filtering may need to be updated.
 --
 function Skillet:ResetTradeSkillWindow()
-	DA.DEBUG(0,"ResetTradeSkillWindow()")
+	--DA.DEBUG(0,"ResetTradeSkillWindow()")
 	Skillet:SortDropdown_OnShow()
 	local buttons = SkilletFrame.added_buttons
 	if buttons then
@@ -549,7 +549,7 @@ function Skillet:TradeButton_OnEnter(button)
 	local bName = button:GetName()
 	local _, player, tradeID = string.split("-", bName)
 	local sInfo = GetSpellInfo(tradeID)
-	DA.DEBUG(3,"TradeButton_OnEnter("..tostring(bName).."), player= "..tostring(player)..", tradeID= "..tostring(tradeID)..", sInfo= "..tostring(sInfo))
+	--DA.DEBUG(3,"TradeButton_OnEnter("..tostring(bName).."), player= "..tostring(player)..", tradeID= "..tostring(tradeID)..", sInfo= "..tostring(sInfo))
 	GameTooltip:AddLine(sInfo)
 	tradeID = tonumber(tradeID)
 	local data
@@ -575,7 +575,7 @@ function Skillet:TradeButton_OnEnter(button)
 end
 
 function Skillet:TradeButtonAdditional_OnEnter(button)
-	DA.DEBUG(0,"TradeButtonAdditional_OnEnter("..tostring(button)..")")
+	--DA.DEBUG(0,"TradeButtonAdditional_OnEnter("..tostring(button)..")")
 	--DA.DEBUG(0,"TradeButtonAdditional_OnEnter: button= "..DA.DUMP1(button))
 	GameTooltip:SetOwner(button, "ANCHOR_TOPLEFT")
 	GameTooltip:ClearLines()
@@ -611,7 +611,7 @@ function Skillet:TradeButtonAdditional_OnEnter(button)
 end
 
 function Skillet:BlizzardUIButton_OnEnter(button)
-	DA.DEBUG(0,"BlizzardUIButton_OnEnter("..tostring(button)..")")
+	--DA.DEBUG(0,"BlizzardUIButton_OnEnter("..tostring(button)..")")
 	GameTooltip:SetOwner(button, "ANCHOR_TOPLEFT")
 	GameTooltip:ClearLines()
 	GameTooltip:AddLine("Toggle Blizzard UI")
@@ -670,14 +670,14 @@ end
 -- this function will never be called.
 --
 function Skillet:TradeButtonAdditional_OnClick(this,button)
-	DA.DEBUG(0,"TradeButtonAdditional_OnClick("..DA.DUMP1(this)..", "..tostring(button)..")")
+	--DA.DEBUG(0,"TradeButtonAdditional_OnClick("..DA.DUMP1(this)..", "..tostring(button)..")")
 	local name = this:GetName()
-	DA.DEBUG(0,"TradeButtonAdditional_OnClick: name= "..tostring(name))
+	--DA.DEBUG(0,"TradeButtonAdditional_OnClick: name= "..tostring(name))
 	GameTooltip:Hide()
 end
 
 function Skillet:BlizzardUIButton_OnClick(this,button)
-	DA.DEBUG(0,"BlizzardUIButton_OnClick")
+	--DA.DEBUG(0,"BlizzardUIButton_OnClick")
 	GameTooltip:Hide()
 	if Skillet.BlizzardUIshowing then
 		HideUIPanel(ProfessionsFrame)
@@ -839,7 +839,7 @@ function Skillet:UpdateTradeButtons(player)
 			local buttonName = "SkilletDo"..additionalSpellName
 			local button = _G[buttonName]
 			if not button then
-				DA.DEBUG(0,"UpdateTradeButtons: CreateFrame for "..tostring(buttonName))
+				--DA.DEBUG(0,"UpdateTradeButtons: CreateFrame for "..tostring(buttonName))
 				button = CreateFrame("Button", buttonName, frame, "SkilletTradeButtonAdditionalTemplate")
 				button:SetID(additionalSpellId)
 				if additionalToy then
@@ -1040,7 +1040,7 @@ function Skillet:UpdateTradeSkillWindow()
 	SkilletQueueManagementParent:SetWidth(reagent_width)
 	width = SkilletFrame:GetWidth() - reagent_width - 20 -- padding
 	SkilletSkillListParent:SetWidth(width)
-	DA.DEBUG(0,"UpdateTradeSkillWindow: width= "..string.format("%.0d", width)..", height= "..string.format("%.0d", height)..", reagent_width= "..string.format("%.0d", reagent_width)..", reagent_height= "..string.format("%.0d", reagent_height))
+	--DA.DEBUG(0,"UpdateTradeSkillWindow: width= "..string.format("%.0d", width)..", height= "..string.format("%.0d", height)..", reagent_width= "..string.format("%.0d", reagent_width)..", reagent_height= "..string.format("%.0d", reagent_height))
 --
 -- Set the state of any craft specific options
 --
@@ -1444,7 +1444,7 @@ function Skillet:UpdateTradeSkillWindow()
 		SkilletFrameEmptySpace:SetPoint("TOPLEFT",SkilletSkillListParent,"TOPLEFT")
 	end
 	SkilletFrameEmptySpace:SetPoint("BOTTOMRIGHT",SkilletSkillListParent,"BOTTOMRIGHT")
-	DA.DEBUG(3,"UpdateTradeSkillWindow Complete")
+	--DA.DEBUG(3,"UpdateTradeSkillWindow Complete")
 end
 
 --
@@ -2158,7 +2158,7 @@ function Skillet:RankFrame_OnLeave(button)
 end
 
 function Skillet:SkilletFrameForceClose()
-	DA.DEBUG(0,"SkilletFrameForceClose()")
+	--DA.DEBUG(0,"SkilletFrameForceClose()")
 --
 -- Skillet's Close (X) button just hides our frames to avoid crashing TSM
 --
@@ -3016,7 +3016,7 @@ end
 -- returned in case you need to pop up a frame attached to it.
 --
 function Skillet:AddButtonToTradeskillWindow(button)
-	DA.DEBUG(0,"AddButtonToTradeskillWindow("..tostring(button)..")")
+	--DA.DEBUG(0,"AddButtonToTradeskillWindow("..tostring(button)..")")
 	if not SkilletFrame.added_buttons then
 		SkilletFrame.added_buttons = {}
 	end
