@@ -142,11 +142,11 @@ end
 -- Called to update the finishing list window
 --
 function Skillet:UpdateFinishingListWindow()
-	DA.DEBUG(0,"UpdateFinishingListWindow()")
+	--DA.DEBUG(0,"UpdateFinishingListWindow()")
 	local numItems
 	local recipe = self:GetRecipeDataByTradeIndex(self.currentTrade, self.selectedSkill)
 	if self.cachedFinishingList then
-		DA.DEBUG(1,"UpdateFinishingListWindow: cachedFinishingList= ",DA.DUMP1(self.cachedFinishingList))
+		--DA.DEBUG(1,"UpdateFinishingListWindow: cachedFinishingList= ",DA.DUMP1(self.cachedFinishingList))
 		numItems = #self.cachedFinishingList.reagents
 	else
 		return
@@ -157,7 +157,7 @@ function Skillet:UpdateFinishingListWindow()
 	--DA.DEBUG(1,"UpdateFinishingListWindow: SkilletFinishingListParent width= "..tostring(width))
 	local button_count = height / SKILLET_FINISHING_LIST_HEIGHT
 	button_count = math.floor(button_count) - 1
-	DA.DEBUG(1,"UpdateFinishingListWindow: numItems= "..tostring(numItems)..", button_count= "..tostring(button_count))
+	--DA.DEBUG(1,"UpdateFinishingListWindow: numItems= "..tostring(numItems)..", button_count= "..tostring(button_count))
 --
 -- Update the scroll frame
 --
@@ -169,7 +169,7 @@ function Skillet:UpdateFinishingListWindow()
 -- Where in the list of items to start counting.
 --
 	local itemOffset = FauxScrollFrame_GetOffset(SkilletFinishingListList)
-	DA.DEBUG(1,"UpdateFinishingListWindow: itemOffset= "..tostring(itemOffset))
+	--DA.DEBUG(1,"UpdateFinishingListWindow: itemOffset= "..tostring(itemOffset))
 	for i=1, button_count, 1 do
 		num_buttons = math.max(num_buttons, i)
 		local itemIndex = i + itemOffset
@@ -216,7 +216,7 @@ function Skillet:UpdateFinishingListWindow()
 			button:SetID(itemIndex)
 			button:Show()
 		else
-			DA.DEBUG(1,"UpdateFinishingListWindow: Hide unused button")
+			--DA.DEBUG(1,"UpdateFinishingListWindow: Hide unused button")
 			text:SetText("")
 			text:Hide()
 			icon:Hide()
@@ -275,7 +275,7 @@ end
 -- the quantity (per craft) is one.
 --
 function Skillet:FinishingReagentOnClick(button, mouse, skillIndex, reagentIndex)
-	DA.DEBUG(0,"FinishingReagentOnClick("..tostring(button)..", "..tostring(mouse)..", "..tostring(skillIndex)..", "..tostring(reagentIndex)..")")
+	--DA.DEBUG(0,"FinishingReagentOnClick("..tostring(button)..", "..tostring(mouse)..", "..tostring(skillIndex)..", "..tostring(reagentIndex)..")")
 	local recipe = self:GetRecipeDataByTradeIndex(self.currentTrade, skillIndex)
 	SkilletFinishingHaveItems:Hide()
 	local thisFinishing
@@ -286,9 +286,9 @@ function Skillet:FinishingReagentOnClick(button, mouse, skillIndex, reagentIndex
 --
 	thisFinishing = recipe.finishingData[reagentIndex - 200]
 	self.cachedFinishingIndex = reagentIndex - 200
-	DA.DEBUG(1,"FinishingReagentOnClick: thisFinishing= "..DA.DUMP(thisFinishing))
+	--DA.DEBUG(1,"FinishingReagentOnClick: thisFinishing= "..DA.DUMP(thisFinishing))
 	self.cachedFinishingList = thisFinishing.schematic
-	DA.DEBUG(1,"FinishingReagentOnClick: cachedFinishingIndex= "..tostring(self.cachedFinishingIndex)..", cachedFinishingList= "..DA.DUMP1(self.cachedFinishingList))
+	--DA.DEBUG(1,"FinishingReagentOnClick: cachedFinishingIndex= "..tostring(self.cachedFinishingIndex)..", cachedFinishingList= "..DA.DUMP1(self.cachedFinishingList))
 --
 -- Left-click selects and right-click deselects.
 --
@@ -307,7 +307,7 @@ end
 -- item, the index'th reagent required for the item is returned
 --
 function Skillet:GetFinishingItemLink(skillIndex, index)
-	DA.DEBUG(0,"GetFinishingItemLink("..tostring(skillIndex)..", "..tostring(index)..")")
+	--DA.DEBUG(0,"GetFinishingItemLink("..tostring(skillIndex)..", "..tostring(index)..")")
 	if skillIndex and index then
 		local recipe = self:GetRecipeDataByTradeIndex(self.currentTrade, skillIndex)
 		if recipe and self.cachedFinishingList then
@@ -361,8 +361,8 @@ end
 -- the quantity (per craft) is one.
 --
 function Skillet:FinishingButtonOnClick(button, mouse, skillIndex, reagentIndex)
-	DA.DEBUG(0,"FinishingButtonOnClick("..tostring(button)..", "..tostring(mouse)..", "..tostring(skillIndex)..", "..tostring(reagentIndex)..")")
-	DA.DEBUG(1,"FinishingButtonOnClick: cachedFinishingIndex= "..tostring(self.cachedFinishingIndex)..", cachedFinishingList= "..DA.DUMP(self.cachedFinishingList))
+	--DA.DEBUG(0,"FinishingButtonOnClick("..tostring(button)..", "..tostring(mouse)..", "..tostring(skillIndex)..", "..tostring(reagentIndex)..")")
+	--DA.DEBUG(1,"FinishingButtonOnClick: cachedFinishingIndex= "..tostring(self.cachedFinishingIndex)..", cachedFinishingList= "..DA.DUMP(self.cachedFinishingList))
 	local freagentID = self.cachedFinishingList.reagents[reagentIndex].itemID
 	local freagentSlot = self.cachedFinishingList.dataSlotIndex
 	if not self.finishingSelected then
@@ -373,6 +373,6 @@ function Skillet:FinishingButtonOnClick(button, mouse, skillIndex, reagentIndex)
 	elseif mouse == "RightButton" then
 		self.finishingSelected[self.cachedFinishingIndex] = nil
 	end
-	DA.DEBUG(1,"FinishingButtonOnClick: cachedFinishingIndex= "..tostring(self.cachedFinishingIndex)..", freagentID= "..tostring(freagentID)..", finishingSelected= "..DA.DUMP(self.finishingSelected))
+	--DA.DEBUG(1,"FinishingButtonOnClick: cachedFinishingIndex= "..tostring(self.cachedFinishingIndex)..", freagentID= "..tostring(freagentID)..", finishingSelected= "..DA.DUMP(self.finishingSelected))
 	self:UpdateDetailWindow(skillIndex)
 end

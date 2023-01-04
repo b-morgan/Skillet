@@ -136,12 +136,12 @@ end
 -- Called to update the modified list window
 --
 function Skillet:UpdateModifiedListWindow()
-	DA.DEBUG(0,"UpdateModifiedListWindow()")
+	--DA.DEBUG(0,"UpdateModifiedListWindow()")
 	local numItems
 	if self.cachedModifiedList then
 		numItems = #self.cachedModifiedList
-		DA.DEBUG(1,"UpdateModifiedListWindow: numItems= "..tostring(numItems)..", cachedModifiedIndex= "..tostring(self.cachedModifiedIndex)..", cachedModifiedNeeded= "..tostring(self.cachedModifiedNeeded))
-		DA.DEBUG(1,"UpdateModifiedListWindow: cachedModifiedList= "..DA.DUMP1(self.cachedModifiedList))
+		--DA.DEBUG(1,"UpdateModifiedListWindow: numItems= "..tostring(numItems)..", cachedModifiedIndex= "..tostring(self.cachedModifiedIndex)..", cachedModifiedNeeded= "..tostring(self.cachedModifiedNeeded))
+		--DA.DEBUG(1,"UpdateModifiedListWindow: cachedModifiedList= "..DA.DUMP1(self.cachedModifiedList))
 	else
 		return
 	end
@@ -191,7 +191,7 @@ function Skillet:UpdateModifiedListWindow()
 			count:SetText(count_text)
 			count:Show()
 			local modifiedSelected = self.modifiedSelected[self.cachedModifiedIndex]
-			DA.DEBUG(1,"UpdateModifiedListWindow: modifiedSelected= "..DA.DUMP1(modifiedSelected))
+			--DA.DEBUG(1,"UpdateModifiedListWindow: modifiedSelected= "..DA.DUMP1(modifiedSelected))
 			local use = 0
 			if modifiedSelected then
 				for j,reagent in pairs(modifiedSelected) do
@@ -270,7 +270,7 @@ end
 --
 
 function Skillet:ModifiedReagentOnClick(button, mouse, skillIndex, reagentIndex)
-	DA.DEBUG(0,"ModifiedReagentOnClick("..tostring(button)..", "..tostring(mouse)..", "..tostring(skillIndex)..", "..tostring(reagentIndex)..")")
+	--DA.DEBUG(0,"ModifiedReagentOnClick("..tostring(button)..", "..tostring(mouse)..", "..tostring(skillIndex)..", "..tostring(reagentIndex)..")")
 	local recipe = self:GetRecipeDataByTradeIndex(self.currentTrade, skillIndex)
 	local thisModified = recipe.modifiedData[reagentIndex - 100]
 	--DA.DEBUG(1,"ModifiedReagentOnClick: thisModified= "..DA.DUMP(thisModified))
@@ -343,7 +343,7 @@ end
 -- Called when the mouse is clicked on a modified button in the ModifiedList frame
 --
 function Skillet:ModifiedButtonOnClick(button, mouse, skillIndex, reagentIndex)
-	DA.DEBUG(0,"ModifiedButtonOnClick("..tostring(button)..", "..tostring(mouse)..", "..tostring(skillIndex)..", "..tostring(reagentIndex)..")")
+	--DA.DEBUG(0,"ModifiedButtonOnClick("..tostring(button)..", "..tostring(mouse)..", "..tostring(skillIndex)..", "..tostring(reagentIndex)..")")
 	local mreagentID = self.cachedModifiedList[reagentIndex].itemID
 	if not self.modifiedSelected then
 		self.modifiedSelected = {}
@@ -366,11 +366,11 @@ function Skillet:ModifiedListToggleBestQuality()
 end
 
 function Skillet:ModifyItemCount(this,button)
-	DA.DEBUG(0,"ModifyItemCount("..tostring(this)..", "..tostring(button))
+	--DA.DEBUG(0,"ModifyItemCount("..tostring(this)..", "..tostring(button))
 end
 
 function Skillet:ResetItemCount(this,button)
-	DA.DEBUG(0,"ResetItemCount("..tostring(this)..", "..tostring(button))
+	--DA.DEBUG(0,"ResetItemCount("..tostring(this)..", "..tostring(button))
 end
 
 function Skillet:ModifiedItemCount(this, button, count)
@@ -485,7 +485,7 @@ function Skillet:CheckModifiedSelected(modifiedSelected)
 	--DA.DEBUG(0,"CheckModifiedSelected()")
 	for i,items in pairs(modifiedSelected) do
 		for j,reagent in pairs(items) do
-			DA.DEBUG(2,"CheckModifiedSelected: i= "..tostring(i)..", j= "..tostring(j)..", item= "..DA.DUMP1(reagent))
+			--DA.DEBUG(2,"CheckModifiedSelected: i= "..tostring(i)..", j= "..tostring(j)..", item= "..DA.DUMP1(reagent))
 			local have = GetItemCount(reagent.itemID,true)
 			if have < reagent.quantity then
 				return false

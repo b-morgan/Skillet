@@ -142,11 +142,11 @@ end
 -- Called to update the optional list window
 --
 function Skillet:UpdateOptionalListWindow()
-	DA.DEBUG(0,"UpdateOptionalListWindow()")
+	--DA.DEBUG(0,"UpdateOptionalListWindow()")
 	local numItems
 	local recipe = self:GetRecipeDataByTradeIndex(self.currentTrade, self.selectedSkill)
 	if self.cachedOptionalList then
-		DA.DEBUG(1,"UpdateOptionalListWindow: cachedOptionalList= ",DA.DUMP1(self.cachedOptionalList))
+		--DA.DEBUG(1,"UpdateOptionalListWindow: cachedOptionalList= ",DA.DUMP1(self.cachedOptionalList))
 		numItems = #self.cachedOptionalList.reagents
 	else
 		return
@@ -157,7 +157,7 @@ function Skillet:UpdateOptionalListWindow()
 	--DA.DEBUG(1,"UpdateOptionalListWindow: SkilletOptionalListParent width= "..tostring(width))
 	local button_count = height / SKILLET_OPTIONAL_LIST_HEIGHT
 	button_count = math.floor(button_count) - 1
-	DA.DEBUG(1,"UpdateOptionalListWindow: numItems= "..tostring(numItems)..", button_count= "..tostring(button_count))
+	--DA.DEBUG(1,"UpdateOptionalListWindow: numItems= "..tostring(numItems)..", button_count= "..tostring(button_count))
 --
 -- Update the scroll frame
 --
@@ -169,7 +169,7 @@ function Skillet:UpdateOptionalListWindow()
 -- Where in the list of items to start counting.
 --
 	local itemOffset = FauxScrollFrame_GetOffset(SkilletOptionalListList)
-	DA.DEBUG(1,"UpdateOptionalListWindow: itemOffset= "..tostring(itemOffset))
+	--DA.DEBUG(1,"UpdateOptionalListWindow: itemOffset= "..tostring(itemOffset))
 	for i=1, button_count, 1 do
 		num_buttons = math.max(num_buttons, i)
 		local itemIndex = i + itemOffset
@@ -216,7 +216,7 @@ function Skillet:UpdateOptionalListWindow()
 			button:SetID(itemIndex)
 			button:Show()
 		else
-			DA.DEBUG(1,"UpdateOptionalListWindow: Hide unused button")
+			--DA.DEBUG(1,"UpdateOptionalListWindow: Hide unused button")
 			text:SetText("")
 			text:Hide()
 			icon:Hide()
@@ -275,7 +275,7 @@ end
 -- the quantity (per craft) is one.
 --
 function Skillet:OptionalReagentOnClick(button, mouse, skillIndex, reagentIndex)
-	DA.DEBUG(0,"OptionalReagentOnClick("..tostring(button)..", "..tostring(mouse)..", "..tostring(skillIndex)..", "..tostring(reagentIndex)..")")
+	--DA.DEBUG(0,"OptionalReagentOnClick("..tostring(button)..", "..tostring(mouse)..", "..tostring(skillIndex)..", "..tostring(reagentIndex)..")")
 	local recipe = self:GetRecipeDataByTradeIndex(self.currentTrade, skillIndex)
 	SkilletOptionalHaveItems:Hide()
 	local thisOptional
@@ -286,9 +286,9 @@ function Skillet:OptionalReagentOnClick(button, mouse, skillIndex, reagentIndex)
 --
 	thisOptional = recipe.optionalData[reagentIndex * -1]
 	self.cachedOptionalIndex = reagentIndex * -1
-	DA.DEBUG(1,"OptionalReagentOnClick: thisOptional= "..DA.DUMP(thisOptional))
+	--DA.DEBUG(1,"OptionalReagentOnClick: thisOptional= "..DA.DUMP(thisOptional))
 	self.cachedOptionalList = thisOptional.schematic
-	DA.DEBUG(1,"OptionalReagentOnClick: cachedOptionalIndex= "..tostring(self.cachedOptionalIndex)..", cachedOptionalList= "..DA.DUMP1(self.cachedOptionalList))
+	--DA.DEBUG(1,"OptionalReagentOnClick: cachedOptionalIndex= "..tostring(self.cachedOptionalIndex)..", cachedOptionalList= "..DA.DUMP1(self.cachedOptionalList))
 --
 -- Left-click selects and right-click deselects.
 --
@@ -307,7 +307,7 @@ end
 -- item, the index'th reagent required for the item is returned
 --
 function Skillet:GetOptionalItemLink(skillIndex, index)
-	DA.DEBUG(0,"GetOptionalItemLink("..tostring(skillIndex)..", "..tostring(index)..")")
+	--DA.DEBUG(0,"GetOptionalItemLink("..tostring(skillIndex)..", "..tostring(index)..")")
 	if skillIndex and index then
 		local recipe = self:GetRecipeDataByTradeIndex(self.currentTrade, skillIndex)
 		if recipe and self.cachedOptionalList then
@@ -361,8 +361,8 @@ end
 -- the quantity (per craft) is one.
 --
 function Skillet:OptionalButtonOnClick(button, mouse, skillIndex, reagentIndex)
-	DA.DEBUG(0,"OptionalButtonOnClick("..tostring(button)..", "..tostring(mouse)..", "..tostring(skillIndex)..", "..tostring(reagentIndex)..")")
-	DA.DEBUG(1,"OptionalButtonOnClick: cachedOptionalIndex= "..tostring(self.cachedOptionalIndex)..", cachedOptionalList= "..DA.DUMP(self.cachedOptionalList))
+	--DA.DEBUG(0,"OptionalButtonOnClick("..tostring(button)..", "..tostring(mouse)..", "..tostring(skillIndex)..", "..tostring(reagentIndex)..")")
+	--DA.DEBUG(1,"OptionalButtonOnClick: cachedOptionalIndex= "..tostring(self.cachedOptionalIndex)..", cachedOptionalList= "..DA.DUMP(self.cachedOptionalList))
 	local oreagentID = self.cachedOptionalList.reagents[reagentIndex].itemID
 	local oreagentSlot = self.cachedOptionalList.dataSlotIndex
 	if not self.optionalSelected then
@@ -373,6 +373,6 @@ function Skillet:OptionalButtonOnClick(button, mouse, skillIndex, reagentIndex)
 	elseif mouse == "RightButton" then
 		self.optionalSelected[self.cachedOptionalIndex] = nil
 	end
-	DA.DEBUG(1,"OptionalButtonOnClick: cachedOptionalIndex= "..tostring(self.cachedOptionalIndex)..", oreagentID= "..tostring(oreagentID)..", optionalSelected= "..DA.DUMP(self.optionalSelected))
+	--DA.DEBUG(1,"OptionalButtonOnClick: cachedOptionalIndex= "..tostring(self.cachedOptionalIndex)..", oreagentID= "..tostring(oreagentID)..", optionalSelected= "..DA.DUMP(self.optionalSelected))
 	self:UpdateDetailWindow(skillIndex)
 end

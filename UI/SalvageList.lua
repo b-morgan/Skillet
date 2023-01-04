@@ -149,19 +149,19 @@ function Skillet:UpdateSalvageListWindow()
 		self.cachedSalvageList.reagents = recipe.salvage
 	end
 	if self.cachedSalvageList then
-		DA.DEBUG(1,"UpdateSalvageListWindow: cachedSalvageList= ",DA.DUMP1(self.cachedSalvageList))
+		--DA.DEBUG(1,"UpdateSalvageListWindow: cachedSalvageList= ",DA.DUMP1(self.cachedSalvageList))
 		numItems = #self.cachedSalvageList
-		DA.DEBUG(1,"UpdateSalvageListWindow: numItems= "..tostring(numItems))
+		--DA.DEBUG(1,"UpdateSalvageListWindow: numItems= "..tostring(numItems))
 	else
 		return
 	end
 	local height = SkilletSalvageListParent:GetHeight() - 30 -- Allow for frame border
 	local width = SkilletSalvageListParent:GetWidth() - 30 -- Allow for scrollbars
-	DA.DEBUG(1,"UpdateSalvageListWindow: SkilletSalvageListParent height= "..tostring(height))
-	DA.DEBUG(1,"UpdateSalvageListWindow: SkilletSalvageListParent width= "..tostring(width))
+	--DA.DEBUG(1,"UpdateSalvageListWindow: SkilletSalvageListParent height= "..tostring(height))
+	--DA.DEBUG(1,"UpdateSalvageListWindow: SkilletSalvageListParent width= "..tostring(width))
 	local button_count = height / SKILLET_SALVAGE_LIST_HEIGHT
 	button_count = math.floor(button_count) - 1
-	DA.DEBUG(1,"UpdateSalvageListWindow: numItems= "..tostring(numItems)..", button_count= "..tostring(button_count))
+	--DA.DEBUG(1,"UpdateSalvageListWindow: numItems= "..tostring(numItems)..", button_count= "..tostring(button_count))
 --
 -- Update the scroll frame
 --
@@ -173,7 +173,7 @@ function Skillet:UpdateSalvageListWindow()
 -- Where in the list of items to start counting.
 --
 	local itemOffset = FauxScrollFrame_GetOffset(SkilletSalvageListList)
-	DA.DEBUG(1,"UpdateSalvageListWindow: itemOffset= "..tostring(itemOffset)..", width= "..tostring(width))
+	--DA.DEBUG(1,"UpdateSalvageListWindow: itemOffset= "..tostring(itemOffset)..", width= "..tostring(width))
 	for i=1, button_count, 1 do
 		num_buttons = math.max(num_buttons, i)
 		local itemIndex = i + itemOffset
@@ -220,7 +220,7 @@ function Skillet:UpdateSalvageListWindow()
 			button:SetID(itemIndex)
 			button:Show()
 		else
-			DA.DEBUG(1,"UpdateSalvageListWindow: Hide unused button")
+			--DA.DEBUG(1,"UpdateSalvageListWindow: Hide unused button")
 			text:SetText("")
 			text:Hide()
 			icon:Hide()
@@ -279,11 +279,11 @@ end
 -- the quantity (per craft) is one.
 --
 function Skillet:SalvageReagentOnClick(button, mouse, skillIndex, reagentIndex)
-	DA.DEBUG(0,"SalvageReagentOnClick("..tostring(button)..", "..tostring(mouse)..", "..tostring(skillIndex)..", "..tostring(reagentIndex)..")")
+	--DA.DEBUG(0,"SalvageReagentOnClick("..tostring(button)..", "..tostring(mouse)..", "..tostring(skillIndex)..", "..tostring(reagentIndex)..")")
 	local recipe = self:GetRecipeDataByTradeIndex(self.currentTrade, skillIndex)
 	SkilletSalvageHaveItems:Show()
 	self.cachedSalvageList = {}
-	DA.DEBUG(1,"SalvageReagentOnClick: salvage= "..DA.DUMP1(recipe.salvage))
+	--DA.DEBUG(1,"SalvageReagentOnClick: salvage= "..DA.DUMP1(recipe.salvage))
 	local j = 1
 	for i=1, #recipe.salvage,1 do
 		if self.db.char.hide_unowned then
@@ -299,7 +299,7 @@ function Skillet:SalvageReagentOnClick(button, mouse, skillIndex, reagentIndex)
 		end
 	end
 	self.cachedSalvageIndex = reagentIndex * -1
-	DA.DEBUG(1,"SalvageReagentOnClick: cachedSalvageIndex= "..tostring(self.cachedSalvageIndex)..", cachedSalvageList= "..DA.DUMP1(self.cachedSalvageList))
+	--DA.DEBUG(1,"SalvageReagentOnClick: cachedSalvageIndex= "..tostring(self.cachedSalvageIndex)..", cachedSalvageList= "..DA.DUMP1(self.cachedSalvageList))
 --
 -- Left-click selects and right-click deselects.
 --
@@ -318,7 +318,7 @@ end
 -- item, the index'th reagent required for the item is returned
 --
 function Skillet:GetSalvageItemLink(skillIndex, index)
-	DA.DEBUG(0,"GetSalvageItemLink("..tostring(skillIndex)..", "..tostring(index)..")")
+	--DA.DEBUG(0,"GetSalvageItemLink("..tostring(skillIndex)..", "..tostring(index)..")")
 	if skillIndex and index then
 		local recipe = self:GetRecipeDataByTradeIndex(self.currentTrade, skillIndex)
 		if recipe and self.cachedSalvageList then
@@ -372,8 +372,8 @@ end
 -- the quantity (per craft) is one.
 --
 function Skillet:SalvageButtonOnClick(button, mouse, skillIndex, reagentIndex)
-	DA.DEBUG(0,"SalvageButtonOnClick("..tostring(button)..", "..tostring(mouse)..", "..tostring(skillIndex)..", "..tostring(reagentIndex)..")")
-	DA.DEBUG(1,"SalvageButtonOnClick: cachedSalvageIndex= "..tostring(self.cachedSalvageIndex)..", cachedSalvageList= "..DA.DUMP(self.cachedSalvageList))
+	--DA.DEBUG(0,"SalvageButtonOnClick("..tostring(button)..", "..tostring(mouse)..", "..tostring(skillIndex)..", "..tostring(reagentIndex)..")")
+	--DA.DEBUG(1,"SalvageButtonOnClick: cachedSalvageIndex= "..tostring(self.cachedSalvageIndex)..", cachedSalvageList= "..DA.DUMP(self.cachedSalvageList))
 	local sreagentID = self.cachedSalvageList[reagentIndex].itemID
 	if not self.salvageSelected then
 		self.salvageSelected = {}
@@ -384,6 +384,6 @@ function Skillet:SalvageButtonOnClick(button, mouse, skillIndex, reagentIndex)
 	elseif mouse == "RightButton" then
 		self.salvageSelected[self.cachedSalvageIndex] = nil
 	end
-	DA.DEBUG(1,"SalvageButtonOnClick: cachedSalvageIndex= "..tostring(self.cachedSalvageIndex)..", sreagentID= "..tostring(sreagentID)..", salvageSelected= "..DA.DUMP(self.salvageSelected))
+	--DA.DEBUG(1,"SalvageButtonOnClick: cachedSalvageIndex= "..tostring(self.cachedSalvageIndex)..", sreagentID= "..tostring(sreagentID)..", salvageSelected= "..DA.DUMP(self.salvageSelected))
 	self:UpdateDetailWindow(skillIndex)
 end
