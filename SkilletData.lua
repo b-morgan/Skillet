@@ -1135,22 +1135,25 @@ local function ScanTrade()
 		local finishingData = {}
 		local numFinishing = 0
 		local reagentString = "-"
-		if recipeSchematic.recipeType == Enum.TradeskillRecipeType.Salvage then -- 2
+--
+-- Pre-processing based on Enum.TradeskillRecipeType
+--
+		if recipeSchematic.recipeType == Enum.TradeskillRecipeType.Item then -- 1
+			--DA.DEBUG(2,"ScanTrade: recipeID= "..tostring(recipeID)..", name= "..tostring(recipeInfo.name).." is type Item")
+		elseif recipeSchematic.recipeType == Enum.TradeskillRecipeType.Salvage then -- 2
 			--DA.DEBUG(2,"ScanTrade: recipeID= "..tostring(recipeID)..", name= "..tostring(recipeInfo.name)..", recipeInfo= "..DA.DUMP(recipeInfo))
 			--DA.DEBUG(2,"ScanTrade: recipeSchematic= "..DA.DUMP(recipeSchematic))
 			local salvageIDs = C_TradeSkillUI.GetSalvagableItemIDs(recipeID)
 			--DA.DEBUG(2,"ScanTrade: recipeID= "..tostring(recipeID)..", salvageIDs= "..DA.DUMP1(salvageIDs))
 			recipe.salvage = salvageIDs
 			recipe.numUsed = (recipeSchematic.quantityMin + recipeSchematic.quantityMax)/2
-		end
-		if recipeSchematic.recipeType == Enum.TradeskillRecipeType.Enchant then -- 3
+		elseif recipeSchematic.recipeType == Enum.TradeskillRecipeType.Enchant then -- 3
 			--DA.DEBUG(2,"ScanTrade: recipeID= "..tostring(recipeID)..", name= "..tostring(recipeInfo.name).." is type Enchant")
-		end
-		if recipeSchematic.recipeType == Enum.TradeskillRecipeType.Recraft then -- 4
+		elseif recipeSchematic.recipeType == Enum.TradeskillRecipeType.Recraft then -- 4
 			--DA.DEBUG(2,"ScanTrade: recipeID= "..tostring(recipeID)..", name= "..tostring(recipeInfo.name).." is type Recraft")
 		end
 --
--- recipeSchematic.recipeType == Enum.TradeskillRecipeType.Item (1)
+-- Common processing of all Enum.TradeskillRecipeType
 --
 		local numReagents = #recipeSchematic.reagentSlotSchematics
 		for k = 1, numReagents do

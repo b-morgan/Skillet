@@ -350,7 +350,7 @@ function Skillet:ProcessQueue(altMode)
 				Skillet:Print(L["Skipping"],recipe.name,"-",L["has cooldown of"],SecondsToTime(cooldown))
 				craftable = false
 			else
-				if command.recipeType == Enum.TradeskillRecipeType.Item then
+				if command.recipeType == Enum.TradeskillRecipeType.Item or command.recipeType == Enum.TradeskillRecipeType.Enchant then
 --
 -- Check required reagents
 --
@@ -433,12 +433,18 @@ function Skillet:ProcessQueue(altMode)
 							end
 						end -- for
 					end
---				elseif command.recipeType == Enum.TradeskillRecipeType.Enchant then
---				elseif command.recipeType == Enum.TradeskillRecipeType.Recraft then
+				elseif command.recipeType == Enum.TradeskillRecipeType.Enchant then
+					DA.DEBUG(1,"ProcessQueue(E): command= "..DA.DUMP(command))
+					DA.DEBUG(1,"ProcessQueue(E): recipe= "..DA.DUMP(recipe))
+				elseif command.recipeType == Enum.TradeskillRecipeType.Recraft then
+					DA.DEBUG(1,"ProcessQueue(R): command= "..DA.DUMP(command))
+					DA.DEBUG(1,"ProcessQueue(R): recipe= "..DA.DUMP(recipe))
 --
 -- Check for type Salvage
 --
 				elseif command.recipeType ~= Enum.TradeskillRecipeType.Salvage then
+					DA.DEBUG(1,"ProcessQueue(S): command= "..DA.DUMP(command))
+					DA.DEBUG(1,"ProcessQueue(S): recipe= "..DA.DUMP(recipe))
 					craftable = false
 					break
 				end
@@ -466,7 +472,7 @@ function Skillet:ProcessQueue(altMode)
 				return
 			end
 			local recipe = self:GetRecipe(command.recipeID)
-			if command.recipeType == Enum.TradeskillRecipeType.Item then
+			if command.recipeType == Enum.TradeskillRecipeType.Item or command.recipeType == Enum.TradeskillRecipeType.Enchant then
 				local numAvailable = C_TradeSkillUI.GetCraftableCount(command.recipeID) or 0
 				if numAvailable > 0 then
 					self.processingSpell = self:GetRecipeName(command.recipeID)
@@ -543,6 +549,12 @@ function Skillet:ProcessQueue(altMode)
 					DA.MARK3("Insufficent Materials available, count= "..tostring(command.count)..", numAvailable= "..tostring(numAvailable))
 					self.queuecasting = false
 				end
+			elseif command.recipeType == Enum.TradeskillRecipeType.Enchant then
+				DA.DEBUG(1,"ProcessQueue(E): command= "..DA.DUMP(command))
+				DA.DEBUG(1,"ProcessQueue(E): recipe= "..DA.DUMP(recipe))
+			elseif command.recipeType == Enum.TradeskillRecipeType.Recraft then
+				DA.DEBUG(1,"ProcessQueue(R): command= "..DA.DUMP(command))
+				DA.DEBUG(1,"ProcessQueue(R): recipe= "..DA.DUMP(recipe))
 			elseif command.recipeType == Enum.TradeskillRecipeType.Salvage then
 				local numAvailable
 				local itemLocation
