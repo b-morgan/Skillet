@@ -40,6 +40,7 @@ local CALTS = "|cffff80ff"		-- Purple = How many you can make using materials on
 
 function Skillet:SetReagentToolTip(reagentID, numNeeded, numCraftable)
 	--DA.DEBUG(0,"SetReagentToolTip("..tostring(reagentID)..", "..tostring(numNeeded)..", "..tostring(numCraftable)..")")
+	if not reagentID or type(reagentID) ~= "number" then return end
 	GameTooltip:ClearLines()
 	GameTooltip:SetHyperlink("item:"..reagentID)
 	if self:VendorSellsReagent(reagentID) then
@@ -921,7 +922,7 @@ function Skillet:ChangeItemCount(this, button, count)
 end
 
 --
--- Called when then mouse enters a reagent button
+-- Called to set the tooltip when the mouse enters a reagent button
 --
 function Skillet:ReagentButtonOnEnter(button, skillIndex, reagentIndex)
 	--DA.DEBUG(0,"ReagentButtonOnEnter("..tostring(button)..", "..tostring(skillIndex)..", "..tostring(reagentIndex)..")")
@@ -942,9 +943,12 @@ function Skillet:ReagentButtonOnEnter(button, skillIndex, reagentIndex)
 		local reagent
 		if recipe then
 			if reagentIndex > 0 and reagentIndex < 100 then
+--
+-- Basic reagent
+--
 				reagent = recipe.reagentData[reagentIndex]
 				if reagent then
-					Skillet:SetReagentToolTip(reagent.reagentID, reagent.numNeeded, skill.numCraftable or 0)
+					self:SetReagentToolTip(reagent.reagentID, reagent.numNeeded, skill.numCraftable or 0)
 					if self.db.profile.link_craftable_reagents then
 						if self.db.global.itemRecipeSource[reagent.reagentID] then
 							local icon = _G[button:GetName() .. "Icon"]
@@ -955,23 +959,50 @@ function Skillet:ReagentButtonOnEnter(button, skillIndex, reagentIndex)
 						end
 					end
 				end
-			elseif reagentIndex <= 0 and not recipe.salvage then
-				reagent = recipe.optionalData[-1 * reagentIndex]
-				if reagent.lockedReason then
-					GameTooltip:AddLine(reagent.lockedReason, 1,0,0)
+			elseif reagentIndex <= 0 then
+				if not recipe.salvage then
+--
+-- Optional reagent
+--
+					reagent = recipe.optionalData[-1 * reagentIndex]
+					--DA.DEBUG(1,"ReagentButtonOnEnter(O): reagent= "..DA.DUMP1(reagent))
+					--DA.DEBUG(1,"ReagentButtonOnEnter(O): index="..tostring(reagentIndex)..", optionalSelected= "..DA.DUMP1(self.optionalSelected))
+					if self.optionalSelected[-1 * reagentIndex] then
+						self:SetReagentToolTip(self.optionalSelected[-1 * reagentIndex].itemID, 0, 0)
+					end
+					if reagent.lockedReason then
+						GameTooltip:AddLine(reagent.lockedReason, 1,0,0)
+					end
+				elseif self.salvageSelected[1] then
+--
+-- Salvage reagent
+--
+					--DA.DEBUG(1,"ReagentButtonOnEnter(S): index= "..tostring(reagentIndex)..", salvageSelected= "..DA.DUMP1(self.salvageSelected))
+					self:SetReagentToolTip(self.salvageSelected[1], 0, 0)
 				end
 			elseif reagentIndex > 200 then
+--
+-- Finishing reagent
+--
 				reagent = recipe.finishingData[reagentIndex - 200]
+				--DA.DEBUG(1,"ReagentButtonOnEnter(F): reagent= "..DA.DUMP1(reagent))
+				--DA.DEBUG(1,"ReagentButtonOnEnter(F): index= "..tostring(reagentIndex)..", finishingSelected= "..DA.DUMP1(self.finishingSelected))
+				if self.finishingSelected[reagentIndex - 200] then
+					self:SetReagentToolTip(self.finishingSelected[reagentIndex - 200].itemID, 0, 0)
+				end
 				if reagent.lockedReason then
 					GameTooltip:AddLine(reagent.lockedReason, 1,0,0)
 				end
 			elseif reagentIndex > 100 then
+--
+-- Modified reagent (use the default first one)
+--
 				reagent = recipe.modifiedData[reagentIndex - 100]
+				--DA.DEBUG(1,"ReagentButtonOnEnter(M): reagent= "..DA.DUMP1(reagent))
+				self:SetReagentToolTip(reagent.reagentID, 0, 0)
 				if reagent.lockedReason then
 					GameTooltip:AddLine(reagent.lockedReason, 1,0,0)
 				end
-			else
-				GameTooltip:AddLine("unknown", 1,0,0)
 			end
 		end
 	end
