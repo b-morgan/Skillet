@@ -120,7 +120,8 @@ end
 -- The DetailFrame will be refreshed unless modified is true
 --
 function Skillet:nameWithQuality(itemID, modified)
-	local quality
+	--DA.DEBUG(0,"nameWithQuality("..tostring(itemID)..", "..tostring(modified)..")")
+	local name, quality
 	local bname, link = GetItemInfo(itemID)
 	if not bname then
 		if modified then
@@ -136,7 +137,10 @@ function Skillet:nameWithQuality(itemID, modified)
 	end
 	if quality then
 		name = bname..C_Texture.GetCraftingReagentQualityChatIcon(quality)
+	else
+		name = bname
 	end
+	--DA.DEBUG(0,"nameWithQuality: name= "..tostring(name)..", bname= "..tostring(bname))
 	return name, bname
 end
 
@@ -758,7 +762,7 @@ function Skillet:UpdateDetailWindow(skillIndex)
 -- reagent or the reagent that has been selected for that slot
 --
 			if j == 1 then
-				--DA.DEBUG(0,"UpdateDetailWindow: salvageSelected= "..DA.DUMP1(self.salvageSelected))
+				DA.DEBUG(0,"UpdateDetailWindow: salvageSelected= "..DA.DUMP1(self.salvageSelected))
 				local sselected
 				if self.salvageSelected then
 					sselected = self.salvageSelected[j]
@@ -767,7 +771,7 @@ function Skillet:UpdateDetailWindow(skillIndex)
 --
 -- A salvage reagent has been selected for this slot
 --
-					--DA.DEBUG(0,"UpdateDetailWindow: sselected= "..tostring(sselected))
+					DA.DEBUG(0,"UpdateDetailWindow: sselected= "..tostring(sselected))
 					local name = self:nameWithQuality(sselected)
 					text:SetText(name)
 					texture = GetItemIcon(sselected)
