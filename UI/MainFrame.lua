@@ -1975,6 +1975,7 @@ function Skillet:SkillButton_OnClick(button, mouse)
 		lastClick = thisClick
 		if delay < .25 then
 			doubleClicked = true
+			DA.DEBUG(1,"SkillButton_OnClick: double click")
 		end
 		if doubleClicked then
 			if button.skill.subGroup then
@@ -2029,7 +2030,32 @@ function Skillet:SkillButton_OnClick(button, mouse)
 		end
 		self:UpdateTradeSkillWindow()
 	elseif (mouse == "RightButton") then
-		self:SkilletSkillMenu_Show(button)
+--
+-- The following options are primarily for debugging.
+--
+		if IsShiftKeyDown() then
+			DA.DEBUG(1,"SkillButton_OnClick: Shift is down")
+		elseif IsControlKeyDown() then
+			DA.DEBUG(1,"SkillButton_OnClick: Ctrl is down")
+		elseif IsAltKeyDown() then
+			DA.DEBUG(1,"SkillButton_OnClick: Alt is down")
+			local skill = self:GetSkill(self.currentPlayer, self.currentTrade, self.selectedSkill)
+			local recipe = self:GetRecipe(skill.id)
+			local requirements = C_TradeSkillUI.GetRecipeRequirements(recipe.spellID)
+			local recipeInfo = C_TradeSkillUI.GetRecipeInfo(recipe.spellID)
+			local recipeSchematic = C_TradeSkillUI.GetRecipeSchematic(recipe.spellID, false)
+			DA.DEBUG(1,"SkillButton_OnClick: name= "..tostring(recipe.name)..", skill.id= "..tostring(skill.id)..", recipe.spellID= "..tostring(recipe.spellID))
+			DA.DEBUG(1,"SkillButton_OnClick: skill= "..DA.DUMP1(skill))
+			DA.DEBUG(1,"SkillButton_OnClick: recipe= "..DA.DUMP(recipe))
+			DA.DEBUG(1,"SkillButton_OnClick: requirements= "..DA.DUMP(requirements))
+			DA.DEBUG(1,"SkillButton_OnClick: GetRecipeInfo= "..DA.DUMP(recipeInfo))
+			DA.DEBUG(1,"SkillButton_OnClick: GetRecipeSchematic= "..DA.DUMP(recipeSchematic))
+		else
+--
+-- Currently the only "useful" option.
+--
+			self:SkilletSkillMenu_Show(button)
+		end
 	end
 end
 
@@ -2569,7 +2595,7 @@ function Skillet:SkilletSkillMenu_Show(button)
 		end
 	else
 		GameTooltip:Hide() --hide tooltip, because it may be over the menu, sometimes it still fails
-		if C_TradeSkillUI.GetOnlyShowLearnedRecipes() then
+		if C_TradeSkillUI.GetShowLearned() then
 			favoriteMenu["text"] = L["Set Favorite"]
 		else
 			favoriteMenu["text"] = L["Cannot Set Favorite"]
