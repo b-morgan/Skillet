@@ -215,8 +215,6 @@ function Skillet:EnablePlugins()
 		DA.DEBUG(1,"k= "..tostring(k)..", v= "..tostring(v))
 		if v and v.OnEnable then
 			v.OnEnable()
-		elseif v and v.OnInitialize then
-			v.OnInitialize()
 		end
 	end
 end
