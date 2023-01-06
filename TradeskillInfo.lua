@@ -131,3 +131,42 @@ function Skillet:GetTradeSkillLine()
 	DA.DEBUG(0,"GetTradeSkillLine "..tostring(tradeName).." "..tostring(rank).." "..tostring(maxRank))
 	return tradeName, rank, maxRank
 end
+
+function Skillet:IsRecipeOnCooldown(recipeID)
+	local cooldown, isDayCooldown, charges, maxCharges = C_TradeSkillUI.GetRecipeCooldown(recipeID);
+	if not cooldown then
+		return false;
+	end
+	if charges > 0 then
+		return false;
+	end
+	return true;
+end
+
+function Skillet:UpdateCooldown(recipeID, fontString)
+	local recipeInfo = C_TradeSkillUI.GetRecipeInfo(recipeID)
+	local cooldown, isDayCooldown, charges, maxCharges = C_TradeSkillUI.GetRecipeCooldown(recipeID);
+	if maxCharges and charges and maxCharges > 0 and (charges > 0 or not cooldown) then
+		fontString:SetFormattedText(TRADESKILL_CHARGES_REMAINING, charges, maxCharges);
+		fontString:SetTextColor(HIGHLIGHT_FONT_COLOR.r, HIGHLIGHT_FONT_COLOR.g, HIGHLIGHT_FONT_COLOR.b);
+	elseif recipeInfo.disabled then
+		fontString:SetTextColor(RED_FONT_COLOR.r, RED_FONT_COLOR.g, RED_FONT_COLOR.b);
+		fontString:SetText(recipeInfo.disabledReason);
+	else
+		local function SetCooldownRemaining(cooldown)
+			fontString:SetText(COOLDOWN_REMAINING.." "..SecondsToTime(cooldown));
+		end
+		fontString:SetTextColor(RED_FONT_COLOR.r, RED_FONT_COLOR.g, RED_FONT_COLOR.b);
+		if not cooldown then
+			fontString:SetText("");
+		elseif not isDayCooldown then
+--			cooldownFormatter:SetMinInterval(SecondsFormatter.Interval.Seconds);
+			SetCooldownRemaining(cooldown);
+		elseif cooldown > SECONDS_PER_DAY then
+--			cooldownFormatter:SetMinInterval(SecondsFormatter.Interval.Days);
+			SetCooldownRemaining(cooldown);
+		else
+			fontString:SetText(COOLDOWN_EXPIRES_AT_MIDNIGHT);
+		end
+	end
+end
