@@ -605,7 +605,7 @@ function Skillet:ToggleFavorite(recipeID)
 end
 
 function Skillet:IsUpgradeHidden(recipeID)
-	local recipeInfo = Skillet.data.recipeInfo[Skillet.currentTrade][recipeID]
+	local recipeInfo = self.data.recipeInfo[Skillet.currentTrade][recipeID]
 	--filter out upgrades
 	if recipeInfo and recipeInfo.upgradeable then
 		if Skillet.unlearnedRecipes then
@@ -1063,6 +1063,8 @@ local function ScanTrade()
 		recipe.tradeID = tradeID
 		recipe.spellID = recipeID
 		recipe.name = skillName
+		recipe.firstCraft = recipeInfo.firstCraft
+		recipe.supportsQualities = recipeInfo.supportsQualities
 		recipe.itemID = 0		-- Make sure this value exists
 		recipe.numMade = 1		-- Make sure this value exists
 
