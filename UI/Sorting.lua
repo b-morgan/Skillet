@@ -357,7 +357,6 @@ function Skillet:AddRecipeSorter(text, sorter)
 		end
 	end
 	table.insert(sorters, {["name"]=text, ["sorter"]=sorter})
-	end
 end
 
 function Skillet:InitializeSorting()
