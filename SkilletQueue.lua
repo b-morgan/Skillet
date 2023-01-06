@@ -345,9 +345,8 @@ function Skillet:ProcessQueue(altMode)
 		if command and command.op == "iterate" then
 			local recipe = self:GetRecipe(command.recipeID)
 			craftable = true
-			local cooldown = C_TradeSkillUI.GetRecipeCooldown(command.recipeID)
-			if cooldown then
-				Skillet:Print(L["Skipping"],recipe.name,"-",L["has cooldown of"],SecondsToTime(cooldown))
+			if self:IsRecipeOnCooldown(command.recipeID) then
+				Skillet:Print(L["Skipping"],recipe.name,"-",PROFESSIONS_RECIPE_COOLDOWN) -- L["is on cooldown"], ON_COOLDOWN
 				craftable = false
 			else
 				if command.recipeType == Enum.TradeskillRecipeType.Item or command.recipeType == Enum.TradeskillRecipeType.Enchant then
