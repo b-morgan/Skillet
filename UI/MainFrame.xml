@@ -1783,10 +1783,20 @@
 								</Anchor>
 							</Anchors>
 						</FontString>
+						<!-- If the skill is a first craft, this is the display for it -->
+						<FontString name="SkilletFirstCraft" inherits="GameFontHighlightSmall" text="PROFESSIONS_FIRST_CRAFT">
+							<Anchors>
+								<Anchor point="TOPLEFT" relativeTo="SkilletDescriptionText" relativePoint="BOTTOMLEFT">
+									<Offset>
+										<AbsDimension x="0" y="0"/>
+									</Offset>
+								</Anchor>
+							</Anchors>
+						</FontString>
 						<!-- If the skill requires a special tool, this is the "Requires: " label for it -->
 						<FontString name="SkilletRequirementLabel" inherits="GameFontHighlightSmall" text="REQUIRES_LABEL">
 							<Anchors>
-								<Anchor point="TOPLEFT" relativeTo="SkilletDescriptionText" relativePoint="BOTTOMLEFT">
+								<Anchor point="TOPLEFT" relativeTo="SkilletFirstCraft" relativePoint="BOTTOMLEFT">
 									<Offset>
 										<AbsDimension x="0" y="0"/>
 									</Offset>

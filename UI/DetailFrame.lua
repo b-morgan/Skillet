@@ -88,6 +88,7 @@ function Skillet:HideDetailWindow()
 	SkilletSkillName:SetText("")
 	SkilletSkillCooldown:SetText("")
 	SkilletDescriptionText:SetText("")
+	SkilletFirstCraft:Hide()
 	SkilletRequirementLabel:Hide()
 	SkilletRequirementText:SetText("")
 	SkilletSkillIcon:Hide()
@@ -238,7 +239,7 @@ function Skillet:UpdateDetailWindow(skillIndex)
 --
 		local description
 		description = C_TradeSkillUI.GetRecipeDescription(skill.id, {})
-		--DA.DEBUG(0,"UpdateDetailWindow: description="..tostring(description))
+		--DA.DEBUG(0,"UpdateDetailWindow: description= "..tostring(description))
 		if description then
 			description = description:gsub("\r","")	-- Skillet frame has less space than Blizzard frame, so
 			description = description:gsub("\n","")	-- remove any extra blank lines, but
@@ -248,23 +249,30 @@ function Skillet:UpdateDetailWindow(skillIndex)
 			SkilletDescriptionText:SetText("")
 		end
 --
+-- Is this recipe a First Craft
+--
+--[[
+PROFESSIONS_FIRST_CRAFT = "First Craft";
+PROFESSIONS_FIRST_CRAFT_DESCRIPTION = "Crafting this recipe for the first time will teach you something new.";
+--]]
+		if recipe.firstCraft then
+			SkilletFirstCraft:Show()
+		else
+			SkilletFirstCraft:Hide()
+		end
+--
 -- Whether or not it is on cooldown.
 --
 		local _, _, _, _, _, _, _, _, _, _, _, displayAsUnavailable, unavailableString = Skillet:GetTradeSkillInfo(skill.id)
 		--DA.DEBUG(0,"UpdateDetailWindow: displayAsUnavailable="..tostring(displayAsUnavailable)..", unavailableString="..tostring(unavailableString))
-		local cd, isDayCooldown, charges, maxCharges = C_TradeSkillUI.GetRecipeCooldown(skill.id)
-		--DA.DEBUG(0,"UpdateDetailWindow: cd= "..tostring(cd))
-		local cooldown = (cd or 0)
-		if cooldown > 0 then
-			SkilletSkillCooldown:SetText(COOLDOWN_REMAINING.." "..SecondsToTime(cooldown))
-		elseif displayAsUnavailable then
+		if displayAsUnavailable then
 			local width = SkilletReagentParent:GetWidth()
 			local iconw = SkilletSkillIcon:GetWidth()
 			SkilletSkillCooldown:SetWidth(width - iconw - 15)
 			SkilletSkillCooldown:SetMaxLines(3)
 			SkilletSkillCooldown:SetText(unavailableString)
 		else
-			SkilletSkillCooldown:SetText("")
+			self:UpdateCooldown(skill.id, SkilletSkillCooldown)
 		end
 --
 -- Are special tools needed for this skill?
