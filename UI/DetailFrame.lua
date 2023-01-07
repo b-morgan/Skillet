@@ -1094,7 +1094,7 @@ function Skillet:ReagentButtonRightClick(button, mouse, skillIndex, reagentIndex
 		Skillet:DisplayModifiedList()
 		Skillet:ModifiedReagentOnClick(button, mouse, skillIndex, reagentIndex)
 		return
-	else
+	elseif reagentIndex > 200 then
 --
 -- Finishing reagent (reagentIndex + 200)
 --
@@ -1144,7 +1144,7 @@ function Skillet:ReagentButtonOnClick(button, mouse, skillIndex, reagentIndex)
 		Skillet:DisplayModifiedList()
 		Skillet:ModifiedReagentOnClick(button, mouse, skillIndex, reagentIndex)
 		return
-	else
+	elseif reagentIndex > 200 then
 --
 -- Finishing reagent (reagentIndex + 200)
 --
