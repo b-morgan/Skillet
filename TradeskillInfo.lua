@@ -95,13 +95,6 @@ function Skillet:AdjustNumberMade(index, adjust)
 	end
 end
 
-function Skillet:GetTradeSkillNumReagents(skillIndex)
-	local recipe = self:GetRecipeDataByTradeIndex(self.currentTrade, skillIndex)
-	if recipe then
-		return #recipe.reagentData
-	end
-end
-
 --
 -- Returns a link for the reagent required to create the specified
 -- item, the index'th reagent required for the item is returned
