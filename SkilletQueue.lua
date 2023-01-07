@@ -133,6 +133,7 @@ function Skillet:QueueAppendCommand(command, queueCraftables, noWindowRefresh)
 	if recipe and not self.visited[command.recipeID] then
 		self.visited[command.recipeID] = true
 		local reagentsInQueue = self.db.realm.reagentsInQueue[Skillet.currentPlayer]
+		local modifiedInQueue = self.db.realm.modifiedInQueue[Skillet.currentPlayer]
 		local skillIndexLookup = self.data.skillIndexLookup
 		local queueGlyph = Skillet.db.profile.queue_glyph_reagents or not recipe.name:match(Skillet.L["Glyph "])
 		for i=1,#recipe.reagentData do
@@ -155,8 +156,9 @@ function Skillet:QueueAppendCommand(command, queueCraftables, noWindowRefresh)
 		if recipe.modifiedData then
 			for i=1,#recipe.modifiedData do
 				local reagent = recipe.modifiedData[i]
-				DA.DEBUG(2,"QueueAppendCommand: reagent= "..DA.DUMP(reagent))
+				--DA.DEBUG(2,"QueueAppendCommand: reagent= "..DA.DUMP(reagent))
 				queueAppendReagent(command, reagent.reagentID, command.count * reagent.numNeeded, queueCraftables and queueGlyph)
+				modifiedInQueue[reagent.reagentID] = reagent.schematic.reagents
 			end
 		end
 		if command.optionalReagents then
@@ -286,6 +288,7 @@ function Skillet:ClearQueue()
 		end
 		self.db.realm.queueData[self.currentPlayer] = {}
 		self.db.realm.reagentsInQueue[self.currentPlayer] = {}
+		self.db.realm.modifiedInQueue[self.currentPlayer] = {}
 		self:UpdateTradeSkillWindow()
 	end
 end
@@ -332,10 +335,14 @@ end
 function Skillet:PrintRIQ()
 	--DA.DEBUG(0,"PrintRIQ()");
 	local reagentsInQueue = self.db.realm.reagentsInQueue[Skillet.currentPlayer]
+	local modifiedInQueue = self.db.realm.modifiedInQueue[Skillet.currentPlayer]
 	if reagentsInQueue then
 		for id,count in pairs(reagentsInQueue) do
 			local name = GetItemInfo(id)
 			print("reagent: "..id.." ("..tostring(name)..") x "..count)
+			if modifiedInQueue[id] then
+				print("    "..DA.DUMP1(modifiedInQueue[id]))
+			end
 		end
 	end
 end
@@ -896,6 +903,7 @@ function Skillet:ScanQueuedReagents()
 		return
 	end
 	local reagentsInQueue = {}
+	local modifiedInQueue = {}
 	for i,command in pairs(self.db.realm.queueData[self.currentPlayer]) do
 		if command.op == "iterate" then
 			local recipe = self:GetRecipe(command.recipeID)
@@ -926,6 +934,7 @@ function Skillet:ScanQueuedReagents()
 					local reagent = recipe.modifiedData[i]
 					--DA.DEBUG(2,"QueueAppendCommand: reagent= "..DA.DUMP(reagent))
 					reagentsInQueue[reagent.reagentID] = (reagentsInQueue[reagent.reagentID] or 0) - reagent.numNeeded * command.count
+					modifiedInQueue[reagent.reagentID] = reagent.schematic.reagents
 				end
 			end
 --[[
@@ -946,6 +955,7 @@ function Skillet:ScanQueuedReagents()
 		end
 	end
 	self.db.realm.reagentsInQueue[self.currentPlayer] = reagentsInQueue
+	self.db.realm.modifiedInQueue[self.currentPlayer] = modifiedInQueue
 end
 
 function Skillet:QueueMoveToTop(index)
@@ -993,6 +1003,7 @@ end
 function Skillet:SaveQueue(name, overwrite)
 	local queue = self.db.realm.queueData[self.currentPlayer]
 	local reagents = self.db.realm.reagentsInQueue[self.currentPlayer]
+	local reagents = self.db.realm.modifiedInQueue[self.currentPlayer]
 	if not name or name == "" then return end
 	if not queue or #queue == 0 then
 		Skillet:MessageBox(L["Queue is empty"])
@@ -1007,6 +1018,7 @@ function Skillet:SaveQueue(name, overwrite)
 	self.db.profile.SavedQueues[name] = {}
 	self.db.profile.SavedQueues[name].queue = tcopy(queue)
 	self.db.profile.SavedQueues[name].reagents = tcopy(reagents)
+	self.db.profile.SavedQueues[name].modified = tcopy(modified)
 	Skillet.selectedQueueName = name
 	Skillet:QueueLoadDropdown_OnShow()
 	SkilletQueueSaveEditBox:SetText("")
@@ -1027,6 +1039,7 @@ function Skillet:LoadQueue(name, overwrite)
 	end
 	self.db.realm.queueData[self.currentPlayer] = tcopy(self.db.profile.SavedQueues[name].queue)
 	self.db.realm.reagentsInQueue[self.currentPlayer] = tcopy(self.db.profile.SavedQueues[name].reagents)
+	self.db.realm.modifiedInQueue[self.currentPlayer] = tcopy(self.db.profile.SavedQueues[name].modified)
 	Skillet:UpdateTradeSkillWindow()
 end
 

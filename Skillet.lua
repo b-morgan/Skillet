@@ -461,6 +461,7 @@ function Skillet:FlushPlayerData()
 	Skillet.db.realm.bankDetails[player] = {}
 	Skillet.db.realm.queueData[player] = {}
 	Skillet.db.realm.reagentsInQueue[player] = {}
+	Skillet.db.realm.modifiedInQueue[player] = {}
 	Skillet.db.realm.groupDB[player] = {}
 	Skillet.db.realm.options[player] = {}
 end
@@ -482,6 +483,7 @@ end
 function Skillet:FlushQueueData()
 	Skillet.db.realm.queueData = {}
 	Skillet.db.realm.reagentsInQueue = {}
+	Skillet.db.realm.modifiedInQueue = {}
 end
 
 --
@@ -630,6 +632,12 @@ function Skillet:InitializeDatabase(player)
 			end
 			if not self.db.realm.reagentsInQueue[player] then
 				self.db.realm.reagentsInQueue[player] = {}
+			end
+			if not self.db.realm.modifiedInQueue then
+				self.db.realm.modifiedInQueue = {}
+			end
+			if not self.db.realm.modifiedInQueue[player] then
+				self.db.realm.modifiedInQueue[player] = {}
 			end
 			if not self.db.realm.userIgnoredMats then
 				self.db.realm.userIgnoredMats = {}
