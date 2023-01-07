@@ -326,6 +326,20 @@ function Skillet:PrintQueue(name)
 	end
 end
 
+--
+-- Prints the list of reagentsInQueue
+--
+function Skillet:PrintRIQ()
+	--DA.DEBUG(0,"PrintRIQ()");
+	local reagentsInQueue = self.db.realm.reagentsInQueue[Skillet.currentPlayer]
+	if reagentsInQueue then
+		for id,count in pairs(reagentsInQueue) do
+			local name = GetItemInfo(id)
+			print("reagent: "..id.." ("..tostring(name)..") x "..count)
+		end
+	end
+end
+
 function Skillet:ProcessQueue(altMode)
 	DA.DEBUG(0,"ProcessQueue("..tostring(altMode)..")");
 	local queue = self.db.realm.queueData[self.currentPlayer]
@@ -907,6 +921,28 @@ function Skillet:ScanQueuedReagents()
 				end
 				reagentsInQueue[reagent.reagentID] = (reagentsInQueue[reagent.reagentID] or 0) - reagent.numNeeded * command.count
 			end
+			if recipe.modifiedData then
+				for i=1,#recipe.modifiedData do
+					local reagent = recipe.modifiedData[i]
+					--DA.DEBUG(2,"QueueAppendCommand: reagent= "..DA.DUMP(reagent))
+					reagentsInQueue[reagent.reagentID] = (reagentsInQueue[reagent.reagentID] or 0) - reagent.numNeeded * command.count
+				end
+			end
+--[[
+			if command.optionalReagents then
+				for i,reagent in pairs(command.optionalReagents) do
+					DA.DEBUG(2,"QueueAppendCommand: i= "..tostring(i)..", reagent= "..DA.DUMP(reagent))
+					reagentsInQueue[reagent.reagentID] = (reagentsInQueue[reagent.reagentID] or 0) - reagent.numNeeded * command.count
+				end
+			end
+			if command.finishingReagents then
+				for i,reagent in pairs(command.finishingReagents) do
+					DA.DEBUG(2,"QueueAppendCommand: i= "..tostring(i)..", reagent= "..DA.DUMP(reagent))
+					reagentsInQueue[reagent.reagentID] = (reagentsInQueue[reagent.reagentID] or 0) - reagent.numNeeded * command.count
+				end
+			end
+--]]
+		reagentsInQueue[recipe.itemID] = (reagentsInQueue[recipe.itemID] or 0) + command.count * recipe.numMade;
 		end
 	end
 	self.db.realm.reagentsInQueue[self.currentPlayer] = reagentsInQueue
