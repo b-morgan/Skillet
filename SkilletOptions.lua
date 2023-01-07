@@ -790,6 +790,20 @@ Skillet.options =
 			end,
 			order = 66
 		},
+		printriq = {
+			type = 'execute',
+			name = "printriq",
+			desc = "Print Reagents In Queue",
+			func = function()
+				if not (UnitAffectingCombat("player")) then
+					Skillet:PrintRIQ()
+				else
+					DA.DEBUG(0,"|cff8888ffSkillet|r: Combat lockdown restriction." ..
+												  " Leave combat and try again.")
+				end
+			end,
+			order = 67
+		},
 --
 -- commands to toggle Blizzard's frames (beats using "/run")
 --
