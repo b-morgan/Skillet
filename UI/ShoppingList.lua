@@ -194,6 +194,7 @@ function Skillet:ClearShoppingList(player)
 		local player = playerList[i]
 		--DA.DEBUG(1,"player: "..player)
 		self.db.realm.reagentsInQueue[player] = {}
+		self.db.realm.modifiedInQueue[player] = {}
 		self.db.realm.queueData[player] = {}
 		self.db.realm.inventoryData[player] = {}
 	end
@@ -944,6 +945,12 @@ function Skillet:BAG_UPDATE_DELAYED(event)
 	end
 end
 
+local function tcopy(t)
+  local u = { }
+  for k, v in pairs(t) do u[k] = v end
+  return setmetatable(u, getmetatable(t))
+end
+
 --
 -- Gets all the reagents possible for queued recipes from the bank
 --
@@ -951,8 +958,26 @@ function Skillet:GetReagentsFromBanks()
 	DA.DEBUG(0,"GetReagentsFromBanks()")
 	local list = self.cachedShoppingList
 	local incAlts = Skillet.db.char.include_alts
-	local name = UnitName("player")
-
+--
+-- Add other qualities for modified items
+-- ToDo: clear the base item from the list when an alternate quality is pulled
+--
+	for _,v in pairs(list) do
+		if incAlts or v.player == Skillet.currentPlayer then
+			if self.db.realm.modifiedInQueue[v.player][v.id] then
+				--DA.DEBUG(1,"GetReagentsFromBanks: modified found for: "..DA.DUMP1(v))
+				for _,m in pairs(modifiedInQueue[v.id]) do
+					if m.itemID ~= v.id then
+						local n = tcopy(v)
+						n.base = n.id
+						n.id = m.itemID
+						--DA.DEBUG(1,"GetReagentsFromBanks: Adding "..DA.DUMP1(n))
+						table.insert(list,n)
+					end
+				end
+			end
+		end
+	end
 --
 -- Do things using a queue and events.
 --
@@ -962,7 +987,7 @@ function Skillet:GetReagentsFromBanks()
 		for j,v in pairs(list) do
 			--DA.DEBUG(2,"j=",j,", v=",DA.DUMP1(v))
 			local id = v.id
-			if incAlts or v.player == name then
+			if incAlts or v.player == Skillet.currentPlayer then
 				for i,item in pairs(bank) do
 					if item.id == id then
 						--DA.DEBUG(2,"i=",i,", item=",DA.DUMP1(item))
