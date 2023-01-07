@@ -18,9 +18,11 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
 ]]--
 local PT = LibStub("LibPeriodicTable-3.1")
 
+--
 -- recursive reagent craftability check
 -- not considering alts
 -- does consider queued recipes
+--
 function Skillet:InventoryReagentCraftability(reagentID)
 	--DA.DEBUG(1,"InventoryReagentCraftability("..tostring(reagentID)..") -- "..tostring((GetItemInfo(reagentID))))
 	if not reagentID or reagentID == 0 then
@@ -86,9 +88,11 @@ function Skillet:InventoryReagentCraftability(reagentID)
 	return numCrafted, numCraftedVendor
 end
 
+--
 -- recipe iteration check: calculate how many times a recipe can be iterated with materials available
 -- (not to be confused with the reagent craftability which is designed to determine how many
 -- craftable reagents are available for recipe iterations)
+--
 function Skillet:InventorySkillIterations(tradeID, recipe)
 	--DA.DEBUG(1,"InventorySkillIterations("..tostring(tradeID)..", "..tostring(recipe.name)..")")
 	local player = Skillet.currentPlayer
