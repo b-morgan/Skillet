@@ -19,6 +19,12 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
 local L = Skillet.L
 
+local function tcopy(t)
+  local u = { }
+  for k, v in pairs(t) do u[k] = v end
+  return setmetatable(u, getmetatable(t))
+end
+
 --
 -- Iterates through a list of reagentIDs and recalculates craftability
 --
@@ -317,14 +323,14 @@ function Skillet:PrintQueue(name)
 	--DA.DEBUG(0,"PrintQueue("..tostring(name)..")");
 	local queue
 	if name then
-		print("name= "..tostring(name))
+		DA.MARK2("name= "..tostring(name))
 		queue = self.db.profile.SavedQueues[name].queue
 	else
 		queue = self.db.realm.queueData[self.currentPlayer]
 	end
 	if queue then
 		for qpos,command in pairs(queue) do
-			print("qpos= "..tostring(qpos)..", command= "..DA.DUMP1(command))
+			DA.MARK2("qpos= "..tostring(qpos)..", command= "..DA.DUMP1(command))
 		end
 	end
 end
@@ -404,15 +410,18 @@ function Skillet:ProcessQueue(altMode)
 -- Modified reagents
 --
 					if command.modifiedReagents then
-						if #command.modifiedReagents == 0 then
-							for j=1,recipe.numModified,1 do
+						for j=1,recipe.numModified,1 do
+							if not self:CheckModifiedSelected(command.modifiedReagents[j]) then
 								command.modifiedReagents[j], craftable = self:InitializeModifiedSelected(recipe.modifiedData[j])
+								if not craftable then
+									DA.DEBUG(2,"ProcessQueue: j= "..tostring(j)..", modifiedReagent="..DA.DUMP(command.modifiedReagents[j]))
+									break
+								end
 							end
-						else
-							craftable = self:CheckModifiedSelected(command.modifiedReagents)
 						end
 						if not craftable then
 							Skillet:Print(L["Skipping"],recipe.name)
+							DA.DEBUG(2,"ProcessQueue: craftable= "..tostring(craftable)..", modifiedReagents="..DA.DUMP(command.modifiedReagents))
 							break
 						end
 					end
@@ -647,7 +656,8 @@ function Skillet:QueueItems(count)
 				if queueCommand.modified then
 					queueCommand.count = 1
 					for i=1, count, 1 do
-						self:QueueAppendCommand(queueCommand, Skillet.db.profile.queue_craftable_reagents)
+						local c = tcopy(queueCommand)
+						self:QueueAppendCommand(c, Skillet.db.profile.queue_craftable_reagents)
 					end
 				else
 					self:QueueAppendCommand(queueCommand, Skillet.db.profile.queue_craftable_reagents)
@@ -814,38 +824,40 @@ end
 -- Counts down each successful completion of the current command and does finish processing when the count reaches zero
 --
 function Skillet:ContinueCast(spellID)
-	name = GetSpellInfo(spellID)
-	DA.DEBUG(0,"ContinueCast("..tostring(spellID).."), "..tostring(name))
-	if spellID == self.processingSpellID then
-		DA.DEBUG(1,"ContinueCast: processingCount= "..tostring(Skillet.processingCount))
-		local queue = self.db.realm.queueData[self.currentPlayer]
-		local qpos = self.processingPosition
-		if queue[qpos] and queue[qpos] == self.processingCommand then
-			local command = queue[qpos]
-			if command.op == "iterate" then
-				command.count = command.count - 1
-				if command.count == 0 then
-					self:RemoveFromQueue(qpos)
-				elseif command.modifiedReagents then
-					DA.DEBUG(2,"ContinueCast: command= "..DA.DUMP(command))
+	if self.enabledState then
+		name = GetSpellInfo(spellID)
+		DA.DEBUG(0,"ContinueCast("..tostring(spellID).."), "..tostring(name))
+		if spellID == self.processingSpellID then
+			DA.DEBUG(1,"ContinueCast: processingCount= "..tostring(Skillet.processingCount))
+			local queue = self.db.realm.queueData[self.currentPlayer]
+			local qpos = self.processingPosition
+			if queue[qpos] and queue[qpos] == self.processingCommand then
+				local command = queue[qpos]
+				if command.op == "iterate" then
+					command.count = command.count - 1
+					if command.count == 0 then
+						self:RemoveFromQueue(qpos)
+					elseif command.modifiedReagents then
+						DA.DEBUG(2,"ContinueCast: command= "..DA.DUMP(command))
+					end
 				end
+			else
+				DA.DEBUG(1,"ContinueCast: queued command and processingCommand don't match")
 			end
-		else
-			DA.DEBUG(1,"ContinueCast: queued command and processingCommand don't match")
-		end
-		Skillet.processingCount = Skillet.processingCount - 1
-		if Skillet.processingCount == 0 then
-			self.queuecasting = false
-			self.processingSpell = nil
-			self.processingSpellID = nil
-			self.processingPosition = nil
-			self.processingCommand = nil
-			self.processingLevel = nil
-			self.salvageItem = nil
---
--- Restore the TraceLog setting.
---
-			DA.TraceLog = self.oldTraceLog
+			Skillet.processingCount = Skillet.processingCount - 1
+			if Skillet.processingCount == 0 then
+				self.queuecasting = false
+				self.processingSpell = nil
+				self.processingSpellID = nil
+				self.processingPosition = nil
+				self.processingCommand = nil
+				self.processingLevel = nil
+				self.salvageItem = nil
+	--
+	-- Restore the TraceLog setting.
+	--
+				DA.TraceLog = self.oldTraceLog
+			end
 		end
 	end
 end
@@ -854,16 +866,18 @@ end
 -- Stop a trade skill currently in progress. Called from UNIT_SPELLCAST_* events that indicate failure
 --
 function Skillet:StopCast(spellID)
-	name = GetSpellInfo(spellID)
-	DA.DEBUG(0,"StopCast("..tostring(spellID).."), "..tostring(name))
-	self.queuecasting = false
-	self.processingSpell = nil
-	self.processingSpellID = nil
-	self.processingPosition = nil
-	self.processingCommand = nil
-	self.processingLevel = nil
-	self.processingCount = nil
-	self.salvageItem = nil
+	if self.enabledState then
+		name = GetSpellInfo(spellID)
+		DA.DEBUG(0,"StopCast("..tostring(spellID).."), "..tostring(name))
+		self.queuecasting = false
+		self.processingSpell = nil
+		self.processingSpellID = nil
+		self.processingPosition = nil
+		self.processingCommand = nil
+		self.processingLevel = nil
+		self.processingCount = nil
+		self.salvageItem = nil
+	end
 end
 
 --
@@ -871,8 +885,10 @@ end
 -- don't meet expected criteria
 --
 function Skillet:IgnoreCast(spellID)
-	name = GetSpellInfo(spellID)
-	--DA.DEBUG(4,"IgnoreCast("..tostring(spellID).."), "..tostring(name))
+	if self.enabledState then
+		name = GetSpellInfo(spellID)
+		DA.DEBUG(4,"IgnoreCast("..tostring(spellID).."), "..tostring(name))
+	end
 end
 
 --
@@ -881,8 +897,10 @@ end
 -- made from secure code. All this does is stop repeating after the current item
 --
 function Skillet:CancelCast()
-	DA.DEBUG(0,"CancelCast()")
-	--C_TradeSkillUI.StopRecipeRepeat()
+	if self.enabledState then
+		DA.DEBUG(0,"CancelCast()")
+--		C_TradeSkillUI.StopRecipeRepeat()
+	end
 end
 
 --
@@ -992,12 +1010,6 @@ function Skillet:QueueMoveToBottom(index)
 		table.remove(queue, index)
 	end
 	self:UpdateTradeSkillWindow()
-end
-
-local function tcopy(t)
-  local u = { }
-  for k, v in pairs(t) do u[k] = v end
-  return setmetatable(u, getmetatable(t))
 end
 
 function Skillet:SaveQueue(name, overwrite)
