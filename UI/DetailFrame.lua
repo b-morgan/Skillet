@@ -546,6 +546,9 @@ PROFESSIONS_FIRST_CRAFT_DESCRIPTION = "Crafting this recipe for the first time w
 		--DA.DEBUG(0,"UpdateDetailWindow: (none) recipeID= "..tostring(recipe.spellID)..", name= "..tostring(recipe.name)..", numModified="..tostring(recipe.numModified))
 		self.modifiedSelected = {}
 	end
+	if self.ModifiedList and self.ModifiedList:IsVisible() then
+		self:UpdateModifiedListWindow()
+	end
 
 --
 -- Optional reagents
@@ -643,6 +646,9 @@ PROFESSIONS_FIRST_CRAFT_DESCRIPTION = "Crafting this recipe for the first time w
 		SkilletOptionalLabel:SetText("")
 		SkilletOptionalLabel:Hide()
 		Skillet.optionalSelected = {}
+	end
+	if self.OptionalList and self.OptionalList:IsVisible() then
+		self:UpdateOptionalListWindow()
 	end
 
 --
@@ -742,6 +748,9 @@ PROFESSIONS_FIRST_CRAFT_DESCRIPTION = "Crafting this recipe for the first time w
 		SkilletFinishingLabel:Hide()
 		self.finishingSelected = {}
 	end
+	if self.FinishingList and self.FinishingList:IsVisible() then
+		self:UpdateFinishingListWindow()
+	end
 
 --
 -- Salvage reagents. These recipes don't have any other types of reagents and 
@@ -827,6 +836,9 @@ PROFESSIONS_FIRST_CRAFT_DESCRIPTION = "Crafting this recipe for the first time w
 --
 		--DA.DEBUG(0,"UpdateDetailWindow: (no salvage) recipeID= "..tostring(recipe.spellID)..", name= "..tostring(recipe.name))
 		self.salvageSelected = {}
+	end
+	if self.SalvageList and self.SalvageList:IsVisible() then
+		self:UpdateSalvageListWindow()
 	end
 --
 -- If we have stack of recipes, show the button pop the stack.
