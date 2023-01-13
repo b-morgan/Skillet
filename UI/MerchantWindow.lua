@@ -28,6 +28,7 @@ local merchant_inventory = {}
 -- only be called when the merchant window is open
 --
 local function get_merchant_item_name(slot)
+	--DA.DEBUG(0,"get_merchant_item_name("..tostring(slot)..")")
 	local link = GetMerchantItemLink(slot);
 	if link then
 		local _,_,name = string.find(link, "^.*%[(.*)%].*$");
@@ -37,14 +38,24 @@ local function get_merchant_item_name(slot)
 	end
 end
 
+local function get_shopping_list()
+	local name = nil
+	if not Skillet.db.char.include_alts then
+		name = Skillet.currentPlayer
+	end
+	return Skillet:GetShoppingList(name, Skillet.db.char.same_faction, Skillet.db.char.include_guild)
+end
+
 --
 -- Checks to see if the cached list of items for this merchant
 -- included anything we need to buy.
 --
 local function does_merchant_sell_required_items(list)
 	--DA.DEBUG(0,"does_merchant_sell_required_items("..tostring(list)..")")
+	--DA.DEBUG(1,"does_merchant_sell_required_items: list= "..DA.DUMP1(list))
+	--DA.DEBUG(1,"does_merchant_sell_required_items: merchant = "..DA.DUMP1(merchant_inventory))
 	for i=1,#list,1 do
-		local id  = list[i].id
+		local id = list[i].id
 		if merchant_inventory[id] then
 			return true
 		end
@@ -124,8 +135,12 @@ local function update_merchant_inventory()
 								end
 							end
 						end
+					else
+						--DA.DEBUG(1,"not used "..tostring(name).." ("..tostring(id)..")")
 					end
 				end
+			else
+				--DA.DEBUG(1,"no link "..tostring(i))
 			end
 		end
 	end
@@ -140,25 +155,25 @@ end
 local function update_merchant_buy_button()
 	--DA.DEBUG(0,"update_merchant_buy_button()")
 	Skillet:InventoryScan()
-	local list = Skillet:GetShoppingList(Skillet.currentPlayer, Skillet.db.char.same_faction)
+	local list = get_shopping_list()
 	if not list or #list == 0 then
-		--DA.DEBUG(0,"ShoppingList is empty")
+		--DA.DEBUG(1,"ShoppingList is empty")
 		SkilletMerchantBuyFrame:Hide()
 		return false
 	elseif does_merchant_sell_required_items(list) == false then
-		--DA.DEBUG(0,"Merchant does not sell required items")
+		--DA.DEBUG(1,"Merchant does not sell required items")
 		SkilletMerchantBuyFrame:Hide()
 		return false
 	end
 	if Skillet.db.profile.display_shopping_list_at_merchant then
-		--DA.DEBUG(0,"Shopping List should be displayed")
+		--DA.DEBUG(1,"Shopping List should be displayed")
 		Skillet:DisplayShoppingList(false)
 	end
 	if SkilletMerchantBuyFrame:IsVisible() then
-		--DA.DEBUG(0,"Merchant Buy Button should already be there")
+		--DA.DEBUG(1,"Merchant Buy Button should already be there")
 		return true		-- already inserted the button
 	end
-	--DA.DEBUG(0,"Create and show the Merchant Buy Button")
+	--DA.DEBUG(1,"Create and show the Merchant Buy Button")
 	SkilletMerchantBuyFrameButton:SetText(L["Reagents"])
 	SkilletMerchantBuyFrame:SetPoint("TOPLEFT", "MerchantFrame", "TOPLEFT" , 55, -5) -- May need to be adjusted for each WoW build
 	SkilletMerchantBuyFrame:SetFrameStrata("HIGH")
@@ -242,7 +257,7 @@ end
 --
 function Skillet:BuyRequiredReagents()
 	--DA.DEBUG(0,"BuyRequiredReagents()")
-	local list = Skillet:GetShoppingList(Skillet.currentPlayer, Skillet.db.char.same_faction)
+	local list = get_shopping_list()
 	if #list == 0 then
 		return
 	elseif does_merchant_sell_required_items(list) == false then
@@ -317,7 +332,7 @@ function Skillet:MerchantBuyButton_OnEnter(button)
 	GameTooltip:SetOwner(button, "ANCHOR_BOTTOMRIGHT")
 	GameTooltip:ClearLines()
 	GameTooltip:AddLine(L["Buy Reagents"])
-	local needList = Skillet:GetShoppingList(Skillet.currentPlayer, Skillet.db.char.same_faction)
+	local needList = get_shopping_list()
 	local totalCost = 0
 	for i=1,#needList,1 do
 		local itemID = needList[i].id
