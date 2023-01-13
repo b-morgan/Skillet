@@ -481,15 +481,13 @@ end
 --
 -- Called to check if there still are enough reagents.
 --
-function Skillet:CheckModifiedSelected(modifiedSelected)
-	--DA.DEBUG(0,"CheckModifiedSelected()")
-	for i,items in pairs(modifiedSelected) do
-		for j,reagent in pairs(items) do
-			--DA.DEBUG(2,"CheckModifiedSelected: i= "..tostring(i)..", j= "..tostring(j)..", item= "..DA.DUMP1(reagent))
-			local have = GetItemCount(reagent.itemID,true)
-			if have < reagent.quantity then
-				return false
-			end
+function Skillet:CheckModifiedSelected(mreagent)
+	--DA.DEBUG(0,"CheckModifiedSelected("..DA.DUMP(mreagent)..")")
+	for j,reagent in pairs(mreagent) do
+		--DA.DEBUG(1,"CheckModifiedSelected: j= "..tostring(j)..", reagent= "..DA.DUMP1(reagent))
+		local have = GetItemCount(reagent.itemID,true)
+		if have < reagent.quantity then
+			return false
 		end
 	end
 	return true
