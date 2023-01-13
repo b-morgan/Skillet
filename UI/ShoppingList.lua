@@ -276,10 +276,12 @@ function Skillet:GetShoppingList(player, sameFaction, includeGuildbank)
 				if not usedGuild[id] then
 					usedGuild[id] = 0
 				end
-				-- If the Guildbank should be included then
-				-- the player must be in the guild to use items from the guild bank and
-				-- only count guild bank items when not at the guild bank because
-				-- we might start using them.
+--
+-- If the Guildbank should be included then
+-- the player must be in the guild to use items from the guild bank and
+-- only count guild bank items when not at the guild bank because
+-- we might start using them.
+--
 				if includeGuildbank and curGuild and not guildbankFrameOpen then
 					--DA.DEBUG(2,"deficit=",deficit,"cachedGuildbank=",cachedGuildbank[curGuild][id],"usedGuild=",usedGuild[id])
 					local temp = -1 * math.min(deficit,0) -- calculate exactly how many are needed
