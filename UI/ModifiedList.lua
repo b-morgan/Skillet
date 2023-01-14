@@ -485,7 +485,7 @@ function Skillet:CheckModifiedSelected(mreagent)
 	--DA.DEBUG(0,"CheckModifiedSelected("..DA.DUMP(mreagent)..")")
 	for j,reagent in pairs(mreagent) do
 		--DA.DEBUG(1,"CheckModifiedSelected: j= "..tostring(j)..", reagent= "..DA.DUMP1(reagent))
-		local have = GetItemCount(reagent.itemID,true)
+		local have = GetItemCount(reagent.itemID,true,false,true)
 		if have < reagent.quantity then
 			return false
 		end

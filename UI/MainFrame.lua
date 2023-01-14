@@ -1533,7 +1533,7 @@ function Skillet:SkillButton_OnEnter(button)
 	if skill.skillData then
 		num, numrecursive, numwvendor, numwalts = get_craftable_counts(skill.skillData, recipe.numMade)
 	end
-	numowned = GetItemCount(recipe.itemID,true)
+	numowned = GetItemCount(recipe.itemID,true,false,true)
 --
 -- How many are there already
 --
