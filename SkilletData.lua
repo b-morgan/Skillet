@@ -1068,8 +1068,232 @@ local function ScanTrade()
 		recipe.itemID = 0		-- Make sure this value exists
 		recipe.numMade = 1		-- Make sure this value exists
 
+--[[
+recipeSchematic= {
+['outputItemID'] = 189538
+['hasCraftingOperationInfo'] = true
+['quantityMax'] = 1
+['quantityMin'] = 1
+['recipeID'] = 395886
+['recipeType'] = 1
+['name'] = Explorer's Plate Chestguard
+['hasGatheringOperationInfo'] = false
+['reagentSlotSchematics'] =   {
+  [1] =     {
+    ['quantityRequired'] = 2
+    ['dataSlotIndex'] = 2
+    ['slotIndex'] = 1
+    ['dataSlotType'] = 1
+    ['reagentType'] = 1
+    ['orderSource'] = 0
+    ['reagents'] =       {
+      [1] =         {
+        ['itemID'] = 190452
+        }
+      }
+    }
+  [2] =     {
+    ['quantityRequired'] = 3
+    ['slotIndex'] = 2
+    ['dataSlotIndex'] = 1
+    ['dataSlotType'] = 2
+    ['slotInfo'] =       {
+      ['mcrSlotID'] = 81
+      ['requiredSkillRank'] = 0
+      ['slotText'] = Draconium Ore (DNT)
+      }
+    ['reagentType'] = 1
+    ['orderSource'] = 0
+    ['reagents'] =       {
+      [1] =         {
+        ['itemID'] = 189143
+        }
+      [2] =         {
+        ['itemID'] = 188658
+        }
+      [3] =         {
+        ['itemID'] = 190311
+        }
+      }
+    }
+  [3] =     {
+    ['quantityRequired'] = 10
+    ['slotIndex'] = 3
+    ['dataSlotIndex'] = 2
+    ['dataSlotType'] = 2
+    ['slotInfo'] =       {
+      ['mcrSlotID'] = 114
+      ['requiredSkillRank'] = 0
+      ['slotText'] = Serevite Ore (DNT)
+      }
+    ['reagentType'] = 1
+    ['orderSource'] = 0
+    ['reagents'] =       {
+      [1] =         {
+        ['itemID'] = 190395
+        }
+      [2] =         {
+        ['itemID'] = 190396
+        }
+      [3] =         {
+        ['itemID'] = 190394
+        }
+      }
+    }
+  [4] =     {
+    ['quantityRequired'] = 1
+    ['slotIndex'] = 4
+    ['dataSlotIndex'] = 3
+    ['dataSlotType'] = 2
+    ['slotInfo'] =       {
+      ['mcrSlotID'] = 116
+      ['requiredSkillRank'] = 0
+      ['slotText'] = Empower with Training Matrix
+      }
+    ['reagentType'] = 0
+    ['orderSource'] = 1
+    ['reagents'] =       {
+      [1] =         {
+        ['itemID'] = 198048
+        }
+      [2] =         {
+        ['itemID'] = 198056
+        }
+      [3] =         {
+        ['itemID'] = 198058
+        }
+      [4] =         {
+        ['itemID'] = 198059
+        }
+      }
+    }
+  [5] =     {
+    ['quantityRequired'] = 1
+    ['slotIndex'] = 5
+    ['dataSlotIndex'] = 4
+    ['dataSlotType'] = 2
+    ['slotInfo'] =       {
+      ['mcrSlotID'] = 125
+      ['requiredSkillRank'] = 0
+      ['slotText'] = Customize Secondary Stats
+      }
+    ['reagentType'] = 0
+    ['orderSource'] = 0
+    ['reagents'] =       {
+      [1] =         {
+        ['itemID'] = 192553
+        }
+      [2] =         {
+        ['itemID'] = 192554
+        }
+      [3] =         {
+        ['itemID'] = 192552
+        }
+      [4] =         {
+        ['itemID'] = 194579
+        }
+      [5] =         {
+        ['itemID'] = 194580
+        }
+      [6] =         {
+        ['itemID'] = 194578
+        }
+      [7] =         {
+        ['itemID'] = 194567
+        }
+      [8] =         {
+        ['itemID'] = 194568
+        }
+      [9] =         {
+        ['itemID'] = 194566
+        }
+      [10] =         {
+        ['itemID'] = 194573
+        }
+      [11] =         {
+        ['itemID'] = 194574
+        }
+      [12] =         {
+        ['itemID'] = 194572
+        }
+      [13] =         {
+        ['itemID'] = 194570
+        }
+      [14] =         {
+        ['itemID'] = 194571
+        }
+      [15] =         {
+        ['itemID'] = 194569
+        }
+      [16] =         {
+        ['itemID'] = 194576
+        }
+      [17] =         {
+        ['itemID'] = 194577
+        }
+      [18] =         {
+        ['itemID'] = 194575
+        }
+      }
+    }
+  [6] =     {
+    ['quantityRequired'] = 1
+    ['slotIndex'] = 6
+    ['dataSlotIndex'] = 5
+    ['dataSlotType'] = 2
+    ['slotInfo'] =       {
+      ['mcrSlotID'] = 124
+      ['requiredSkillRank'] = 0
+      ['slotText'] = Quenching Fluid
+      }
+    ['reagentType'] = 2
+    ['orderSource'] = 2
+    ['reagents'] =       {
+      [1] =         {
+        ['itemID'] = 191511
+        }
+      [2] =         {
+        ['itemID'] = 191512
+        }
+      [3] =         {
+        ['itemID'] = 191513
+        }
+      [4] =         {
+        ['itemID'] = 191517
+        }
+      [5] =         {
+        ['itemID'] = 191518
+        }
+      [6] =         {
+        ['itemID'] = 191519
+        }
+      }
+    }
+  [7] =     {
+    ['quantityRequired'] = 1
+    ['slotIndex'] = 7
+    ['dataSlotIndex'] = 6
+    ['dataSlotType'] = 2
+    ['slotInfo'] =       {
+      ['mcrSlotID'] = 92
+      ['requiredSkillRank'] = 0
+      ['slotText'] = Lesser Illustrious Insight
+      }
+    ['reagentType'] = 2
+    ['orderSource'] = 2
+    ['reagents'] =       {
+      [1] =         {
+        ['itemID'] = 191526
+        }
+      }
+    }
+  }
+['isRecraft'] = false
+['icon'] = 0
+}
+--]]
 		local recipeSchematic = C_TradeSkillUI.GetRecipeSchematic(recipeID, false)
-		--DA.DEBUG(2,"recipeSchematic= "..DA.DUMP(recipeSchematic))
+		DA.DEBUG(2,"recipeSchematic= "..DA.DUMP(recipeSchematic))
 		recipe.recipeType = recipeSchematic.recipeType
 		local itemLink = C_TradeSkillUI.GetRecipeItemLink(recipeID)
 		--DA.DEBUG(2,"recipeID= "..tostring(recipeID)..", itemLink = "..DA.PLINK(itemLink))
@@ -1171,6 +1395,7 @@ local function ScanTrade()
 					basicData[numBasic].numNeeded = numNeeded
 					basicData[numBasic].name = GetItemInfo(reagentID)
 					basicData[numBasic].schematic = schematic
+					Skillet:ItemDataAddUsedInRecipe(reagentID, recipeID)	-- add a cross reference for where a particular item is used
 				elseif schematic.dataSlotType == Enum.TradeskillSlotDataType.ModifiedReagent then -- 2
 					numModified = numModified + 1
 					modifiedData[numModified] = {}
@@ -1180,6 +1405,9 @@ local function ScanTrade()
 					modifiedData[numModified].name = schematic.slotInfo.slotText
 					modifiedData[numModified].schematic = schematic
 					--DA.DEBUG(2,"ScanTrade: recipeID= "..tostring(recipeID)..", name= "..tostring(recipeInfo.name)..", Modified reagents= "..DA.DUMP(schematic.reagents))
+					for m = 1, #schematic.reagents do
+						Skillet:ItemDataAddUsedInRecipe(schematic.reagents[m].itemID, recipeID) -- cross reference all qualities
+					end
 				elseif schematic.dataSlotType == Enum.TradeskillSlotDataType.Currency then -- 3
 					DA.DEBUG(2,"ScanTrade: recipeID= "..tostring(recipeID)..", name= "..tostring(recipeInfo.name)..", Currency reagents= "..DA.DUMP(schematic.reagents))
 				end
@@ -1188,7 +1416,6 @@ local function ScanTrade()
 				else
 					reagentString = reagentID..":"..numNeeded
 				end
-				Skillet:ItemDataAddUsedInRecipe(reagentID, recipeID)	-- add a cross reference for where a particular item is used
 			elseif schematic.reagentType == Enum.CraftingReagentType.Optional then
 				--DA.DEBUG(2,"ScanTrade: recipeID= "..tostring(recipeID)..", name= "..tostring(recipeInfo.name)..", Optional reagent= "..DA.DUMP(schematic))
 				numOptional = numOptional + 1
