@@ -53,7 +53,7 @@ function Skillet:InventoryReagentCraftability(reagentID)
 				local numCraftableVendor = 100000
 				for i=1,#childRecipe.reagentData,1 do
 					local childReagent = childRecipe.reagentData[i]
-					local numReagentOnHand = GetItemCount(childReagent.reagentID,true)
+					local numReagentOnHand = GetItemCount(childReagent.reagentID,true,false,true)
 					local numReagentCraftable, numReagentCraftableVendor = self:InventoryReagentCraftability(childReagent.reagentID)
 					--DA.DEBUG(2,"     ReagentCraftability: childID="..childReagent.reagentID.." ("..tostring((GetItemInfo(childReagent.reagentID))).."), numReagentOnHand="..tostring(numReagentOnHand)..", numReagentCraftable= "..tostring(numReagentCraftable)..", numReagentCraftableVendor= "..tostring(numReagentCraftableVendor))
 					numReagentCraftable = numReagentCraftable + numReagentOnHand
@@ -195,7 +195,7 @@ function Skillet:InventoryScan()
 			if reagentID and not inventoryData[reagentID] then				-- have we calculated this one yet?
 				if self.currentPlayer == (UnitName("player")) then			-- if this is the current player, use the API
 					--DA.DEBUG(2,"Using API")
-					numInBoth = GetItemCount(reagentID,true)				-- both bank and bags
+					numInBoth = GetItemCount(reagentID,true,false,true)		-- both bank and bags
 				end
 				inventoryData[reagentID] = tostring(numInBoth)	-- only what we have for now (no craftability info)
 				--DA.DEBUG(2,"inventoryData["..reagentID.."]="..inventoryData[reagentID])
@@ -235,8 +235,8 @@ function Skillet:GetInventory(player, reagentID)
 			--DA.DEBUG(1,"inventoryData= "..tostring(self.db.realm.inventoryData[player][reagentID]))
 			local have, make, wven = string.split(" ", self.db.realm.inventoryData[player][reagentID])
 			return tonumber(have) or 0, tonumber(make) or 0, tonumber(wven) or 0
-		elseif player == self.currentPlayer then	-- UnitName("player")
-			return GetItemCount(reagentID,true) or 0, 0, 0
+		elseif player == self.currentPlayer then
+			return GetItemCount(reagentID,true,false,true) or 0, 0, 0
 		end
 	end
 	return 0, 0, 0		-- have, make, make with vendor
