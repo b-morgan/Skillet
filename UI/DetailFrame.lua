@@ -255,7 +255,7 @@ function Skillet:UpdateDetailWindow(skillIndex)
 PROFESSIONS_FIRST_CRAFT = "First Craft";
 PROFESSIONS_FIRST_CRAFT_DESCRIPTION = "Crafting this recipe for the first time will teach you something new.";
 --]]
-		if recipe.firstCraft then
+		if newInfo.firstCraft then
 			SkilletFirstCraft:Show()
 		else
 			SkilletFirstCraft:Hide()
