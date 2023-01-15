@@ -571,11 +571,8 @@ function Skillet:GetRecipeDataByTradeIndex(tradeID, index)
 end
 
 function Skillet:CalculateCraftableCounts()
-	DA.DEBUG(0,"CalculateCraftableCounts()")
+	--DA.DEBUG(0,"CalculateCraftableCounts()")
 	local player = self.currentPlayer
-	if player ~= UnitName("player") then
-		return
-	end
 	self.visited = {}
 	local n = self:GetNumSkills(player, self.currentTrade)
 	if n then
@@ -583,7 +580,7 @@ function Skillet:CalculateCraftableCounts()
 			local skill = self:GetSkill(player, self.currentTrade, i)
 			if skill and skill.id ~= 0 then -- skip headers
 				local recipe = self:GetRecipe(skill.id)
-				if recipe and recipe.reagentData and #recipe.reagentData > 0 then	-- make sure that recipe is in the database before continuing
+				if recipe then
 					skill.numCraftable, skill.numRecursive, skill.numCraftableVendor, skill.numCraftableAlts = self:InventorySkillIterations(self.currentTrade, recipe)
 					--DA.DEBUG(2,"name= "..tostring(skill.name)..", numCraftable= "..tostring(skill.numCraftable)..", numRecursive= "..tostring(skill.numRecursive)..", numCraftableVendor= "..tostring(skill.numCraftableVendor)..", numCraftableAlts= "..tostring(skill.numCraftableAlts))
 				end
@@ -1293,7 +1290,7 @@ recipeSchematic= {
 }
 --]]
 		local recipeSchematic = C_TradeSkillUI.GetRecipeSchematic(recipeID, false)
-		DA.DEBUG(2,"recipeSchematic= "..DA.DUMP(recipeSchematic))
+		--DA.DEBUG(2,"recipeSchematic= "..DA.DUMP(recipeSchematic))
 		recipe.recipeType = recipeSchematic.recipeType
 		local itemLink = C_TradeSkillUI.GetRecipeItemLink(recipeID)
 		--DA.DEBUG(2,"recipeID= "..tostring(recipeID)..", itemLink = "..DA.PLINK(itemLink))
@@ -1377,6 +1374,7 @@ recipeSchematic= {
 			--DA.DEBUG(2,"ScanTrade: recipeID= "..tostring(recipeID)..", name= "..tostring(recipeInfo.name).." is type Enchant")
 		elseif recipeSchematic.recipeType == Enum.TradeskillRecipeType.Recraft then -- 4
 			--DA.DEBUG(2,"ScanTrade: recipeID= "..tostring(recipeID)..", name= "..tostring(recipeInfo.name).." is type Recraft")
+			recipe.recraft = true
 		end
 --
 -- Common processing of all Enum.TradeskillRecipeType

@@ -277,6 +277,8 @@ PROFESSIONS_FIRST_CRAFT_DESCRIPTION = "Crafting this recipe for the first time w
 --
 -- Are special tools needed for this skill?
 --
+		SkilletRequirementText:Hide()
+		SkilletRequirementLabel:Hide()
 		local requirements = C_TradeSkillUI.GetRecipeRequirements(skill.id)
 		if requirements then
 			local tools = ""
@@ -289,12 +291,11 @@ PROFESSIONS_FIRST_CRAFT_DESCRIPTION = "Crafting this recipe for the first time w
 				tools = tools..sep..toolName
 				sep = ", "
 			end
-			SkilletRequirementText:SetText(tools)
-			SkilletRequirementText:Show()
-			SkilletRequirementLabel:Show()
-		else
-			SkilletRequirementText:Hide()
-			SkilletRequirementLabel:Hide()
+			if tools ~= "" then
+				SkilletRequirementText:SetText(tools)
+				SkilletRequirementText:Show()
+				SkilletRequirementLabel:Show()
+			end
 		end
 	end
 
@@ -780,7 +781,7 @@ PROFESSIONS_FIRST_CRAFT_DESCRIPTION = "Crafting this recipe for the first time w
 -- reagent or the reagent that has been selected for that slot
 --
 			if j == 1 then
-				DA.DEBUG(0,"UpdateDetailWindow: salvageSelected= "..DA.DUMP1(self.salvageSelected))
+				--DA.DEBUG(0,"UpdateDetailWindow: salvageSelected= "..DA.DUMP1(self.salvageSelected))
 				local sselected
 				if self.salvageSelected then
 					sselected = self.salvageSelected[j]
@@ -789,7 +790,7 @@ PROFESSIONS_FIRST_CRAFT_DESCRIPTION = "Crafting this recipe for the first time w
 --
 -- A salvage reagent has been selected for this slot
 --
-					DA.DEBUG(0,"UpdateDetailWindow: sselected= "..tostring(sselected))
+					--DA.DEBUG(0,"UpdateDetailWindow: sselected= "..tostring(sselected))
 					local name = self:nameWithQuality(sselected)
 					text:SetText(name)
 					texture = GetItemIcon(sselected)

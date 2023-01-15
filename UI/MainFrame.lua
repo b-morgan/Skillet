@@ -1289,54 +1289,50 @@ function Skillet:UpdateTradeSkillWindow()
 --
 -- Prepare the counts (displayed on the right)
 --
-				if recipe.reagentData and #recipe.reagentData > 0 then
-					local num, numrecursive, numwvendor, numwalts = get_craftable_counts(skill.skillData, recipe.numMade)
-					if (num > 0 and showBag) or (numrecursive > 0 and showCraft) or (numwvendor > 0 and showVendor) or (numwalts > 0 and showAlts) then
-						local c = 1
-						if showBag then
-							if num >= 1000 then
-								num = "##"
-							end
-							catstring[c] = CBAG..num
-							c = c + 1
+				local num, numrecursive, numwvendor, numwalts = get_craftable_counts(skill.skillData, recipe.numMade)
+				if (num > 0 and showBag) or (numrecursive > 0 and showCraft) or (numwvendor > 0 and showVendor) or (numwalts > 0 and showAlts) then
+					local c = 1
+					if showBag then
+						if num >= 1000 then
+							num = "##"
 						end
-						if showCraft then
-							if numrecursive >= 1000 then
-								numrecursive = "##"
-							end
-							catstring[c] = CCRAFT..numrecursive
-							c = c + 1
-						end
-						if showVendor then
-							if numwvendor >= 1000 then
-								numwvendor = "##"
-							end
-							catstring[c] = CVENDOR..numwvendor
-							c = c + 1
-						end
-						if showAlts then
-							if numwalts >= 1000 then
-								numwalts = "##"
-							end
-							catstring[c] = CALTS..numwalts
-							c = c + 1
-						end
-						local count = ""
-						if c > 1 then
-							count = CGREY.."["
-							for b=1,c-1 do
-								count = count..catstring[b]
-								if b+1 < c then
-									count = count..CGREY.."/"
-								end
-							end
-							count = count..CGREY.."]|r"
-						end
-						countText:SetText(count)
-						countText:Show()
-					else
-						countText:Hide()
+						catstring[c] = CBAG..num
+						c = c + 1
 					end
+					if showCraft then
+						if numrecursive >= 1000 then
+							numrecursive = "##"
+						end
+						catstring[c] = CCRAFT..numrecursive
+						c = c + 1
+					end
+					if showVendor then
+						if numwvendor >= 1000 then
+							numwvendor = "##"
+						end
+						catstring[c] = CVENDOR..numwvendor
+						c = c + 1
+					end
+					if showAlts then
+						if numwalts >= 1000 then
+							numwalts = "##"
+						end
+						catstring[c] = CALTS..numwalts
+						c = c + 1
+					end
+					local count = ""
+					if c > 1 then
+						count = CGREY.."["
+						for b=1,c-1 do
+							count = count..catstring[b]
+							if b+1 < c then
+								count = count..CGREY.."/"
+							end
+						end
+						count = count..CGREY.."]|r"
+					end
+					countText:SetText(count)
+					countText:Show()
 				else
 					countText:Hide()
 				end
@@ -1522,9 +1518,9 @@ function Skillet:SkillButton_OnEnter(button)
 --
 		local color = Skillet.skill_style_type[skill.difficulty]
 		if (color) then
-			tip:AddLine(skill.name, color.r, color.g, color.b, false);
+			tip:AddLine(skill.name, color.r, color.g, color.b, false)
 		else
-			tip:AddLine(skill.name, NORMAL_FONT_COLOR.r, NORMAL_FONT_COLOR.g, NORMAL_FONT_COLOR.b, false);
+			tip:AddLine(skill.name, NORMAL_FONT_COLOR.r, NORMAL_FONT_COLOR.g, NORMAL_FONT_COLOR.b, false)
 		end
 --
 --	Add Skillet specific information to the tooltip
@@ -1538,22 +1534,22 @@ function Skillet:SkillButton_OnEnter(button)
 -- How many are there already
 --
 	if numowned > 0 then
-		local text = "\n" .. COWNED..numowned .. "|r " .. L["in your inventory"];
-		tip:AddLine(text, 1, 1, 1, false); -- (text, r, g, b, wrap)
+		local text = "\n" .. COWNED..numowned .. "|r " .. L["in your inventory"]
+		tip:AddLine(text, 1, 1, 1, false) -- (text, r, g, b, wrap)
 	end
 --
 -- How many can be created with the reagents in the inventory
 --
 	if num > 0 then
-		local text = "\n" .. CBAG..num .. "|r " .. L["can be created from reagents in your inventory"];
-		tip:AddLine(text, 1, 1, 1, false); -- (text, r, g, b, wrap)
+		local text = "\n" .. CBAG..num .. "|r " .. L["can be created from reagents in your inventory"]
+		tip:AddLine(text, 1, 1, 1, false) -- (text, r, g, b, wrap)
 	end
 --
 -- How many can be created by crafting the reagents
 --
 	if numrecursive > 0 then
-		local text = "\n" .. CCRAFT..numrecursive .. "|r " .. L["can be created by crafting reagents"];
-		tip:AddLine(text, 1, 1, 1, false); -- (text, r, g, b, wrap)
+		local text = "\n" .. CCRAFT..numrecursive .. "|r " .. L["can be created by crafting reagents"]
+		tip:AddLine(text, 1, 1, 1, false) -- (text, r, g, b, wrap)
 	end
 --
 -- How many can be created with reagents bought at vendor
@@ -1562,8 +1558,8 @@ function Skillet:SkillButton_OnEnter(button)
 		if numwvendor >= 1000 then
 			numwvendor = "##"
 		end
-		local text =  "\n" .. CVENDOR..numwvendor .. "|r " .. L["can be created with reagents bought at vendor"];
-		tip:AddLine(text, 1, 1, 1, false); -- (text, r, g, b, wrap)
+		local text =  "\n" .. CVENDOR..numwvendor .. "|r " .. L["can be created with reagents bought at vendor"]
+		tip:AddLine(text, 1, 1, 1, false) -- (text, r, g, b, wrap)
 	end
 --
 -- How many can be crafted with reagents on *all* alts, including this one.
@@ -1572,8 +1568,8 @@ function Skillet:SkillButton_OnEnter(button)
 		if numwalts >= 1000 then
 			numwalts = "##"
 		end
-		local text = "\n" .. CALTS..numwalts .. "|r " .. L["can be created from reagents on all characters"];
-		tip:AddLine(text, 1, 1, 1, false);	-- (text, r, g, b, wrap)
+		local text = "\n" .. CALTS..numwalts .. "|r " .. L["can be created from reagents on all characters"]
+		tip:AddLine(text, 1, 1, 1, false)	-- (text, r, g, b, wrap)
 	end
 --
 -- Now the list of regents for this recipe and some info about them
@@ -1592,8 +1588,20 @@ function Skillet:SkillButton_OnEnter(button)
 		else
 			text = string.format("  %d x %s", reagent.numNeeded, itemName)
 		end
-		local counts = string.format("|cff808080[%d/%d]|r", numInBoth, numCraftable)
-		tip:AddDoubleLine(text, counts, 1, 1, 1);
+		local counts
+		counts = string.format("|cff808080[%d/%d]|r", numInBoth, numCraftable)
+		tip:AddDoubleLine(text, counts, 1, 1, 1)
+	end
+	if recipe.modifiedData then
+		for i=1,#recipe.modifiedData do
+			local numInBoth, numCraftable = self:GetInventory(self.currentPlayer, recipe.modifiedData[i].schematic.reagents)
+			local itemName = GetItemInfo(recipe.modifiedData[i].reagentID) or recipe.modifiedData[i].reagentID
+			local text
+			text = string.format("  %d x %s", recipe.modifiedData[i].numNeeded, itemName)
+			local counts
+			counts = string.format("|cff808080[%d/%d]|r", numInBoth, numCraftable)
+			tip:AddDoubleLine(text, counts, 1, 1, 1)
+		end
 	end
 	local text = string.format("[%s/%s]", L["Inventory"], L["craftable"]) -- match the case sometime
 	tip:AddDoubleLine("\n", text)
