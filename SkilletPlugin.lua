@@ -164,7 +164,7 @@ function Skillet:GetExtraText(skill, recipe)
 			output_text = output_text..text
 		end
 	end
-	return output_label, output_text
+	return output_label or "", output_text or ""
 end
 
 function Skillet:RecipeNamePrefix(skill, recipe)
