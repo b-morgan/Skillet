@@ -443,7 +443,7 @@ end
 --
 function Skillet:InitializeModifiedSelected(mreagent)
 	--DA.DEBUG(0,"InitializeModifiedSelected("..DA.DUMP(mreagent)..")")
-	modifiedSelected = {}
+	local modifiedSelected = {}
 	local total = 0
 	local this = 0
 	local used = 0
@@ -483,12 +483,16 @@ end
 --
 function Skillet:CheckModifiedSelected(mreagent)
 	--DA.DEBUG(0,"CheckModifiedSelected("..DA.DUMP(mreagent)..")")
-	for j,reagent in pairs(mreagent) do
-		--DA.DEBUG(1,"CheckModifiedSelected: j= "..tostring(j)..", reagent= "..DA.DUMP1(reagent))
-		local have = GetItemCount(reagent.itemID,true,false,true)
-		if have < reagent.quantity then
-			return false
+	if mreagent then
+		for j,reagent in pairs(mreagent) do
+			--DA.DEBUG(1,"CheckModifiedSelected: j= "..tostring(j)..", reagent= "..DA.DUMP1(reagent))
+			local have = GetItemCount(reagent.itemID,true,false,true)
+			if have < reagent.quantity then
+				return false
+			end
 		end
+	else
+		return false
 	end
 	return true
 end

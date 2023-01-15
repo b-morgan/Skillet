@@ -59,8 +59,9 @@ function Skillet:QueueCommandIterate(recipeID, count)
 	if recipe.numModified and recipe.numModified ~= 0 then
 		newCommand.complex = true
 		newCommand.modified = true
-		if self.modifiedSelected then
-			newCommand.modifiedReagents = self.modifiedSelected
+		newCommand.modifiedReagents = {}
+		for j=1,recipe.numModified do
+			newCommand.modifiedReagents[j] = self:InitializeModifiedSelected(recipe.modifiedData[j])
 		end
 	end
 	if recipe.numOptional and recipe.numOptional ~= 0 and self.optionalSelected then
@@ -331,7 +332,7 @@ function Skillet:PrintQueue(name)
 	end
 	if queue then
 		for qpos,command in pairs(queue) do
-			DA.MARK2("qpos= "..tostring(qpos)..", command= "..DA.DUMP1(command))
+			DA.MARK2("qpos= "..tostring(qpos)..", command= "..DA.DUMP(command))
 		end
 	end
 end
@@ -411,13 +412,11 @@ function Skillet:ProcessQueue(altMode)
 -- Modified reagents
 --
 					if command.modifiedReagents then
-						for j=1,recipe.numModified,1 do
-							if not self:CheckModifiedSelected(command.modifiedReagents[j]) then
-								command.modifiedReagents[j], craftable = self:InitializeModifiedSelected(recipe.modifiedData[j])
-								if not craftable then
-									DA.DEBUG(2,"ProcessQueue: j= "..tostring(j)..", modifiedReagent="..DA.DUMP(command.modifiedReagents[j]))
-									break
-								end
+						for j=1,recipe.numModified do
+							command.modifiedReagents[j], craftable = self:InitializeModifiedSelected(recipe.modifiedData[j])
+							if not craftable then
+								DA.DEBUG(2,"ProcessQueue: j= "..tostring(j)..", modifiedReagent="..DA.DUMP(command.modifiedReagents[j]))
+								break
 							end
 						end
 						if not craftable then
