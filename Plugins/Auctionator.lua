@@ -407,7 +407,7 @@ local function GetBuyout(recipe)
 				outputItemInfo = C_TradeSkillUI.GetRecipeOutputItemData(recipe.spellID, {}, nil, 4)
 			end
 		end
-		if outputItemInfo.hyperlink then
+		if outputItemInfo and outputItemInfo.hyperlink then
 			buyout = (Auctionator.API.v1.GetAuctionPriceByItemLink(addonName, outputItemInfo.hyperlink) or 0) * recipe.numMade
 		elseif Auctionator and Auctionator.API.v1.GetAuctionPriceByItemID then
 			buyout = (Auctionator.API.v1.GetAuctionPriceByItemID(addonName, itemID) or 0) * recipe.numMade
