@@ -198,6 +198,9 @@ function Skillet:OnInitialize()
 	end
 	DA.DebugLog = SkilletDBPC
 	DA.DebugProfile = SkilletProfile
+	if not self.InProgress then
+		self.InProgress = {}
+	end
 	self.db = AceDB:New("SkilletDB", defaults)
 
 --
@@ -1046,7 +1049,9 @@ function Skillet:ITEM_DATA_LOAD_RESULT(event, itemID, result)
 		Skillet.modifiedDataNeeded = nil
 	end
 	if Skillet.detailDataNeeded then
-		Skillet:UpdateDetailWindow(self.selectedSkill)
+		if not Skillet.InProgress.detail then
+			Skillet:UpdateDetailWindow(self.selectedSkill)
+		end
 		Skillet.detailDataNeeded = nil
 	end
 end
