@@ -136,8 +136,7 @@ function Skillet:IsRecipeOnCooldown(recipeID)
 	return true;
 end
 
-function Skillet:UpdateCooldown(recipeID, fontString)
-	local recipeInfo = C_TradeSkillUI.GetRecipeInfo(recipeID)
+function Skillet:UpdateCooldown(recipeID, recipeInfo, fontString)
 	local cooldown, isDayCooldown, charges, maxCharges = C_TradeSkillUI.GetRecipeCooldown(recipeID);
 	if maxCharges and charges and maxCharges > 0 and (charges > 0 or not cooldown) then
 		fontString:SetFormattedText(TRADESKILL_CHARGES_REMAINING, charges, maxCharges);
