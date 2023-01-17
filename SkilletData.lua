@@ -58,6 +58,7 @@ local DifficultyNum = {
 	[2] = "easy",
 	[3] = "trivial",
 }
+Skillet.DifficultyNum = DifficultyNum
 
 local DifficultyText = {
 	x = "unknown",
@@ -67,6 +68,8 @@ local DifficultyText = {
 	t = "trivial",
 	u = "unavailable",
 }
+Skillet.DifficultyText = DifficultyText
+
 local DifficultyChar = {
 	unknown = "x",
 	optimal = "o",
@@ -75,6 +78,8 @@ local DifficultyChar = {
 	trivial = "t",
 	unavailable = "u",
 }
+Skillet.DifficultyChar = DifficultyChar
+
 local skill_style_type = {
 	["unknown"]			= { r = 1.00, g = 0.00, b = 0.00, level = 5, alttext="???", cstring = "|cffff0000"},
 	["optimal"]			= { r = 1.00, g = 0.50, b = 0.25, level = 4, alttext="+++", cstring = "|cffff8040"},
@@ -85,22 +90,6 @@ local skill_style_type = {
 	["unavailable"]		= { r = 0.3, g = 0.3, b = 0.3,	  level = 6, alttext="",	cstring = "|cff606060"},
 }
 Skillet.skill_style_type = skill_style_type
-
-function Skillet:GetTradeSkillInfo(index)
-	--DA.PROFILE("Skillet:GetTradeSkillInfo("..tostring(index)..")")
--- index is now a recipeID
--- GetTradeSkillInfo returned:
--- skillName, skillType, numAvailable, isExpanded, altVerb, numSkillUps, indentLevel, showProgressBar, currentRank, maxRank, startingRank
-	if index then
-		local info = C_TradeSkillUI.GetRecipeInfo(index)
-		if info then
-			--DA.DEBUG(0,"GetTradeSkillInfo: index= "..tostring(index)..", info= "..DA.DUMP1(info))
-			local tradeSkillID, skillLineName, skillLineRank, skillLineMaxRank, skillLineModifier = C_TradeSkillUI.GetTradeSkillLineForRecipe(index)
-			--DA.DEBUG(0,"GetTradeSkillInfo: tradeSkillID= "..tostring(tradeSkillID)..", skillLineName= "..tostring(skillLineName)..", skillLineRank= "..tostring(skillLineRank)..", skillLineMaxRank= "..tostring(skillLineMaxRank)..", skillLineModifier= "..tostring(skillLineModifier))
-			return info.name, DifficultyNum[info.relativeDifficulty], info.numAvailable, false, info.alternateVerb, info.numSkillUps, info.numIndents, false, skillLineRank, skillLineMaxRank, nil
-		end
-	end
-end
 
 local lastAutoTarget = {}
 function Skillet:GetAutoTargetItem(addSpellID)
@@ -823,7 +812,7 @@ local function ScanTrade()
 	if not player or not tradeID then
 		DA.MARK3("ScanTrade: abort! player= "..tostring(player)..", tradeID= "..tostring(tradeID)..
 			", parentSkillLineID= "..tostring(parentSkillLineID)..", parentSkillLineName= "..tostring(parentSkillLineName))
-		Skillet.scanInProgress = false
+		Skillet.InProgress.scan = false
 		Skillet.currentTrade = nil
 		return false
 	end
@@ -923,8 +912,9 @@ local function ScanTrade()
 		local recipeInfo = Skillet.data.recipeInfo[tradeID][recipeID]
 		--DA.DEBUG(1,"ScanTrade: j= "..tostring(j)..", tradeID= "..tostring(tradeID)..", recipeID= "..tostring(recipeID))
 		--DA.DEBUG(1,"ScanTrade: j= "..tostring(j)..", tradeID= "..tostring(tradeID)..", recipeID= "..tostring(recipeID)..", recipeInfo= "..DA.DUMP1(recipeInfo))
-		local skillName, skillType, _, isExpanded, _, _, _, _, _, _, _, displayAsUnavailable, _ = Skillet:GetTradeSkillInfo(recipeID);
-		if displayAsUnavailable then skillType = "unavailable" end
+		local skillName = recipeInfo.name
+		local skillType = DifficultyNum[recipeInfo.relativeDifficulty]
+		local numSkillUps = recipeInfo.numSkillUps
 		if not headerUsed[recipeInfo.categoryID] then
 --
 -- This category (header) hasn't been seen yet. Stack it (and its unseen parents)
@@ -1026,10 +1016,11 @@ local function ScanTrade()
 -- break recipes into lists by profession for ease of sorting
 --
 		skillData[i] = {}
-		skillData[i].name = skillName
 		skillData[i].id = recipeID
+		skillData[i].name = skillName
 		skillData[i].difficulty = skillType
 		skillData[i].color = skill_style_type[skillType]
+		skillData[i].numSkillUps = numSkillUps
 		--DA.DEBUG(0,"skillType= "..tostring(skillType)..", recipeID= "..tostring(recipeID))
 		local skillDBString = (DifficultyChar[skillType] or "")..tostring(recipeID)
 --[[
@@ -1060,6 +1051,8 @@ local function ScanTrade()
 		recipe.tradeID = tradeID
 		recipe.spellID = recipeID
 		recipe.name = skillName
+		recipe.difficulty = skillType
+		recipe.numSkillUps = numSkillUps
 		recipe.firstCraft = recipeInfo.firstCraft
 		recipe.supportsQualities = recipeInfo.supportsQualities
 		recipe.itemID = 0		-- Make sure this value exists
@@ -1501,8 +1494,8 @@ function Skillet:RescanTrade()
 	if not Skillet.db.realm.tradeSkills[player] then
 		Skillet.db.realm.tradeSkills[player] = {}
 	end
-	Skillet.scanInProgress = true
+	Skillet.InProgress.scan = true
 	Skillet.dataScanned = ScanTrade()
-	Skillet.scanInProgress = false
+	Skillet.InProgress.scan = false
 	return Skillet.dataScanned
 end
