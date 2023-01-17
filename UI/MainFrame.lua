@@ -975,6 +975,17 @@ end
 --
 function Skillet:UpdateTradeSkillWindow()
 	--DA.DEBUG(0,"UpdateTradeSkillWindow()")
+--[[
+	if self.InProgress.main then 
+		self.InProgress.mainDepth = self.InProgress.mainDepth + 1
+		self.InProgress.mainMax = max(self.InProgress.mainMax,self.InProgress.mainDepth)
+--		return
+	else
+		self.InProgress.mainDepth = 1
+		self.InProgress.mainMax = 1
+	end
+--]]
+	self.InProgress.main = true
 	self:NameEditSave()
 	if not self.currentPlayer or not self.currentTrade then 
 		DA.DEBUG(0,"UpdateTradeSkillWindow: leaving early, no player or no trade")
@@ -1239,8 +1250,7 @@ function Skillet:UpdateTradeSkillWindow()
 				local recipe = self:GetRecipe(skill.recipeID)
 				buttonExpand.group = nil
 				button.skill = skill
-				local _, difficulty = self:GetTradeSkillInfo(skillIndex) --**--
-				local skill_color = Skillet.skill_style_type[difficulty] or skill.color or skill.skillData.color or NORMAL_FONT_COLOR
+				local skill_color = Skillet.skill_style_type[recipe.difficulty] or skill.color or skill.skillData.color or NORMAL_FONT_COLOR
 				buttonText:SetTextColor(skill_color.r, skill_color.g, skill_color.b, textAlpha)
 				countText:SetTextColor(skill_color.r, skill_color.g, skill_color.b, textAlpha)
 				buttonExpand:Hide()
@@ -1351,7 +1361,7 @@ function Skillet:UpdateTradeSkillWindow()
 					end
 				end
 				if skill_color.alttext == "+++" then
-					local _, _, _, _, _, numSkillUps  = Skillet:GetTradeSkillInfo(skill.recipeID)
+					local numSkillUps = recipe.numSkillUps
 					if numSkillUps and numSkillUps > 1 then
 						local count = "<+"..numSkillUps.."> "..(countText:GetText() or "")
 						countText:SetText(count)
@@ -1440,6 +1450,8 @@ function Skillet:UpdateTradeSkillWindow()
 		SkilletFrameEmptySpace:SetPoint("TOPLEFT",SkilletSkillListParent,"TOPLEFT")
 	end
 	SkilletFrameEmptySpace:SetPoint("BOTTOMRIGHT",SkilletSkillListParent,"BOTTOMRIGHT")
+	self.InProgress.main = false
+--	self.InProgress.mainDepth = self.InProgress.mainDepth - 1
 	--DA.DEBUG(3,"UpdateTradeSkillWindow Complete")
 end
 

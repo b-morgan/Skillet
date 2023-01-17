@@ -143,6 +143,7 @@ end
 --
 function Skillet:UpdateSalvageListWindow()
 	DA.DEBUG(0,"UpdateSalvageListWindow()")
+	self.InProgress.salvage = true
 	local numItems
 	local recipe = self:GetRecipeDataByTradeIndex(self.currentTrade, self.selectedSkill)
 	if recipe.salvage then
@@ -239,6 +240,7 @@ function Skillet:UpdateSalvageListWindow()
 		local button = get_button(i)
 		button:Hide()
 	end
+	self.InProgress.salvage = false
 end
 
 --

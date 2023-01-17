@@ -143,6 +143,7 @@ end
 --
 function Skillet:UpdateOptionalListWindow()
 	--DA.DEBUG(0,"UpdateOptionalListWindow()")
+	self.InProgress.optional = true
 	local numItems
 	local recipe = self:GetRecipeDataByTradeIndex(self.currentTrade, self.selectedSkill)
 	if self.cachedOptionalList then
@@ -235,6 +236,7 @@ function Skillet:UpdateOptionalListWindow()
 		local button = get_button(i)
 		button:Hide()
 	end
+	self.InProgress.optional = false
 end
 
 --

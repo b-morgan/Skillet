@@ -151,6 +151,16 @@ end
 --
 function Skillet:UpdateDetailWindow(skillIndex)
 	--DA.DEBUG(0,"UpdateDetailWindow("..tostring(skillIndex)..")")
+--[[
+	if self.InProgress.detail then 
+		self.InProgress.detailDepth = self.InProgress.detailDepth + 1
+		self.InProgress.detailMax = max(self.InProgress.detailMax,self.InProgress.detailDepth)
+	else
+		self.InProgress.detailDepth = 1
+		self.InProgress.detailMax = 1
+	end
+--]]
+	self.InProgress.detail = true
 	SkilletReagentParent.StarsFrame:Hide()
 	SkilletRecipeRankFrame:Hide()
 	self.currentRecipeInfo = nil
@@ -263,17 +273,7 @@ PROFESSIONS_FIRST_CRAFT_DESCRIPTION = "Crafting this recipe for the first time w
 --
 -- Whether or not it is on cooldown.
 --
-		local _, _, _, _, _, _, _, _, _, _, _, displayAsUnavailable, unavailableString = Skillet:GetTradeSkillInfo(skill.id)
-		--DA.DEBUG(0,"UpdateDetailWindow: displayAsUnavailable="..tostring(displayAsUnavailable)..", unavailableString="..tostring(unavailableString))
-		if displayAsUnavailable then
-			local width = SkilletReagentParent:GetWidth()
-			local iconw = SkilletSkillIcon:GetWidth()
-			SkilletSkillCooldown:SetWidth(width - iconw - 15)
-			SkilletSkillCooldown:SetMaxLines(3)
-			SkilletSkillCooldown:SetText(unavailableString)
-		else
-			self:UpdateCooldown(skill.id, SkilletSkillCooldown)
-		end
+		self:UpdateCooldown(skill.id, newInfo, SkilletSkillCooldown)
 --
 -- Are special tools needed for this skill?
 --
@@ -866,8 +866,7 @@ PROFESSIONS_FIRST_CRAFT_DESCRIPTION = "Crafting this recipe for the first time w
 	if Skillet.db.profile.show_recipe_source_for_learned then
 		sourceText = C_TradeSkillUI.GetRecipeSourceText(skill.id)
 	else
-		local recipeInfo = C_TradeSkillUI.GetRecipeInfo(skill.id)
-		if recipeInfo and not recipeInfo.learned then
+		if newInfo and not newInfo.learned then
 			sourceText = C_TradeSkillUI.GetRecipeSourceText(skill.id)
 		end
 	end
@@ -924,6 +923,8 @@ PROFESSIONS_FIRST_CRAFT_DESCRIPTION = "Crafting this recipe for the first time w
 	else
 		SkilletExtraDetailTextRight:Hide()
 	end
+	Skillet.InProgress.detail = false
+--	self.InProgress.detailDepth = self.InProgress.detailDepth - 1
 	--DA.DEBUG(3,"UpdateDetailWindow Complete")
 end
 

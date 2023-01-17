@@ -137,6 +137,7 @@ end
 --
 function Skillet:UpdateModifiedListWindow()
 	--DA.DEBUG(0,"UpdateModifiedListWindow()")
+	self.InProgress.modified = true
 	local numItems
 	if self.cachedModifiedList then
 		numItems = #self.cachedModifiedList
@@ -232,6 +233,7 @@ function Skillet:UpdateModifiedListWindow()
 		local button = get_button(i)
 		button:Hide()
 	end
+	self.InProgress.modified = false
 end
 
 --

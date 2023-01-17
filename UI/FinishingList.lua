@@ -143,6 +143,7 @@ end
 --
 function Skillet:UpdateFinishingListWindow()
 	--DA.DEBUG(0,"UpdateFinishingListWindow()")
+	self.InProgress.finishing = true
 	local numItems
 	local recipe = self:GetRecipeDataByTradeIndex(self.currentTrade, self.selectedSkill)
 	if self.cachedFinishingList then
@@ -235,6 +236,7 @@ function Skillet:UpdateFinishingListWindow()
 		local button = get_button(i)
 		button:Hide()
 	end
+	self.InProgress.finishing = false
 end
 
 --
