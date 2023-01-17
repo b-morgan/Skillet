@@ -370,7 +370,7 @@ local function GetMinMaxBuyout(recipe)
 	if Auctionator and Auctionator.API.v1.GetAuctionPriceByItemLink then
 		for quality=4, 8 do
 			outputItemInfo = C_TradeSkillUI.GetRecipeOutputItemData(recipe.spellID, {}, nil, quality)
-			if outputItemInfo.hyperlink then
+			if outputItemInfo and outputItemInfo.hyperlink then
 				buyout = (Auctionator.API.v1.GetAuctionPriceByItemLink(addonName, outputItemInfo.hyperlink) or 0) * recipe.numMade
 			elseif Auctionator and Auctionator.API.v1.GetAuctionPriceByItemID then
 				buyout = (Auctionator.API.v1.GetAuctionPriceByItemID(addonName, itemID) or 0) * recipe.numMade
@@ -705,33 +705,21 @@ function plugin.GetExtraText(skill, recipe)
 			if Skillet.db.profile.plugins.ATR.qualityBuyout and recipe.supportsQualities then
 				label = label.."\n"
 				extra_text = extra_text.."\n"
-				h = 18
-				local outputItemInfo4 = C_TradeSkillUI.GetRecipeOutputItemData(recipe.spellID, {}, nil, 4);
-				buyout4 = (Auctionator.API.v1.GetAuctionPriceByItemLink(addonName, outputItemInfo4.hyperlink) or 0) * recipe.numMade
-				--DA.DEBUG(0,"GetExtraText: buyout4= "..tostring(buyout4)..", outputItemInfo4= "..DA.DUMP1(outputItemInfo4))
-				label = label.."\n"..outputItemInfo4.hyperlink
-				extra_text = extra_text.."\n".."|T982414:"..tostring(h)..":1|t"..Skillet:FormatMoneyFull(buyout4, true)
-				local outputItemInfo5 = C_TradeSkillUI.GetRecipeOutputItemData(recipe.spellID, {}, nil, 5);
-				buyout5 = (Auctionator.API.v1.GetAuctionPriceByItemLink(addonName, outputItemInfo5.hyperlink) or 0) * recipe.numMade
-				--DA.DEBUG(0,"GetExtraText: buyout5= "..tostring(buyout5))
-				label = label.."\n"..outputItemInfo5.hyperlink
-				extra_text = extra_text.."\n".."|T982414:"..tostring(h)..":1|t"..Skillet:FormatMoneyFull(buyout5, true)
-				local outputItemInfo6 = C_TradeSkillUI.GetRecipeOutputItemData(recipe.spellID, {}, nil, 6);
-				buyout6 = (Auctionator.API.v1.GetAuctionPriceByItemLink(addonName, outputItemInfo6.hyperlink) or 0) * recipe.numMade
-				--DA.DEBUG(0,"GetExtraText: buyout6= "..tostring(buyout6))
-				label = label.."\n"..outputItemInfo6.hyperlink
-				extra_text = extra_text.."\n".."|T982414:"..tostring(h)..":1|t"..Skillet:FormatMoneyFull(buyout6, true)
-				local outputItemInfo7 = C_TradeSkillUI.GetRecipeOutputItemData(recipe.spellID, {}, nil, 7);
-				buyout7 = (Auctionator.API.v1.GetAuctionPriceByItemLink(addonName, outputItemInfo7.hyperlink) or 0) * recipe.numMade
-				--DA.DEBUG(0,"GetExtraText: buyout7= "..tostring(buyout7))
-				label = label.."\n"..outputItemInfo7.hyperlink
-				extra_text = extra_text.."\n".."|T982414:"..tostring(h)..":1|t"..Skillet:FormatMoneyFull(buyout7, true)
-				local outputItemInfo8 = C_TradeSkillUI.GetRecipeOutputItemData(recipe.spellID, {}, nil, 8);
-				buyout8 = (Auctionator.API.v1.GetAuctionPriceByItemLink(addonName, outputItemInfo8.hyperlink) or 0) * recipe.numMade
-				--DA.DEBUG(0,"GetExtraText: buyout8= "..tostring(buyout8))
-				label = label.."\n"..outputItemInfo8.hyperlink
---				extra_text = extra_text.."\n".."|T982414:"..tostring(h)..":1|t"..Skillet:FormatMoneyFull(buyout8, true)
-				extra_text = extra_text.."\n"..Skillet:FormatMoneyFull(buyout8, true)
+--
+-- The hyperlink label is taller than normal text so 
+-- add a transparent icon of the same size to the extra_text
+--
+				local h = 18
+				local buyout, outputItemInfo
+				for quality=4, 8 do
+					outputItemInfo = C_TradeSkillUI.GetRecipeOutputItemData(recipe.spellID, {}, nil, quality)
+					if outputItemInfo and outputItemInfo.hyperlink then
+						buyout = (Auctionator.API.v1.GetAuctionPriceByItemLink(addonName, outputItemInfo.hyperlink) or 0) * recipe.numMade
+						--DA.DEBUG(0,"GetExtraText: quality= "..tostring(quality)..", buyout= "..tostring(buyout)..", outputItemInfo= "..DA.DUMP1(outputItemInfo))
+						label = label.."\n"..outputItemInfo.hyperlink
+						extra_text = extra_text.."\n".."|T982414:"..tostring(h)..":1|t"..Skillet:FormatMoneyFull(buyout, true)
+					end
+				end
 			end
 		end
 --
