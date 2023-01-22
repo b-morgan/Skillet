@@ -88,7 +88,7 @@ function plugin.RecipeNamePrefix(skill, recipe)
 			end
 			--DA.DEBUG(0,"RecipeNamePrefix: scrollID = "..tostring(itemID).." ("..tostring(itemName)..")")
 		end
-		if itemID then
+		if itemID and Skillet.DSAPlayer then
 			itemCount = DataStore:GetAuctionHouseItemCount(Skillet.DSAPlayer, itemID)
 			--DA.DEBUG(0,"RecipeNamePrefix: itemCount = "..tostring(itemCount))
 			prefix = "   "
