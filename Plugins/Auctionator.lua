@@ -627,6 +627,7 @@ function plugin.SortByPercent(skill,a,b)
 end
 
 function plugin.OnInitialize()
+	--DA.DEBUG(0,"ATR:OnInitialize()")
 	if not Skillet.db.profile.plugins.ATR then
 		Skillet.db.profile.plugins.ATR = {}
 		Skillet.db.profile.plugins.ATR.enabled = true
