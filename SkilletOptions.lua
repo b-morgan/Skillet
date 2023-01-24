@@ -972,6 +972,20 @@ Skillet.options =
 			end,
 			order = 79
 		},
+		news = {
+			type = 'execute',
+			name = "Display news",
+			desc = "Display the news frame",
+			func = function()
+				if not (UnitAffectingCombat("player")) then
+					Skillet:DisplayNews()
+				else
+					DA.DEBUG(0,"|cff8888ffSkillet|r: Combat lockdown restriction." ..
+												  " Leave combat and try again.")
+				end
+			end,
+			order = 80
+		},
 
 --
 -- commands to manipulate the state of debugging code flags
