@@ -1061,13 +1061,26 @@ function Skillet:ReagentButtonSkillSelect(player, id)
 end
 
 --
+-- Called when the reagent button is control-clicked
+-- (not sure if this is worth anything)
+--
+function Skillet:ReagentButtonControlClick(button, mouse, skillIndex, reagentIndex)
+	DA.DEBUG(0,"ReagentButtonControlClick("..tostring(button)..", "..tostring(skillIndex)..", "..tostring(reagentIndex)..")")
+	local link = Skillet:GetRecipeReagentItemLink(skillIndex, reagentIndex)
+	if link then
+		DA.DEBUG(1,"ReagentButtonControlClick: link= "..tostring(link))
+		DressUpItemLink(link)
+	end
+end
+
+--
 -- Called when the reagent button is shift-clicked
 --
 function Skillet:ReagentButtonShiftClick(button, mouse, skillIndex, reagentIndex)
-	--DA.DEBUG(0,"ReagentButtonShiftClick("..tostring(button)..", "..tostring(skillIndex)..", "..tostring(reagentIndex)..")")
+	DA.DEBUG(0,"ReagentButtonShiftClick("..tostring(button)..", "..tostring(skillIndex)..", "..tostring(reagentIndex)..")")
 	local link = Skillet:GetRecipeReagentItemLink(skillIndex, reagentIndex)
-	if not ChatEdit_InsertLink(link) then
-		--DA.DEBUG(1,"ReagentButtonShiftClick: ChatEdit_InsertLink returned false. link= "..tostring(link))
+	if link and not ChatEdit_InsertLink(link) then
+		DA.DEBUG(1,"ReagentButtonShiftClick: ChatEdit_InsertLink returned false. link= "..DA.PLINK(link))
 		local name = GetItemInfo(link)
 		if SkilletSearchBox:HasFocus() then
 			SkilletSearchBox:SetText(name)
@@ -1119,67 +1132,68 @@ function Skillet:ReagentButtonRightClick(button, mouse, skillIndex, reagentIndex
 --
 -- Basic reagent (does nothing)
 --
-	if mouse == "RightButton" then
-		--DA.DEBUG(0,"ReagentButtonRightClick: RightButton, skillIndex= "..tostring(skillIndex)..", reagentIndex= "..tostring(reagentIndex))
-		return
-	end
 end
 
 --
 -- Called when the reagent button is left-clicked
+-- (shift-click and control-click handled elsewhere)
 --
 function Skillet:ReagentButtonOnClick(button, mouse, skillIndex, reagentIndex)
-	--DA.DEBUG(0,"ReagentButtonOnClick("..tostring(button)..", "..tostring(mouse)..", "..tostring(skillIndex)..", "..tostring(reagentIndex)..")")
+	DA.DEBUG(0,"ReagentButtonOnClick("..tostring(button)..", "..tostring(mouse)..", "..tostring(skillIndex)..", "..tostring(reagentIndex)..")")
 	local recipe = self:GetRecipeDataByTradeIndex(self.currentTrade, skillIndex)
 	if not recipe then
 		--DA.WARN("ReagentButtonRightClick: recipe is nil. "..tostring(button)..", "..tostring(mouse)..", "..tostring(skillIndex)..", "..tostring(reagentIndex))
 		return
 	end
-	if reagentIndex < 0 then
-		if recipe.salvage then
+--
+-- Alt-click will open the appropriate list frame
+--
+	if IsAltKeyDown() then
+		if reagentIndex < 0 then
+			if recipe.salvage then
 --
 -- Salvage reagent (reagentIndex < 0 and recipe.salvage)
 --
-			Skillet:DisplaySalvageList()
-			Skillet:SalvageReagentOnClick(button, mouse, skillIndex, reagentIndex)
-			return
-		else
+				Skillet:DisplaySalvageList()
+				Skillet:SalvageReagentOnClick(button, mouse, skillIndex, reagentIndex)
+				return
+			else
 --
 -- Optional reagent (reagentIndex < 0)
 --
-			Skillet:DisplayOptionalList()
-			Skillet:OptionalReagentOnClick(button, mouse, skillIndex, reagentIndex)
-			return
-		end
-	elseif reagentIndex > 100 and reagentIndex < 200 then
+				Skillet:DisplayOptionalList()
+				Skillet:OptionalReagentOnClick(button, mouse, skillIndex, reagentIndex)
+				return
+			end
+		elseif reagentIndex > 100 and reagentIndex < 200 then
 --
 -- Modified reagent (reagentIndex + 100)
 --
-		Skillet:DisplayModifiedList()
-		Skillet:ModifiedReagentOnClick(button, mouse, skillIndex, reagentIndex)
-		return
-	elseif reagentIndex > 200 then
+			Skillet:DisplayModifiedList()
+			Skillet:ModifiedReagentOnClick(button, mouse, skillIndex, reagentIndex)
+			return
+		elseif reagentIndex > 200 then
 --
 -- Finishing reagent (reagentIndex + 200)
 --
-		Skillet:DisplayFinishingList()
-		Skillet:FinishingReagentOnClick(button, mouse, skillIndex, reagentIndex)
-		return
+			Skillet:DisplayFinishingList()
+			Skillet:FinishingReagentOnClick(button, mouse, skillIndex, reagentIndex)
+			return
+		end
 	end
 --
--- Basic reagent
+-- Check if this reagent is a craftable recipe.
 --
 	if not self.db.profile.link_craftable_reagents then
 		return
 	end
-	local recipe = self:GetRecipeDataByTradeIndex(self.currentTrade, skillIndex)
-	if not recipe then
-		--DA.WARN("ReagentButtonOnClick: recipe is nil. "..tostring(button)..", "..tostring(mouse)..", "..tostring(skillIndex)..", "..tostring(reagentIndex))
-		return
+	local reagent
+	if reagentIndex > 0 and reagentIndex < 100 then
+		reagent = recipe.reagentData[reagentIndex]
+	elseif reagentIndex > 100 and reagentIndex < 200 then
+		reagent = recipe.modifiedData[reagentIndex-100]
 	end
-	local reagent = recipe.reagentData[reagentIndex]
 	if not reagent then
-		--DA.DEBUG(0,"ReagentButtonOnClick: recipe= "..DA.DUMP1(recipe))
 		--DA.WARN("ReagentButtonOnClick: reagent is nil. "..tostring(button)..", "..tostring(mouse)..", "..tostring(skillIndex)..", "..tostring(reagentIndex))
 		return
 	end
@@ -1242,7 +1256,7 @@ end
 -- Called when the icon button is clicked
 --
 function Skillet:ReagentsLinkOnClick(button, skillIndex, reagentIndex)
-	--DA.DEBUG(0,"ReagentLinkOnClick("..tostring(button)..", "..tostring(skillIndex)..", "..tostring(reagentIndex)..")")
+	DA.DEBUG(0,"ReagentLinkOnClick("..tostring(button)..", "..tostring(skillIndex)..", "..tostring(reagentIndex)..")")
 	if not self.db.profile.link_craftable_reagents then
 		--DA.DEBUG(1,"ReagentsLinkOnClick: link_craftable_reagents= "..tostring(self.db.profile.link_craftable_reagents))
 		return
@@ -1260,7 +1274,9 @@ function Skillet:ReagentsLinkOnClick(button, skillIndex, reagentIndex)
 			end
 			--DA.DEBUG(1,"ReagentsLinkOnClick: reagentLink= "..DA.DUMP1(reagentLink))
 			if reagentLink then
-				ChatEdit_InsertLink(sep .. reagent.numNeeded .. "x" .. reagentLink)
+				if not ChatEdit_InsertLink(sep .. reagent.numNeeded .. "x" .. reagentLink) then
+					DA.DEBUG(0,"ReagentsLinkOnClick: reagentLink= "..DA.PLINK(reagentLink))
+				end
 			end
 		sep = ", "
 		end
