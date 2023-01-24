@@ -117,14 +117,14 @@
 			<!-- shift clicking will insert a link to the recipe in the chat window. -->
 			if button == "LeftButton" and IsShiftKeyDown() then
 				local name,link = GetItemInfo(self.id)
-				ChatEdit_InsertLink(self.count .. "x" .. link)
+				if not ChatEdit_InsertLink(self.count .. "x" .. link) then
+					DA.DEBUG(0,"ShoppingListItemLink: link= "..DA.PLINK(link))
+				end
 			end
-
 			<!-- control clicking will remove this player's entries. -->
 			if button == "LeftButton" and IsControlKeyDown() then
 				Skillet:ClearShoppingList(self.player)
 			end
-
 			<!-- right clicking will remove this player's entries. -->
 			if button == "RightButton" then
 				Skillet:ClearShoppingList(self.player)

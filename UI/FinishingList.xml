@@ -98,11 +98,12 @@
 				CursorOnUpdate(self)
 			</OnUpdate>
 			<OnClick>
-				local link = Skillet:GetFinishingItemLink(Skillet.selectedSkill, self:GetID())
 				if ( button == "LeftButton" and IsShiftKeyDown() ) then
-				<!-- Put a link to the *item* in chat
-					 into the current chat edit box -->
-					ChatEdit_InsertLink(link)
+				<!-- Put a link to the *item* in chat into the current chat edit box -->
+					local link = Skillet:GetFinishingItemLink(Skillet.selectedSkill, self:GetID())
+					if not ChatEdit_InsertLink(link) then
+						DA.DEBUG(0,"FinishingItemLink: link= "..DA.PLINK(link))
+					end
 				else
 				<!-- generic click action -->
 					Skillet:FinishingButtonOnClick(self, button, Skillet.selectedSkill, self:GetID())

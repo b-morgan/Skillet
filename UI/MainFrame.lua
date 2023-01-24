@@ -171,7 +171,9 @@ function Skillet:CreateTradeSkillWindow()
 	titlebar2:SetPoint("TOPLEFT",titlebar,"BOTTOMLEFT",0,0)
 	titlebar2:SetPoint("TOPRIGHT",titlebar,"BOTTOMRIGHT",0,0)
 	titlebar2:SetHeight(13)
+	titlebar:SetGradient("VERTICAL", CreateColor(r*0.6,g*0.6,b*0.6,1), CreateColor(r,g,b,1))
 	titlebar:SetColorTexture(r,g,b,1)
+	titlebar2:SetGradient("VERTICAL", CreateColor(r*0.9,g*0.9,b*0.9,1), CreateColor(r*0.6,g*0.6,b*0.6,1))
 	titlebar2:SetColorTexture(r,g,b,1)
 
 	local title = CreateFrame("Frame",nil,frame)
@@ -629,7 +631,9 @@ function Skillet:TradeButton_OnClick(this,button)
 		if player == UnitName("player") or (data and data ~= nil) then
 			if self.currentTrade == tradeID and IsShiftKeyDown() then
 				local link = C_TradeSkillUI.GetTradeSkillListLink()
-				ChatEdit_InsertLink(link)
+				if not ChatEdit_InsertLink(link) then
+					DA.DEBUG(0,"TradeButton_OnClick: link= "..DA.PLINK(link))
+				end
 			end
 			if player == UnitName("player") then
 				self:SetTradeSkill(self.currentPlayer, tradeID)
@@ -1816,8 +1820,9 @@ function Skillet:SkillButton_LinkRecipe()
 	local skill = Skillet.menuButton.skill
 	if skill and skill.recipeID then
 		local spellLink = C_TradeSkillUI.GetRecipeLink(skill.recipeID)
-		--DA.DEBUG(0,"SkillButton_LinkRecipe: spellLink= "..DA.PLINK(spellLink))
-		ChatEdit_InsertLink(spellLink)
+		if not ChatEdit_InsertLink(spellLink) then
+			DA.DEBUG(0,"SkillButton_LinkRecipe: spellLink= "..DA.PLINK(spellLink))
+		end
 	end
 end
 
@@ -2011,7 +2016,9 @@ function Skillet:SkillButton_OnClick(button, mouse)
 				local skill = button.skill
 				if skill and skill.recipeID then
 					local spellLink = C_TradeSkillUI.GetRecipeLink(skill.recipeID)
-					ChatEdit_InsertLink(spellLink)
+					if not ChatEdit_InsertLink(spellLink) then
+						DA.DEBUG(0,"SkillButton_OnClick: spellLink= "..DA.PLINK(spellLink))
+					end
 				end
 			end
 		elseif not button.skill.mainGroup then
@@ -3008,7 +3015,9 @@ function Skillet:CreateStandaloneQueueFrame()
 	titlebar2:SetPoint("TOPLEFT",titlebar,"BOTTOMLEFT",0,0)
 	titlebar2:SetPoint("TOPRIGHT",titlebar,"BOTTOMRIGHT",0,0)
 	titlebar2:SetHeight(13)
+	titlebar:SetGradient("VERTICAL", CreateColor(r*0.6,g*0.6,b*0.6,1), CreateColor(r,g,b,1))
 	titlebar:SetColorTexture(r,g,b,1)
+	titlebar2:SetGradient("VERTICAL", CreateColor(r*0.9,g*0.9,b*0.9,1), CreateColor(r*0.6,g*0.6,b*0.6,1))
 	titlebar2:SetColorTexture(r,g,b,1)
 	local title = CreateFrame("Frame",nil,frame)
 	title:SetPoint("TOPLEFT",titlebar,"TOPLEFT",0,0)
