@@ -75,7 +75,7 @@ function Skillet:GetRecipeItemLink(index)
 end
 
 function Skillet:AdjustNumberMade(index, adjust)
-	--DA.DEBUG(0,"AdjustNumberMade("..tostring(index)..", adjust= "..tostring(adjust)..")")
+	--DA.DEBUG(0,"AdjustNumberMade("..tostring(index)..", "..tostring(adjust)..")")
 	local recipe, recipeID = self:GetRecipeDataByTradeIndex(self.currentTrade, index)
 	local recipeSchematic = C_TradeSkillUI.GetRecipeSchematic(recipeID, false)
 	--DA.DEBUG(2,"recipeSchematic= "..DA.DUMP1(recipeSchematic))
@@ -100,14 +100,25 @@ end
 -- item, the index'th reagent required for the item is returned
 --
 function Skillet:GetRecipeReagentItemLink(skillIndex, index)
+	--DA.DEBUG(0,"GetRecipeReagentItemLink("..tostring(skillIndex)..", "..tostring(index)..")")
 	if skillIndex and index then
 		local recipe = self:GetRecipeDataByTradeIndex(self.currentTrade, skillIndex)
-		if recipe and recipe.reagentData[index] then
-			local _, link = GetItemInfo(recipe.reagentData[index].reagentID)
-			return link;
+		--DA.DEBUG(1,"GetRecipeReagentItemLink: recipe= "..DA.DUMP1(recipe,1))
+		if recipe then
+			if index > 0 and index < 100 and recipe.reagentData[index] then
+				DA.DEBUG(1,"GetRecipeReagentItemLink: reagentID= "..tostring(recipe.reagentData[index].reagentID))
+				local _, link = GetItemInfo(recipe.reagentData[index].reagentID)
+				return link
+			elseif index > 100 and index < 200 and recipe.modifiedData[index-100] then
+				DA.DEBUG(1,"GetRecipeReagentItemLink: reagentID= "..tostring(recipe.modifiedData[index-100].reagentID))
+				local _, link = GetItemInfo(recipe.modifiedData[index-100].reagentID)
+				return link
+			end
+--
+-- Optional (index < 0) and Finishing (index > 200) reagents have no link for now.
+--
 		end
 	end
-		return nil
 end
 
 -- Gets the trade skill line, and knows how to do the right
