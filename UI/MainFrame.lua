@@ -992,7 +992,7 @@ function Skillet:UpdateTradeSkillWindow()
 	self.InProgress.main = true
 	self:NameEditSave()
 	if not self.currentPlayer or not self.currentTrade then 
-		DA.DEBUG(0,"UpdateTradeSkillWindow: leaving early, no player or no trade")
+		--DA.DEBUG(0,"UpdateTradeSkillWindow: leaving early, no player or no trade")
 		return
 	end
 	local skillListKey = self.currentPlayer..":"..self.currentTrade..":"..self.currentGroupLabel
