@@ -1111,6 +1111,19 @@ Skillet.options =
 			end,
 			order = 88
 		},
+		TraceLog2 = {
+			type = "toggle",
+			name = "TraceLog2",
+			desc = "Option for debugging",
+			get = function()
+				return Skillet.db.profile.TraceLog2
+			end,
+			set = function(self,value)
+				Skillet.db.profile.TraceLog2 = value
+				Skillet.TraceLog2 = value
+			end,
+			order = 88
+		},
 		ProfileShow = {
 			type = "toggle",
 			name = "ProfileShow",
