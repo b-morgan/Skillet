@@ -10,6 +10,7 @@
 ## X-Credits lilsparky, nogudnik (creator of Skillet), Slartie (for ASTW)
 ## X-Curse-Project-ID: 445339
 ## X-WoWI-ID: 7571
+## X-Wago-ID: ME6geXG1
 ## X-Website: https://www.curseforge.com/wow/addons/skillet
 ## SavedVariables: SkilletDB
 ## SavedVariablesPerCharacter: SkilletWho, SkilletDBPC, SkilletMemory, SkilletProfile
