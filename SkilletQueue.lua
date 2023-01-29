@@ -368,6 +368,13 @@ function Skillet:ProcessQueue(altMode)
 		return
 	end
 	local command, craftable
+--
+-- If any plugins have registered a ProcessQueue function, call it now
+--
+	self:ProcessQueuePlugins()
+--
+-- find the first queue entry that is craftable
+--
 	repeat
 		command = queue[qpos]
 		--DA.DEBUG(1,DA.DUMP1(command))

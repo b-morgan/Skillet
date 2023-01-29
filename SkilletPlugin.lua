@@ -21,9 +21,10 @@ local L = Skillet.L
 
 Skillet.registeredPlugins = {}		-- plugins that have registered a function
 Skillet.updatePlugins = {}			-- each plugin will register if it has an Update function
+Skillet.processQueuePlugins = {}	-- each plugin will register if it has a ProcessQueue function
 Skillet.displayDetailPlugins = {}	-- each plugin will register if it has a GetExtraText function
-Skillet.RecipeNamePrefixes = {}			-- each plugin will register, only one can be active
-Skillet.RecipeNameSuffixes = {}			-- each plugin will register, only one can be active
+Skillet.RecipeNamePrefixes = {}		-- each plugin will register, only one can be active
+Skillet.RecipeNameSuffixes = {}		-- each plugin will register, only one can be active
 
 Skillet.pluginsOrder = 2
 Skillet.pluginsOptions = {
@@ -138,8 +139,34 @@ function Skillet:IsUpdatePluginRegistered(moduleName)
 end
 
 function Skillet:UpdatePlugins()
+	--DA.DEBUG(0,"UpdatePlugins()")
 	for k,v in pairs(Skillet.updatePlugins) do
 		v.Update()
+	end
+end
+
+function Skillet:RegisterProcessQueuePlugin(moduleName, priority)
+	DA.DEBUG(0,"RegisterProcessQueuePlugin("..tostring(moduleName)..", "..tostring(priority))
+	if not priority then priority = 100 end
+	if type(moduleName) == "string" then
+		local module = Skillet[moduleName]
+		if module and type(module) == "table" and module.ProcessQueue then
+			Skillet.processQueuePlugins[moduleName] = module
+			Skillet.registeredPlugins[moduleName] = module
+		end
+	end
+end
+
+function Skillet:IsProcessQueuePluginRegistered(moduleName)
+	if type(moduleName)	 == "string" then
+		return Skillet.processQueuePlugins[moduleName] ~= nil
+	end
+end
+
+function Skillet:ProcessQueuePlugins()
+	--DA.DEBUG(0,"ProcessQueuePlugins()")
+	for k,v in pairs(Skillet.processQueuePlugins) do
+		v.ProcessQueue()
 	end
 end
 
@@ -164,7 +191,7 @@ function Skillet:GetExtraText(skill, recipe)
 			output_text = output_text..text
 		end
 	end
-	return output_label or "", output_text or ""
+	return output_label, output_text
 end
 
 function Skillet:RecipeNamePrefix(skill, recipe)
@@ -202,8 +229,8 @@ end
 function Skillet:InitializePlugins()
 	DA.DEBUG(0,"InitializePlugins()")
 	for k,v in pairs(Skillet.registeredPlugins) do
-		--DA.DEBUG(1,"k= "..tostring(k)..", v= "..tostring(v))
 		if v and v.OnInitialize then
+			DA.DEBUG(1,"InitializePlugins: k= "..tostring(k)..", v= "..tostring(v))
 			v.OnInitialize()
 		end
 	end
@@ -212,9 +239,20 @@ end
 function Skillet:EnablePlugins()
 	DA.DEBUG(0,"EnablePlugins()")
 	for k,v in pairs(Skillet.registeredPlugins) do
-		DA.DEBUG(1,"k= "..tostring(k)..", v= "..tostring(v))
 		if v and v.OnEnable then
+			DA.DEBUG(1,"EnablePlugins: k= "..tostring(k)..", v= "..tostring(v))
 			v.OnEnable()
 		end
 	end
 end
+
+function Skillet:DisablePlugins()
+	DA.DEBUG(0,"DisablePlugins()")
+	for k,v in pairs(Skillet.registeredPlugins) do
+		if v and v.OnDisable then
+			DA.DEBUG(1,"DisablePlugins: k= "..tostring(k)..", v= "..tostring(v))
+			v.OnDisable()
+		end
+	end
+end
+
