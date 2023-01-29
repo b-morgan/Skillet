@@ -342,6 +342,7 @@ function Skillet:OnInitialize()
 -- Warning:	Setting TableDump can be a performance hog, use caution.
 --			Setting DebugLogging (without DebugShow) is a minor performance hit.
 --			WarnLog (with or without WarnShow) can remain on as warning messages are rare.
+--			TraceLog2 controls event tracing of high frequency events like BAG_UPDATE
 --
 -- Note:	Undefined is the same as false so we only need to predefine true variables
 --
@@ -360,6 +361,7 @@ function Skillet:OnInitialize()
 	Skillet.TableDump = Skillet.db.profile.TableDump
 	Skillet.TraceShow = Skillet.db.profile.TraceShow
 	Skillet.TraceLog = Skillet.db.profile.TraceLog
+	Skillet.TraceLog2 = Skillet.db.profile.TraceLog2
 	Skillet.ProfileShow = Skillet.db.profile.ProfileShow
 --
 -- Profile variable to control Skillet fixes for Blizzard bugs.
@@ -426,6 +428,7 @@ StaticPopupDialogs["SKILLET_MANUAL_CHANGE"] = {
 -- Now do the character initialization
 --
 	self:InitializeDatabase(UnitName("player"))
+	self:InitializePlugins()
 end
 
 --
@@ -693,11 +696,12 @@ function Skillet:OnEnable()
 	self:RegisterEvent("TRADE_SKILL_LIST_UPDATE")
 	self:RegisterEvent("GUILD_RECIPE_KNOWN_BY_MEMBERS", "SkilletShowGuildCrafters")
 	self:RegisterEvent("GARRISON_TRADESKILL_NPC_CLOSED")
-	self:RegisterEvent("BAG_UPDATE") -- Fires for both bag and bank updates.
-	self:RegisterEvent("BAG_UPDATE_DELAYED") -- Fires after all applicable BAG_UPDATE events for a specific action have been fired.
+	self:RegisterEvent("BAG_UPDATE") 				-- Fires for both bag and bank updates.
+	self:RegisterEvent("BAG_UPDATE_DELAYED")		-- Fires after all applicable BAG_UPDATE events for a specific action have been fired.
+	self:RegisterEvent("UNIT_INVENTORY_CHANGED")	-- BAG_UPDATE_DELAYED seems to have disappeared. Using this instead.
 
 --
--- Dragonflight events that replace *_SHOW and *_CLOSED by adding a PlayerInteractionType parameter
+-- Events that replace *_SHOW and *_CLOSED by adding a PlayerInteractionType parameter
 --
 	self:RegisterEvent("PLAYER_INTERACTION_MANAGER_FRAME_SHOW")
 	self:RegisterEvent("PLAYER_INTERACTION_MANAGER_FRAME_HIDE")
@@ -794,6 +798,7 @@ function Skillet:OnEnable()
 	self:RegisterEvent("PLAYER_LOGIN")
 	self:RegisterEvent("PLAYER_ENTERING_WORLD")
 
+	self.bagsChanged = true
 	self.hideUncraftableRecipes = false
 	self.hideTrivialRecipes = false
 	self.currentTrade = nil
@@ -1031,7 +1036,12 @@ function Skillet:GARRISON_TRADESKILL_NPC_CLOSED()
 end
 
 function Skillet:ITEM_DATA_LOAD_RESULT(event, itemID, result)
-	--DA.TRACE("ITEM_DATA_LOAD_RESULT("..tostring(itemID)..", "..tostring(result).."), "..tostring(GetItemInfo(itemID)))
+	if itemID then
+		local name = GetItemInfo(itemID)
+		DA.TRACE2("ITEM_DATA_LOAD_RESULT("..tostring(itemID)..", "..tostring(result).."), "..tostring(name))
+	else
+		DA.TRACE2("ITEM_DATA_LOAD_RESULT")
+	end
 	if Skillet.salvageDataNeeded then
 		Skillet:UpdateSalvageListWindow()
 		Skillet.salvageDataNeeded = nil
@@ -1057,7 +1067,12 @@ function Skillet:ITEM_DATA_LOAD_RESULT(event, itemID, result)
 end
 
 function Skillet:GET_ITEM_INFO_RECEIVED(event, itemID, result)
-	--DA.TRACE("GET_ITEM_INFO_RECEIVED("..tostring(itemID)..", "..tostring(result).."), "..tostring(GetItemInfo(itemID)))
+	if itemID then
+		local name = GetItemInfo(itemID)
+		DA.TRACE2("GET_ITEM_INFO_RECEIVED("..tostring(itemID)..", "..tostring(result).."), "..tostring(name))
+	else
+		DA.TRACE2("GET_ITEM_INFO_RECEIVED")
+	end
 end
 
 --
@@ -1353,51 +1368,6 @@ function Skillet:RescanBags()
 	if elapsed > 0.5 then
 		DA.DEBUG(0,"WARNING: skillet inventory scan took " .. math.floor(elapsed*100+.5)/100 .. " seconds to complete.")
 	end
-end
-
-function Skillet:BAG_OPEN(event, bagID) -- Fires when a non-inventory container is opened.
-	DA.TRACE("BAG_OPEN( "..tostring(bagID).." )") -- We don't really care
-end
-
---
--- So we can track when the players inventory changes and update craftable counts
---
-function Skillet:BAG_UPDATE(event, bagID)
-	--DA.TRACE("BAG_UPDATE( "..bagID.." )")
-	local showing = false
-	if self.tradeSkillFrame and self.tradeSkillFrame:IsVisible() then
-		showing = true
-	end
-	if self.shoppingList and self.shoppingList:IsVisible() then
-		showing = true
-	end
---	bagID = tonumber(bagID)
-	if showing then
-		if bagID >= 0 and bagID <= 4 then
---
--- an inventory bag update, do nothing (wait for the BAG_UPDATE_DELAYED).
---
-		end
-		if bagID == -1 or bagID >= 5 then
---
--- a bank update, process it in ShoppingList.lua
---
-			Skillet:BANK_UPDATE(event,bagID) -- Looks like an event but its not.
-		end
-	end
-	if MerchantFrame and MerchantFrame:IsVisible() then
-		-- may need to update the button on the merchant frame window ...
-		self:UpdateMerchantFrame()
-	end
-	-- Most of the shoppingList code is in ShoppingList.lua
-	if self.shoppingList and self.shoppingList:IsVisible() then
-		self:InventoryScan()
-		self:UpdateShoppingListWindow()
-	end
-end
-
-function Skillet:BAG_CLOSED(event, bagID)        -- Fires when the whole bag is removed from
-	DA.TRACE("BAG_CLOSED( "..tostring(bagID).." )") -- inventory or bank. We don't really care.
 end
 
 --
