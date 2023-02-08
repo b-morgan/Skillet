@@ -495,6 +495,180 @@ local function indexGuildBank(tab)
 	end
 end
 
+--
+-- Returns a bag that the item can be placed in.
+--
+local function findBagForItem(itemID, count)
+	DA.DEBUG(0, "findBagForItem("..tostring(itemID)..", "..tostring(count)..")")
+	if not itemID then return nil end
+	local _, _, _, _, _, _, _, itemStackCount = GetItemInfo(itemID)
+	for container = 0, 5, 1 do
+		local bagSize = C_Container.GetContainerNumSlots(container)
+		local freeSlots, bagType = C_Container.GetContainerNumFreeSlots(container)
+		--DA.DEBUG(1, "findBagForItem: container= "..tostring(container)..", bagSize= "..tostring(bagSize)..", freeSlots= "..tostring(freeSlots)..", bagType= "..tostring(bagType))
+		if bagType == 0 then
+			for slot = 1, bagSize, 1 do
+				local bagItem = C_Container.GetContainerItemLink(container, slot)
+				if bagItem then
+					local info = C_Container.GetContainerItemInfo(container, slot)
+					if itemID == info.itemID then
+--
+-- found some of the same, it is a full stack or locked?
+--
+						if (itemStackCount - info.stackCount) >= count and not info.isLocked then
+							--DA.DEBUG(1, "findBagForItem: container= "..tostring(container)..", slot= "..tostring(slot)..", true")
+							return container, slot, true
+						end
+					end
+				else
+--
+-- no item there, this looks like a good place to put something.
+--
+					--DA.DEBUG(1, "findBagForItem: container= "..tostring(container)..", slot= "..tostring(slot)..", false")
+					return container, slot, false
+				end
+			end -- for slot
+		end -- bagType
+	end -- for container
+	return nil, nil, nil
+end
+
+local function getItemFromBank(itemID, bag, slot, count)
+	DA.DEBUG(0,"getItemFromBank("..tostring(itemID)..", "..tostring(bag)..", "..tostring(slot)..", "..tostring(count)..")")
+	ClearCursor()
+	local info = C_Container.GetContainerItemInfo(bag, slot)
+	local num_moved = 0
+	local available = info.stackCount
+	if available then
+		if available == 1 or count >= available then
+			--DA.DEBUG(1,"getItemFromBank: PickupContainerItem("..tostring(bag)..", "..tostring(slot)..")")
+			C_Container.PickupContainerItem(bag, slot)
+			num_moved = available
+		else
+			--DA.DEBUG(1,"getItemFromBank: SplitContainerItem("..tostring(bag)..", "..tostring(slot)..", "..tostring(count)..")")
+			C_Container.SplitContainerItem(bag, slot, count)
+			num_moved = count
+		end
+		local tobag, toslot = findBagForItem(itemID, num_moved)
+		--DA.DEBUG(1,"getItemFromBank: tobag= "..tostring(tobag)..", toslot= "..tostring(toslot)..", findBagForItem("..tostring(itemID)..", "..tostring(num_moved)..")")
+		if not tobag then
+			Skillet:Print(L["Could not find bag space for"]..": "..C_Container.GetContainerItemLink(bag, slot))
+			ClearCursor()
+			return 0
+		end
+		if tobag == 0 then
+			--DA.DEBUG(1,"getItemFromBank: PutItemInBackpack()")
+			PutItemInBackpack()
+		else
+			DA.DEBUG(1,"PutItemInBag("..tostring(C_Container.ContainerIDToInventoryID(tobag))..")")
+			PutItemInBag(C_Container.ContainerIDToInventoryID(tobag))
+		end
+	else
+		--DA.DEBUG(1,"getItemFromBank: none available")
+	end
+	ClearCursor()
+	return num_moved
+end
+
+local function getItemFromGuildBank(itemID, bag, slot, count)
+	DA.DEBUG(0,"getItemFromGuildBank("..tostring(itemID)..", "..tostring(bag)..", "..tostring(slot)..", "..tostring(count)..")")
+	ClearCursor()
+	local _, available = GetGuildBankItemInfo(bag, slot)
+	local num_moved = 0
+	if available then
+		if available == 1 or count >= available then
+			--DA.DEBUG(1,"getItemFromGuildBank: PickupGuildBankItem("..tostring(bag)..", "..tostring(slot)..")")
+			PickupGuildBankItem(bag, slot)
+			num_moved = available
+		else
+			--DA.DEBUG(1,"getItemFromGuildBank: SplitGuildBankItem("..tostring(bag)..", "..tostring(slot)..", "..tostring(count)..")")
+			SplitGuildBankItem(bag, slot, count)
+			num_moved = count
+		end
+		local tobag, toslot = findBagForItem(itemID, num_moved)
+		--DA.DEBUG(1,"getItemFromGuildBank: tobag= "..tostring(tobag)..", toslot= "..tostring(toslot)", findBagForItem("..tostring(itemID)..", "..tostring(num_moved)..")")
+		if not tobag then
+			Skillet:Print(L["Could not find bag space for"]..": "..GetGuildBankItemLink(bag, slot))
+			ClearCursor()
+			return 0
+		else
+			--DA.DEBUG(1,"getItemFromGuildBank: PickupContainerItem("..tostring(tobag)..", "..tostring(toslot)..")")
+			C_Container.PickupContainerItem(tobag, toslot) -- actually puts the item in the bag
+		end
+	end
+	ClearCursor()
+	return num_moved
+end
+
+--
+-- Called once to get things started and then is called after both
+-- BANK_UPDATE (subset of BAG_UPDATE) and BAG_UPDATE_DELAYED events have fired.
+--
+local function processBankQueue(where)
+	--DA.DEBUG(0,"processBankQueue("..tostring(where)..")")
+	local bankQueue = Skillet.bankQueue
+	if Skillet.bankBusy then
+		--DA.DEBUG(1,"BANK_UPDATE and bankBusy")
+		while true do
+			local queueitem = table.remove(bankQueue,1)
+			if queueitem then
+				local id = queueitem["id"]
+				local j = queueitem["j"]
+				local v = queueitem["list"]
+				local i = queueitem["i"]
+				local item = queueitem["item"]
+				--DA.DEBUG(3,"j=",j,", v=",DA.DUMP1(v))
+				--DA.DEBUG(3,"i=",i,", item=",DA.DUMP1(item))
+				Skillet.gotBankEvent = false
+				Skillet.gotBagUpdateEvent = false
+				local moved = getItemFromBank(id, item.bag, item.slot, v.count)
+				if moved > 0 then
+					v.count = v.count - moved
+					item.count = item.count - moved -- adjust our cached copy
+					break
+				end
+			else
+				Skillet.bankBusy = false
+				break
+			end
+		end
+	end
+end
+
+--
+-- Called once to get things started and then is called after both
+-- GUILDBANKBAGSLOTS_CHANGED and BAG_UPDATE_DELAYED events have fired.
+--
+local function processGuildQueue(where)
+	--DA.DEBUG(0,"processGuildQueue("..where..")")
+	local guildQueue = Skillet.guildQueue
+	if Skillet.guildBusy then
+		while true do
+			local queueitem = table.remove(guildQueue,1)
+			if queueitem then
+				local id = queueitem["id"]
+				local j = queueitem["j"]
+				local v = queueitem["list"]
+				local i = queueitem["i"]
+				local item = queueitem["item"]
+				--DA.DEBUG(2,"j=",j,", v=",DA.DUMP1(v))
+				--DA.DEBUG(2,"i=",i,", item=",DA.DUMP1(item))
+				Skillet.gotGuildbankEvent = false
+				Skillet.gotBagUpdateEvent = false
+				local moved = getItemFromGuildBank(id, item.bag, item.slot, v.count)
+				if moved > 0 then
+					v.count = v.count - moved
+					item.count = item.count - moved -- adjust our cached copy
+					break
+				end
+			else
+				Skillet.guildBusy = false
+				break
+			end
+		end
+	end
+end
+
 function Skillet:BAG_OPEN(event, bagID)				-- Fires when a non-inventory container is opened.
 	DA.TRACE("BAG_OPEN( "..tostring(bagID).." )")	-- We don't really care
 end
@@ -754,182 +928,8 @@ function Skillet:PrintAuctionData()
 	end
 end
 
---
--- Returns a bag that the item can be placed in.
---
-local function findBagForItem(itemID, count)
-	DA.DEBUG(0, "findBagForItem("..tostring(itemID)..", "..tostring(count)..")")
-	if not itemID then return nil end
-	local _, _, _, _, _, _, _, itemStackCount = GetItemInfo(itemID)
-	for container = 0, 5, 1 do
-		local bagSize = C_Container.GetContainerNumSlots(container)
-		local freeSlots, bagType = C_Container.GetContainerNumFreeSlots(container)
-		--DA.DEBUG(1, "findBagForItem: container= "..tostring(container)..", bagSize= "..tostring(bagSize)..", freeSlots= "..tostring(freeSlots)..", bagType= "..tostring(bagType))
-		if bagType == 0 then
-			for slot = 1, bagSize, 1 do
-				local bagItem = C_Container.GetContainerItemLink(container, slot)
-				if bagItem then
-					local info = C_Container.GetContainerItemInfo(container, slot)
-					if itemID == info.itemID then
---
--- found some of the same, it is a full stack or locked?
---
-						if (itemStackCount - info.stackCount) >= count and not info.isLocked then
-							--DA.DEBUG(1, "findBagForItem: container= "..tostring(container)..", slot= "..tostring(slot)..", true")
-							return container, slot, true
-						end
-					end
-				else
---
--- no item there, this looks like a good place to put something.
---
-					--DA.DEBUG(1, "findBagForItem: container= "..tostring(container)..", slot= "..tostring(slot)..", false")
-					return container, slot, false
-				end
-			end -- for slot
-		end -- bagType
-	end -- for container
-	return nil, nil, nil
-end
-
-local function getItemFromBank(itemID, bag, slot, count)
-	DA.DEBUG(0,"getItemFromBank("..tostring(itemID)..", "..tostring(bag)..", "..tostring(slot)..", "..tostring(count)..")")
-	ClearCursor()
-	local info = C_Container.GetContainerItemInfo(bag, slot)
-	local num_moved = 0
-	local available = info.stackCount
-	if available then
-		if available == 1 or count >= available then
-			--DA.DEBUG(1,"getItemFromBank: PickupContainerItem("..tostring(bag)..", "..tostring(slot)..")")
-			C_Container.PickupContainerItem(bag, slot)
-			num_moved = available
-		else
-			--DA.DEBUG(1,"getItemFromBank: SplitContainerItem("..tostring(bag)..", "..tostring(slot)..", "..tostring(count)..")")
-			C_Container.SplitContainerItem(bag, slot, count)
-			num_moved = count
-		end
-		local tobag, toslot = findBagForItem(itemID, num_moved)
-		--DA.DEBUG(1,"getItemFromBank: tobag= "..tostring(tobag)..", toslot= "..tostring(toslot)..", findBagForItem("..tostring(itemID)..", "..tostring(num_moved)..")")
-		if not tobag then
-			Skillet:Print(L["Could not find bag space for"]..": "..C_Container.GetContainerItemLink(bag, slot))
-			ClearCursor()
-			return 0
-		end
-		if tobag == 0 then
-			--DA.DEBUG(1,"getItemFromBank: PutItemInBackpack()")
-			PutItemInBackpack()
-		else
-			DA.DEBUG(1,"PutItemInBag("..tostring(C_Container.ContainerIDToInventoryID(tobag))..")")
-			PutItemInBag(C_Container.ContainerIDToInventoryID(tobag))
-		end
-	else
-		--DA.DEBUG(1,"getItemFromBank: none available")
-	end
-	ClearCursor()
-	return num_moved
-end
-
-local function getItemFromGuildBank(itemID, bag, slot, count)
-	DA.DEBUG(0,"getItemFromGuildBank("..tostring(itemID)..", "..tostring(bag)..", "..tostring(slot)..", "..tostring(count)..")")
-	ClearCursor()
-	local _, available = GetGuildBankItemInfo(bag, slot)
-	local num_moved = 0
-	if available then
-		if available == 1 or count >= available then
-			--DA.DEBUG(1,"getItemFromGuildBank: PickupGuildBankItem("..tostring(bag)..", "..tostring(slot)..")")
-			PickupGuildBankItem(bag, slot)
-			num_moved = available
-		else
-			--DA.DEBUG(1,"getItemFromGuildBank: SplitGuildBankItem("..tostring(bag)..", "..tostring(slot)..", "..tostring(count)..")")
-			SplitGuildBankItem(bag, slot, count)
-			num_moved = count
-		end
-		local tobag, toslot = findBagForItem(itemID, num_moved)
-		--DA.DEBUG(1,"getItemFromGuildBank: tobag= "..tostring(tobag)..", toslot= "..tostring(toslot)", findBagForItem("..tostring(itemID)..", "..tostring(num_moved)..")")
-		if not tobag then
-			Skillet:Print(L["Could not find bag space for"]..": "..GetGuildBankItemLink(bag, slot))
-			ClearCursor()
-			return 0
-		else
-			--DA.DEBUG(1,"getItemFromGuildBank: PickupContainerItem("..tostring(tobag)..", "..tostring(toslot)..")")
-			C_Container.PickupContainerItem(tobag, toslot) -- actually puts the item in the bag
-		end
-	end
-	ClearCursor()
-	return num_moved
-end
-
---
--- Called once to get things started and then is called after both
--- BANK_UPDATE (subset of BAG_UPDATE) and BAG_UPDATE_DELAYED events have fired.
---
-local function processBankQueue(where)
-	--DA.DEBUG(0,"processBankQueue("..tostring(where)..")")
-	local bankQueue = Skillet.bankQueue
-	if Skillet.bankBusy then
-		--DA.DEBUG(1,"BANK_UPDATE and bankBusy")
-		while true do
-			local queueitem = table.remove(bankQueue,1)
-			if queueitem then
-				local id = queueitem["id"]
-				local j = queueitem["j"]
-				local v = queueitem["list"]
-				local i = queueitem["i"]
-				local item = queueitem["item"]
-				--DA.DEBUG(3,"j=",j,", v=",DA.DUMP1(v))
-				--DA.DEBUG(3,"i=",i,", item=",DA.DUMP1(item))
-				Skillet.gotBankEvent = false
-				Skillet.gotBagUpdateEvent = false
-				local moved = getItemFromBank(id, item.bag, item.slot, v.count)
-				if moved > 0 then
-					v.count = v.count - moved
-					item.count = item.count - moved -- adjust our cached copy
-					break
-				end
-			else
-				Skillet.bankBusy = false
-				break
-			end
-		end
-	end
-end
-
 function Skillet:UpdateBankQueue(where)
 	processBankQueue(where)
-end
-
---
--- Called once to get things started and then is called after both
--- GUILDBANKBAGSLOTS_CHANGED and BAG_UPDATE_DELAYED events have fired.
---
-local function processGuildQueue(where)
-	--DA.DEBUG(0,"processGuildQueue("..where..")")
-	local guildQueue = Skillet.guildQueue
-	if Skillet.guildBusy then
-		while true do
-			local queueitem = table.remove(guildQueue,1)
-			if queueitem then
-				local id = queueitem["id"]
-				local j = queueitem["j"]
-				local v = queueitem["list"]
-				local i = queueitem["i"]
-				local item = queueitem["item"]
-				--DA.DEBUG(2,"j=",j,", v=",DA.DUMP1(v))
-				--DA.DEBUG(2,"i=",i,", item=",DA.DUMP1(item))
-				Skillet.gotGuildbankEvent = false
-				Skillet.gotBagUpdateEvent = false
-				local moved = getItemFromGuildBank(id, item.bag, item.slot, v.count)
-				if moved > 0 then
-					v.count = v.count - moved
-					item.count = item.count - moved -- adjust our cached copy
-					break
-				end
-			else
-				Skillet.guildBusy = false
-				break
-			end
-		end
-	end
 end
 
 --
