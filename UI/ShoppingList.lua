@@ -1059,7 +1059,8 @@ function Skillet:GetReagentsFromBanks()
 --
 	for _,v in pairs(list) do
 		if incAlts or v.player == Skillet.currentPlayer then
-			if self.db.realm.modifiedInQueue[v.player][v.id] then
+			local modifiedInQueue = self.db.realm.modifiedInQueue[v.player]
+			if modifiedInQueue[v.id] then
 				--DA.DEBUG(1,"GetReagentsFromBanks: modified found for: "..DA.DUMP1(v))
 				for _,m in pairs(modifiedInQueue[v.id]) do
 					if m.itemID ~= v.id then
