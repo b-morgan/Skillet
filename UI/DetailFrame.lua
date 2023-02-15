@@ -947,7 +947,7 @@ end
 -- Called to set the tooltip when the mouse enters a reagent button
 --
 function Skillet:ReagentButtonOnEnter(button, skillIndex, reagentIndex)
-	--DA.DEBUG(0,"ReagentButtonOnEnter("..tostring(button)..", "..tostring(skillIndex)..", "..tostring(reagentIndex)..")")
+	DA.DEBUG(0,"ReagentButtonOnEnter("..tostring(button)..", "..tostring(skillIndex)..", "..tostring(reagentIndex)..")")
 	GameTooltip:SetOwner(button, "ANCHOR_TOPLEFT")
 	if Skillet.db.profile.scale_tooltip then
 		local uiScale = 1.0;
@@ -991,9 +991,10 @@ function Skillet:ReagentButtonOnEnter(button, skillIndex, reagentIndex)
 					--DA.DEBUG(1,"ReagentButtonOnEnter(O): index="..tostring(reagentIndex)..", optionalSelected= "..DA.DUMP1(self.optionalSelected))
 					if self.optionalSelected[-1 * reagentIndex] then
 						self:SetReagentToolTip(self.optionalSelected[-1 * reagentIndex].itemID, 0, 0)
-					end
-					if reagent.lockedReason then
+					elseif reagent.lockedReason then
 						GameTooltip:AddLine(reagent.lockedReason, 1,0,0)
+					else
+						GameTooltip:AddLine(L["Right-Click to select"])
 					end
 				elseif self.salvageSelected[1] then
 --
@@ -1001,6 +1002,8 @@ function Skillet:ReagentButtonOnEnter(button, skillIndex, reagentIndex)
 --
 					--DA.DEBUG(1,"ReagentButtonOnEnter(S): index= "..tostring(reagentIndex)..", salvageSelected= "..DA.DUMP1(self.salvageSelected))
 					self:SetReagentToolTip(self.salvageSelected[1], 0, 0)
+				else
+					GameTooltip:AddLine(L["Right-Click to select"])
 				end
 			elseif reagentIndex > 200 then
 --
@@ -1011,9 +1014,10 @@ function Skillet:ReagentButtonOnEnter(button, skillIndex, reagentIndex)
 				--DA.DEBUG(1,"ReagentButtonOnEnter(F): index= "..tostring(reagentIndex)..", finishingSelected= "..DA.DUMP1(self.finishingSelected))
 				if self.finishingSelected[reagentIndex - 200] then
 					self:SetReagentToolTip(self.finishingSelected[reagentIndex - 200].itemID, 0, 0)
-				end
-				if reagent.lockedReason then
+				elseif reagent.lockedReason then
 					GameTooltip:AddLine(reagent.lockedReason, 1,0,0)
+				else
+					GameTooltip:AddLine(L["Right-Click to select"])
 				end
 			elseif reagentIndex > 100 then
 --
@@ -1024,6 +1028,8 @@ function Skillet:ReagentButtonOnEnter(button, skillIndex, reagentIndex)
 				self:SetReagentToolTip(reagent.reagentID, 0, 0)
 				if reagent.lockedReason then
 					GameTooltip:AddLine(reagent.lockedReason, 1,0,0)
+				else
+					GameTooltip:AddLine(L["Right-Click to change"])
 				end
 			end
 		end
