@@ -79,25 +79,35 @@ end
 --
 -- Reserve reagents
 --
-local function queueAppendReagent(command, reagentID, need, queueCraftables)
+local function queueAppendReagent(command, reagentID, need, queueCraftables, mreagent)
 	local reagentName = GetItemInfo(reagentID)
 	DA.DEBUG(0,"queueAppendReagent("..tostring(reagentID)..", "..tostring(need)..", "..tostring(queueCraftables).."), name= "..tostring(reagentName))
 	local reagentsInQueue = Skillet.db.realm.reagentsInQueue[Skillet.currentPlayer]
 	local skillIndexLookup = Skillet.data.skillIndexLookup
-	local numInBoth = GetItemCount(reagentID,true,false,true)
-	local numInBags = GetItemCount(reagentID)
-	local numInBank =  numInBoth - numInBags
-	DA.DEBUG(1,"numInBoth= "..tostring(numInBoth)..", numInBags="..tostring(numInBags)..", numInBank="..tostring(numInBank))
-	local have = numInBoth + (reagentsInQueue[reagentID] or 0)
+	local have = 0
+	if not mreagent then
+		local numInBoth = GetItemCount(reagentID,true,false,true)
+		local numInBags = GetItemCount(reagentID)
+		local numInBank =  numInBoth - numInBags
+		--DA.DEBUG(1,"queueAppendReagent: numInBoth= "..tostring(numInBoth)..", numInBags="..tostring(numInBags)..", numInBank="..tostring(numInBank))
+		have = numInBoth + (reagentsInQueue[reagentID] or 0)
+	else
+		--DA.DEBUG(2,"queueAppendReagent: mreagent= "..DA.DUMP(mreagent))
+		for k=1, #mreagent.schematic.reagents, 1 do
+			mitem = mreagent.schematic.reagents[k].itemID
+			have = have + GetItemCount(mitem,true,false,true)
+		end
+--		have = have + (reagentsInQueue[reagentID] or 0)
+	end
 	reagentsInQueue[reagentID] = (reagentsInQueue[reagentID] or 0) - need
-	DA.DEBUG(1,"queueCraftables= "..tostring(queueCraftables)..", need= "..tostring(need)..", have= "..tostring(have))
+	DA.DEBUG(1,"queueAppendReagent: queueCraftables= "..tostring(queueCraftables)..", need= "..tostring(need)..", have= "..tostring(have))
 	if queueCraftables and need > have then
 		local recipeSource = Skillet.db.global.itemRecipeSource[reagentID]
-		DA.DEBUG(2,"recipeSource= "..DA.DUMP1(recipeSource))
+		--DA.DEBUG(2,"queueAppendReagent: recipeSource= "..DA.DUMP1(recipeSource))
 		if recipeSource then
 			for recipeSourceID in pairs(recipeSource) do
 				local skillIndex = skillIndexLookup[recipeSourceID]
-				DA.DEBUG(3,"recipeSourceID= "..tostring(recipeSourceID)..", skillIndex= "..tostring(skillIndex))
+				--DA.DEBUG(3,"queueAppendReagent: recipeSourceID= "..tostring(recipeSourceID)..", skillIndex= "..tostring(skillIndex))
 				if skillIndex then
 --
 -- Identify that this queue has craftable reagent requirements
@@ -123,7 +133,7 @@ local function queueAppendReagent(command, reagentID, need, queueCraftables)
 						end
 						break
 					else
-						DA.DEBUG(3,"Did Not Queue "..tostring(recipeSourceID).." ("..tostring(recipeSource.name)..")")
+						DA.DEBUG(3,"queueAppendReagent: Did Not Queue "..tostring(recipeSourceID).." ("..tostring(recipeSource.name)..")")
 					end
 				end
 			end -- for
@@ -137,7 +147,7 @@ end
 function Skillet:QueueAppendCommand(command, queueCraftables, noWindowRefresh)
 	DA.DEBUG(0,"QueueAppendCommand("..DA.DUMP(command)..", "..tostring(queueCraftables)..", "..tostring(noWindowRefresh).."), visited=  "..tostring(self.visited[command.recipeID]))
 	local recipe = self:GetRecipe(command.recipeID)
-	DA.DEBUG(0,"QueueAppendCommand: recipe= "..DA.DUMP(recipe))
+	--DA.DEBUG(0,"QueueAppendCommand: recipe= "..DA.DUMP(recipe))
 	if recipe and not self.visited[command.recipeID] then
 		self.visited[command.recipeID] = true
 		local reagentsInQueue = self.db.realm.reagentsInQueue[Skillet.currentPlayer]
@@ -147,9 +157,9 @@ function Skillet:QueueAppendCommand(command, queueCraftables, noWindowRefresh)
 		for i=1,#recipe.reagentData do
 			local reagent = recipe.reagentData[i]
 			if command.recipeLevel and command.recipeLevel > 0 then
-				DA.DEBUG(2,"QueueAppendCommand: recipeID= "..tostring(command.recipeID)..", recipeLevel= "..tostring(command.recipeLevel))
+				--DA.DEBUG(2,"QueueAppendCommand: recipeID= "..tostring(command.recipeID)..", recipeLevel= "..tostring(command.recipeLevel))
 				local reagentName, reagentTexture, reagentCount, playerReagentCount = C_TradeSkillUI.GetRecipeReagentInfo(command.recipeID, i, command.recipeLevel)
-				DA.DEBUG(2,"QueueAppendCommand: reagentName= "..tostring(reagentName)..", reagentCount= "..tostring(reagentCount))
+				--DA.DEBUG(2,"QueueAppendCommand: reagentName= "..tostring(reagentName)..", reagentCount= "..tostring(reagentCount))
 				local reagentLink = C_TradeSkillUI.GetRecipeReagentItemLink(command.recipeID, i)
 				local reagentID = Skillet:GetItemIDFromLink(reagentLink)
 				if reagent.reagentID == reagentID then
@@ -158,14 +168,14 @@ function Skillet:QueueAppendCommand(command, queueCraftables, noWindowRefresh)
 					DA.DEBUG(0,"QueueAppendCommand: Reagent Mismatch, i= "..tostring(i)..", reagentID= "..tostring(reagent.reagentID)..", mismatch= "..tostring(reagentID))
 				end
 			end
-			DA.DEBUG(2,"QueueAppendCommand: reagent= "..DA.DUMP(reagent))
+			--DA.DEBUG(2,"QueueAppendCommand: reagent= "..DA.DUMP(reagent))
 			queueAppendReagent(command, reagent.reagentID, command.count * reagent.numNeeded, queueCraftables and queueGlyph)
 		end -- for
 		if recipe.modifiedData then
 			for i=1,#recipe.modifiedData do
 				local reagent = recipe.modifiedData[i]
 				--DA.DEBUG(2,"QueueAppendCommand: reagent= "..DA.DUMP(reagent))
-				queueAppendReagent(command, reagent.reagentID, command.count * reagent.numNeeded, queueCraftables and queueGlyph)
+				queueAppendReagent(command, reagent.reagentID, command.count * reagent.numNeeded, queueCraftables and queueGlyph, reagent)
 				modifiedInQueue[reagent.reagentID] = reagent.schematic.reagents
 			end
 		end
