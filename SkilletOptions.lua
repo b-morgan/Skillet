@@ -978,7 +978,7 @@ Skillet.options =
 			desc = "Display the news frame",
 			func = function()
 				if not (UnitAffectingCombat("player")) then
-					Skillet:DisplayNews()
+					Skillet.NewsGUI:Toggle()
 				else
 					DA.DEBUG(0,"|cff8888ffSkillet|r: Combat lockdown restriction." ..
 												  " Leave combat and try again.")

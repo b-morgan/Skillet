@@ -57,6 +57,8 @@ Skillet.lua
 SkilletOptions.lua
 SkilletTables.lua
 SkilletData.lua
+SkilletNewsGUI.lua
+SkilletNewsData.lua
 TradeskillInfo.lua
 SkilletQueue.lua
 ThirdPartyHooks.lua

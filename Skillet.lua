@@ -429,6 +429,7 @@ StaticPopupDialogs["SKILLET_MANUAL_CHANGE"] = {
 --
 	self:InitializeDatabase(UnitName("player"))
 	self:InitializePlugins()
+	self.NewsGUI:Initialize()
 end
 
 --
