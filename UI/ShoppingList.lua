@@ -219,11 +219,14 @@ function Skillet:GetShoppingList(player, sameFaction, includeGuildbank)
 		self.db.realm.faction[curPlayer] = UnitFactionGroup("player")
 	end
 	local curFaction = self.db.realm.faction[curPlayer] 
-	local curGuild = GetGuildInfo("player")
 	if not self.db.global.cachedGuildbank then
 		self.db.global.cachedGuildbank = {}
 	end
-	local cachedGuildbank = Skillet.db.global.cachedGuildbank
+	local cachedGuildbank = self.db.global.cachedGuildbank
+	local curGuild = GetGuildInfo("player")
+	if curGuild and not cachedGuildbank[curGuild] then
+		cachedGuildbank[curGuild] = {}
+	end
 	local list = {}
 	local playerList
 	local usedInventory = {}  -- only use the items from each player once
@@ -242,9 +245,6 @@ function Skillet:GetShoppingList(player, sameFaction, includeGuildbank)
 	local usedInventory = {}  -- only use the items from each player once
 	if not usedInventory[curPlayer] then
 		usedInventory[curPlayer] = {}
-	end
-	if curGuild and not cachedGuildbank[curGuild] then
-		cachedGuildbank[curGuild] = {}
 	end
 	for i=1,#playerList,1 do
 		local player = playerList[i]
@@ -317,10 +317,10 @@ end
 local function indexBags()
 	--DA.DEBUG(0,"indexBags()")
 --
--- bank contains detailed contents of each tab,slot which 
--- is only needed while the bank is open.
+-- bags contains detailed contents of each tab,slot which
+-- is only saved if collect_details is true.
 --
--- bankData is a count by item.
+-- bagData is a count by item.
 --
 	local player = Skillet.currentPlayer
 	local bagData = Skillet.db.realm.bagData[player]
@@ -375,6 +375,7 @@ local function indexBank()
 --
 -- bank contains detailed contents of each tab,slot which 
 -- is only needed while the bank is open.
+-- Also saved if collect_details is true.
 --
 -- bankData is a count by item.
 --
