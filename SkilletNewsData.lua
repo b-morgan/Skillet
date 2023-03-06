@@ -39,6 +39,11 @@ Skillet.NewsData = {
 					{ header = "Tooltips", body = "Add tooltip to unselected salvage, optional, and finishing reagents" },
 				},
 			},
+			{	name = "Fixes",
+				data = {
+					{ header = "Issues", body = "Fix cachedGuildBank initialization" },
+				},
+			},
 		},
 	},
 	{	version = "5.08",
