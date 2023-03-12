@@ -29,14 +29,8 @@ Skillet.NewsData = {
 		data = {
 			{	name = "New Features",
 				data = {
-					{ header = "Filter", body = "Add a filter option, Both, to display learned and unlearned recipes at the same time. Unlearned recipes will be prefixed with a '-' sign"},
+					{ header = "Filter", body = "Add an option to display learned and unlearned recipes at the same time. Unlearned recipes will be prefixed with a '-' sign"},
 					{ header = "Options", body = "Add an option to queue recipes to the front of the queue" },
-				},
-			},
-			{	name = "Changes",
-				data = {
-					{ header = "Queuing", body = "Better queuing of modified craftable reagents" },
-					{ header = "Tooltips", body = "Add tooltip to unselected salvage, optional, and finishing reagents" },
 				},
 			},
 		},
