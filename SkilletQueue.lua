@@ -126,10 +126,10 @@ local function queueAppendReagent(command, reagentID, need, queueCraftables, mre
 							newCommand.count = 1
 							for i=1, newCount, 1 do
 								local c = tcopy(newCommand)
-								Skillet:QueueAppendCommand(c, queueCraftables, true)
+								Skillet:QueueAppendCommand(c, queueCraftables)
 							end
 						else
-							Skillet:QueueAppendCommand(newCommand, queueCraftables, true)
+							Skillet:QueueAppendCommand(newCommand, queueCraftables)
 						end
 						break
 					else
@@ -144,8 +144,8 @@ end
 --
 -- Queue up the command and reserve reagents
 --
-function Skillet:QueueAppendCommand(command, queueCraftables, noWindowRefresh)
-	DA.DEBUG(0,"QueueAppendCommand("..DA.DUMP(command)..", "..tostring(queueCraftables)..", "..tostring(noWindowRefresh).."), visited=  "..tostring(self.visited[command.recipeID]))
+function Skillet:QueueAppendCommand(command, queueCraftables)
+	DA.DEBUG(0,"QueueAppendCommand("..DA.DUMP(command)..", "..tostring(queueCraftables).."), visited=  "..tostring(self.visited[command.recipeID]))
 	local recipe = self:GetRecipe(command.recipeID)
 	--DA.DEBUG(0,"QueueAppendCommand: recipe= "..DA.DUMP(recipe))
 	if recipe and not self.visited[command.recipeID] then
@@ -192,7 +192,8 @@ function Skillet:QueueAppendCommand(command, queueCraftables, noWindowRefresh)
 			end
 		end
 		reagentsInQueue[recipe.itemID] = (reagentsInQueue[recipe.itemID] or 0) + command.count * recipe.numMade;
-		Skillet:AddToQueue(command, noWindowRefresh)
+		local first = self.db.profile.queue_to_front
+		Skillet:AddToQueue(command, first)
 		self.visited[command.recipeID] = nil
 	end
 end
@@ -246,8 +247,8 @@ end
 -- we can't just increase the # of the first command if it happens to be the same recipe without making sure
 -- the additional queue entry doesn't require some additional craftable reagents
 --
-function Skillet:AddToQueue(command, noWindowRefresh)
-	DA.DEBUG(0,"AddToQueue("..DA.DUMP1(command)..", "..tostring(noWindowRefresh)..")")
+function Skillet:AddToQueue(command, first)
+	DA.DEBUG(0,"AddToQueue("..DA.DUMP1(command)..", "..tostring(first)..")")
 	local queue = self.db.realm.queueData[self.currentPlayer]
 	if (not command.complex) then
 --
@@ -272,13 +273,18 @@ function Skillet:AddToQueue(command, noWindowRefresh)
 		if queue[i].op == "iterate" and queue[i].recipeID == command.recipeID and queue[i].recipeLevel == command.recipeLevel and sameOptionals(queue[i], command) then
 			queue[i].count = queue[i].count + command.count
 		else
-			table.insert(queue, command)
+			if first then
+				table.insert(queue, 1, command)
+			else
+				table.insert(queue, command)
+			end
 		end
 	else
-		table.insert(queue, command)
-	end
-	if not noWindowRefresh then
-		self:AdjustInventory()
+		if first then
+			table.insert(queue, 1, command)
+		else
+			table.insert(queue, command)
+		end
 	end
 end
 

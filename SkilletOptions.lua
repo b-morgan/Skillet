@@ -206,6 +206,19 @@ Skillet.options =
 					order = 23
 				},
 --]]
+				queue_to_front = {
+					type = "toggle",
+					name = L["QUEUETOFRONTNAME"],
+					desc = L["QUEUETOFRONTDESC"],
+					get = function()
+						return Skillet.db.profile.queue_to_front
+					end,
+					set = function(self,value)
+						Skillet.db.profile.queue_to_front = value
+					end,
+					width = "full",
+					order = 23
+				},
 				queue_glyph_reagents = {
 					type = "toggle",
 					name = L["QUEUEGLYPHREAGENTSNAME"],
