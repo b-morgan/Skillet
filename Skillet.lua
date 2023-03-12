@@ -56,6 +56,7 @@ local defaults = {
 		link_craftable_reagents = true,
 		queue_craftable_reagents = true,
 		queue_more_than_one = false,
+		queue_to_front = false,
 		queue_glyph_reagents = false,
 		display_required_level = false,
 		display_shopping_list_at_bank = true,
