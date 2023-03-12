@@ -184,11 +184,10 @@ local function SkillIsFilteredOut(skillIndex)
 	local recipeInfo = Skillet.data.recipeInfo[Skillet.currentTrade][recipeID]
 	if recipeInfo then
 		--DA.DEBUG(1,"SkillIsFilteredOut: unlearnedRecipes= "..tostring(Skillet.unlearnedRecipes)..", recipeInfo = "..DA.DUMP1(recipeInfo,1))
-		if Skillet.unlearnedRecipes then
-			if recipeInfo.learned then
-				return true
-			end
-		elseif not recipeInfo.learned then
+		if Skillet.unlearnedRecipes and recipeInfo.learned then
+			return true
+		end
+		if Skillet.learnedRecipes and not recipeInfo.learned then
 			return true
 		end
 	end

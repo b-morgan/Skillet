@@ -317,10 +317,10 @@ end
 local function indexBags()
 	--DA.DEBUG(0,"indexBags()")
 --
--- bags contains detailed contents of each tab,slot which
--- is only saved if collect_details is true.
+-- bank contains detailed contents of each tab,slot which 
+-- is only needed while the bank is open.
 --
--- bagData is a count by item.
+-- bankData is a count by item.
 --
 	local player = Skillet.currentPlayer
 	local bagData = Skillet.db.realm.bagData[player]
@@ -375,7 +375,6 @@ local function indexBank()
 --
 -- bank contains detailed contents of each tab,slot which 
 -- is only needed while the bank is open.
--- Also saved if collect_details is true.
 --
 -- bankData is a count by item.
 --
@@ -449,6 +448,9 @@ local function indexGuildBank(tab)
 	guildtab = {}
 	local guildName = GetGuildInfo("player")
 	local cachedGuildbank = Skillet.db.global.cachedGuildbank
+	if guildName and not cachedGuildbank[guildName] then
+		cachedGuildbank[guildName] = {}
+	end
 	local tabname, icon, isViewable, canDeposit, numWithdrawals, remainingWithdrawals = GetGuildBankTabInfo(tab);
 	--DA.DEBUG(1,"indexGuildBank tab="..tab..", name="..tostring(name)..", isViewable="..tostring(isViewable)..", canDeposit="..tostring(canDeposit)..", numWithdrawals="..tostring(numWithdrawals)..", remainingWithdrawals="..tostring(remainingWithdrawals))
 	if isViewable then

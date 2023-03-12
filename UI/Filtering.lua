@@ -26,9 +26,11 @@ function Skillet:FilterDropDown_OnShow()
 	--DA.DEBUG(0,"FilterDropDown_OnShow()")
 	UIDropDownMenu_Initialize(SkilletFilterDropdown, Skillet.FilterDropDown_Initialize)
 	SkilletFilterDropdown.displayMode = "MENU"  -- changes the pop-up borders to be rounded instead of square
-	if Skillet.unlearnedRecipes then
+	if Skillet.unlearnedRecipes and Skillet.learnedRecipes then
+		UIDropDownMenu_SetSelectedID(SkilletFilterDropdown, 3)
+	elseif Skillet.unlearnedRecipes and not Skillet.learnedRecipes then
 		UIDropDownMenu_SetSelectedID(SkilletFilterDropdown, 2)
-	else
+	elseif Skillet.learnedRecipes and not Skillet.unlearnedRecipes then
 		UIDropDownMenu_SetSelectedID(SkilletFilterDropdown, 1)
 	end
 end
@@ -60,6 +62,16 @@ function Skillet:FilterDropDown_Initialize()
 	end
 	UIDropDownMenu_AddButton(info)
 	i = i + 1
+
+	info = UIDropDownMenu_CreateInfo()
+	info.text = L["Both"]
+	info.func = Skillet.FilterDropDown_OnClick
+	info.value = i
+	if self then
+		info.owner = self:GetParent()
+	end
+	UIDropDownMenu_AddButton(info)
+	i = i + 1
 end
 
 --
@@ -73,6 +85,8 @@ function Skillet:FilterDropDown_OnClick()
 		Skillet:SetTradeSkillLearned()
 	elseif index == 2 then
 		Skillet:SetTradeSkillUnlearned()
+	elseif index == 3 then
+		Skillet:SetTradeSkillBoth()
 	end
 	Skillet.dataScanned = false
 	Skillet:RescanTrade()

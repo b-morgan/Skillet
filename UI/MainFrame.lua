@@ -1401,10 +1401,18 @@ function Skillet:UpdateTradeSkillWindow()
 				suffixText:SetText(self:RecipeNameSuffix(skill, recipe) or "")
 				suffixText:Show()
 --
--- Adjust the width of this line
+-- When displaying both learned and unlearned, add a "-" to the name of unlearned recipes
 --
+				if self.learnedRecipes and self.unlearnedRecipes then
+					if recipeInfo and not recipeInfo.learned then
+						text = "-"..text
+					end
+				end
 				buttonText:SetText(text)
 				buttonText:SetWordWrap(false)
+--
+-- Adjust the width of this line
+--
 				buttonText:SetWidth(max_text_width - countText:GetWidth())
 --
 -- Set this line's highlight and color

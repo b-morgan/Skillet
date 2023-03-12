@@ -227,6 +227,7 @@ end
 
 function Skillet:SetTradeSkillLearned()
 	Skillet:SetGroupSelection(nil)
+	Skillet.learnedRecipes = true
 	Skillet.unlearnedRecipes = false
 	Skillet.selectedSkill = nil
 	Skillet:FilterDropDown_OnShow()
@@ -234,6 +235,15 @@ end
 
 function Skillet:SetTradeSkillUnlearned()
 	Skillet:SetGroupSelection(nil)
+	Skillet.learnedRecipes = false
+	Skillet.unlearnedRecipes = true
+	Skillet.selectedSkill = nil
+	Skillet:FilterDropDown_OnShow()
+end
+
+function Skillet:SetTradeSkillBoth()
+	Skillet:SetGroupSelection(nil)
+	Skillet.learnedRecipes = true
 	Skillet.unlearnedRecipes = true
 	Skillet.selectedSkill = nil
 	Skillet:FilterDropDown_OnShow()
@@ -721,7 +731,7 @@ local function GetRecipeList(player, tradeID)
 	for i, recipeID in ipairs(recipeIDs) do
 		local recipeInfo = C_TradeSkillUI.GetRecipeInfo(recipeID)
 		--DA.DEBUG(3,"GetRecipeList: i= "..tostring(i)..", recipeID= "..tostring(recipeID)..", recipeInfo.name= "..tostring(recipeInfo.name))
-		if (not Skillet.unlearnedRecipes and recipeInfo.learned) or (Skillet.unlearnedRecipes and not recipeInfo.learned) then
+		if (Skillet.learnedRecipes and recipeInfo.learned) or (Skillet.unlearnedRecipes and not recipeInfo.learned) then
 			if recipeInfo.learned then
 				numLearned = numLearned + 1
 			else

@@ -25,6 +25,22 @@ local isWrath = WOW_PROJECT_ID == WOW_PROJECT_WRATH_CLASSIC
 
 Skillet.NewsName = "Skillet News"
 Skillet.NewsData = {
+	{	version = "5.10",
+		data = {
+			{	name = "New Features",
+				data = {
+					{ header = "Filter", body = "Add a filter option, Both, to display learned and unlearned recipes at the same time. Unlearned recipes will be prefixed with a '-' sign"},
+					{ header = "Options", body = "Add an option to queue recipes to the front of the queue" },
+				},
+			},
+			{	name = "Changes",
+				data = {
+					{ header = "Queuing", body = "Better queuing of modified craftable reagents" },
+					{ header = "Tooltips", body = "Add tooltip to unselected salvage, optional, and finishing reagents" },
+				},
+			},
+		},
+	},
 	{	version = "5.09",
 		data = {
 			{	name = "New Features",
@@ -37,11 +53,6 @@ Skillet.NewsData = {
 				data = {
 					{ header = "Queuing", body = "Better queuing of modified craftable reagents" },
 					{ header = "Tooltips", body = "Add tooltip to unselected salvage, optional, and finishing reagents" },
-				},
-			},
-			{	name = "Fixes",
-				data = {
-					{ header = "Issues", body = "Fix cachedGuildBank initialization" },
 				},
 			},
 		},
