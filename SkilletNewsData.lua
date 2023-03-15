@@ -30,7 +30,7 @@ Skillet.NewsData = {
 			{	name = "New Features",
 				data = {
 					{ header = "Filter", body = "Add an option to display learned and unlearned recipes at the same time. Unlearned recipes will be prefixed with a '-' sign"},
-					{ header = "Options", body = "Add an option to queue recipes to the front of the queue" },
+					{ header = "Queue", body = "Add right-click on the \"Queue\" button to queue to the front" },
 				},
 			},
 		},

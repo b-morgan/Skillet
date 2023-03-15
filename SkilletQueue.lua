@@ -144,7 +144,7 @@ end
 --
 -- Queue up the command and reserve reagents
 --
-function Skillet:QueueAppendCommand(command, queueCraftables)
+function Skillet:QueueAppendCommand(command, queueCraftables, first)
 	DA.DEBUG(0,"QueueAppendCommand("..DA.DUMP(command)..", "..tostring(queueCraftables).."), visited=  "..tostring(self.visited[command.recipeID]))
 	local recipe = self:GetRecipe(command.recipeID)
 	--DA.DEBUG(0,"QueueAppendCommand: recipe= "..DA.DUMP(recipe))
@@ -192,9 +192,9 @@ function Skillet:QueueAppendCommand(command, queueCraftables)
 			end
 		end
 		reagentsInQueue[recipe.itemID] = (reagentsInQueue[recipe.itemID] or 0) + command.count * recipe.numMade;
-		local first = self.db.profile.queue_to_front
 		Skillet:AddToQueue(command, first)
 		self.visited[command.recipeID] = nil
+		self:AdjustInventory()
 	end
 end
 
@@ -642,8 +642,8 @@ end
 --
 -- Adds the currently selected number of items to the queue
 --
-function Skillet:QueueItems(count)
-	DA.DEBUG(0,"QueueItems("..tostring(count)..")")
+function Skillet:QueueItems(count, button)
+	DA.DEBUG(0,"QueueItems("..tostring(count)..", "..tostring(button)..")")
 	if self.currentTrade and self.selectedSkill then
 		local skill = self:GetSkill(self.currentPlayer, self.currentTrade, self.selectedSkill)
 		if not skill then return 0 end
@@ -675,15 +675,19 @@ function Skillet:QueueItems(count)
 		self.visited = {}
 		if count > 0 then
 			if recipe then
+				local first = false
+				if button == "RightButton" then
+					first = true
+				end
 				local queueCommand = self:QueueCommandIterate(recipe.spellID, count)
 				if queueCommand.modified then
 					queueCommand.count = 1
 					for i=1, count, 1 do
 						local c = tcopy(queueCommand)
-						self:QueueAppendCommand(c, Skillet.db.profile.queue_craftable_reagents)
+						self:QueueAppendCommand(c, Skillet.db.profile.queue_craftable_reagents, first)
 					end
 				else
-					self:QueueAppendCommand(queueCommand, Skillet.db.profile.queue_craftable_reagents)
+					self:QueueAppendCommand(queueCommand, Skillet.db.profile.queue_craftable_reagents, first)
 				end
 				self.optionalSelected = {}
 				self.finishingSelected = {}

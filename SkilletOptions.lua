@@ -206,6 +206,7 @@ Skillet.options =
 					order = 23
 				},
 --]]
+--[[
 				queue_to_front = {
 					type = "toggle",
 					name = L["QUEUETOFRONTNAME"],
@@ -219,6 +220,7 @@ Skillet.options =
 					width = "full",
 					order = 23
 				},
+--]]
 				queue_glyph_reagents = {
 					type = "toggle",
 					name = L["QUEUEGLYPHREAGENTSNAME"],
