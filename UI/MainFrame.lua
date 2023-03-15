@@ -2749,7 +2749,7 @@ local queueMenuList = {
 --
 -- The start/pause queue button.
 --
-function Skillet:StartQueue_OnClick(button,mouse)
+function Skillet:StartQueue_OnClick(button, mouse)
 	if self.queuecasting then
 		DA.MARK3("Cancel incomplete processing")
 		self:CancelCast()
