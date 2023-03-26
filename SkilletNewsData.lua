@@ -25,6 +25,15 @@ local isWrath = WOW_PROJECT_ID == WOW_PROJECT_WRATH_CLASSIC
 
 Skillet.NewsName = "Skillet News"
 Skillet.NewsData = {
+	{	version = "5.11",
+		data = {
+			{	name = "Fixes",
+				data = {
+					{ header = "Issues", body = "Fix #86, Blizzard Frame is invisible" },
+				},
+			},
+		},
+	},
 	{	version = "5.10",
 		data = {
 			{	name = "New Features",
