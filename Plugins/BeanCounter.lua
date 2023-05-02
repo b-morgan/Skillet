@@ -100,12 +100,12 @@ end
 function plugin.GetBCValues(itemID)
 	local success, failed, sucessStack, failedStack, earned = 0, 0, 0, 0, 0
 	local daysNum = Skillet.db.profile.plugins.beancounter.days or 0
-	local server = GetRealmName()
+	local realm = GetRealmName()
 	local now = time()
 	local days = daysNum * 86400 --days to seconds
-	if itemID and BeanCounterDB[server] then
+	if itemID and BeanCounterDB[realm] then
 		itemID = tostring(itemID)
-		for _, playerData in pairs(BeanCounterDB[server]) do
+		for _, playerData in pairs(BeanCounterDB[realm]) do
 			if playerData["completedAuctions"][itemID] then
 				for key in pairs(playerData["completedAuctions"][itemID] ) do
 					for i, text in pairs(playerData["completedAuctions"][itemID][key]) do
