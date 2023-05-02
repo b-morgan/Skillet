@@ -29,14 +29,14 @@ local L = LibStub("AceLocale-3.0"):GetLocale("Skillet")
 Skillet.L = L
 
 -- Get version info from the .toc file
-local MAJOR_VERSION = GetAddOnMetadata("Skillet", "Version");
-local ADDON_BUILD = ((select(4, GetBuildInfo())) < 20000 and "Classic") or ((select(4, GetBuildInfo())) < 80000 and "BCC") or "Retail"
-Skillet.version = MAJOR_VERSION
-Skillet.build = ADDON_BUILD
+Skillet.version = GetAddOnMetadata("Skillet", "Version")
+Skillet.interface = select(4, GetBuildInfo())
+Skillet.build = (Skillet.interface < 20000 and "Classic") or (Skillet.interface < 30000 and "BCC") or (Skillet.interface < 40000 and "Wrath") or "Retail"
 Skillet.project = WOW_PROJECT_ID
 local isRetail = WOW_PROJECT_ID == WOW_PROJECT_MAINLINE
 local isClassic = WOW_PROJECT_ID == WOW_PROJECT_CLASSIC
 local isBCC = WOW_PROJECT_ID == WOW_PROJECT_BURNING_CRUSADE_CLASSIC
+local isWrath = WOW_PROJECT_ID == WOW_PROJECT_WRATH_CLASSIC
 
 Skillet.gttScale = GameTooltip:GetScale()
 
@@ -133,24 +133,13 @@ Skillet.unknownRecipe = {
 	numCraftableAlts = 0,
 }
 
---[[ From @plusmouse on WoWUIDev Discord channel
-local craftingPage = CreateFrame("Frame", nil, nil, "ProfessionsCraftingPageTemplate")
-craftingPage:SetParent(nil)
-craftingPage:Hide()
-craftingPage:SetScript("OnShow", nil)
-craftingPage:SetScript("OnHide", nil)
-EventRegistry:UnregisterCallback("ProfessionsRecipeListMixin.Event.OnRecipeSelected", craftingPage)
-EventRegistry:UnregisterCallback("Professions.ProfessionSelected", craftingPage);
-EventRegistry:UnregisterCallback("Professions.ReagentClicked", craftingPage);
-EventRegistry:UnregisterCallback("Professions.TransactionUpdated", craftingPage)
-craftingPage:RegisterEvent("UPDATE_TRADESKILL_CAST_COMPLETE")
---]]
-
 function Skillet:DisableBlizzardFrame()
 	DA.DEBUG(0,"DisableBlizzardFrame()")
 	if self.BlizzardTradeSkillFrame == nil then
 		self.BlizzardTradeSkillFrame = ProfessionsFrame
 		self.tradeSkillHide = ProfessionsFrame:GetScript("OnHide")
+		ProfessionsFrame:SetScript("OnHide", nil)
+--[[ From @plusmouse on WoWUIDev Discord channel
 		if not self.craftingFrame then
 			DA.DEBUG(1,"DisableBlizzardFrame: creating hack frames")
 			self.craftingFrame = CreateFrame("Frame", nil, nil, "ProfessionsCraftingPageTemplate")
@@ -162,7 +151,10 @@ function Skillet:DisableBlizzardFrame()
 			EventRegistry:UnregisterCallback("Professions.TransactionUpdated", self.craftingFrame)
 			self.craftingFrame:RegisterEvent("UPDATE_TRADESKILL_CAST_COMPLETE")
 		end
-		ProfessionsFrame:SetScript("OnHide", nil)
+--]]
+	end
+	if self.interface < 100100 then
+		SetUIPanelAttribute(ProfessionsFrame, "width", 0)	-- Prevent AH from closing when Skillet is opened
 	end
 	HideUIPanel(ProfessionsFrame)
 	self.BlizzardUIshowing = false
@@ -172,6 +164,9 @@ function Skillet:EnableBlizzardFrame()
 	DA.DEBUG(0,"EnableBlizzardFrame()")
 	if self.BlizzardTradeSkillFrame ~= nil then
 		self.BlizzardTradeSkillFrame = nil
+		if self.interface < 100100 then
+			SetUIPanelAttribute(ProfessionsFrame, "width", nil)	-- Allow the frame to use its real width
+		end
 		ProfessionsFrame:SetScript("OnHide", self.tradeSkillHide)
 		self.tradeSkillHide = nil
 	end
@@ -296,9 +291,6 @@ function Skillet:OnInitialize()
 	if not self.db.global.itemRecipeUsedIn then
 		self.db.global.itemRecipeUsedIn = {}
 	end
-	if not self.db.global.cachedGuildbank then
-		self.db.global.cachedGuildbank = {}
-	end
 	if not self.db.global.Categories then
 		self.db.global.Categories = {}
 	end
@@ -316,6 +308,12 @@ function Skillet:OnInitialize()
 	end
 	if not self.db.global.SkillLevels then
 		self:InitializeSkillLevels()
+	end
+	if not self.db.global.cachedGuildbank then
+		self.db.global.cachedGuildbank = {}
+	end
+	if not self.db.global.customPrice then
+		self.db.global.customPrice = {}
 	end
 
 --[[
@@ -832,7 +830,14 @@ function Skillet:PLAYER_ENTERING_WORLD()
 	local className, classFile, classId = UnitClass("player")
 	local locale = GetLocale()
 	local _,wowBuild,_,wowVersion = GetBuildInfo();
-	local guid = UnitGUID("player")		-- example: guid="Player-970-0002FD64" kind=="Player" server=="970" ID="0002FD64" 
+	local guid = UnitGUID("player")		-- example: guid="Player-970-0002FD64" kind=="Player" server=="970" ID="0002FD64"
+--
+-- PLAYER_ENTERING_WORLD happens on login and when changing zones so
+-- only save the time of the first one.
+--
+	if not Skillet.loginTime then
+		Skillet.loginTime = GetTime()
+	end
 --
 -- Store some identifying data in the per character saved variables file
 --
@@ -848,6 +853,7 @@ function Skillet:PLAYER_ENTERING_WORLD()
 	SkilletWho.wowBuild = wowBuild
 	SkilletWho.wowVersion = wowVersion
 	SkilletWho.guid = guid
+	SkilletWho.version = Skillet.version
 	if guid then
 		local kind, server, ID = strsplit("-", guid)
 		DA.DEBUG(1,"player="..tostring(player)..", faction="..tostring(faction)..", guid="..tostring(guid)..", server="..tostring(server))
@@ -867,6 +873,10 @@ function Skillet:PLAYER_ENTERING_WORLD()
 				self.db.global.server[server] = {}
 			end
 			self.db.global.server[server][realm] = player
+
+			if not self.db.global.customPrice[server] then
+				self.db.global.customPrice[server] = {}
+			end
 			if not self.db.global.faction[server] then
 				self.db.global.faction[server] = {}
 			end

@@ -25,6 +25,22 @@ local isWrath = WOW_PROJECT_ID == WOW_PROJECT_WRATH_CLASSIC
 
 Skillet.NewsName = "Skillet News"
 Skillet.NewsData = {
+	{	version = "5.14",
+		data = {
+			{	name = "Fixes",
+				data = {
+					{ header = "TOC", body = "Update TOC to 100100" },
+				},
+			},
+			{	name = "New Features",
+				data = {
+					{ header = "Table", body = "Add customPrice table" },
+					{ header = "Commands", body = "Add \"/skillet customadd\", \"/skillet customdel\", \"/skillet customshow\", \"/skillet customclear\"," },
+					{ header = "Plugins", body = "Auctionator refactor code and use customPrice table for costs" },
+				},
+			},
+		},
+	},
 	{	version = "5.13",
 		data = {
 			{	name = "Fixes",
