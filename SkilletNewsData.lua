@@ -25,6 +25,15 @@ local isWrath = WOW_PROJECT_ID == WOW_PROJECT_WRATH_CLASSIC
 
 Skillet.NewsName = "Skillet News"
 Skillet.NewsData = {
+	{	version = "5.16",
+		data = {
+			{	name = "Changes",
+				data = {
+					{ header = "TOC", body = "Add addon icon" },
+				},
+			},
+		},
+	},
 	{	version = "5.14",
 		data = {
 			{	name = "Fixes",
