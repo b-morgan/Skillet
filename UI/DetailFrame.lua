@@ -64,6 +64,13 @@ function Skillet:SetReagentToolTip(reagentID, numNeeded, numCraftable)
 			end
 		end
 	end
+	local server = self.data.server or 0
+	local customPrice = self.db.global.customPrice[server]
+	if customPrice and customPrice[reagentID] then
+		local price = customPrice[reagentID].value
+		local text = self:FormatMoneyFull(price,true)
+		GameTooltip:AddDoubleLine("Custom Price: ",text,0,1,0,1,1,1)
+	end
 	local inBoth = self:GetInventory(self.currentPlayer, reagentID)
 	local surplus = inBoth - numNeeded * numCraftable
 	if inBoth < 0 then

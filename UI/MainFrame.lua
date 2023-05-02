@@ -687,6 +687,9 @@ function Skillet:BlizzardUIButton_OnClick(this,button)
 		HideUIPanel(ProfessionsFrame)
 		Skillet.BlizzardUIshowing = false
 	else
+--
+-- If needed: ProfessionsFrame:SetTab(ProfessionsFrame.recipesTabID)
+--
 		ShowUIPanel(ProfessionsFrame)
 		Skillet.BlizzardUIshowing = true
 		ProfessionsFrame.CloseButton:HookScript("OnClick",function(...) Skillet.BlizzardUIshowing = false end)
@@ -2968,9 +2971,8 @@ function Skillet:QueueOnlyViewToggle()
 		self:ShowFullView()
 		if self.db.profile.queue_only_view then
 			SkilletFrame:Show()
-		else
-			self:UpdateTradeSkillWindow()
 		end
+		self:UpdateTradeSkillWindow()
 	else
 		self:ShowQueueView()
 		if self.db.profile.queue_only_view then
