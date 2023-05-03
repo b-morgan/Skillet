@@ -25,6 +25,15 @@ local isWrath = WOW_PROJECT_ID == WOW_PROJECT_WRATH_CLASSIC
 
 Skillet.NewsName = "Skillet News"
 Skillet.NewsData = {
+	{	version = "5.17",
+		data = {
+			{	name = "Fixes",
+				data = {
+					{ header = "Issues", body = "Fix scrolling" },
+				},
+			},
+		},
+	},
 	{	version = "5.16",
 		data = {
 			{	name = "Changes",
