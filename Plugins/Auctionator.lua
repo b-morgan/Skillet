@@ -487,7 +487,7 @@ local function GetBuyout(recipe)
 	else
 		itemID = recipe.itemID
 	end
-	if Skillet.db.profile.plugins.ATR.minmaxBuyout then
+	if isRetail and Skillet.db.profile.plugins.ATR.minmaxBuyout then
 		minBuyout, maxBuyout = GetMinMaxBuyout(recipe)
 		if Skillet.db.char.best_quality then
 			buyout = maxBuyout
@@ -497,17 +497,19 @@ local function GetBuyout(recipe)
 	else
 		if Atr_GetAuctionBuyout then
 			buyout = (Atr_GetAuctionBuyout(itemID) or 0) * recipe.numMade
-		elseif isRetail and Auctionator and Auctionator.API.v1.GetAuctionPriceByItemLink then
-			if Skillet.db.char.best_quality then
-				outputItemInfo = C_TradeSkillUI.GetRecipeOutputItemData(recipe.spellID, {}, nil, 8)
-			else
-				outputItemInfo = C_TradeSkillUI.GetRecipeOutputItemData(recipe.spellID, {}, nil, 4)
+		elseif Auctionator and Auctionator.API.v1 then
+			if isRetail then
+				if Skillet.db.char.best_quality then
+					outputItemInfo = C_TradeSkillUI.GetRecipeOutputItemData(recipe.spellID, {}, nil, 8)
+				else
+					outputItemInfo = C_TradeSkillUI.GetRecipeOutputItemData(recipe.spellID, {}, nil, 4)
+				end
 			end
-		end
-		if outputItemInfo and outputItemInfo.hyperlink then
-			buyout = (Auctionator.API.v1.GetAuctionPriceByItemLink(addonName, outputItemInfo.hyperlink) or 0) * recipe.numMade
-		elseif Auctionator and Auctionator.API.v1.GetAuctionPriceByItemID then
-			buyout = (Auctionator.API.v1.GetAuctionPriceByItemID(addonName, itemID) or 0) * recipe.numMade
+			if outputItemInfo and outputItemInfo.hyperlink then
+				buyout = (Auctionator.API.v1.GetAuctionPriceByItemLink(addonName, outputItemInfo.hyperlink) or 0) * recipe.numMade
+			else
+				buyout = (Auctionator.API.v1.GetAuctionPriceByItemID(addonName, itemID) or 0) * recipe.numMade
+			end
 		else
 			return
 		end
@@ -1145,19 +1147,9 @@ function plugin.RecipeNameSuffix(skill, recipe)
 				end
 			end
 		end
---
--- Enchants don't have any profit so if checked, always display the (negative) cost.
---[[
-		if recipe.tradeID == 7411 then
-			if not Skillet.db.profile.plugins.ATR.alwaysEnchanting then
-				if not isSort and Skillet.db.profile.plugins.ATR.onlyPositive and profit <= 0 then
-					text = nil
-				end
-			end
-		elseif not isSort and Skillet.db.profile.plugins.ATR.onlyPositive and profit <= 0 then
+		if not isSort and Skillet.db.profile.plugins.ATR.onlyPositive and profit <= 0 then
 			text = nil
 		end
---]]
 	end
 	recipe.buyout = buyout
 	recipe.cost = cost
