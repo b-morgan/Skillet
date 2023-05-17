@@ -26,11 +26,6 @@ local isWrath = WOW_PROJECT_ID == WOW_PROJECT_WRATH_CLASSIC
 --
 -- All the options that we allow the user to control.
 --
-local MAJOR_VERSION = GetAddOnMetadata("Skillet", "Version");
-
---
--- All the options that we allow the user to control.
---
 Skillet.options =
 {
 	handler = Skillet,
@@ -44,7 +39,7 @@ Skillet.options =
 			args = {
 				header = {
 					type = "header",
-					name = L["Skillet Trade Skills"].." "..MAJOR_VERSION,
+					name = L["Skillet Trade Skills"].." "..Skillet.version,
 					order = 11
 				},
 				vendor_buy_button = {

@@ -29,7 +29,7 @@ local L = LibStub("AceLocale-3.0"):GetLocale("Skillet")
 Skillet.L = L
 
 -- Get version info from the .toc file
-Skillet.version = GetAddOnMetadata("Skillet", "Version")
+Skillet.version = C_AddOns.GetAddOnMetadata("Skillet", "Version")
 Skillet.interface = select(4, GetBuildInfo())
 Skillet.build = (Skillet.interface < 20000 and "Classic") or (Skillet.interface < 30000 and "BCC") or (Skillet.interface < 40000 and "Wrath") or "Retail"
 Skillet.project = WOW_PROJECT_ID
