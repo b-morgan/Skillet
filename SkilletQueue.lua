@@ -612,7 +612,7 @@ function Skillet:ProcessQueue(altMode)
 					self.oldTraceLog = DA.TraceLog
 					DA.TraceLog = true
 					if not self.FakeIt then
-						C_TradeSkillUI.CraftRecipe(command.recipeID, 2, transaction:CreateCraftingReagentInfoTbl(), recipeLevel)
+						C_TradeSkillUI.CraftRecipe(command.recipeID, command.count, transaction:CreateCraftingReagentInfoTbl(), recipeLevel)
 					end
 				else
 --
@@ -700,15 +700,7 @@ function Skillet:QueueItems(count, button)
 					first = true
 				end
 				local queueCommand = self:QueueCommandIterate(recipe.spellID, count)
-				if queueCommand.modified then
-					queueCommand.count = 1
-					for i=1, count, 1 do
-						local c = tcopy(queueCommand)
-						self:QueueAppendCommand(c, Skillet.db.profile.queue_craftable_reagents, first)
-					end
-				else
-					self:QueueAppendCommand(queueCommand, Skillet.db.profile.queue_craftable_reagents, first)
-				end
+        self:QueueAppendCommand(queueCommand, Skillet.db.profile.queue_craftable_reagents, first)
 				self.optionalSelected = {}
 				self.finishingSelected = {}
 				self:HideOptionalList()
