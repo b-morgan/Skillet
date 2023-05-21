@@ -1065,6 +1065,10 @@ local function ScanTrade()
 		recipe.numSkillUps = numSkillUps
 		recipe.firstCraft = recipeInfo.firstCraft
 		recipe.supportsQualities = recipeInfo.supportsQualities
+		if recipeInfo.supportsQualities then
+			--DA.DEBUG(0,"recipeID= "..tostring(recipeID)..", recipeInfo= "..DA.DUMP(recipeInfo))
+			recipe.qualityIDs = recipeInfo.qualityIDs
+		end
 		recipe.itemID = 0		-- Make sure this value exists
 		recipe.numMade = 1		-- Make sure this value exists
 
