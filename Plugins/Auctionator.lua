@@ -457,14 +457,15 @@ end
 local function GetMinMaxBuyout(recipe)
 	local minBuyout = 999999999999
 	local maxBuyout = 0
-	local buyout, outputItemInfo
+	local buyout, outputItemInfo, hasQ
 	local itemID = recipe.itemID
-	if Auctionator and Auctionator.API.v1.GetAuctionPriceByItemLink then
-		for quality=4, 8 do
+	if recipe.supportsQualities and Auctionator and Auctionator.API.v1.GetAuctionPriceByItemLink and Auctionator.API.v1.GetAuctionPriceByItemID then
+		for _, quality in pairs(recipe.qualityIDs) do
 			outputItemInfo = C_TradeSkillUI.GetRecipeOutputItemData(recipe.spellID, {}, nil, quality)
 			if outputItemInfo and outputItemInfo.hyperlink then
 				buyout = (Auctionator.API.v1.GetAuctionPriceByItemLink(addonName, outputItemInfo.hyperlink) or 0) * recipe.numMade
-			elseif Auctionator and Auctionator.API.v1.GetAuctionPriceByItemID then
+				hasQ = true
+			else
 				buyout = (Auctionator.API.v1.GetAuctionPriceByItemID(addonName, itemID) or 0) * recipe.numMade
 			end
 			minBuyout = min(buyout,minBuyout)
@@ -476,7 +477,7 @@ local function GetMinMaxBuyout(recipe)
 	else
 		return 0,0
 	end
-	return minBuyout, maxBuyout
+	return minBuyout, maxBuyout, hasQ
 end
 
 local function GetBuyout(recipe)
@@ -884,10 +885,13 @@ function plugin.GetExtraText(skill, recipe)
 --
 -- buyout is Auctionator's price (for one) times the number this recipe makes
 --
-		local buyout = GetBuyout(recipe)
+		local buyout, minBuyout, maxBuyout, hasQ
+		buyout = GetBuyout(recipe)
 		if buyout and Skillet.db.profile.plugins.ATR.extraBuyout then
 			if Skillet.db.profile.plugins.ATR.minmaxBuyout and recipe.supportsQualities then
-				minBuyout, maxBuyout = GetMinMaxBuyout(recipe)
+				minBuyout, maxBuyout, hasQ = GetMinMaxBuyout(recipe)
+			end
+			if hasQ then
 				label = "|r".."ATR "..L["Buyout"].." (min):"
 				extra_text = Skillet:FormatMoneyFull(minBuyout, true)
 				label = label.."\n".."ATR "..L["Buyout"].." (max):"
@@ -905,11 +909,11 @@ function plugin.GetExtraText(skill, recipe)
 --
 				local h = 18
 				local buyout, outputItemInfo
-				for quality=4, 8 do
+				for _, quality in pairs(recipe.qualityIDs) do
 					outputItemInfo = C_TradeSkillUI.GetRecipeOutputItemData(recipe.spellID, {}, nil, quality)
 					if outputItemInfo and outputItemInfo.hyperlink then
 						buyout = (Auctionator.API.v1.GetAuctionPriceByItemLink(addonName, outputItemInfo.hyperlink) or 0) * recipe.numMade
-						--DA.DEBUG(0,"GetExtraText: quality= "..tostring(quality)..", buyout= "..tostring(buyout)..", outputItemInfo= "..DA.DUMP1(outputItemInfo))
+						DA.DEBUG(0,"GetExtraText: quality= "..tostring(quality)..", buyout= "..tostring(buyout)..", outputItemInfo= "..DA.DUMP1(outputItemInfo))
 						label = label.."\n"..outputItemInfo.hyperlink
 						extra_text = extra_text.."\n".."|T982414:"..tostring(h)..":1|t"..Skillet:FormatMoneyFull(buyout, true)
 					end
