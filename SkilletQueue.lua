@@ -372,21 +372,21 @@ function Skillet:PrintRIQ()
 end
 
 local function ApplyAllocations(transaction, modifiedReagents)
-  local reagentsToQuantity = {}
-  for _, all in ipairs(modifiedReagents) do
-    for _, item in ipairs(all) do
-      reagentsToQuantity[item.itemID] = item.quantity
-    end
-  end
+	local reagentsToQuantity = {}
+	for _, all in ipairs(modifiedReagents) do
+		for _, item in ipairs(all) do
+			reagentsToQuantity[item.itemID] = item.quantity
+		end
+	end
 
-  local schematic = transaction:GetRecipeSchematic()
-  for slotID, reagentSlotSchematic in ipairs(schematic.reagentSlotSchematics) do
-    for _, r in ipairs(reagentSlotSchematic.reagents) do
-      if reagentsToQuantity[r.itemID] then
-        transaction:OverwriteAllocation(slotID, r, reagentsToQuantity[r.itemID])
-      end
-    end
-  end
+	local schematic = transaction:GetRecipeSchematic()
+	for slotID, reagentSlotSchematic in ipairs(schematic.reagentSlotSchematics) do
+		for _, r in ipairs(reagentSlotSchematic.reagents) do
+			if reagentsToQuantity[r.itemID] then
+				transaction:OverwriteAllocation(slotID, r, reagentsToQuantity[r.itemID])
+			end
+		end
+	end
 end
 
 function Skillet:ProcessQueue(altMode)
@@ -576,8 +576,10 @@ function Skillet:ProcessQueue(altMode)
 					if command.recipeLevel then
 						recipeLevel = command.recipeLevel
 					end
-          local transaction = CreateProfessionsRecipeTransaction(C_TradeSkillUI.GetRecipeSchematic(command.recipeID, false, recipeLevel))
-          ApplyAllocations(transaction, command.modifiedReagents)
+					local transaction = CreateProfessionsRecipeTransaction(C_TradeSkillUI.GetRecipeSchematic(command.recipeID, false, recipeLevel))
+					if not self.db.profile.queue_one_at_a_time then
+						ApplyAllocations(transaction, command.modifiedReagents)
+					end
 					self.processingLevel = recipeLevel
 					self.optionalReagentsArray = {}
 					if command.modifiedReagents then
@@ -612,7 +614,11 @@ function Skillet:ProcessQueue(altMode)
 					self.oldTraceLog = DA.TraceLog
 					DA.TraceLog = true
 					if not self.FakeIt then
-						C_TradeSkillUI.CraftRecipe(command.recipeID, command.count, transaction:CreateCraftingReagentInfoTbl(), recipeLevel)
+						if self.db.profile.queue_one_at_a_time then
+							C_TradeSkillUI.CraftRecipe(command.recipeID, command.count, command.optionalReagentsArray, recipeLevel)
+						else
+							C_TradeSkillUI.CraftRecipe(command.recipeID, command.count, transaction:CreateCraftingReagentInfoTbl(), recipeLevel)
+						end
 					end
 				else
 --
