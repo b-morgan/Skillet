@@ -680,7 +680,7 @@ function Skillet:QueueItems(count, button)
 					first = true
 				end
 				local queueCommand = self:QueueCommandIterate(recipe.spellID, count)
-				if queueCommand.modified then
+				if self.db.profile.queue_one_at_a_time and queueCommand.modified then
 					queueCommand.count = 1
 					for i=1, count, 1 do
 						local c = tcopy(queueCommand)
