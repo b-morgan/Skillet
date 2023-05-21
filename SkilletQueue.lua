@@ -371,6 +371,24 @@ function Skillet:PrintRIQ()
 	end
 end
 
+local function ApplyAllocations(transaction, modifiedReagents)
+  local reagentsToQuantity = {}
+  for _, all in ipairs(modifiedReagents) do
+    for _, item in ipairs(all) do
+      reagentsToQuantity[item.itemID] = item.quantity
+    end
+  end
+
+  local schematic = transaction:GetRecipeSchematic()
+  for slotID, reagentSlotSchematic in ipairs(schematic.reagentSlotSchematics) do
+    for _, r in ipairs(reagentSlotSchematic.reagents) do
+      if reagentsToQuantity[r.itemID] then
+        transaction:OverwriteAllocation(slotID, r, reagentsToQuantity[r.itemID])
+      end
+    end
+  end
+end
+
 function Skillet:ProcessQueue(altMode)
 	DA.DEBUG(0,"ProcessQueue("..tostring(altMode)..")");
 	local queue = self.db.realm.queueData[self.currentPlayer]
@@ -558,6 +576,8 @@ function Skillet:ProcessQueue(altMode)
 					if command.recipeLevel then
 						recipeLevel = command.recipeLevel
 					end
+          local transaction = CreateProfessionsRecipeTransaction(C_TradeSkillUI.GetRecipeSchematic(command.recipeID, false, recipeLevel))
+          ApplyAllocations(transaction, command.modifiedReagents)
 					self.processingLevel = recipeLevel
 					self.optionalReagentsArray = {}
 					if command.modifiedReagents then
@@ -592,7 +612,7 @@ function Skillet:ProcessQueue(altMode)
 					self.oldTraceLog = DA.TraceLog
 					DA.TraceLog = true
 					if not self.FakeIt then
-						C_TradeSkillUI.CraftRecipe(command.recipeID, command.count, command.optionalReagentsArray, recipeLevel)
+						C_TradeSkillUI.CraftRecipe(command.recipeID, 2, transaction:CreateCraftingReagentInfoTbl(), recipeLevel)
 					end
 				else
 --
