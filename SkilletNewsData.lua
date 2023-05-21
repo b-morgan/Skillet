@@ -27,9 +27,16 @@ Skillet.NewsName = "Skillet News"
 Skillet.NewsData = {
 	{	version = "5.18",
 		data = {
-			{	name = "Fixes",
+			{	name = "Changes",
 				data = {
-					{ header = "Issues", body = "Code cleanup" },
+					{ header = "Auctionator", body = "Fix plugin quality issues" },
+					{ header = "Auctionator", body = "Move the Auctionator button" },
+				},
+			},
+			{	name = "Pending",
+				data = {
+					{ header = "Queue", body = "Add one at a time option" },
+					{ header = "Experimental", body = "Queue multiple items with modified reagents" },
 				},
 			},
 		},
