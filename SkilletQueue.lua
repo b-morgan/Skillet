@@ -700,7 +700,15 @@ function Skillet:QueueItems(count, button)
 					first = true
 				end
 				local queueCommand = self:QueueCommandIterate(recipe.spellID, count)
-        self:QueueAppendCommand(queueCommand, Skillet.db.profile.queue_craftable_reagents, first)
+				if self.db.profile.queue_one_at_a_time and queueCommand.modified then
+					queueCommand.count = 1
+					for i=1, count, 1 do
+						local c = tcopy(queueCommand)
+						self:QueueAppendCommand(c, Skillet.db.profile.queue_craftable_reagents, first)
+					end
+				else
+					self:QueueAppendCommand(queueCommand, Skillet.db.profile.queue_craftable_reagents, first)
+				end
 				self.optionalSelected = {}
 				self.finishingSelected = {}
 				self:HideOptionalList()

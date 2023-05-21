@@ -187,21 +187,19 @@ Skillet.options =
 					width = "full",
 					order = 22
 				},
---[[
-				queue_more_than_one = {
+				queue_one_at_a_time = {
 					type = "toggle",
-					name = L["QUEUEMORETHANONENAME"],
-					desc = L["QUEUEMORETHANONEDESC"],
+					name = L["QUEUEONEATATIMENAME"],
+					desc = L["QUEUEONEATATIMEDESC"],
 					get = function()
-						return Skillet.db.profile.queue_more_than_one
+						return Skillet.db.profile.queue_one_at_a_time
 					end,
 					set = function(self,value)
-						Skillet.db.profile.queue_more_than_one = value
+						Skillet.db.profile.queue_one_at_a_time = value
 					end,
 					width = "full",
 					order = 23
 				},
---]]
 --[[
 				queue_to_front = {
 					type = "toggle",
