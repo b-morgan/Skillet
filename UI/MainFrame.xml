@@ -2562,12 +2562,15 @@
 			-->
 			<Button name="SkilletAuctionatorButton" inherits="UIPanelButtonTemplate" text="Auctionator" parent="SkilletFrame">
 				<Size>
-					<AbsDimension x="85" y="22"/>
+					<AbsDimension x="85" y="20"/>
 				</Size>
 				<Anchors>
+					<Anchor point="RIGHT" relativeTo="SkilletIgnoredMatsButton" relativePoint="LEFT">
+			<!--
 					<Anchor point="BOTTOMLEFT" relativeTo="SkilletReagentParent" relativePoint="BOTTOMLEFT">
+			-->
 						<Offset>
-							<AbsDimension x="2" y="2"/>
+							<AbsDimension x="0" y="0"/>
 						</Offset>
 					</Anchor>
 				</Anchors>
