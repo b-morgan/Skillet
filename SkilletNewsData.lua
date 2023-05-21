@@ -25,7 +25,7 @@ local isWrath = WOW_PROJECT_ID == WOW_PROJECT_WRATH_CLASSIC
 
 Skillet.NewsName = "Skillet News"
 Skillet.NewsData = {
-	{	version = "5.18",
+	{	version = "5.19",
 		data = {
 			{	name = "Changes",
 				data = {
@@ -37,6 +37,15 @@ Skillet.NewsData = {
 				data = {
 					{ header = "Queue", body = "Add one at a time option" },
 					{ header = "Experimental", body = "Queue multiple items with modified reagents" },
+				},
+			},
+		},
+	},
+	{	version = "5.18",
+		data = {
+			{	name = "Changes",
+				data = {
+					{ header = "Cleanup", body = "Code Cleanup" },
 				},
 			},
 		},
