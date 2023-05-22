@@ -954,7 +954,7 @@ end
 -- Called to set the tooltip when the mouse enters a reagent button
 --
 function Skillet:ReagentButtonOnEnter(button, skillIndex, reagentIndex)
-	DA.DEBUG(0,"ReagentButtonOnEnter("..tostring(button)..", "..tostring(skillIndex)..", "..tostring(reagentIndex)..")")
+	--DA.DEBUG(0,"ReagentButtonOnEnter("..tostring(button)..", "..tostring(skillIndex)..", "..tostring(reagentIndex)..")")
 	GameTooltip:SetOwner(button, "ANCHOR_TOPLEFT")
 	if Skillet.db.profile.scale_tooltip then
 		local uiScale = 1.0;
