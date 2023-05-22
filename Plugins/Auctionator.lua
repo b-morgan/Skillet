@@ -597,7 +597,7 @@ local function AddExtraText(value, needed, id, name, custom)
 end
 
 local function GetRecipeData(recipe)
-	DA.DEBUG(0,"GetRecipeData: recipe= "..DA.DUMP(recipe,1))
+	--DA.DEBUG(0,"GetRecipeData: recipe= "..DA.DUMP(recipe,1))
 	if not recipe then return end
 	local buyout, cost, profit, percentage
 	local itemID
@@ -904,18 +904,30 @@ function plugin.GetExtraText(skill, recipe)
 				label = label.."\n"
 				extra_text = extra_text.."\n"
 --
--- The hyperlink label is taller than normal text so 
+-- The hyperlink label can be taller than normal text so 
 -- add a transparent icon of the same size to the extra_text
 --
 				local h = 18
-				local buyout, outputItemInfo
+				local price, age, buyout, outputItemInfo
 				for _, quality in pairs(recipe.qualityIDs) do
 					outputItemInfo = C_TradeSkillUI.GetRecipeOutputItemData(recipe.spellID, {}, nil, quality)
 					if outputItemInfo and outputItemInfo.hyperlink then
-						buyout = (Auctionator.API.v1.GetAuctionPriceByItemLink(addonName, outputItemInfo.hyperlink) or 0) * recipe.numMade
-						DA.DEBUG(0,"GetExtraText: quality= "..tostring(quality)..", buyout= "..tostring(buyout)..", outputItemInfo= "..DA.DUMP1(outputItemInfo))
-						label = label.."\n"..outputItemInfo.hyperlink
-						extra_text = extra_text.."\n".."|T982414:"..tostring(h)..":1|t"..Skillet:FormatMoneyFull(buyout, true)
+						age = Auctionator.API.v1.GetAuctionAgeByItemLink and Auctionator.API.v1.GetAuctionAgeByItemLink(addonName, outputItemInfo.hyperlink)
+						if age and age < 2 then
+							price = Auctionator.API.v1.GetAuctionPriceByItemLink(addonName, outputItemInfo.hyperlink)
+							buyout = (price or 0) * recipe.numMade
+							--DA.DEBUG(0,"GetExtraText: quality= "..tostring(quality)..", buyout= "..tostring(buyout)..", outputItemInfo= "..DA.DUMP1(outputItemInfo))
+							local effectiveILvl, isPreview, baseILvl = GetDetailedItemLevelInfo(outputItemInfo.hyperlink)
+							--DA.DEBUG(0,"GetExtraText: effectiveILvl= "..tostring(effectiveILvl)..", itemType= "..tostring(recipe.itemType)..", classID= "..tostring(recipe.classID))
+							if recipe.classID == 0 or recipe.classID == 7 then
+								label = label.."\n"..outputItemInfo.hyperlink
+								extra_text = extra_text.."\n".."|T982414:"..tostring(h)..":1|t"..Skillet:FormatMoneyFull(buyout, true)
+							else
+--								label = label.."\n"..recipe.name.." ("..tostring(effectiveILvl)..")".." <"..tostring(age)..">"
+								label = label.."\n"..recipe.name.." ("..tostring(effectiveILvl)..")"
+								extra_text = extra_text.."\n"..Skillet:FormatMoneyFull(buyout, true)
+							end
+						end
 					end
 				end
 			end
@@ -1180,7 +1192,8 @@ function Skillet:AuctionatorSearch(whichOne)
 	local shoppingListName
 	local items = {}
 	local recipe = Skillet:GetRecipeDataByTradeIndex(Skillet.currentTrade, Skillet.selectedSkill)
-	DA.DEBUG(1,"AuctionatorSearch: recipe= "..DA.DUMP1(recipe))
+	local useSearchExact = Skillet.db.profile.plugins.ATR.useSearchExact
+	--DA.DEBUG(1,"AuctionatorSearch: recipe= "..DA.DUMP1(recipe))
 	if whichOne then
 		shoppingListName = L["Shopping List"]
 		local name = nil
@@ -1222,7 +1235,7 @@ function Skillet:AuctionatorSearch(whichOne)
 					local scrollName = GetItemInfo(recipe.scrollID)
 					table.insert(items, scrollName)
 				end
-			else
+			elseif not recipe.salvage then
 				table.insert(items, shoppingListName)
 			end
 		end
@@ -1254,6 +1267,26 @@ function Skillet:AuctionatorSearch(whichOne)
 				end
 			end
 		end
+		if recipe.salvage then
+			--DA.DEBUG(1,"AuctionatorSearch: recipe= "..DA.DUMP1(recipe))
+			--DA.DEBUG(1, "AuctionatorSearch: numSalvage= "..tostring(#recipe.salvage)..", salvage= "..DA.DUMP(recipe.salvage))
+			useSearchExact = true
+			for i=1, #recipe.salvage do
+				local id = recipe.salvage[i]
+				local quality = C_TradeSkillUI.GetItemReagentQualityByItemInfo(id)
+				if quality == nil or quality == 1 then
+					local name, bname = self:nameWithQuality(id)
+					if (bname) then
+						if not Skillet:VendorSellsReagent(id) then
+							table.insert (items, bname)
+							DA.DEBUG(1, "AuctionatorSearch:  Added  ["..i.."] ("..id..") "..bname)
+						else
+							DA.DEBUG(1, "AuctionatorSearch: Skipped ["..i.."] ("..id..") "..bname)
+						end
+					end
+				end
+			end
+		end
 		if recipe.numModified then
 			for i=1, recipe.numModified do
 				local id = recipe.modifiedData[i].reagentID
@@ -1274,7 +1307,7 @@ function Skillet:AuctionatorSearch(whichOne)
 		local BUY_TAB = 3;
 		Atr_SelectPane(BUY_TAB)
 		Atr_SearchAH(shoppingListName, items)
-	elseif Skillet.db.profile.plugins.ATR.useSearchExact and Auctionator.API.v1.MultiSearchExact then
+	elseif useSearchExact and Auctionator.API.v1.MultiSearchExact then
 		DA.DEBUG(0, "AuctionatorSearch: (exact) addonName= "..tostring(addonName)..", items= "..DA.DUMP1(items))
 		Auctionator.API.v1.MultiSearchExact(addonName, items)
 	elseif Auctionator.API.v1.MultiSearch then
