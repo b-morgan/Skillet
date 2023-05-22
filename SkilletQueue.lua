@@ -617,7 +617,9 @@ function Skillet:ProcessQueue(altMode)
 						if self.db.profile.queue_one_at_a_time then
 							C_TradeSkillUI.CraftRecipe(command.recipeID, command.count, command.optionalReagentsArray, recipeLevel)
 						else
-							C_TradeSkillUI.CraftRecipe(command.recipeID, command.count, transaction:CreateCraftingReagentInfoTbl(), recipeLevel)
+							local reagentInfoTbl = transaction:CreateCraftingReagentInfoTbl()
+							--DA.DEBUG(1,"ProcessQueue: reagentInfoTbl= "..DA.DUMP(reagentInfoTbl))
+							C_TradeSkillUI.CraftRecipe(command.recipeID, command.count, reagentInfoTbl, recipeLevel)
 						end
 					end
 				else
