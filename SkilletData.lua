@@ -1310,6 +1310,8 @@ recipeSchematic= {
 				itemID = 0
 			end
 			recipe.itemID = itemID
+			recipe.itemType = select(2,GetItemInfoInstant(itemID))
+			recipe.classID = select(6,GetItemInfoInstant(itemID)) or 0
 			recipeInfo.itemID = itemID		-- save a copy for our records
 			if not recipeInfo.alternateVerb then
 				local minMade = recipeSchematic.quantityMin
