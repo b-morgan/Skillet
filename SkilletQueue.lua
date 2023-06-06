@@ -122,7 +122,7 @@ local function queueAppendReagent(command, reagentID, need, queueCraftables, mre
 --
 					if not Skillet.TradeSkillIgnoredMats[recipeSourceID] and
 					  not Skillet.db.realm.userIgnoredMats[Skillet.currentPlayer][recipeSourceID] then
-						if newCommand.modified then
+						if newCommand.modified and self.db.profile.queue_one_at_a_time then
 							newCommand.count = 1
 							for i=1, newCount, 1 do
 								local c = tcopy(newCommand)
@@ -371,14 +371,29 @@ function Skillet:PrintRIQ()
 	end
 end
 
-local function ApplyAllocations(transaction, modifiedReagents)
+local function ApplyAllocations(transaction, modifiedReagents, optionalReagents, finishingReagents)
 	local reagentsToQuantity = {}
-	for _, all in ipairs(modifiedReagents) do
-		for _, item in ipairs(all) do
-			reagentsToQuantity[item.itemID] = item.quantity
+	if modifiedReagents then
+		for _, all in ipairs(modifiedReagents) do
+			for _, item in ipairs(all) do
+				reagentsToQuantity[item.itemID] = item.quantity
+			end
 		end
 	end
-
+	if optionalReagents then
+		for _, all in ipairs(optionalReagents) do
+			for _, item in ipairs(all) do
+				reagentsToQuantity[item.itemID] = item.quantity
+			end
+		end
+	end
+	if finishingReagents then
+		for _, all in ipairs(finishingReagents) do
+			for _, item in ipairs(all) do
+				reagentsToQuantity[item.itemID] = item.quantity
+			end
+		end
+	end
 	local schematic = transaction:GetRecipeSchematic()
 	for slotID, reagentSlotSchematic in ipairs(schematic.reagentSlotSchematics) do
 		for _, r in ipairs(reagentSlotSchematic.reagents) do
@@ -576,36 +591,38 @@ function Skillet:ProcessQueue(altMode)
 					if command.recipeLevel then
 						recipeLevel = command.recipeLevel
 					end
-					local transaction = CreateProfessionsRecipeTransaction(C_TradeSkillUI.GetRecipeSchematic(command.recipeID, false, recipeLevel))
-					if not self.db.profile.queue_one_at_a_time then
-						ApplyAllocations(transaction, command.modifiedReagents)
-					end
-					self.processingLevel = recipeLevel
-					self.optionalReagentsArray = {}
-					if command.modifiedReagents then
-						for i,items in pairs(command.modifiedReagents) do
-							for j,reagent in pairs(items) do
-								DA.DEBUG(2,"Modified: i= "..tostring(i)..", j= "..tostring(j)..", item= "..DA.DUMP1(reagent))
-								if reagent.quantity ~= 0 then
-									table.insert(self.optionalReagentsArray, reagent)
+					if self.db.profile.queue_one_at_a_time then
+						self.processingLevel = recipeLevel
+						self.optionalReagentsArray = {}
+						if command.modifiedReagents then
+							for i,items in pairs(command.modifiedReagents) do
+								for j,reagent in pairs(items) do
+									DA.DEBUG(2,"Modified: i= "..tostring(i)..", j= "..tostring(j)..", item= "..DA.DUMP1(reagent))
+									if reagent.quantity ~= 0 then
+										table.insert(self.optionalReagentsArray, reagent)
+									end
 								end
-							end
-						end -- for
+							end -- for
+						end
+						if command.optionalReagents then
+							for i,reagent in pairs(command.optionalReagents) do
+								DA.DEBUG(2,"Optional: i= "..tostring(i)..", reagent= "..DA.DUMP1(reagent))
+								table.insert(self.optionalReagentsArray, reagent)
+							end -- for
+						end
+						if command.finishingReagents then
+							for i,reagent in pairs(command.finishingReagents) do
+								DA.DEBUG(2,"Finishing: i= "..tostring(i)..", reagent= "..DA.DUMP1(reagent))
+								table.insert(self.optionalReagentsArray, reagent)
+							end -- for
+						end
+						DA.DEBUG(1,"ProcessQueue: recipeLevel= "..tostring(recipeLevel)..", optionalReagentsArray= "..DA.DUMP(self.optionalReagentsArray))
+						command.optionalReagentsArray = self.optionalReagentsArray
+					else
+						self.recipeTransaction = CreateProfessionsRecipeTransaction(C_TradeSkillUI.GetRecipeSchematic(command.recipeID, false, recipeLevel))
+						ApplyAllocations(self.recipeTransaction, command.modifiedReagents, command.optionalReagents, command.finishingReagents)
+						DA.DEBUG(1,"ProcessQueue: recipeLevel= "..tostring(recipeLevel)..", recipeTransaction= "..DA.DUMP(self.recipeTransaction))
 					end
-					if command.optionalReagents then
-						for i,reagent in pairs(command.optionalReagents) do
-							DA.DEBUG(2,"Optional: i= "..tostring(i)..", reagent= "..DA.DUMP1(reagent))
-							table.insert(self.optionalReagentsArray, reagent)
-						end -- for
-					end
-					if command.finishingReagents then
-						for i,reagent in pairs(command.finishingReagents) do
-							DA.DEBUG(2,"Finishing: i= "..tostring(i)..", reagent= "..DA.DUMP1(reagent))
-							table.insert(self.optionalReagentsArray, reagent)
-						end -- for
-					end
-					DA.DEBUG(1,"ProcessQueue: recipeLevel= "..tostring(recipeLevel)..", optionalReagentsArray= "..DA.DUMP(self.optionalReagentsArray))
-					command.optionalReagentsArray = self.optionalReagentsArray
 --
 -- For debugging, save the command and TraceLog setting. Restored in ContinueCast.
 -- FakeIt is used to test the creation of the CraftRecipe parameters without wasting materials.
@@ -617,7 +634,7 @@ function Skillet:ProcessQueue(altMode)
 						if self.db.profile.queue_one_at_a_time then
 							C_TradeSkillUI.CraftRecipe(command.recipeID, command.count, command.optionalReagentsArray, recipeLevel)
 						else
-							local reagentInfoTbl = transaction:CreateCraftingReagentInfoTbl()
+							local reagentInfoTbl = self.recipeTransaction:CreateCraftingReagentInfoTbl()
 							--DA.DEBUG(1,"ProcessQueue: reagentInfoTbl= "..DA.DUMP(reagentInfoTbl))
 							C_TradeSkillUI.CraftRecipe(command.recipeID, command.count, reagentInfoTbl, recipeLevel)
 						end
@@ -908,9 +925,9 @@ function Skillet:ContinueCast(spellID)
 				self.processingCommand = nil
 				self.processingLevel = nil
 				self.salvageItem = nil
-	--
-	-- Restore the TraceLog setting.
-	--
+--
+-- Restore the TraceLog setting.
+--
 				DA.TraceLog = self.oldTraceLog
 			end
 		end
