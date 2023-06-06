@@ -1423,7 +1423,7 @@ recipeSchematic= {
 				else
 					reagentString = reagentID..":"..numNeeded
 				end
-			elseif schematic.reagentType == Enum.CraftingReagentType.Optional then
+			elseif schematic.reagentType == Enum.CraftingReagentType.Modifying then
 				--DA.DEBUG(2,"ScanTrade: recipeID= "..tostring(recipeID)..", name= "..tostring(recipeInfo.name)..", Optional reagent= "..DA.DUMP(schematic))
 				numOptional = numOptional + 1
 				optionalData[numOptional] = {}
@@ -1453,6 +1453,8 @@ recipeSchematic= {
 					finishingData[numFinishing].locked = locked
 					finishingData[numFinishing].lockedReason = lockedReason
 				end
+			else
+				DA.DEBUG(2,"ScanTrade: recipeID= "..tostring(recipeID)..", name= "..tostring(recipeInfo.name)..", Unknown reagentType= "..DA.DUMP(schematic))
 			end
 		end -- for numReagents
 		--DA.DEBUG(2,"ScanTrade: basicData= "..DA.DUMP(basicData))
