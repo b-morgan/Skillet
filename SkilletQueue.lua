@@ -122,7 +122,7 @@ local function queueAppendReagent(command, reagentID, need, queueCraftables, mre
 --
 					if not Skillet.TradeSkillIgnoredMats[recipeSourceID] and
 					  not Skillet.db.realm.userIgnoredMats[Skillet.currentPlayer][recipeSourceID] then
-						if newCommand.modified and self.db.profile.queue_one_at_a_time then
+						if newCommand.modified and Skillet.db.profile.queue_one_at_a_time then
 							newCommand.count = 1
 							for i=1, newCount, 1 do
 								local c = tcopy(newCommand)
