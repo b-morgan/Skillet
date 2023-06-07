@@ -29,14 +29,8 @@ Skillet.NewsData = {
 		data = {
 			{	name = "Changes",
 				data = {
-					{ header = "Auctionator", body = "Fix plugin quality issues" },
-					{ header = "Auctionator", body = "Move the Auctionator button" },
-				},
-			},
-			{	name = "Pending",
-				data = {
-					{ header = "Queue", body = "Add one at a time option" },
-					{ header = "Experimental", body = "Queue multiple items with modified reagents" },
+					{ header = "Auctionator", body = "Fix plugin quality issues\nMove the Auctionator button" },
+					{ header = "Queuing", body = "Add one at a time option\n    false = Queue items with modified reagents all at once\n    true  = Queue items with modified reagents one by one" },
 				},
 			},
 		},
