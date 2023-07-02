@@ -619,7 +619,11 @@ PROFESSIONS_FIRST_CRAFT_DESCRIPTION = "Crafting this recipe for the first time w
 						--DA.DEBUG(0,"UpdateDetailWindow: slotText= "..tostring(oreagent.schematic.slotInfo.slotText)..", categorySkillRank="..tostring(categorySkillRank)..", requiredSkillRank= "..tostring(oreagent.schematic.slotInfo.requiredSkillRank))
 						local locked, lockedReason = self:GetReagentSlotStatus(oreagent.schematic, newInfo)
 						--DA.DEBUG(0,"UpdateDetailWindow: locked= "..tostring(locked)..", lockedReason="..tostring(lockedReason))
-						text:SetText(oreagent.schematic.slotInfo.slotText or OPTIONAL_REAGENT_POSTFIX)
+						local name = oreagent.schematic.slotInfo.slotText or OPTIONAL_REAGENT_POSTFIX
+						if oreagent.schematic.required then
+							name = name..COLORRED.." (required)".."|r"
+						end
+						text:SetText(name)
 						if not locked and categorySkillRank >= oreagent.schematic.slotInfo.requiredSkillRank then
 							icon:SetNormalAtlas("itemupgrade_greenplusicon")
 						else
