@@ -19,7 +19,7 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
 local L = LibStub("AceLocale-3.0"):GetLocale("Skillet")
 
-SKILLET_NUM_REAGENT_BUTTONS = 12
+SKILLET_NUM_REAGENT_BUTTONS = 14
 
 local COLORORANGE = "|cffff8040"
 local COLORYELLOW = "|cffffff00"
@@ -183,6 +183,7 @@ function Skillet:UpdateDetailWindow(skillIndex)
 		self.currentSkillIndex = skillIndex
 		self.salvageSelected = {}
 		self.modifiedSelected = {}
+		self.requiredSelected = {}
 		self.optionalSelected = {}
 		self.finishingSelected = {}
 		self.recipeRank = 0
@@ -487,7 +488,7 @@ PROFESSIONS_FIRST_CRAFT_DESCRIPTION = "Crafting this recipe for the first time w
 				if count_text then
 					count_text = count_text .."]"
 				end
-				if self.db.char.best_quality then
+				if self.db.profile.best_quality then
 					for k=#mreagent.schematic.reagents, 1 , -1 do
 						if num[k] > 0 and not mselected then
 							mselected = mreagent.schematic.reagents[k].itemID
@@ -557,12 +558,106 @@ PROFESSIONS_FIRST_CRAFT_DESCRIPTION = "Crafting this recipe for the first time w
 	if self.ModifiedList and self.ModifiedList:IsVisible() then
 		self:UpdateModifiedListWindow()
 	end
-
+--
+-- Required reagents
+--
+	if recipe.numRequired and recipe.numRequired > 0 then
+		DA.DEBUG(0,"UpdateDetailWindow: recipeID= "..tostring(recipe.spellID)..", name= "..tostring(recipe.name)..", numRequired="..tostring(recipe.numRequired))
+		local categoryInfo = C_TradeSkillUI.GetCategoryInfo(recipeInfo.categoryID)
+		while not categoryInfo.skillLineCurrentLevel and categoryInfo.parentCategoryID do
+			categoryInfo = C_TradeSkillUI.GetCategoryInfo(categoryInfo.parentCategoryID)
+		end
+		local categorySkillRank = categoryInfo.skillLineCurrentLevel or 0
+		DA.DEBUG(0,"UpdateDetailWindow: categorySkillRank="..tostring(categorySkillRank))
+		lastReagentIndex = lastReagentIndex + 1
+		lastReagentButton = _G["SkilletReagent"..tostring(lastReagentIndex)]
+		local j = 1
+		for i= lastReagentIndex, SKILLET_NUM_REAGENT_BUTTONS, 1 do
+			local button = _G["SkilletReagent"..i]
+			local   text = _G[button:GetName() .. "Text"]
+			local   icon = _G[button:GetName() .. "Icon"]
+			local  count = _G[button:GetName() .. "Count"]
+			local needed = _G[button:GetName() .. "Needed"]
+--
+-- Each required reagent slot will be filled with the type of
+-- reagent or the reagent that has been selected for that slot
+--
+			local rreagent = recipe.requiredData[j]
+			if rreagent then
+				DA.DEBUG(0,"UpdateDetailWindow: rreagent="..DA.DUMP(rreagent))
+				local rselected
+				if self.requiredSelected then
+					rselected = self.requiredSelected[j]
+				end
+				if rselected then
+					DA.DEBUG(0,"UpdateDetailWindow: rselected="..DA.DUMP(rselected))
+--
+-- A required reagent has been selected for this slot
+--
+					local name = self:nameWithQuality(rselected.itemID)
+					text:SetText(name)
+					texture = GetItemIcon(rselected.itemID)
+					icon:SetNormalTexture(texture)
+					local num, craftable = self:GetInventory(self.currentPlayer, rselected.itemID)
+					local count_text
+					if craftable > 0 then
+						count_text = string.format("[%d/%d]", num, craftable)
+					else
+						count_text = string.format("[%d]", num)
+					end
+					count:SetText(count_text)
+				else
+--
+-- Show the type of reagent that can be used. The icon reflects useability.
+-- (do we need to prevent locked slots from being filled?)
+--
+					if rreagent.schematic then
+						DA.DEBUG(0,"UpdateDetailWindow: slotText= "..tostring(rreagent.schematic.slotInfo.slotText)..", categorySkillRank="..tostring(categorySkillRank)..", requiredSkillRank= "..tostring(rreagent.schematic.slotInfo.requiredSkillRank))
+						local locked, lockedReason = self:GetReagentSlotStatus(rreagent.schematic, newInfo)
+						DA.DEBUG(0,"UpdateDetailWindow: locked= "..tostring(locked)..", lockedReason="..tostring(lockedReason))
+						local name = rreagent.schematic.slotInfo.slotText or OPTIONAL_REAGENT_POSTFIX
+						text:SetText(name)
+						if not locked and categorySkillRank >= rreagent.schematic.slotInfo.requiredSkillRank then
+							icon:SetNormalAtlas("itemupgrade_greenplusicon")
+						else
+							icon:SetNormalAtlas("AdventureMapIcon-Lock")
+						end
+						count:SetText("")
+					end
+				end
+				icon:Show()
+				needed:SetText("")
+				button:SetID((j * -1) - 100)
+				button:SetWidth(width - 20)
+				button:Enable()
+				button:Show()
+				lastReagentButton = button
+				lastReagentIndex = i
+				j = j + 1
+			else
+--
+-- Out of required reagents, don't need to show the button,
+-- or any of the text.
+--
+				button:Hide()
+				button:Disable()
+			end
+		end
+	else
+--
+-- Recipe has no required reagents.
+--
+		--DA.DEBUG(0,"UpdateDetailWindow: (none) recipeID= "..tostring(recipe.spellID)..", name= "..tostring(recipe.name)..", numRequired="..tostring(recipe.numRequired))
+		Skillet.requiredSelected = {}
+	end
+	if self.RequiredList and self.RequiredList:IsVisible() then
+		self:UpdateRequiredListWindow()
+	end
 --
 -- Optional reagents
 --
 	if recipe.numOptional and recipe.numOptional > 0 then
-		--DA.DEBUG(0,"UpdateDetailWindow: recipeID= "..tostring(recipe.spellID)..", name= "..tostring(recipe.name)..", numOptional="..tostring(recipe.numOptional))
+		DA.DEBUG(0,"UpdateDetailWindow: recipeID= "..tostring(recipe.spellID)..", name= "..tostring(recipe.name)..", numOptional="..tostring(recipe.numOptional))
 		local categoryInfo = C_TradeSkillUI.GetCategoryInfo(recipeInfo.categoryID)
 		while not categoryInfo.skillLineCurrentLevel and categoryInfo.parentCategoryID do
 			categoryInfo = C_TradeSkillUI.GetCategoryInfo(categoryInfo.parentCategoryID)
@@ -667,7 +762,7 @@ PROFESSIONS_FIRST_CRAFT_DESCRIPTION = "Crafting this recipe for the first time w
 -- Finishing reagents
 --
 	if recipe.numFinishing and recipe.numFinishing > 0 then
-		--DA.DEBUG(0,"UpdateDetailWindow: recipeID= "..tostring(recipe.spellID)..", name= "..tostring(recipe.name)..", numFinishing="..tostring(recipe.numFinishing))
+		DA.DEBUG(0,"UpdateDetailWindow: recipeID= "..tostring(recipe.spellID)..", name= "..tostring(recipe.name)..", numFinishing="..tostring(recipe.numFinishing))
 		local categoryInfo = C_TradeSkillUI.GetCategoryInfo(recipeInfo.categoryID)
 		while not categoryInfo.skillLineCurrentLevel and categoryInfo.parentCategoryID do
 			categoryInfo = C_TradeSkillUI.GetCategoryInfo(categoryInfo.parentCategoryID)
@@ -994,18 +1089,36 @@ function Skillet:ReagentButtonOnEnter(button, skillIndex, reagentIndex)
 				end
 			elseif reagentIndex <= 0 then
 				if not recipe.salvage then
+					if reagentIndex < -100 then
+--
+-- Required reagent
+--
+						local index = -1 * (reagentIndex + 100)
+						reagent = recipe.requiredData[index]
+						--DA.DEBUG(1,"ReagentButtonOnEnter(O): reagent= "..DA.DUMP1(reagent))
+						--DA.DEBUG(1,"ReagentButtonOnEnter(O): index="..tostring(reagentIndex)..", requiredSelected= "..DA.DUMP1(self.requiredSelected))
+						if self.requiredSelected[index] then
+							self:SetReagentToolTip(self.requiredSelected[index].itemID, 0, 0)
+						elseif reagent.lockedReason then
+							GameTooltip:AddLine(reagent.lockedReason, 1,0,0)
+						else
+							GameTooltip:AddLine(L["Right-Click to select"])
+						end
+					else
 --
 -- Optional reagent
 --
-					reagent = recipe.optionalData[-1 * reagentIndex]
-					--DA.DEBUG(1,"ReagentButtonOnEnter(O): reagent= "..DA.DUMP1(reagent))
-					--DA.DEBUG(1,"ReagentButtonOnEnter(O): index="..tostring(reagentIndex)..", optionalSelected= "..DA.DUMP1(self.optionalSelected))
-					if self.optionalSelected[-1 * reagentIndex] then
-						self:SetReagentToolTip(self.optionalSelected[-1 * reagentIndex].itemID, 0, 0)
-					elseif reagent.lockedReason then
-						GameTooltip:AddLine(reagent.lockedReason, 1,0,0)
-					else
-						GameTooltip:AddLine(L["Right-Click to select"])
+						local index = -1 * reagentIndex
+						reagent = recipe.optionalData[index]
+						--DA.DEBUG(1,"ReagentButtonOnEnter(O): reagent= "..DA.DUMP1(reagent))
+						--DA.DEBUG(1,"ReagentButtonOnEnter(O): index="..tostring(reagentIndex)..", optionalSelected= "..DA.DUMP1(self.optionalSelected))
+						if self.optionalSelected[index] then
+							self:SetReagentToolTip(self.optionalSelected[index].itemID, 0, 0)
+						elseif reagent.lockedReason then
+							GameTooltip:AddLine(reagent.lockedReason, 1,0,0)
+						else
+							GameTooltip:AddLine(L["Right-Click to select"])
+						end
 					end
 				elseif self.salvageSelected[1] then
 --
@@ -1123,6 +1236,13 @@ function Skillet:ReagentButtonRightClick(button, mouse, skillIndex, reagentIndex
 			Skillet:DisplaySalvageList()
 			Skillet:SalvageReagentOnClick(button, mouse, skillIndex, reagentIndex)
 			return
+		elseif reagentIndex < -100 then
+--
+-- Required reagent (reagentIndex < -100)
+--
+				Skillet:DisplayRequiredList()
+				Skillet:RequiredReagentOnClick(button, mouse, skillIndex, reagentIndex)
+				return
 		else
 --
 -- Optional reagent (reagentIndex < 0)
@@ -1173,6 +1293,13 @@ function Skillet:ReagentButtonOnClick(button, mouse, skillIndex, reagentIndex)
 --
 				Skillet:DisplaySalvageList()
 				Skillet:SalvageReagentOnClick(button, mouse, skillIndex, reagentIndex)
+				return
+			elseif reagentIndex < -100 then
+--
+-- Required reagent (reagentIndex < -100)
+--
+				Skillet:DisplayRequiredList()
+				Skillet:RequiredReagentOnClick(button, mouse, skillIndex, reagentIndex)
 				return
 			else
 --
