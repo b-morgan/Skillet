@@ -1064,7 +1064,7 @@ function Skillet:UpdateTradeSkillWindow()
 -- Set the state of any craft specific options
 --
 	self:RecipeDifficultyButton_OnShow()
-	SkilletUseHighestQuality:SetChecked(self.db.char.best_quality)
+	SkilletUseHighestQuality:SetChecked(self.db.profile.best_quality)
 	SkilletUseHighestQuality:Show()
 	SkilletHideUncraftableRecipes:SetChecked(self:GetTradeSkillOption("hideuncraftable"))
 	C_TradeSkillUI.SetOnlyShowMakeableRecipes(self:GetTradeSkillOption("hideuncraftable"))
