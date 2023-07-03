@@ -22,7 +22,7 @@ SKILLET_FINISHING_LIST_HEIGHT = 16
 local L = LibStub("AceLocale-3.0"):GetLocale("Skillet")
 
 function Skillet:FinishingListToggleHaveItems()
-	self.db.char.hide_unowned = not self.db.char.hide_unowned
+	self.db.profile.hide_unowned = not self.db.profile.hide_unowned
 	self:HideFinishingList()
 end
 
@@ -101,7 +101,7 @@ local function createFinishingListFrame(self)
 	titletext:SetText("Skillet: Finishing Reagents")
 	frame.titletext = titletext
 	SkilletFinishingHaveItemsText:SetText(OPTIONAL_REAGENT_LIST_HIDE_UNOWNED)
-	SkilletFinishingHaveItems:SetChecked(Skillet.db.char.hide_unowned)
+	SkilletFinishingHaveItems:SetChecked(Skillet.db.profile.hide_unowned)
 --
 -- The frame enclosing the scroll list needs a border and a background .....
 --

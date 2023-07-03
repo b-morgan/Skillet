@@ -22,7 +22,7 @@ SKILLET_OPTIONAL_LIST_HEIGHT = 16
 local L = LibStub("AceLocale-3.0"):GetLocale("Skillet")
 
 function Skillet:OptionalListToggleHaveItems()
-	self.db.char.hide_unowned = not self.db.char.hide_unowned
+	self.db.profile.hide_unowned = not self.db.profile.hide_unowned
 	self:HideOptionalList()
 end
 
@@ -101,7 +101,7 @@ local function createOptionalListFrame(self)
 	titletext:SetText("Skillet: Optional Reagents")
 	frame.titletext = titletext
 	SkilletOptionalHaveItemsText:SetText(OPTIONAL_REAGENT_LIST_HIDE_UNOWNED)
-	SkilletOptionalHaveItems:SetChecked(Skillet.db.char.hide_unowned)
+	SkilletOptionalHaveItems:SetChecked(Skillet.db.profile.hide_unowned)
 --
 -- The frame enclosing the scroll list needs a border and a background .....
 --

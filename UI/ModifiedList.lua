@@ -361,9 +361,9 @@ function Skillet:ModifiedButtonOnClick(button, mouse, skillIndex, reagentIndex)
 end
 
 function Skillet:ModifiedListToggleBestQuality()
-	self.db.char.best_quality = not self.db.char.best_quality
-	--DA.DEBUG(0,"ModifiedListToggleBestQuality: best_quality= "..tostring(self.db.char.best_quality))
-	SkilletUseHighestQuality:SetChecked(self.db.char.best_quality)
+	self.db.profile.best_quality = not self.db.profile.best_quality
+	--DA.DEBUG(0,"ModifiedListToggleBestQuality: best_quality= "..tostring(self.db.profile.best_quality))
+	SkilletUseHighestQuality:SetChecked(self.db.profile.best_quality)
 	self:UpdateDetailWindow(self.selectedSkill)
 end
 
@@ -441,7 +441,7 @@ end
 --
 -- Called when there are enough reagents for this slot.
 -- Builds a table in the format needed by C_TradeSkillUI.CraftRecipe
--- using self.db.char.best_quality to determine the order.
+-- using self.db.profile.best_quality to determine the order.
 --
 function Skillet:InitializeModifiedSelected(mreagent)
 	--DA.DEBUG(0,"InitializeModifiedSelected("..DA.DUMP(mreagent)..")")
@@ -451,7 +451,7 @@ function Skillet:InitializeModifiedSelected(mreagent)
 	local used = 0
 	local need = mreagent.numNeeded
 	local num
-	if self.db.char.best_quality then
+	if self.db.profile.best_quality then
 		for k=#mreagent.schematic.reagents, 1 , -1 do
 			if used < need then
 				num = self:GetInventory(self.currentPlayer, mreagent.schematic.reagents[k].itemID)

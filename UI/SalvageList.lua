@@ -22,7 +22,7 @@ SKILLET_SALVAGE_LIST_HEIGHT = 16
 local L = LibStub("AceLocale-3.0"):GetLocale("Skillet")
 
 function Skillet:SalvageListToggleHaveItems()
-	self.db.char.hide_unowned = not self.db.char.hide_unowned
+	self.db.profile.hide_unowned = not self.db.profile.hide_unowned
 	self:HideSalvageList()
 end
 
@@ -101,7 +101,7 @@ local function createSalvageListFrame(self)
 	titletext:SetText("Skillet: Salvage Reagents")
 	frame.titletext = titletext
 	SkilletSalvageHaveItemsText:SetText(OPTIONAL_REAGENT_LIST_HIDE_UNOWNED)
-	SkilletSalvageHaveItems:SetChecked(Skillet.db.char.hide_unowned)
+	SkilletSalvageHaveItems:SetChecked(Skillet.db.profile.hide_unowned)
 --
 -- The frame enclosing the scroll list needs a border and a background .....
 --
@@ -288,7 +288,7 @@ function Skillet:SalvageReagentOnClick(button, mouse, skillIndex, reagentIndex)
 	--DA.DEBUG(1,"SalvageReagentOnClick: salvage= "..DA.DUMP1(recipe.salvage))
 	local j = 1
 	for i=1, #recipe.salvage,1 do
-		if self.db.char.hide_unowned then
+		if self.db.profile.hide_unowned then
 			local num, craftable = self:GetInventory(self.currentPlayer, recipe.salvage[i])
 			if num > 0 or craftable > 0 then
 				self.cachedSalvageList[j] = {}
