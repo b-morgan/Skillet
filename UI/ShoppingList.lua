@@ -209,7 +209,7 @@ function Skillet:ClearShoppingList(player)
 end
 
 function Skillet:GetShoppingList(player, sameFaction, includeGuildbank)
-	DA.DEBUG(0,"GetShoppingList("..tostring(player)..", "..tostring(sameFaction)..", "..tostring(includeGuildbank)..")")
+	--DA.DEBUG(0,"GetShoppingList("..tostring(player)..", "..tostring(sameFaction)..", "..tostring(includeGuildbank)..")")
 	self:InventoryScan()
 	local curPlayer = self.currentPlayer
 	if not self.db.realm.faction then
@@ -241,7 +241,7 @@ function Skillet:GetShoppingList(player, sameFaction, includeGuildbank)
 			end
 		end
 	end
-	DA.DEBUG(0,"shopping list for: "..(player or "all players"))
+	--DA.DEBUG(0,"shopping list for: "..(player or "all players"))
 	local usedInventory = {}  -- only use the items from each player once
 	if not usedInventory[curPlayer] then
 		usedInventory[curPlayer] = {}
