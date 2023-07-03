@@ -40,10 +40,10 @@ end
 
 local function get_shopping_list()
 	local name = nil
-	if not Skillet.db.char.include_alts then
+	if not Skillet.db.profile.include_alts then
 		name = Skillet.currentPlayer
 	end
-	return Skillet:GetShoppingList(name, Skillet.db.char.same_faction, Skillet.db.char.include_guild)
+	return Skillet:GetShoppingList(name, Skillet.db.profile.same_faction, Skillet.db.profile.include_guild)
 end
 
 --

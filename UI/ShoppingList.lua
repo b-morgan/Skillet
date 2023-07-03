@@ -111,18 +111,18 @@ local function createShoppingListFrame(self)
 	titletext:SetText("Skillet: " .. L["Shopping List"])
 
 	SkilletShowQueuesFromAllAltsText:SetText(L["Include alts"])
-	SkilletShowQueuesFromAllAlts:SetChecked(Skillet.db.char.include_alts)
+	SkilletShowQueuesFromAllAlts:SetChecked(Skillet.db.profile.include_alts)
 
 	SkilletShowQueuesFromSameFactionText:SetText(L["Same faction"])
-	SkilletShowQueuesFromSameFaction:SetChecked(Skillet.db.char.same_faction)
+	SkilletShowQueuesFromSameFaction:SetChecked(Skillet.db.profile.same_faction)
 
 	SkilletShowQueuesInItemOrderText:SetText(L["Order by item"])
-	SkilletShowQueuesInItemOrder:SetChecked(Skillet.db.char.item_order)
+	SkilletShowQueuesInItemOrder:SetChecked(Skillet.db.profile.item_order)
 	SkilletShowQueuesMergeItemsText:SetText(L["Merge items"])
-	SkilletShowQueuesMergeItems:SetChecked(Skillet.db.char.merge_items)
+	SkilletShowQueuesMergeItems:SetChecked(Skillet.db.profile.merge_items)
 
 	SkilletShowQueuesIncludeGuildText:SetText(L["Include guild"])
-	SkilletShowQueuesIncludeGuild:SetChecked(Skillet.db.char.include_guild)
+	SkilletShowQueuesIncludeGuild:SetChecked(Skillet.db.profile.include_guild)
 
 --
 -- Button to retrieve items needed from the bank
@@ -209,7 +209,7 @@ function Skillet:ClearShoppingList(player)
 end
 
 function Skillet:GetShoppingList(player, sameFaction, includeGuildbank)
-	--DA.DEBUG(0,"GetShoppingList("..tostring(player)..", "..tostring(sameFaction)..", "..tostring(includeGuildbank)..")")
+	DA.DEBUG(0,"GetShoppingList("..tostring(player)..", "..tostring(sameFaction)..", "..tostring(includeGuildbank)..")")
 	self:InventoryScan()
 	local curPlayer = self.currentPlayer
 	if not self.db.realm.faction then
@@ -241,7 +241,7 @@ function Skillet:GetShoppingList(player, sameFaction, includeGuildbank)
 			end
 		end
 	end
-	--DA.DEBUG(0,"shopping list for: "..(player or "all players"))
+	DA.DEBUG(0,"shopping list for: "..(player or "all players"))
 	local usedInventory = {}  -- only use the items from each player once
 	if not usedInventory[curPlayer] then
 		usedInventory[curPlayer] = {}
@@ -308,10 +308,10 @@ end
 
 local function cache_list(self)
 	local name = nil
-	if not Skillet.db.char.include_alts then
+	if not Skillet.db.profile.include_alts then
 		name = Skillet.currentPlayer
 	end
-	self.cachedShoppingList = self:GetShoppingList(name, self.db.char.same_faction, self.db.char.include_guild)
+	self.cachedShoppingList = self:GetShoppingList(name, self.db.profile.same_faction, self.db.profile.include_guild)
 end
 
 local function indexBags()
@@ -1055,7 +1055,7 @@ end
 function Skillet:GetReagentsFromBanks()
 	DA.DEBUG(0,"GetReagentsFromBanks()")
 	local list = self.cachedShoppingList
-	local incAlts = Skillet.db.char.include_alts
+	local incAlts = Skillet.db.profile.include_alts
 --
 -- Add other qualities for modified items
 -- ToDo: clear the base item from the list when an alternate quality is pulled
@@ -1147,23 +1147,23 @@ function Skillet:GetReagentsFromBanks()
 end
 
 function Skillet:ShoppingListToggleShowAlts()
-	Skillet.db.char.include_alts = not Skillet.db.char.include_alts
+	Skillet.db.profile.include_alts = not Skillet.db.profile.include_alts
 end
 
 function Skillet:ShoppingListToggleSameFaction()
-	Skillet.db.char.same_faction = not Skillet.db.char.same_faction
+	Skillet.db.profile.same_faction = not Skillet.db.profile.same_faction
 end
 
 function Skillet:ShoppingListToggleItemOrder()
-	Skillet.db.char.item_order = not Skillet.db.char.item_order
+	Skillet.db.profile.item_order = not Skillet.db.profile.item_order
 end
 
 function Skillet:ShoppingListToggleMergeItems()
-	Skillet.db.char.merge_items = not Skillet.db.char.merge_items
+	Skillet.db.profile.merge_items = not Skillet.db.profile.merge_items
 end
 
 function Skillet:ShoppingListToggleIncludeGuild()
-	Skillet.db.char.include_guild = not Skillet.db.char.include_guild
+	Skillet.db.profile.include_guild = not Skillet.db.profile.include_guild
 end
 
 local function get_button(i)
@@ -1203,7 +1203,7 @@ function Skillet:UpdateShoppingListWindow(use_cached_recipes)
 	else
 		SkilletShoppingListRetrieveButton:Enable()
 	end
-	if Skillet.db.char.item_order then
+	if Skillet.db.profile.item_order then
 --
 -- sort by item
 --
@@ -1213,7 +1213,7 @@ function Skillet:UpdateShoppingListWindow(use_cached_recipes)
 			nb = GetItemInfo(b.id) or ""
 			return nb > na
 		end)
-		if Skillet.db.char.merge_items then
+		if Skillet.db.profile.merge_items then
 --
 -- merge counts of same item
 --
