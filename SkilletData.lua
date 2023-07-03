@@ -1362,6 +1362,8 @@ recipeSchematic= {
 --		local numSalvage = 0
 		local modifiedData = {}
 		local numModified = 0
+		local requiredData = {}
+		local numRequired = 0
 		local optionalData = {}
 		local numOptional = 0
 		local finishingData = {}
@@ -1425,18 +1427,34 @@ recipeSchematic= {
 				end
 			elseif schematic.reagentType == Enum.CraftingReagentType.Modifying then
 				--DA.DEBUG(2,"ScanTrade: recipeID= "..tostring(recipeID)..", name= "..tostring(recipeInfo.name)..", Optional reagent= "..DA.DUMP(schematic))
-				numOptional = numOptional + 1
-				optionalData[numOptional] = {}
-				optionalData[numOptional].reagentID = reagentID		-- the first reagent in the list
-				optionalData[numOptional].numNeeded = numNeeded
-				optionalData[numOptional].slot = schematic.dataSlotIndex
-				optionalData[numOptional].name = schematic.slotInfo.slotText
-				optionalData[numOptional].schematic = schematic
-				local locked, lockedReason = Skillet:GetReagentSlotStatus(schematic, recipeInfo)
-				if locked then
-					--DA.DEBUG(2,"ScanTrade: recipeID= "..tostring(recipeID)..", name= "..tostring(recipeInfo.name)..", Optional lockedReason= "..tostring(lockedReason))
-					optionalData[numOptional].locked = locked
-					optionalData[numOptional].lockedReason = lockedReason
+				if schematic.required then
+					numRequired = numRequired + 1
+					requiredData[numRequired] = {}
+					requiredData[numRequired].reagentID = reagentID		-- the first reagent in the list
+					requiredData[numRequired].numNeeded = numNeeded
+					requiredData[numRequired].slot = schematic.dataSlotIndex
+					requiredData[numRequired].name = schematic.slotInfo.slotText
+					requiredData[numRequired].schematic = schematic
+					local locked, lockedReason = Skillet:GetReagentSlotStatus(schematic, recipeInfo)
+					if locked then
+						--DA.DEBUG(2,"ScanTrade: recipeID= "..tostring(recipeID)..", name= "..tostring(recipeInfo.name)..", Required lockedReason= "..tostring(lockedReason))
+						requiredData[numRequired].locked = locked
+						requiredData[numRequired].lockedReason = lockedReason
+					end
+				else
+					numOptional = numOptional + 1
+					optionalData[numOptional] = {}
+					optionalData[numOptional].reagentID = reagentID		-- the first reagent in the list
+					optionalData[numOptional].numNeeded = numNeeded
+					optionalData[numOptional].slot = schematic.dataSlotIndex
+					optionalData[numOptional].name = schematic.slotInfo.slotText
+					optionalData[numOptional].schematic = schematic
+					local locked, lockedReason = Skillet:GetReagentSlotStatus(schematic, recipeInfo)
+					if locked then
+						--DA.DEBUG(2,"ScanTrade: recipeID= "..tostring(recipeID)..", name= "..tostring(recipeInfo.name)..", Optional lockedReason= "..tostring(lockedReason))
+						optionalData[numOptional].locked = locked
+						optionalData[numOptional].lockedReason = lockedReason
+					end
 				end
 			elseif schematic.reagentType == Enum.CraftingReagentType.Finishing then
 				--DA.DEBUG(2,"ScanTrade: recipeID= "..tostring(recipeID)..", name= "..tostring(recipeInfo.name)..", Finishing reagent= "..DA.DUMP(schematic))
@@ -1463,6 +1481,9 @@ recipeSchematic= {
 		--DA.DEBUG(2,"ScanTrade: modifiedData= "..DA.DUMP(modifiedData))
 		recipe.modifiedData = modifiedData
 		recipe.numModified = numModified
+		--DA.DEBUG(2,"ScanTrade: requiredData= "..DA.DUMP(requiredData))
+		recipe.requiredData = requiredData
+		recipe.numRequired = numRequired
 		--DA.DEBUG(2,"ScanTrade: optionalData= "..DA.DUMP(optionalData))
 		recipe.optionalData = optionalData
 		recipe.numOptional = numOptional

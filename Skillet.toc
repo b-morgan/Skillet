@@ -105,6 +105,8 @@ UI\FinishingList.lua
 UI\FinishingList.xml
 UI\ModifiedList.lua
 UI\ModifiedList.xml
+UI\RequiredList.lua
+UI\RequiredList.xml
 UI\OptionalList.lua
 UI\OptionalList.xml
 UI\SalvageList.lua
