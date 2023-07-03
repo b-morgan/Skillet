@@ -1,0 +1,244 @@
+<Ui xmlns="http://www.blizzard.com/wow/ui/" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://www.blizzard.com/wow/ui/
+..\..\FrameXML\UI.xsd">
+
+	<!--
+	Skillet: A tradeskill window replacement.
+
+	This program is free software: you can redistribute it and/or modify
+	it under the terms of the GNU General Public License as published by
+	the Free Software Foundation, either version 3 of the License, or
+	(at your option) any later version.
+
+	This program is distributed in the hope that it will be useful,
+	but WITHOUT ANY WARRANTY; without even the implied warranty of
+	MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+	GNU General Public License for more details.
+
+	You should have received a copy of the GNU General Public License
+	along with this program.  If not, see <http://www.gnu.org/licenses/>.
+	-->
+
+<!--
+#
+#  Template for all the buttons we use to display items in the required list
+#
+-->
+	<Frame name="SkilletRequiredListItemTemplate" hidden="false" virtual="true">
+		<Size>
+			<AbsDimension x="190" y="20"/>
+		</Size>
+		<Layers>
+			<Layer level="OVERLAY">
+				<FontString name="$parentCount" inherits="GameFontNormal" justifyH="RIGHT" justifyV="MIDDLE">
+					<Size>
+						<AbsDimension x="48" y="20"/>
+					</Size>
+					<Anchors>
+						<Anchor point="TOPRIGHT" relativeTo="$parent" relativePoint="TOPRIGHT">
+							<Offset>
+								<AbsDimension x="0" y="0"/>
+							</Offset>
+						</Anchor>
+					</Anchors>
+					<Color r="1" g="1" b="1" a="1"/>
+				</FontString>
+				<FontString name="$parentNeeded" inherits="GameFontNormal" justifyH="RIGHT" justifyV="MIDDLE">
+					<Size>
+						<AbsDimension x="32" y="16"/>
+					</Size>
+					<Anchors>
+						<Anchor point="TOPLEFT" relativeTo="$parent" relativePoint="TOPLEFT">
+							<Offset>
+								<AbsDimension x="18" y="0"/>
+							</Offset>
+						</Anchor>
+					</Anchors>
+				<Color r="1" g="1" b="1" a="1"/>
+				</FontString>
+				<FontString name="$parentText" inherits="GameFontNormal" justifyH="LEFT" justifyV="MIDDLE">
+					<Anchors>
+						<Anchor point="LEFT" relativeTo="$parentNeeded" relativePoint="RIGHT" />
+						<Anchor point="RIGHT" relativeTo="$parentCount" relativePoint="LEFT" />
+					</Anchors>
+					<Color r="1" g="1" b="1" a="1"/>
+				</FontString>
+			</Layer>
+		</Layers>
+		<Frames>
+			<!-- A button for the icon -->
+			<button name="$parentIcon">
+				<Size>
+					<AbsDimension x="16" y="16"/>
+				</Size>
+				<Layers>
+					<Layer level="BACKGROUND">
+						<Texture name="$parentTexture"/>
+					</Layer>
+				</Layers>
+				<Anchors>
+					<Anchor point="TOPLEFT" relativeTo="$parent" relativePoint="TOPLEFT">
+						<Offset>
+							<AbsDimension x="0" y="0"/>
+						</Offset>
+					</Anchor>
+				</Anchors>
+			</button>
+		</Frames>
+		<Scripts>
+			<OnLoad>
+				self:RegisterForClicks("LeftButtonUp", "RightButtonUp")
+			</OnLoad>
+			<OnEnter>
+				Skillet:RequiredButtonOnEnter(self, SkilletFrame.selectedSkill, self:GetID())
+			</OnEnter>
+			<OnLeave>
+				Skillet:RequiredButtonOnLeave(self, SkilletFrame.selectedSkill, self:GetID())
+			</OnLeave>
+			<OnUpdate>
+				CursorOnUpdate(self)
+			</OnUpdate>
+			<OnClick>
+				if ( button == "LeftButton" and IsShiftKeyDown() ) then
+				<!-- Put a link to the *item* in chat into the current chat edit box -->
+					local link = Skillet:GetRequiredItemLink(Skillet.selectedSkill, self:GetID())
+					if not ChatEdit_InsertLink(link) then
+						DA.DEBUG(0,"RequiredItemLink: link= "..DA.PLINK(link))
+					end
+				else
+				<!-- generic click action -->
+					Skillet:RequiredButtonOnClick(self, button, Skillet.selectedSkill, self:GetID())
+				end
+			</OnClick>
+		</Scripts>
+	</Frame>
+
+<CheckButton name="SkilletRequiredListCheckButtonTemplate" virtual="true">
+	<Size>
+		<AbsDimension x="20" y="20"/>
+	</Size>
+	<Layers>
+		<Layer level="ARTWORK">
+			<FontString name="$parentText" inherits="GameFontHighlight">
+				<Anchors>
+					<Anchor point="RIGHT" relativePoint="LEFT">
+						<Offset>
+							<AbsDimension x="0" y="1"/>
+						</Offset>
+					</Anchor>
+				</Anchors>
+			</FontString>
+		</Layer>
+	</Layers>
+	<NormalTexture file="Interface\Buttons\UI-CheckBox-Up"/>
+	<PushedTexture file="Interface\Buttons\UI-CheckBox-Down"/>
+	<HighlightTexture file="Interface\Buttons\UI-CheckBox-Highlight" alphaMode="ADD"/>
+	<CheckedTexture file="Interface\Buttons\UI-CheckBox-Check"/>
+	<DisabledCheckedTexture file="Interface\Buttons\UI-CheckBox-Check-Disabled"/>
+</CheckButton>
+
+<CheckButton name="SkilletRequiredListCheckButtonTemplate2" virtual="true">
+	<Size>
+		<AbsDimension x="20" y="20"/>
+	</Size>
+	<Layers>
+		<Layer level="ARTWORK">
+			<FontString name="$parentText" inherits="GameFontHighlight">
+				<Anchors>
+					<Anchor point="LEFT" relativePoint="RIGHT">
+						<Offset>
+							<AbsDimension x="0" y="1"/>
+						</Offset>
+					</Anchor>
+				</Anchors>
+			</FontString>
+		</Layer>
+	</Layers>
+	<NormalTexture file="Interface\Buttons\UI-CheckBox-Up"/>
+	<PushedTexture file="Interface\Buttons\UI-CheckBox-Down"/>
+	<HighlightTexture file="Interface\Buttons\UI-CheckBox-Highlight" alphaMode="ADD"/>
+	<CheckedTexture file="Interface\Buttons\UI-CheckBox-Check"/>
+	<DisabledCheckedTexture file="Interface\Buttons\UI-CheckBox-Check-Disabled"/>
+</CheckButton>
+
+<Frame name="SkilletRequiredList" parent="UIParent" toplevel="true" movable="true" enableMouse="true" resizable="true" hidden="true" clampedToScreen="true" inherits="BackdropTemplate">
+	<Size><AbsDimension x="420" y="240"/></Size>
+	<Anchors>
+		<Anchor point="CENTER"/>
+	</Anchors>
+	<Frames>
+		<Button name="SkilletRequiredListCloseButton" inherits="UIPanelCloseButton" parent="SkilletRequiredList">
+			<Anchors>
+				<Anchor point="TOPRIGHT" relativeTo="SkilletRequiredList" relativePoint="TOPRIGHT">
+					<Offset>
+						<AbsDimension x="-2" y="-2"/>
+					</Offset>
+				</Anchor>
+			</Anchors>
+			<Scripts>
+				<OnClick>
+					HideUIPanel(SkilletRequiredList)
+				</OnClick>
+			</Scripts>
+		</Button>
+		<CheckButton name="SkilletRequiredHaveItems" inherits="SkilletRequiredListCheckButtonTemplate2">
+			<Anchors>
+				<Anchor point="BOTTOMLEFT" relativeTo="SkilletRequiredList" relativePoint="BOTTOMLEFT">
+					<Offset>
+						<AbsDimension x="10" y="10"/>
+					</Offset>
+				</Anchor>
+			</Anchors>
+			<Scripts>
+				<OnClick>
+					Skillet:RequiredListToggleHaveItems()
+					Skillet:UpdateRequiredListWindow()
+				</OnClick>
+			</Scripts>
+		</CheckButton>
+		<Frame name="SkilletRequiredListParent" parent="SkilletRequiredList">
+			<Anchors>
+				<Anchor point="TOPLEFT" relativeTo="SkilletRequiredList" relativePoint="TOPLEFT">
+					<Offset>
+						<AbsDimension x="5" y="-35"/>
+					</Offset>
+				</Anchor>
+				<Anchor point="BOTTOMRIGHT" relativeTo="SkilletRequiredList" relativePoint="BOTTOMRIGHT">
+					<Offset>
+						<AbsDimension x="-5" y="35"/>
+					</Offset>
+				</Anchor>
+			</Anchors>
+		</Frame>
+		<ScrollFrame name="SkilletRequiredListList" inherits="FauxScrollFrameTemplate" parent="SkilletRequiredListParent">
+			<Anchors>
+				<Anchor point="TOPLEFT" relativeTo="SkilletRequiredListParent" relativePoint="TOPLEFT">
+					<Offset>
+						<AbsDimension x="5" y="-5"/>
+					</Offset>
+				</Anchor>
+				<Anchor point="BOTTOMRIGHT" relativeTo="SkilletRequiredListParent" relativePoint="BOTTOMRIGHT">
+					<Offset>
+						<AbsDimension x="-27" y="5"/>
+					</Offset>
+				</Anchor>
+			</Anchors>
+			<Scripts>
+				<OnVerticalScroll>
+					FauxScrollFrame_OnVerticalScroll(self, offset, SKILLET_OPTIONAL_LIST_HEIGHT, Skillet.RequiredList_OnScroll)
+				</OnVerticalScroll>
+			</Scripts>
+		</ScrollFrame>
+		<Button name="SkilletRequiredListButton1" inherits="SkilletRequiredListItemTemplate">
+			<Anchors>
+				<Anchor point="TOPLEFT" relativeTo="SkilletRequiredListList" relativePoint="TOPLEFT">
+					<Offset>
+						<AbsDimension x="1" y="-1"/>
+					</Offset>
+				</Anchor>
+			</Anchors>
+		</Button>
+		<!-- rest of the buttons are created dynamically -->
+	</Frames>
+</Frame>
+</Ui>
+

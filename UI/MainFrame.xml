@@ -2567,10 +2567,28 @@
 					</Anchor>
 				</Anchors>
 			</Button>
-			<!-- Define one more just in case the recipe has 12 reagents -->
-			<Button name="SkilletReagent13" inherits="SkilletReagentTemplate" id="0" parent="SkilletReagentParent">
+			<Button name="SkilletReagent13" inherits="SkilletReagentTemplate" id="13" parent="SkilletReagentParent">
 				<Anchors>
 					<Anchor point="TOPLEFT" relativeTo="SkilletReagent12" relativePoint="BOTTOMLEFT">
+						<Offset>
+							<AbsDimension x="0" y="0"/>
+						</Offset>
+					</Anchor>
+				</Anchors>
+			</Button>
+			<Button name="SkilletReagent14" inherits="SkilletReagentTemplate" id="14" parent="SkilletReagentParent">
+				<Anchors>
+					<Anchor point="TOPLEFT" relativeTo="SkilletReagent13" relativePoint="BOTTOMLEFT">
+						<Offset>
+							<AbsDimension x="0" y="0"/>
+						</Offset>
+					</Anchor>
+				</Anchors>
+			</Button>
+			<!-- Define one more just in case the recipe has 14 reagents -->
+			<Button name="SkilletReagent15" inherits="SkilletReagentTemplate" id="0" parent="SkilletReagentParent">
+				<Anchors>
+					<Anchor point="TOPLEFT" relativeTo="SkilletReagent14" relativePoint="BOTTOMLEFT">
 						<Offset>
 							<AbsDimension x="0" y="0"/>
 						</Offset>
