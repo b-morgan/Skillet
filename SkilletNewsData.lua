@@ -25,6 +25,17 @@ local isWrath = WOW_PROJECT_ID == WOW_PROJECT_WRATH_CLASSIC
 
 Skillet.NewsName = "Skillet News"
 Skillet.NewsData = {
+	{	version = "5.20",
+		data = {
+			{	name = "Changes",
+				data = {
+					{ header = "Clean up", body = "Move db.char to db.profile" },
+					{ header = "Reagents", body = "Add more reagent slots" },
+					{ header = "Required Reagents", body = "Add required reagents (optionals with required=true)" },
+				},
+			},
+		},
+	},
 	{	version = "5.19",
 		data = {
 			{	name = "Changes",
