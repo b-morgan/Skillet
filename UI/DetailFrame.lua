@@ -562,7 +562,7 @@ PROFESSIONS_FIRST_CRAFT_DESCRIPTION = "Crafting this recipe for the first time w
 -- Required reagents
 --
 	if recipe.numRequired and recipe.numRequired > 0 then
-		DA.DEBUG(0,"UpdateDetailWindow: recipeID= "..tostring(recipe.spellID)..", name= "..tostring(recipe.name)..", numRequired="..tostring(recipe.numRequired))
+		--DA.DEBUG(0,"UpdateDetailWindow: recipeID= "..tostring(recipe.spellID)..", name= "..tostring(recipe.name)..", numRequired="..tostring(recipe.numRequired))
 		local categoryInfo = C_TradeSkillUI.GetCategoryInfo(recipeInfo.categoryID)
 		while not categoryInfo.skillLineCurrentLevel and categoryInfo.parentCategoryID do
 			categoryInfo = C_TradeSkillUI.GetCategoryInfo(categoryInfo.parentCategoryID)
@@ -657,7 +657,7 @@ PROFESSIONS_FIRST_CRAFT_DESCRIPTION = "Crafting this recipe for the first time w
 -- Optional reagents
 --
 	if recipe.numOptional and recipe.numOptional > 0 then
-		DA.DEBUG(0,"UpdateDetailWindow: recipeID= "..tostring(recipe.spellID)..", name= "..tostring(recipe.name)..", numOptional="..tostring(recipe.numOptional))
+		--DA.DEBUG(0,"UpdateDetailWindow: recipeID= "..tostring(recipe.spellID)..", name= "..tostring(recipe.name)..", numOptional="..tostring(recipe.numOptional))
 		local categoryInfo = C_TradeSkillUI.GetCategoryInfo(recipeInfo.categoryID)
 		while not categoryInfo.skillLineCurrentLevel and categoryInfo.parentCategoryID do
 			categoryInfo = C_TradeSkillUI.GetCategoryInfo(categoryInfo.parentCategoryID)
@@ -762,7 +762,7 @@ PROFESSIONS_FIRST_CRAFT_DESCRIPTION = "Crafting this recipe for the first time w
 -- Finishing reagents
 --
 	if recipe.numFinishing and recipe.numFinishing > 0 then
-		DA.DEBUG(0,"UpdateDetailWindow: recipeID= "..tostring(recipe.spellID)..", name= "..tostring(recipe.name)..", numFinishing="..tostring(recipe.numFinishing))
+		--DA.DEBUG(0,"UpdateDetailWindow: recipeID= "..tostring(recipe.spellID)..", name= "..tostring(recipe.name)..", numFinishing="..tostring(recipe.numFinishing))
 		local categoryInfo = C_TradeSkillUI.GetCategoryInfo(recipeInfo.categoryID)
 		while not categoryInfo.skillLineCurrentLevel and categoryInfo.parentCategoryID do
 			categoryInfo = C_TradeSkillUI.GetCategoryInfo(categoryInfo.parentCategoryID)
