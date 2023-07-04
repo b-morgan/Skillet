@@ -64,6 +64,9 @@ function Skillet:QueueCommandIterate(recipeID, count)
 			newCommand.modifiedReagents[j] = self:InitializeModifiedSelected(recipe.modifiedData[j])
 		end
 	end
+	if recipe.numRequired and recipe.numRequired ~= 0 and self.requiredSelected then
+		newCommand.requiredReagents = self.requiredSelected
+	end
 	if recipe.numOptional and recipe.numOptional ~= 0 and self.optionalSelected then
 		newCommand.optionalReagents = self.optionalSelected
 	end
@@ -177,6 +180,12 @@ function Skillet:QueueAppendCommand(command, queueCraftables, first)
 				--DA.DEBUG(2,"QueueAppendCommand: reagent= "..DA.DUMP(reagent))
 				queueAppendReagent(command, reagent.reagentID, command.count * reagent.numNeeded, queueCraftables and queueGlyph, reagent)
 				modifiedInQueue[reagent.reagentID] = reagent.schematic.reagents
+			end
+		end
+		if command.requiredReagents then
+			for i,reagent in pairs(command.requiredReagents) do
+				DA.DEBUG(2,"QueueAppendCommand: i= "..tostring(i)..", reagent= "..DA.DUMP(reagent))
+				queueAppendReagent(command, reagent.itemID, command.count, queueCraftables)
 			end
 		end
 		if command.optionalReagents then
@@ -371,10 +380,17 @@ function Skillet:PrintRIQ()
 	end
 end
 
-local function ApplyAllocations(transaction, modifiedReagents, optionalReagents, finishingReagents)
+local function ApplyAllocations(transaction, modifiedReagents, requiredReagents, optionalReagents, finishingReagents)
 	local reagentsToQuantity = {}
 	if modifiedReagents then
 		for _, all in ipairs(modifiedReagents) do
+			for _, item in ipairs(all) do
+				reagentsToQuantity[item.itemID] = item.quantity
+			end
+		end
+	end
+	if requiredReagents then
+		for _, all in ipairs(requiredReagents) do
 			for _, item in ipairs(all) do
 				reagentsToQuantity[item.itemID] = item.quantity
 			end
@@ -482,6 +498,26 @@ function Skillet:ProcessQueue(altMode)
 						end
 					end
 --
+-- Required reagents
+--
+					if command.requiredReagents then
+						for i,reagent in pairs(command.requiredReagents) do
+							--DA.DEBUG(2,"ProcessQueue(R): i= "..tostring(i)..", reagent= "..DA.DUMP1(reagent))
+							local reagentID = reagent.itemID
+							local reagentName = GetItemInfo(reagentID) or reagentID
+							--DA.DEBUG(2,"ProcessQueue(R): oid= "..tostring(reagentID)..", reagentName="..tostring(reagentName)..", numNeeded="..tostring(command.count))
+							local numInBoth = GetItemCount(reagentID,true,false,true)
+							local numInBags = GetItemCount(reagentID)
+							local numInBank =  numInBoth - numInBags
+							--DA.DEBUG(2,"ProcessQueue(R): numInBoth= "..tostring(numInBoth)..", numInBags="..tostring(numInBags)..", numInBank="..tostring(numInBank))
+							if numInBoth < command.count then
+								Skillet:Print(L["Skipping"],recipe.name,"-",L["need"],command.count,"x",reagentName,"("..L["have"],numInBoth..")")
+								craftable = false
+								break
+							end
+						end -- for
+					end
+--
 -- Optional reagents
 --
 					if command.optionalReagents then
@@ -501,6 +537,9 @@ function Skillet:ProcessQueue(altMode)
 							end
 						end -- for
 					end
+--
+-- Finishing reagents
+--
 					if command.finishingReagents then
 						for i,reagent in pairs(command.finishingReagents) do
 							--DA.DEBUG(2,"ProcessQueue(F): i= "..tostring(i)..", reagent= "..DA.DUMP1(reagent))
@@ -604,6 +643,12 @@ function Skillet:ProcessQueue(altMode)
 								end
 							end -- for
 						end
+						if command.requiredReagents then
+							for i,reagent in pairs(command.requiredReagents) do
+								DA.DEBUG(2,"Required: i= "..tostring(i)..", reagent= "..DA.DUMP1(reagent))
+								table.insert(self.optionalReagentsArray, reagent)
+							end -- for
+						end
 						if command.optionalReagents then
 							for i,reagent in pairs(command.optionalReagents) do
 								DA.DEBUG(2,"Optional: i= "..tostring(i)..", reagent= "..DA.DUMP1(reagent))
@@ -616,12 +661,12 @@ function Skillet:ProcessQueue(altMode)
 								table.insert(self.optionalReagentsArray, reagent)
 							end -- for
 						end
-						DA.DEBUG(1,"ProcessQueue: recipeLevel= "..tostring(recipeLevel)..", optionalReagentsArray= "..DA.DUMP(self.optionalReagentsArray))
+						--DA.DEBUG(1,"ProcessQueue: recipeLevel= "..tostring(recipeLevel)..", optionalReagentsArray= "..DA.DUMP(self.optionalReagentsArray))
 						command.optionalReagentsArray = self.optionalReagentsArray
 					else
 						self.recipeTransaction = CreateProfessionsRecipeTransaction(C_TradeSkillUI.GetRecipeSchematic(command.recipeID, false, recipeLevel))
-						ApplyAllocations(self.recipeTransaction, command.modifiedReagents, command.optionalReagents, command.finishingReagents)
-						DA.DEBUG(1,"ProcessQueue: recipeLevel= "..tostring(recipeLevel)..", recipeTransaction= "..DA.DUMP(self.recipeTransaction))
+						ApplyAllocations(self.recipeTransaction, command.modifiedReagents, command.requiredReagents, command.optionalReagents, command.finishingReagents)
+						--DA.DEBUG(1,"ProcessQueue: recipeLevel= "..tostring(recipeLevel)..", recipeTransaction= "..DA.DUMP(self.recipeTransaction))
 					end
 --
 -- For debugging, save the command and TraceLog setting. Restored in ContinueCast.
@@ -629,13 +674,20 @@ function Skillet:ProcessQueue(altMode)
 --
 					self.command = command
 					self.oldTraceLog = DA.TraceLog
-					DA.TraceLog = true
-					if not self.FakeIt then
+					--DA.TraceLog = true
+					if self.FakeIt then
+						if self.db.profile.queue_one_at_a_time then
+							DA.DEBUG(1,"ProcessQueue: recipeLevel= "..tostring(recipeLevel)..", optionalReagentsArray= "..DA.DUMP(command.optionalReagentsArray))
+						else
+							DA.DEBUG(1,"ProcessQueue: recipeLevel= "..tostring(recipeLevel)..", recipeTransaction= "..DA.DUMP(self.recipeTransaction))
+							local reagentInfoTbl = self.recipeTransaction:CreateCraftingReagentInfoTbl()
+							DA.DEBUG(1,"ProcessQueue: reagentInfoTbl= "..DA.DUMP(reagentInfoTbl))
+						end
+					else
 						if self.db.profile.queue_one_at_a_time then
 							C_TradeSkillUI.CraftRecipe(command.recipeID, command.count, command.optionalReagentsArray, recipeLevel)
 						else
 							local reagentInfoTbl = self.recipeTransaction:CreateCraftingReagentInfoTbl()
-							--DA.DEBUG(1,"ProcessQueue: reagentInfoTbl= "..DA.DUMP(reagentInfoTbl))
 							C_TradeSkillUI.CraftRecipe(command.recipeID, command.count, reagentInfoTbl, recipeLevel)
 						end
 					end
@@ -734,6 +786,7 @@ function Skillet:QueueItems(count, button)
 				else
 					self:QueueAppendCommand(queueCommand, Skillet.db.profile.queue_craftable_reagents, first)
 				end
+				self.requiredSelected = {}
 				self.optionalSelected = {}
 				self.finishingSelected = {}
 				self:HideOptionalList()
@@ -1028,6 +1081,12 @@ function Skillet:ScanQueuedReagents()
 				end
 			end
 --[[
+			if command.requiredReagents then
+				for i,reagent in pairs(command.requiredReagents) do
+					DA.DEBUG(2,"QueueAppendCommand: i= "..tostring(i)..", reagent= "..DA.DUMP(reagent))
+					reagentsInQueue[reagent.reagentID] = (reagentsInQueue[reagent.reagentID] or 0) - reagent.numNeeded * command.count
+				end
+			end
 			if command.optionalReagents then
 				for i,reagent in pairs(command.optionalReagents) do
 					DA.DEBUG(2,"QueueAppendCommand: i= "..tostring(i)..", reagent= "..DA.DUMP(reagent))
