@@ -24,7 +24,7 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
 -- Runs all the update functions, should they be required
 function Skillet:UpgradeDataAndOptions()
-
+	DA.DEBUG(0,"UpgradeDataAndOptions()")
 	if not self.db.realm.options then
 		self.db.realm.options = {}
 	end
@@ -43,7 +43,6 @@ function Skillet:UpgradeDataAndOptions()
 	if SkilletDB.servers then
 		SkilletDB.realms = SkilletDB.servers
 		SkilletDB.servers = nil
-
 		self.db = LibStub("AceDB-3.0"):New("SkilletDB")
 	end
 
