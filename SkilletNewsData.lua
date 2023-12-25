@@ -25,6 +25,16 @@ local isWrath = WOW_PROJECT_ID == WOW_PROJECT_WRATH_CLASSIC
 
 Skillet.NewsName = "Skillet News"
 Skillet.NewsData = {
+	{	version = "5.24",
+		data = {
+			{	name = "New Features",
+				data = {
+					{ header = "Queuing", body = "Ignore queued reagents. Queuing recipes which share reagents will queue all of them" },
+					{ header = "Shopping", body = "Ignore items on hand. The shopping list will reflect everything needed to process the queue" },
+				},
+			},
+		},
+	},
 	{	version = "5.23",
 		data = {
 			{	name = "Changes",

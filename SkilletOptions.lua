@@ -159,7 +159,6 @@ Skillet.options =
 					width = 1.5,
 					order = 20
 				},
---[[
 				ignore_banked_reagents = {
 					type = "toggle",
 					name = L["IGNOREBANKEDREAGENTSNAME"],
@@ -173,7 +172,19 @@ Skillet.options =
 					width = 1.5,
 					order = 21
 				},
---]]
+				ignore_queued_reagents = {
+					type = "toggle",
+					name = L["IGNOREQUEUEDREAGENTSNAME"],
+					desc = L["IGNOREQUEUEDREAGENTSDESC"],
+					get = function()
+						return Skillet.db.profile.ignore_queued_reagents
+					end,
+					set = function(self,value)
+						Skillet.db.profile.ignore_queued_reagents = value
+					end,
+					width = 1.5,
+					order = 21
+				},
 				queue_craftable_reagents = {
 					type = "toggle",
 					name = L["QUEUECRAFTABLEREAGENTSNAME"],

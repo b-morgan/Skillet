@@ -87,20 +87,27 @@ local function queueAppendReagent(command, reagentID, need, queueCraftables, mre
 	DA.DEBUG(0,"queueAppendReagent("..tostring(reagentID)..", "..tostring(need)..", "..tostring(queueCraftables).."), name= "..tostring(reagentName))
 	local reagentsInQueue = Skillet.db.realm.reagentsInQueue[Skillet.currentPlayer]
 	local skillIndexLookup = Skillet.data.skillIndexLookup
-	local have = 0
+	local have
 	if not mreagent then
 		local numInBoth = GetItemCount(reagentID,true,false,true)
 		local numInBags = GetItemCount(reagentID)
 		local numInBank =  numInBoth - numInBags
-		--DA.DEBUG(1,"queueAppendReagent: numInBoth= "..tostring(numInBoth)..", numInBags="..tostring(numInBags)..", numInBank="..tostring(numInBank))
-		have = numInBoth + (reagentsInQueue[reagentID] or 0)
+		local numInQueue = reagentsInQueue[reagentID] or 0
+		--DA.DEBUG(1,"queueAppendReagent: numInBoth= "..tostring(numInBoth)..", numInBags="..tostring(numInBags)..", numInBank="..tostring(numInBank)..", numInQueue="..tostring(numInQueue))
+		if Skillet.db.profile.ignore_queued_reagents then
+			numInQueue = 0
+		end
+		if Skillet.db.profile.ignore_banked_reagents then
+			have = numInBags + numInQueue
+		else
+			have = numInBoth + numInQueue
+		end
 	else
 		--DA.DEBUG(2,"queueAppendReagent: mreagent= "..DA.DUMP(mreagent))
 		for k=1, #mreagent.schematic.reagents, 1 do
 			mitem = mreagent.schematic.reagents[k].itemID
 			have = have + GetItemCount(mitem,true,false,true)
 		end
---		have = have + (reagentsInQueue[reagentID] or 0)
 	end
 	reagentsInQueue[reagentID] = (reagentsInQueue[reagentID] or 0) - need
 	DA.DEBUG(1,"queueAppendReagent: queueCraftables= "..tostring(queueCraftables)..", need= "..tostring(need)..", have= "..tostring(have))
