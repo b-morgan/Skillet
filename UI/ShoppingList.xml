@@ -236,7 +236,7 @@
 			<Anchors>
 				<Anchor point="BOTTOMLEFT" relativeTo="SkilletShoppingList" relativePoint="BOTTOMLEFT">
 					<Offset>
-						<AbsDimension x="5" y="50"/>
+						<AbsDimension x="170" y="50"/> <!--  x="5" is the edge -->
 					</Offset>
 				</Anchor>
 			</Anchors>
@@ -256,7 +256,7 @@
 			<Anchors>
 				<Anchor point="BOTTOMLEFT" relativeTo="SkilletShoppingList" relativePoint="BOTTOMLEFT">
 					<Offset>
-						<AbsDimension x="5" y="50"/>
+						<AbsDimension x="170" y="50"/> <!--  x="5" is the edge -->
 					</Offset>
 				</Anchor>
 			</Anchors>
@@ -268,10 +268,10 @@
 		</Button>
 
 		<!--
-			#
-			# Check boxes for various recipe filtering options.
-			#
-			-->
+		#
+		# Check boxes for various recipe filtering options.
+		#
+		-->
 		<CheckButton name="SkilletShowQueuesFromAllAlts" inherits="SkilletShoppingListCheckButtonTemplate">
 			<Anchors>
 				<Anchor point="BOTTOMRIGHT" relativeTo="SkilletShoppingList" relativePoint="BOTTOMRIGHT">
@@ -315,6 +315,22 @@
 			<Scripts>
 				<OnClick>
 					Skillet:ShoppingListToggleIncludeGuild()
+					Skillet:UpdateShoppingListWindow(false)
+				</OnClick>
+			</Scripts>
+		</CheckButton>
+
+		<CheckButton name="SkilletShowQueuesIgnoreOnHand" inherits="SkilletShoppingListCheckButtonTemplate2">
+			<Anchors>
+				<Anchor point="BOTTOMLEFT" relativeTo="SkilletShoppingList" relativePoint="BOTTOMLEFT">
+					<Offset>
+						<AbsDimension x="10" y="50"/>
+					</Offset>
+				</Anchor>
+			</Anchors>
+			<Scripts>
+				<OnClick>
+					Skillet:ShoppingListToggleIgnoreOnHand()
 					Skillet:UpdateShoppingListWindow(false)
 				</OnClick>
 			</Scripts>
