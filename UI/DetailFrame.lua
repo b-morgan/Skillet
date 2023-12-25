@@ -1399,8 +1399,8 @@ end
 --
 -- Called when the icon button is clicked
 --
-function Skillet:ReagentsLinkOnClick(button, skillIndex, reagentIndex)
-	DA.DEBUG(0,"ReagentLinkOnClick("..tostring(button)..", "..tostring(skillIndex)..", "..tostring(reagentIndex)..")")
+function Skillet:ReagentsLinkOnClick(button, skillIndex, reagentIndex, recurse)
+	DA.DEBUG(0,"ReagentLinkOnClick("..tostring(button)..", "..tostring(skillIndex)..", "..tostring(reagentIndex)..", "..tostring(recurse)..")")
 	if not self.db.profile.link_craftable_reagents then
 		--DA.DEBUG(1,"ReagentsLinkOnClick: link_craftable_reagents= "..tostring(self.db.profile.link_craftable_reagents))
 		return

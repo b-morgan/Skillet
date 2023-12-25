@@ -2422,7 +2422,7 @@
 						elseif ( button == "LeftButton" and IsAltKeyDown() ) then
 						<!-- This will put a link to the *reagents* required by this *item*
 							 into the current chat edit box -->
-							Skillet:ReagentsLinkOnClick(self, Skillet.selectedSkill, self:GetID())
+							Skillet:ReagentsLinkOnClick(self, Skillet.selectedSkill, self:GetID(), IsControlKeyDown())
 						elseif ( button == "RightButton" ) then
 							<!-- right clicking allow adjusting numCreated -->
 							if ( IsShiftKeyDown() ) then
