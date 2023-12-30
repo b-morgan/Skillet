@@ -87,7 +87,7 @@ local function queueAppendReagent(command, reagentID, need, queueCraftables, mre
 	DA.DEBUG(0,"queueAppendReagent("..tostring(reagentID)..", "..tostring(need)..", "..tostring(queueCraftables).."), name= "..tostring(reagentName))
 	local reagentsInQueue = Skillet.db.realm.reagentsInQueue[Skillet.currentPlayer]
 	local skillIndexLookup = Skillet.data.skillIndexLookup
-	local have
+	local have = 0
 	if not mreagent then
 		local numInBoth = GetItemCount(reagentID,true,false,true)
 		local numInBags = GetItemCount(reagentID)
