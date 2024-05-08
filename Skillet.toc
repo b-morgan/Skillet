@@ -1,4 +1,4 @@
-## Interface: 100206
+## Interface: 100207
 ## Title: Skillet |cff7fff7f -Ace3-|r
 ## IconTexture: Interface\AddOns\Skillet\Icons\Skillet.tga
 ## Notes: A replacement tradeskill window
@@ -15,7 +15,7 @@
 ## X-Website: https://www.curseforge.com/wow/addons/skillet
 ## SavedVariables: SkilletDB
 ## SavedVariablesPerCharacter: SkilletWho, SkilletDBPC, SkilletMemory, SkilletProfile
-## OptionalDeps: Ace3, LibDialog-1.0, LibWindow-1.1, LibPeriodicTable-3.1, TradeSkillMaster, OribosExchange, BeanCounter, Auctionator, Journalator, DataStore, tekDebug
+## OptionalDeps: Ace3, LibDialog-1.0, LibWindow-1.1, LibPeriodicTable-3.1, TradeSkillMaster, OribosExchange, BeanCounter, Auctionator, Journalator, CraftInfoAnywhere, DataStore, tekDebug
 ## X-Embeds: Ace3, LibStub, CallbackHandler-1.0, LibDialog-1.0, LibWindow-1.1, LibPeriodicTable-3.1
 
 ## LoadManagers: AddonLoader

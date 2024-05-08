@@ -31,12 +31,14 @@ Skillet.L = L
 -- Get version info from the .toc file
 Skillet.version = C_AddOns.GetAddOnMetadata("Skillet", "Version")
 Skillet.interface = select(4, GetBuildInfo())
-Skillet.build = (Skillet.interface < 20000 and "Classic") or (Skillet.interface < 30000 and "BCC") or (Skillet.interface < 40000 and "Wrath") or "Retail"
+Skillet.build = (Skillet.interface < 20000 and "Classic") or (Skillet.interface < 30000 and "BCC") or
+  (Skillet.interface < 40000 and "Wrath") or (Skillet.interface < 50000 and "Cata") or "Retail"
 Skillet.project = WOW_PROJECT_ID
-local isRetail = WOW_PROJECT_ID == WOW_PROJECT_MAINLINE
-local isClassic = WOW_PROJECT_ID == WOW_PROJECT_CLASSIC
-local isBCC = WOW_PROJECT_ID == WOW_PROJECT_BURNING_CRUSADE_CLASSIC
-local isWrath = WOW_PROJECT_ID == WOW_PROJECT_WRATH_CLASSIC
+local isRetail = WOW_PROJECT_ID == WOW_PROJECT_MAINLINE -- 1
+local isClassic = WOW_PROJECT_ID == WOW_PROJECT_CLASSIC -- 2
+local isBCC = WOW_PROJECT_ID == WOW_PROJECT_BURNING_CRUSADE_CLASSIC -- 5
+local isWrath = WOW_PROJECT_ID == WOW_PROJECT_WRATH_CLASSIC -- 11
+local isCata = WOW_PROJECT_ID == WOW_PROJECT_CATACLYSM_CLASSIC -- 14
 
 Skillet.gttScale = GameTooltip:GetScale()
 
@@ -320,6 +322,21 @@ function Skillet:OnInitialize()
 	if not self.db.global.customPrice then
 		self.db.global.customPrice = {}
 	end
+--
+-- Initialize the Skill Levels data if any of the tables are missing
+--
+	if not self.db.global.MissingSkillLevels then
+		self.db.global.MissingSkillLevels = {}
+	end
+	if not self.db.global.SkillLineAbility_era then
+		self:InitializeSkillLevels()
+	end
+	if not self.db.global.SkillLineAbility_cata then
+		self:InitializeSkillLevels()
+	end
+	if not self.db.global.SkillLineAbility_retail then
+		self:InitializeSkillLevels()
+	end
 
 --[[
 -- Hook default tooltips
@@ -445,6 +462,7 @@ end
 -- increment to trigger a call.
 --
 function Skillet:FlushAllData()
+	DA.DEBUG(0,"FlushAllData()");
 	Skillet.data = {}
 	Skillet.db.realm.tradeSkills = {}
 	Skillet.db.realm.auctionData = {}
@@ -461,6 +479,7 @@ end
 -- Flush all data for the current player
 --
 function Skillet:FlushPlayerData()
+	DA.DEBUG(0,"FlushPlayerData()");
 	local player = UnitName("player")
 	Skillet.db.realm.tradeSkills[player] = {}
 	Skillet.db.realm.auctionData[player] = {}
@@ -483,6 +502,7 @@ end
 -- good cause.
 --
 function Skillet:FlushCustomData()
+	DA.DEBUG(0,"FlushCustomData()");
 	Skillet.db.realm.groupDB = {}
 end
 
@@ -492,6 +512,7 @@ end
 -- queue and should have minimal impact.
 --
 function Skillet:FlushQueueData()
+	DA.DEBUG(0,"FlushQueueData()");
 	Skillet.db.realm.queueData = {}
 	Skillet.db.realm.reagentsInQueue = {}
 	Skillet.db.realm.modifiedInQueue = {}
@@ -504,6 +525,7 @@ end
 -- primary reason this function exists.
 --
 function Skillet:FlushRecipeData()
+	DA.DEBUG(0,"FlushRecipeData()");
 	Skillet.db.global.recipeDB = {}
 	Skillet.db.global.recipeNameDB = {}
 	Skillet.db.global.itemRecipeUsedIn = {}
@@ -512,6 +534,7 @@ function Skillet:FlushRecipeData()
 	Skillet.db.global.spellIDtoName = {}
 	if Skillet.data and Skillet.data.recipeInfo then
 		Skillet.data.recipeInfo = {}
+	Skillet:InitializeSkillLevels()
 	end
 end
 
@@ -521,6 +544,7 @@ end
 -- can free that up.
 --
 function Skillet:FlushDetailData()
+	DA.DEBUG(0,"FlushDetailData()");
 	Skillet.db.realm.bagData = {}
 	Skillet.db.realm.bagDetails = {}
 	Skillet.db.realm.bankData = {}
