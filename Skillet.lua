@@ -1607,7 +1607,7 @@ end
 -- Show the options window
 --
 function Skillet:ShowOptions()
-	InterfaceOptionsFrame_OpenToCategory("Skillet")
+	Settings.OpenToCategory("Skillet")
 end
 
 --
