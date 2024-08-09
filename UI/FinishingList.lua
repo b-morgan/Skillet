@@ -183,7 +183,7 @@ function Skillet:UpdateFinishingListWindow()
 		if itemIndex <= numItems then
 			freagentID = self.cachedFinishingList.reagents[itemIndex].itemID
 			button.freagentID = freagentID
-			local freagentName, freagentLink = GetItemInfo(freagentID)
+			local freagentName, freagentLink = C_Item.GetItemInfo(freagentID)
 			local freagentQuality
 			if not freagentName then
 				Skillet.finishingDataNeeded = true
@@ -314,7 +314,7 @@ function Skillet:GetFinishingItemLink(skillIndex, index)
 		local recipe = self:GetRecipeDataByTradeIndex(self.currentTrade, skillIndex)
 		if recipe and self.cachedFinishingList then
 			freagentID = self.cachedFinishingList.reagents[index].itemID
-			local name, link = GetItemInfo(freagentID)
+			local name, link = C_Item.GetItemInfo(freagentID)
 			return link
 		end
 	end

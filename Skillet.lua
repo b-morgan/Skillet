@@ -1078,7 +1078,7 @@ end
 
 function Skillet:ITEM_DATA_LOAD_RESULT(event, itemID, result)
 	if itemID then
-		local name = GetItemInfo(itemID)
+		local name = C_Item.GetItemInfo(itemID)
 		DA.TRACE2("ITEM_DATA_LOAD_RESULT("..tostring(itemID)..", "..tostring(result).."), "..tostring(name))
 	else
 		DA.TRACE2("ITEM_DATA_LOAD_RESULT")
@@ -1109,7 +1109,7 @@ end
 
 function Skillet:GET_ITEM_INFO_RECEIVED(event, itemID, result)
 	if itemID then
-		local name = GetItemInfo(itemID)
+		local name = C_Item.GetItemInfo(itemID)
 		DA.TRACE2("GET_ITEM_INFO_RECEIVED("..tostring(itemID)..", "..tostring(result).."), "..tostring(name))
 	else
 		DA.TRACE2("GET_ITEM_INFO_RECEIVED")

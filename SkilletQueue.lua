@@ -83,14 +83,14 @@ end
 -- Reserve reagents
 --
 local function queueAppendReagent(command, reagentID, need, queueCraftables, mreagent)
-	local reagentName = GetItemInfo(reagentID)
+	local reagentName = C_Item.GetItemInfo(reagentID)
 	DA.DEBUG(0,"queueAppendReagent("..tostring(reagentID)..", "..tostring(need)..", "..tostring(queueCraftables).."), name= "..tostring(reagentName))
 	local reagentsInQueue = Skillet.db.realm.reagentsInQueue[Skillet.currentPlayer]
 	local skillIndexLookup = Skillet.data.skillIndexLookup
 	local have = 0
 	if not mreagent then
-		local numInBoth = GetItemCount(reagentID,true,false,true)
-		local numInBags = GetItemCount(reagentID)
+		local numInBoth = C_Item.GetItemCount(reagentID,true,false,true,true)
+		local numInBags = C_Item.GetItemCount(reagentID)
 		local numInBank =  numInBoth - numInBags
 		local numInQueue = reagentsInQueue[reagentID] or 0
 		--DA.DEBUG(1,"queueAppendReagent: numInBoth= "..tostring(numInBoth)..", numInBags="..tostring(numInBags)..", numInBank="..tostring(numInBank)..", numInQueue="..tostring(numInQueue))
@@ -106,7 +106,7 @@ local function queueAppendReagent(command, reagentID, need, queueCraftables, mre
 		--DA.DEBUG(2,"queueAppendReagent: mreagent= "..DA.DUMP(mreagent))
 		for k=1, #mreagent.schematic.reagents, 1 do
 			mitem = mreagent.schematic.reagents[k].itemID
-			have = have + GetItemCount(mitem,true,false,true)
+			have = have + C_Item.GetItemCount(mitem,true,false,true,true)
 		end
 	end
 	reagentsInQueue[reagentID] = (reagentsInQueue[reagentID] or 0) - need
@@ -378,7 +378,7 @@ function Skillet:PrintRIQ()
 	local modifiedInQueue = self.db.realm.modifiedInQueue[Skillet.currentPlayer]
 	if reagentsInQueue then
 		for id,count in pairs(reagentsInQueue) do
-			local name = GetItemInfo(id)
+			local name = C_Item.GetItemInfo(id)
 			print("reagent: "..id.." ("..tostring(name)..") x "..count)
 			if modifiedInQueue[id] then
 				print("    "..DA.DUMP1(modifiedInQueue[id]))
@@ -475,10 +475,10 @@ function Skillet:ProcessQueue(altMode)
 								DA.DEBUG(0,"ProcessQueue: Reagent Mismatch, i= "..tostring(i)..", reagentID= "..tostring(reagent.reagentID)..", mismatch= "..tostring(reagentID))
 							end
 						end
-						local reagentName = GetItemInfo(reagent.reagentID) or reagent.reagentID
+						local reagentName = C_Item.GetItemInfo(reagent.reagentID) or reagent.reagentID
 						--DA.DEBUG(2,"ProcessQueue: id= "..tostring(reagent.reagentID)..", reagentName="..tostring(reagentName)..", numNeeded="..tostring(reagent.numNeeded))
-						local numInBoth = GetItemCount(reagent.reagentID,true,false,true)
-						local numInBags = GetItemCount(reagent.reagentID)
+						local numInBoth = C_Item.GetItemCount(reagent.reagentID,true,false,true,true)
+						local numInBags = C_Item.GetItemCount(reagent.reagentID)
 						local numInBank =  numInBoth - numInBags
 						--DA.DEBUG(2,"ProcessQueue: numInBoth= "..tostring(numInBoth)..", numInBags="..tostring(numInBags)..", numInBank="..tostring(numInBank))
 						if numInBoth < reagent.numNeeded then
@@ -511,10 +511,10 @@ function Skillet:ProcessQueue(altMode)
 						for i,reagent in pairs(command.requiredReagents) do
 							--DA.DEBUG(2,"ProcessQueue(R): i= "..tostring(i)..", reagent= "..DA.DUMP1(reagent))
 							local reagentID = reagent.itemID
-							local reagentName = GetItemInfo(reagentID) or reagentID
+							local reagentName = C_Item.GetItemInfo(reagentID) or reagentID
 							--DA.DEBUG(2,"ProcessQueue(R): oid= "..tostring(reagentID)..", reagentName="..tostring(reagentName)..", numNeeded="..tostring(command.count))
-							local numInBoth = GetItemCount(reagentID,true,false,true)
-							local numInBags = GetItemCount(reagentID)
+							local numInBoth = C_Item.GetItemCount(reagentID,true,false,true,true)
+							local numInBags = C_Item.GetItemCount(reagentID)
 							local numInBank =  numInBoth - numInBags
 							--DA.DEBUG(2,"ProcessQueue(R): numInBoth= "..tostring(numInBoth)..", numInBags="..tostring(numInBags)..", numInBank="..tostring(numInBank))
 							if numInBoth < command.count then
@@ -531,10 +531,10 @@ function Skillet:ProcessQueue(altMode)
 						for i,reagent in pairs(command.optionalReagents) do
 							--DA.DEBUG(2,"ProcessQueue(O): i= "..tostring(i)..", reagent= "..DA.DUMP1(reagent))
 							local reagentID = reagent.itemID
-							local reagentName = GetItemInfo(reagentID) or reagentID
+							local reagentName = C_Item.GetItemInfo(reagentID) or reagentID
 							--DA.DEBUG(2,"ProcessQueue(O): oid= "..tostring(reagentID)..", reagentName="..tostring(reagentName)..", numNeeded="..tostring(command.count))
-							local numInBoth = GetItemCount(reagentID,true,false,true)
-							local numInBags = GetItemCount(reagentID)
+							local numInBoth = C_Item.GetItemCount(reagentID,true,false,true,true)
+							local numInBags = C_Item.GetItemCount(reagentID)
 							local numInBank =  numInBoth - numInBags
 							--DA.DEBUG(2,"ProcessQueue(O): numInBoth= "..tostring(numInBoth)..", numInBags="..tostring(numInBags)..", numInBank="..tostring(numInBank))
 							if numInBoth < command.count then
@@ -551,10 +551,10 @@ function Skillet:ProcessQueue(altMode)
 						for i,reagent in pairs(command.finishingReagents) do
 							--DA.DEBUG(2,"ProcessQueue(F): i= "..tostring(i)..", reagent= "..DA.DUMP1(reagent))
 							local reagentID = reagent.itemID
-							local reagentName = GetItemInfo(reagentID) or reagentID
+							local reagentName = C_Item.GetItemInfo(reagentID) or reagentID
 							--DA.DEBUG(2,"ProcessQueue(F): oid= "..tostring(reagentID)..", reagentName="..tostring(reagentName)..", numNeeded="..tostring(command.count))
-							local numInBoth = GetItemCount(reagentID,true,false,true)
-							local numInBags = GetItemCount(reagentID)
+							local numInBoth = C_Item.GetItemCount(reagentID,true,false,true,true)
+							local numInBags = C_Item.GetItemCount(reagentID)
 							local numInBank =  numInBoth - numInBags
 							--DA.DEBUG(2,"ProcessQueue(F): numInBoth= "..tostring(numInBoth)..", numInBags="..tostring(numInBags)..", numInBank="..tostring(numInBank))
 							if numInBoth < command.count then

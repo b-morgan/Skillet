@@ -21,7 +21,7 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
 	o={}
 	OEMarketInfo(item,o)
 
-The item can be identified by anything GetItemInfo takes (itemid, itemstring, itemlink) or a battlepet itemstring/itemlink.
+The item can be identified by anything C_Item.GetItemInfo takes (itemid, itemstring, itemlink) or a battlepet itemstring/itemlink.
 Prices are returned in copper, but accurate to the last *silver* (with coppers always 0).
 
 	o['input']			-> the item/battlepet parameter you just passed in, verbatim

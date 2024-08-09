@@ -183,7 +183,7 @@ function Skillet:UpdateRequiredListWindow()
 		if itemIndex <= numItems then
 			oreagentID = self.cachedRequiredList.reagents[itemIndex].itemID
 			button.oreagentID = oreagentID
-			local oreagentName, oreagentLink = GetItemInfo(oreagentID)
+			local oreagentName, oreagentLink = C_Item.GetItemInfo(oreagentID)
 			local oreagentQuality
 			if not oreagentName then
 				Skillet.optionalDataNeeded = true
@@ -315,7 +315,7 @@ function Skillet:GetRequiredItemLink(skillIndex, index)
 		local recipe = self:GetRecipeDataByTradeIndex(self.currentTrade, skillIndex)
 		if recipe and self.cachedRequiredList then
 			oreagentID = self.cachedRequiredList.reagents[index].itemID
-			local name, link = GetItemInfo(oreagentID)
+			local name, link = C_Item.GetItemInfo(oreagentID)
 			return link
 		end
 	end

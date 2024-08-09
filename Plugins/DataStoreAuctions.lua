@@ -77,7 +77,7 @@ function plugin.RecipeNamePrefix(skill, recipe)
 	if Skillet.db.profile.plugins.DSA.enabled and DataStore then
 		itemID = recipe.itemID
 		if itemID and itemID ~= 0 then
-			itemName = GetItemInfo(itemID)
+			itemName = C_Item.GetItemInfo(itemID)
 		end
 		--DA.DEBUG(0,"RecipeNamePrefix: itemID = "..tostring(itemID).." ("..tostring(itemName)..")")
 --
@@ -86,7 +86,7 @@ function plugin.RecipeNamePrefix(skill, recipe)
 		if not Skillet.isCraft and recipe.tradeID == 7411 and itemID == 0 then
 			itemID = recipe.scrollID
 			if itemID and itemID ~= 0 then
-				itemName = GetItemInfo(itemID)
+				itemName = C_Item.GetItemInfo(itemID)
 			end
 			--DA.DEBUG(0,"RecipeNamePrefix: scrollID = "..tostring(itemID).." ("..tostring(itemName)..")")
 		end

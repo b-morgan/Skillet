@@ -90,7 +90,7 @@ local function update_merchant_inventory()
 							if currencyName then
 								currencyID = -1 * tonumber(Skillet.currencyIDsByName[currencyName] or 0)
 							elseif itemLink then
-								currencyName = GetItemInfo(itemLink)
+								currencyName = C_Item.GetItemInfo(itemLink)
 								currencyID = Skillet:GetItemIDFromLink(itemLink)
 							end
 							--DA.DEBUG(2,"  currencyName= "..tostring(currencyName).." ("..tostring(currencyID)..") x "..tostring(itemValue))
@@ -339,7 +339,7 @@ function Skillet:MerchantBuyButton_OnEnter(button)
 		if merchant_inventory[itemID] then
 			local cost = merchant_inventory[itemID].price * math.ceil(needList[i].count / merchant_inventory[itemID].quantity)
 			totalCost = totalCost + cost
-			GameTooltip:AddDoubleLine((GetItemInfo(itemID)).." x "..needList[i].count, Skillet:FormatMoneyFull(cost, true),1,1,0)
+			GameTooltip:AddDoubleLine((C_Item.GetItemInfo(itemID)).." x "..needList[i].count, Skillet:FormatMoneyFull(cost, true),1,1,0)
 		end
 	end
 	if #needList > 1 then

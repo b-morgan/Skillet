@@ -176,7 +176,7 @@ local function createShoppingListFrame(self)
 end
 
 function Skillet:ShoppingListButton_OnEnter(button)
-	local name, link, quality = GetItemInfo(button.id)
+	local name, link, quality = C_Item.GetItemInfo(button.id)
 	if link then
 		GameTooltip:SetOwner(button, "ANCHOR_TOPLEFT")
 		GameTooltip:SetHyperlink(link)
@@ -256,7 +256,7 @@ function Skillet:GetShoppingList(player, sameFaction, includeGuildbank)
 		--DA.DEBUG(1,"player: "..player)
 		if reagentsInQueue then
 			for id,count in pairs(reagentsInQueue) do
-				local name = GetItemInfo(id)
+				local name = C_Item.GetItemInfo(id)
 				--DA.DEBUG(2,"reagent: "..id.." ("..tostring(name)..") x "..count)
 				local deficit = count -- deficit is usually negative
 				local numInBoth, numInBothCurrent, numGuildbank = 0,0,0
@@ -509,7 +509,7 @@ end
 local function findBagForItem(itemID, count)
 	DA.DEBUG(0, "findBagForItem("..tostring(itemID)..", "..tostring(count)..")")
 	if not itemID then return nil end
-	local _, _, _, _, _, _, _, itemStackCount = GetItemInfo(itemID)
+	local _, _, _, _, _, _, _, itemStackCount = C_Item.GetItemInfo(itemID)
 	for container = 0, 5, 1 do
 		local bagSize = C_Container.GetContainerNumSlots(container)
 		local freeSlots, bagType = C_Container.GetContainerNumFreeSlots(container)
@@ -930,7 +930,7 @@ function Skillet:PrintAuctionData()
 	local auctionData = self.db.realm.auctionData[player]
 	if auctionData then
 		for itemID,count in pairs(auctionData) do
-			local itemName = GetItemInfo(itemID)
+			local itemName = C_Item.GetItemInfo(itemID)
 			DA.MARK2("itemID= "..tostring(itemID).." ("..tostring(itemName).."), count= "..tostring(count))
 		end
 	end
@@ -1214,8 +1214,8 @@ function Skillet:UpdateShoppingListWindow(use_cached_recipes)
 --
 		table.sort(self.cachedShoppingList, function(a,b)
 			local na, nb
-			na = GetItemInfo(a.id) or ""
-			nb = GetItemInfo(b.id) or ""
+			na = C_Item.GetItemInfo(a.id) or ""
+			nb = C_Item.GetItemInfo(b.id) or ""
 			return nb > na
 		end)
 		if Skillet.db.profile.merge_items then
@@ -1285,7 +1285,7 @@ function Skillet:UpdateShoppingListWindow(use_cached_recipes)
 		player:SetPoint("LEFT", name:GetName(), "RIGHT", 4)
 		if itemIndex <= numItems then
 			count:SetText(self.cachedShoppingList[itemIndex].count)
-			name:SetText(GetItemInfo(self.cachedShoppingList[itemIndex].id))
+			name:SetText(C_Item.GetItemInfo(self.cachedShoppingList[itemIndex].id))
 			player:SetText(self.cachedShoppingList[itemIndex].player)
 			button.valueText:Hide()
 			button.id  = self.cachedShoppingList[itemIndex].id

@@ -26,7 +26,7 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
 function Skillet:GetLevelRequiredToUse(item)
 	if not item then return end
-		local level = select(5, GetItemInfo(item))
+		local level = select(5, C_Item.GetItemInfo(item))
 	if not level then level = 0 end
 	return level
 end
@@ -47,12 +47,12 @@ end
 --
 function Skillet:GetItemInfo(id)
 	if id then
-		local name = GetItemInfo(id)
+		local name = C_Item.GetItemInfo(id)
 		if not name then
 			GameTooltip:SetHyperlink("item:"..id)
 			GameTooltip:SetHyperlink("enchant:"..id)
 		end
-		return GetItemInfo(id)
+		return C_Item.GetItemInfo(id)
 	end
 end
 
@@ -68,7 +68,7 @@ end
 function Skillet:GetRecipeItemLink(index)
 	local recipe, recipeID = self:GetRecipeDataByTradeIndex(self.currentTrade, index)
 		if recipe then
-		local _, link = GetItemInfo(recipe.itemID)
+		local _, link = C_Item.GetItemInfo(recipe.itemID)
 		return link
 	end
 		return nil
@@ -107,11 +107,11 @@ function Skillet:GetRecipeReagentItemLink(skillIndex, index)
 		if recipe then
 			if index > 0 and index < 100 and recipe.reagentData[index] then
 				DA.DEBUG(1,"GetRecipeReagentItemLink: reagentID= "..tostring(recipe.reagentData[index].reagentID))
-				local _, link = GetItemInfo(recipe.reagentData[index].reagentID)
+				local _, link = C_Item.GetItemInfo(recipe.reagentData[index].reagentID)
 				return link
 			elseif index > 100 and index < 200 and recipe.modifiedData[index-100] then
 				DA.DEBUG(1,"GetRecipeReagentItemLink: reagentID= "..tostring(recipe.modifiedData[index-100].reagentID))
-				local _, link = GetItemInfo(recipe.modifiedData[index-100].reagentID)
+				local _, link = C_Item.GetItemInfo(recipe.modifiedData[index-100].reagentID)
 				return link
 			end
 --

@@ -299,7 +299,7 @@ function Skillet:GetModifiedItemLink(skillIndex, index)
 		local recipe = self:GetRecipeDataByTradeIndex(self.currentTrade, skillIndex)
 		if recipe and self.cachedModifiedList then
 			mreagentID = self.cachedModifiedList[index].itemID
-			local name, link = GetItemInfo(mreagentID)
+			local name, link = C_Item.GetItemInfo(mreagentID)
 			return link
 		end
 	end
@@ -488,7 +488,7 @@ function Skillet:CheckModifiedSelected(mreagent)
 	if mreagent then
 		for j,reagent in pairs(mreagent) do
 			--DA.DEBUG(1,"CheckModifiedSelected: j= "..tostring(j)..", reagent= "..DA.DUMP1(reagent))
-			local have = GetItemCount(reagent.itemID,true,false,true)
+			local have = C_Item.GetItemCount(reagent.itemID,true,false,true,true)
 			if have < reagent.quantity then
 				return false
 			end

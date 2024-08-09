@@ -24,7 +24,7 @@ local PT = LibStub("LibPeriodicTable-3.1")
 -- does consider queued recipes
 --
 function Skillet:InventoryReagentCraftability(reagentID)
-	--DA.DEBUG(1,"InventoryReagentCraftability("..tostring(reagentID)..") -- "..tostring((GetItemInfo(reagentID))))
+	--DA.DEBUG(1,"InventoryReagentCraftability("..tostring(reagentID)..") -- "..tostring((C_Item.GetItemInfo(reagentID))))
 	if not reagentID or type(reagentID) == "table" or reagentID == 0 then
 		return 0, 0
 	end
@@ -39,7 +39,7 @@ function Skillet:InventoryReagentCraftability(reagentID)
 	local skillIndexLookup = self.data.skillIndexLookup
 	local recipeSource = self.db.global.itemRecipeSource[reagentID]
 	if recipeSource then
-		--DA.DEBUG(2,"     ReagentCraftability: reagentID= "..tostring(reagentID).."("..tostring((GetItemInfo(reagentID))).."), recipeSource= "..DA.DUMP1(recipeSource))
+		--DA.DEBUG(2,"     ReagentCraftability: reagentID= "..tostring(reagentID).."("..tostring((C_Item.GetItemInfo(reagentID))).."), recipeSource= "..DA.DUMP1(recipeSource))
 		for childRecipeID in pairs(recipeSource) do
 			local childRecipe = self:GetRecipe(childRecipeID)
 			local childSkillIndex = skillIndexLookup[childRecipeID]
@@ -49,7 +49,7 @@ function Skillet:InventoryReagentCraftability(reagentID)
 				local numCraftableVendor = 100000
 				for i=1,#childRecipe.reagentData,1 do
 					local childReagent = childRecipe.reagentData[i]
-					local numReagentOnHand = GetItemCount(childReagent.reagentID,true,false,true)
+					local numReagentOnHand = C_Item.GetItemCount(childReagent.reagentID,true,false,true,true)
 					local numReagentCraftable, numReagentCraftableVendor = self:InventoryReagentCraftability(childReagent.reagentID)
 					numReagentCraftable = numReagentCraftable + numReagentOnHand
 					numReagentCraftableVendor = numReagentCraftableVendor + numReagentOnHand
@@ -65,7 +65,7 @@ function Skillet:InventoryReagentCraftability(reagentID)
 			end
 		end
 	else
-		--DA.DEBUG(2,"     ReagentCraftability: reagentID= "..tostring(reagentID).."("..tostring((GetItemInfo(reagentID))).."), recipeSource= nil")
+		--DA.DEBUG(2,"     ReagentCraftability: reagentID= "..tostring(reagentID).."("..tostring((C_Item.GetItemInfo(reagentID))).."), recipeSource= nil")
 	end
 	local queued = 0
 	if self.db.realm.reagentsInQueue[player] then
@@ -189,10 +189,10 @@ function Skillet:InventoryScan()
 	local numInBoth
 	if self.db.global.itemRecipeUsedIn then
 		for reagentID in pairs(self.db.global.itemRecipeUsedIn) do
-			--DA.DEBUG(2,"reagent "..tostring(GetItemInfo(reagentID)).." "..tostring(inventoryData[reagentID]))
+			--DA.DEBUG(2,"reagent "..tostring(C_Item.GetItemInfo(reagentID)).." "..tostring(inventoryData[reagentID]))
 			if reagentID and not inventoryData[reagentID] then			-- have we calculated this one yet?
 				--DA.DEBUG(2,"Using API")
-				numInBoth = GetItemCount(reagentID,true,false,true)		-- both bank and bags
+				numInBoth = C_Item.GetItemCount(reagentID,true,false,true,true)		-- both bank and bags
 				inventoryData[reagentID] = tostring(numInBoth)			-- only what we have for now (no craftability info)
 				--DA.DEBUG(2,"inventoryData["..reagentID.."]="..inventoryData[reagentID])
 			end
@@ -257,12 +257,12 @@ function Skillet:GetInventory(player, reagentID)
 		end
 		if player == self.currentPlayer then
 			if type(reagentID) ~= "table" then
-				have = GetItemCount(reagentID,true,false,true) or 0
+				have = C_Item.GetItemCount(reagentID,true,false,true,true) or 0
 			else
 				--DA.DEBUG(2,"GetInventory(C): #reagentID= "..tostring(#reagentID)..", reagentID= "..DA.DUMP1(reagentID))
 				for i = 1, #reagentID do
 					--DA.DEBUG(2,"GetInventory: itemID= "..tostring(reagentID[i].itemID))
-					have = have + (GetItemCount(reagentID[i].itemID,true,false,true) or 0)
+					have = have + (C_Item.GetItemCount(reagentID[i].itemID,true,false,true,true) or 0)
 				end
 			end
 			return have, 0, 0

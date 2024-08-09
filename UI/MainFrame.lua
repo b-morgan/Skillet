@@ -591,7 +591,7 @@ function Skillet:TradeButtonAdditional_OnEnter(button)
 	if not button.Toy then
 		local itemID = Skillet:GetAutoTargetItem(self.currentTrade, spellID)
 		if itemID and IsAltKeyDown() then
-			GameTooltip:AddLine("/use "..GetItemInfo(itemID))
+			GameTooltip:AddLine("/use "..C_Item.GetItemInfo(itemID))
 		end
 	end
 --[[
@@ -1278,7 +1278,7 @@ function Skillet:UpdateTradeSkillWindow()
 				if self.db.profile.display_required_level then
 					local level = self:GetLevelRequiredToUse(recipe.itemID)
 					if level and level > 1 then
-						local _, _, rarity = GetItemInfo("item:"..recipe.itemID)
+						local _, _, rarity = C_Item.GetItemInfo("item:"..recipe.itemID)
 						local r, g, b = GetItemQualityColor(rarity)
 						if r and g and b then
 							levelText:SetTextColor(r, g, b)
@@ -1358,7 +1358,7 @@ function Skillet:UpdateTradeSkillWindow()
 -- Show the count of the item currently owned that the recipe will produce
 --
 				if showOwned and self.currentPlayer == UnitName("player") then
-					local numowned = (self.db.realm.auctionData[self.currentPlayer][recipe.itemID] or 0) + GetItemCount(recipe.itemID,true)
+					local numowned = (self.db.realm.auctionData[self.currentPlayer][recipe.itemID] or 0) + C_Item.GetItemCount(recipe.itemID,true)
 					if numowned > 0 then
 						if numowned >= 1000 then
 							numowned = "##"
@@ -1557,7 +1557,7 @@ function Skillet:SkillButton_OnEnter(button)
 	if skill.skillData then
 		num, numrecursive, numwvendor, numwalts = get_craftable_counts(skill.skillData, recipe.numMade)
 	end
-	numowned = GetItemCount(recipe.itemID,true,false,true)
+	numowned = C_Item.GetItemCount(recipe.itemID,true,false,true,true)
 --
 -- How many are there already
 --
@@ -1609,7 +1609,7 @@ function Skillet:SkillButton_OnEnter(button)
 			break
 		end
 		local numInBoth, numCraftable = self:GetInventory(self.currentPlayer, reagent.reagentID)
-		local itemName = GetItemInfo(reagent.reagentID) or reagent.reagentID
+		local itemName = C_Item.GetItemInfo(reagent.reagentID) or reagent.reagentID
 		local text
 		if self:VendorSellsReagent(reagent.reagentID) then
 			text = string.format("  %d x %s  |cff808080(%s)|r", reagent.numNeeded, itemName, L["buyable"])
@@ -1623,7 +1623,7 @@ function Skillet:SkillButton_OnEnter(button)
 	if recipe.modifiedData then
 		for i=1,#recipe.modifiedData do
 			local numInBoth, numCraftable = self:GetInventory(self.currentPlayer, recipe.modifiedData[i].schematic.reagents)
-			local itemName = GetItemInfo(recipe.modifiedData[i].reagentID) or recipe.modifiedData[i].reagentID
+			local itemName = C_Item.GetItemInfo(recipe.modifiedData[i].reagentID) or recipe.modifiedData[i].reagentID
 			local text
 			text = string.format("  %d x %s", recipe.modifiedData[i].numNeeded, itemName)
 			local counts
@@ -1691,7 +1691,7 @@ Skillet.bopCache = {}
 function Skillet:bopCheck(item)
 	--DA.DEBUG(0,"bopCheck("..tostring(item)..")")
 	if not self.bopCache[item] then
-		local _, link, _, _, _, _, _, _, _, _, _, _, _, bindType, _, _, _ = GetItemInfo(item)
+		local _, link, _, _, _, _, _, _, _, _, _, _, _, bindType, _, _, _ = C_Item.GetItemInfo(item)
 		--DA.DEBUG(0,"bopCheck: bindType= "..tostring(bindType))
 		self.bopCache[item] = bindType or 0	-- Item binding type: 0 - none; 1 - on pickup; 2 - on equip; 3 - on use; 4 - quest
 	end

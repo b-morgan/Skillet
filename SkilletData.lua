@@ -99,13 +99,13 @@ function Skillet:GetAutoTargetItem(addSpellID)
 		--DA.DEBUG(0,"itemID= "..tostring(itemID))
 		if itemID then
 			local limit = Skillet.TradeSkillAutoTarget[addSpellID][itemID]
-			local count = GetItemCount(itemID)
+			local count = C_Item.GetItemCount(itemID)
 			if count >= limit then
 				return itemID
 			end
 		end
 		for itemID,limit in pairs(Skillet.TradeSkillAutoTarget[addSpellID]) do
-			local count = GetItemCount(itemID)
+			local count = C_Item.GetItemCount(itemID)
 			--DA.DEBUG(0,"itemID= "..tostring(itemID)..", limit= "..tostring(limit)..", count= "..tostring(count))
 			if count >= limit then
 				lastAutoTarget[addSpellID] = itemID
@@ -126,7 +126,7 @@ function Skillet:GetAutoTargetMacro(addSpellID, toy, pet, petGUID)
 	else
 		local itemID = Skillet:GetAutoTargetItem(addSpellID)
 		if itemID then
-			return "/cast "..(GetSpellInfo(addSpellID) or "").."\n/use "..(GetItemInfo(itemID) or "")
+			return "/cast "..(GetSpellInfo(addSpellID) or "").."\n/use "..(C_Item.GetItemInfo(itemID) or "")
 		else
 			return "/cast "..(GetSpellInfo(addSpellID) or "")
 		end
@@ -1310,8 +1310,8 @@ recipeSchematic= {
 				itemID = 0
 			end
 			recipe.itemID = itemID
-			recipe.itemType = select(2,GetItemInfoInstant(itemID))
-			recipe.classID = select(6,GetItemInfoInstant(itemID)) or 0
+			recipe.itemType = select(2,C_Item.GetItemInfoInstant(itemID))
+			recipe.classID = select(6,C_Item.GetItemInfoInstant(itemID)) or 0
 			recipeInfo.itemID = itemID		-- save a copy for our records
 			if not recipeInfo.alternateVerb then
 				local minMade = recipeSchematic.quantityMin
@@ -1402,7 +1402,7 @@ recipeSchematic= {
 					basicData[numBasic] = {}
 					basicData[numBasic].reagentID = reagentID
 					basicData[numBasic].numNeeded = numNeeded
-					basicData[numBasic].name = GetItemInfo(reagentID)
+					basicData[numBasic].name = C_Item.GetItemInfo(reagentID)
 					basicData[numBasic].schematic = schematic
 					Skillet:ItemDataAddUsedInRecipe(reagentID, recipeID)	-- add a cross reference for where a particular item is used
 				elseif schematic.dataSlotType == Enum.TradeskillSlotDataType.ModifiedReagent then -- 2

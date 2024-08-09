@@ -1424,7 +1424,7 @@ Skillet.options =
 						else
 							id = tonumber(item)
 						end
-						name, link = GetItemInfo(id)
+						name, link = C_Item.GetItemInfo(id)
 						price = tonumber(price)
 						DA.DEBUG(0,"id= "..tostring(id)..", name= "..tostring(name)..", price= "..tostring(price)..", link= "..tostring(link))
 						Skillet.db.global.customPrice[server][id] = { ["name"] = name, ["value"] = price }

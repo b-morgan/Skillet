@@ -89,8 +89,8 @@ local function sort_recipe_by_item_level(tradeskill, a, b)
 --
 -- Same level, try iLevel next
 --
-		local left = select(4,GetItemInfo(left_r.itemID)) or 0
-		local right = select(4,GetItemInfo(right_r.itemID)) or 0
+		local left = select(4,C_Item.GetItemInfo(left_r.itemID)) or 0
+		local right = select(4,C_Item.GetItemInfo(right_r.itemID)) or 0
 		if left == right then
 --
 -- Same level, sort by difficulty
@@ -113,8 +113,8 @@ local function sort_recipe_by_item_quality(tradeskill, a, b)
 	end
 	local left_r = Skillet:GetRecipe(a.recipeID)
 	local right_r = Skillet:GetRecipe(b.recipeID)
-	local _,_, left = GetItemInfo(left_r.itemID)
-	local _,_, right = GetItemInfo(right_r.itemID)
+	local _,_, left = C_Item.GetItemInfo(left_r.itemID)
+	local _,_, right = C_Item.GetItemInfo(right_r.itemID)
 	if not left  then  left = 0 end
 	if not right then right = 0 end
 	if left == right then

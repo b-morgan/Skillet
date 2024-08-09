@@ -131,7 +131,7 @@ end
 function Skillet:nameWithQuality(itemID, modified)
 	--DA.DEBUG(0,"nameWithQuality("..tostring(itemID)..", "..tostring(modified)..")")
 	local name, quality
-	local bname, link = GetItemInfo(itemID)
+	local bname, link = C_Item.GetItemInfo(itemID)
 	if not bname then
 		if modified then
 			self.modifiedDataNeeded = true
@@ -379,7 +379,7 @@ PROFESSIONS_FIRST_CRAFT_DESCRIPTION = "Crafting this recipe for the first time w
 		if reagent then
 			local reagentName
 			if reagent.reagentID then
-				reagentName	= GetItemInfo("item:"..reagent.reagentID) or reagent.reagentID
+				reagentName	= C_Item.GetItemInfo("item:"..reagent.reagentID) or reagent.reagentID
 			else
 				reagentName = "unknown"
 			end
@@ -1211,7 +1211,7 @@ function Skillet:ReagentButtonShiftClick(button, mouse, skillIndex, reagentIndex
 	local link = Skillet:GetRecipeReagentItemLink(skillIndex, reagentIndex)
 	if link and not ChatEdit_InsertLink(link) then
 		DA.DEBUG(1,"ReagentButtonShiftClick: ChatEdit_InsertLink returned false. link= "..DA.PLINK(link))
-		local name = GetItemInfo(link)
+		local name = C_Item.GetItemInfo(link)
 		if SkilletSearchBox:HasFocus() then
 			SkilletSearchBox:SetText(name)
 		end
@@ -1414,7 +1414,7 @@ function Skillet:ReagentsLinkOnClick(button, skillIndex, reagentIndex, recurse)
 		if reagent then
 			local reagentName, reagentLink
 			if reagent.reagentID then
-				reagentName, reagentLink = GetItemInfo(reagent.reagentID)
+				reagentName, reagentLink = C_Item.GetItemInfo(reagent.reagentID)
 			end
 			--DA.DEBUG(1,"ReagentsLinkOnClick: reagentLink= "..DA.DUMP1(reagentLink))
 			if reagentLink then
