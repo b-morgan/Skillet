@@ -31,6 +31,7 @@ Skillet.NewsData = {
 			{	name = "Fixes",
 				data = {
 					{ header = "Inventory", body = "Add Warband Bank" },
+					{ header = "TradeSkills", body = "Fix TradeSkill buttons" },
 				},
 			},
 		},

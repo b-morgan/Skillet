@@ -1455,14 +1455,9 @@ function Skillet:ChangeTradeSkill(tradeID, tradeName)
 			DA.DEBUG(0,"ChangeTradeSkill: changingTrade= "..tostring(self.changingTrade)..", changingName= "..tostring(self.changingName))
 			StaticPopup_Show("SKILLET_MANUAL_CHANGE", self.changingName)
 		else
-			if self.spellOffset and self.spellOffset[tradeName] then
-				DA.DEBUG(1,"ChangeTradeSkill: executing CastSpell("..tostring(self.spellOffset[tradeName]+1)..",BOOKTYPE_PROFESSION)")
-				CastSpell(self.spellOffset[tradeName]+1,BOOKTYPE_PROFESSION)
-			else
-				if tradeName == "Mining" then tradeName = "Mining Journal" end
-				DA.DEBUG(1,"ChangeTradeSkill: executing CastSpellByName("..tostring(tradeName)..")")
-				CastSpellByName(tradeName)
-			end
+			if tradeName == "Mining" then tradeName = "Mining Journal" end
+			DA.DEBUG(1,"ChangeTradeSkill: executing CastSpellByName("..tostring(tradeName)..")")
+			CastSpellByName(tradeName)
 			self.delayTrade = tradeID
 			self.delayName = tradeName
 			self.delayChange = true
