@@ -28,6 +28,11 @@ Skillet.NewsName = "Skillet News"
 Skillet.NewsData = {
 	{	version = "5.31",
 		data = {
+			{	name = "Changes",
+				data = {
+					{ header = "TOC", body = "Update TOC to 110002" },
+				},
+			},
 			{	name = "Fixes",
 				data = {
 					{ header = "Inventory", body = "Add Warband Bank" },
