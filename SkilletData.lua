@@ -126,9 +126,9 @@ function Skillet:GetAutoTargetMacro(addSpellID, toy, pet, petGUID)
 	else
 		local itemID = Skillet:GetAutoTargetItem(addSpellID)
 		if itemID then
-			return "/cast "..(GetSpellInfo(addSpellID) or "").."\n/use "..(C_Item.GetItemInfo(itemID) or "")
+			return "/cast "..(C_Spell.GetSpellInfo(addSpellID) or "").."\n/use "..(C_Item.GetItemInfo(itemID) or "")
 		else
-			return "/cast "..(GetSpellInfo(addSpellID) or "")
+			return "/cast "..(C_Spell.GetSpellInfo(addSpellID) or "")
 		end
 	end
 end
@@ -318,7 +318,7 @@ end
 
 function Skillet:GetRecipeName(id)
 	if not id then return "unknown" end
-	local name = GetSpellInfo(id)
+	local name = C_Spell.GetSpellInfo(id)
 	--DA.DEBUG(0,"name "..(id or "nil").." "..(name or "nil"))
 	if name then
 		return name, id
@@ -358,7 +358,7 @@ function Skillet:GetRecipe(id)
 			end
 			Skillet.data.recipeList[id] = {}
 			Skillet.data.recipeList[id].spellID = tonumber(id)
-			Skillet.data.recipeList[id].name = GetSpellInfo(tonumber(id))
+			Skillet.data.recipeList[id].name = C_Spell.GetSpellInfo(tonumber(id))
 			Skillet.data.recipeList[id].tradeID = tonumber(tradeID)
 			Skillet.data.recipeList[id].itemID = tonumber(itemID)
 			if Skillet.db.global.AdjustNumMade and Skillet.db.global.AdjustNumMade[id] then
@@ -464,7 +464,7 @@ function Skillet:CollectTradeSkillData()
 	self.tradeSkillNamesByID = {}
 	for i=1,#TradeSkillList,1 do
 		local id = TradeSkillList[i]
-		local name, _, icon = GetSpellInfo(id)
+		local name, _, icon = C_Spell.GetSpellInfo(id)
 		self.tradeSkillIDsByName[name] = id
 		self.tradeSkillNamesByID[id] = name
 	end
@@ -509,8 +509,8 @@ function Skillet:ScanPlayerTradeSkills(player)
 		for i=1,#TradeSkillList,1 do
 			local id = TradeSkillList[i]
 			--DA.DEBUG(3,"ScanPlayerTradeSkills: id= "..tostring(id))
-			local name = GetSpellInfo(id)			-- always returns data
-			local name = GetSpellInfo(name)			-- only returns data if you have this spell in your spellbook
+			local name = C_Spell.GetSpellInfo(id)			-- always returns data
+			local name = C_Spell.GetSpellInfo(name)			-- only returns data if you have this spell in your spellbook
 			--DA.DEBUG(3,"ScanPlayerTradeSkills: name= "..tostring(name))
 			if name then
 				if id == 2656 then id = 2575 end -- Ye old Smelting vs. Mining issue
