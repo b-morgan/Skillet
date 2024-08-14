@@ -957,7 +957,7 @@ end
 --
 function Skillet:ContinueCast(spellID)
 	if self.enabledState then
-		name = GetSpellInfo(spellID)
+		name = C_Spell.GetSpellInfo(spellID)
 		DA.DEBUG(0,"ContinueCast("..tostring(spellID).."), "..tostring(name))
 		if spellID == self.processingSpellID then
 			DA.DEBUG(1,"ContinueCast: processingCount= "..tostring(Skillet.processingCount))
@@ -999,7 +999,7 @@ end
 --
 function Skillet:StopCast(spellID)
 	if self.enabledState then
-		name = GetSpellInfo(spellID)
+		name = C_Spell.GetSpellInfo(spellID)
 		DA.DEBUG(0,"StopCast("..tostring(spellID).."), "..tostring(name))
 		self.queuecasting = false
 		self.processingSpell = nil
@@ -1018,7 +1018,7 @@ end
 --
 function Skillet:IgnoreCast(spellID)
 	if self.enabledState then
-		name = GetSpellInfo(spellID)
+		name = C_Spell.GetSpellInfo(spellID)
 		DA.DEBUG(4,"IgnoreCast("..tostring(spellID).."), "..tostring(name))
 	end
 end
