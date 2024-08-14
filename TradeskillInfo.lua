@@ -58,7 +58,7 @@ end
 
 -- Returns the name of the current trade skill
 function Skillet:GetTradeName(tradeID)
-	local tradeName = GetSpellInfo(tonumber(tradeID))
+	local tradeName = C_Spell.GetSpellName(tonumber(tradeID))
 	return tradeName
 end
 
@@ -124,7 +124,7 @@ end
 -- Gets the trade skill line, and knows how to do the right
 -- thing depending on whether or not this is a craft.
 function Skillet:GetTradeSkillLine()
-	local tradeName = GetSpellInfo(self.currentTrade)
+	local tradeName = C_Spell.GetSpellName(self.currentTrade)
 	local ranks = self:GetSkillRanks(self.currentPlayer, self.currentTrade)
 	local rank, maxRank
 	if ranks then

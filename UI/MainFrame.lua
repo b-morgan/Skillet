@@ -550,9 +550,9 @@ function Skillet:TradeButton_OnEnter(button)
 	GameTooltip:ClearLines()
 	local bName = button:GetName()
 	local _, player, tradeID = string.split("-", bName)
-	local sInfo = GetSpellInfo(tradeID)
-	--DA.DEBUG(3,"TradeButton_OnEnter("..tostring(bName).."), player= "..tostring(player)..", tradeID= "..tostring(tradeID)..", sInfo= "..tostring(sInfo))
-	GameTooltip:AddLine(sInfo)
+	local sName = C_Spell.GetSpellName(tradeID)
+	--DA.DEBUG(3,"TradeButton_OnEnter("..tostring(bName).."), player= "..tostring(player)..", tradeID= "..tostring(tradeID)..", sName= "..tostring(sName))
+	GameTooltip:AddLine(sName)
 	tradeID = tonumber(tradeID)
 	local data
 	data = self:GetSkillRanks(player, tradeID)
@@ -570,7 +570,7 @@ function Skillet:TradeButton_OnEnter(button)
 			GameTooltip:AddLine("scan incomplete...",1,0,0)
 		end
 		if nonLinkingTrade[tradeID] and player ~= UnitName("player") then
-			GameTooltip:AddLine((GetSpellInfo(tradeID)).." not available for alts")
+			GameTooltip:AddLine(sName.." not available for alts")
 		end
 	end
 	GameTooltip:Show()
@@ -582,12 +582,12 @@ function Skillet:TradeButtonAdditional_OnEnter(button)
 	GameTooltip:SetOwner(button, "ANCHOR_TOPLEFT")
 	GameTooltip:ClearLines()
 	local spellID = button:GetID()
-	local spellInfo, _ = GetSpellInfo(spellID)
+	local spellName = C_Spell.GetSpellName(spellID)
 	if button.Toy then
-		_, spellInfo = C_ToyBox.GetToyInfo(spellID)
+		_, spellName = C_ToyBox.GetToyInfo(spellID)
 	end
-	--DA.DEBUG(1,"TradeButtonAdditional_OnEnter: spellInfo= "..tostring(spellInfo))
-	GameTooltip:AddLine(spellInfo)
+	--DA.DEBUG(1,"TradeButtonAdditional_OnEnter: spellName= "..tostring(spellName))
+	GameTooltip:AddLine(spellName)
 	if not button.Toy then
 		local itemID = Skillet:GetAutoTargetItem(self.currentTrade, spellID)
 		if itemID and IsAltKeyDown() then
@@ -717,8 +717,8 @@ function Skillet:CreateAdditionalButtonsList()
 						local spellID = additionalSpellTab[j][1]
 						if not seenButtons[spellID] then
 							if additionalSpellTab[j][5] then
-								local name = GetSpellInfo(spellID)	-- always returns data
-								local name = GetSpellInfo(name)		-- only returns data if you have this spell in your spellbook
+								local name = C_Spell.GetSpellName(spellID)	-- always returns data
+								local name = C_Spell.GetSpellName(name)		-- only returns data if you have this spell in your spellbook
 								--DA.DEBUG(1,"CreateAdditionalButtonsList: name= "..tostring(name))
 								if name then
 									table.insert(Skillet.AdditionalButtonsList, additionalSpellTab[j])
@@ -768,7 +768,11 @@ function Skillet:UpdateTradeButtons(player)
 			end
 		end
 		if ranks then
-			local spellName, _, spellIcon = GetSpellInfo(tradeID)
+			local spellName, spellIcon 
+			local spellInfo = C_Spell.GetSpellInfo(tradeID)
+			--DA.DEBUG(1,"UpdateTradeButtons: spellInfo= "..DA.DUMP1(spellInfo))
+			spellName = spellInfo.name
+			spellIcon = spellInfo.iconID
 			local buttonName = "SkilletFrameTradeButton-"..player.."-"..tradeID
 			local button = _G[buttonName]
 			if not button then
@@ -824,7 +828,7 @@ function Skillet:UpdateTradeButtons(player)
 		local additionalSpellName = additionalSpellTab[2]
 		local additionalToy = additionalSpellTab[3]
 		local additionalPet = additionalSpellTab[4]
-		local spellName, _, spellIcon, petGUID
+		local spellInfo, spellName, spellIcon, petGUID
 		if additionalToy then
 			if (PlayerHasToy(additionalSpellId) and C_ToyBox.IsToyUsable(additionalSpellId)) then
 				_, spellName, spellIcon = C_ToyBox.GetToyInfo(additionalSpellId)
@@ -832,7 +836,10 @@ function Skillet:UpdateTradeButtons(player)
 				spellName = nil
 			end
 		else
-			spellName, _, spellIcon = GetSpellInfo(additionalSpellId)
+			local spellInfo = C_Spell.GetSpellInfo(additionalSpellId)
+			--DA.DEBUG(1,"UpdateTradeButtons: spellInfo= "..DA.DUMP1(spellInfo))
+			spellName = spellInfo.name
+			spellIcon = spellInfo.iconID
 		end
 		if additionalPet then
 			_, petGUID = C_PetJournal.FindPetIDByName(additionalSpellName)
@@ -865,7 +872,7 @@ function Skillet:UpdateTradeButtons(player)
 --
 -- pure spell on left-click
 --
-			local spellName, _, texture = GetSpellInfo(additionalSpellId)
+			local spellName, _, texture = C_Spell.GetSpellName(additionalSpellId)
 			DA.DEBUG(1,"UpdateTradeButtons: additionalSpellId= "..tostring(additionalSpellId)..", spellName= "..tostring(spellName))
 			button:SetAttribute("type1", "spell")
 			button:SetAttribute("spell1", spellName)

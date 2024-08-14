@@ -307,9 +307,6 @@ function Skillet:OnInitialize()
 	if not self.db.global.AdjustNumMade then
 		self.db.global.AdjustNumMade = {}
 	end
-	if not self.db.global.spellIDtoName then
-		self.db.global.spellIDtoName = {}
-	end
 	if not self.db.global.MissingSkillLevels then
 		self.db.global.MissingSkillLevels = {}
 	end
@@ -531,7 +528,6 @@ function Skillet:FlushRecipeData()
 	Skillet.db.global.itemRecipeUsedIn = {}
 	Skillet.db.global.itemRecipeSource = {}
 	Skillet.db.global.Categories = {}
-	Skillet.db.global.spellIDtoName = {}
 	if Skillet.data and Skillet.data.recipeInfo then
 		Skillet.data.recipeInfo = {}
 	Skillet:InitializeSkillLevels()
@@ -783,7 +779,6 @@ function Skillet:OnEnable()
 	self:RegisterEvent("SKILL_LINES_CHANGED") -- replacement for CHAT_MSG_SKILL?
 	self:RegisterEvent("LEARNED_SPELL_IN_TAB") -- arg1 = professionID
 	self:RegisterEvent("NEW_RECIPE_LEARNED") -- arg1 = recipeID
---	self:RegisterEvent("SPELL_NAME_UPDATE") -- arg1 = spellID, arg2 = spellName
 --	self:RegisterEvent("ADDON_ACTION_BLOCKED")
 
 --
@@ -974,23 +969,6 @@ function Skillet:NEW_RECIPE_LEARNED(event, recipeID)
 	DA.TRACE("recipeID= "..tostring(recipeID))
 	if Skillet.tradeSkillOpen then
 		Skillet.dataSourceChanged = true	-- Process the change on the next TRADE_SKILL_LIST_UPDATE
-	end
-end
-
-function Skillet:SPELL_NAME_UPDATE(event, spellID, spellName)
-	DA.TRACE("SPELL_NAME_UPDATE")
-	DA.TRACE("spellID= "..tostring(spellID)..", spellName= "..tostring(spellName))
-	Skillet.db.global.spellIDtoName[spellID] = spellName
-end
-
-function Skillet:GetSpellName(spellID)
-	DA.DEBUG(0,"GetSpellName")
-	DA.DEBUG(0,"spellID= "..tostring(spellID)..", spellName= "..tostring(spellName))
-	if Skillet.db.global.spellIDtoName[spellID] then
-		return Skillet.db.global.spellIDtoName[spellID]
-	else
-		GetSpellInfo(spellID)	-- Name will be returned asynchronously 
-		return "Unknown"
 	end
 end
 

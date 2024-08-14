@@ -149,7 +149,7 @@ function Skillet:UpdateNotesWindow()
 			if index == 1 then
 				local texture
 				-- notes for the recipe itself
-				text:SetText((GetSpellInfo(recipeID)))
+				text:SetText((C_Spell.GetSpellName(recipeID)))
 				if recipe.numMade > 0 then
 					local a
 					a,a,a,a,a,a,a,a,a,texture = C_Item.GetItemInfo(recipe.itemID)		-- get the item texture
@@ -183,7 +183,7 @@ function Skillet:UpdateNotesWindow()
 end
 
 --
--- Hide the Skillet notes window, it it was open
+-- Hide the Skillet notes window, if it was open
 --
 function Skillet:HideNotesWindow()
 	--DA.DEBUG(0,"HideNotesWindow()")
