@@ -65,6 +65,7 @@ SkilletQueue.lua
 ThirdPartyHooks.lua
 Upgrades.lua
 SkillLevelData.lua
+SkillLevelData2.lua
 RecipeGroups.lua
 Inventory.lua
 SkilletPlugin.lua

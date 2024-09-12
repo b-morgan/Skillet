@@ -322,16 +322,24 @@ function Skillet:OnInitialize()
 --
 -- Initialize the Skill Levels data if any of the tables are missing
 --
+	local initSkillLevels
 	if not self.db.global.MissingSkillLevels then
 		self.db.global.MissingSkillLevels = {}
+		initSkillLevels = true
 	end
 	if not self.db.global.SkillLineAbility_era then
-		self:InitializeSkillLevels()
+		self.db.global.SkillLineAbility_era = {}
+		initSkillLevels = true
 	end
 	if not self.db.global.SkillLineAbility_cata then
-		self:InitializeSkillLevels()
+		self.db.global.SkillLineAbility_cata = {}
+		initSkillLevels = true
 	end
 	if not self.db.global.SkillLineAbility_retail then
+		self.db.global.SkillLineAbility_retail = {}
+		initSkillLevels = true
+	end
+	if initSkillLevels then
 		self:InitializeSkillLevels()
 	end
 

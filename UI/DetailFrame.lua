@@ -227,12 +227,29 @@ function Skillet:UpdateDetailWindow(skillIndex)
 		SkilletRecipeNotesButton:Show()
 		if recipe.spellID and recipe.itemID then
 			local orange,yellow,green,gray = self:GetTradeSkillLevels(recipe.itemID, recipe.spellID)
-			SkilletRankFrame.subRanks.green:SetValue(gray)
-			SkilletRankFrame.subRanks.yellow:SetValue(green)
-			SkilletRankFrame.subRanks.orange:SetValue(yellow)
-			SkilletRankFrame.subRanks.red:SetValue(orange)
-			for c,s in pairs(SkilletRankFrame.subRanks) do
-				s:Show()
+			if not gray or not green or not yellow or not orange then
+				DA.DEBUG(1,"UpdateDetailsWindow: orange= "..tostring(orange)..", yellow= "..tostring(yellow)..", green= "..tostring(green)..", gray= "..tostring(gray))
+				DA.DEBUG(1,"UpdateDetailsWindow: sourceTradeSkillLevel= "..tostring(self.sourceTradeSkillLevel))
+			else
+--
+-- Save the actual values
+--
+				SkilletRankFrame.itemID = recipe.itemID
+				SkilletRankFrame.spellID = recipe.spellID
+				SkilletRankFrame.gray = gray
+				SkilletRankFrame.green = green
+				SkilletRankFrame.yellow = yellow
+				SkilletRankFrame.orange = orange
+--
+-- Set the graphical values
+--
+				SkilletRankFrame.subRanks.green:SetValue(gray)
+				SkilletRankFrame.subRanks.yellow:SetValue(green)
+				SkilletRankFrame.subRanks.orange:SetValue(yellow)
+				SkilletRankFrame.subRanks.red:SetValue(orange)
+				for c,s in pairs(SkilletRankFrame.subRanks) do
+					s:Show()
+				end
 			end
 		end
 		recipeInfo = Skillet.data.recipeInfo[self.currentTrade][recipe.spellID]
