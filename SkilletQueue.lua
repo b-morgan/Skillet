@@ -651,10 +651,15 @@ function Skillet:ProcessQueue(altMode)
 							end -- for
 						end
 						if command.requiredReagents then
+							local required = 0
 							for i,reagent in pairs(command.requiredReagents) do
 								DA.DEBUG(2,"Required: i= "..tostring(i)..", reagent= "..DA.DUMP1(reagent))
 								table.insert(self.optionalReagentsArray, reagent)
+								required = required + 1
 							end -- for
+							if required == 0 then
+								DA.MARK3("Required reagent(s) missing")
+							end
 						end
 						if command.optionalReagents then
 							for i,reagent in pairs(command.optionalReagents) do
@@ -689,20 +694,28 @@ function Skillet:ProcessQueue(altMode)
 							DA.DEBUG(1,"ProcessQueue: recipeLevel= "..tostring(recipeLevel)..", recipeTransaction= "..DA.DUMP(self.recipeTransaction))
 							local reagentInfoTbl = self.recipeTransaction:CreateCraftingReagentInfoTbl()
 							DA.DEBUG(1,"ProcessQueue: reagentInfoTbl= "..DA.DUMP(reagentInfoTbl))
+							if not self.recipeTransaction:HasAllAllocations(command.count) then
+								DA.MARK3("Insufficient Materials available")
+							end
 						end
 					else
 						if self.db.profile.queue_one_at_a_time then
 							C_TradeSkillUI.CraftRecipe(command.recipeID, command.count, command.optionalReagentsArray, recipeLevel)
 						else
 							local reagentInfoTbl = self.recipeTransaction:CreateCraftingReagentInfoTbl()
-							C_TradeSkillUI.CraftRecipe(command.recipeID, command.count, reagentInfoTbl, recipeLevel)
+							if self.recipeTransaction:HasAllAllocations(command.count) then
+								DA.DEBUG(1,"ProcessQueue: reagentInfoTbl= "..DA.DUMP(reagentInfoTbl))
+								C_TradeSkillUI.CraftRecipe(command.recipeID, command.count, reagentInfoTbl, recipeLevel)
+							else
+								DA.MARK3("Insufficient (Required) Materials available")
+							end
 						end
 					end
 				else
 --
 -- C_TradeSkillUI.GetCraftableCount failed
 --
-					DA.MARK3("Insufficent Materials available, count= "..tostring(command.count)..", numAvailable= "..tostring(numAvailable))
+					DA.MARK3("Insufficient Materials available, count= "..tostring(command.count)..", numAvailable= "..tostring(numAvailable))
 					self.queuecasting = false
 				end
 			elseif command.recipeType == Enum.TradeskillRecipeType.Enchant then
