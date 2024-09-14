@@ -136,7 +136,7 @@ local function createFinishingListFrame(self)
 --
 -- Adjust the button height
 --
-	SKILLET_FINISHING_LIST_HEIGHT = math.max(SkilletFinishingButton1:GetHeight(), SKILLET_FINISHING_LIST_HEIGHT)
+	SKILLET_FINISHING_LIST_HEIGHT = math.max(SkilletFinishingListButton1:GetHeight(), SKILLET_FINISHING_LIST_HEIGHT)
 	return frame
 end
 
