@@ -17,15 +17,12 @@ You should have received a copy of the GNU General Public License
 along with this program.  If not, see <http://www.gnu.org/licenses/>.
 ]]--
 
-SKILLET_MODIFIED_LIST_HEIGHT = 24
-
 local L = LibStub("AceLocale-3.0"):GetLocale("Skillet")
 
 -- ===========================================================================================
 --    Window creation and update methods
 -- ===========================================================================================
 local num_buttons = 0
-
 local function get_button(i)
 	local button = _G["SkilletModifiedListButton"..i]
 	if not button then
@@ -135,6 +132,7 @@ end
 --
 -- Called to update the modified list window
 --
+local SKILLET_MODIFIED_LIST_HEIGHT = 24
 function Skillet:UpdateModifiedListWindow()
 	--DA.DEBUG(0,"UpdateModifiedListWindow()")
 	self.InProgress.modified = true
@@ -148,22 +146,26 @@ function Skillet:UpdateModifiedListWindow()
 	end
 	SkilletModifiedNeeded:SetText(self.cachedModifiedNeeded)
 	SkilletModifiedNeeded:SetTextColor(1,1,1)
-	local height = SkilletModifiedListParent:GetHeight() - 30 -- Allow for frame border
+	local height = SkilletModifiedListParent:GetHeight()
+	local buttonH = SkilletModifiedListButton1:GetHeight()
+	buttonH = math.max(buttonH, SKILLET_MODIFIED_LIST_HEIGHT)
 	local width = SkilletModifiedListParent:GetWidth() - 30 -- Allow for scrollbars
-	local button_count = height / SKILLET_MODIFIED_LIST_HEIGHT
+	--DA.DEBUG(1,"UpdateModifiedListWindow: height= "..tostring(height)..", buttonH= "..tostring(buttonH))
+	--DA.DEBUG(1,"UpdateModifiedListWindow: width= "..tostring(width))
+	local button_count = height / buttonH
 	button_count = math.floor(button_count) - 1
 --
 -- Update the scroll frame
 --
-	FauxScrollFrame_Update(SkilletModifiedListList,			-- frame
-							numItems,						-- num items
-							button_count,					-- num to display
-							SKILLET_MODIFIED_LIST_HEIGHT)	-- value step (item height)
+	FauxScrollFrame_Update(SkilletModifiedListList,		-- frame
+							numItems,					-- num items
+							button_count,				-- num to display
+							buttonH)					-- value step (item height)
 --
 -- Where in the list of items to start counting.
 --
 	local itemOffset = FauxScrollFrame_GetOffset(SkilletModifiedListList)
-	--DA.DEBUG(1,"UpdateModifiedListWindow: itemOffset= "..tostring(itemOffset)..", width= "..tostring(width))
+	--DA.DEBUG(1,"UpdateModifiedListWindow: itemOffset= "..tostring(itemOffset))
 	for i=1, button_count, 1 do
 		num_buttons = math.max(num_buttons, i)
 		local itemIndex = i + itemOffset

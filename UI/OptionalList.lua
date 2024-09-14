@@ -17,8 +17,6 @@ You should have received a copy of the GNU General Public License
 along with this program.  If not, see <http://www.gnu.org/licenses/>.
 ]]--
 
-SKILLET_OPTIONAL_LIST_HEIGHT = 16
-
 local L = LibStub("AceLocale-3.0"):GetLocale("Skillet")
 
 function Skillet:OptionalListToggleHaveItems()
@@ -26,11 +24,10 @@ function Skillet:OptionalListToggleHaveItems()
 	self:HideOptionalList()
 end
 
-local num_buttons = 0
-
 -- ===========================================================================================
 --    Window creation and update methods
 -- ===========================================================================================
+local num_buttons = 0
 local function get_button(i)
 	local button = _G["SkilletOptionalListButton"..i]
 	if not button then
@@ -152,20 +149,21 @@ function Skillet:UpdateOptionalListWindow()
 	else
 		return
 	end
-	local height = SkilletOptionalListParent:GetHeight() - 30 -- Allow for frame border
+	local height = SkilletOptionalListParent:GetHeight()
+	local buttonH = SkilletOptionalListButton1:GetHeight()
 	local width = SkilletOptionalListParent:GetWidth() - 30 -- Allow for scrollbars
-	--DA.DEBUG(1,"UpdateOptionalListWindow: SkilletOptionalListParent height= "..tostring(height))
-	--DA.DEBUG(1,"UpdateOptionalListWindow: SkilletOptionalListParent width= "..tostring(width))
-	local button_count = height / SKILLET_OPTIONAL_LIST_HEIGHT
+	--DA.DEBUG(1,"UpdateOptionalListWindow: height= "..tostring(height)..", buttonH= "..tostring(buttonH))
+	--DA.DEBUG(1,"UpdateOptionalListWindow: width= "..tostring(width))
+	local button_count = height / buttonH
 	button_count = math.floor(button_count) - 1
-	--DA.DEBUG(1,"UpdateOptionalListWindow: numItems= "..tostring(numItems)..", button_count= "..tostring(button_count))
+	--DA.DEBUG(1,"UpdateOptionalListWindow: numItems= "..tostring(numItems)..", button_count= "..tostring(button_count)..", num_buttons= "..tostring(num_buttons))
 --
 -- Update the scroll frame
 --
-	FauxScrollFrame_Update(SkilletOptionalListList,			-- frame
-							numItems,						-- num items
-							button_count,					-- num to display
-							SKILLET_OPTIONAL_LIST_HEIGHT)	-- value step (item height)
+	FauxScrollFrame_Update(SkilletOptionalListList,		-- frame
+							numItems,					-- num items
+							button_count,				-- num to display
+							buttonH)					-- value step (item height)
 --
 -- Where in the list of items to start counting.
 --

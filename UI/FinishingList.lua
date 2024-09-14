@@ -17,8 +17,6 @@ You should have received a copy of the GNU General Public License
 along with this program.  If not, see <http://www.gnu.org/licenses/>.
 ]]--
 
-SKILLET_FINISHING_LIST_HEIGHT = 16
-
 local L = LibStub("AceLocale-3.0"):GetLocale("Skillet")
 
 function Skillet:FinishingListToggleHaveItems()
@@ -26,11 +24,10 @@ function Skillet:FinishingListToggleHaveItems()
 	self:HideFinishingList()
 end
 
-local num_buttons = 0
-
 -- ===========================================================================================
 --    Window creation and update methods
 -- ===========================================================================================
+local num_buttons = 0
 local function get_button(i)
 	local button = _G["SkilletFinishingListButton"..i]
 	if not button then
@@ -152,20 +149,21 @@ function Skillet:UpdateFinishingListWindow()
 	else
 		return
 	end
-	local height = SkilletFinishingListParent:GetHeight() - 30 -- Allow for frame border
+	local height = SkilletFinishingListParent:GetHeight()
+	local buttonH = SkilletOptionalListButton1:GetHeight()
 	local width = SkilletFinishingListParent:GetWidth() - 30 -- Allow for scrollbars
-	--DA.DEBUG(1,"UpdateFinishingListWindow: SkilletFinishingListParent height= "..tostring(height))
+	--DA.DEBUG(1,"UpdateFinishingListWindow: height= "..tostring(height)..", buttonH= "..tostring(buttonH))
 	--DA.DEBUG(1,"UpdateFinishingListWindow: SkilletFinishingListParent width= "..tostring(width))
-	local button_count = height / SKILLET_FINISHING_LIST_HEIGHT
+	local button_count = height / buttonH
 	button_count = math.floor(button_count) - 1
 	--DA.DEBUG(1,"UpdateFinishingListWindow: numItems= "..tostring(numItems)..", button_count= "..tostring(button_count))
 --
 -- Update the scroll frame
 --
-	FauxScrollFrame_Update(SkilletFinishingListList,			-- frame
-							numItems,						-- num items
-							button_count,					-- num to display
-							SKILLET_FINISHING_LIST_HEIGHT)	-- value step (item height)
+	FauxScrollFrame_Update(SkilletFinishingListList,	-- frame
+							numItems,					-- num items
+							button_count,				-- num to display
+							buttonH)					-- value step (item height)
 --
 -- Where in the list of items to start counting.
 --

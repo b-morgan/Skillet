@@ -17,8 +17,6 @@ You should have received a copy of the GNU General Public License
 along with this program.  If not, see <http://www.gnu.org/licenses/>.
 ]]--
 
-SKILLET_SALVAGE_LIST_HEIGHT = 16
-
 local L = LibStub("AceLocale-3.0"):GetLocale("Skillet")
 
 function Skillet:SalvageListToggleHaveItems()
@@ -26,11 +24,10 @@ function Skillet:SalvageListToggleHaveItems()
 	self:HideSalvageList()
 end
 
-local num_buttons = 0
-
 -- ===========================================================================================
 --    Window creation and update methods
 -- ===========================================================================================
+local num_buttons = 0
 local function get_button(i)
 	local button = _G["SkilletSalvageListButton"..i]
 	if not button then
@@ -156,25 +153,26 @@ function Skillet:UpdateSalvageListWindow()
 	else
 		return
 	end
-	local height = SkilletSalvageListParent:GetHeight() - 30 -- Allow for frame border
+	local height = SkilletSalvageListParent:GetHeight()
+	local buttonH = SkilletOptionalListButton1:GetHeight()
 	local width = SkilletSalvageListParent:GetWidth() - 30 -- Allow for scrollbars
-	--DA.DEBUG(1,"UpdateSalvageListWindow: SkilletSalvageListParent height= "..tostring(height))
+	--DA.DEBUG(1,"UpdateSalvageListWindow: height= "..tostring(height)..", buttonH= "..tostring(buttonH))
 	--DA.DEBUG(1,"UpdateSalvageListWindow: SkilletSalvageListParent width= "..tostring(width))
-	local button_count = height / SKILLET_SALVAGE_LIST_HEIGHT
+	local button_count = height / buttonH
 	button_count = math.floor(button_count) - 1
-	--DA.DEBUG(1,"UpdateSalvageListWindow: numItems= "..tostring(numItems)..", button_count= "..tostring(button_count))
+	--DA.DEBUG(1,"UpdateSalvageListWindow: numItems= "..tostring(numItems)..", button_count= "..tostring(button_count)..", num_buttons= "..tostring(num_buttons))
 --
 -- Update the scroll frame
 --
-	FauxScrollFrame_Update(SkilletSalvageListList,			-- frame
-							numItems,						-- num items
-							button_count,					-- num to display
-							SKILLET_SALVAGE_LIST_HEIGHT)	-- value step (item height)
+	FauxScrollFrame_Update(SkilletSalvageListList,	-- frame
+							numItems,				-- num items
+							button_count,			-- num to display
+							buttonH)				-- value step (item height)
 --
 -- Where in the list of items to start counting.
 --
 	local itemOffset = FauxScrollFrame_GetOffset(SkilletSalvageListList)
-	--DA.DEBUG(1,"UpdateSalvageListWindow: itemOffset= "..tostring(itemOffset)..", width= "..tostring(width))
+	--DA.DEBUG(1,"UpdateSalvageListWindow: itemOffset= "..tostring(itemOffset))
 	for i=1, button_count, 1 do
 		num_buttons = math.max(num_buttons, i)
 		local itemIndex = i + itemOffset
