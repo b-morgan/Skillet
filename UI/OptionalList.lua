@@ -55,6 +55,7 @@ local FrameBackdrop = {
 	insets = { left = 3, right = 3, top = 30, bottom = 3 }
 }
 
+SKILLET_OPTIONAL_LIST_HEIGHT = 16
 local function createOptionalListFrame(self)
 	--DA.DEBUG(0,"createOptionalListFrame")
 	local frame = SkilletOptionalList
@@ -132,6 +133,10 @@ local function createOptionalListFrame(self)
 -- so hitting [ESC] will close the window
 --
 	tinsert(UISpecialFrames, frame:GetName())
+--
+-- Adjust the button height
+--
+	SKILLET_OPTIONAL_LIST_HEIGHT = math.max(SkilletOptionalListButton1:GetHeight(), SKILLET_OPTIONAL_LIST_HEIGHT)
 	return frame
 end
 

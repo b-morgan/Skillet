@@ -55,6 +55,7 @@ local FrameBackdrop = {
 	insets = { left = 3, right = 3, top = 30, bottom = 3 }
 }
 
+SKILLET_FINISHING_LIST_HEIGHT = 16
 local function createFinishingListFrame(self)
 	--DA.DEBUG(0,"createFinishingListFrame")
 	local frame = SkilletFinishingList
@@ -132,6 +133,10 @@ local function createFinishingListFrame(self)
 -- so hitting [ESC] will close the window
 --
 	tinsert(UISpecialFrames, frame:GetName())
+--
+-- Adjust the button height
+--
+	SKILLET_FINISHING_LIST_HEIGHT = math.max(SkilletFinishingButton1:GetHeight(), SKILLET_FINISHING_LIST_HEIGHT)
 	return frame
 end
 
@@ -150,20 +155,19 @@ function Skillet:UpdateFinishingListWindow()
 		return
 	end
 	local height = SkilletFinishingListParent:GetHeight()
-	local buttonH = SkilletOptionalListButton1:GetHeight()
 	local width = SkilletFinishingListParent:GetWidth() - 30 -- Allow for scrollbars
-	--DA.DEBUG(1,"UpdateFinishingListWindow: height= "..tostring(height)..", buttonH= "..tostring(buttonH))
+	--DA.DEBUG(1,"UpdateFinishingListWindow: height= "..tostring(height)..", SKILLET_FINISHING_LIST_HEIGHT= "..tostring(SKILLET_FINISHING_LIST_HEIGHT))
 	--DA.DEBUG(1,"UpdateFinishingListWindow: SkilletFinishingListParent width= "..tostring(width))
-	local button_count = height / buttonH
+	local button_count = height / SKILLET_FINISHING_LIST_HEIGHT
 	button_count = math.floor(button_count) - 1
 	--DA.DEBUG(1,"UpdateFinishingListWindow: numItems= "..tostring(numItems)..", button_count= "..tostring(button_count))
 --
 -- Update the scroll frame
 --
-	FauxScrollFrame_Update(SkilletFinishingListList,	-- frame
-							numItems,					-- num items
-							button_count,				-- num to display
-							buttonH)					-- value step (item height)
+	FauxScrollFrame_Update(SkilletFinishingListList,		-- frame
+							numItems,						-- num items
+							button_count,					-- num to display
+							SKILLET_FINISHING_LIST_HEIGHT)	-- value step (item height)
 --
 -- Where in the list of items to start counting.
 --

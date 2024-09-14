@@ -55,6 +55,7 @@ local FrameBackdrop = {
 	insets = { left = 3, right = 3, top = 30, bottom = 3 }
 }
 
+SKILLET_SALVAGE_LIST_HEIGHT = 16
 local function createSalvageListFrame(self)
 	--DA.DEBUG(0,"createSalvageListFrame")
 	local frame = SkilletSalvageList
@@ -132,6 +133,10 @@ local function createSalvageListFrame(self)
 -- so hitting [ESC] will close the window
 --
 	tinsert(UISpecialFrames, frame:GetName())
+--
+-- Adjust the button height
+--
+	SKILLET_SALVAGE_LIST_HEIGHT = math.max(SkilletModifiedListButton1:GetHeight(), SKILLET_SALVAGE_LIST_HEIGHT)
 	return frame
 end
 
@@ -153,21 +158,20 @@ function Skillet:UpdateSalvageListWindow()
 	else
 		return
 	end
-	local height = SkilletSalvageListParent:GetHeight()
-	local buttonH = SkilletOptionalListButton1:GetHeight()
+	local height = SkilletSalvageListParent:GetHeight()	local buttonH = SkilletOptionalListButton1:GetHeight()
 	local width = SkilletSalvageListParent:GetWidth() - 30 -- Allow for scrollbars
-	--DA.DEBUG(1,"UpdateSalvageListWindow: height= "..tostring(height)..", buttonH= "..tostring(buttonH))
+	--DA.DEBUG(1,"UpdateSalvageListWindow: height= "..tostring(height)..", SKILLET_SALVAGE_LIST_HEIGHT= "..tostring(SKILLET_SALVAGE_LIST_HEIGHT))
 	--DA.DEBUG(1,"UpdateSalvageListWindow: SkilletSalvageListParent width= "..tostring(width))
-	local button_count = height / buttonH
+	local button_count = height / SKILLET_SALVAGE_LIST_HEIGHT
 	button_count = math.floor(button_count) - 1
 	--DA.DEBUG(1,"UpdateSalvageListWindow: numItems= "..tostring(numItems)..", button_count= "..tostring(button_count)..", num_buttons= "..tostring(num_buttons))
 --
 -- Update the scroll frame
 --
-	FauxScrollFrame_Update(SkilletSalvageListList,	-- frame
-							numItems,				-- num items
-							button_count,			-- num to display
-							buttonH)				-- value step (item height)
+	FauxScrollFrame_Update(SkilletSalvageListList,			-- frame
+							numItems,						-- num items
+							button_count,					-- num to display
+							SKILLET_SALVAGE_LIST_HEIGHT)	-- value step (item height)
 --
 -- Where in the list of items to start counting.
 --

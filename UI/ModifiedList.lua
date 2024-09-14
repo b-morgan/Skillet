@@ -50,6 +50,7 @@ local FrameBackdrop = {
 	insets = { left = 3, right = 3, top = 30, bottom = 3 }
 }
 
+SKILLET_MODIFIED_LIST_HEIGHT = 24
 local function createModifiedListFrame(self)
 	--DA.DEBUG(0,"createModifiedListFrame")
 	local frame = SkilletModifiedList
@@ -126,13 +127,16 @@ local function createModifiedListFrame(self)
 -- so hitting [ESC] will close the window
 --
 	tinsert(UISpecialFrames, frame:GetName())
+--
+-- Adjust the button height
+--
+	SKILLET_MODIFIED_LIST_HEIGHT = math.max(SkilletModifiedListButton1:GetHeight(), SKILLET_MODIFIED_LIST_HEIGHT)
 	return frame
 end
 
 --
 -- Called to update the modified list window
 --
-local SKILLET_MODIFIED_LIST_HEIGHT = 24
 function Skillet:UpdateModifiedListWindow()
 	--DA.DEBUG(0,"UpdateModifiedListWindow()")
 	self.InProgress.modified = true
@@ -147,20 +151,18 @@ function Skillet:UpdateModifiedListWindow()
 	SkilletModifiedNeeded:SetText(self.cachedModifiedNeeded)
 	SkilletModifiedNeeded:SetTextColor(1,1,1)
 	local height = SkilletModifiedListParent:GetHeight()
-	local buttonH = SkilletModifiedListButton1:GetHeight()
-	buttonH = math.max(buttonH, SKILLET_MODIFIED_LIST_HEIGHT)
 	local width = SkilletModifiedListParent:GetWidth() - 30 -- Allow for scrollbars
-	--DA.DEBUG(1,"UpdateModifiedListWindow: height= "..tostring(height)..", buttonH= "..tostring(buttonH))
+	--DA.DEBUG(1,"UpdateModifiedListWindow: height= "..tostring(height)..", SKILLET_MODIFIED_LIST_HEIGHT= "..tostring(SKILLET_MODIFIED_LIST_HEIGHT))
 	--DA.DEBUG(1,"UpdateModifiedListWindow: width= "..tostring(width))
-	local button_count = height / buttonH
+	local button_count = height / SKILLET_MODIFIED_LIST_HEIGHT
 	button_count = math.floor(button_count) - 1
 --
 -- Update the scroll frame
 --
-	FauxScrollFrame_Update(SkilletModifiedListList,		-- frame
-							numItems,					-- num items
-							button_count,				-- num to display
-							buttonH)					-- value step (item height)
+	FauxScrollFrame_Update(SkilletModifiedListList,			-- frame
+							numItems,						-- num items
+							button_count,					-- num to display
+							SKILLET_MODIFIED_LIST_HEIGHT)	-- value step (item height)
 --
 -- Where in the list of items to start counting.
 --

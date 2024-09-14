@@ -224,7 +224,7 @@
 			</Anchors>
 			<Scripts>
 				<OnVerticalScroll>
-					FauxScrollFrame_OnVerticalScroll(self, offset, SKILLET_OPTIONAL_LIST_HEIGHT, Skillet.SalvageList_OnScroll)
+					FauxScrollFrame_OnVerticalScroll(self, offset, SKILLET_SALVAGE_LIST_HEIGHT, Skillet.SalvageList_OnScroll)
 				</OnVerticalScroll>
 			</Scripts>
 		</ScrollFrame>

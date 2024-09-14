@@ -17,8 +17,6 @@ You should have received a copy of the GNU General Public License
 along with this program.  If not, see <http://www.gnu.org/licenses/>.
 ]]--
 
-SKILLET_OPTIONAL_LIST_HEIGHT = 16
-
 local L = LibStub("AceLocale-3.0"):GetLocale("Skillet")
 
 function Skillet:RequiredListToggleHaveItems()
@@ -26,11 +24,10 @@ function Skillet:RequiredListToggleHaveItems()
 	self:HideRequiredList()
 end
 
-local num_buttons = 0
-
 -- ===========================================================================================
 --    Window creation and update methods
 -- ===========================================================================================
+local num_buttons = 0
 local function get_button(i)
 	local button = _G["SkilletRequiredListButton"..i]
 	if not button then
@@ -58,6 +55,7 @@ local FrameBackdrop = {
 	insets = { left = 3, right = 3, top = 30, bottom = 3 }
 }
 
+SKILLET_REQUIRED_LIST_HEIGHT = 16
 local function createRequiredListFrame(self)
 	--DA.DEBUG(0,"createRequiredListFrame")
 	local frame = SkilletRequiredList
@@ -135,6 +133,10 @@ local function createRequiredListFrame(self)
 -- so hitting [ESC] will close the window
 --
 	tinsert(UISpecialFrames, frame:GetName())
+--
+-- Adjust the button height
+--
+	SKILLET_REQUIRED_LIST_HEIGHT = math.max(SkilletRequiredListButton1:GetHeight(), SKILLET_REQUIRED_LIST_HEIGHT)
 	return frame
 end
 
@@ -147,16 +149,16 @@ function Skillet:UpdateRequiredListWindow()
 	local numItems
 	local recipe = self:GetRecipeDataByTradeIndex(self.currentTrade, self.selectedSkill)
 	if self.cachedRequiredList then
-		--DA.DEBUG(1,"UpdateRequiredListWindow: cachedRequiredList= ",DA.DUMP1(self.cachedRequiredList))
 		numItems = #self.cachedRequiredList.reagents
+		--DA.DEBUG(1,"UpdateRequiredListWindow: cachedRequiredList= ",DA.DUMP1(self.cachedRequiredList))
 	else
 		return
 	end
 	local height = SkilletRequiredListParent:GetHeight() - 30 -- Allow for frame border
 	local width = SkilletRequiredListParent:GetWidth() - 30 -- Allow for scrollbars
-	--DA.DEBUG(1,"UpdateRequiredListWindow: SkilletRequiredListParent height= "..tostring(height))
+	--DA.DEBUG(1,"UpdateRequiredListWindow: SkilletRequiredListParent height= "..tostring(height)..", SKILLET_REQUIRED_LIST_HEIGHT= "..tostring(SKILLET_REQUIRED_LIST_HEIGHT))
 	--DA.DEBUG(1,"UpdateRequiredListWindow: SkilletRequiredListParent width= "..tostring(width))
-	local button_count = height / SKILLET_OPTIONAL_LIST_HEIGHT
+	local button_count = height / SKILLET_REQUIRED_LIST_HEIGHT
 	button_count = math.floor(button_count) - 1
 	--DA.DEBUG(1,"UpdateRequiredListWindow: numItems= "..tostring(numItems)..", button_count= "..tostring(button_count))
 --
@@ -165,7 +167,7 @@ function Skillet:UpdateRequiredListWindow()
 	FauxScrollFrame_Update(SkilletRequiredListList,			-- frame
 							numItems,						-- num items
 							button_count,					-- num to display
-							SKILLET_OPTIONAL_LIST_HEIGHT)	-- value step (item height)
+							SKILLET_REQUIRED_LIST_HEIGHT)	-- value step (item height)
 --
 -- Where in the list of items to start counting.
 --

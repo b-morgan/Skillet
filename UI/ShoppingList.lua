@@ -67,6 +67,7 @@ Skillet.guildText = 0
 --
 -- Creates and sets up the shopping list window
 --
+SKILLET_SHOPPING_LIST_HEIGHT = 16
 local function createShoppingListFrame(self)
 	local frame = SkilletShoppingList
 	if not frame then
@@ -170,6 +171,10 @@ local function createShoppingListFrame(self)
 -- so hitting [ESC] will close the window
 --
 	tinsert(UISpecialFrames, frame:GetName())
+--
+-- Adjust the button height
+--
+	SKILLET_SHOPPING_LIST_HEIGHT = math.max(SkilletShoppingListButton1:GetHeight(), SKILLET_SHOPPING_LIST_HEIGHT)
 	return frame
 end
 
@@ -1250,20 +1255,19 @@ function Skillet:UpdateShoppingListWindow(use_cached_recipes)
 		end)
 	end
 	local height = SkilletShoppingListParent:GetHeight()
-	local buttonH = SkilletShoppingListButton1:GetHeight()
 	local width = SkilletShoppingListParent:GetWidth() - 30 -- Allow for scrollbars
-	--DA.DEBUG(1,"UpdateShoppingListWindow: height= "..tostring(height)..", buttonH= "..tostring(buttonH))
+	--DA.DEBUG(1,"UpdateShoppingListWindow: height= "..tostring(height)..", SKILLET_SHOPPING_LIST_HEIGHT= "..tostring(SKILLET_SHOPPING_LIST_HEIGHT))
 	--DA.DEBUG(1,"UpdateShoppingListWindow: SkilletShoppingListParent width= "..tostring(width))
-	local button_count = height / buttonH
+	local button_count = height / SKILLET_SHOPPING_LIST_HEIGHT
 	button_count = math.floor(button_count) - 1
 	--DA.DEBUG(1,"UpdateShoppingListWindow: numItems= "..tostring(numItems)..", button_count= "..tostring(button_count)..", num_buttons= "..tostring(num_buttons))
 --
 -- Update the scroll frame
 --
-	FauxScrollFrame_Update(SkilletShoppingListList,  -- frame
-							numItems,                -- num items
-							button_count,            -- num to display
-							buttonH)                 -- value step (item height)
+	FauxScrollFrame_Update(SkilletShoppingListList,  		-- frame
+							numItems,                		-- num items
+							button_count,            		-- num to display
+							SKILLET_SHOPPING_LIST_HEIGHT)	-- value step (item height)
 --
 -- Where in the list of items to start counting.
 --
