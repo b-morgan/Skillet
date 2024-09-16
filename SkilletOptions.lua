@@ -824,6 +824,20 @@ Skillet.options =
 			end,
 			order = 67
 		},
+		printshop = {
+			type = 'execute',
+			name = "printshop",
+			desc = "Print ShoppingList",
+			func = function()
+				if not (UnitAffectingCombat("player")) then
+					Skillet:PrintShoppingList()
+				else
+					DA.DEBUG(0,"|cff8888ffSkillet|r: Combat lockdown restriction." ..
+												  " Leave combat and try again.")
+				end
+			end,
+			order = 68
+		},
 --
 -- commands to toggle Blizzard's frames (beats using "/run")
 --
@@ -844,7 +858,7 @@ Skillet.options =
 					Skillet.BlizzardUIshowing = false
 				end
 			end,
-			order = 68
+			order = 69
 		},
 		bcui = {
 			type = "toggle",
@@ -861,7 +875,7 @@ Skillet.options =
 					HideUIPanel(CraftFrame)
 				end
 			end,
-			order = 69
+			order = 70
 		},
 --
 -- commands to update Skillet's main windows
@@ -1497,6 +1511,54 @@ Skillet.options =
 			end,
 			order = 109
 		},
+--
+-- Debug options to deal with bag update events slowing bag and bank sorting
+--
+		bagevents = {
+			type = "toggle",
+			name = "bagevents",
+			desc = "Option for debugging",
+			get = function()
+				return Skillet.BagEvents
+			end,
+			set = function(self,value)
+				Skillet.BagEvents = value
+				if Skillet.BagEvents then
+					Skillet:UnregisterEvent("BAG_UPDATE") 				-- Fires for both bag and bank updates.
+					Skillet:UnregisterEvent("BAG_UPDATE_DELAYED")		-- Fires after all applicable BAG_UPDATE events for a specific action have been fired.
+					Skillet:UnregisterEvent("UNIT_INVENTORY_CHANGED")	-- BAG_UPDATE_DELAYED seems to have disappeared. Using this instead.
+					Skillet:Print(RED_FONT_COLOR_CODE.."BAG_UPDATE events are off"..FONT_COLOR_CODE_CLOSE)
+				else
+					Skillet:RegisterEvent("BAG_UPDATE") 				-- Fires for both bag and bank updates.
+					Skillet:RegisterEvent("BAG_UPDATE_DELAYED")		-- Fires after all applicable BAG_UPDATE events for a specific action have been fired.
+					Skillet:RegisterEvent("UNIT_INVENTORY_CHANGED")	-- BAG_UPDATE_DELAYED seems to have disappeared. Using this instead.
+					Skillet:Print(GREEN_FONT_COLOR_CODE.."BAG_UPDATE events are on"..FONT_COLOR_CODE_CLOSE)
+				end
+			end,
+			order = 120
+		},
+		bagcounts = {
+			type = 'execute',
+			name = "bagcounts",
+			desc = "Option for debugging",
+			func = function()
+				Skillet:Print("bagUpdateCounts= "..DA.DUMP1(Skillet.bagUpdateCounts))
+				Skillet:Print("bagUpdateDelayedCount= "..tostring(Skillet.bagUpdateDelayedCount))
+				Skillet:Print("bankUpdateCount= "..tostring(Skillet.bankUpdateCount))
+			end,
+			order = 121
+		},
+		bagclear = {
+			type = 'execute',
+			name = "bagclear",
+			desc = "Option for debugging",
+			func = function()
+				Skillet.bagUpdateCounts = {}
+				Skillet.bagUpdateDelayedCount = 0
+				Skillet.bankUpdateCount = 0
+			end,
+			order = 122
+		},
 	}
 }
 
@@ -1541,54 +1603,3 @@ local function get_panel_name(panel)
 		end
 	end
 end
-
-local doNotRun
-local function InterfaceOptionsFrame_OpenToCategory_Fix(panel)
-	if doNotRun or InCombatLockdown() then return end
-	local panelName = get_panel_name(panel)
-	if not panelName then return end -- if its not part of our list return early
-	local noncollapsedHeaders = {}
-	local shownpanels = 0
-	local mypanel
-	local t = {}
-	local cat = INTERFACEOPTIONS_ADDONCATEGORIES
-	for i = 1, #cat do
-		local panel = cat[i]
-		if not panel.parent or noncollapsedHeaders[panel.parent] then
-			if panel.name == panelName then
-				panel.collapsed = true
-				t.element = panel
-				InterfaceOptionsListButton_ToggleSubCategories(t)
-				noncollapsedHeaders[panel.name] = true
-				mypanel = shownpanels + 1
-			end
-			if not panel.collapsed then
-				noncollapsedHeaders[panel.name] = true
-			end
-			shownpanels = shownpanels + 1
-		end
-	end
-	local Smin, Smax = InterfaceOptionsFrameAddOnsListScrollBar:GetMinMaxValues()
-	if shownpanels > 15 and Smin < Smax then
-		local val = (Smax/(shownpanels-15))*(mypanel-2)
-		InterfaceOptionsFrameAddOnsListScrollBar:SetValue(val)
-	end
-	doNotRun = true
-	InterfaceOptionsFrame_OpenToCategory(panel)
-	doNotRun = false
-end
-
---
--- Fix InterfaceOptionsFrame_OpenToCategory not actually opening the category (and not even scrolling to it)
---
-function Skillet:FixOpenToCategory()
---[[
-	if (not IsAddOnLoaded("!BlizzBugsSuck")) then
-		DA.DEBUG(0,"FixOpenToCategory executed")
-		hooksecurefunc("InterfaceOptionsFrame_OpenToCategory", InterfaceOptionsFrame_OpenToCategory_Fix)
-	else
-		DA.DEBUG(0,"FixOpenToCategory skipped")
-	end
---]]
-end
-

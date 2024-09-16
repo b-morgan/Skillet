@@ -319,6 +319,12 @@ function Skillet:OnInitialize()
 	if not self.db.global.customPrice then
 		self.db.global.customPrice = {}
 	end
+	if not self.db.global.warbandData then
+		self.db.global.warbandData = {}
+	end
+	if not self.db.global.warbandDetails then
+		self.db.global.warbandDetails = {}
+	end
 --
 -- Initialize the Skill Levels data if any of the tables are missing
 --
@@ -399,13 +405,6 @@ function Skillet:OnInitialize()
 	Skillet.FixBugs = Skillet.db.profile.FixBugs
 
 --
--- Fix InterfaceOptionsFrame_OpenToCategory not actually opening the category (and not even scrolling to it)
---
-	if Skillet.FixBugs then
-		Skillet:FixOpenToCategory()
-	end
-
---
 -- Create static popups for changing professions
 --
 StaticPopupDialogs["SKILLET_CONTINUE_CHANGE"] = {
@@ -456,6 +455,15 @@ StaticPopupDialogs["SKILLET_MANUAL_CHANGE"] = {
 	self:InitializeDatabase(UnitName("player"))
 	self:InitializePlugins()
 	self.NewsGUI:Initialize()
+
+--
+--	Some counters for high frequency events
+--
+	if not Skillet.bagUpdateCounts then
+		Skillet.bagUpdateCounts = {}
+		Skillet.bagUpdateDelayedCount = 0
+		Skillet.bankUpdateCount = 0
+	end
 end
 
 --
@@ -553,6 +561,8 @@ function Skillet:FlushDetailData()
 	Skillet.db.realm.bagDetails = {}
 	Skillet.db.realm.bankData = {}
 	Skillet.db.realm.bankDetails = {}
+	Skillet.db.global.warbandData = {}
+	Skillet.db.global.warbandDetails = {}
 	Skillet.db.global.detailedGuildbank = {}
 end
 
@@ -789,40 +799,41 @@ function Skillet:OnEnable()
 	self:RegisterEvent("NEW_RECIPE_LEARNED") -- arg1 = recipeID
 --	self:RegisterEvent("ADDON_ACTION_BLOCKED")
 
+	if Skillet.db.profile.BlizzOR then
 --
 -- Dump the data passed to C_TradeSkillUI functions so we can learn how Blizzard handles the new stuff
 --
 -- C_TradeSkillUI.CraftRecipe(recipeSpellID [, numCasts, craftingReagents, recipeLevel, orderID])
 --
-	hooksecurefunc(C_TradeSkillUI,"CraftRecipe",function(...)
-		local recipeSpellID, numCasts, craftingReagents, recipeLevel, orderID = ...
-		DA.DEBUG(0, "C_TradeSkillUI.CraftRecipe: recipeSpellID= "..tostring(recipeSpellID)..", numCasts= "..tostring(numCasts)..", craftingReagents= "..DA.DUMP(craftingReagents)..", recipeLevel= "..tostring(recipeLevel)..", orderID= "..tostring(orderID))
-	end)
+		hooksecurefunc(C_TradeSkillUI,"CraftRecipe",function(...)
+			local recipeSpellID, numCasts, craftingReagents, recipeLevel, orderID = ...
+			DA.DEBUG(0, "C_TradeSkillUI.CraftRecipe: recipeSpellID= "..tostring(recipeSpellID)..", numCasts= "..tostring(numCasts)..", craftingReagents= "..DA.DUMP(craftingReagents)..", recipeLevel= "..tostring(recipeLevel)..", orderID= "..tostring(orderID))
+		end)
 
 --
 -- C_TradeSkillUI.CraftSalvage(recipeSpellID [, numCasts, itemTarget])
 --
-	hooksecurefunc(C_TradeSkillUI,"CraftSalvage",function(...)
-		local recipeSpellID, numCasts, itemTarget = ...
-		DA.DEBUG(0, "C_TradeSkillUI.CraftSalvage: recipeSpellID= "..tostring(recipeSpellID)..", numCasts= "..tostring(numCasts)..", itemTarget= "..DA.DUMP(itemTarget))
-	end)
+		hooksecurefunc(C_TradeSkillUI,"CraftSalvage",function(...)
+			local recipeSpellID, numCasts, itemTarget = ...
+			DA.DEBUG(0, "C_TradeSkillUI.CraftSalvage: recipeSpellID= "..tostring(recipeSpellID)..", numCasts= "..tostring(numCasts)..", itemTarget= "..DA.DUMP(itemTarget))
+		end)
 
 --
 -- C_TradeSkillUI.CraftEnchant(recipeSpellID [, numCasts, craftingReagents, itemTarget])
 --
-	hooksecurefunc(C_TradeSkillUI,"CraftEnchant",function(...)
-		local recipeSpellID, numCasts, craftingReagents, itemTarget = ...
-		DA.DEBUG(0, "C_TradeSkillUI.CraftEnchant: recipeSpellID= "..tostring(recipeSpellID)..", numCasts= "..tostring(numCasts)..", craftingReagents= "..DA.DUMP(craftingReagents)..", itemTarget= "..DA.DUMP(itemTarget))
-	end)
+		hooksecurefunc(C_TradeSkillUI,"CraftEnchant",function(...)
+			local recipeSpellID, numCasts, craftingReagents, itemTarget = ...
+			DA.DEBUG(0, "C_TradeSkillUI.CraftEnchant: recipeSpellID= "..tostring(recipeSpellID)..", numCasts= "..tostring(numCasts)..", craftingReagents= "..DA.DUMP(craftingReagents)..", itemTarget= "..DA.DUMP(itemTarget))
+		end)
 
 --
 -- result = C_TradeSkillUI.RecraftRecipe(itemGUID [, craftingReagents])
 --
-	hooksecurefunc(C_TradeSkillUI,"RecraftRecipe",function(...)
-		local itemGUID, craftingReagents = ...
-		DA.DEBUG(0, "C_TradeSkillUI.RecraftRecipe: itemGUID= "..tostring(itemGUID)..", craftingReagents= "..DA.DUMP(craftingReagents))
-	end)
-
+		hooksecurefunc(C_TradeSkillUI,"RecraftRecipe",function(...)
+			local itemGUID, craftingReagents = ...
+			DA.DEBUG(0, "C_TradeSkillUI.RecraftRecipe: itemGUID= "..tostring(itemGUID)..", craftingReagents= "..DA.DUMP(craftingReagents))
+		end)
+	end
 --
 -- Debugging cleanup if enabled
 --

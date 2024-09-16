@@ -1073,6 +1073,8 @@ function Skillet:UpdateTradeSkillWindow()
 	self:RecipeDifficultyButton_OnShow()
 	SkilletUseHighestQuality:SetChecked(self.db.profile.best_quality)
 	SkilletUseHighestQuality:Show()
+	SkilletUseConcentration:SetChecked(self.db.profile.use_concentration)
+	SkilletUseConcentration:Show()
 	SkilletHideUncraftableRecipes:SetChecked(self:GetTradeSkillOption("hideuncraftable"))
 	C_TradeSkillUI.SetOnlyShowMakeableRecipes(self:GetTradeSkillOption("hideuncraftable"))
 	self:UpdateQueueWindow()
@@ -2624,19 +2626,28 @@ function Skillet:SkilletSkillMenu_Show(button)
 	local x, y = GetCursorPosition()
 	local uiScale = UIParent:GetEffectiveScale()
 	local locked = self:RecipeGroupIsLocked()
+	if not SkilletSkillMenu then
+		SkilletSkillMenu = CreateFrame("Frame", "SkilletSkillMenu", _G["UIParent"], "UIDropDownMenuTemplate")
+		SkilletSkillMenu:SetScale(uiScale)
+		if not SkilletSkillMenu.SetBackdrop then
+			Mixin(SkilletSkillMenu, BackdropTemplateMixin)
+		end
+		SkilletSkillMenu:SetBackdrop(FrameBackdrop)
+		SkilletSkillMenu:SetBackdropColor(0.1, 0.1, 0.1)
+	end
 	self.menuButton = button
 	if button.skill.subGroup then
 		if button.skill.mainGroup then
 			if locked then
-				EasyMenu(headerMenuListMainGroupLocked, SkilletSkillMenu, _G["UIParent"], x/uiScale,y/uiScale, "MENU", 5)
+				EasySkillet(headerMenuListMainGroupLocked, SkilletSkillMenu, _G["UIParent"], x/uiScale,y/uiScale, "MENU", 5)
 			else
-				EasyMenu(headerMenuListMainGroup, SkilletSkillMenu, _G["UIParent"], x/uiScale,y/uiScale, "MENU", 5)
+				EasySkillet(headerMenuListMainGroup, SkilletSkillMenu, _G["UIParent"], x/uiScale,y/uiScale, "MENU", 5)
 			end
 		else
 			if locked then
-				EasyMenu(headerMenuListLocked, SkilletSkillMenu, _G["UIParent"], x/uiScale,y/uiScale, "MENU", 5)
+				EasySkillet(headerMenuListLocked, SkilletSkillMenu, _G["UIParent"], x/uiScale,y/uiScale, "MENU", 5)
 			else
-				EasyMenu(headerMenuList, SkilletSkillMenu, _G["UIParent"], x/uiScale,y/uiScale, "MENU", 5)
+				EasySkillet(headerMenuList, SkilletSkillMenu, _G["UIParent"], x/uiScale,y/uiScale, "MENU", 5)
 			end
 		end
 	else
@@ -2650,9 +2661,9 @@ function Skillet:SkilletSkillMenu_Show(button)
 			favoriteMenu["text"] = L["Remove Favorite"]
 		end
 		if locked then
-			EasyMenu(skillMenuListLocked, SkilletSkillMenu, _G["UIParent"], x/uiScale,y/uiScale, "MENU", 5)
+			EasySkillet(skillMenuListLocked, SkilletSkillMenu, _G["UIParent"], x/uiScale,y/uiScale, "MENU", 5)
 		else
-			EasyMenu(skillMenuList, SkilletSkillMenu, _G["UIParent"], x/uiScale,y/uiScale, "MENU", 5)
+			EasySkillet(skillMenuList, SkilletSkillMenu, _G["UIParent"], x/uiScale,y/uiScale, "MENU", 5)
 		end
 	end
 end
@@ -2773,13 +2784,23 @@ function Skillet:StartQueue_OnClick(button, mouse)
 end
 
 function Skillet:SkilletQueueMenu_Show(button)
-	if not SkilletQueueMenu then
-		SkilletQueueMenu = CreateFrame("Frame", "SkilletQueueMenu", _G["UIParent"], "UIDropDownMenuTemplate")
-	end
+	--DA.DEBUG(0,"SkilletQueueMenu_Show("..tostring(button)..")")
 	local x, y = GetCursorPosition()
 	local uiScale = UIParent:GetEffectiveScale()
+	if not SkilletQueueMenu then
+		SkilletQueueMenu = CreateFrame("Frame", "SkilletQueueMenu", _G["UIParent"], "UIDropDownMenuTemplate")
+--		SkilletQueueMenu = CreateFrame("Frame", "SkilletQueueMenu", _G["UIParent"], "WowStyle1DropdownTemplate")
+		--DA.DEBUG(0,"SkilletQueueMenu_Show: uiScale= "..tostring(uiScale))
+		SkilletQueueMenu:SetScale(uiScale)
+	end
 	self.queueMenuButton = button
-	EasyMenu(queueMenuList, SkilletQueueMenu, _G["UIParent"], x/uiScale,y/uiScale, "MENU", 5)
+--	EasyMenu(queueMenuList, SkilletQueueMenu, _G["UIParent"], x/uiScale,y/uiScale, "MENU", 5)
+	MenuUtil.CreateButtonContextMenu(SkilletQueueMenu,
+    {L["Move to Top"], function() Skillet:QueueMoveToTop(Skillet.queueMenuButton:GetID()) end},
+    {L["Move Up"], function() Skillet:QueueMoveUp(Skillet.queueMenuButton:GetID()) end},
+    {L["Move Down"], function() Skillet:QueueMoveDown(Skillet.queueMenuButton:GetID()) end},
+    {L["Move to Bottom"], function() Skillet:QueueMoveToBottom(Skillet.queueMenuButton:GetID()) end}
+	);
 end
 
 function Skillet:QueueManagementToggle(showDetails)
@@ -3107,4 +3128,11 @@ function Skillet:AddButtonToTradeskillWindow(button)
 		SkilletPluginButton:Show()
 	end
 	return SkilletFrame
+end
+
+function Skillet:ToggleUseConcentration()
+	self.db.profile.use_concentration = not self.db.profile.use_concentration
+	--DA.DEBUG(0,"ToggleUseConcentration: use_concentration= "..tostring(self.db.profile.use_concentration))
+	SkilletUseConcentration:SetChecked(self.db.profile.use_concentration)
+	self:UpdateDetailWindow(self.selectedSkill)
 end

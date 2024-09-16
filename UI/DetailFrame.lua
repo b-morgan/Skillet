@@ -1408,7 +1408,7 @@ function Skillet:ReagentButtonOnClick(button, mouse, skillIndex, reagentIndex)
 		else
 			local x, y = GetCursorPosition()
 			local uiScale = UIParent:GetEffectiveScale()
-			EasyMenu(self.data.recipeMenuTable, self.recipeMenu, _G["UIParent"], x/uiScale,y/uiScale, "MENU", 5)
+			EasySkillet(self.data.recipeMenuTable, self.recipeMenu, _G["UIParent"], x/uiScale,y/uiScale, "MENU", 5)
 		end
 	end
 end

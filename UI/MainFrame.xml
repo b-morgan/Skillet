@@ -1465,6 +1465,39 @@
 					</OnLeave>
 				</Scripts>
 			</CheckButton>
+			<!--
+			#
+			# See: ProfessionsConcentrateToggleButtonMixin:OnEnter() in Blizzard_ProfessionsTemplates.lua
+			#
+			-->
+			<CheckButton name="SkilletUseConcentration" inherits="SkilletInvFilterButtonTemplate" hidden="true">
+				<Anchors>
+					<Anchor point="BOTTOMRIGHT" relativeTo="SkilletUseHighestQuality" relativePoint="BOTTOMLEFT">
+						<Offset>
+							<AbsDimension x="-5" y="0"/>
+						</Offset>
+					</Anchor>
+				</Anchors>
+				<NormalTexture file="Interface\ICONS\UI_Concentration" desaturated="true" setAllPoints="true"/>
+				<CheckedTexture file="Interface\ICONS\UI_Concentration" setAllPoints="true"/>
+				<Scripts>
+					<OnLoad>
+						self:SetFrameLevel(self:GetFrameLevel()+5)
+					</OnLoad>
+					<OnClick>
+						Skillet:ToggleUseConcentration()
+						Skillet:UpdateDetailWindow(Skillet.selectedSkill)
+					</OnClick>
+					<OnEnter>
+						GameTooltip:SetOwner(self, "ANCHOR_TOPLEFT")
+						GameTooltip:SetText(PROFESSIONS_CRAFTING_CONCENTRATION_TOGGLE_ON_DESC, nil, nil, nil, nil, true)
+						GameTooltip:Show()
+					</OnEnter>
+					<OnLeave>
+						GameTooltip:Hide()
+					</OnLeave>
+				</Scripts>
+			</CheckButton>
 			<CheckButton name="SkilletInventoryFilterOwned" inherits="SkilletInvFilterButtonTemplate" hidden="true">
 				<Anchors>
 					<Anchor point="TOPLEFT" relativeTo="SkilletHideUncraftableRecipes" relativePoint="BOTTOMLEFT">
