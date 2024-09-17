@@ -737,7 +737,7 @@ function Skillet:OnEnable()
 	self:RegisterEvent("TRADE_SKILL_DETAILS_UPDATE")
 --	self:RegisterEvent("TRADE_SKILL_FILTER_UPDATE")
 	self:RegisterEvent("TRADE_SKILL_LIST_UPDATE")
-	self:RegisterEvent("GUILD_RECIPE_KNOWN_BY_MEMBERS", "SkilletShowGuildCrafters")
+--	self:RegisterEvent("GUILD_RECIPE_KNOWN_BY_MEMBERS", "SkilletShowGuildCrafters")
 	self:RegisterEvent("GARRISON_TRADESKILL_NPC_CLOSED")
 	self:RegisterEvent("BAG_UPDATE") 				-- Fires for both bag and bank updates.
 	self:RegisterEvent("BAG_UPDATE_DELAYED")		-- Fires after all applicable BAG_UPDATE events for a specific action have been fired.
