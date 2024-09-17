@@ -2328,10 +2328,6 @@ local skillMenuSelection = {
 		func = function() Skillet:SkillButton_SetAllSelections(false) Skillet:UpdateTradeSkillWindow() end,
 	},
 }
---[[
-				{L["Select All"], function() Skillet:SkillButton_SetAllSelections(true) Skillet:UpdateTradeSkillWindow() end},
-				{L["Select None"], function() Skillet:SkillButton_SetAllSelections(false) Skillet:UpdateTradeSkillWindow() end},
---]]
 
 local skillMenuGroup = {
 --[[
@@ -2350,10 +2346,6 @@ local skillMenuGroup = {
 		func = function() Skillet:SkillButton_MakeGroup() end,
 	},
 }
---[[
-				{L["Empty Group"], function() Skillet:SkillButton_NewGroup() end},
-				{L["From Selection"], function() Skillet:SkillButton_MakeGroup() end},
---]]
 
 local favoriteMenu = {
 --[[
@@ -2371,14 +2363,6 @@ local favoriteMenu = {
 					favoriteButton:SetFavorite(Skillet:IsFavorite(recipeID))
 				end,
 }
---[[
-				{favoriteMenu["text"], function()
-						local recipeID = Skillet.menuButton.skill.recipeID
-						local favoriteButton = _G[Skillet.menuButton:GetName() .. "Favorite"]
-						Skillet:ToggleFavorite(recipeID)
-						favoriteButton:SetFavorite(Skillet:IsFavorite(recipeID))
-					end},
---]]
 
 local skillMenuIgnore = {
 --[[
@@ -2415,28 +2399,6 @@ local skillMenuIgnore = {
 				end,
 	},
 }
---[[
-				{L["Add Recipe to Ignored List"], function()
-						local index = Skillet.menuButton:GetID()
-						local skillDB = Skillet.db.realm.skillDB[Skillet.currentPlayer][Skillet.currentTrade][index]
-						local recipeID = string.sub(skillDB,2)
-						local print=(tostring(index)..", "..tostring(skillDB)..", "..tostring(recipeID))
-						Skillet.db.realm.userIgnoredMats[Skillet.currentPlayer][recipeID] = Skillet.currentTrade
-						if Skillet.ignoreList and Skillet.ignoreList:IsVisible() then
-							Skillet:UpdateIgnoreListWindow()
-						end
-					end},
-				{L["Remove Recipe from Ignored List"], function()
-						local index = Skillet.menuButton:GetID()
-						local skillDB = Skillet.db.realm.skillDB[Skillet.currentPlayer][Skillet.currentTrade][index]
-						local recipeID = string.sub(skillDB,2)
-						local print=(tostring(index)..", "..tostring(skillDB)..", "..tostring(recipeID))
-						Skillet.db.realm.userIgnoredMats[Skillet.currentPlayer][recipeID] = nil
-						if Skillet.ignoreList and Skillet.ignoreList:IsVisible() then
-							Skillet:UpdateIgnoreListWindow()
-						end
-					end},
---]]
 
 local skillMenuList = {
 --[[
@@ -2495,6 +2457,45 @@ local skillMenuList = {
 	},
 }
 
+local function SkillMenuList(SkilletSkillMenu, rootDescription)
+	if Skillet.isTest then rootDescription:CreateTitle("skillMenuList"); end
+	rootDescription:CreateButton(L["Link Recipe"], function() Skillet:SkillButton_LinkRecipe() end);
+	rootDescription:CreateButton(favoriteMenu["text"], function()
+		local recipeID = Skillet.menuButton.skill.recipeID
+		local favoriteButton = _G[Skillet.menuButton:GetName() .. "Favorite"]
+		Skillet:ToggleFavorite(recipeID)
+		favoriteButton:SetFavorite(Skillet:IsFavorite(recipeID))
+	end);
+	local submenu1 = rootDescription:CreateButton(L["Ignore"]);
+		submenu1:CreateButton(L["Add Recipe to Ignored List"], function()
+			local index = Skillet.menuButton:GetID()
+			local skillDB = Skillet.db.realm.skillDB[Skillet.currentPlayer][Skillet.currentTrade][index]
+			local recipeID = string.sub(skillDB,2)
+			local print=(tostring(index)..", "..tostring(skillDB)..", "..tostring(recipeID))
+			Skillet.db.realm.userIgnoredMats[Skillet.currentPlayer][recipeID] = Skillet.currentTrade
+			if Skillet.ignoreList and Skillet.ignoreList:IsVisible() then
+				Skillet:UpdateIgnoreListWindow()
+			end
+		end);
+		submenu1:CreateButton(L["Remove Recipe from Ignored List"], function()
+			local index = Skillet.menuButton:GetID()
+			local skillDB = Skillet.db.realm.skillDB[Skillet.currentPlayer][Skillet.currentTrade][index]
+			local recipeID = string.sub(skillDB,2)
+			local print=(tostring(index)..", "..tostring(skillDB)..", "..tostring(recipeID))
+			Skillet.db.realm.userIgnoredMats[Skillet.currentPlayer][recipeID] = nil
+			if Skillet.ignoreList and Skillet.ignoreList:IsVisible() then
+				Skillet:UpdateIgnoreListWindow()
+			end
+		end);
+	local submenu2 = rootDescription:CreateButton(L["New Group"]);
+		submenu2:CreateButton(L["Empty Group"], function() Skillet:SkillButton_NewGroup() end);
+		submenu2:CreateButton(L["From Selection"], function() Skillet:SkillButton_MakeGroup() end);
+	rootDescription:CreateDivider(); -- CreateSpacer, CreateDivider
+	rootDescription:CreateButton(L["Copy"], function() Skillet:SkillButton_CopySelected() end);
+	rootDescription:CreateButton(L["Cut"], function() Skillet:SkillButton_CutSelected() end);
+	rootDescription:CreateButton(L["Paste"], function() Skillet:SkillButton_PasteSelected(Skillet.menuButton) end);
+end;
+
 local skillMenuListLocked = {
 --[[
 	{
@@ -2532,6 +2533,30 @@ local skillMenuListLocked = {
 		func = function() Skillet:SkillButton_CopySelected() end,
 	},
 }
+
+local function SkillMenuListLocked(SkilletSkillMenu, rootDescription)
+	if Skillet.isTest then rootDescription:CreateTitle("skillMenuListLocked"); end
+	rootDescription:CreateButton(L["Link Recipe"], function() Skillet:SkillButton_LinkRecipe() end);
+	rootDescription:CreateButton(L["Add to Ignore Materials"], function()
+		local skill = Skillet.menuButton.skill
+		if skill and skill.recipeID then
+			local recipeID = skill.recipeID
+			local spellLink = C_TradeSkillUI.GetRecipeLink(skill.recipeID)
+			Skillet.db.realm.userIgnoredMats[Skillet.currentPlayer][recipeID] = spellLink
+			if Skillet.ignoreList and Skillet.ignoreList:IsVisible() then
+				Skillet:UpdateIgnoreListWindow()
+			end
+		end
+	end);
+	rootDescription:CreateButton(favoriteMenu["text"], function()
+		local recipeID = Skillet.menuButton.skill.recipeID
+		local favoriteButton = _G[Skillet.menuButton:GetName() .. "Favorite"]
+		Skillet:ToggleFavorite(recipeID)
+		favoriteButton:SetFavorite(Skillet:IsFavorite(recipeID))
+	end);
+	rootDescription:CreateDivider(); -- CreateSpacer, CreateDivider
+	rootDescription:CreateButton(L["Copy"], function() Skillet:SkillButton_CopySelected() end);
+end;
 
 local headerMenuList = {
 --[[
@@ -2579,6 +2604,23 @@ local headerMenuList = {
 	},
 }
 
+local function HeaderMenuList(SkilletSkillMenu, rootDescription)
+	if Skillet.isTest then rootDescription:CreateTitle("headerMenuList"); end
+	rootDescription:CreateButton(L["Rename Group"], function() Skillet:SkillButton_NameEditEnable(Skillet.menuButton) end);
+	local submenu1 = rootDescription:CreateButton(L["New Group"]);
+		submenu1:CreateButton(L["Empty Group"], function() Skillet:SkillButton_NewGroup() end);
+		submenu1:CreateButton(L["From Selection"], function() Skillet:SkillButton_MakeGroup() end);
+	rootDescription:CreateDivider(); -- CreateSpacer, CreateDivider
+	local submenu2 = rootDescription:CreateButton(L["Selection"]);
+		submenu2:CreateButton(L["Select All"], function() Skillet:SkillButton_SetAllSelections(true) Skillet:UpdateTradeSkillWindow() end);
+		submenu2:CreateButton(L["Select None"], function() Skillet:SkillButton_SetAllSelections(false) Skillet:UpdateTradeSkillWindow() end);
+	rootDescription:CreateDivider(); -- CreateSpacer, CreateDivider
+	rootDescription:CreateButton(L["Copy"], function() Skillet:SkillButton_CopySelected() end);
+	rootDescription:CreateButton(L["Cut"], function() Skillet:SkillButton_CutSelected() end);
+	rootDescription:CreateButton(L["Paste"], function() Skillet:SkillButton_PasteSelected(Skillet.menuButton) end);
+end;
+
+
 local headerMenuListLocked = {
 --[[
 	{
@@ -2597,6 +2639,15 @@ local headerMenuListLocked = {
 		func = function() Skillet:SkillButton_CopySelected() end,
 	},
 }
+
+local function HeaderMenuListLocked(SkilletSkillMenu, rootDescription)
+	if Skillet.isTest then rootDescription:CreateTitle("headerMenuListLocked"); end
+	local submenu = rootDescription:CreateButton(L["Selection"]);
+		submenu:CreateButton(L["Select All"], function() Skillet:SkillButton_SetAllSelections(true) Skillet:UpdateTradeSkillWindow() end);
+		submenu:CreateButton(L["Select None"], function() Skillet:SkillButton_SetAllSelections(false) Skillet:UpdateTradeSkillWindow() end);
+	rootDescription:CreateDivider(); -- CreateSpacer, CreateDivider
+	rootDescription:CreateButton(L["Copy"], function() Skillet:SkillButton_CopySelected() end);
+end;
 
 local headerMenuListMainGroup = {
 --[[
@@ -2640,6 +2691,21 @@ local headerMenuListMainGroup = {
 	},
 }
 
+local function HeaderMenuListMainGroup(SkilletSkillMenu, rootDescription)
+	if Skillet.isTest then rootDescription:CreateTitle("headerMenuListMainGroup"); end
+	local submenu1 = rootDescription:CreateButton(L["New Group"]);
+		submenu1:CreateButton(L["Empty Group"], function() Skillet:SkillButton_NewGroup() end);
+		submenu1:CreateButton(L["From Selection"], function() Skillet:SkillButton_MakeGroup() end);
+	rootDescription:CreateDivider(); -- CreateSpacer, CreateDivider
+	local submenu2 = rootDescription:CreateButton(L["Selection"]);
+		submenu2:CreateButton(L["Select All"], function() Skillet:SkillButton_SetAllSelections(true) Skillet:UpdateTradeSkillWindow() end);
+		submenu2:CreateButton(L["Select None"], function() Skillet:SkillButton_SetAllSelections(false) Skillet:UpdateTradeSkillWindow() end);
+	rootDescription:CreateDivider(); -- CreateSpacer, CreateDivider
+	rootDescription:CreateButton(L["Copy"], function() Skillet:SkillButton_CopySelected() end);
+	rootDescription:CreateButton(L["Cut"], function() Skillet:SkillButton_CutSelected() end);
+	rootDescription:CreateButton(L["Paste"], function() Skillet:SkillButton_PasteSelected(Skillet.menuButton) end);
+end;
+
 local headerMenuListMainGroupLocked = {
 --[[
 	{
@@ -2654,6 +2720,11 @@ local headerMenuListMainGroupLocked = {
 	},
 }
 
+local function HeaderMenuListMainGroupLocked(SkilletSkillMenu, rootDescription)
+	if Skillet.isTest then rootDescription:CreateTitle("headerMenuListMainGroupLocked"); end
+	rootDescription:CreateButton(L["Copy"], function() Skillet:SkillButton_CopySelected() end);
+end;
+
 --
 -- Called when the skill operators drop down is displayed
 --
@@ -2663,7 +2734,7 @@ function Skillet:SkilletSkillMenu_Show(button)
 	local uiScale = UIParent:GetEffectiveScale()
 	local locked = self:RecipeGroupIsLocked()
 	if not SkilletSkillMenu then
-		SkilletSkillMenu = CreateFrame("Frame", "SkilletSkillMenu", _G["UIParent"], "UIDropDownMenuTemplate")
+		SkilletSkillMenu = CreateFrame("Frame", "SkilletSkillMenu", _G["UIParent"], "UIDropDownMenuTemplate") -- WowStyle1DropdownTemplate
 		SkilletSkillMenu:SetScale(uiScale)
 	end
 	self.menuButton = button
@@ -2671,11 +2742,16 @@ function Skillet:SkilletSkillMenu_Show(button)
 		if button.skill.mainGroup then
 			if locked then
 --				EasySkillet(headerMenuListMainGroupLocked, SkilletSkillMenu, _G["UIParent"], x/uiScale,y/uiScale, "MENU", 5)
+				MenuUtil.CreateContextMenu(SkilletSkillMenu, HeaderMenuListMainGroupLocked);
+--[[
 				MenuUtil.CreateButtonContextMenu(SkilletSkillMenu,
 				{L["Copy"], function() Skillet:SkillButton_CopySelected() end}
 				);
+--]]
 			else
 --				EasySkillet(headerMenuListMainGroup, SkilletSkillMenu, _G["UIParent"], x/uiScale,y/uiScale, "MENU", 5)
+				MenuUtil.CreateContextMenu(SkilletSkillMenu, HeaderMenuListMainGroup);
+--[[
 				MenuUtil.CreateButtonContextMenu(SkilletSkillMenu,
 				{L["Empty Group"], function() Skillet:SkillButton_NewGroup() end},
 				{L["From Selection"], function() Skillet:SkillButton_MakeGroup() end},
@@ -2685,17 +2761,23 @@ function Skillet:SkilletSkillMenu_Show(button)
 				{L["Cut"], function() Skillet:SkillButton_CutSelected() end},
 				{L["Paste"], function() Skillet:SkillButton_PasteSelected(Skillet.menuButton) end}
 				);
+--]]
 			end
 		else
 			if locked then
 --				EasySkillet(headerMenuListLocked, SkilletSkillMenu, _G["UIParent"], x/uiScale,y/uiScale, "MENU", 5)
+				MenuUtil.CreateContextMenu(SkilletSkillMenu, HeaderMenuListLocked);
+--[[
 				MenuUtil.CreateButtonContextMenu(SkilletSkillMenu,
 				{L["Select All"], function() Skillet:SkillButton_SetAllSelections(true) Skillet:UpdateTradeSkillWindow() end},
 				{L["Select None"], function() Skillet:SkillButton_SetAllSelections(false) Skillet:UpdateTradeSkillWindow() end},
 				{L["Copy"], function() Skillet:SkillButton_CopySelected() end}
 				);
+--]]
 			else
 --				EasySkillet(headerMenuList, SkilletSkillMenu, _G["UIParent"], x/uiScale,y/uiScale, "MENU", 5)
+				MenuUtil.CreateContextMenu(SkilletSkillMenu, HeaderMenuList);
+--[[
 				MenuUtil.CreateButtonContextMenu(SkilletSkillMenu,
 				{L["Rename Group"], function() Skillet:SkillButton_NameEditEnable(Skillet.menuButton) end},
 				{L["Empty Group"], function() Skillet:SkillButton_NewGroup() end},
@@ -2706,6 +2788,7 @@ function Skillet:SkilletSkillMenu_Show(button)
 				{L["Cut"], function() Skillet:SkillButton_CutSelected() end},
 				{L["Paste"], function() Skillet:SkillButton_PasteSelected(Skillet.menuButton) end}
 				);
+--]]
 			end
 		end
 	else
@@ -2720,6 +2803,8 @@ function Skillet:SkilletSkillMenu_Show(button)
 		end
 		if locked then
 --			EasySkillet(skillMenuListLocked, SkilletSkillMenu, _G["UIParent"], x/uiScale,y/uiScale, "MENU", 5)
+				MenuUtil.CreateContextMenu(SkilletSkillMenu, SkillMenuListLocked);
+--[[
 				MenuUtil.CreateButtonContextMenu(SkilletSkillMenu,
 				{L["Link Recipe"], function() Skillet:SkillButton_LinkRecipe() end},
 				{L["Add to Ignore Materials"], function()
@@ -2741,8 +2826,11 @@ function Skillet:SkilletSkillMenu_Show(button)
 					end},
 				{L["Copy"], function() Skillet:SkillButton_CopySelected() end}
 				);
+--]]
 		else
 --			EasySkillet(skillMenuList, SkilletSkillMenu, _G["UIParent"], x/uiScale,y/uiScale, "MENU", 5)
+				MenuUtil.CreateContextMenu(SkilletSkillMenu, SkillMenuList);
+--[[
 				MenuUtil.CreateButtonContextMenu(SkilletSkillMenu,
 				{L["Link Recipe"], function() Skillet:SkillButton_LinkRecipe() end},
 				{favoriteMenu["text"], function()
@@ -2779,6 +2867,7 @@ function Skillet:SkilletSkillMenu_Show(button)
 				{L["Cut"], function() Skillet:SkillButton_CutSelected() end},
 				{L["Paste"], function() Skillet:SkillButton_PasteSelected(Skillet.menuButton) end}
 				);
+--]]
 		end
 	end
 end
