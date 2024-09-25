@@ -678,7 +678,7 @@ function Skillet:ProcessQueue(altMode)
 					else
 						self.recipeTransaction = CreateProfessionsRecipeTransaction(C_TradeSkillUI.GetRecipeSchematic(command.recipeID, false, recipeLevel))
 						ApplyAllocations(self.recipeTransaction, command.modifiedReagents, command.requiredReagents, command.optionalReagents, command.finishingReagents)
-						--DA.DEBUG(1,"ProcessQueue: recipeLevel= "..tostring(recipeLevel)..", recipeTransaction= "..DA.DUMP(self.recipeTransaction))
+						DA.DEBUG(1,"ProcessQueue: recipeLevel= "..tostring(recipeLevel)..", recipeTransaction= "..DA.DUMP(self.recipeTransaction))
 					end
 --
 -- For debugging, save the command and TraceLog setting. Restored in ContinueCast.
@@ -708,6 +708,7 @@ function Skillet:ProcessQueue(altMode)
 								C_TradeSkillUI.CraftRecipe(command.recipeID, command.count, reagentInfoTbl, recipeLevel)
 							else
 								DA.MARK3("Insufficient (Required) Materials available")
+								DA.DEBUG(1,"ProcessQueue: reagentInfoTbl= "..DA.DUMP(reagentInfoTbl))
 							end
 						end
 					end

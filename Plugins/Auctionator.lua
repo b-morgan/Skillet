@@ -628,10 +628,10 @@ local function GetRecipeData(recipe)
 		profit = buyout * ah_tax - cost
 		percentage = profit * 100 / cost
 		--DA.DEBUG(0,"GetRecipeData: buyout= "..tostring(buyout)..", profit= "..tostring(profit)..", percentage= "..tostring(percentage))
-		recipe.buyout = buyout
-		recipe.cost = cost
-		recipe.profit = profit
-		recipe.percentage = percentage
+		recipe.buyout = buyout or 0
+		recipe.cost = cost or 0
+		recipe.profit = profit or 0
+		recipe.percentage = percentage or 0
 --		recipe.mostsold = successCount
 --		recipe.salesrate = salesRate
 		recipe.suffix = SetATRsuffix(recipe)
@@ -642,8 +642,13 @@ end
 -- Sort by Auctionator Buyout price
 --
 function plugin.SortByBuyout(skill,a,b)
-	if a.subGroup or b.subGroup then
-		return NOSORT(skill, a, b)
+	--DA.DEBUG(0,"SortByBuyout: skill= "..tostring(skill)..", a="..tostring(a)..", b="..tostring(b))
+	if a and b then
+		if a.subGroup or b.subGroup then
+			return NOSORT(skill, a, b)
+		end
+	else
+		return false
 	end
 	local recipeA, recipeB, idA, idB, buyoutA, buyoutB
 	recipeA = Skillet:GetRecipe(a.recipeID)
@@ -666,8 +671,13 @@ end
 -- Sort by Auctionator Cost
 --
 function plugin.SortByCost(skill,a,b)
-	if a.subGroup or b.subGroup then
-		return NOSORT(skill, a, b)
+	--DA.DEBUG(0,"SortByCost: skill= "..tostring(skill)..", a="..tostring(a)..", b="..tostring(b))
+	if a and b then
+		if a.subGroup or b.subGroup then
+			return NOSORT(skill, a, b)
+		end
+	else
+		return false
 	end
 	local recipeA, recipeB, idA, idB, costA, costB
 	recipeA = Skillet:GetRecipe(a.recipeID)
@@ -690,8 +700,13 @@ end
 -- Sort by calculated profit value
 --
 function plugin.SortByProfit(skill,a,b)
-	if a.subGroup or b.subGroup then
-		return NOSORT(skill, a, b)
+	--DA.DEBUG(0,"SortByProfit: skill= "..tostring(skill)..", a="..tostring(a)..", b="..tostring(b))
+	if a and b then
+		if a.subGroup or b.subGroup then
+			return NOSORT(skill, a, b)
+		end
+	else
+		return false
 	end
 	local recipeA, recipeB, idA, idB, profitA, profitB
 	recipeA = Skillet:GetRecipe(a.recipeID)
@@ -714,14 +729,22 @@ end
 -- Sort by calculated profit percentage
 --
 function plugin.SortByPercent(skill,a,b)
-	if a.subGroup or b.subGroup then
-		return NOSORT(skill, a, b)
+	--DA.DEBUG(0,"SortByPercent: skill= "..tostring(skill)..", a="..tostring(a)..", b="..tostring(b))
+	if a and b then
+		--DA.DEBUG(1,"SortByPercent: a= "..DA.DUMP1(a,1))
+		--DA.DEBUG(1,"SortByPercent: b= "..DA.DUMP1(b,1))
+		if a.subGroup or b.subGroup then
+--			return NOSORT(skill, a, b)
+			return false
+		end
+	else
+		return false
 	end
 	local recipeA, recipeB, idA, idB, percentA, percentB
 	recipeA = Skillet:GetRecipe(a.recipeID)
-	--DA.DEBUG(0,"SortByPercent: recipeA= "..DA.DUMP1(recipeA))
+	--DA.DEBUG(1,"SortByPercent: recipeA= "..DA.DUMP1(recipeA))
 	recipeB = Skillet:GetRecipe(b.recipeID)
-	--DA.DEBUG(0,"SortByPercent: recipeB= "..DA.DUMP1(recipeB))
+	--DA.DEBUG(1,"SortByPercent: recipeB= "..DA.DUMP1(recipeB))
 	if not recipeA.percentage then
 		GetRecipeData(recipeA)
 	end
@@ -730,7 +753,7 @@ function plugin.SortByPercent(skill,a,b)
 		GetRecipeData(recipeB)
 	end
 	percentB = recipeB.percentage or 0
-	--DA.DEBUG(0,"SortByPercent: percentA= "..tostring(percentA)..", percentB= "..tostring(percentB))
+	--DA.DEBUG(1,"SortByPercent: percentA= "..tostring(percentA)..", percentB= "..tostring(percentB))
 	return (percentA > percentB)
 end
 
@@ -740,8 +763,12 @@ end
 -- For enchanting, use the scrollID instead of the itemID
 --
 function plugin.SortMostSold(skill,a,b)
-	if a.subGroup or b.subGroup then
-		return NOSORT(skill, a, b)
+	if a and b then
+		if a.subGroup or b.subGroup then
+			return NOSORT(skill, a, b)
+		end
+	else
+		return
 	end
 	local recipeA, recipeB, itemNameA, itemNameB, successCountA, successCountB
 	recipeA = Skillet:GetRecipe(a.recipeID)
@@ -778,8 +805,12 @@ end
 -- For enchanting, use the scrollID instead of the itemID
 --
 function plugin.SortSalesRate(skill,a,b)
-	if a.subGroup or b.subGroup then
-		return NOSORT(skill, a, b)
+	if a and b then
+		if a.subGroup or b.subGroup then
+			return NOSORT(skill, a, b)
+		end
+	else
+		return
 	end
 	local recipeA, recipeB, itemNameA, itemNameB, successCountA, successCountB
 	local failedCountA, failedCountB, salesRateA, salesRateB

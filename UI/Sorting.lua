@@ -128,16 +128,20 @@ local function sort_recipe_by_item_quality(tradeskill, a, b)
 end
 
 local function sort_recipe_by_index(tradeskill, a, b)
-	if a.subGroup and not b.subGroup then
-		return true
-	end
-	if b.subGroup and not a.subGroup then
-		return false
-	end
-	if (a.skillIndex or 0) == (b.skillIndex or 0) then
-		return (a.name or "A") < (b.name or "B")
+	if a and b then
+		if a.subGroup and not b.subGroup then
+			return true
+		end
+		if b.subGroup and not a.subGroup then
+			return false
+		end
+		if (a.skillIndex or 0) == (b.skillIndex or 0) then
+			return (a.name or "A") < (b.name or "B")
+		else
+			return (a.skillIndex or 0) < (b.skillIndex or 0)
+		end
 	else
-		return (a.skillIndex or 0) < (b.skillIndex or 0)
+		return false
 	end
 end
 

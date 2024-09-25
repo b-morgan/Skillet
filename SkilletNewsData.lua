@@ -36,6 +36,7 @@ Skillet.NewsData = {
 			{	name = "Fixes",
 				data = {
 					{ header = "EasyMenu", body = "Replace EasyMenu calls" },
+					{ header = "Sorting", body = "Add more error checks" },
 				},
 			},
 		},

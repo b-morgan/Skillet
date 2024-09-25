@@ -104,12 +104,21 @@ function Skillet:RecipeGroupNew(player, tradeID, label, name)
 	end
 end
 
-function Skillet:RecipeGroupClearEntries(group)
+function Skillet:RecipeGroupClearEntries(group, n)
 	--DA.DEBUG(0,"RecipeGroupClearEntries("..DA.DUMP1(group,1))
+	if not n then 
+		n = 0 
+		--DA.DEBUG(0,"RecipeGroupClearEntries("..DA.DUMP1(group,1))
+	end
 	if group then
+		--DA.DEBUG(1,"RecipeGroupClearEntries: n="..tostring(n)..", name= "..tostring(group.name)..", #group.entries= "..tostring(#group.entries))
 		for i=1,#group.entries do
-			if group.entries[i].subGroup then
-				self:RecipeGroupClearEntries(group.entries[i].subGroup)
+			if group.entries[i] then
+				if group.entries[i].subGroup then
+					self:RecipeGroupClearEntries(group.entries[i].subGroup, n+1)
+				end
+			else
+				--DA.DEBUG(2,"RecipeGroupClearEntries: i="..tostring(i)..", entry= "..DA.DUMP1(group.entries[i],1))
 			end
 		end
 		group.entries = {}
@@ -337,15 +346,20 @@ function Skillet:RecipeGroupRenameEntry(entry, name)
 	end
 end
 
-function Skillet:RecipeGroupSort(group, sortMethod, reverse)
+function Skillet:RecipeGroupSort(group, sortMethod, reverse, n)
 	--DA.DEBUG(0,"RecipeGroupSort("..tostring(group.skillIndex)..", "..tostring(sortMethod)..","..tostring(reverse)..")")
+	if not n then 
+		n = 0 
+		--DA.DEBUG(0,"RecipeGroupSort("..DA.DUMP1(group,1))
+	end
+	--DA.DEBUG(0,"RecipeGroupSort: skillIndex="..tostring(group.skillIndex)..", name="..tostring(group.name)..", reverse="..tostring(reverse)..", n="..tostring(n))
 	if group then
 		for v, entry in pairs(group.entries) do
 			if entry.subGroup and entry.subGroup ~= group then
-				self:RecipeGroupSort(entry.subGroup, sortMethod, reverse)
+				self:RecipeGroupSort(entry.subGroup, sortMethod, reverse, n+1)
 			end
 		end
-		if group.entries and #group.entries>1 then
+		if group.entries and #group.entries > 1 then
 			if reverse then
 				table.sort(group.entries, function(a,b)
 					return sortMethod(Skillet.currentTrade, b, a)

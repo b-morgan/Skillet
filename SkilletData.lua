@@ -652,14 +652,17 @@ local function GetMyCategories(player, tradeID)
 	--DA.DEBUG(1,"GetMyCategories: categories= "..DA.DUMP1(categories))
 	for i, categoryID in ipairs(categories) do
 		local catInfo = C_TradeSkillUI.GetCategoryInfo(categoryID)
-		--DA.DEBUG(2,"GetMyCategories: i= "..tostring(i)..", categoryID= "..tostring(categoryID)..", catInfo.name= "..tostring(catInfo.name))
+		--DA.DEBUG(2,"GetMyCategories: i= "..tostring(i)..", categoryID= "..tostring(categoryID)..
+		--	", catInfo.name= "..tostring(catInfo.name)..", type= "..tostring(catInfo.type)..", hasProgressBar= "..tostring(catInfo.hasProgressBar))
 		--DA.DEBUG(3,"GetMyCategories: catInfo= "..DA.DUMP1(catInfo))
 		Skillet.db.global.Categories[tradeID][categoryID] = catInfo
+
 		local subCategories = { C_TradeSkillUI.GetSubCategories(categoryID) }
 		--DA.DEBUG(4,"GetMyCategories: subCategories= "..DA.DUMP1(subCategories))
 		for j, subCategory in ipairs(subCategories) do
 			local subCatInfo = C_TradeSkillUI.GetCategoryInfo(subCategory)
-			--DA.DEBUG(3,"GetMyCategories: j= "..tostring(j)..", subCategory= "..tostring(subCategory)..", subCatInfo.name= "..tostring(subCatInfo.name))
+			--DA.DEBUG(3,"GetMyCategories: j= "..tostring(j)..", subCategory= "..tostring(subCategory)..
+			--	", subCatInfo.name= "..tostring(subCatInfo.name)..", type= "..tostring(subCatInfo.type)..", hasProgressBar= "..tostring(subCatInfo.hasProgressBar))
 			--DA.DEBUG(4,"GetMyCategories: subCatInfo= "..DA.DUMP1(subCatInfo))
 			Skillet.db.global.Categories[tradeID][subCategory] = subCatInfo
 
@@ -667,7 +670,8 @@ local function GetMyCategories(player, tradeID)
 			--DA.DEBUG(5,"GetMyCategories: subsubCategories= "..DA.DUMP1(subsubCategories))
 			for k, subsubCategory in ipairs(subsubCategories) do
 				local subsubCatInfo = C_TradeSkillUI.GetCategoryInfo(subsubCategory)
-				--DA.DEBUG(4,"GetMyCategories: k= "..tostring(k)..", subsubCategory= "..tostring(subsubCategory)..", subsubCatInfo.name= "..tostring(subsubCatInfo.name))
+				--DA.DEBUG(4,"GetMyCategories: k= "..tostring(k)..", subsubCategory= "..tostring(subsubCategory)..
+				--	", subsubCatInfo.name= "..tostring(subsubCatInfo.name)..", type= "..tostring(subsubCatInfo.type)..", hasProgressBar= "..tostring(subsubCatInfo.hasProgressBar))
 				--DA.DEBUG(5,"GetMyCategories: subsubCatInfo= "..DA.DUMP1(subsubCatInfo))
 				Skillet.db.global.Categories[tradeID][subsubCategory] = subsubCatInfo
 
