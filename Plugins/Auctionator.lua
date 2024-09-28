@@ -1267,7 +1267,7 @@ function Skillet:AuctionatorSearch(whichOne)
 					local scrollName = C_Item.GetItemInfo(recipe.scrollID)
 					table.insert(items, scrollName)
 				end
-			elseif not recipe.salvage then
+			else
 				table.insert(items, shoppingListName)
 			end
 		end

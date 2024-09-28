@@ -269,6 +269,7 @@ function Skillet:AddToQueue(command, first)
 	if (not command.complex) then
 --
 -- Check if we can add this queue entry to any of the other entries
+-- Add a new entry to either the beginning or the end of the queue
 --
 		local added
 		for i=1,#queue,1 do
@@ -279,13 +280,23 @@ function Skillet:AddToQueue(command, first)
 			end
 		end
 		if not added then
-			table.insert(queue, command)
+			if first then
+				table.insert(queue, 1, command)
+			else
+				table.insert(queue, command)
+			end
 		end
 	elseif queue and #queue > 0 then
 --
--- Check last item in queue - add current if they are the same
+-- Complex command, check first or last item in queue - add to current entry if they are the same and
+-- add to the beginning or the end of the queue if they are not the same.
 --
-		local i = #queue
+		local i
+		if first then
+			i = 1
+		else
+			i = #queue
+		end
 		if queue[i].op == "iterate" and queue[i].recipeID == command.recipeID and queue[i].recipeLevel == command.recipeLevel and sameOptionals(queue[i], command) then
 			queue[i].count = queue[i].count + command.count
 		else
@@ -638,6 +649,9 @@ function Skillet:ProcessQueue(altMode)
 						recipeLevel = command.recipeLevel
 					end
 					if self.db.profile.queue_one_at_a_time then
+--
+-- Craft one item at a time.
+--
 						self.processingLevel = recipeLevel
 						self.optionalReagentsArray = {}
 						if command.modifiedReagents then
@@ -676,9 +690,14 @@ function Skillet:ProcessQueue(altMode)
 						--DA.DEBUG(1,"ProcessQueue: recipeLevel= "..tostring(recipeLevel)..", optionalReagentsArray= "..DA.DUMP(self.optionalReagentsArray))
 						command.optionalReagentsArray = self.optionalReagentsArray
 					else
-						self.recipeTransaction = CreateProfessionsRecipeTransaction(C_TradeSkillUI.GetRecipeSchematic(command.recipeID, false, recipeLevel))
+--
+-- Craft all items in this queue entry at once.
+--					
+						self.recipeSchematic = C_TradeSkillUI.GetRecipeSchematic(command.recipeID, false, recipeLevel)
+						DA.DEBUG(1,"ProcessQueue: recipeID= "..tostring(command.recipeID)..", recipeLevel= "..tostring(recipeLevel)..", recipeSchematic= "..DA.DUMP(self.recipeSchematic))
+						self.recipeTransaction = CreateProfessionsRecipeTransaction(self.recipeSchematic)
 						ApplyAllocations(self.recipeTransaction, command.modifiedReagents, command.requiredReagents, command.optionalReagents, command.finishingReagents)
-						DA.DEBUG(1,"ProcessQueue: recipeLevel= "..tostring(recipeLevel)..", recipeTransaction= "..DA.DUMP(self.recipeTransaction))
+						DA.DEBUG(1,"ProcessQueue: recipeTransaction= "..DA.DUMP(self.recipeTransaction))
 					end
 --
 -- For debugging, save the command and TraceLog setting. Restored in ContinueCast.
@@ -689,9 +708,9 @@ function Skillet:ProcessQueue(altMode)
 					--DA.TraceLog = true
 					if self.FakeIt then
 						if self.db.profile.queue_one_at_a_time then
-							DA.DEBUG(1,"ProcessQueue: recipeLevel= "..tostring(recipeLevel)..", optionalReagentsArray= "..DA.DUMP(command.optionalReagentsArray))
+							DA.DEBUG(1,"ProcessQueue: recipeID= "..tostring(command.recipeID)..",recipeLevel= "..tostring(recipeLevel)..", optionalReagentsArray= "..DA.DUMP(command.optionalReagentsArray))
 						else
-							DA.DEBUG(1,"ProcessQueue: recipeLevel= "..tostring(recipeLevel)..", recipeTransaction= "..DA.DUMP(self.recipeTransaction))
+							DA.DEBUG(1,"ProcessQueue: recipeID= "..tostring(command.recipeID)..",recipeLevel= "..tostring(recipeLevel)..", recipeTransaction= "..DA.DUMP(self.recipeTransaction))
 							local reagentInfoTbl = self.recipeTransaction:CreateCraftingReagentInfoTbl()
 							DA.DEBUG(1,"ProcessQueue: reagentInfoTbl= "..DA.DUMP(reagentInfoTbl))
 							if not self.recipeTransaction:HasAllAllocations(command.count) then
@@ -700,16 +719,16 @@ function Skillet:ProcessQueue(altMode)
 						end
 					else
 						if self.db.profile.queue_one_at_a_time then
+							DA.DEBUG(1,"ProcessQueue: recipeID= "..tostring(command.recipeID)..", recipeLevel= "..tostring(recipeLevel)..", optionalReagentsArray= "..DA.DUMP(command.optionalReagentsArray))
 							C_TradeSkillUI.CraftRecipe(command.recipeID, command.count, command.optionalReagentsArray, recipeLevel)
 						else
 							local reagentInfoTbl = self.recipeTransaction:CreateCraftingReagentInfoTbl()
-							if self.recipeTransaction:HasAllAllocations(command.count) then
-								DA.DEBUG(1,"ProcessQueue: reagentInfoTbl= "..DA.DUMP(reagentInfoTbl))
+							DA.DEBUG(1,"ProcessQueue: reagentInfoTbl= "..DA.DUMP(reagentInfoTbl))
+--							if self.recipeTransaction:HasAllAllocations(command.count) then
 								C_TradeSkillUI.CraftRecipe(command.recipeID, command.count, reagentInfoTbl, recipeLevel)
-							else
-								DA.MARK3("Insufficient (Required) Materials available")
-								DA.DEBUG(1,"ProcessQueue: reagentInfoTbl= "..DA.DUMP(reagentInfoTbl))
-							end
+--							else
+--								DA.MARK3("Insufficient (Required) Materials available")
+--							end
 						end
 					end
 				else
@@ -726,7 +745,7 @@ function Skillet:ProcessQueue(altMode)
 				DA.DEBUG(1,"ProcessQueue(R): command= "..DA.DUMP(command))
 				DA.DEBUG(1,"ProcessQueue(R): recipe= "..DA.DUMP(recipe))
 			elseif command.recipeType == Enum.TradeskillRecipeType.Salvage then
-				local numAvailable
+				local numAvailable = 0
 				local itemLocation
 				DA.DEBUG(1,"ProcessQueue(S): salvageItem= "..tostring(command.salvageItem))
 				local targetItems = C_TradeSkillUI.GetCraftingTargetItems(recipe.salvage)
