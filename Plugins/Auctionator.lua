@@ -895,6 +895,7 @@ function plugin.GetExtraText(skill, recipe)
 	local label = ""
 	local extra_text = ""
 	if not recipe then return end
+	if not Auctionator then return end
 	local itemID = recipe.itemID
 --
 -- Check for Enchanting. 
@@ -943,7 +944,7 @@ function plugin.GetExtraText(skill, recipe)
 				for _, quality in pairs(recipe.qualityIDs) do
 					outputItemInfo = C_TradeSkillUI.GetRecipeOutputItemData(recipe.spellID, {}, nil, quality)
 					if outputItemInfo and outputItemInfo.hyperlink then
-						age = Auctionator.API.v1.GetAuctionAgeByItemLink and Auctionator.API.v1.GetAuctionAgeByItemLink(addonName, outputItemInfo.hyperlink)
+						age = Auctionator.API.v1.GetAuctionAgeByItemLink(addonName, outputItemInfo.hyperlink)
 						if age and age < 2 then
 							price = Auctionator.API.v1.GetAuctionPriceByItemLink(addonName, outputItemInfo.hyperlink)
 							buyout = (price or 0) * recipe.numMade
