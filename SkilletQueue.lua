@@ -356,7 +356,7 @@ function Skillet:PrintSaved()
 			for qpos,command in pairs(queue) do
 				size = size + 1
 			end
-			print("name= "..tostring(name)..", size= "..tostring(size))
+			DA.MARK2("name= "..tostring(name)..", size= "..tostring(size))
 		end
 	end
 end
@@ -390,25 +390,26 @@ function Skillet:PrintRIQ()
 	if reagentsInQueue then
 		for id,count in pairs(reagentsInQueue) do
 			local name = C_Item.GetItemInfo(id)
-			print("reagent: "..id.." ("..tostring(name)..") x "..count)
+			DA.MARK2("reagent: "..id.." ("..tostring(name)..") x "..count)
 			if modifiedInQueue[id] then
-				print("    "..DA.DUMP1(modifiedInQueue[id]))
+				DA.MARK2("    "..DA.DUMP1(modifiedInQueue[id]))
 			end
 		end
 	end
 end
 
-local function ApplyAllocations(transaction, modifiedReagents, requiredReagents, optionalReagents, finishingReagents)
+local function ApplyAllocations(transaction, requiredReagents, modifiedReagents, optionalReagents, finishingReagents)
 	local reagentsToQuantity = {}
-	if modifiedReagents then
-		for _, all in ipairs(modifiedReagents) do
+	local haverequired = true
+	if requiredReagents then
+		for _, all in ipairs(requiredReagents) do
 			for _, item in ipairs(all) do
 				reagentsToQuantity[item.itemID] = item.quantity
 			end
 		end
 	end
-	if requiredReagents then
-		for _, all in ipairs(requiredReagents) do
+	if modifiedReagents then
+		for _, all in ipairs(modifiedReagents) do
 			for _, item in ipairs(all) do
 				reagentsToQuantity[item.itemID] = item.quantity
 			end
@@ -428,14 +429,20 @@ local function ApplyAllocations(transaction, modifiedReagents, requiredReagents,
 			end
 		end
 	end
+	--DA.DEBUG(0,"ApplyAllocations: reagentsToQuantity= "..DA.DUMP1(reagentsToQuantity))
 	local schematic = transaction:GetRecipeSchematic()
-	for slotID, reagentSlotSchematic in ipairs(schematic.reagentSlotSchematics) do
-		for _, r in ipairs(reagentSlotSchematic.reagents) do
+	for slotID, s in ipairs(schematic.reagentSlotSchematics) do
+		for _, r in ipairs(s.reagents) do
 			if reagentsToQuantity[r.itemID] then
 				transaction:OverwriteAllocation(slotID, r, reagentsToQuantity[r.itemID])
 			end
 		end
+		if s.required and not transaction:HasAllAllocations(slotID, s.quantityRequired) then
+			DA.DEBUG(0,"ApplyAllocations: missing required quantity, slotID= "..tostring(slotID)..", need= "..tostring(s.quantityRequired))
+			haverequired = false
+		end
 	end
+	return haverequired
 end
 
 function Skillet:ProcessQueue(altMode)
@@ -687,17 +694,16 @@ function Skillet:ProcessQueue(altMode)
 								table.insert(self.optionalReagentsArray, reagent)
 							end -- for
 						end
-						--DA.DEBUG(1,"ProcessQueue: recipeLevel= "..tostring(recipeLevel)..", optionalReagentsArray= "..DA.DUMP(self.optionalReagentsArray))
 						command.optionalReagentsArray = self.optionalReagentsArray
 					else
 --
 -- Craft all items in this queue entry at once.
 --					
 						self.recipeSchematic = C_TradeSkillUI.GetRecipeSchematic(command.recipeID, false, recipeLevel)
-						DA.DEBUG(1,"ProcessQueue: recipeID= "..tostring(command.recipeID)..", recipeLevel= "..tostring(recipeLevel)..", recipeSchematic= "..DA.DUMP(self.recipeSchematic))
+						--DA.DEBUG(1,"ProcessQueue: recipeID= "..tostring(command.recipeID)..", recipeLevel= "..tostring(recipeLevel)..", recipeSchematic= "..DA.DUMP(self.recipeSchematic))
 						self.recipeTransaction = CreateProfessionsRecipeTransaction(self.recipeSchematic)
-						ApplyAllocations(self.recipeTransaction, command.modifiedReagents, command.requiredReagents, command.optionalReagents, command.finishingReagents)
-						DA.DEBUG(1,"ProcessQueue: recipeTransaction= "..DA.DUMP(self.recipeTransaction))
+						ApplyAllocations(self.recipeTransaction, command.requiredReagents, command.modifiedReagents, command.optionalReagents, command.finishingReagents)
+						--DA.DEBUG(1,"ProcessQueue: recipeID= "..tostring(command.recipeID)..", recipeTransaction= "..DA.DUMP(self.recipeTransaction))
 					end
 --
 -- For debugging, save the command and TraceLog setting. Restored in ContinueCast.
@@ -713,18 +719,22 @@ function Skillet:ProcessQueue(altMode)
 							DA.DEBUG(1,"ProcessQueue: recipeID= "..tostring(command.recipeID)..",recipeLevel= "..tostring(recipeLevel)..", recipeTransaction= "..DA.DUMP(self.recipeTransaction))
 							local reagentInfoTbl = self.recipeTransaction:CreateCraftingReagentInfoTbl()
 							DA.DEBUG(1,"ProcessQueue: reagentInfoTbl= "..DA.DUMP(reagentInfoTbl))
-							if not self.recipeTransaction:HasAllAllocations(command.count) then
+							if not self.recipeTransaction:HasMetQuantityRequirements() then
 								DA.MARK3("Insufficient Materials available")
 							end
 						end
 					else
 						if self.db.profile.queue_one_at_a_time then
-							DA.DEBUG(1,"ProcessQueue: recipeID= "..tostring(command.recipeID)..", recipeLevel= "..tostring(recipeLevel)..", optionalReagentsArray= "..DA.DUMP(command.optionalReagentsArray))
+							--DA.DEBUG(1,"ProcessQueue: recipeID= "..tostring(command.recipeID)..", recipeLevel= "..tostring(recipeLevel)..", optionalReagentsArray= "..DA.DUMP(command.optionalReagentsArray))
 							C_TradeSkillUI.CraftRecipe(command.recipeID, command.count, command.optionalReagentsArray, recipeLevel)
 						else
 							local reagentInfoTbl = self.recipeTransaction:CreateCraftingReagentInfoTbl()
 							DA.DEBUG(1,"ProcessQueue: reagentInfoTbl= "..DA.DUMP(reagentInfoTbl))
+							--DA.DEBUG(1,"ProcessQueue: HasMetQuantityRequirements= "..tostring(self.recipeTransaction:HasMetQuantityRequirements()))
+--							if self.recipeTransaction:HasMetQuantityRequirements() then
 --							if self.recipeTransaction:HasAllAllocations(command.count) then
+							--DA.DEBUG(1,"ProcessQueue: HasAllAllocations= "..tostring(self.recipeTransaction:HasAllAllocations(command.count)))
+--							if self.recipeTransaction:HasMetQuantityRequirements() then
 								C_TradeSkillUI.CraftRecipe(command.recipeID, command.count, reagentInfoTbl, recipeLevel)
 --							else
 --								DA.MARK3("Insufficient (Required) Materials available")
@@ -779,8 +789,8 @@ end
 --
 -- Adds the currently selected number of items to the queue
 --
-function Skillet:QueueItems(count, button)
-	DA.DEBUG(0,"QueueItems("..tostring(count)..", "..tostring(button)..")")
+function Skillet:QueueItems(button, count)
+	DA.DEBUG(0,"QueueItems("..tostring(button)..", "..tostring(count)..")")
 	if self.currentTrade and self.selectedSkill then
 		local skill = self:GetSkill(self.currentPlayer, self.currentTrade, self.selectedSkill)
 		if not skill then return 0 end
@@ -843,29 +853,29 @@ end
 --
 -- Queue the max number of craftable items for the currently selected skill
 --
-function Skillet:QueueAllItems()
-	DA.DEBUG(0,"QueueAllItems()");
-	local count = self:QueueItems()
+function Skillet:QueueAllItems(button)
+	DA.DEBUG(0,"QueueAllItems("..tostring(button)..")");
+	local count = self:QueueItems(button)
 	return count
 end
 
 --
 -- Adds the currently selected number of items to the queue and then starts the queue
 --
-function Skillet:CreateItems(count, mouse)
-	DA.DEBUG(0,"CreateItems("..tostring(count)..", "..tostring(mouse)..")")
-	if self:QueueItems(count) > 0 then
-		self:ProcessQueue(mouse == "RightButton" or IsAltKeyDown())
+function Skillet:CreateItems(button, count)
+	DA.DEBUG(0,"CreateItems("..tostring(button)..", "..tostring(count)..")")
+	if self:QueueItems(button, count) > 0 then
+		self:ProcessQueue(button == "RightButton" or IsAltKeyDown())
 	end
 end
 
 --
 -- Queue and create the max number of craftable items for the currently selected skill
 --
-function Skillet:CreateAllItems(mouse)
-	DA.DEBUG(0,"CreateAllItems("..tostring(mouse)..")")
-	if self:QueueAllItems() > 0 then
-		self:ProcessQueue(mouse == "RightButton" or IsAltKeyDown())
+function Skillet:CreateAllItems(button)
+	DA.DEBUG(0,"CreateAllItems("..tostring(button)..")")
+	if self:QueueAllItems(button) > 0 then
+		self:ProcessQueue(button == "RightButton" or IsAltKeyDown())
 	end
 end
 
@@ -1033,7 +1043,7 @@ end
 function Skillet:StopCast(spellID)
 	if self.enabledState then
 		name = C_Spell.GetSpellName(spellID)
-		DA.DEBUG(0,"StopCast("..tostring(spellID).."), "..tostring(name))
+		DA.MARK3("StopCast("..tostring(spellID).."), "..tostring(name))
 		self.queuecasting = false
 		self.processingSpell = nil
 		self.processingSpellID = nil

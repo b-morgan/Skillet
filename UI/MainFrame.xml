@@ -2520,7 +2520,7 @@
 					</OnLoad>
 					<OnClick>
 						Skillet:InventoryFilterButtons_Hide()
-						Skillet:QueueAllItems()
+						Skillet:QueueAllItems(button)
 					</OnClick>
 				</Scripts>
 			</Button>
@@ -2541,7 +2541,7 @@
 					</OnLoad>
 					<OnClick>
 						Skillet:InventoryFilterButtons_Hide()
-						Skillet:EnchantItem()
+						Skillet:EnchantItem(button)
 					</OnClick>
 				</Scripts>
 			</Button>
@@ -2805,7 +2805,7 @@
 					</OnLoad>
 					<OnClick>
 						Skillet:InventoryFilterButtons_Hide()
-						Skillet:QueueItems(SkilletItemCountInputBox:GetNumber(), button)
+						Skillet:QueueItems(button, SkilletItemCountInputBox:GetNumber())
 					</OnClick>
 				</Scripts>
 			</Button>
@@ -2832,7 +2832,7 @@
 					</OnLoad>
 					<OnClick>
 						Skillet:InventoryFilterButtons_Hide()
-						Skillet:CreateItems(SkilletItemCountInputBox:GetNumber(), button)
+						Skillet:CreateItems(button, SkilletItemCountInputBox:GetNumber())
 					</OnClick>
 				</Scripts>
 			</Button>

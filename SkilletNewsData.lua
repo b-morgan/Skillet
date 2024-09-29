@@ -31,12 +31,14 @@ Skillet.NewsData = {
 			{	name = "Changes",
 				data = {
 					{ header = "Warband Bank", body = "Keep track of Warband (Account) bank" },
+					{ header = "Wowhead URL", body = "Add to recipe right-click menu" },
 				},
 			},
 			{	name = "Fixes",
 				data = {
 					{ header = "EasyMenu", body = "Replace EasyMenu calls" },
 					{ header = "Sorting", body = "Add more error checks" },
+					{ header = "Plugins", body = "Auctionator sort error checks" },
 				},
 			},
 		},

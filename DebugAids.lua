@@ -73,6 +73,10 @@ DA.DEBUG_COLOR  = "|c00A0FF00"
 DA.TRACE_COLOR  = "|c0000FFA0"
 DA.WARN_COLOR   = "|c0000FFE0"
 
+local function print(msg)
+	(SELECTED_CHAT_FRAME or DEFAULT_CHAT_FRAME):AddMessage(msg)
+end
+
 local function tekD(text)
 	print(text)
 	if tek then 
