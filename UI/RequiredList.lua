@@ -328,7 +328,7 @@ end
 --
 function Skillet:RequiredButtonOnEnter(button, skillIndex, optionalIndex)
 	--DA.DEBUG(0,"RequiredButtonOnEnter("..tostring(button)..", "..tostring(skillIndex)..", "..tostring(optionalIndex)..")")
-	local tip = SkilletTradeskillTooltip
+	local tip = GameTooltip -- SkilletTradeskillTooltip
 	tip:SetOwner(button, "ANCHOR_BOTTOMRIGHT")
 	if Skillet.db.profile.scale_tooltip then
 		local uiScale = 1.0;
@@ -351,7 +351,7 @@ end
 --
 function Skillet:RequiredButtonOnLeave(button, skillIndex, optionalIndex)
 	--DA.DEBUG(0,"RequiredButtonOnLeave("..tostring(button)..", "..tostring(skillIndex)..", "..tostring(optionalIndex)..")")
-	local tip = SkilletTradeskillTooltip
+	local tip = GameTooltip -- SkilletTradeskillTooltip
 	if Skillet.db.profile.scale_tooltip then
 		tip:SetScale(Skillet.gttScale)
 	end

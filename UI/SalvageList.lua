@@ -338,7 +338,7 @@ end
 --
 function Skillet:SalvageButtonOnEnter(button, skillIndex, salvageIndex)
 	--DA.DEBUG(0,"SalvageButtonOnEnter("..tostring(button)..", "..tostring(skillIndex)..", "..tostring(salvageIndex)..")")
-	local tip = SkilletTradeskillTooltip
+	local tip = GameTooltip -- SkilletTradeskillTooltip
 	tip:SetOwner(button, "ANCHOR_BOTTOMRIGHT")
 	if Skillet.db.profile.scale_tooltip then
 		local uiScale = 1.0;
@@ -361,7 +361,7 @@ end
 --
 function Skillet:SalvageButtonOnLeave(button, skillIndex, salvageIndex)
 	--DA.DEBUG(0,"SalvageButtonOnLeave("..tostring(button)..", "..tostring(skillIndex)..", "..tostring(salvageIndex)..")")
-	local tip = SkilletTradeskillTooltip
+	local tip = GameTooltip -- SkilletTradeskillTooltip
 	if Skillet.db.profile.scale_tooltip then
 		tip:SetScale(Skillet.gttScale)
 	end

@@ -1017,12 +1017,12 @@ PROFESSIONS_FIRST_CRAFT_DESCRIPTION = "Crafting this recipe for the first time w
 --
 	if Skillet.db.profile.recipe_source_first then
 		local l, e = Skillet:GetExtraText(skill, recipe)
-		if label then
+		if label and l then
 			label = label.."\n\n"..l
 		else
 			label = l
 		end
-		if extra_text then
+		if extra_text and e then
 			extra_text = extra_text.."\n\n"..e
 		else
 			extra_text = e
