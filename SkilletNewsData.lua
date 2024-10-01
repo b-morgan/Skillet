@@ -38,7 +38,9 @@ Skillet.NewsData = {
 				data = {
 					{ header = "EasyMenu", body = "Replace EasyMenu calls" },
 					{ header = "Sorting", body = "Add more error checks" },
-					{ header = "Plugins", body = "Auctionator sort error checks" },
+					{ header = "Plugins", body = "Auctionator error checks" },
+					{ header = "Tooltips", body = "Use GameTooltip instead of SkilletTradeskillTooltip" },
+					{ header = "Localization", body = "Add localization to some error strings" },
 				},
 			},
 		},

@@ -2535,7 +2535,7 @@ end
 --
 function Skillet:StartQueue_OnClick(button, mouse)
 	if self.queuecasting then
-		DA.MARK3("Cancel incomplete processing")
+		DA.MARK3(L["Cancel incomplete processing"])
 		self:CancelCast()
 		self.queuecasting = false
 	else

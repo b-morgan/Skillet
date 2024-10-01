@@ -679,7 +679,7 @@ function Skillet:ProcessQueue(altMode)
 								required = required + 1
 							end -- for
 							if required == 0 then
-								DA.MARK3("Required reagent(s) missing")
+								DA.MARK3(L["Required reagents missing"])
 							end
 						end
 						if command.optionalReagents then
@@ -737,7 +737,7 @@ function Skillet:ProcessQueue(altMode)
 --							if self.recipeTransaction:HasMetQuantityRequirements() then
 								C_TradeSkillUI.CraftRecipe(command.recipeID, command.count, reagentInfoTbl, recipeLevel)
 --							else
---								DA.MARK3("Insufficient (Required) Materials available")
+--								DA.MARK3(L["Insufficient materials available"])
 --							end
 						end
 					end
@@ -745,7 +745,7 @@ function Skillet:ProcessQueue(altMode)
 --
 -- C_TradeSkillUI.GetCraftableCount failed
 --
-					DA.MARK3("Insufficient Materials available, count= "..tostring(command.count)..", numAvailable= "..tostring(numAvailable))
+					DA.MARK3(L["Insufficient materials available"].." count= "..tostring(command.count)..", numAvailable= "..tostring(numAvailable))
 					self.queuecasting = false
 				end
 			elseif command.recipeType == Enum.TradeskillRecipeType.Enchant then
@@ -1043,7 +1043,8 @@ end
 function Skillet:StopCast(spellID)
 	if self.enabledState then
 		name = C_Spell.GetSpellName(spellID)
-		DA.MARK3("StopCast("..tostring(spellID).."), "..tostring(name))
+		--DA.DEBUG(0,"StopCast("..tostring(spellID).."), "..tostring(name))
+		DA.MARK3(0,L["Crafting error"]..tostring(spellID).."), "..tostring(name))
 		self.queuecasting = false
 		self.processingSpell = nil
 		self.processingSpellID = nil
