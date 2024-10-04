@@ -585,7 +585,7 @@ PROFESSIONS_FIRST_CRAFT_DESCRIPTION = "Crafting this recipe for the first time w
 			categoryInfo = C_TradeSkillUI.GetCategoryInfo(categoryInfo.parentCategoryID)
 		end
 		local categorySkillRank = categoryInfo.skillLineCurrentLevel or 0
-		DA.DEBUG(0,"UpdateDetailWindow: categorySkillRank="..tostring(categorySkillRank))
+		--DA.DEBUG(0,"UpdateDetailWindow: categorySkillRank="..tostring(categorySkillRank))
 		lastReagentIndex = lastReagentIndex + 1
 		lastReagentButton = _G["SkilletReagent"..tostring(lastReagentIndex)]
 		local j = 1
@@ -601,13 +601,13 @@ PROFESSIONS_FIRST_CRAFT_DESCRIPTION = "Crafting this recipe for the first time w
 --
 			local rreagent = recipe.requiredData[j]
 			if rreagent then
-				DA.DEBUG(0,"UpdateDetailWindow: rreagent="..DA.DUMP(rreagent))
+				--DA.DEBUG(0,"UpdateDetailWindow: rreagent="..DA.DUMP(rreagent))
 				local rselected
 				if self.requiredSelected then
 					rselected = self.requiredSelected[j]
 				end
 				if rselected then
-					DA.DEBUG(0,"UpdateDetailWindow: rselected="..DA.DUMP(rselected))
+					--DA.DEBUG(0,"UpdateDetailWindow: rselected="..DA.DUMP(rselected))
 --
 -- A required reagent has been selected for this slot
 --
