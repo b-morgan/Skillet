@@ -720,22 +720,26 @@ local function GetRecipeList(player, tradeID)
 			if recipeInfo.categoryID ~= currentCategoryID then
 				currentCategoryID = recipeInfo.categoryID
 				categoryData = Skillet.db.global.Categories[tradeID][currentCategoryID]
-				--DA.DEBUG(3,"GetRecipeList: categoryData= "..DA.DUMP1(categoryData))
-				--DA.DEBUG(3,"GetRecipeList: categoryData.name= "..tostring(categoryData.name)..", type= "..tostring(categoryData.type)..", uiOrder= "..tostring(categoryData.uiOrder))
-				isCurrentCategoryEnabled = categoryData.enabled
-				if categoryData.parentCategoryID ~= currentParentCategoryID then
-					--DA.DEBUG(3,"GetRecipeList: categoryData.parentCategoryID= "..tostring(categoryData.parentCategoryID))
-					currentParentCategoryID = categoryData.parentCategoryID
-					if currentParentCategoryID then
-						parentCategoryData = Skillet.db.global.Categories[tradeID][currentParentCategoryID]
-						--DA.DEBUG(3,"GetRecipeList: parentCategoryData= "..DA.DUMP1(parentCategoryData))
-						--DA.DEBUG(3,"GetRecipeList: parentCategoryData.name= "..tostring(parentCategoryData.name)..", type= "..tostring(parentCategoryData.type)..", uiOrder= "..tostring(parentCategoryData.uiOrder))
-						isCurrentParentCategoryEnabled = parentCategoryData.enabled
+				if categoryData then
+					--DA.DEBUG(3,"GetRecipeList: categoryData= "..DA.DUMP1(categoryData))
+					--DA.DEBUG(3,"GetRecipeList: categoryData.name= "..tostring(categoryData.name)..", type= "..tostring(categoryData.type)..", uiOrder= "..tostring(categoryData.uiOrder))
+					isCurrentCategoryEnabled = categoryData.enabled
+					if categoryData.parentCategoryID ~= currentParentCategoryID then
+						--DA.DEBUG(3,"GetRecipeList: categoryData.parentCategoryID= "..tostring(categoryData.parentCategoryID))
+						currentParentCategoryID = categoryData.parentCategoryID
+						if currentParentCategoryID then
+							parentCategoryData = Skillet.db.global.Categories[tradeID][currentParentCategoryID]
+							--DA.DEBUG(3,"GetRecipeList: parentCategoryData= "..DA.DUMP1(parentCategoryData))
+							--DA.DEBUG(3,"GetRecipeList: parentCategoryData.name= "..tostring(parentCategoryData.name)..", type= "..tostring(parentCategoryData.type)..", uiOrder= "..tostring(parentCategoryData.uiOrder))
+							isCurrentParentCategoryEnabled = parentCategoryData.enabled
+						else
+							isCurrentParentCategoryEnabled = true
+						end
 					else
-						isCurrentParentCategoryEnabled = true
+						--DA.DEBUG(3,"GetRecipeList: categoryData.parentCategoryID equals currentParentCategoryID")
 					end
 				else
-					--DA.DEBUG(3,"GetRecipeList: categoryData.parentCategoryID equals currentParentCategoryID")
+					DA.DEBUG(3,"GetRecipeList: No categoryData for currentCategoryID= "..tostring(currentCategoryID))
 				end
 			end
 			if isCurrentCategoryEnabled and isCurrentParentCategoryEnabled then
@@ -909,91 +913,95 @@ local function ScanTrade()
 -- This category (header) hasn't been seen yet. Stack it (and its unseen parents)
 --
 			local category = recipeInfo.categoryID
-			headerUsed[category] = true
-			local headerType = Skillet.db.global.Categories[tradeID][category].type
-			local headerName = Skillet.db.global.Categories[tradeID][category].name
-			local headerUIOrder = Skillet.db.global.Categories[tradeID][category].uiOrder
 			--DA.DEBUG(2,"ScanTrade: category="..tostring(category))
-			local numCat = 1
-			local catStack = {}
-			catStack[numCat] = category
-			while headerType == "subheader" do
-				if Skillet.db.global.Categories[tradeID][category].parentCategoryID then
-					parent = Skillet.db.global.Categories[tradeID][category].parentCategoryID
-					if Skillet.db.global.Categories[tradeID][parent] then
+			if not category or category == 0 then
+				DA.DEBUG(2,"ScanTrade: j= "..tostring(j)..", tradeID= "..tostring(tradeID)..", recipeID= "..tostring(recipeID)..", recipeInfo= "..DA.DUMP1(recipeInfo))
+			else
+				headerUsed[category] = true
+				local headerType = Skillet.db.global.Categories[tradeID][category].type
+				local headerName = Skillet.db.global.Categories[tradeID][category].name
+				local headerUIOrder = Skillet.db.global.Categories[tradeID][category].uiOrder
+				local numCat = 1
+				local catStack = {}
+				catStack[numCat] = category
+				while headerType == "subheader" do
+					if Skillet.db.global.Categories[tradeID][category].parentCategoryID then
+						parent = Skillet.db.global.Categories[tradeID][category].parentCategoryID
+						if Skillet.db.global.Categories[tradeID][parent] then
+							if not headerUsed[parent] then
+								headerUsed[parent] = true
+								numCat = numCat + 1
+								catStack[numCat] = parent
+							end
+							--DA.DEBUG(3,"ScanTrade: tradeID= "..tostring(tradeID)..", parent="..tostring(parent)..", recipeID="..tostring(recipeID))
+							--DA.DEBUG(3,"ScanTrade: Categories= "..DA.DUMP(Skillet.db.global.Categories[tradeID][parent]))
+							headerType = Skillet.db.global.Categories[tradeID][parent].type
+						else
+							Skillet.db.global.Categories[tradeID][category].type = "header"
+							headerType = "header"
+						end
+					end
+					category = parent
+				end -- while
+				--DA.DEBUG(2,"ScanTrade: numCat= "..tostring(numCat)..", catStack= "..DA.DUMP1(catStack))
+--
+-- Make sure any base-level empty categories with higher priority are added.
+--
+				local emptyCategoriesToAdd = Skillet.emptyCategoriesToAdd
+				if emptyCategoriesToAdd then
+					--DA.DEBUG(2,"ScanTrade: emptyCategory= "..DA.DUMP1(emptyCategoriesToAdd[1]))
+					local lastCat = catStack[numCat]
+					--DA.DEBUG(2,"ScanTrade: catStack["..tostring(numCat).."]= "..DA.DUMP1(Skillet.db.global.Categories[tradeID][lastCat]))
+					while (#emptyCategoriesToAdd > 0) and (emptyCategoriesToAdd[1].uiOrder < Skillet.db.global.Categories[tradeID][lastCat].uiOrder) do
+						--DA.DEBUG(3,"ScanTrade: adding emptyCategory= "..tostring(emptyCategoriesToAdd[1].name)..", type= "..tostring(emptyCategoriesToAdd[1].type))
+						parent = emptyCategoriesToAdd[1].categoryID
 						if not headerUsed[parent] then
 							headerUsed[parent] = true
 							numCat = numCat + 1
 							catStack[numCat] = parent
 						end
-						--DA.DEBUG(3,"ScanTrade: tradeID= "..tostring(tradeID)..", parent="..tostring(parent)..", recipeID="..tostring(recipeID))
-						--DA.DEBUG(3,"ScanTrade: Categories= "..DA.DUMP(Skillet.db.global.Categories[tradeID][parent]))
-						headerType = Skillet.db.global.Categories[tradeID][parent].type
-					else
-						Skillet.db.global.Categories[tradeID][category].type = "header"
-						headerType = "header"
+						table.remove(emptyCategoriesToAdd, 1)
 					end
+					--DA.DEBUG(2,"ScanTrade: emptyCat= "..tostring(numCat)..", catStack= "..DA.DUMP1(catStack))
 				end
-				category = parent
-			end -- while
-			--DA.DEBUG(2,"ScanTrade: numCat= "..tostring(numCat)..", catStack= "..DA.DUMP1(catStack))
---
--- Make sure any base-level empty categories with higher priority are added.
---
-			local emptyCategoriesToAdd = Skillet.emptyCategoriesToAdd
-			if emptyCategoriesToAdd then
-				--DA.DEBUG(2,"ScanTrade: emptyCategory= "..DA.DUMP1(emptyCategoriesToAdd[1]))
-				local lastCat = catStack[numCat]
-				--DA.DEBUG(2,"ScanTrade: catStack["..tostring(numCat).."]= "..DA.DUMP1(Skillet.db.global.Categories[tradeID][lastCat]))
-				while (#emptyCategoriesToAdd > 0) and (emptyCategoriesToAdd[1].uiOrder < Skillet.db.global.Categories[tradeID][lastCat].uiOrder) do
-					--DA.DEBUG(3,"ScanTrade: adding emptyCategory= "..tostring(emptyCategoriesToAdd[1].name)..", type= "..tostring(emptyCategoriesToAdd[1].type))
-					parent = emptyCategoriesToAdd[1].categoryID
-					if not headerUsed[parent] then
-						headerUsed[parent] = true
-						numCat = numCat + 1
-						catStack[numCat] = parent
-					end
-					table.remove(emptyCategoriesToAdd, 1)
-				end
-				--DA.DEBUG(2,"ScanTrade: emptyCat= "..tostring(numCat)..", catStack= "..DA.DUMP1(catStack))
-			end
 
-			while numCat > 0 do
+				while numCat > 0 do
 --
 -- We have a stack of headers. Output them to the skillDB.
 --
-				category = catStack[numCat]
-				headerType = Skillet.db.global.Categories[tradeID][category].type
-				headerName = Skillet.db.global.Categories[tradeID][category].name
-				--DA.DEBUG(2,"ScanTrade: headerType= "..tostring(headerType)..", headerName= "..tostring(headerName))
-				local groupName
-				if groupList[headerName] then
-					groupList[headerName] = groupList[headerName]+1
-					groupName = headerName..":"..groupList[headerName]
-				else
-					groupList[headerName] = 1
-					groupName = headerName
-				end
-				--DA.DEBUG(2,"ScanTrade: groupList[headerName]= "..tostring(groupList[headerName])..", groupName= "..tostring(groupName))
-				if Skillet.db.global.Categories[tradeID][category].hasProgressBar then
-					skillDB[i] = "header "..headerName..":"..tostring(category)
-					Skillet.hasProgressBar[headerName] = category
-				else
-					skillDB[i] = "header "..headerName
-				end
-				skillData[i] = nil
-				currentGroup = Skillet:RecipeGroupNew(player, tradeID, "Blizzard", groupName)
-				currentGroup.autoGroup = true
-				if headerType == "header" then
-					parentGroup = currentGroup
-					Skillet:RecipeGroupAddSubGroup(mainGroup, currentGroup, i)
-				else
-					Skillet:RecipeGroupAddSubGroup(parentGroup, currentGroup, i)
-				end
-				numHeaders = numHeaders + 1
-				numCat = numCat - 1
-				i = i + 1
-			end -- while
+					category = catStack[numCat]
+					headerType = Skillet.db.global.Categories[tradeID][category].type
+					headerName = Skillet.db.global.Categories[tradeID][category].name
+					--DA.DEBUG(2,"ScanTrade: headerType= "..tostring(headerType)..", headerName= "..tostring(headerName))
+					local groupName
+					if groupList[headerName] then
+						groupList[headerName] = groupList[headerName]+1
+						groupName = headerName..":"..groupList[headerName]
+					else
+						groupList[headerName] = 1
+						groupName = headerName
+					end
+					--DA.DEBUG(2,"ScanTrade: groupList[headerName]= "..tostring(groupList[headerName])..", groupName= "..tostring(groupName))
+					if Skillet.db.global.Categories[tradeID][category].hasProgressBar then
+						skillDB[i] = "header "..headerName..":"..tostring(category)
+						Skillet.hasProgressBar[headerName] = category
+					else
+						skillDB[i] = "header "..headerName
+					end
+					skillData[i] = nil
+					currentGroup = Skillet:RecipeGroupNew(player, tradeID, "Blizzard", groupName)
+					currentGroup.autoGroup = true
+					if headerType == "header" then
+						parentGroup = currentGroup
+						Skillet:RecipeGroupAddSubGroup(mainGroup, currentGroup, i)
+					else
+						Skillet:RecipeGroupAddSubGroup(parentGroup, currentGroup, i)
+					end
+					numHeaders = numHeaders + 1
+					numCat = numCat - 1
+					i = i + 1
+				end -- while
+			end -- category
 		end -- headerUsed
 		if currentGroup then
 			Skillet:RecipeGroupAddRecipe(currentGroup, recipeID, i)

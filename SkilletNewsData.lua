@@ -32,6 +32,7 @@ Skillet.NewsData = {
 				data = {
 					{ header = "Warband Bank", body = "Keep track of Warband (Account) bank" },
 					{ header = "Wowhead URL", body = "Add to recipe right-click menu" },
+					{ header = "Queuing", body = "Add more right-click queue to top" },
 				},
 			},
 			{	name = "Fixes",

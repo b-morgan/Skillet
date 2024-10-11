@@ -767,21 +767,24 @@ function Skillet:ProcessQueue(altMode)
 				DA.DEBUG(1,"ProcessQueue(R): recipe= "..DA.DUMP(recipe))
 			elseif command.recipeType == Enum.TradeskillRecipeType.Salvage then
 				local numAvailable = 0
-				local itemLocation
 				DA.DEBUG(1,"ProcessQueue(S): salvageItem= "..tostring(command.salvageItem))
 				local targetItems = C_TradeSkillUI.GetCraftingTargetItems(recipe.salvage)
 				DA.DEBUG(2,"ProcessQueue(S): targetItems= "..DA.DUMP1(targetItems))
 				for i,targetItem in pairs(targetItems) do
 					if targetItem.itemID == command.salvageItem then
-						itemLocation = C_Item.GetItemLocation(targetItem.itemGUID)
+						self.itemLocation = C_Item.GetItemLocation(targetItem.itemGUID)
 						numAvailable = targetItem.quantity / (recipe.numUsed or 1)
 					end
 				end
-				--DA.DEBUG(1,"ProcessQueue(S): itemLocation= "..DA.DUMP1(itemLocation))
-				command.itemLocation = itemLocation
+				DA.DEBUG(1,"ProcessQueue(S): itemLocation= "..DA.DUMP1(self.itemLocation))
+				command.itemLocation = self.itemLocation
 				if command.count > numAvailable then
 					command.count = numAvailable
 				end
+				if not command.useConcentration then
+					command.useConcentration = false
+				end
+				self.command = command
 				self.processingSpell = self:GetRecipeName(command.recipeID)
 				self.processingSpellID = command.recipeID
 				self.processingPosition = qpos
@@ -789,6 +792,7 @@ function Skillet:ProcessQueue(altMode)
 				self.processingCount = command.count
 				self.salvageItem = command.salvageItem
 				self.queuecasting = true
+--				C_TradeSkillUI.CraftSalvage(recipeSpellID, [numCasts], itemTarget [, craftingReagents [, applyConcentration]])
 				C_TradeSkillUI.CraftSalvage(command.recipeID, command.count, command.itemLocation)
 			end
 		else
