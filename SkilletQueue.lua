@@ -765,35 +765,40 @@ function Skillet:ProcessQueue(altMode)
 			elseif command.recipeType == Enum.TradeskillRecipeType.Recraft then
 				DA.DEBUG(1,"ProcessQueue(R): command= "..DA.DUMP(command))
 				DA.DEBUG(1,"ProcessQueue(R): recipe= "..DA.DUMP(recipe))
+				DA.MARK3(L["Recraft not supported"])
 			elseif command.recipeType == Enum.TradeskillRecipeType.Salvage then
-				local numAvailable = 0
-				DA.DEBUG(1,"ProcessQueue(S): salvageItem= "..tostring(command.salvageItem))
-				local targetItems = C_TradeSkillUI.GetCraftingTargetItems(recipe.salvage)
-				DA.DEBUG(2,"ProcessQueue(S): targetItems= "..DA.DUMP1(targetItems))
-				for i,targetItem in pairs(targetItems) do
-					if targetItem.itemID == command.salvageItem then
-						self.itemLocation = C_Item.GetItemLocation(targetItem.itemGUID)
-						numAvailable = targetItem.quantity / (recipe.numUsed or 1)
+				if command.salvageItem then
+					local numAvailable = 0
+					DA.DEBUG(1,"ProcessQueue(S): salvageItem= "..tostring(command.salvageItem))
+					local targetItems = C_TradeSkillUI.GetCraftingTargetItems(recipe.salvage)
+					DA.DEBUG(2,"ProcessQueue(S): targetItems= "..DA.DUMP1(targetItems))
+					for i,targetItem in pairs(targetItems) do
+						if targetItem.itemID == command.salvageItem then
+							self.itemTarget = C_Item.GetItemLocation(targetItem.itemGUID)
+							numAvailable = targetItem.quantity / (recipe.numUsed or 1)
+						end
 					end
+					DA.DEBUG(1,"ProcessQueue(S): itemTarget= "..DA.DUMP1(self.itemTarget))
+					command.itemTarget = self.itemTarget
+					if command.count > numAvailable then
+						command.count = numAvailable
+					end
+					if not command.useConcentration then
+						command.useConcentration = false
+					end
+					self.command = command
+					self.processingSpell = self:GetRecipeName(command.recipeID)
+					self.processingSpellID = command.recipeID
+					self.processingPosition = qpos
+					self.processingCommand = command
+					self.processingCount = command.count
+					self.salvageItem = command.salvageItem
+					self.queuecasting = true
+--					C_TradeSkillUI.CraftSalvage(recipeSpellID, [numCasts], itemTarget [, craftingReagents [, applyConcentration]])
+					C_TradeSkillUI.CraftSalvage(command.recipeID, command.count, command.itemTarget)
 				end
-				DA.DEBUG(1,"ProcessQueue(S): itemLocation= "..DA.DUMP1(self.itemLocation))
-				command.itemLocation = self.itemLocation
-				if command.count > numAvailable then
-					command.count = numAvailable
-				end
-				if not command.useConcentration then
-					command.useConcentration = false
-				end
-				self.command = command
-				self.processingSpell = self:GetRecipeName(command.recipeID)
-				self.processingSpellID = command.recipeID
-				self.processingPosition = qpos
-				self.processingCommand = command
-				self.processingCount = command.count
-				self.salvageItem = command.salvageItem
-				self.queuecasting = true
---				C_TradeSkillUI.CraftSalvage(recipeSpellID, [numCasts], itemTarget [, craftingReagents [, applyConcentration]])
-				C_TradeSkillUI.CraftSalvage(command.recipeID, command.count, command.itemLocation)
+			else
+				DA.MARK3(L["Salvage reagent missing"])
 			end
 		else
 			DA.DEBUG(0,"Unsupported queue op: "..tostring(command.op))
