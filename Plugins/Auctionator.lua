@@ -1125,7 +1125,9 @@ function plugin.RecipeNameSuffix(skill, recipe)
 		end
 		local ah_tax = Skillet.db.profile.plugins.ATR.calcProfitAhTax and ahtaxDef or 1
 		profit = buyout * ah_tax - cost
-		percentage = profit * 100 / cost
+		if cost ~= 0 then
+			percentage = profit * 100 / cost
+		end
 
 		if addonName and Journalator and Journalator.API then
 			if itemName then
@@ -1268,7 +1270,7 @@ function Skillet:AuctionatorSearch(whichOne)
 					local scrollName = C_Item.GetItemInfo(recipe.scrollID)
 					table.insert(items, scrollName)
 				end
-			else
+			elseif not recipe.salvage then
 				table.insert(items, shoppingListName)
 			end
 		end
