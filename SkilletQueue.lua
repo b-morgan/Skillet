@@ -224,7 +224,7 @@ function Skillet:QueueAppendCommand(command, queueCraftables, first)
 			end
 		end
 		reagentsInQueue[recipe.itemID] = (reagentsInQueue[recipe.itemID] or 0) + command.count * recipe.numMade;
-		Skillet:AddToQueue(command, first)
+		self:AddToQueue(command, first)
 		self.visited[command.recipeID] = nil
 		self:AdjustInventory()
 	end
