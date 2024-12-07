@@ -2517,6 +2517,7 @@
 				<Scripts>
 					<OnLoad>
 						self:SetFrameLevel(self:GetFrameLevel()+2)
+						self:RegisterForClicks("LeftButtonUp", "RightButtonUp")
 					</OnLoad>
 					<OnClick>
 						Skillet:InventoryFilterButtons_Hide()
