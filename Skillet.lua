@@ -1215,6 +1215,7 @@ end
 -- Checks to see if the current trade is one that we support.
 -- Control key says we do (even if we don't, debugging)
 -- Shift key says we don't support it (even if we do)
+-- Shift key behavior can be swapped with "/skillet swapshiftkey"
 --
 function Skillet:IsSupportedTradeskill(tradeID)
 	--DA.DEBUG(0,"IsSupportedTradeskill("..tostring(tradeID)..")")
@@ -1222,7 +1223,7 @@ function Skillet:IsSupportedTradeskill(tradeID)
 		return true
 	end
 	if self:IsModKey1Down() then
-		return false
+		return Skillet.db.profile.swapshiftkey
 	end
 	if not tradeID or self.BlizzardSkillList[tradeID] or self.currentPlayer ~= UnitName("player") then
 		DA.DEBUG(3,"IsSupportedTradeskill: BlizzardSkillList="..tostring(self.BlizzardSkillList[tradeID]))
@@ -1233,7 +1234,7 @@ function Skillet:IsSupportedTradeskill(tradeID)
 		DA.DEBUG(3,"IsSupportedTradeskill: not ranks")
 		return false
 	end
-	return true
+	return not Skillet.db.profile.swapshiftkey
 end
 
 --

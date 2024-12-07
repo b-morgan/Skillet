@@ -26,6 +26,15 @@ local isCata = WOW_PROJECT_ID == WOW_PROJECT_CATACLYSM_CLASSIC
 
 Skillet.NewsName = "Skillet News"
 Skillet.NewsData = {
+	{	version = "5.36",
+		data = {
+			{	name = "Changes",
+				data = {
+					{ header = "Mod Keys", body = "Add '/skillet swapshiftkey' to change default shift behavior" },
+				},
+			},
+		},
+	},
 	{	version = "5.35",
 		data = {
 			{	name = "Changes",

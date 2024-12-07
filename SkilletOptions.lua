@@ -979,6 +979,18 @@ Skillet.options =
 			end,
 			order = 77
 		},
+		swapshiftkey = {
+			type = "toggle",
+			name = "SwapShiftKey",
+			desc = "Swap Shift Key to open the Blizzard frames",
+			get = function()
+				return Skillet.db.profile.swapshiftkey
+			end,
+			set = function(self,value)
+				Skillet.db.profile.swapshiftkey = value
+			end,
+			order = 77
+		},
 		collectdetails = {
 			type = "toggle",
 			name = "Collect details",

@@ -428,11 +428,13 @@ function Skillet:GetSkill(player,trade,index)
 		if not Skillet.data.skillList[trade][index] and Skillet.data.skillDB[trade][index] then
 			local skillString = Skillet.data.skillDB[trade][index]
 			if skillString then
+				--DA.DEBUG(1,"GetSkill: skillString= ",DA.DUMP1(skillString))
 				local skill = {}
 				local data = { string.split(" ",skillString) }
 				if data[1] == "header" or data[1] == "subheader" then
 					skill.id = 0
 				else
+					--DA.DEBUG(1,"GetSkill: data= ",DA.DUMP1(data))
 					local difficulty = string.sub(data[1],1,1)
 					local recipeID = string.sub(data[1],2)
 					skill.id = tonumber(recipeID)
