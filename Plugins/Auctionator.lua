@@ -163,66 +163,6 @@ plugin.options =
 			end,
 			order = 10
 		},
---[[
-		header = {
-			type = "header",
-			name = L["Suffix"],
-			order = 11
-		},
-			suffixBuyout = {
-				type = "toggle",
-				name = L["Buyout"],
-				desc = "Show buyout value",
-				get = function()
-					return Skillet.db.profile.plugins.ATR.suffixBuyout
-				end,
-				set = function(self,value)
-					Skillet.db.profile.plugins.ATR.suffixBuyout = value
-				end,
-				width = 0.6,
-				order = 12
-			},
-			suffixCost = {
-				type = "toggle",
-				name = L["Cost"],
-				desc = "Show cost value",
-				get = function()
-					return Skillet.db.profile.plugins.ATR.suffixCost
-				end,
-				set = function(self,value)
-					Skillet.db.profile.plugins.ATR.suffixCost = value
-				end,
-				width = 0.6,
-				order = 13
-			},
-			suffixProfitValue = {
-				type = "toggle",
-				name = L["Profit"],
-				desc = "Show profit value",
-				get = function()
-					return Skillet.db.profile.plugins.ATR.suffixProfitValue
-				end,
-				set = function(self,value)
-					Skillet.db.profile.plugins.ATR.suffixProfitValue = value
-				end,
-				width = 0.6,
-				order = 14
-			},
-			suffixProfitPercentage = {
-				type = "toggle",
-				name = L["Percent"],
-				desc = "Show profit as percentage",
-				get = function()
-					return Skillet.db.profile.plugins.ATR.suffixProfitPercentage
-				end,
-				set = function(self,value)
-					Skillet.db.profile.plugins.ATR.suffixProfitPercentage = value
-				end,
-				width = 0.6,
-				order = 15
-			},
---]]
---[
 		suffix = {
 			type = "select",
 			name = "Suffix",
@@ -248,7 +188,6 @@ plugin.options =
 			style = "radio", -- "dropdown"
 			order = 11
 		},
---]]
 		colorCode = {
 			type = "toggle",
 			name = "colorCode",
@@ -481,13 +420,14 @@ local function GetMinMaxBuyout(recipe)
 end
 
 local function GetBuyout(recipe)
-	local buyout, minBuyout, maxBuyout, outputItemInfo
+	local buyout, minBuyout, maxBuyout, outputItemInfo, sellout
 	local itemID
 	if recipe.scrollID then
 		itemID = recipe.scrollID
 	else
 		itemID = recipe.itemID
 	end
+	sellout = ( select(11,C_Item.GetItemInfo(itemID)) or 0 )
 	if isRetail and Skillet.db.profile.plugins.ATR.minmaxBuyout then
 		minBuyout, maxBuyout = GetMinMaxBuyout(recipe)
 		if Skillet.db.profile.best_quality then
@@ -512,10 +452,10 @@ local function GetBuyout(recipe)
 				buyout = (Auctionator.API.v1.GetAuctionPriceByItemID(addonName, itemID) or 0) * recipe.numMade
 			end
 		else
-			return 0
+			return 0, sellout or 0
 		end
 	end
-	return buyout or 0
+	return buyout or 0, sellout or 0
 end
 
 local function GetReagentData(reagent)
@@ -599,7 +539,7 @@ end
 local function GetRecipeData(recipe)
 	--DA.DEBUG(0,"GetRecipeData: recipe= "..DA.DUMP(recipe,1))
 	if not recipe then return end
-	local buyout, cost, profit, percentage
+	local buyout, cost, profit, percentage, sellout, vprofit, vpercentage
 	local itemID
 	if recipe.scrollID then
 		itemID = recipe.scrollID
@@ -607,7 +547,7 @@ local function GetRecipeData(recipe)
 		itemID = recipe.itemID
 	end
 	if Skillet.db.profile.plugins.ATR.enabled and itemID then
-		buyout = GetBuyout(recipe)
+		buyout, sellout = GetBuyout(recipe)
 		cost = 0
 		for i=1,#recipe.reagentData do
 			local value = GetReagentData(recipe.reagentData[i])
@@ -627,13 +567,17 @@ local function GetRecipeData(recipe)
 		local ah_tax = Skillet.db.profile.plugins.ATR.calcProfitAhTax and ahtaxDef or 1
 		profit = buyout * ah_tax - cost
 		percentage = profit * 100 / cost
+		vprofit = sellout - cost
+		vpercentage = vprofit * 100 / cost
 		--DA.DEBUG(0,"GetRecipeData: buyout= "..tostring(buyout)..", profit= "..tostring(profit)..", percentage= "..tostring(percentage))
-		recipe.buyout = buyout or 0
+		--DA.DEBUG(0,"GetRecipeData: sellout= "..tostring(sellout)..", vprofit= "..tostring(vprofit)..", vpercentage= "..tostring(vpercentage))
 		recipe.cost = cost or 0
+		recipe.buyout = buyout or 0
 		recipe.profit = profit or 0
 		recipe.percentage = percentage or 0
---		recipe.mostsold = successCount
---		recipe.salesrate = salesRate
+		recipe.sellout = sellout or 0
+		recipe.vprofit = vprofit or 0
+		recipe.vpercentage = vpercentage or 0
 		recipe.suffix = SetATRsuffix(recipe)
 	end
 end
@@ -665,6 +609,35 @@ function plugin.SortByBuyout(skill,a,b)
 	buyoutB = recipeB.buyout or 0
 	--DA.DEBUG(0,"SortByBuyout: buyoutA= "..tostring(buyoutA)..", buyoutB= "..tostring(buyoutB))
 	return (buyoutA > buyoutB)
+end
+
+--
+-- Sort by Auctionator Sell to Vendor price
+--
+function plugin.SortBySellout(skill,a,b)
+	--DA.DEBUG(0,"SortBySellout: skill= "..tostring(skill)..", a="..tostring(a)..", b="..tostring(b))
+	if a and b then
+		if a.subGroup or b.subGroup then
+			return NOSORT(skill, a, b)
+		end
+	else
+		return false
+	end
+	local recipeA, recipeB, idA, idB, selloutA, selloutB
+	recipeA = Skillet:GetRecipe(a.recipeID)
+	--DA.DEBUG(0,"SortBySellout: recipeA= "..DA.DUMP1(recipeA))
+	recipeB = Skillet:GetRecipe(b.recipeID)
+	--DA.DEBUG(0,"SortBySellout: recipeB= "..DA.DUMP1(recipeB))
+	if not recipeA.sellout then
+		GetRecipeData(recipeA)
+	end
+	selloutA = recipeA.sellout or 0
+	if not recipeB.sellout then
+		GetRecipeData(recipeB)
+	end
+	selloutB = recipeB.sellout or 0
+	--DA.DEBUG(0,"SortBySellout: selloutA= "..tostring(selloutA)..", selloutB= "..tostring(selloutB))
+	return (selloutA > selloutB)
 end
 
 --
@@ -723,6 +696,35 @@ function plugin.SortByProfit(skill,a,b)
 	profitB = recipeB.profit or 0
 	--DA.DEBUG(0,"SortByProfit: profitA= "..tostring(profitA)..", profitB= "..tostring(profitB))
 	return (profitA > profitB)
+end
+
+--
+-- Sort by sell to vendor profit value
+--
+function plugin.SortByVProfit(skill,a,b)
+	--DA.DEBUG(0,"SortByVProfit: skill= "..tostring(skill)..", a="..tostring(a)..", b="..tostring(b))
+	if a and b then
+		if a.subGroup or b.subGroup then
+			return NOSORT(skill, a, b)
+		end
+	else
+		return false
+	end
+	local recipeA, recipeB, idA, idB, vprofitA, vprofitB
+	recipeA = Skillet:GetRecipe(a.recipeID)
+	--DA.DEBUG(0,"SortByProfit: recipeA= "..DA.DUMP1(recipeA))
+	recipeB = Skillet:GetRecipe(b.recipeID)
+	--DA.DEBUG(0,"SortByProfit: recipeB= "..DA.DUMP1(recipeB))
+	if not recipeA.vprofit then
+		GetRecipeData(recipeA)
+	end
+	vprofitA = recipeA.vprofit or 0
+	if not recipeB.vprofit then
+		GetRecipeData(recipeB)
+	end
+	vprofitB = recipeB.vprofit or 0
+	--DA.DEBUG(0,"SortByProfit: vprofitA= "..tostring(vprofitA)..", vprofitB= "..tostring(vprofitB))
+	return (vprofitA > vprofitB)
 end
 
 --
@@ -865,6 +867,8 @@ function plugin.OnInitialize()
 	Skillet:AddRecipeSorter("ATR: "..L["Cost"], plugin.SortByCost)
 	Skillet:AddRecipeSorter("ATR: "..L["Profit"], plugin.SortByProfit)
 	Skillet:AddRecipeSorter("ATR: "..L["Percent"], plugin.SortByPercent)
+	Skillet:AddRecipeSorter("ATR: "..L["Sellout"], plugin.SortBySellout)
+	Skillet:AddRecipeSorter("ATR: "..L["VProfit"], plugin.SortByVProfit)
 	if Journalator and Journalator.API then
 		Skillet:AddRecipeSorter("JNL: "..L["Most Sold"], plugin.SortMostSold)
 		Skillet:AddRecipeSorter("JNL: "..L["Sales Rate"], plugin.SortSalesRate)
@@ -1079,7 +1083,7 @@ end
 -- Returns a text string suffix
 --
 function plugin.RecipeNameSuffix(skill, recipe)
-	local text, buyout, cost, profit, percentage
+	local text, buyout, cost, profit, percentage, sellout, vprofit
 	local successCount = 0
 	local failedCount = 0
 	local salesRate = nil
@@ -1106,7 +1110,7 @@ function plugin.RecipeNameSuffix(skill, recipe)
 	if itemID then itemName = C_Item.GetItemInfo(itemID) end
 	--DA.DEBUG(0,"RecipeNameSuffix: itemName= "..tostring(itemName)..", type= "..type(itemName))
 	if Skillet.db.profile.plugins.ATR.enabled and itemID then
-		buyout = GetBuyout(recipe)
+		buyout, sellout = GetBuyout(recipe)
 		cost = 0
 		for i=1,#recipe.reagentData do
 			local value = GetReagentData(recipe.reagentData[i])
@@ -1125,6 +1129,7 @@ function plugin.RecipeNameSuffix(skill, recipe)
 		end
 		local ah_tax = Skillet.db.profile.plugins.ATR.calcProfitAhTax and ahtaxDef or 1
 		profit = buyout * ah_tax - cost
+		vprofit = sellout - cost
 		if cost ~= 0 then
 			percentage = profit * 100 / cost
 		end
@@ -1172,12 +1177,32 @@ function plugin.RecipeNameSuffix(skill, recipe)
 			else
 				text = Skillet:FormatMoneyFull(profit, true, Skillet.db.profile.plugins.ATR.colorCode)
 			end
+			if not isSort and Skillet.db.profile.plugins.ATR.onlyPositive and profit <= 0 then
+				text = nil
+			end
 		elseif getSort == "ATR: "..L["Percent"] or ((not isSortA or isSortJ) and Skillet.db.profile.plugins.ATR.suffixProfitPercentage) then
 			--DA.DEBUG(1, "RecipeNameSuffix: GetATRSort="..tostring(getSort)..", IsATRSort= "..tostring(isSort)..", suffixProfitPercentage= "..tostring(Skillet.db.profile.plugins.ATR.suffixProfitPercentage))
 			if text then
 				text = text.." ("..profitPctText(profit,cost,999).."%)"
 			else
 				text = "("..profitPctText(profit,cost,999).."%)"
+			end
+		elseif getSort == "ATR: "..L["Sellout"] then
+			--DA.DEBUG(1, "RecipeNameSuffix: GetATRSort="..tostring(getSort)..", IsATRSort= "..tostring(isSort)..", suffixProfitPercentage= "..tostring(Skillet.db.profile.plugins.ATR.suffixProfitPercentage))
+			if Skillet.db.profile.plugins.ATR.useShort then
+				text = Skillet:FormatMoneyShort(sellout, true, Skillet.db.profile.plugins.ATR.colorCode)
+			else
+				text = Skillet:FormatMoneyFull(sellout, true, Skillet.db.profile.plugins.ATR.colorCode)
+			end
+		elseif getSort == "ATR: "..L["VProfit"] then
+			--DA.DEBUG(1, "RecipeNameSuffix: GetATRSort="..tostring(getSort)..", IsATRSort= "..tostring(isSort)..", suffixProfitPercentage= "..tostring(Skillet.db.profile.plugins.ATR.suffixProfitPercentage))
+			if Skillet.db.profile.plugins.ATR.useShort then
+				text = Skillet:FormatMoneyShort(vprofit, true, Skillet.db.profile.plugins.ATR.colorCode)
+			else
+				text = Skillet:FormatMoneyFull(vprofit, true, Skillet.db.profile.plugins.ATR.colorCode)
+			end
+			if Skillet.db.profile.plugins.ATR.onlyPositive and vprofit <= 0 then
+				text = nil
 			end
 		end
 		if Journalator and Skillet.db.profile.plugins.ATR.journalatorC then
@@ -1198,14 +1223,13 @@ function plugin.RecipeNameSuffix(skill, recipe)
 				end
 			end
 		end
-		if not isSort and Skillet.db.profile.plugins.ATR.onlyPositive and profit <= 0 then
-			text = nil
-		end
 	end
 	recipe.buyout = buyout
 	recipe.cost = cost
 	recipe.profit = profit
 	recipe.percentage = percentage
+	recipe.sellout = sellout
+	recipe.vprofit = vprofit
 	recipe.mostsold = successCount
 	recipe.salesrate = salesRate
 	recipe.suffix = SetATRsuffix(recipe)
