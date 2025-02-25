@@ -31,6 +31,7 @@ Skillet.NewsData = {
 			{	name = "Changes",
 				data = {
 					{ header = "Plugins", body = "Add sell to vendor price and profit sorts to Auctionator" },
+					{ header = "TOC", body = "Update TOC to 110100" },
 				},
 			},
 		},
