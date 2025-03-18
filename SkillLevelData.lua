@@ -190,18 +190,18 @@ function Skillet:GetTradeSkillLevels(itemID, spellID)
 --
 				local diff = false
 				if a ~= e then
-					DA.DEBUG(1,"GetTradeSkillLevels: a= "..tostring(a)..", e= "..tostring(e))
+					--DA.DEBUG(1,"GetTradeSkillLevels: a= "..tostring(a)..", e= "..tostring(e))
 				end
 				if b ~= f then
-					DA.DEBUG(1,"GetTradeSkillLevels: b= "..tostring(b)..", f= "..tostring(f))
+					--DA.DEBUG(1,"GetTradeSkillLevels: b= "..tostring(b)..", f= "..tostring(f))
 					diff = true
 				end
 				if c ~= g then
-					DA.DEBUG(1,"GetTradeSkillLevels: c= "..tostring(c)..", g= "..tostring(g))
+					--DA.DEBUG(1,"GetTradeSkillLevels: c= "..tostring(c)..", g= "..tostring(g))
 					diff = true
 				end
 				if d ~= h then
-					DA.DEBUG(1,"GetTradeSkillLevels: d= "..tostring(b)..", h= "..tostring(h))
+					--DA.DEBUG(1,"GetTradeSkillLevels: d= "..tostring(b)..", h= "..tostring(h))
 					diff = true
 				end
 --
