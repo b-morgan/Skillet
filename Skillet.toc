@@ -6,7 +6,17 @@
 ## Notes-ruRU: Заменяет окно профессий на более функциональное.
 ## Author: yossa, bsmorgan
 ## Version: @project-version@
-## X-Category: Tradeskill
+## Category-enUS: Professions
+## Category-deDE: Berufe
+## Category-esES: Profesiones
+## Category-esMX: Profesiones
+## Category-frFR: Métiers
+## Category-itIT: Professioni
+## Category-koKR: 전문 기술
+## Category-ptBR: Profissões
+## Category-ruRU: Профессии
+## Category-zhCN: 专业
+## Category-zhTW: 專業技能
 ## X-License GPL v3 or later
 ## X-Credits lilsparky, nogudnik (creator of Skillet), Slartie (for ASTW)
 ## X-Curse-Project-ID: 445339
