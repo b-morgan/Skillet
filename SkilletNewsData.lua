@@ -26,7 +26,6 @@ local isCata = WOW_PROJECT_ID == WOW_PROJECT_CATACLYSM_CLASSIC
 
 Skillet.NewsName = "Skillet News"
 Skillet.NewsData = {
---[[
 	{	version = "5.41",
 		data = {
 			{	name = "Changes",
@@ -36,7 +35,6 @@ Skillet.NewsData = {
 			},
 		},
 	},
-]]--
 	{	version = "5.40",
 		data = {
 			{	name = "Changes",
