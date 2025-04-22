@@ -1,4 +1,4 @@
-## Interface: 110100
+## Interface: 110105
 ## Title: Skillet |cff7fff7f -Ace3-|r
 ## IconTexture: Interface\AddOns\Skillet\Icons\Skillet.tga
 ## Notes: A replacement tradeskill window
