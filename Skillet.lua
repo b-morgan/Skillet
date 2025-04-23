@@ -334,18 +334,18 @@ function Skillet:OnInitialize()
 		self.db.global.MissingSkillLevels = {}
 		initSkillLevels = true
 	end
-	if not self.db.global.SkillLineAbility_era then
-		self.db.global.SkillLineAbility_era = {}
+	if not self.db.global.SkillLevels then
+		self.db.global.SkillLevels = {}
 		initSkillLevels = true
 	end
-	if not self.db.global.SkillLineAbility_cata then
-		self.db.global.SkillLineAbility_cata = {}
+	if not self.db.global.SkillLineAbility then
+		self.db.global.SkillLineAbility = {}
 		initSkillLevels = true
 	end
-	if not self.db.global.SkillLineAbility_retail then
-		self.db.global.SkillLineAbility_retail = {}
-		initSkillLevels = true
-	end
+--	if not self.db.global.NameToSpellID then
+--		self.db.global.NameToSpellID = {}
+--		initSkillLevels = true
+--	end
 	if initSkillLevels then
 		self:InitializeSkillLevels()
 	end
@@ -518,6 +518,7 @@ end
 function Skillet:FlushCustomData()
 	DA.DEBUG(0,"FlushCustomData()");
 	Skillet.db.realm.groupDB = {}
+	Skillet.db.profile.groupSN = {}
 end
 
 --
