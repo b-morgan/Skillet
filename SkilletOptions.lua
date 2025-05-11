@@ -521,6 +521,62 @@ Skillet.options =
 					width = "full",
 					order = 14
 				},
+				sound_on_empty_queue = {
+					type = "toggle",
+					name = L["SOUNDONEMPTYQUEUENAME"],
+					desc = L["SOUNDONEMPTYQUEUEDESC"],
+					get = function()
+						return Skillet.db.profile.sound_on_empty_queue
+					end,
+					set = function(self,value)
+						Skillet.db.profile.sound_on_empty_queue = value
+					end,
+--					width = "full",
+					width = 1.5,
+					order = 15,
+				},
+				flash_on_empty_queue = {
+					type = "toggle",
+					name = L["FLASHONEMPTYQUEUENAME"],
+					desc = L["FLASHONEMPTYQUEUEDESC"],
+					get = function()
+						return Skillet.db.profile.flash_on_empty_queue
+					end,
+					set = function(self,value)
+						Skillet.db.profile.flash_on_empty_queue = value
+					end,
+--					width = "full",
+					width = 1.5,
+					order = 16,
+				},
+				sound_on_remove_queue = {
+					type = "toggle",
+					name = L["SOUNDONREMOVEQUEUENAME"],
+					desc = L["SOUNDONREMOVEQUEUEDESC"],
+					get = function()
+						return Skillet.db.profile.sound_on_remove_queue
+					end,
+					set = function(self,value)
+						Skillet.db.profile.sound_on_remove_queue = value
+					end,
+--					width = "full",
+					width = 1.5,
+					order = 17,
+				},
+				flash_on_remove_queue = {
+					type = "toggle",
+					name = L["FLASHONREMOVEQUEUENAME"],
+					desc = L["FLASHONREMOVEQUEUEDESC"],
+					get = function()
+						return Skillet.db.profile.flash_on_remove_queue
+					end,
+					set = function(self,value)
+						Skillet.db.profile.flash_on_remove_queue = value
+					end,
+--					width = "full",
+					width = 1.5,
+					order = 18,
+				},
 				transparency = {
 					type = "range",
 					name = L["Transparency"],

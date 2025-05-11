@@ -26,6 +26,16 @@ local isCata = WOW_PROJECT_ID == WOW_PROJECT_CATACLYSM_CLASSIC
 
 Skillet.NewsName = "Skillet News"
 Skillet.NewsData = {
+	{	version = "5.42",
+		data = {
+			{	name = "Changes",
+				data = {
+					{ header = "TOC", body = "Update TOC to 110107" },
+					{ header = "Options", body = "Add sound and flash options to craft queue" },
+				},
+			},
+		},
+	},
 	{	version = "5.41",
 		data = {
 			{	name = "Changes",
