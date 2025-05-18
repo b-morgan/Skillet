@@ -638,8 +638,7 @@ Skillet.options =
 				if not (UnitAffectingCombat("player")) then
 					Skillet:ShowOptions()
 				else
-					DA.DEBUG(0,"|cff8888ffSkillet|r: Combat lockdown restriction." ..
-												  " Leave combat and try again.")
+					DA.DEBUG(0,"|cff8888ffSkillet|r: Combat lockdown restriction. Leave combat and try again.")
 				end
 			end,
 			guiHidden = true,
@@ -657,8 +656,7 @@ Skillet.options =
 						Skillet:DisplayShoppingList(false)
 					end
 				else
-					DA.DEBUG(0,"|cff8888ffSkillet|r: Combat lockdown restriction." ..
-												  " Leave combat and try again.")
+					DA.DEBUG(0,"|cff8888ffSkillet|r: Combat lockdown restriction. Leave combat and try again.")
 				end
 			end,
 			order = 52
@@ -686,8 +684,7 @@ Skillet.options =
 					Skillet:FlushAllData()
 					Skillet:InitializeDatabase(UnitName("player"))
 				else
-					DA.DEBUG(0,"|cff8888ffSkillet|r: Combat lockdown restriction." ..
-												  " Leave combat and try again.")
+					DA.DEBUG(0,"|cff8888ffSkillet|r: Combat lockdown restriction. Leave combat and try again.")
 				end
 			end,
 			order = 54
@@ -701,11 +698,78 @@ Skillet.options =
 					Skillet:FlushRecipeData()
 					Skillet:InitializeDatabase(UnitName("player"))
 				else
-					DA.DEBUG(0,"|cff8888ffSkillet|r: Combat lockdown restriction." ..
-												  " Leave combat and try again.")
+					DA.DEBUG(0,"|cff8888ffSkillet|r: Combat lockdown restriction. Leave combat and try again.")
 				end
 			end,
 			order = 55
+		},
+		flushcustomdata = {
+			type = 'execute',
+			name = "Flush Custom Data",
+			desc = "Flush Custom Group Data",
+			func = function()
+				if not (UnitAffectingCombat("player")) then
+					Skillet:FlushCustomData()
+					Skillet:InitializeDatabase(UnitName("player"))
+				else
+					DA.DEBUG(0,"|cff8888ffSkillet|r: Combat lockdown restriction. Leave combat and try again.")
+				end
+			end,
+			order = 56
+		},
+		flushqueuedata = {
+			type = 'execute',
+			name = "Flush Queue Data",
+			desc = "Flush Queue Data",
+			func = function()
+				if not (UnitAffectingCombat("player")) then
+					Skillet:FlushQueueData()
+					Skillet:InitializeDatabase(UnitName("player"))
+				else
+					DA.DEBUG(0,"|cff8888ffSkillet|r: Combat lockdown restriction. Leave combat and try again.")
+				end
+			end,
+			order = 57
+		},
+		flushplayerdata = {
+			type = 'execute',
+			name = L["Flush Player Data"],
+			desc = L["Flush Player Data"],
+			func = function()
+				if not (UnitAffectingCombat("player")) then
+					Skillet:FlushPlayerData()
+					Skillet:InitializeDatabase(UnitName("player"))
+				else
+					DA.DEBUG(0,"|cff8888ffSkillet|r: Combat lockdown restriction. Leave combat and try again.")
+				end
+			end,
+			order = 58
+		},
+		flushdetaildata = {
+			type = 'execute',
+			name = "Flush Detail Data",
+			desc = "Clear the collected bag, bank, guildbank details",
+			func = function()
+				if not (UnitAffectingCombat("player")) then
+					Skillet:FlushDetailData()
+					Skillet:InitializeDatabase(UnitName("player"))
+				else
+					DA.DEBUG(0,"|cff8888ffSkillet|r: Combat lockdown restriction. Leave combat and try again.")
+				end
+			end,
+			order = 59
+		},
+		collectdetails = {
+			type = "toggle",
+			name = "Collect details",
+			desc = "Disable/Enable collecting bag, bank, guildbank details",
+			get = function()
+				return Skillet.db.profile.collect_details
+			end,
+			set = function(self,value)
+				Skillet.db.profile.collect_details = value
+			end,
+			order = 60
 		},
 		standby = {
 			type = 'execute',
@@ -721,7 +785,7 @@ Skillet.options =
 				end
 			end,
 			guiHidden = true,
-			order = 56
+			order = 61
 		},
 		ignorelist = {
 			type = 'execute',
@@ -731,11 +795,10 @@ Skillet.options =
 				if not (UnitAffectingCombat("player")) then
 					Skillet:DisplayIgnoreList()
 				else
-					DA.DEBUG(0,"|cff8888ffSkillet|r: Combat lockdown restriction." ..
-												  " Leave combat and try again.")
+					DA.DEBUG(0,"|cff8888ffSkillet|r: Combat lockdown restriction. Leave combat and try again.")
 				end
 			end,
-			order = 57
+			order = 62
 		},
 		ignoreclear = {
 			type = 'execute',
@@ -745,11 +808,10 @@ Skillet.options =
 				if not (UnitAffectingCombat("player")) then
 					Skillet:ClearIgnoreList()
 				else
-					DA.DEBUG(0,"|cff8888ffSkillet|r: Combat lockdown restriction." ..
-												  " Leave combat and try again.")
+					DA.DEBUG(0,"|cff8888ffSkillet|r: Combat lockdown restriction. Leave combat and try again.")
 				end
 			end,
-			order = 58
+			order = 63
 		},
 		ignoreadd = {
 			type = "input",
@@ -763,7 +825,7 @@ Skillet.options =
 				local value = tonumber(value)
 				Skillet.db.realm.userIgnoredMats[UnitName("player")][value] = 1
 			end,
-			order = 59
+			order = 64
 		},
 		ignoredel = {
 			type = "input",
@@ -777,7 +839,7 @@ Skillet.options =
 				local value = tonumber(value)
 				Skillet.db.realm.userIgnoredMats[UnitName("player")][value] = nil
 			end,
-			order = 60
+			order = 65
 		},
 		resetrecipefilter = {
 			type = 'execute',
@@ -787,11 +849,10 @@ Skillet.options =
 				if not (UnitAffectingCombat("player")) then
 					Skillet:ResetTradeSkillFilter()
 				else
-					DA.DEBUG(0,"|cff8888ffSkillet|r: Combat lockdown restriction." ..
-												  " Leave combat and try again.")
+					DA.DEBUG(0,"|cff8888ffSkillet|r: Combat lockdown restriction. Leave combat and try again.")
 				end
 			end,
-			order = 61
+			order = 66
 		},
 		printsaved = {
 			type = 'execute',
@@ -801,11 +862,10 @@ Skillet.options =
 				if not (UnitAffectingCombat("player")) then
 					Skillet:PrintSaved()
 				else
-					DA.DEBUG(0,"|cff8888ffSkillet|r: Combat lockdown restriction." ..
-												  " Leave combat and try again.")
+					DA.DEBUG(0,"|cff8888ffSkillet|r: Combat lockdown restriction. Leave combat and try again.")
 				end
 			end,
-			order = 62
+			order = 67
 		},
 		printqueue = {
 			type = 'execute',
@@ -815,11 +875,10 @@ Skillet.options =
 				if not (UnitAffectingCombat("player")) then
 					Skillet:PrintQueue()
 				else
-					DA.DEBUG(0,"|cff8888ffSkillet|r: Combat lockdown restriction." ..
-												  " Leave combat and try again.")
+					DA.DEBUG(0,"|cff8888ffSkillet|r: Combat lockdown restriction. Leave combat and try again.")
 				end
 			end,
-			order = 63
+			order = 68
 		},
 		printsavedqueue = {
 			type = 'input',
@@ -832,11 +891,10 @@ Skillet.options =
 				if not (UnitAffectingCombat("player")) then
 					Skillet:PrintQueue(value)
 				else
-					DA.DEBUG(0,"|cff8888ffSkillet|r: Combat lockdown restriction." ..
-												  " Leave combat and try again.")
+					DA.DEBUG(0,"|cff8888ffSkillet|r: Combat lockdown restriction. Leave combat and try again.")
 				end
 			end,
-			order = 64
+			order = 69
 		},
 		clearqueue = {
 			type = 'execute',
@@ -846,11 +904,10 @@ Skillet.options =
 				if not (UnitAffectingCombat("player")) then
 					Skillet:ClearQueue()
 				else
-					DA.DEBUG(0,"|cff8888ffSkillet|r: Combat lockdown restriction." ..
-												  " Leave combat and try again.")
+					DA.DEBUG(0,"|cff8888ffSkillet|r: Combat lockdown restriction. Leave combat and try again.")
 				end
 			end,
-			order = 65
+			order = 70
 		},
 		printauction = {
 			type = 'execute',
@@ -860,11 +917,10 @@ Skillet.options =
 				if not (UnitAffectingCombat("player")) then
 					Skillet:PrintAuctionData()
 				else
-					DA.DEBUG(0,"|cff8888ffSkillet|r: Combat lockdown restriction." ..
-												  " Leave combat and try again.")
+					DA.DEBUG(0,"|cff8888ffSkillet|r: Combat lockdown restriction. Leave combat and try again.")
 				end
 			end,
-			order = 66
+			order = 71
 		},
 		printriq = {
 			type = 'execute',
@@ -874,11 +930,10 @@ Skillet.options =
 				if not (UnitAffectingCombat("player")) then
 					Skillet:PrintRIQ()
 				else
-					DA.DEBUG(0,"|cff8888ffSkillet|r: Combat lockdown restriction." ..
-												  " Leave combat and try again.")
+					DA.DEBUG(0,"|cff8888ffSkillet|r: Combat lockdown restriction. Leave combat and try again.")
 				end
 			end,
-			order = 67
+			order = 72
 		},
 		printshop = {
 			type = 'execute',
@@ -888,11 +943,10 @@ Skillet.options =
 				if not (UnitAffectingCombat("player")) then
 					Skillet:PrintShoppingList()
 				else
-					DA.DEBUG(0,"|cff8888ffSkillet|r: Combat lockdown restriction." ..
-												  " Leave combat and try again.")
+					DA.DEBUG(0,"|cff8888ffSkillet|r: Combat lockdown restriction. Leave combat and try again.")
 				end
 			end,
-			order = 68
+			order = 73
 		},
 --
 -- commands to toggle Blizzard's frames (beats using "/run")
@@ -914,7 +968,7 @@ Skillet.options =
 					Skillet.BlizzardUIshowing = false
 				end
 			end,
-			order = 69
+			order = 74
 		},
 		bcui = {
 			type = "toggle",
@@ -931,7 +985,7 @@ Skillet.options =
 					HideUIPanel(CraftFrame)
 				end
 			end,
-			order = 70
+			order = 75
 		},
 --
 -- commands to update Skillet's main windows
@@ -943,7 +997,7 @@ Skillet.options =
 			func = function()
 				Skillet:UpdateShoppingListWindow(false)
 			end,
-			order = 71
+			order = 76
 		},
 		utsw = {
 			type = 'execute',
@@ -952,7 +1006,7 @@ Skillet.options =
 			func = function()
 				Skillet:UpdateTradeSkillWindow()
 			end,
-			order = 72
+			order = 77
 		},
 --
 -- command to turn on/off custom groups 
@@ -973,55 +1027,7 @@ Skillet.options =
 					SkilletRecipeGroupOperations:Disable()
 				end
 			end,
-			order = 73
-		},
---
--- additional database flush commands
---
-		flushcustomdata = {
-			type = 'execute',
-			name = "Flush Custom Data",
-			desc = "Flush Custom Group Data",
-			func = function()
-				if not (UnitAffectingCombat("player")) then
-					Skillet:FlushCustomData()
-					Skillet:InitializeDatabase(UnitName("player"))
-				else
-					DA.DEBUG(0,"|cff8888ffSkillet|r: Combat lockdown restriction." ..
-												  " Leave combat and try again.")
-				end
-			end,
-			order = 74
-		},
-		flushqueuedata = {
-			type = 'execute',
-			name = "Flush Queue Data",
-			desc = "Flush Queue Data",
-			func = function()
-				if not (UnitAffectingCombat("player")) then
-					Skillet:FlushQueueData()
-					Skillet:InitializeDatabase(UnitName("player"))
-				else
-					DA.DEBUG(0,"|cff8888ffSkillet|r: Combat lockdown restriction." ..
-												  " Leave combat and try again.")
-				end
-			end,
-			order = 75
-		},
-		flushplayerdata = {
-			type = 'execute',
-			name = L["Flush Player Data"],
-			desc = L["Flush Player Data"],
-			func = function()
-				if not (UnitAffectingCombat("player")) then
-					Skillet:FlushPlayerData()
-					Skillet:InitializeDatabase(UnitName("player"))
-				else
-					DA.DEBUG(0,"|cff8888ffSkillet|r: Combat lockdown restriction." ..
-												  " Leave combat and try again.")
-				end
-			end,
-			order = 76
+			order = 78
 		},
 		nomodkeys = {
 			type = "toggle",
@@ -1033,7 +1039,7 @@ Skillet.options =
 			set = function(self,value)
 				Skillet.db.profile.nomodkeys = value
 			end,
-			order = 77
+			order = 79
 		},
 		swapshiftkey = {
 			type = "toggle",
@@ -1045,34 +1051,7 @@ Skillet.options =
 			set = function(self,value)
 				Skillet.db.profile.swapshiftkey = value
 			end,
-			order = 77
-		},
-		collectdetails = {
-			type = "toggle",
-			name = "Collect details",
-			desc = "Disable/Enable collecting bag, bank, guildbank details",
-			get = function()
-				return Skillet.db.profile.collect_details
-			end,
-			set = function(self,value)
-				Skillet.db.profile.collect_details = value
-			end,
-			order = 78
-		},
-		flushdetails = {
-			type = 'execute',
-			name = "Flush details",
-			desc = "Clear the collected bag, bank, guildbank details",
-			func = function()
-				if not (UnitAffectingCombat("player")) then
-					Skillet:FlushDetailData()
-					Skillet:InitializeDatabase(UnitName("player"))
-				else
-					DA.DEBUG(0,"|cff8888ffSkillet|r: Combat lockdown restriction." ..
-												  " Leave combat and try again.")
-				end
-			end,
-			order = 79
+			order = 80
 		},
 		news = {
 			type = 'execute',
@@ -1082,11 +1061,10 @@ Skillet.options =
 				if not (UnitAffectingCombat("player")) then
 					Skillet.NewsGUI:Toggle()
 				else
-					DA.DEBUG(0,"|cff8888ffSkillet|r: Combat lockdown restriction." ..
-												  " Leave combat and try again.")
+					DA.DEBUG(0,"|cff8888ffSkillet|r: Combat lockdown restriction. Leave combat and try again.")
 				end
 			end,
-			order = 80
+			order = 81
 		},
 
 --
