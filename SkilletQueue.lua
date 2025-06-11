@@ -1000,7 +1000,7 @@ function Skillet:UPDATE_TRADESKILL_RECAST(event)
 end
 
 function Skillet:ITEM_COUNT_CHANGED(event,itemID)
-	DA.TRACE("ITEM_COUNT_CHANGED("..tostring(itemID)..")")
+	DA.TRACE3("ITEM_COUNT_CHANGED("..tostring(itemID)..")")
 --[[
 	if itemID == self.salvageItem then
 		DA.DEBUG(0,"ITEM_COUNT_CHANGED: itemID= "..tostring(itemID))

@@ -63,6 +63,7 @@ DA.TableDump = false
 DA.TraceShow = false
 DA.TraceLog = false
 DA.TraceLog2 = false
+DA.TraceLog3 = false
 DA.ProfileShow = false
 DA.DebugLog = {} -- Add to SavedVariables for debugging
 DA.MAXDEBUG = 4000
@@ -222,6 +223,11 @@ function DA.TRACE2(...)
 	DA.TRACE(...)
 end
 
+function DA.TRACE3(...)
+	if not DA.TraceLog3 then return "" end
+	DA.TRACE(...)
+end
+
 function DA.TRACE(...)
 	if not DA.TraceLog then return "" end
 	local text = ""
@@ -363,7 +369,7 @@ end
 function DA.DebugAidsStatus()
 	print("WarnShow= "..tostring(DA.WarnShow)..", WarnLog= "..tostring(DA.WarnLog))
 	print("DebugShow= "..tostring(DA.DebugShow)..", DebugLogging= "..tostring(DA.DebugLogging)..", DebugLevel= "..tostring(DA.DebugLevel))
-	print("TraceShow= "..tostring(DA.TraceShow)..", TraceLog= "..tostring(DA.TraceLog)..", TraceLog2= "..tostring(DA.TraceLog2))
+	print("TraceShow= "..tostring(DA.TraceShow)..", TraceLog= "..tostring(DA.TraceLog)..", 2= "..tostring(DA.TraceLog2)..", 3= "..tostring(DA.TraceLog3))
 	print("ProfileShow= "..tostring(DA.ProfileShow))
 	print("TableDump= "..tostring(DA.TableDump))
 	print("LogLevel= "..tostring(DA.LogLevel))

@@ -467,6 +467,7 @@ StaticPopupDialogs["SKILLET_MANUAL_CHANGE"] = {
 	if not Skillet.bagUpdateCounts then
 		Skillet.bagUpdateCounts = {}
 		Skillet.bagUpdateDelayedCount = 0
+		Skillet.unitInventoryChangedCount = 0
 		Skillet.bankUpdateCount = 0
 	end
 end
@@ -785,11 +786,11 @@ function Skillet:OnEnable()
 	self:RegisterEvent("UNIT_SPELLCAST_INTERRUPTED")
 --	self:RegisterEvent("UPDATE_TRADESKILL_CAST_COMPLETE")
 --	self:RegisterEvent("UPDATE_TRADESKILL_RECAST")
-	self:RegisterEvent("ITEM_COUNT_CHANGED")
 	self:RegisterEvent("TRADE_SKILL_ITEM_CRAFTED_RESULT")
 --
 -- Events needed to handle caching of item info
 --
+	self:RegisterEvent("ITEM_COUNT_CHANGED")
 	self:RegisterEvent("ITEM_DATA_LOAD_RESULT")
 	self:RegisterEvent("GET_ITEM_INFO_RECEIVED")
 --
@@ -1082,9 +1083,9 @@ end
 function Skillet:ITEM_DATA_LOAD_RESULT(event, itemID, result)
 	if itemID then
 		local name = C_Item.GetItemInfo(itemID)
-		DA.TRACE2("ITEM_DATA_LOAD_RESULT("..tostring(itemID)..", "..tostring(result).."), "..tostring(name))
+		DA.TRACE3("ITEM_DATA_LOAD_RESULT("..tostring(itemID)..", "..tostring(result).."), "..tostring(name))
 	else
-		DA.TRACE2("ITEM_DATA_LOAD_RESULT")
+		DA.TRACE3("ITEM_DATA_LOAD_RESULT")
 	end
 	if Skillet.salvageDataNeeded then
 		Skillet:UpdateSalvageListWindow()
@@ -1113,9 +1114,9 @@ end
 function Skillet:GET_ITEM_INFO_RECEIVED(event, itemID, result)
 	if itemID then
 		local name = C_Item.GetItemInfo(itemID)
-		DA.TRACE2("GET_ITEM_INFO_RECEIVED("..tostring(itemID)..", "..tostring(result).."), "..tostring(name))
+		DA.TRACE3("GET_ITEM_INFO_RECEIVED("..tostring(itemID)..", "..tostring(result).."), "..tostring(name))
 	else
-		DA.TRACE2("GET_ITEM_INFO_RECEIVED")
+		DA.TRACE3("GET_ITEM_INFO_RECEIVED")
 	end
 end
 

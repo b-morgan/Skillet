@@ -1204,6 +1204,19 @@ Skillet.options =
 			end,
 			order = 88
 		},
+		TraceLog3 = {
+			type = "toggle",
+			name = "TraceLog3",
+			desc = "Option for debugging",
+			get = function()
+				return Skillet.db.profile.TraceLog3
+			end,
+			set = function(self,value)
+				Skillet.db.profile.TraceLog3 = value
+				Skillet.TraceLog3 = value
+			end,
+			order = 88
+		},
 		ProfileShow = {
 			type = "toggle",
 			name = "ProfileShow",
@@ -1283,6 +1296,14 @@ Skillet.options =
 				if Skillet.db.profile.TraceLog then
 					Skillet.db.profile.TraceLog = false
 					Skillet.TraceLog = false
+				end
+				if Skillet.db.profile.TraceLog2 then
+					Skillet.db.profile.TraceLog2 = false
+					Skillet.TraceLog2 = false
+				end
+				if Skillet.db.profile.TraceLog3 then
+					Skillet.db.profile.TraceLog3 = false
+					Skillet.TraceLog3 = false
 				end
 				if Skillet.db.profile.ProfileShow then
 					Skillet.db.profile.ProfileShow = false
@@ -1590,6 +1611,7 @@ Skillet.options =
 			func = function()
 				Skillet:Print("bagUpdateCounts= "..DA.DUMP1(Skillet.bagUpdateCounts))
 				Skillet:Print("bagUpdateDelayedCount= "..tostring(Skillet.bagUpdateDelayedCount))
+				Skillet:Print("unitInventoryChangedCount= "..tostring(Skillet.unitInventoryChangedCount))
 				Skillet:Print("bankUpdateCount= "..tostring(Skillet.bankUpdateCount))
 			end,
 			order = 121
@@ -1601,6 +1623,7 @@ Skillet.options =
 			func = function()
 				Skillet.bagUpdateCounts = {}
 				Skillet.bagUpdateDelayedCount = 0
+				Skillet.unitInventoryChangedCount = 0
 				Skillet.bankUpdateCount = 0
 			end,
 			order = 122

@@ -32,6 +32,7 @@ Skillet.NewsData = {
 				data = {
 					{ header = "TOC", body = "Update TOC to 110107" },
 					{ header = "Options", body = "Add sound and flash options to craft queue" },
+					{ header = "Inventory", body = "Optimize bag handling" },
 				},
 			},
 		},
