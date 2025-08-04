@@ -335,9 +335,15 @@ end
 --
 local function indexBags()
 	--DA.DEBUG(0,"indexBags()")
-	local player = Skillet.currentPlayer
+	if not Skillet.currentPlayer then Skillet.currentPlayer = UnitName("player") end
+	local player = Skillet.currentPlayer 	
 	local bagData = Skillet.db.realm.bagData[player]
-	local Bags = {0,1,2,3,4,5}
+--	local Bags = {0,1,2,3,4,5}
+	local Bags = {
+		Enum.BagIndex.Backpack, Enum.BagIndex.Bag_1, Enum.BagIndex.Bag_2, 
+		Enum.BagIndex.Bag_3, Enum.BagIndex.Bag_4, Enum.BagIndex.ReagentBag,
+		}
+	--DA.DEBUG(0,"indexBags: Bags= "..DA.DUMP1(Bags))
 	for _, container in pairs(Bags) do
 		bags = {}
 		local slots = C_Container.GetContainerNumSlots(container)
@@ -393,11 +399,13 @@ end
 --
 local function indexBank()
 	DA.DEBUG(0,"indexBank()")
+	if not Skillet.currentPlayer then Skillet.currentPlayer = UnitName("player") end
 	local player = Skillet.currentPlayer
 	local bankData = Skillet.db.realm.bankData[player]
-	local bankBags = {-1,6,7,8,9,10,11,12,-3,	-- -1 is main bank, -3 is reagent bank
-			Enum.BagIndex.AccountBankTab_1, Enum.BagIndex.AccountBankTab_2, Enum.BagIndex.AccountBankTab_3,
-			Enum.BagIndex.AccountBankTab_4, Enum.BagIndex.AccountBankTab_5,
+--	local bankBags = {-1,6,7,8,9,10,11,12,-3,}	-- -1 is main bank, -3 is reagent bank
+	local bankBags = {
+		Enum.BagIndex.CharacterBankTab_1, Enum.BagIndex.CharacterBankTab_2, Enum.BagIndex.CharacterBankTab_3,
+		Enum.BagIndex.CharacterBankTab_4, Enum.BagIndex.CharacterBankTab_5, Enum.BagIndex.CharacterBankTab_6,
 		}
 	--DA.DEBUG(0,"indexBank: bankBags= "..DA.DUMP1(bankBags))
 	bank = {}

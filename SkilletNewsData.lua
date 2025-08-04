@@ -33,6 +33,7 @@ Skillet.NewsData = {
 					{ header = "TOC", body = "Update TOC to 110200" },
 					{ header = "Skill Levels", body = "Update Skill Level data" },
 					{ header = "Enchant Scrolls", body = "Update Enchant Scroll data" },
+					{ header = "Inventory", body = "Update Player Bank structure" },
 				},
 			},
 		},
