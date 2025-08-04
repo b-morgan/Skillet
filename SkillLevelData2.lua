@@ -6759,6 +6759,7 @@ Skillet.db.global.SkillLevels = {
 -- Invalid recipe: Shadowlands Cuisine (31) - Seared Cutlets (338117)
 	
 }
+-- .\SkillLineAbility.11.2.0.62253.lua
 Skillet.db.global.SkillLineAbility = {
 [2018] = '1/1/1/1',    -- Blacksmithing
 [2108] = '1/1/1/1',    -- Leatherworking
@@ -17066,5 +17067,23 @@ Skillet.db.global.SkillLineAbility = {
 [1216520] = '1/80/90/100',    -- Charged Armor Kit
 [1218414] = '1/65/70/75',    -- Authentic Undermine Clam Chowder
 [1226650] = '1/30/32/35',    -- Void-Crystal Panther
+[1228338] = '1/100/100/100',    -- Pure Energizing Fiber
+[1228344] = '1/100/100/100',    -- Pure Chronomatic Fiber
+[1228342] = '1/100/100/100',    -- Pure Precise Fiber
+[1228343] = '1/100/100/100',    -- Pure Dexterous Fiber
+[1234336] = '1/60/67/75',    -- Glyph of the Strix
+[1236170] = '1/80/90/100',    -- Contract: The K'aresh Trust
+[1236908] = '1/80/90/100',    -- Vantus Rune: Manaforge Omega
+[1238010] = '1/35/47/60',    -- Invigorating Healing Potion
+[1243994] = '1/80/90/100',    -- Inspired Writer's Quill
+[1246966] = '1/80/90/100',    -- Umbral Essentia
+[1249463] = '1/80/90/100',    -- Deal: Cartel Zo
+[1249466] = '1/80/90/100',    -- Deal: Cartel Ba
+[1249468] = '1/80/90/100',    -- Deal: Cartel Om
+[1249469] = '1/40/47/55',    -- Gleeful Glamour - Ethereal
+[1250314] = '1/15/22/30',    -- Phantom Bloom
+[1250317] = '1/60/80/100',    -- Lush Phantom Bloom
+[1250351] = '1/60/65/70',    -- Desolate Deposit
+[1250356] = '1/75/80/85',    -- Rich Desolate Deposit
 }
 end
