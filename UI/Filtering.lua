@@ -99,7 +99,7 @@ function Skillet.InitializeFilterDropdown(self, level)
 		info.text = L["Reset"]
 		info.notCheckable = true
 		info.func = function()
-			TradeSkillFrame_SetAllSourcesFiltered(true)
+			Skillet:SetDefaultFilters()
 			Skillet:ResetTradeSkillFilter() -- verify the search filter is blank (so we get all skills)
 			UIDropDownMenu_RefreshAll(SkilletFilterDropMenu, 3)
 			SkilletFilterText:SetText("")
@@ -148,14 +148,17 @@ function Skillet.InitializeFilterDropdown(self, level)
 
 		info.text = TRADESKILL_FILTER_SLOTS
 		info.value = 1
+		info.disabled = true
 		UIDropDownMenu_AddButton(info, level)
 
 		info.text = TRADESKILL_FILTER_CATEGORY
 		info.value = 2
+		info.disabled = true
 		UIDropDownMenu_AddButton(info, level)
 
 		info.text = SOURCES
 		info.value = 3
+		info.disabled = true
 		UIDropDownMenu_AddButton(info, level)
 
 	elseif level == 2 then
@@ -191,7 +194,7 @@ function Skillet.InitializeFilterDropdown(self, level)
 			info.keepShownOnClick = true
 			info.text = CHECK_ALL
 			info.func = function()
-				TradeSkillFrame_SetAllSourcesFiltered(false)
+				C_TradeSkillUI.ClearRecipeSourceTypeFilter()
 				UIDropDownMenu_Refresh(SkilletFilterDropMenu, 3, 2)
 				Skillet.dataScanned = false
 				Skillet:UpdateTradeSkillWindow()
@@ -200,7 +203,7 @@ function Skillet.InitializeFilterDropdown(self, level)
 
 			info.text = UNCHECK_ALL
 			info.func = function()
-				TradeSkillFrame_SetAllSourcesFiltered(true)
+				Skillet:SetDefaultFilters()
 				UIDropDownMenu_Refresh(SkilletFilterDropMenu, 3, 2)
 				Skillet.dataScanned = false
 				Skillet:UpdateTradeSkillWindow()
@@ -255,4 +258,52 @@ function Skillet.SetSlotFilter(inventorySlotIndex, categoryId, subCategoryId)
 	end
 	Skillet.dataScanned = false
 	Skillet:UpdateTradeSkillWindow()
+end
+
+function Skillet:SetDefaultFilters()
+	C_TradeSkillUI.SetShowLearned(true)
+	C_TradeSkillUI.SetShowUnlearned(true)
+	C_TradeSkillUI.SetOnlyShowMakeableRecipes(false)
+	C_TradeSkillUI.SetOnlyShowSkillUpRecipes(false)
+	C_TradeSkillUI.SetOnlyShowFirstCraftRecipes(false)
+	C_TradeSkillUI.ClearInventorySlotFilter()
+	Professions.SetAllSourcesFiltered(false)
+	C_TradeSkillUI.ClearRecipeSourceTypeFilter()
+	C_TradeSkillUI.ClearRecipeCategoryFilter()
+end
+
+function Skillet:GetCurrentFilterSet()
+	local filterSet =
+	{
+		textFilter = C_TradeSkillUI.GetRecipeItemNameFilter(),
+		showOnlyMakeable = C_TradeSkillUI.GetOnlyShowMakeableRecipes(),
+		showOnlySkillUps = C_TradeSkillUI.GetOnlyShowSkillUpRecipes(),
+		showOnlyFirstCraft = C_TradeSkillUI.GetOnlyShowFirstCraftRecipes(),
+		professionInfo = C_TradeSkillUI.GetChildProfessionInfo(),
+		showUnlearned = C_TradeSkillUI.GetShowUnlearned(),
+		showLearned = C_TradeSkillUI.GetShowLearned(),
+		sourceTypeFilter = C_TradeSkillUI.GetSourceTypeFilter(),
+	}
+	filterSet.invTypeFilters = {}
+	for idx = 1, C_TradeSkillUI.GetAllFilterableInventorySlotsCount() do
+		filterSet.invTypeFilters[idx] = C_TradeSkillUI.IsInventorySlotFiltered(idx)
+	end
+	return filterSet
+end
+
+function Skillet:ApplyfilterSet(filterSet)
+	if filterSet then
+		C_TradeSkillUI.SetShowLearned(filterSet.showLearned)
+		C_TradeSkillUI.SetShowUnlearned(filterSet.showUnlearned)
+		C_TradeSkillUI.SetOnlyShowMakeableRecipes(filterSet.showOnlyMakeable)
+		C_TradeSkillUI.SetOnlyShowSkillUpRecipes(filterSet.showOnlySkillUps)
+		C_TradeSkillUI.SetOnlyShowFirstCraftRecipes(filterSet.showOnlyFirstCraft)
+		C_TradeSkillUI.SetSourceTypeFilter(filterSet.sourceTypeFilter)
+		for idx, filtered in ipairs(filterSet.invTypeFilters) do
+			C_TradeSkillUI.SetInventorySlotFilter(idx, not filtered)
+		end
+	else
+		Professions.OnRecipeListSearchTextChanged("")
+		Professions.SetDefaultFilters();
+	end
 end
