@@ -18,53 +18,40 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
 -- Handy utilities for Skillet UI methods.
 
 local L = LibStub("AceLocale-3.0"):GetLocale("Skillet")
-local Dialog = LibStub("LibDialog-1.0")
 
-Dialog:Register("SKILLETMSG", {
+StaticPopupDialogs["SKILLETMSG"] = {
 	text = "",
-	on_show = function(self, data)
-		self.text:SetText(data.msg)
+	button1 = OKAY,
+	OnAccept = function( self )
+		return
 	end,
-	buttons = {
-		{
-			text = OKAY,
-		},
-	},
-	show_while_dead = true,
-	hide_on_escape = true,
-})
+	timeout = 0,
+	exclusive = 1,
+	whileDead = 1,
+	hideOnEscape = 1
+};
 
 function Skillet:MessageBox(msg)
-	Dialog:Spawn("SKILLETMSG", {
-		msg = msg,
-	})
+	StaticPopupDialogs.SKILLETMSG.text = msg
+	StaticPopup_Show("SKILLETMSG")
 end
 
-Dialog:Register("SKILLETASKFOR", {
+StaticPopupDialogs["SKILLETASKFOR"] = {
 	text = "",
-	on_show = function(self, data)
-		self.text:SetText(data.msg)
+	button1 = OKAY,
+	OnAccept = function( self )
+		return
 	end,
-	buttons = {
-		{
-			text = YES,
-			on_click = function(self, data)
-				data.handler()
-			end,
-		},
-		{
-			text = NO,
-		},
-	},
-	show_while_dead = true,
-	hide_on_escape = true,
-})
+	timeout = 0,
+	exclusive = 1,
+	whileDead = 1,
+	hideOnEscape = 1
+};
 
 function Skillet:AskFor(msg, handler)
-	Dialog:Spawn("SKILLETASKFOR", {
-		msg = msg,
-		handler = handler,
-	})
+	StaticPopupDialogs.SKILLETASKFOR.text = msg
+	StaticPopupDialogs.SKILLETASKFOR.OnAccept = handler
+	StaticPopup_Show("SKILLETASKFOR")
 end
 
 --

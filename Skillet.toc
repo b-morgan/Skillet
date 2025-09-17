@@ -25,7 +25,7 @@
 ## X-Website: https://www.curseforge.com/wow/addons/skillet
 ## SavedVariables: SkilletDB
 ## SavedVariablesPerCharacter: SkilletWho, SkilletDBPC, SkilletMemory, SkilletProfile
-## OptionalDeps: Ace3, LibDialog-1.0, LibWindow-1.1, LibPeriodicTable-3.1, TradeSkillMaster, OribosExchange, BeanCounter, Auctionator, Journalator, CraftInfoAnywhere, DataStore, tekDebug
+## OptionalDeps: Ace3, LibWindow-1.1, LibPeriodicTable-3.1, TradeSkillMaster, OribosExchange, BeanCounter, Auctionator, Journalator, CraftInfoAnywhere, DataStore, tekDebug
 ## X-Embeds: Ace3, LibStub, CallbackHandler-1.0, LibDialog-1.0, LibWindow-1.1, LibPeriodicTable-3.1
 
 ## LoadManagers: AddonLoader
@@ -44,7 +44,6 @@ Libs\AceLocale-3.0\AceLocale-3.0.xml
 Libs\AceConsole-3.0\AceConsole-3.0.xml
 Libs\AceGUI-3.0\AceGUI-3.0.xml
 Libs\AceConfig-3.0\AceConfig-3.0.xml
-Libs\LibDialog-1.0\lib.xml
 Libs\LibWindow-1.1\LibWindow-1.1.lua
 Libs\LibPeriodicTable-3.1\LibPeriodicTable-3.1.lua
 Libs\LibPeriodicTable-3.1\LibPeriodicTable-3.1-Tradeskill\LibPeriodicTable-3.1-Tradeskill.lua
