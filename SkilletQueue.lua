@@ -20,9 +20,12 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
 local L = Skillet.L
 
 local function tcopy(t)
-  local u = { }
-  for k, v in pairs(t) do u[k] = v end
-  return setmetatable(u, getmetatable(t))
+	local u = {}
+	if t then
+		for k, v in pairs(t) do u[k] = v end
+		return setmetatable(u, getmetatable(t))
+	end
+	return {}
 end
 
 --
