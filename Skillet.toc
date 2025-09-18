@@ -26,7 +26,7 @@
 ## SavedVariables: SkilletDB
 ## SavedVariablesPerCharacter: SkilletWho, SkilletDBPC, SkilletMemory, SkilletProfile
 ## OptionalDeps: Ace3, LibWindow-1.1, LibPeriodicTable-3.1, TradeSkillMaster, OribosExchange, BeanCounter, Auctionator, Journalator, CraftInfoAnywhere, DataStore, tekDebug
-## X-Embeds: Ace3, LibStub, CallbackHandler-1.0, LibDialog-1.0, LibWindow-1.1, LibPeriodicTable-3.1
+## X-Embeds: Ace3, LibStub, CallbackHandler-1.0, LibWindow-1.1, LibPeriodicTable-3.1
 
 ## LoadManagers: AddonLoader
 ## X-LoadOn-Always: delayed
