@@ -31,6 +31,7 @@ Skillet.NewsData = {
 			{	name = "Changes",
 				data = {
 					{ header = "Packaging", body = "Remove LibDialog" },
+					{ header = "TOC", body = "Add 110205 to TOC" },
 				},
 			},
 		},
