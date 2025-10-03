@@ -98,8 +98,8 @@ local function compareLevels(levelsWowhead, levelsByRecipe)
 --
 -- Compare the sources
 --				
-	DA.DEBUG(0,"compareLevels: levelsWowhead= "..tostring(levelsWowhead))
-	DA.DEBUG(0,"compareLevels: levelsByRecipe= "..tostring(levelsByRecipe))
+	--DA.DEBUG(0,"compareLevels: levelsWowhead= "..tostring(levelsWowhead))
+	--DA.DEBUG(0,"compareLevels: levelsByRecipe= "..tostring(levelsByRecipe))
 	local rb = getRacialBonus()
 	if levelsWowhead and type(levelsWowhead) == 'string' then
 		a,b,c,d = string.split("/", levelsWowhead)
@@ -169,7 +169,7 @@ end
 -- Note: MainFrame.lua uses both inputs, other calls just use itemID.
 --
 function Skillet:GetTradeSkillLevels(itemID, spellID)
-	DA.DEBUG(0,"GetTradeSkillLevels("..tostring(itemID)..", "..tostring(spellID)..")")
+	--DA.DEBUG(0,"GetTradeSkillLevels("..tostring(itemID)..", "..tostring(spellID)..")")
 	local rb = getRacialBonus()
 	local skillLevels = Skillet.db.global.SkillLevels
 	local levels
@@ -287,7 +287,7 @@ function Skillet:GetTradeSkillLevels(itemID, spellID)
 	if spellID then
 		if type(spellID) == 'number' and spellID ~= 0 then
 			levelsByRecipe = SkillLineAbility[spellID]
-			DA.DEBUG(1,"GetTradeSkillLevels: spellID= "..tostring(spellID)..", levelsByRecipe= "..tostring(levelsByRecipe))
+			--DA.DEBUG(1,"GetTradeSkillLevels: spellID= "..tostring(spellID)..", levelsByRecipe= "..tostring(levelsByRecipe))
 			if skillLevels and (skillLevels[spellID] or skillLevels[-spellID]) then
 --
 -- The data from Wowhead is not specific to the game version
