@@ -465,6 +465,41 @@ local function ApplyAllocations(transaction, requiredReagents, modifiedReagents,
 	return haverequired
 end
 
+-- returns an ItemLocationMixin if found in the players bags or optional also bank
+-- @param itemID number
+-- @param includeBank boolean?
+-- @return ItemLocationMixin | nil itemLocation
+local function GetItemLocationFromItemID(itemID, includeBank)
+    includeBank = includeBank or false
+    local function FindBagAndSlot(itemID)
+        for bag = 0, NUM_BAG_SLOTS do
+            for slot = 1, C_Container.GetContainerNumSlots(bag) do
+                local slotItemID = C_Container.GetContainerItemID(bag, slot)
+                if slotItemID == itemID then
+                    return bag, slot
+                end
+            end
+        end
+        if includeBank then
+            -- +6 to include warbank
+            for bag = NUM_BAG_SLOTS + 1, NUM_BAG_SLOTS + NUM_BANKBAGSLOTS + 6 do
+                for slot = 1, C_Container.GetContainerNumSlots(bag) do
+                    local slotItemID = C_Container.GetContainerItemID(bag, slot)
+                    if slotItemID == itemID then
+                        return bag, slot
+                    end
+                end
+            end
+        end
+    end
+    local bag, slot = FindBagAndSlot(itemID)
+
+    if bag and slot then
+        return ItemLocation:CreateFromBagAndSlot(bag, slot)
+    end
+    return nil -- Return nil if not found
+end
+
 function Skillet:ProcessQueue(altMode)
 	DA.DEBUG(0,"ProcessQueue("..tostring(altMode)..")");
 	local queue = self.db.realm.queueData[self.currentPlayer]
@@ -602,18 +637,19 @@ function Skillet:ProcessQueue(altMode)
 							end
 						end -- for
 					end
-				elseif command.recipeType == Enum.TradeskillRecipeType.Enchant then
-					DA.DEBUG(1,"ProcessQueue(E): command= "..DA.DUMP(command))
-					DA.DEBUG(1,"ProcessQueue(E): recipe= "..DA.DUMP(recipe))
 				elseif command.recipeType == Enum.TradeskillRecipeType.Recraft then
-					DA.DEBUG(1,"ProcessQueue(R): command= "..DA.DUMP(command))
-					DA.DEBUG(1,"ProcessQueue(R): recipe= "..DA.DUMP(recipe))
+					DA.DEBUG(1,"ProcessQueue(Re): command= "..DA.DUMP(command))
+					DA.DEBUG(1,"ProcessQueue(Re): recipe= "..DA.DUMP(recipe))
+--					result = C_TradeSkillUI.RecraftRecipe(itemGUID [, craftingReagents [, removedModifications [, applyConcentration]]])
+					craftable = false
+					break
 --
 -- Check for type Salvage
 --
 				elseif command.recipeType ~= Enum.TradeskillRecipeType.Salvage then
 					DA.DEBUG(1,"ProcessQueue(S): command= "..DA.DUMP(command))
 					DA.DEBUG(1,"ProcessQueue(S): recipe= "..DA.DUMP(recipe))
+--					C_TradeSkillUI.CraftSalvage(recipeSpellID, [numCasts], itemTarget [, craftingReagents [, applyConcentration]])
 					craftable = false
 					break
 				end
@@ -745,18 +781,50 @@ function Skillet:ProcessQueue(altMode)
 							end
 						end
 					else
-						if self.db.profile.queue_one_at_a_time then
-							--DA.DEBUG(1,"ProcessQueue: recipeID= "..tostring(command.recipeID)..", recipeLevel= "..tostring(recipeLevel)..", optionalReagentsArray= "..DA.DUMP(command.optionalReagentsArray))
-							C_TradeSkillUI.CraftRecipe(command.recipeID, command.count, command.optionalReagentsArray, recipeLevel)
-						else
-							--DA.DEBUG(1,"ProcessQueue: HasMetQuantityRequirements= "..tostring(self.recipeTransaction:HasMetQuantityRequirements()))
---							if self.recipeTransaction:HasMetQuantityRequirements() then
-							--DA.DEBUG(1,"ProcessQueue: HasAllAllocations= "..tostring(self.recipeTransaction:HasAllAllocations(command.count)))
---							if self.recipeTransaction:HasAllAllocations(command.count) then
+						if command.recipeType == Enum.TradeskillRecipeType.Item then
+							if self.db.profile.queue_one_at_a_time then
+								--DA.DEBUG(1,"ProcessQueue(1I) recipeID= "..tostring(command.recipeID)..", recipeLevel= "..tostring(recipeLevel)..", optionalReagentsArray= "..DA.DUMP(command.optionalReagentsArray))
+								DA.DEBUG(1,"ProcessQueue(1I): recipeID= "..tostring(command.recipeID))
+--								C_TradeSkillUI.CraftRecipe(recipeSpellID [, numCasts [, craftingReagents [, recipeLevel [, orderID [, applyConcentration]]]]])
+								C_TradeSkillUI.CraftRecipe(command.recipeID, command.count, command.optionalReagentsArray, recipeLevel)
+							else
+								--DA.DEBUG(1,"ProcessQueue(I) HasMetQuantityRequirements= "..tostring(self.recipeTransaction:HasMetQuantityRequirements()))
+--								if self.recipeTransaction:HasMetQuantityRequirements() then
+								--DA.DEBUG(1,"ProcessQueue(I) HasAllAllocations= "..tostring(self.recipeTransaction:HasAllAllocations(command.count)))
+--								if self.recipeTransaction:HasAllAllocations(command.count) then
+--									C_TradeSkillUI.CraftRecipe(recipeSpellID [, numCasts [, craftingReagents [, recipeLevel [, orderID [, applyConcentration]]]]])
+								DA.DEBUG(1,"ProcessQueue(I): recipeID= "..tostring(command.recipeID))
 								C_TradeSkillUI.CraftRecipe(command.recipeID, command.count, reagentInfoTbl, recipeLevel)
---							else
---								DA.MARK3(L["Insufficient materials available"])
---							end
+--								else
+--									DA.MARK3(L["Insufficient materials available"])
+--								end
+							end
+						elseif command.recipeType == Enum.TradeskillRecipeType.Enchant then
+							if self.db.profile.queue_one_at_a_time then
+								--DA.DEBUG(1,"ProcessQueue(1E) recipeID= "..tostring(command.recipeID)..", recipeLevel= "..tostring(recipeLevel)..", optionalReagentsArray= "..DA.DUMP(command.optionalReagentsArray))
+								DA.DEBUG(1,"ProcessQueue(1E): recipeID= "..tostring(command.recipeID))
+--								C_TradeSkillUI.CraftRecipe(recipeSpellID [, numCasts [, craftingReagents [, recipeLevel [, orderID [, applyConcentration]]]]])
+								C_TradeSkillUI.CraftRecipe(command.recipeID, command.count, command.optionalReagentsArray, recipeLevel)
+							else							
+								--DA.DEBUG(1,"ProcessQueue(E) HasMetQuantityRequirements= "..tostring(self.recipeTransaction:HasMetQuantityRequirements()))
+--								if self.recipeTransaction:HasMetQuantityRequirements() then
+								--DA.DEBUG(1,"ProcessQueue(E) HasAllAllocations= "..tostring(self.recipeTransaction:HasAllAllocations(command.count)))
+--								if self.recipeTransaction:HasAllAllocations(command.count) then
+								if command.count > 1 then
+									local itemID = Skillet:GetAutoTargetItem(command.tradeID)
+									local itemLocation = GetItemLocationFromItemID(itemID)
+--									C_TradeSkillUI.CraftEnchant(recipeSpellID [, numCasts [, craftingReagents [, itemTarget [, applyConcentration]]]])
+									DA.DEBUG(1,"ProcessQueue(E): recipeID= "..tostring(command.recipeID))
+									C_TradeSkillUI.CraftEnchant(command.recipeID, command.count, reagentInfoTbl, itemLocation)
+--									else
+--										DA.MARK3(L["Insufficient materials available"])
+--									end
+								else
+--									C_TradeSkillUI.CraftRecipe(recipeSpellID [, numCasts [, craftingReagents [, recipeLevel [, orderID [, applyConcentration]]]]])
+									DA.DEBUG(1,"ProcessQueue(E1): recipeID= "..tostring(command.recipeID))
+									C_TradeSkillUI.CraftRecipe(command.recipeID, command.count, reagentInfoTbl, recipeLevel)
+								end
+							end
 						end
 					end
 				else
@@ -767,8 +835,8 @@ function Skillet:ProcessQueue(altMode)
 					self.queuecasting = false
 				end
 			elseif command.recipeType == Enum.TradeskillRecipeType.Recraft then
-				DA.DEBUG(1,"ProcessQueue(R): command= "..DA.DUMP(command))
-				DA.DEBUG(1,"ProcessQueue(R): recipe= "..DA.DUMP(recipe))
+				DA.DEBUG(1,"ProcessQueue(Re): command= "..DA.DUMP(command))
+				DA.DEBUG(1,"ProcessQueue(Re): recipe= "..DA.DUMP(recipe))
 				DA.MARK3(L["Recraft not supported"])
 			elseif command.recipeType == Enum.TradeskillRecipeType.Salvage then
 				if command.salvageItem then
