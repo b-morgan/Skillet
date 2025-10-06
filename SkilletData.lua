@@ -133,6 +133,53 @@ function Skillet:GetAutoTargetMacro(addSpellID, toy, pet, petGUID)
 	end
 end
 
+-- returns an ItemLocationMixin if found in the players bags or optional also bank
+-- @param itemID number
+-- @param includeBank boolean?
+-- @return ItemLocationMixin | nil itemLocation
+function Skillet:GetItemLocationFromItemID(itemID, includeBank)
+	DA.DEBUG(0,"GetItemLocationFromItemID("..tostring(itemID)..", "..tostring(includeBank)..")")
+    local function FindBagAndSlot(itemID)
+		local Bags = {
+			Enum.BagIndex.Backpack, Enum.BagIndex.Bag_1, Enum.BagIndex.Bag_2, 
+			Enum.BagIndex.Bag_3, Enum.BagIndex.Bag_4, Enum.BagIndex.ReagentBag,
+			}
+		local Banks = {
+			Enum.BagIndex.CharacterBankTab_1, Enum.BagIndex.CharacterBankTab_2, Enum.BagIndex.CharacterBankTab_3,
+			Enum.BagIndex.CharacterBankTab_4, Enum.BagIndex.CharacterBankTab_5, Enum.BagIndex.CharacterBankTab_6,
+			Enum.BagIndex.AccountBankTab_1, Enum.BagIndex.AccountBankTab_2, Enum.BagIndex.AccountBankTab_3,
+			Enum.BagIndex.AccountBankTab_4, Enum.BagIndex.AccountBankTab_5,
+			}
+		for _, bag in pairs(Bags) do
+			--DA.DEBUG(1,"GetItemLocationFromItemID: bag= "..tostring(bag))
+            for slot = 1, C_Container.GetContainerNumSlots(bag) do
+                local slotItemID = C_Container.GetContainerItemID(bag, slot)
+                if slotItemID == itemID then
+                    return bag, slot
+                end
+            end
+        end
+        if includeBank then
+			for _, bank in pairs(Banks) do
+				--DA.DEBUG(1,"GetItemLocationFromItemID: bank= "..tostring(bank))
+                for slot = 1, C_Container.GetContainerNumSlots(bank) do
+                    local slotItemID = C_Container.GetContainerItemID(bank, slot)
+                    if slotItemID == itemID then
+                        return bank, slot
+                    end
+                end
+            end
+        end
+    end
+    local bag, slot = FindBagAndSlot(itemID)
+	DA.DEBUG(1,"GetItemLocationFromItemID: bag= "..tostring(bag)..", slot= "..tostring(slot))
+
+    if bag and slot then
+        return ItemLocation:CreateFromBagAndSlot(bag, slot)
+    end
+    return nil -- Return nil if not found
+end
+
 --
 -- Adds an recipe source for an itemID (recipeID produces itemID)
 --
@@ -1324,7 +1371,7 @@ recipeSchematic= {
 					recipe.itemID = Skillet.scrollData[recipeID]
 					itemID = Skillet.scrollData[recipeID]
 				else
-					DA.DEBUG(0,"ScanTrade: recipeID= "..tostring(recipeID).." has no scrollData")
+					--DA.DEBUG(0,"ScanTrade: recipeID= "..tostring(recipeID).." has no scrollData")
 				end
 			else
 				--DA.DEBUG(2,"ScanTrade: recipeID= "..tostring(recipeID)..", name= "..tostring(recipeInfo.name)..", alternateVerb= "..tostring(recipeInfo.alternateVerb))
