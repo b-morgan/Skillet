@@ -252,7 +252,7 @@ function Skillet:GetShoppingList(player, sameFaction, includeGuildbank)
 			end
 		end
 	end
-	DA.DEBUG(0,"GetShoppingList: shopping list for: "..(player or "all players"))
+	--DA.DEBUG(0,"GetShoppingList: shopping list for: "..(player or "all players"))
 	if not usedInventory[curPlayer] then
 		usedInventory[curPlayer] = {}
 	end
@@ -262,17 +262,17 @@ function Skillet:GetShoppingList(player, sameFaction, includeGuildbank)
 			usedInventory[player] = {}
 		end
 		local reagentsInQueue = self.db.realm.reagentsInQueue[player]
-		DA.DEBUG(1,"GetShoppingList: player= "..player)
+		--DA.DEBUG(1,"GetShoppingList: player= "..player)
 		if reagentsInQueue then
 			for id,count in pairs(reagentsInQueue) do
 				local name = C_Item.GetItemInfo(id)
-				DA.DEBUG(2,"GetShoppingList: reagent= "..id.." ("..tostring(name)..") x "..count)
+				--DA.DEBUG(2,"GetShoppingList: reagent= "..id.." ("..tostring(name)..") x "..count)
 				local deficit = count -- deficit is usually negative
 				local numInBoth, numInBothCurrent, numGuildbank = 0,0,0
 				if not usedInventory[player][id] then
 					numInBoth = self:GetInventory(player, id)
 				end
-				DA.DEBUG(2,"GetShoppingList: numInBoth= "..numInBoth)
+				--DA.DEBUG(2,"GetShoppingList: numInBoth= "..numInBoth)
 				if numInBoth > 0 then
 					usedInventory[player][id] = true
 				end
@@ -280,7 +280,7 @@ function Skillet:GetShoppingList(player, sameFaction, includeGuildbank)
 					if not usedInventory[curPlayer] then
 						numInBothCurrent = self:GetInventory(curPlayer, id)
 					end
-					DA.DEBUG(2,"GetShoppingList: numInBothCurrent= "..numInBothCurrent)
+					--DA.DEBUG(2,"GetShoppingList: numInBothCurrent= "..numInBothCurrent)
 					if numInBothCurrent > 0 then
 						usedInventory[curPlayer][id] = true
 					end
@@ -302,7 +302,7 @@ function Skillet:GetShoppingList(player, sameFaction, includeGuildbank)
 				end
 				if not self.db.profile.ignore_on_hand then
 					if includeGuildbank and curGuild and not guildbankFrameOpen then
-						DA.DEBUG(2,"GetShoppingList: deficit= ",deficit,"cachedGuildbank=",cachedGuildbank[curGuild][id],"usedGuild=",usedGuild[id])
+						--DA.DEBUG(2,"GetShoppingList: deficit= ",deficit,"cachedGuildbank=",cachedGuildbank[curGuild][id],"usedGuild=",usedGuild[id])
 						local temp = -1 * math.min(deficit,0) -- calculate exactly how many are needed
 						deficit = deficit + cachedGuildbank[curGuild][id] - usedGuild[id]
 						usedGuild[id] = usedGuild[id] + temp  -- keep track how many have been used
@@ -398,7 +398,7 @@ end
 -- bankData is a count by item.
 --
 local function indexBank()
-	DA.DEBUG(0,"indexBank()")
+	--DA.DEBUG(0,"indexBank()")
 	if not Skillet.currentPlayer then Skillet.currentPlayer = UnitName("player") end
 	local player = Skillet.currentPlayer
 	local bankData = Skillet.db.realm.bankData[player]
@@ -465,7 +465,7 @@ end
 -- warbandData is a count by item.
 --
 local function indexWarband()
-	DA.DEBUG(0,"indexWarband()")
+	--DA.DEBUG(0,"indexWarband()")
 	local warbandData = Skillet.db.global.warbandData
 	local warbandBags = {
 			Enum.BagIndex.AccountBankTab_1, Enum.BagIndex.AccountBankTab_2, Enum.BagIndex.AccountBankTab_3,
@@ -633,7 +633,7 @@ local function findBagForItem(itemID, count)
 end
 
 local function getItemFromBank(itemID, bag, slot, count)
-	DA.DEBUG(0,"getItemFromBank("..tostring(itemID)..", "..tostring(bag)..", "..tostring(slot)..", "..tostring(count)..")")
+	--DA.DEBUG(0,"getItemFromBank("..tostring(itemID)..", "..tostring(bag)..", "..tostring(slot)..", "..tostring(count)..")")
 	ClearCursor()
 	local info = C_Container.GetContainerItemInfo(bag, slot)
 	local num_moved = 0
@@ -670,7 +670,7 @@ local function getItemFromBank(itemID, bag, slot, count)
 end
 
 local function getItemFromGuildBank(itemID, bag, slot, count)
-	DA.DEBUG(0,"getItemFromGuildBank("..tostring(itemID)..", "..tostring(bag)..", "..tostring(slot)..", "..tostring(count)..")")
+	--DA.DEBUG(0,"getItemFromGuildBank("..tostring(itemID)..", "..tostring(bag)..", "..tostring(slot)..", "..tostring(count)..")")
 	ClearCursor()
 	local _, available = GetGuildBankItemInfo(bag, slot)
 	local num_moved = 0
@@ -704,7 +704,7 @@ end
 -- BANK_UPDATE (subset of BAG_UPDATE) and BAG_UPDATE_DELAYED events have fired.
 --
 local function processBankQueue(where)
-	DA.DEBUG(0,"processBankQueue("..tostring(where)..")")
+	--DA.DEBUG(0,"processBankQueue("..tostring(where)..")")
 	local bankQueue = Skillet.bankQueue
 	if Skillet.bankBusy then
 		--DA.DEBUG(1,"processBankQueue: BANK_UPDATE and bankBusy")
@@ -716,8 +716,8 @@ local function processBankQueue(where)
 				local v = queueitem["list"]
 				local i = queueitem["i"]
 				local item = queueitem["item"]
-				DA.DEBUG(3,"processBankQueue: j=",j,", v=",DA.DUMP1(v))
-				DA.DEBUG(3,"processBankQueue: i=",i,", item=",DA.DUMP1(item))
+				--DA.DEBUG(3,"processBankQueue: j=",j,", v=",DA.DUMP1(v))
+				--DA.DEBUG(3,"processBankQueue: i=",i,", item=",DA.DUMP1(item))
 				Skillet.gotBankEvent = false
 				Skillet.gotBagUpdateEvent = false
 				local moved = getItemFromBank(id, item.bag, item.slot, v.count)
@@ -739,7 +739,7 @@ end
 -- GUILDBANKBAGSLOTS_CHANGED and BAG_UPDATE_DELAYED events have fired.
 --
 local function processGuildQueue(where)
-	DA.DEBUG(0,"processGuildQueue("..where..")")
+	--DA.DEBUG(0,"processGuildQueue("..where..")")
 	local guildQueue = Skillet.guildQueue
 	if Skillet.guildBusy then
 		while true do
@@ -1200,7 +1200,7 @@ end
 -- Gets all the reagents possible for queued recipes from the bank
 --
 function Skillet:GetReagentsFromBanks()
-	DA.DEBUG(0,"GetReagentsFromBanks()")
+	--DA.DEBUG(0,"GetReagentsFromBanks()")
 	local list = self.cachedShoppingList
 	local incAlts = Skillet.db.profile.include_alts
 --
@@ -1211,13 +1211,13 @@ function Skillet:GetReagentsFromBanks()
 		if incAlts or v.player == Skillet.currentPlayer then
 			local modifiedInQueue = self.db.realm.modifiedInQueue[v.player]
 			if modifiedInQueue[v.id] then
-				DA.DEBUG(1,"GetReagentsFromBanks: modified found for: "..DA.DUMP1(v))
+				--DA.DEBUG(1,"GetReagentsFromBanks: modified found for: "..DA.DUMP1(v))
 				for _,m in pairs(modifiedInQueue[v.id]) do
 					if m.itemID ~= v.id then
 						local n = tcopy(v)
 						n.base = n.id
 						n.id = m.itemID
-						DA.DEBUG(1,"GetReagentsFromBanks: Adding "..DA.DUMP1(n))
+						--DA.DEBUG(1,"GetReagentsFromBanks: Adding "..DA.DUMP1(n))
 						table.insert(list,n)
 					end
 				end
@@ -1228,15 +1228,15 @@ function Skillet:GetReagentsFromBanks()
 -- Do things using a queue and events.
 --
 	if bankFrameOpen then
-		DA.DEBUG(0,"GetReagentsFromBanks: Bank #list=",#list)
+		--DA.DEBUG(0,"GetReagentsFromBanks: Bank #list=",#list)
 		local bankQueue = Skillet.bankQueue
 		for j,v in pairs(list) do
-			DA.DEBUG(2,"GetReagentsFromBanks: j=",j,", v=",DA.DUMP1(v))
+			--DA.DEBUG(2,"GetReagentsFromBanks: j=",j,", v=",DA.DUMP1(v))
 			local id = v.id
 			if incAlts or v.player == Skillet.currentPlayer then
 				for i,item in pairs(bank) do
 					if item.id == id then
-						DA.DEBUG(2,"GetReagentsFromBanks: i=",i,", item=",DA.DUMP1(item))
+						--DA.DEBUG(2,"GetReagentsFromBanks: i=",i,", item=",DA.DUMP1(item))
 						if item.count > 0 and v.count > 0 then
 							table.insert(bankQueue, {
 								["id"]    = id,
@@ -1262,15 +1262,15 @@ function Skillet:GetReagentsFromBanks()
 -- Do things using a queue and events.
 --
 	if guildbankFrameOpen then
-		DA.DEBUG(0,"GetReagentsFromBanks: Guildbank #list=",#list)
+		--DA.DEBUG(0,"GetReagentsFromBanks: Guildbank #list=",#list)
 		local guildQueue = Skillet.guildQueue
 		for j,v in pairs(list) do
-			DA.DEBUG(2,"GetReagentsFromBanks: j=",j,", v=",DA.DUMP1(v))
+			--DA.DEBUG(2,"GetReagentsFromBanks: j=",j,", v=",DA.DUMP1(v))
 			local id = v.id
 			if incAlts or v.player == name then
 				for i,item in pairs(guildbank) do
 					if item.id == id then
-						DA.DEBUG(2,"GetReagentsFromBanks: i=",i,", item=",DA.DUMP1(item))
+						--DA.DEBUG(2,"GetReagentsFromBanks: i=",i,", item=",DA.DUMP1(item))
 						if item.count > 0 and v.count > 0 then
 							table.insert(guildQueue, {
 								["id"]    = id,
