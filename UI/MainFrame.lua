@@ -589,7 +589,7 @@ function Skillet:TradeButtonAdditional_OnEnter(button)
 	--DA.DEBUG(1,"TradeButtonAdditional_OnEnter: spellName= "..tostring(spellName))
 	GameTooltip:AddLine(spellName)
 	if not button.Toy then
-		local itemID = Skillet:GetAutoTargetItem(self.currentTrade, spellID)
+		local itemID = Skillet:GetAutoTargetItem(spellID)
 		if itemID and IsAltKeyDown() then
 			GameTooltip:AddLine("/use "..C_Item.GetItemInfo(itemID))
 		end
@@ -1074,7 +1074,7 @@ function Skillet:UpdateTradeSkillWindow()
 	SkilletUseHighestQuality:SetChecked(self.db.profile.best_quality)
 	SkilletUseHighestQuality:Show()
 	SkilletUseConcentration:SetChecked(self.db.profile.use_concentration)
---	SkilletUseConcentration:Show()
+	SkilletUseConcentration:Show()
 	SkilletHideUncraftableRecipes:SetChecked(self:GetTradeSkillOption("hideuncraftable"))
 	C_TradeSkillUI.SetOnlyShowMakeableRecipes(self:GetTradeSkillOption("hideuncraftable"))
 	self:UpdateQueueWindow()
