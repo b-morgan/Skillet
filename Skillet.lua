@@ -810,7 +810,7 @@ function Skillet:OnEnable()
 --
 -- Dump the data passed to C_TradeSkillUI functions so we can learn how Blizzard handles the new stuff
 --
--- C_TradeSkillUI.CraftRecipe(recipeSpellID [, numCasts, craftingReagents, recipeLevel, orderID])
+-- C_TradeSkillUI.CraftRecipe(recipeSpellID [, numCasts [, craftingReagents [, recipeLevel [, orderID [, applyConcentration]]]]])
 --
 		hooksecurefunc(C_TradeSkillUI,"CraftRecipe",function(...)
 			local recipeSpellID, numCasts, craftingReagents, recipeLevel, orderID = ...
@@ -818,7 +818,7 @@ function Skillet:OnEnable()
 		end)
 
 --
--- C_TradeSkillUI.CraftSalvage(recipeSpellID [, numCasts, itemTarget])
+-- C_TradeSkillUI.CraftSalvage(recipeSpellID, [numCasts], itemTarget [, craftingReagents [, applyConcentration]])
 --
 		hooksecurefunc(C_TradeSkillUI,"CraftSalvage",function(...)
 			local recipeSpellID, numCasts, itemTarget = ...
@@ -826,7 +826,7 @@ function Skillet:OnEnable()
 		end)
 
 --
--- C_TradeSkillUI.CraftEnchant(recipeSpellID [, numCasts, craftingReagents, itemTarget])
+-- C_TradeSkillUI.CraftEnchant(recipeSpellID [, numCasts [, craftingReagents [, itemTarget [, applyConcentration]]]])
 --
 		hooksecurefunc(C_TradeSkillUI,"CraftEnchant",function(...)
 			local recipeSpellID, numCasts, craftingReagents, itemTarget = ...
@@ -834,7 +834,7 @@ function Skillet:OnEnable()
 		end)
 
 --
--- result = C_TradeSkillUI.RecraftRecipe(itemGUID [, craftingReagents])
+-- result = C_TradeSkillUI.RecraftRecipe(itemGUID [, craftingReagents [, removedModifications [, applyConcentration]]])
 --
 		hooksecurefunc(C_TradeSkillUI,"RecraftRecipe",function(...)
 			local itemGUID, craftingReagents = ...
