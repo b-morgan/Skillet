@@ -1452,9 +1452,9 @@
 			-->
 			<CheckButton name="SkilletUseConcentration" inherits="SkilletInvFilterButtonTemplate" hidden="true">
 				<Anchors>
-					<Anchor point="BOTTOMRIGHT" relativeTo="SkilletUseHighestQuality" relativePoint="BOTTOMLEFT">
+					<Anchor point="BOTTOMRIGHT" relativeTo="SkilletUseHighestQuality" relativePoint="TOPRIGHT">
 						<Offset>
-							<AbsDimension x="-5" y="0"/>
+							<AbsDimension x="0" y="0"/>
 						</Offset>
 					</Anchor>
 				</Anchors>
