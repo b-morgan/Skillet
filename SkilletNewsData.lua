@@ -30,7 +30,7 @@ Skillet.NewsData = {
 		data = {
 			{	name = "Changes",
 				data = {
-					{ header = "TOC", body = "Add 120000 to TOC" },
+					{ header = "TOC", body = "Add 110207, 120000 to TOC" },
 				},
 			},
 		},
