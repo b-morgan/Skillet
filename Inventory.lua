@@ -323,14 +323,16 @@ function Skillet:VendorItemAvailable(itemID)
 		if type(MissingVendorItem) == 'table' then	-- table entries are {name, quantity, currencyName, currencyID, currencyCount}
 			if Skillet.db.profile.use_altcurrency_vendor_items then
 				--DA.DEBUG(1,"MissingVendorItem="..DA.DUMP1(MissingVendorItem))
-				if MissingVendorItem[4] > 0 then
+				if MissingVendorItem[4] and MissingVendorItem[4] > 0 then
 					currencyAvailable = self:GetInventory(self.currentPlayer, MissingVendorItem[4])
-				else
+				elseif MissingVendorItem[4] then
 					local cinfo = C_CurrencyInfo.GetCurrencyInfo(-1 * MissingVendorItem[4])
 					if cinfo then
 						--DA.DEBUG(1,"cinfo="..DA.DUMP1(cinfo))
 						currencyAvailable = cinfo.quantity
 					end
+				else
+					return 0, 0		-- vendor sells item for an alternate currency and we are ignoring it.
 				end
 				--DA.DEBUG(1,"currencyAvailable="..tostring(currencyAvailable))
 --

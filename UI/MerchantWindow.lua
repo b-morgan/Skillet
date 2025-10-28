@@ -67,10 +67,26 @@ end
 -- Scans everything the merchant has and adds it to a table
 -- that we can refer to when looking for items to buy.
 --
+--[[
+    local m, x, y = TomTom:GetCurrentPlayerPosition()
+    TomTom:AddWaypoint(m, x, y, {
+        title = title,
+        from = "Your title here"
+    })
+]]--
 local function update_merchant_inventory()
-	--DA.DEBUG(0,"update_merchant_inventory()")
+	DA.DEBUG(0,"update_merchant_inventory()")
 	if MerchantFrame and MerchantFrame:IsVisible() then
 		local count = GetMerchantNumItems()
+		local vendorName = GetUnitName("target", false)
+		local mapID = C_Map.GetBestMapForUnit("player")
+		local position, mapX, mapY
+		if mapID then
+			position = C_Map.GetPlayerMapPosition(mapID, "player")
+			if position then
+				mapX, mapY = position:GetXY()
+			end
+		end
 		for i=1, count, 1 do
 			local link = GetMerchantItemLink(i)
 			if link then
@@ -83,17 +99,16 @@ local function update_merchant_inventory()
 -- Loop through all the items for debugging but only use the first.
 --
 					if itemCount > 0 then
-						--DA.DEBUG(2,"For "..tostring(name).." ("..tostring(id)..") itemCount= "..tostring(itemCount))
+						DA.DEBUG(2,"For "..tostring(name).." ("..tostring(id)..") itemCount= "..tostring(itemCount))
 						for j=itemCount, 1, -1 do
 							itemTexture, itemValue, itemLink, currencyName = GetMerchantItemCostItem(i, j)
-							--DA.DEBUG(2,"  ["..tostring(j).."]: itemValue= "..tostring(itemValue)..", itemLink= "..tostring(itemLink)..", currencyName= "..tostring(currencyName))
 							if currencyName then
 								currencyID = -1 * tonumber(Skillet.currencyIDsByName[currencyName] or 0)
 							elseif itemLink then
 								currencyName = C_Item.GetItemInfo(itemLink)
 								currencyID = Skillet:GetItemIDFromLink(itemLink)
 							end
-							--DA.DEBUG(2,"  currencyName= "..tostring(currencyName).." ("..tostring(currencyID)..") x "..tostring(itemValue))
+							DA.DEBUG(2,"  ["..tostring(j).."]: itemValue= "..tostring(itemValue)..", itemLink= "..tostring(itemLink)..", currencyName= "..tostring(currencyName).." ("..tostring(currencyID)..")")
 						end
 					end
 				end
@@ -104,7 +119,7 @@ local function update_merchant_inventory()
 					merchant_inventory[id] = {}
 					merchant_inventory[id].price = price
 					merchant_inventory[id].quantity = quantity
-					if Skillet.db.global.itemRecipeUsedIn[id] then		-- if this item is used in any recipes we know about
+					if Skillet.db.global.itemRecipeUsedIn[id] or Skillet.MissAll then		-- if this item is used in any recipes we know about
 						if not Skillet:VendorSellsReagent(id) then		-- if its not a known vendor item
 							if Skillet.db.global.MissingVendorItems[id] then
 								DA.DEBUG(1,"updating "..tostring(name).." ("..tostring(id)..")")
@@ -112,14 +127,17 @@ local function update_merchant_inventory()
 								DA.DEBUG(1,"adding "..tostring(name).." ("..tostring(id)..")")
 							end
 							if itemCount and itemCount > 0 then
-								Skillet.db.global.MissingVendorItems[id] = {name or true, quantity, currencyName, currencyID, itemValue}		-- add it to our table
+--								Skillet.db.global.MissingVendorItems[id] = {name or true, quantity, currencyName, currencyID, itemValue}		-- add it to our table
+								Skillet.db.global.MissingVendorItems[id] = {name or true, quantity or 0, currencyName or "", currencyID or 0, itemValue or 0, 
+									vendorName or "", mapID or 0, mapX or 0, mapY or 0}		-- convert it
 							else
 								Skillet.db.global.MissingVendorItems[id] = name or true		-- add it to our table
 							end
 						else
-							--DA.DEBUG(1,"known "..tostring(name).." ("..tostring(id)..")")
+							DA.DEBUG(1,"known "..tostring(name).." ("..tostring(id)..")")
 							if type(Skillet.db.global.MissingVendorItems[id]) == "table" then
-								if #Skillet.db.global.MissingVendorItems[id] ~= 5 then
+								local size = #Skillet.db.global.MissingVendorItems[id]
+								if not (size == 5 or size == 9) then
 									Skillet.db.global.MissingVendorItems[id] = "Fix Me"
 								end
 							end
@@ -127,7 +145,9 @@ local function update_merchant_inventory()
 						if Skillet.db.global.MissingVendorItems[id] then
 							if itemCount and itemCount > 0 and type(Skillet.db.global.MissingVendorItems[id]) ~= "table" then
 								DA.DEBUG(1,"converting "..tostring(name).." ("..tostring(id)..")")
-								Skillet.db.global.MissingVendorItems[id] = {name or true, quantity, currencyName, currencyID, itemValue}		-- convert it
+--								Skillet.db.global.MissingVendorItems[id] = {name or true, quantity, currencyName, currencyID, itemValue}		-- convert it
+								Skillet.db.global.MissingVendorItems[id] = {name or true, quantity or 0, currencyName or "", currencyID or 0, itemValue or 0, 
+									vendorName or "", mapID or 0, mapX or 0, mapY or 0}		-- convert it
 							elseif PT then
 								if id~=0 and PT:ItemInSet(id,"Tradeskill.Mat.BySource.Vendor") then
 									DA.DEBUG(1,"removing "..tostring(name).." ("..tostring(id)..")")
@@ -136,11 +156,11 @@ local function update_merchant_inventory()
 							end
 						end
 					else
-						--DA.DEBUG(1,"not used "..tostring(name).." ("..tostring(id)..")")
+						DA.DEBUG(1,"not used "..tostring(name).." ("..tostring(id)..")")
 					end
 				end
 			else
-				--DA.DEBUG(1,"no link "..tostring(i))
+				DA.DEBUG(1,"no link "..tostring(i))
 			end
 		end
 	end

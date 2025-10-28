@@ -384,18 +384,30 @@ end
 --
 -- Prints the contents of the queue name or the current queue
 --
-function Skillet:PrintQueue(name)
-	--DA.DEBUG(0,"PrintQueue("..tostring(name)..")");
+function Skillet:PrintQueue(name, player)
+	--DA.DEBUG(0,"PrintQueue("..tostring(name)..", "..tostring(player)..")")
 	local queue
 	if name then
 		DA.MARK2("name= "..tostring(name))
 		queue = self.db.profile.SavedQueues[name].queue
+	elseif player then
+		queue = self.db.realm.queueData[player]
 	else
 		queue = self.db.realm.queueData[self.currentPlayer]
 	end
 	if queue then
 		for qpos,command in pairs(queue) do
 			DA.MARK2("qpos= "..tostring(qpos)..", command= "..DA.DUMP(command))
+		end
+	end
+end
+
+function Skillet:PrintAllQueues()
+	--DA.DEBUG(0,"PrintAllQueues()")
+	for player,queue in pairs(self.db.realm.queueData) do
+		if #queue > 0 then
+			DA.MARK2("player= "..tostring(player))
+			self:PrintQueue(nil,player)
 		end
 	end
 end
