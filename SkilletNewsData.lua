@@ -26,6 +26,16 @@ local isCata = WOW_PROJECT_ID == WOW_PROJECT_CATACLYSM_CLASSIC
 
 Skillet.NewsName = "Skillet News"
 Skillet.NewsData = {
+	{	version = "5.48",
+		data = {
+			{	name = "Changes",
+				data = {
+					{ header = "Merchants", body = "Fix deprecated GetMerchantItemInfo" },
+					{ header = "TOC", body = "Add 120000 to TOC" },
+				},
+			},
+		},
+	},
 	{	version = "5.47",
 		data = {
 			{	name = "Changes",

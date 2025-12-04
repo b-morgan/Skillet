@@ -63,6 +63,13 @@ local function does_merchant_sell_required_items(list)
 	return false
 end
 
+local GetMerchantItemInfo = GetMerchantItemInfo or function(index)
+  local info = C_MerchantFrame.GetItemInfo(index);
+  if info then
+    return info.name, info.texture, info.price, info.stackCount, info.numAvailable, info.isPurchasable, info.isUsable, info.hasExtendedCost, info.currencyID, info.spellID;
+  end
+end
+
 --
 -- Scans everything the merchant has and adds it to a table
 -- that we can refer to when looking for items to buy.
@@ -92,7 +99,7 @@ local function update_merchant_inventory()
 			if link then
 				local itemCount, itemTexture, itemValue, itemLink, currencyName, currencyID
 				local id = Skillet:GetItemIDFromLink(link)
-				local name, texture, price, quantity, numAvailable, isUsable, extendedCost = GetMerchantItemInfo(i)
+				local name, texture, price, quantity, numAvailable, isPurchasable, isUsable, extendedCost, currencyID, spellID = GetMerchantItemInfo(i)
 				if extendedCost then
 					itemCount = GetMerchantItemCostInfo(i)
 --
@@ -294,7 +301,7 @@ function Skillet:BuyRequiredReagents()
 	for i=1, numItems, 1 do
 		local link = GetMerchantItemLink(i)
 		if link then
-			local name, texture, price, quantity, numAvailable, isUsable, extendedCost = GetMerchantItemInfo(i)
+			local name, texture, price, quantity, numAvailable, isPurchasable, isUsable, extendedCost, currencyID, spellID = GetMerchantItemInfo(i)
 			if numAvailable == -1 then			-- only buy unlimited items automatically.
 				local id = self:GetItemIDFromLink(link)
 --

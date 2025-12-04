@@ -800,11 +800,8 @@ function Skillet:OnEnable()
 	self:RegisterEvent("UNIT_SPELLCAST_SENT")
 	self:RegisterEvent("UNIT_SPELLCAST_DELAYED")
 	self:RegisterEvent("UNIT_SPELLCAST_STOP")
---	self:RegisterEvent("CHAT_MSG_SKILL")
 	self:RegisterEvent("SKILL_LINES_CHANGED") -- replacement for CHAT_MSG_SKILL?
-	self:RegisterEvent("LEARNED_SPELL_IN_TAB") -- arg1 = professionID
 	self:RegisterEvent("NEW_RECIPE_LEARNED") -- arg1 = recipeID
---	self:RegisterEvent("ADDON_ACTION_BLOCKED")
 
 	if Skillet.db.profile.BlizzOR then
 --
@@ -978,15 +975,6 @@ function Skillet:SKILL_LINES_CHANGED()
 --		Skillet:RescanTrade()
 --		Skillet:UpdateTradeSkillWindow()
 		Skillet.dataSourceChanged = true	-- Process the change on the next TRADE_SKILL_LIST_UPDATE
-	end
-end
-
-function Skillet:LEARNED_SPELL_IN_TAB(event, profession)
-	DA.TRACE("LEARNED_SPELL_IN_TAB")
-	DA.TRACE("profession= "..tostring(profession))
-	if Skillet.tradeSkillOpen then
-		Skillet:RescanTrade()				-- Untested
-		Skillet:UpdateTradeSkillWindow()	-- Untested
 	end
 end
 
