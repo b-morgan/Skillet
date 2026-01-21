@@ -208,7 +208,8 @@ function Skillet:UpdateOptionalListWindow()
 			count:SetText(count_text)
 			count:Show()
 			if oreagentQuality then
-				oreagentName = oreagentName..C_Texture.GetCraftingReagentQualityChatIcon(oreagentQuality)
+--				oreagentName = oreagentName..C_Texture.GetCraftingReagentQualityChatIcon(oreagentQuality)
+				oreagentName = oreagentName.."|A:"..Professions-ChatIcon-Quality-Tier..oreagentQuality..":17:17::1|a"
 			end
 			text:SetText(oreagentName)
 			text:SetWordWrap(false)

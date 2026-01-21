@@ -30,6 +30,8 @@ Skillet.NewsData = {
 		data = {
 			{	name = "Changes",
 				data = {
+					{ header = "SkillLevels", body = "Update SkillLevels code and data" },
+					{ header = "Reagents", body = "Fix deprecated GetCraftingReagentQualityChatIcon" },
 					{ header = "Merchants", body = "Fix deprecated GetMerchantItemInfo" },
 					{ header = "TOC", body = "Add 120000 to TOC" },
 				},

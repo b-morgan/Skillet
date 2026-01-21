@@ -120,6 +120,12 @@
 			<OnLeave>
 				Skillet:RankFrame_OnLeave(self)
 			</OnLeave>
+			<OnMouseUp>
+				Skillet:RankFrame_OnMouseUp(self)
+			</OnMouseUp>
+			<OnMouseDown>
+				Skillet:RankFrame_OnMouseDown(self)
+			</OnMouseDown>
 		</Scripts>
 	</StatusBar>
 	<CheckButton name="SkilletInvFilterButtonTemplate" virtual="true">

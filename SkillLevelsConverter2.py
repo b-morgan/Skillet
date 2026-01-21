@@ -6,7 +6,7 @@
 # .csv tables from https://wago.tools/db2/SkillLineAbility and https://wago.tools/db2/SpellName
 #
 # The output will be .lua tables containing the data for inclusion in 
-# Skillet-Classic's SkillLevelData1.lua, SkillLevelData4.lua, or SkillLevelData5.lua
+# Skillet-Classic's SkillLevelData1.lua or SkillLevelData4.lua
 #
 # Skillet (retail) will use SkillLevelData2.lua (which is empty in the Skillet-Classic release)
 #
@@ -65,11 +65,12 @@ def spells_list_write(file_name):
 	dirname, basename = os.path.split(output_file)
 	filename, ext = basename.split('.', 1)
 	o = open(output_file, "w")
-	o.write("-- " + output_file + "\n")
-	o.write("Skillet.db.global.SkillLineAbility = {\n")
 	spell_name_output = output_file.replace("SkillLineAbility", "SpellName")
+	dirname2, basename2 = os.path.split(spell_name_output)
 	n = open(spell_name_output, "w")
-	n.write("-- " + spell_name_output + "\n")
+	o.write("-- " + basename + "\n")
+	o.write("Skillet.db.global." + filename + " = {\n")
+	n.write("-- " + basename2 + "\n")
 	n.write("Skillet.db.global.NameToSpellID = {\n")
 	for item_id in spell_to_skill_line:
 		o.write(spells_list_str(item_id))

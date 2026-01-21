@@ -2233,13 +2233,11 @@ function Skillet:PushSkill(player, tradeID, skillIndex)
 	table.insert(self.skillStack, entry)
 end
 
-function Skillet:getLvlUpChance()
+local function getLvlUpChance()
 --
--- icy: 03.03.2012:
--- according to pope (http://www.wowhead.com/spell=83949#comments)
 -- % to level up with this receipt is calculated by: (greySkill - yourSkill) / (greySkill - yellowSkill
 --
-	local skilRanks = self:GetSkillRanks(self.currentPlayer, self.currentTrade)
+	local skilRanks = Skillet:GetSkillRanks(Skillet.currentPlayer, Skillet.currentTrade)
 	local currentLevel, maxLevel = 0, 0
 	if skilRanks then
 		currentLevel, maxLevel = skilRanks.rank, skilRanks.maxRank
@@ -2260,6 +2258,16 @@ function Skillet:getLvlUpChance()
 	end
 end
 
+local function RankFrameMenuList(SkilletRankFrameMenu, rootDescription)
+	if Skillet.isTest then 
+		local title = "RankFrameMenuList"
+		rootDescription:CreateTitle(title);
+	end
+	rootDescription:CreateButton(L["Button 1"], function() Skillet:RankFrame_Button1() end);
+	rootDescription:CreateDivider(); -- CreateSpacer, CreateDivider
+	rootDescription:CreateButton(L["Button 2"], function() Skillet:RankFrame_Button2() end);
+end
+
 --
 -- Called when then mouse enters the rank status bar
 --
@@ -2272,7 +2280,7 @@ function Skillet:RankFrame_OnEnter(button)
 	local yellow = SkilletRankFrame.subRanks.orange:GetValue()
 	local orange = SkilletRankFrame.subRanks.red:GetValue()
 	-- lets add the chance to level up that skill with that receipt
-	local chance = Skillet:getLvlUpChance()
+	local chance = getLvlUpChance()
 	chance = math.floor(chance*10)/10		-- one decimal is enough
 	GameTooltip:AddLine(COLORORANGE..orange.."|r/"..COLORYELLOW..yellow.."|r/"..COLORGREEN..green.."|r/"..COLORGRAY..gray.."|r/ Chance:"..chance.."|r%")
 	GameTooltip:Show()
@@ -2282,7 +2290,54 @@ end
 -- Called when then mouse leaves the rank status bar
 --
 function Skillet:RankFrame_OnLeave(button)
+	Skillet.RankFrameExtra = false
 	GameTooltip:Hide()
+end
+
+function Skillet:RankFrame_OnMouseDown(button)
+	local mouse = GetMouseButtonClicked()
+	DA.DEBUG(3,"RankFrame_OnMouseDown("..tostring(button).."), "..tostring(mouse))
+	if (mouse == "LeftButton") then
+		if not Skillet.RankFrameExtra then
+			GameTooltip:AddLine("RankFrame_OnMouseDown")
+			Skillet.RankFrameExtra = true
+		end
+		GameTooltip:Show()
+	elseif (mouse == "RightButton") then
+		self:SkilletRankFrame_Show(button)
+	end
+end
+
+function Skillet:RankFrame_OnMouseUp(button)
+	local mouse = GetMouseButtonClicked()
+	DA.DEBUG(3,"RankFrame_OnMouseUp("..tostring(button).."), "..tostring(mouse))
+	if (mouse == "LeftButton") then
+		GameTooltip:AddLine("RankFrame_OnMouseUp")
+		GameTooltip:Show()
+	elseif (mouse == "RightButton") then
+		self:SkilletRankFrame_Show(button)
+	end
+end
+
+function Skillet:SkilletRankFrame_Show(button)
+	--DA.DEBUG(0,"SkilletRankFrame_Show("..tostring(button)..")")
+	local x, y = GetCursorPosition()
+	local uiScale = UIParent:GetEffectiveScale()
+	if not SkilletRankFrameMenu then
+		SkilletRankFrameMenu = CreateFrame("Frame", "SkilletRankFrameMenu", _G["UIParent"], "UIDropDownMenuTemplate")
+		SkilletRankFrameMenu:SetScale(uiScale)
+	end
+	self.menuButton = button
+--	GameTooltip:Hide() --hide tooltip, because it may be over the menu, sometimes it still fails
+	MenuUtil.CreateContextMenu(SkilletRankFrameMenu, RankFrameMenuList);
+end
+
+function Skillet:RankFrame_Button1()
+	DA.DEBUG(0,"RankFrame_Button1()")
+end
+
+function Skillet:RankFrame_Button2()
+	DA.DEBUG(0,"RankFrame_Button2()")
 end
 
 function Skillet:SkilletFrameForceClose()

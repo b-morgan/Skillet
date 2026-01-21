@@ -130,7 +130,7 @@ end
 --
 function Skillet:nameWithQuality(itemID, modified)
 	--DA.DEBUG(0,"nameWithQuality("..tostring(itemID)..", "..tostring(modified)..")")
-	local name, quality
+	local name, info
 	local bname, link = C_Item.GetItemInfo(itemID)
 	if not bname then
 		if modified then
@@ -142,10 +142,12 @@ function Skillet:nameWithQuality(itemID, modified)
 		bname = "item:"..tostring(itemID)
 	end
 	if link then
-		quality = C_TradeSkillUI.GetItemReagentQualityByItemInfo(link)
+		info = C_TradeSkillUI.GetItemReagentQualityInfo(link)
+		DA.DEBUG(0,"nameWithQuality: info= "..DA.DUMP(info))
 	end
-	if quality then
-		name = bname..C_Texture.GetCraftingReagentQualityChatIcon(quality)
+	if info and info.quality then
+--		name = bname..C_Texture.GetCraftingReagentQualityChatIcon(quality)
+		name = bname.."|A:"..info.iconChat..":17:17::1|a"
 	else
 		name = bname
 	end
