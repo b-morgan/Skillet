@@ -1592,13 +1592,6 @@ function Skillet:HideAllWindows()
 end
 
 --
--- Show the options window
---
-function Skillet:ShowOptions()
-	Settings.OpenToCategory("Skillet")
-end
-
---
 -- Notes when a new trade has been selected
 --
 function Skillet:SetSelectedTrade(newTrade)

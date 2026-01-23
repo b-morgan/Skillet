@@ -1768,36 +1768,17 @@ function Skillet:ConfigureOptions()
 	acecfg:RegisterOptionsTable("Skillet Profiles", LibStub("AceDBOptions-3.0"):GetOptionsTable(self.db))
 	acecfg:RegisterOptionsTable("Skillet Plugins", Skillet.pluginsOptions)
 	local acedia = LibStub("AceConfigDialog-3.0")
-	acedia:AddToBlizOptions("Skillet Features", "Skillet")
+	Skillet.optionsFrame, Skillet.categoryID = acedia:AddToBlizOptions("Skillet Features", "Skillet")
 	acedia:AddToBlizOptions("Skillet Appearance", "Appearance", "Skillet")
 	acedia:AddToBlizOptions("Skillet Profiles", "Profiles", "Skillet")
 	acedia:AddToBlizOptions("Skillet Plugins", "Plugins", "Skillet")
 end
 
-local function get_panel_name(panel)
-	local tp = type(panel)
-	local cat = INTERFACEOPTIONS_ADDONCATEGORIES
-	if tp == "string" then
-		for i = 1, #cat do
-			local p = cat[i]
-			if p.name == panel then
-				if p.parent then
-					return get_panel_name(p.parent)
-				else
-					return panel
-				end
-			end
-		end
-	elseif tp == "table" then
-		for i = 1, #cat do
-			local p = cat[i]
-			if p == panel then
-				if p.parent then
-					return get_panel_name(p.parent)
-				else
-					return panel.name
-				end
-			end
-		end
-	end
+--
+-- Show the options window
+--
+function Skillet:ShowOptions()
+--	Settings.OpenToCategory("Skillet")
+	Settings.OpenToCategory(Skillet.categoryID)
 end
+
