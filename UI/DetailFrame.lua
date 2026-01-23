@@ -147,7 +147,7 @@ function Skillet:nameWithQuality(itemID, modified)
 	end
 	if info and info.quality then
 --		name = bname..C_Texture.GetCraftingReagentQualityChatIcon(quality)
-		name = bname.."|A:"..info.iconChat..":17:17::1|a"
+		name = bname.."|A:"..info.iconChat..":17:17|a"
 	else
 		name = bname
 	end

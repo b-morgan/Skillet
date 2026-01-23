@@ -208,7 +208,7 @@ function Skillet:UpdateFinishingListWindow()
 			count:Show()
 			if freagentQuality then
 --				freagentName = freagentName..C_Texture.GetCraftingReagentQualityChatIcon(freagentQuality)
-				freagentName = freagentName.."|A:"..Professions-ChatIcon-Quality-Tier..freagentQuality..":17:17::1|a"
+				freagentName = freagentName.."|A:Professions-ChatIcon-Quality-Tier"..freagentQuality..":17:17|a"
 			end
 			text:SetText(freagentName)
 			text:SetWordWrap(false)

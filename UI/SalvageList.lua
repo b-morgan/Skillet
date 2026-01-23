@@ -212,7 +212,7 @@ function Skillet:UpdateSalvageListWindow()
 			count:Show()
 			if sreagentQuality then
 --				sreagentName = sreagentName..C_Texture.GetCraftingReagentQualityChatIcon(sreagentQuality)
-				sreagentName = sreagentName.."|A:"..Professions-ChatIcon-Quality-Tier..sreagentQuality..":17:17::1|a"
+				sreagentName = sreagentName.."|A:Professions-ChatIcon-Quality-Tier"..sreagentQuality..":17:17|a"
 			end
 			text:SetText(sreagentName)
 			text:SetWordWrap(false)
