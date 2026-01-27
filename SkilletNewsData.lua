@@ -30,6 +30,7 @@ Skillet.NewsData = {
 		data = {
 			{	name = "Changes",
 				data = {
+					{ header = "Crafting", body = "Remove code causing crafting failure" },
 					{ header = "SkillLevels", body = "Update SkillLevels code and data" },
 					{ header = "Reagents", body = "Fix deprecated GetCraftingReagentQualityChatIcon" },
 					{ header = "Merchants", body = "Fix deprecated GetMerchantItemInfo" },
