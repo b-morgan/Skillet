@@ -432,7 +432,6 @@ end
 
 local function ApplyAllocations(transaction, requiredReagents, modifiedReagents, optionalReagents, finishingReagents)
 	local reagentsToQuantity = {}
-	local haverequired = true
 	if requiredReagents then
 		for _, all in ipairs(requiredReagents) do
 			for _, item in ipairs(all) do
@@ -469,12 +468,7 @@ local function ApplyAllocations(transaction, requiredReagents, modifiedReagents,
 				transaction:OverwriteAllocation(slotID, r, reagentsToQuantity[r.itemID])
 			end
 		end
-		if s.required and not transaction:HasAllAllocations(slotID, s.quantityRequired) then
-			DA.DEBUG(0,"ApplyAllocations: missing required quantity, slotID= "..tostring(slotID)..", need= "..tostring(s.quantityRequired))
-			haverequired = false
-		end
 	end
-	return haverequired
 end
 
 function Skillet:ProcessQueue(altMode)
