@@ -85,6 +85,7 @@ local defaults = {
 		flash_on_remove_queue = false,
 		always_show_progress_bar = true,
 		tsm_compat = false,
+		tsm_prefer = false,
 		transparency = 1.0,
 		scale = 1.0,
 		ttscale = 1.0,
@@ -980,7 +981,7 @@ end
 
 function Skillet:NEW_RECIPE_LEARNED(event, recipeID)
 	DA.TRACE("NEW_RECIPE_LEARNED")
-	DA.TRACE("recipeID= "..tostring(recipeID))
+	DA.TRACE("recipeID= ", recipeID)
 	if Skillet.tradeSkillOpen then
 		Skillet.dataSourceChanged = true	-- Process the change on the next TRADE_SKILL_LIST_UPDATE
 	end
@@ -1071,7 +1072,7 @@ end
 function Skillet:ITEM_DATA_LOAD_RESULT(event, itemID, result)
 	if itemID then
 		local name = C_Item.GetItemInfo(itemID)
-		DA.TRACE3("ITEM_DATA_LOAD_RESULT("..tostring(itemID)..", "..tostring(result).."), "..tostring(name))
+		DA.TRACE3("ITEM_DATA_LOAD_RESULT(", itemID, result, "), "..tostring(name))
 	else
 		DA.TRACE3("ITEM_DATA_LOAD_RESULT")
 	end
@@ -1102,7 +1103,7 @@ end
 function Skillet:GET_ITEM_INFO_RECEIVED(event, itemID, result)
 	if itemID then
 		local name = C_Item.GetItemInfo(itemID)
-		DA.TRACE3("GET_ITEM_INFO_RECEIVED("..tostring(itemID)..", "..tostring(result).."), "..tostring(name))
+		DA.TRACE3("GET_ITEM_INFO_RECEIVED(", itemID, result, "), "..tostring(name))
 	else
 		DA.TRACE3("GET_ITEM_INFO_RECEIVED")
 	end
@@ -1112,7 +1113,7 @@ end
 -- Dragonflight replacement for *_SHOW events
 --
 function Skillet:PLAYER_INTERACTION_MANAGER_FRAME_SHOW(event,interactionType)
-	DA.TRACE("PLAYER_INTERACTION_MANAGER_FRAME_SHOW("..tostring(interactionType)..")")
+	DA.TRACE("PLAYER_INTERACTION_MANAGER_FRAME_SHOW(", interactionType, ")")
 	if interactionType == Enum.PlayerInteractionType.Merchant then -- 5
 --		Skillet:Skillet:MERCHANT_SHOW()
 		Skillet:MerchantShow()
@@ -1132,7 +1133,7 @@ end
 -- Dragonflight replacement for *_CLOSED events
 --
 function Skillet:PLAYER_INTERACTION_MANAGER_FRAME_HIDE(event,interactionType)
-	DA.TRACE("PLAYER_INTERACTION_MANAGER_FRAME_HIDE("..tostring(interactionType)..")")
+	DA.TRACE("PLAYER_INTERACTION_MANAGER_FRAME_HIDE(", interactionType, ")")
 	if interactionType == Enum.PlayerInteractionType.Merchant then -- 5
 --		Skillet:MERCHANT_CLOSED()
 	end
@@ -1305,10 +1306,19 @@ function Skillet:SkilletShow()
 	if not link then
 		DA.DEBUG(0,"SkilletShow: "..tostring(skillLineName).." not linkable")
 	end
+	if TSM_API and TSM_API.IsUIVisible("CRAFTING") and Skillet.db.profile.tsm_prefer then
 --
--- Use the Blizzard UI for any garrison follower that can't use ours.
+-- Use the TradeSkillMaster UI 
 --
-	if self:IsNotSupportedFollower(self.currentTrade) then
+		DA.DEBUG(3,"SkilletShow: "..tostring(self.currentTrade).." TSM Preferred")
+		self:HideAllWindows()
+--		self:EnableBlizzardFrame()
+--		ShowUIPanel(ProfessionsFrame)
+		Skillet.BlizzardUIshowing = true
+	elseif self:IsNotSupportedFollower(self.currentTrade) or Skillet.db.profile.tsm_prefer then
+--
+-- Use the Blizzard UI for any garrison follower that can't use ours
+--
 		DA.DEBUG(3,"SkilletShow: "..tostring(self.currentTrade).." IsNotSupportedFollower")
 		self:HideAllWindows()
 		self:EnableBlizzardFrame()
@@ -1340,7 +1350,9 @@ function Skillet:SkilletShowWindow(where)
 	if not Skillet.db.profile.tsm_compat then
 		if TSM_API and where == "CHANGED" then
 			if TSM_API.IsUIVisible("CRAFTING") then
-				DA.MARK3(L["TradeSkillMaster must be in 'WOW UI' mode to use Skillet"])
+				if not Skillet.db.profile.tsm_prefer then
+					DA.MARK3(L["TradeSkillMaster must be in 'WOW UI' mode to use Skillet"])
+				end
 				return
 			end
 		end

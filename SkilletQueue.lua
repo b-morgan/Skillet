@@ -931,21 +931,21 @@ end
 -- Events associated with crafting spells
 --
 function Skillet:UNIT_SPELLCAST_SENT(event, unit, target, castGUID, spellID)
-	DA.TRACE("UNIT_SPELLCAST_SENT("..tostring(unit)..", "..tostring(target)..", "..tostring(castGUID)..", "..tostring(spellID)..")")
+	DA.TRACE("UNIT_SPELLCAST_SENT(", unit, target, castGUID, spellID, ")")
 	if unit == "player" then
 		self:IgnoreCast(spellID)
 	end
 end
 
 function Skillet:UNIT_SPELLCAST_START(event, unitTarget, castGUID, spellID)
-	DA.TRACE("UNIT_SPELLCAST_START("..tostring(unitTarget)..", "..tostring(castGUID)..", "..tostring(spellID)..")")
+	DA.TRACE("UNIT_SPELLCAST_START(", unitTarget, castGUID, spellID, ")")
 	if unitTarget == "player" then
 		self:IgnoreCast(spellID)
 	end
 end
 
 function Skillet:UNIT_SPELLCAST_SUCCEEDED(event, unitTarget, castGUID, spellID)
-	DA.TRACE("UNIT_SPELLCAST_SUCCEEDED("..tostring(unitTarget)..", "..tostring(castGUID)..", "..tostring(spellID)..")")
+	DA.TRACE("UNIT_SPELLCAST_SUCCEEDED(", unitTarget, castGUID, spellID, ")")
 	if unitTarget == "player" then
 		if self.processingLevel and self.processingLevel ~= 0 and self.processingSpellID then
 			DA.DEBUG(0,"UNIT_SPELLCAST_SUCCEEDED: "..tostring(unitTarget)..", "..tostring(spellID)..", "..tostring(self.processingSpellID))
@@ -960,7 +960,7 @@ function Skillet:UNIT_SPELLCAST_SUCCEEDED(event, unitTarget, castGUID, spellID)
 end
 
 function Skillet:UNIT_SPELLCAST_FAILED(event, unitTarget, castGUID, spellID)
-	DA.TRACE("UNIT_SPELLCAST_FAILED("..tostring(unitTarget)..", "..tostring(castGUID)..", "..tostring(spellID)..")")
+	DA.TRACE("UNIT_SPELLCAST_FAILED(", unitTarget, castGUID, spellID, ")")
 	if unitTarget == "player" then
 		if self.processingLevel and self.processingLevel ~= 0 and self.processingSpellID then
 			DA.DEBUG(0,"UNIT_SPELLCAST_FAILED: "..tostring(castGUID)..", "..tostring(spellID)..", "..tostring(self.processingSpellID))
@@ -975,7 +975,7 @@ function Skillet:UNIT_SPELLCAST_FAILED(event, unitTarget, castGUID, spellID)
 end
 
 function Skillet:UNIT_SPELLCAST_FAILED_QUIET(event, unitTarget, castGUID, spellID)
-	DA.TRACE("UNIT_SPELLCAST_FAILED_QUIET("..tostring(unitTarget)..", "..tostring(castGUID)..", "..tostring(spellID)..")")
+	DA.TRACE("UNIT_SPELLCAST_FAILED_QUIET(", unitTarget, castGUID, spellID, ")")
 	if unitTarget == "player" then
 		if self.processingLevel and self.processingLevel ~= 0 and self.processingSpellID then
 			DA.DEBUG(0,"UNIT_SPELLCAST_FAILED_QUIET: "..tostring(unitTarget)..", "..tostring(spellID)..", "..tostring(self.processingSpellID))
@@ -990,7 +990,7 @@ function Skillet:UNIT_SPELLCAST_FAILED_QUIET(event, unitTarget, castGUID, spellI
 end
 
 function Skillet:UNIT_SPELLCAST_INTERRUPTED(event, unitTarget, castGUID, spellID)
-	DA.TRACE("UNIT_SPELLCAST_INTERRUPTED("..tostring(unitTarget)..", "..tostring(castGUID)..", "..tostring(spellID)..")")
+	DA.TRACE("UNIT_SPELLCAST_INTERRUPTED(", unitTarget, castGUID, spellID, ")")
 	if unitTarget == "player" then
 		if self.processingLevel and self.processingLevel ~= 0 and self.processingSpellID then
 			DA.DEBUG(0,"UNIT_SPELLCAST_INTERRUPTED: "..tostring(unitTarget)..", "..tostring(spellID)..", "..tostring(self.processingSpellID))
@@ -1005,21 +1005,21 @@ function Skillet:UNIT_SPELLCAST_INTERRUPTED(event, unitTarget, castGUID, spellID
 end
 
 function Skillet:UNIT_SPELLCAST_DELAYED(event, unitTarget, castGUID, spellID)
-	DA.TRACE("UNIT_SPELLCAST_DELAYED("..tostring(unitTarget)..", "..tostring(castGUID)..", "..tostring(spellID)..")")
+	DA.TRACE("UNIT_SPELLCAST_DELAYED(", unitTarget, castGUID, spellID, ")")
 	if unitTarget == "player" then
 		self:IgnoreCast(spellID)
 	end
 end
 
 function Skillet:UNIT_SPELLCAST_STOP(event, unitTarget, castGUID, spellID)
-	DA.TRACE("UNIT_SPELLCAST_STOP("..tostring(unitTarget)..", "..tostring(castGUID)..", "..tostring(spellID)..")")
+	DA.TRACE("UNIT_SPELLCAST_STOP(", unitTarget, castGUID, spellID, ")")
 	if unitTarget == "player" then
 		self:IgnoreCast(spellID)
 	end
 end
 
 function Skillet:UPDATE_TRADESKILL_CAST_COMPLETE(event, isScrapping)
-	DA.TRACE("UPDATE_TRADESKILL_CAST_COMPLETE("..tostring(isScrapping)..")")
+	DA.TRACE("UPDATE_TRADESKILL_CAST_COMPLETE(", isScrapping, ")")
 end
 
 function Skillet:UPDATE_TRADESKILL_RECAST(event)
@@ -1027,7 +1027,7 @@ function Skillet:UPDATE_TRADESKILL_RECAST(event)
 end
 
 function Skillet:ITEM_COUNT_CHANGED(event,itemID)
-	DA.TRACE3("ITEM_COUNT_CHANGED("..tostring(itemID)..")")
+	DA.TRACE3("ITEM_COUNT_CHANGED(", itemID, ")")
 --[[
 	if itemID == self.salvageItem then
 		DA.DEBUG(0,"ITEM_COUNT_CHANGED: itemID= "..tostring(itemID))

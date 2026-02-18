@@ -505,7 +505,22 @@ Skillet.options =
 					set = function(self,value)
 						Skillet.db.profile.tsm_compat = value
 					end,
-					width = "full",
+--					width = "full",
+					width = 1.5,
+					order = 13
+				},
+				tsm_prefer = {
+					type = "toggle",
+					name = L["TSMPREFERNAME"],
+					desc = L["TSMPREFERDESC"],
+					get = function()
+						return Skillet.db.profile.tsm_prefer
+					end,
+					set = function(self,value)
+						Skillet.db.profile.tsm_prefer = value
+					end,
+--					width = "full",
+					width = 1.5,
 					order = 13
 				},
 				scale_tooltip = {

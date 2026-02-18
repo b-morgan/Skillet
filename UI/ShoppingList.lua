@@ -768,16 +768,16 @@ local function processGuildQueue(where)
 	end
 end
 
-function Skillet:BAG_OPEN(event, bagID)				-- Fires when a non-inventory container is opened.
-	DA.TRACE("BAG_OPEN( "..tostring(bagID).." )")	-- We don't really care
+function Skillet:BAG_OPEN(event, bagID)			-- Fires when a non-inventory container is opened.
+	DA.TRACE("BAG_OPEN( ", bagID, " )")			-- We don't really care
 end
 
-function Skillet:BAG_CLOSED(event, bagID)			-- Fires when the whole bag is removed from 
-	DA.TRACE("BAG_CLOSED( "..tostring(bagID).." )")	-- inventory or bank. We don't really care. 
+function Skillet:BAG_CLOSED(event, bagID)		-- Fires when the whole bag is removed from 
+	DA.TRACE("BAG_CLOSED( ", bagID, " )")		-- inventory or bank. We don't really care. 
 end
 
 function Skillet:BAG_CONTAINER_UPDATE(event, bagID)
-	DA.TRACE("BAG_CONTAINER_UPDATE( "..tostring(bagID).." )")
+	DA.TRACE("BAG_CONTAINER_UPDATE( ", bagID, " )")
 end
 
 --[[
@@ -893,7 +893,7 @@ end
 -- Event is fired when the inventory (bags) changes
 --
 function Skillet:UNIT_INVENTORY_CHANGED(event, unit)
-	DA.TRACE2("UNIT_INVENTORY_CHANGED( "..tostring(unit).." )")
+	DA.TRACE2("UNIT_INVENTORY_CHANGED( ", unit, " )")
 	self.unitInventoryChangedCount = self.unitInventoryChangedCount + 1
 	if Skillet.bagsChanged and not UnitAffectingCombat("player") then
 		indexBags()
@@ -926,7 +926,7 @@ end
 -- It may look like a real Blizzard event but its not.
 --
 function Skillet:BANK_UPDATE(event,bagID)
-	DA.TRACE2("BANK_UPDATE( "..tostring(bagID).." )")
+	DA.TRACE2("BANK_UPDATE( ", bagID, " )")
 	if bagID then
 		if not self.bagUpdateCounts[bagID] then
 			self.bagUpdateCounts[bagID] = 1
@@ -1163,7 +1163,7 @@ end
 -- Event is fired when the main bank (bagID == -1) contents change.
 --
 function Skillet:PLAYERBANKSLOTS_CHANGED(event,slot)
-	DA.TRACE("PLAYERBANKSLOTS_CHANGED"..", slot="..tostring(slot))
+	DA.TRACE("PLAYERBANKSLOTS_CHANGED, slot= ", slot)
 	if Skillet.bankBusy then
 		--DA.DEBUG(1,"PLAYERBANKSLOTS_CHANGED and bankBusy")
 		Skillet.gotBankEvent = true
@@ -1177,7 +1177,7 @@ end
 -- Event is fired when the reagent bank (bagID == -3) contents change.
 --
 function Skillet:PLAYERREAGENTBANKSLOTS_CHANGED(event,slot)
-	DA.TRACE("PLAYERREAGENTBANKSLOTS_CHANGED"..", slot="..tostring(slot))
+	DA.TRACE("PLAYERREAGENTBANKSLOTS_CHANGED, slot= ", slot)
 	if Skillet.bankBusy then
 		--DA.DEBUG(1,"PLAYERREAGENTBANKSLOTS_CHANGED and bankBusy")
 		Skillet.gotBankEvent = true

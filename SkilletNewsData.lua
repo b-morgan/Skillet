@@ -26,6 +26,16 @@ local isCata = WOW_PROJECT_ID == WOW_PROJECT_CATACLYSM_CLASSIC
 
 Skillet.NewsName = "Skillet News"
 Skillet.NewsData = {
+	{	version = "5.50",
+		data = {
+			{	name = "Changes",
+				data = {
+					{ header = "Debug", body = "Add secret value tests to DA.TRACE" },
+					{ header = "TSM", body = "(experimental) Add option to prefer the TradeSkillMaster UI" },
+				},
+			},
+		},
+	},
 	{	version = "5.49",
 		data = {
 			{	name = "Changes",
