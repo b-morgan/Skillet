@@ -237,28 +237,32 @@ function DA.TRACE(...)
 			comma = ", "
 		end
 		local value = select(i,...)
-		local vtype = type(value)
-		if (vtype == "nil") then 
-			text = text..comma.."(nil)"
-		elseif (vtype == "number") then 
-			text = text..comma..tostring(value)
-		elseif (vtype == "string") then
-			local t = string.sub(value,1,2)
-			if t == ", " then
-				text = text..value
-			else
-				text = text..comma..value
+		if issecretvalue and issecretvalue(value) then
+			text = text..comma.."(secret)"
+		else
+			local vtype = type(value)
+			if (vtype == "nil") then 
+				text = text..comma.."(nil)"
+			elseif (vtype == "number") then 
+				text = text..comma..tostring(value)
+			elseif (vtype == "string") then
+				local t = string.sub(value,1,2)
+				if t == ", " then
+					text = text..value
+				else
+					text = text..comma..value
+				end
+			elseif (vtype == "boolean") then 
+				if (value) then
+					text = text..comma.."true" 
+				else 
+					text = text..comma.."false" 
+				end
+			elseif (vtype == "table" or vtype == "function" or vtype == "thread" or vtype == "userdata") then 
+				text = text..comma.."("..vtype..")"
+			else                               
+				text = text..comma.."(unknown)"
 			end
-		elseif (vtype == "boolean") then 
-			if (value) then
-				text = text..comma.."true" 
-			else 
-				text = text..comma.."false" 
-			end
-		elseif (vtype == "table" or vtype == "function" or vtype == "thread" or vtype == "userdata") then 
-			text = text..comma.."("..vtype..")"
-		else                               
-			text = text..comma.."(unknown)"
 		end
 	end
 	if (DA.TraceShow) then
