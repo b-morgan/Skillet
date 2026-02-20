@@ -1,8 +1,9 @@
 local addonName,addonTable = ...
-local isRetail = WOW_PROJECT_ID == WOW_PROJECT_MAINLINE
-local isClassic = WOW_PROJECT_ID == WOW_PROJECT_CLASSIC
-local isBCC = WOW_PROJECT_ID == WOW_PROJECT_BURNING_CRUSADE_CLASSIC
-local isWrath = WOW_PROJECT_ID == WOW_PROJECT_WRATH_CLASSIC
+local isRetail = WOW_PROJECT_ID == WOW_PROJECT_MAINLINE -- 1
+local isClassic = WOW_PROJECT_ID == WOW_PROJECT_CLASSIC -- 2
+local isBCC = WOW_PROJECT_ID == WOW_PROJECT_BURNING_CRUSADE_CLASSIC -- 5
+local isWrath = WOW_PROJECT_ID == WOW_PROJECT_WRATH_CLASSIC -- 11
+local isCata = WOW_PROJECT_ID == WOW_PROJECT_CATACLYSM_CLASSIC -- 14
 local DA
 if isRetail then
 	DA = _G[addonName] -- for DebugAids.lua
