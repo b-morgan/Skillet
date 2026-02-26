@@ -4,6 +4,7 @@ local isClassic = WOW_PROJECT_ID == WOW_PROJECT_CLASSIC -- 2
 local isBCC = WOW_PROJECT_ID == WOW_PROJECT_BURNING_CRUSADE_CLASSIC -- 5
 local isWrath = WOW_PROJECT_ID == WOW_PROJECT_WRATH_CLASSIC -- 11
 local isCata = WOW_PROJECT_ID == WOW_PROJECT_CATACLYSM_CLASSIC -- 14
+local isMists = WOW_PROJECT_ID == WOW_PROJECT_MISTS_CLASSIC -- 19
 local DA
 if isRetail then
 	DA = _G[addonName] -- for DebugAids.lua
