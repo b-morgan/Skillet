@@ -58,7 +58,6 @@ local defaults = {
 		display_full_tooltip = true,			-- show full blizzards tooltip
 		link_craftable_reagents = true,
 		queue_craftable_reagents = true,
-		queue_one_at_a_time = true,
 		queue_to_front = false,
 		ignore_banked_reagents = false,
 		ignore_queued_reagents = false,

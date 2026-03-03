@@ -151,15 +151,7 @@ local function queueAppendReagent(command, reagentID, need, queueCraftables, mre
 --
 					if not Skillet.TradeSkillIgnoredMats[recipeSourceID] and
 					  not Skillet.db.realm.userIgnoredMats[Skillet.currentPlayer][recipeSourceID] then
-						if newCommand.modified and Skillet.db.profile.queue_one_at_a_time then
-							newCommand.count = 1
-							for i=1, newCount, 1 do
-								local c = tcopy(newCommand)
-								Skillet:QueueAppendCommand(c, queueCraftables)
-							end
-						else
-							Skillet:QueueAppendCommand(newCommand, queueCraftables)
-						end
+						Skillet:QueueAppendCommand(newCommand, queueCraftables)
 						break
 					else
 						DA.DEBUG(3,"queueAppendReagent: Did Not Queue "..tostring(recipeSourceID).." ("..tostring(recipeSource.name)..")")
@@ -686,47 +678,6 @@ function Skillet:ProcessQueue(altMode)
 						recipeLevel = command.recipeLevel
 					end
 					self.processingLevel = recipeLevel
---
--- Prepare to craft one item at a time.
---
-					self.optionalReagentsArray = {}
-					if command.modifiedReagents then
-						for i,items in pairs(command.modifiedReagents) do
-							for j,reagent in pairs(items) do
-								DA.DEBUG(2,"Modified: i= "..tostring(i)..", j= "..tostring(j)..", item= "..DA.DUMP1(reagent))
-								if reagent.quantity ~= 0 then
-									table.insert(self.optionalReagentsArray, reagent)
-								end
-							end
-						end -- for
-					end
-					if command.requiredReagents then
-						local required = 0
-						for i,reagent in pairs(command.requiredReagents) do
-							DA.DEBUG(2,"Required: i= "..tostring(i)..", reagent= "..DA.DUMP1(reagent))
-							table.insert(self.optionalReagentsArray, reagent)
-							required = required + 1
-						end -- for
-						if required == 0 then
-							DA.MARK3(L["Required reagents missing"])
-						end
-					end
-					if command.optionalReagents then
-						for i,reagent in pairs(command.optionalReagents) do
-							DA.DEBUG(2,"Optional: i= "..tostring(i)..", reagent= "..DA.DUMP1(reagent))
-							table.insert(self.optionalReagentsArray, reagent)
-						end -- for
-					end
-					if command.finishingReagents then
-						for i,reagent in pairs(command.finishingReagents) do
-							DA.DEBUG(2,"Finishing: i= "..tostring(i)..", reagent= "..DA.DUMP1(reagent))
-							table.insert(self.optionalReagentsArray, reagent)
-						end -- for
-					end
-					command.optionalReagentsArray = self.optionalReagentsArray
---
--- Prepare to craft all items in this queue entry at once.
---					
 					self.recipeSchematic = C_TradeSkillUI.GetRecipeSchematic(command.recipeID, false, recipeLevel)
 					--DA.DEBUG(1,"ProcessQueue: recipeID= "..tostring(command.recipeID)..", recipeLevel= "..tostring(recipeLevel)..", recipeSchematic= "..DA.DUMP(self.recipeSchematic))
 					self.recipeTransaction = CreateProfessionsRecipeTransaction(self.recipeSchematic)
@@ -743,46 +694,30 @@ function Skillet:ProcessQueue(altMode)
 					self.oldTraceLog = DA.TraceLog
 					--DA.TraceLog = true
 					if self.FakeIt then
-						if self.db.profile.queue_one_at_a_time then
-							DA.DEBUG(1,"ProcessQueue: recipeID= "..tostring(command.recipeID)..",recipeLevel= "..tostring(recipeLevel)..", optionalReagentsArray= "..DA.DUMP(command.optionalReagentsArray))
-						else
-							DA.DEBUG(1,"ProcessQueue: recipeID= "..tostring(command.recipeID)..",recipeLevel= "..tostring(recipeLevel)..", recipeTransaction= "..DA.DUMP(self.recipeTransaction))
-							DA.DEBUG(1,"ProcessQueue: reagentInfoTbl= "..DA.DUMP(self.reagentInfoTbl))
-							DA.DEBUG(1,"ProcessQueue: HasAllAllocations= "..tostring(self.recipeTransaction:HasAllAllocations(command.count)))
-							DA.DEBUG(1,"ProcessQueue: HasMetQuantityRequirements= "..tostring(self.recipeTransaction:HasMetQuantityRequirements()))
-							if not self.recipeTransaction:HasMetQuantityRequirements() then
-								DA.MARK3("Insufficient Materials available")
-							end
+						DA.DEBUG(1,"ProcessQueue: recipeID= "..tostring(command.recipeID)..",recipeLevel= "..tostring(recipeLevel)..", recipeTransaction= "..DA.DUMP(self.recipeTransaction))
+						DA.DEBUG(1,"ProcessQueue: reagentInfoTbl= "..DA.DUMP(self.reagentInfoTbl))
+						DA.DEBUG(1,"ProcessQueue: HasAllAllocations= "..tostring(self.recipeTransaction:HasAllAllocations(command.count)))
+						DA.DEBUG(1,"ProcessQueue: HasMetQuantityRequirements= "..tostring(self.recipeTransaction:HasMetQuantityRequirements()))
+						if not self.recipeTransaction:HasMetQuantityRequirements() then
+							DA.MARK3("Insufficient Materials available")
 						end
 					else
 						if command.recipeType == Enum.TradeskillRecipeType.Item then
-							if self.db.profile.queue_one_at_a_time then
-								--DA.DEBUG(1,"ProcessQueue(1I) recipeID= "..tostring(command.recipeID)..", recipeLevel= "..tostring(recipeLevel)..", optionalReagentsArray= "..DA.DUMP(command.optionalReagentsArray))
---								C_TradeSkillUI.CraftRecipe(recipeSpellID [, numCasts [, craftingReagents [, recipeLevel [, orderID [, applyConcentration]]]]])
-								C_TradeSkillUI.CraftRecipe(command.recipeID, command.count, command.optionalReagentsArray, recipeLevel, nil, self.db.profile.use_concentration)
-							else
-								DA.DEBUG(1,"ProcessQueue(I): recipeID= "..tostring(command.recipeID))
-								C_TradeSkillUI.CraftRecipe(command.recipeID, command.count, reagentInfoTbl, recipeLevel, nil, self.db.profile.use_concentration)
-							end
+							DA.DEBUG(1,"ProcessQueue(I): recipeID= "..tostring(command.recipeID))
+							C_TradeSkillUI.CraftRecipe(command.recipeID, command.count, reagentInfoTbl, recipeLevel, nil, self.db.profile.use_concentration)
 						elseif command.recipeType == Enum.TradeskillRecipeType.Enchant then
-							if self.db.profile.queue_one_at_a_time then
-								--DA.DEBUG(1,"ProcessQueue(1E) recipeID= "..tostring(command.recipeID)..", recipeLevel= "..tostring(recipeLevel)..", optionalReagentsArray= "..DA.DUMP(command.optionalReagentsArray))
+							if command.count > 1 then
+								local itemID = Skillet:GetAutoTargetItem(command.tradeID)
+								DA.DEBUG(1,"ProcessQueue(E): itemID= "..tostring(itemID))
+								self.itemLocation = self:GetItemLocationFromItemID(itemID)
+								DA.DEBUG(1,"ProcessQueue(E): itemLocation= "..DA.DUMP(self.itemLocation))
+--								C_TradeSkillUI.CraftEnchant(recipeSpellID [, numCasts [, craftingReagents [, itemTarget [, applyConcentration]]]])
+								DA.DEBUG(1,"ProcessQueue(E): recipeID= "..tostring(command.recipeID))
+								C_TradeSkillUI.CraftEnchant(command.recipeID, command.count, reagentInfoTbl, self.itemLocation, self.db.profile.use_concentration)
+							else
 --								C_TradeSkillUI.CraftRecipe(recipeSpellID [, numCasts [, craftingReagents [, recipeLevel [, orderID [, applyConcentration]]]]])
-								C_TradeSkillUI.CraftRecipe(command.recipeID, command.count, command.optionalReagentsArray, recipeLevel, _, self.db.profile.use_concentration)
-							else							
-								if command.count > 1 then
-									local itemID = Skillet:GetAutoTargetItem(command.tradeID)
-									DA.DEBUG(1,"ProcessQueue(E): itemID= "..tostring(itemID))
-									self.itemLocation = self:GetItemLocationFromItemID(itemID)
-									DA.DEBUG(1,"ProcessQueue(E): itemLocation= "..DA.DUMP(self.itemLocation))
---									C_TradeSkillUI.CraftEnchant(recipeSpellID [, numCasts [, craftingReagents [, itemTarget [, applyConcentration]]]])
-									DA.DEBUG(1,"ProcessQueue(E): recipeID= "..tostring(command.recipeID))
-									C_TradeSkillUI.CraftEnchant(command.recipeID, command.count, reagentInfoTbl, self.itemLocation, self.db.profile.use_concentration)
-								else
---									C_TradeSkillUI.CraftRecipe(recipeSpellID [, numCasts [, craftingReagents [, recipeLevel [, orderID [, applyConcentration]]]]])
-									DA.DEBUG(1,"ProcessQueue(E1): recipeID= "..tostring(command.recipeID))
-									C_TradeSkillUI.CraftRecipe(command.recipeID, command.count, reagentInfoTbl, recipeLevel, nil, self.db.profile.use_concentration)
-								end
+								DA.DEBUG(1,"ProcessQueue(E1): recipeID= "..tostring(command.recipeID))
+								C_TradeSkillUI.CraftRecipe(command.recipeID, command.count, reagentInfoTbl, recipeLevel, nil, self.db.profile.use_concentration)
 							end
 						end
 					end
