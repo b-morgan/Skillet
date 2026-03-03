@@ -198,19 +198,6 @@ Skillet.options =
 					width = "full",
 					order = 22
 				},
-				queue_one_at_a_time = {
-					type = "toggle",
-					name = L["QUEUEONEATATIMENAME"],
-					desc = L["QUEUEONEATATIMEDESC"],
-					get = function()
-						return Skillet.db.profile.queue_one_at_a_time
-					end,
-					set = function(self,value)
-						Skillet.db.profile.queue_one_at_a_time = value
-					end,
-					width = "full",
-					order = 23
-				},
 --[[
 				queue_to_front = {
 					type = "toggle",
@@ -866,6 +853,16 @@ Skillet.options =
 				else
 					DA.DEBUG(0,"|cff8888ffSkillet|r: Combat lockdown restriction. Leave combat and try again.")
 				end
+			end,
+			order = 66
+		},
+		version = {
+			type = 'execute',
+			name = "Version",
+			desc = "Print version information",
+			func = function()
+				local wowVersion,wowBuild = GetBuildInfo();
+				print("Skillet "..tostring(Skillet.version).." on "..tostring(wowVersion).."."..tostring(wowBuild)..", "..tostring(GetLocale()))
 			end,
 			order = 66
 		},
