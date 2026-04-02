@@ -712,11 +712,20 @@ PROFESSIONS_FIRST_CRAFT_DESCRIPTION = "Crafting this recipe for the first time w
 --
 -- An optional reagent has been selected for this slot
 --
-					local name = self:nameWithQuality(oselected.itemID)
+					local name, num, craftable
+					if oselected.itemID then
+						name = self:nameWithQuality(oselected.itemID)
+						texture = GetItemIcon(oselected.itemID)
+						num, craftable = self:GetInventory(self.currentPlayer, oselected.itemID)
+					elseif oselected.currencyID then
+						local info = C_CurrencyInfo.GetCurrencyInfo(oreagentID)
+						name = info.name
+						texture = info.iconFileID
+						num = info.quantity
+						craftable = 0
+					end
 					text:SetText(name)
-					texture = GetItemIcon(oselected.itemID)
 					icon:SetNormalTexture(texture)
-					local num, craftable = self:GetInventory(self.currentPlayer, oselected.itemID)
 					local count_text
 					if craftable > 0 then
 						count_text = string.format("[%d/%d]", num, craftable)

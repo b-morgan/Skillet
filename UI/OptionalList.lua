@@ -185,41 +185,65 @@ function Skillet:UpdateOptionalListWindow()
 		button:SetWidth(width)
 		if itemIndex <= numItems then
 			oreagentID = self.cachedOptionalList.reagents[itemIndex].itemID
-			button.oreagentID = oreagentID
-			local oreagentName, oreagentLink = C_Item.GetItemInfo(oreagentID)
-			local oreagentQuality
-			if not oreagentName then
-				Skillet.optionalDataNeeded = true
-				C_Item.RequestLoadItemDataByID(oreagentID)
-				oreagentName = "item:"..tostring(oreagentID)
-			end
-			if oreagentLink then
-				oreagentQuality = C_TradeSkillUI.GetItemReagentQualityByItemInfo(oreagentLink)
-			end
-			needed:SetText("")
-			needed:Show()
-			local num, craftable = self:GetInventory(self.currentPlayer, oreagentID)
-			local count_text
-			if craftable > 0 then
-				count_text = string.format("[%d/%d]", num, craftable)
+			if oreagentID then
+				button.oreagentID = oreagentID
+				local oreagentName, oreagentLink = C_Item.GetItemInfo(oreagentID)
+				local oreagentQuality
+				if not oreagentName then
+					Skillet.optionalDataNeeded = true
+					C_Item.RequestLoadItemDataByID(oreagentID)
+					oreagentName = "item:"..tostring(oreagentID)
+				end
+				if oreagentLink then
+					oreagentQuality = C_TradeSkillUI.GetItemReagentQualityByItemInfo(oreagentLink)
+				end
+				needed:SetText("")
+				needed:Show()
+				local num, craftable = self:GetInventory(self.currentPlayer, oreagentID)
+				local count_text
+				if craftable > 0 then
+					count_text = string.format("[%d/%d]", num, craftable)
+				else
+					count_text = string.format("[%d]", num)
+				end
+				count:SetText(count_text)
+				count:Show()
+				if oreagentQuality then
+--					oreagentName = oreagentName..C_Texture.GetCraftingReagentQualityChatIcon(oreagentQuality)
+					oreagentName = oreagentName.."|A:Professions-ChatIcon-Quality-Tier"..oreagentQuality..":17:17|a"
+				end
+				text:SetText(oreagentName)
+				text:SetWordWrap(false)
+				text:SetWidth(width - (needed:GetWidth() + count:GetWidth()))
+				text:Show()
+				local texture = GetItemIcon(oreagentID)
+				icon:SetNormalTexture(texture)
+				icon:Show()
+				button:SetID(itemIndex)
+				button:Show()
 			else
+				ocurrencyID = self.cachedOptionalList.reagents[itemIndex].currencyID
+				button.ocurrencyID = ocurrencyID
+				local info = C_CurrencyInfo.GetCurrencyInfo(ocurrencyID)
+				local oreagentName = info.name
+				local oreagentLink = C_CurrencyInfo.GetCurrencyLink(ocurrencyID)
+				needed:SetText("")
+				needed:Show()
+				local num = info.quantity
+				local count_text
 				count_text = string.format("[%d]", num)
+				count:SetText(count_text)
+				count:Show()
+				text:SetText(oreagentName)
+				text:SetWordWrap(false)
+				text:SetWidth(width - (needed:GetWidth() + count:GetWidth()))
+				text:Show()
+				local texture = info.iconFileID
+				icon:SetNormalTexture(texture)
+				icon:Show()
+				button:SetID(itemIndex)
+				button:Show()
 			end
-			count:SetText(count_text)
-			count:Show()
-			if oreagentQuality then
---				oreagentName = oreagentName..C_Texture.GetCraftingReagentQualityChatIcon(oreagentQuality)
-				oreagentName = oreagentName.."|A:Professions-ChatIcon-Quality-Tier"..oreagentQuality..":17:17|a"
-			end
-			text:SetText(oreagentName)
-			text:SetWordWrap(false)
-			text:SetWidth(width - (needed:GetWidth() + count:GetWidth()))
-			text:Show()
-			local texture = GetItemIcon(oreagentID)
-			icon:SetNormalTexture(texture)
-			icon:Show()
-			button:SetID(itemIndex)
-			button:Show()
 		else
 			--DA.DEBUG(1,"UpdateOptionalListWindow: Hide unused button")
 			text:SetText("")
@@ -341,8 +365,10 @@ function Skillet:OptionalButtonOnEnter(button, skillIndex, optionalIndex)
 		end
 		tip:SetScale(uiScale)
 	end
-	--DA.DEBUG(1,"OptionalButtonOnEnter: "..tostring(button.oreagentID))
-	tip:SetHyperlink("item:"..button.oreagentID)
+	DA.DEBUG(1,"OptionalButtonOnEnter: "..tostring(button.oreagentID)..", "..tostring(button.ocurrencyID))
+	if button.oreagentID then
+		tip:SetHyperlink("item:"..button.oreagentID)
+	end
 	tip:Show()
 	CursorUpdate(button)
 end
@@ -370,12 +396,17 @@ function Skillet:OptionalButtonOnClick(button, mouse, skillIndex, reagentIndex)
 	--DA.DEBUG(0,"OptionalButtonOnClick("..tostring(button)..", "..tostring(mouse)..", "..tostring(skillIndex)..", "..tostring(reagentIndex)..")")
 	--DA.DEBUG(1,"OptionalButtonOnClick: cachedOptionalIndex= "..tostring(self.cachedOptionalIndex)..", cachedOptionalList= "..DA.DUMP(self.cachedOptionalList))
 	local oreagentID = self.cachedOptionalList.reagents[reagentIndex].itemID
+	local ocurrencyID = self.cachedOptionalList.reagents[reagentIndex].currencyID
 	local oreagentSlot = self.cachedOptionalList.dataSlotIndex
 	if not self.optionalSelected then
 		self.optionalSelected = {}
 	end
 	if mouse == "LeftButton" then
-		self.optionalSelected[self.cachedOptionalIndex] = { itemID = oreagentID, quantity = 1, dataSlotIndex = oreagentSlot, }
+		if oReagentID then
+			self.optionalSelected[self.cachedOptionalIndex] = { itemID = oreagentID, quantity = 1, dataSlotIndex = oreagentSlot, }
+		elseif ocurrencyID then
+			self.optionalSelected[self.cachedOptionalIndex] = { currencyID = ocurrencyID, quantity = 1, dataSlotIndex = oreagentSlot, }
+		end
 	elseif mouse == "RightButton" then
 		self.optionalSelected[self.cachedOptionalIndex] = nil
 	end
