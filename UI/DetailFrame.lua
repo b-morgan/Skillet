@@ -143,7 +143,7 @@ function Skillet:nameWithQuality(itemID, modified)
 	end
 	if link then
 		info = C_TradeSkillUI.GetItemReagentQualityInfo(link)
-		DA.DEBUG(0,"nameWithQuality: info= "..DA.DUMP(info))
+		--DA.DEBUG(0,"nameWithQuality: info= "..DA.DUMP(info))
 	end
 	if info and info.quality then
 --		name = bname..C_Texture.GetCraftingReagentQualityChatIcon(quality)
@@ -230,8 +230,8 @@ function Skillet:UpdateDetailWindow(skillIndex)
 		if recipe.spellID and recipe.itemID then
 			local orange,yellow,green,gray = self:GetTradeSkillLevels(recipe.itemID, recipe.spellID)
 			if not gray or not green or not yellow or not orange then
-				DA.DEBUG(1,"UpdateDetailsWindow: orange= "..tostring(orange)..", yellow= "..tostring(yellow)..", green= "..tostring(green)..", gray= "..tostring(gray))
-				DA.DEBUG(1,"UpdateDetailsWindow: sourceTradeSkillLevel= "..tostring(self.sourceTradeSkillLevel))
+				--DA.DEBUG(1,"UpdateDetailsWindow: orange= "..tostring(orange)..", yellow= "..tostring(yellow)..", green= "..tostring(green)..", gray= "..tostring(gray))
+				--DA.DEBUG(1,"UpdateDetailsWindow: sourceTradeSkillLevel= "..tostring(self.sourceTradeSkillLevel))
 			else
 --
 -- Save the actual values
@@ -631,9 +631,9 @@ PROFESSIONS_FIRST_CRAFT_DESCRIPTION = "Crafting this recipe for the first time w
 -- (do we need to prevent locked slots from being filled?)
 --
 					if rreagent.schematic then
-						DA.DEBUG(0,"UpdateDetailWindow: slotText= "..tostring(rreagent.schematic.slotInfo.slotText)..", categorySkillRank="..tostring(categorySkillRank)..", requiredSkillRank= "..tostring(rreagent.schematic.slotInfo.requiredSkillRank))
+						--DA.DEBUG(0,"UpdateDetailWindow: slotText= "..tostring(rreagent.schematic.slotInfo.slotText)..", categorySkillRank="..tostring(categorySkillRank)..", requiredSkillRank= "..tostring(rreagent.schematic.slotInfo.requiredSkillRank))
 						local locked, lockedReason = self:GetReagentSlotStatus(rreagent.schematic, newInfo)
-						DA.DEBUG(0,"UpdateDetailWindow: locked= "..tostring(locked)..", lockedReason="..tostring(lockedReason))
+						--DA.DEBUG(0,"UpdateDetailWindow: locked= "..tostring(locked)..", lockedReason="..tostring(lockedReason))
 						local name = rreagent.schematic.slotInfo.slotText or OPTIONAL_REAGENT_POSTFIX
 						text:SetText(name)
 						if not locked and categorySkillRank >= rreagent.schematic.slotInfo.requiredSkillRank then
@@ -718,7 +718,7 @@ PROFESSIONS_FIRST_CRAFT_DESCRIPTION = "Crafting this recipe for the first time w
 						texture = GetItemIcon(oselected.itemID)
 						num, craftable = self:GetInventory(self.currentPlayer, oselected.itemID)
 					elseif oselected.currencyID then
-						local info = C_CurrencyInfo.GetCurrencyInfo(oreagentID)
+						local info = C_CurrencyInfo.GetCurrencyInfo(oselected.currencyID)
 						name = info.name
 						texture = info.iconFileID
 						num = info.quantity

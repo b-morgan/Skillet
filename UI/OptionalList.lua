@@ -371,7 +371,7 @@ function Skillet:OptionalButtonOnEnter(button, skillIndex, optionalIndex)
 		end
 		tip:SetScale(uiScale)
 	end
-	DA.DEBUG(1,"OptionalButtonOnEnter: "..tostring(button.oreagentID)..", "..tostring(button.ocurrencyID))
+	--DA.DEBUG(1,"OptionalButtonOnEnter: "..tostring(button.oreagentID)..", "..tostring(button.ocurrencyID))
 	if button.oreagentID then
 		tip:SetHyperlink("item:"..button.oreagentID)
 	elseif button.ocurrencyID then
