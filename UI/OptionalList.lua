@@ -341,8 +341,14 @@ function Skillet:GetOptionalItemLink(skillIndex, index)
 	if skillIndex and index then
 		local recipe = self:GetRecipeDataByTradeIndex(self.currentTrade, skillIndex)
 		if recipe and self.cachedOptionalList then
-			oreagentID = self.cachedOptionalList.reagents[index].itemID
-			local name, link = C_Item.GetItemInfo(oreagentID)
+			local oreagentID = self.cachedOptionalList.reagents[index].itemID
+			local ocurrencyID = self.cachedOptionalList.reagents[index].currencyID
+			local name, link
+			if oreagentID then
+				name, link = C_Item.GetItemInfo(oreagentID)
+			elseif ocurrencyID then
+				link = C_CurrencyInfo.GetCurrencyLink(ocurrencyID)
+			end
 			return link
 		end
 	end
@@ -368,6 +374,8 @@ function Skillet:OptionalButtonOnEnter(button, skillIndex, optionalIndex)
 	DA.DEBUG(1,"OptionalButtonOnEnter: "..tostring(button.oreagentID)..", "..tostring(button.ocurrencyID))
 	if button.oreagentID then
 		tip:SetHyperlink("item:"..button.oreagentID)
+	elseif button.ocurrencyID then
+		tip:SetHyperlink("currency:"..button.ocurrencyID)
 	end
 	tip:Show()
 	CursorUpdate(button)
