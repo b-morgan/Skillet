@@ -1313,6 +1313,10 @@ function Skillet:ShoppingListToggleIncludeGuild()
 	Skillet.db.profile.include_guild = not Skillet.db.profile.include_guild
 end
 
+function Skillet:ShoppingListToggleIgnoreOnHand()
+	Skillet.db.profile.ignore_on_hand = not Skillet.db.profile.ignore_on_hand
+end
+
 local num_buttons = 0
 local function get_button(i)
 	local button = _G["SkilletShoppingListButton"..i]

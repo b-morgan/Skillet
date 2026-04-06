@@ -61,6 +61,7 @@ local defaults = {
 		queue_to_front = false,
 		ignore_banked_reagents = false,
 		ignore_queued_reagents = false,
+		ignore_on_hand = false,
 		queue_glyph_reagents = false,
 		display_required_level = false,
 		display_shopping_list_at_bank = true,
@@ -96,18 +97,6 @@ local defaults = {
 -- notes added to items crafted or used in crafting
 --
 		notes = {},
-	},
-	char = {
---
--- options specific to a current tradeskill
---
-		tradeskill_options = {},
-		include_alts = true,	-- Display alt's items in shopping list
-		same_faction = true,	-- Display same faction alt items only
-		ignore_on_hand = false,	-- Ignore items in inventory
-		item_order =  false,	-- Order shopping list by item
-		merge_items = false,	-- Merge same shopping list items together
-		include_guild = false,	-- Use the contents of the Guild Bank
 	},
 }
 
