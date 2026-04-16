@@ -330,6 +330,7 @@ function Skillet:RecipeGroupRenameEntry(entry, name)
 	if entry and name then
 		local key = entry.parent.key
 		local player, tradeID, label = string.split(":", key)
+		local gkey = tradeID..":"..label
 		tradeID = tonumber(tradeID)
 		if entry.subGroup then
 			local oldName = entry.subGroup.name
@@ -337,9 +338,10 @@ function Skillet:RecipeGroupRenameEntry(entry, name)
 			if oldName ~= name then
 				name = self:RecipeGroupNewName(key, name)
 				entry.subGroup.name = name
+				entry.name = name
 				groupList[name] = groupList[oldName]
 				groupList[oldName] = nil
-				entry.name = name
+				self.db.profile.groupDB[gkey][oldName] = nil
 			end
 		end
 		self:RecipeGroupConstructDBString(entry.parent)
