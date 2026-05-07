@@ -269,6 +269,7 @@ end
 function Skillet:ResetTradeSkillFilter()
 	--DA.PROFILE("Skillet:ResetTradeSkillFilter()")
 	Skillet:SetTradeSkillOption("hideuncraftable", false)
+	Skillet:SetTradeSkillOption("isfirstcraft", false)
 	Skillet:SetTradeSkillOption("filterLevel", 1)
 end
 

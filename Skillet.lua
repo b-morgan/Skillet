@@ -115,6 +115,7 @@ Skillet.defaultOptions = {
 	["filterLevel"] = 1,
 	["hideuncraftable"] = false,
 	["favoritesOnly"] = false,
+	["isfirstcraft"] = false,
 }
 
 Skillet.unknownRecipe = {
