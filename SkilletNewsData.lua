@@ -26,6 +26,16 @@ local isCata = WOW_PROJECT_ID == WOW_PROJECT_CATACLYSM_CLASSIC
 
 Skillet.NewsName = "Skillet News"
 Skillet.NewsData = {
+	{	version = "5.55",
+		data = {
+			{	name = "Changes",
+				data = {
+					{ header = "Filters", body = "Add First Craft Bonus filter" },
+					{ header = "Plugins", body = "Update CanIMogIt plugin" },
+				},
+			},
+		},
+	},
 	{	version = "5.54",
 		data = {
 			{	name = "Changes",
