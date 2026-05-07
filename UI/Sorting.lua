@@ -203,6 +203,11 @@ local function SkillIsFilteredOut(skillIndex)
 	if Skillet:GetTradeSkillOption("favoritesOnly") and not Skillet:IsFavorite(recipeID) then
 		return true
 	end
+
+	if Skillet:GetTradeSkillOption("isfirstcraft") and not Skillet:IsFirstCraft(recipeID) then
+		return true
+	end
+
 --
 -- Are we hiding anything that is trivial (has no chance of giving a skill point)
 --

@@ -121,6 +121,18 @@ function Skillet.InitializeFilterDropdown(self, level)
 		info.isNotRadio = true
 		UIDropDownMenu_AddButton(info, level)
 
+		info.text = PROFESSION_RECIPES_IS_FIRST_CRAFT
+		info.func = function()
+			C_TradeSkillUI.SetOnlyShowFirstCraftRecipes(not C_TradeSkillUI.GetOnlyShowFirstCraftRecipes())
+			Skillet:SetTradeSkillOption("isfirstcraft", C_TradeSkillUI.GetOnlyShowFirstCraftRecipes())
+			Skillet.dataScanned = false
+			Skillet:UpdateTradeSkillWindow()
+		end
+		info.keepShownOnClick = true
+		info.checked = C_TradeSkillUI.GetOnlyShowFirstCraftRecipes()
+		info.isNotRadio = true
+		UIDropDownMenu_AddButton(info, level)
+
 		if not C_TradeSkillUI.IsTradeSkillGuild() and not C_TradeSkillUI.IsNPCCrafting() then
 			info.text = TRADESKILL_FILTER_HAS_SKILL_UP
 			info.func = function()
