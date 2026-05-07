@@ -1,5 +1,16 @@
 local addonName,addonTable = ...
-local DA = _G[addonName] -- for DebugAids.lua
+local isRetail = WOW_PROJECT_ID == WOW_PROJECT_MAINLINE -- 1
+local isClassic = WOW_PROJECT_ID == WOW_PROJECT_CLASSIC -- 2
+local isBCC = WOW_PROJECT_ID == WOW_PROJECT_BURNING_CRUSADE_CLASSIC -- 5
+local isWrath = WOW_PROJECT_ID == WOW_PROJECT_WRATH_CLASSIC -- 11
+local isCata = WOW_PROJECT_ID == WOW_PROJECT_CATACLYSM_CLASSIC -- 14
+local isMists = WOW_PROJECT_ID == WOW_PROJECT_MISTS_CLASSIC -- 19
+local DA
+if isRetail then
+	DA = _G[addonName] -- for DebugAids.lua
+else
+	DA = LibStub("AceAddon-3.0"):GetAddon("Skillet") -- for DebugAids.lua
+end
 --[[
 
 Skillet: A tradeskill window replacement.
@@ -47,6 +58,7 @@ plugin.options =
 }
 
 function plugin.OnInitialize()
+	--DA.DEBUG(0,"CIMI:OnInitialize()")
 	if not Skillet.db.profile.plugins.CIMI then
 		Skillet.db.profile.plugins.CIMI = {}
 		Skillet.db.profile.plugins.CIMI.enabled = true
@@ -55,6 +67,7 @@ function plugin.OnInitialize()
 end
 
 function plugin.RecipeNamePrefix(skill, recipe)
+	--DA.DEBUG(0,"CIMI:RecipeNamePrefix("..tostring(skill)..", "..tostring(recipe)..")")
 	if not skill or not recipe then return end
 	if CanIMogIt and CanIMogIt.GetIconText and Skillet.db.profile.plugins.CIMI.enabled then
 		local itemLink = select(2, C_Item.GetItemInfo(recipe.itemID))
@@ -68,6 +81,7 @@ function plugin.RecipeNamePrefix(skill, recipe)
 end
 
 function plugin.GetExtraText(skill, recipe)
+	--DA.DEBUG(0,"CIMI:GetExtraText("..tostring(skill)..", "..tostring(recipe)..")")
 	if CanIMogIt and CanIMogIt.GetIconText and Skillet.db.profile.plugins.CIMI.enabled then
 		return "|rCanIMogIt:", (plugin.RecipeNamePrefix(skill, recipe) or "No")
 	end
