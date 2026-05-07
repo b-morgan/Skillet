@@ -84,7 +84,7 @@ local function getRacialBonus()
 		for r, bonus in pairs(racialList[trade]) do
 			--DA.DEBUG(1,"getRacialBonus: r = "..tostring(r)..", bonus= "..tostring(bonus))
 			if r == race then
-			DA.DEBUG(1,"getRacialBonus: bonus = "..tostring(bonus))
+			--DA.DEBUG(1,"getRacialBonus: bonus = "..tostring(bonus))
 				return bonus
 			end
 		end

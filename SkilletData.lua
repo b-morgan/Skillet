@@ -614,8 +614,15 @@ function Skillet:CalculateCraftableCounts()
 end
 
 function Skillet:IsFavorite(recipeID)
+	--DA.DEBUG(0,"IsFavorite("..tostring(recipeID)..")")
 	local info = self.data.recipeInfo
 	return info and info[self.currentTrade] and info[self.currentTrade][recipeID] and info[self.currentTrade][recipeID].favorite
+end
+
+function Skillet:IsFirstCraft(recipeID)
+	--DA.DEBUG(0,"IsFirstCraft("..tostring(recipeID)..")")
+	local info = self.data.recipeInfo
+	return info and info[self.currentTrade] and info[self.currentTrade][recipeID] and info[self.currentTrade][recipeID].firstCraft
 end
 
 function Skillet:ToggleFavorite(recipeID)
@@ -813,7 +820,7 @@ end
 --
 local function ScanTrade()
 	--DA.PROFILE("ScanTrade()")
-	DA.DEBUG(0,"ScanTrade()")
+	--DA.DEBUG(0,"ScanTrade()")
 	local tradeID
 	local link = C_TradeSkillUI.GetTradeSkillListLink()
 	local parentSkillLineID, parentSkillLineName, skillLineRank, skillLineMaxRank
@@ -1342,7 +1349,7 @@ recipeSchematic= {
 			local itemID = Skillet:GetItemIDFromLink(itemLink)
 			--DA.DEBUG(2,"itemID= "..tostring(itemID))
 			if (not itemID or tonumber(itemID) == 0) then
-				DA.DEBUG(0,"recipeID= "..tostring(recipeID)..", itemID= "..tostring(itemID))
+				--DA.DEBUG(0,"recipeID= "..tostring(recipeID)..", itemID= "..tostring(itemID))
 				itemID = 0
 			end
 			recipe.itemID = itemID
@@ -1507,6 +1514,8 @@ recipeSchematic= {
 					finishingData[numFinishing].locked = locked
 					finishingData[numFinishing].lockedReason = lockedReason
 				end
+			elseif schematic.reagentType == Enum.CraftingReagentType.Automatic then
+				--DA.DEBUG(2,"ScanTrade: recipeID= "..tostring(recipeID)..", name= "..tostring(recipeInfo.name)..", Automatic reagent= "..DA.DUMP(schematic))
 			else
 				DA.DEBUG(2,"ScanTrade: recipeID= "..tostring(recipeID)..", name= "..tostring(recipeInfo.name)..", Unknown reagentType= "..DA.DUMP(schematic))
 			end

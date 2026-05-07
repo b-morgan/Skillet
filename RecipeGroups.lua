@@ -439,6 +439,23 @@ function Skillet:RecipeGroupFlatten(group, depth, list, index)
 					local filterLevel = ((skillLevel[entry.difficulty] or skillLevel[skillData.difficulty] or 0) < (self:GetTradeSkillOption("filterLevel")))
 					local filterCraftable = false
 					local filterFavoritesOnly = self:GetTradeSkillOption("favoritesOnly") and not Skillet:IsFavorite(entry.recipeID)
+--[[
+function Skillet:IsFirstCraft(recipeID)
+	DA.DEBUG(0,"IsFirstCraft("..tostring(recipeID)..")")
+	local info = self.data.recipeInfo
+	if info[self.currentTrade][recipeID].firstCraft then
+		DA.DEBUG(0,"firstCraft= "..tostring(info[self.currentTrade][recipeID].firstCraft))
+	end
+	return info and info[self.currentTrade] and info[self.currentTrade][recipeID] and info[self.currentTrade][recipeID].firstCraft
+end
+--	if Skillet:GetTradeSkillOption("isfirstcraft") and not Skillet:IsFirstCraft(recipeID) then
+	if Skillet:GetTradeSkillOption("isfirstcraft") then
+		if not Skillet:IsFirstCraft(recipeID) then
+			return true
+		end
+	end
+--]]
+					local filterFirstCraftOnly = self:GetTradeSkillOption("isfirstcraft") and not Skillet:IsFirstCraft(entry.recipeID)
 					if Skillet:GetTradeSkillOption("hideuncraftable") then
 						--DA.DEBUG(1,"RecipeGroupFlatten: name="..tostring(skillData.name)..", numCraftable="..tostring(skillData.numCraftable)..", numRecursive="..tostring(skillData.numRecursive)..", numCraftableVendor="..tostring(skillData.numCraftableVendor)..", numCraftableAlts="..tostring(skillData.numCraftableAlts))
 						if not (skillData.numCraftable and skillData.numCraftable > 0 and Skillet:GetTradeSkillOption("filterInventory-bag")) and
@@ -464,7 +481,7 @@ function Skillet:RecipeGroupFlatten(group, depth, list, index)
 					else
 						newSkill.parentIndex = nil
 					end
-					if not (filterLevel or filterCraftable or filterFavoritesOnly or Skillet:IsUpgradeHidden(newSkill.spellID)) then
+					if not (filterLevel or filterCraftable or filterFavoritesOnly or filterFirstCraftOnly or Skillet:IsUpgradeHidden(newSkill.spellID)) then
 						num = num + 1
 						list[num + index] = newSkill
 					end
