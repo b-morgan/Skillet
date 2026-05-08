@@ -158,52 +158,65 @@ function Skillet.InitializeFilterDropdown(self, level)
 		info.keepShownOnClick = false
 		info.hasArrow = true
 
+--
+-- Uncomment the block below to enable Inventory Slots, Recipe Sources, and Categories
+-- Note that Categories may not be needed as Skillet displays them all by default
+--
+--[[
 		info.text = TRADESKILL_FILTER_SLOTS
 		info.value = 1
-		info.disabled = true
-		UIDropDownMenu_AddButton(info, level)
-
-		info.text = TRADESKILL_FILTER_CATEGORY
-		info.value = 2
-		info.disabled = true
+		info.disabled = true					-- Not working in 5.55
 		UIDropDownMenu_AddButton(info, level)
 
 		info.text = SOURCES
-		info.value = 3
-		info.disabled = true
+		info.value = 2
+		info.disabled = true					-- Not working in 5.55
 		UIDropDownMenu_AddButton(info, level)
+
+		info.text = TRADESKILL_FILTER_CATEGORY
+		info.value = 3
+		info.disabled = false					-- Working in 5.55 but probably not needed
+		UIDropDownMenu_AddButton(info, level)
+--]]
 
 	elseif level == 2 then
 		if UIDROPDOWNMENU_MENU_VALUE == 1 then
 			local inventorySlots = {C_TradeSkillUI.GetAllFilterableInventorySlots()}
+			info.isNotRadio = true
+			info.notCheckable = true
+			info.text = CHECK_ALL
+			info.func = function()
+				Professions.SetAllInventorySlotsFiltered(true)
+				UIDropDownMenu_Refresh(SkilletFilterDropMenu, 1, 2)
+				Skillet.dataScanned = false
+				Skillet:UpdateTradeSkillWindow()
+			end
+			UIDropDownMenu_AddButton(info, level)
+
+			info.text = UNCHECK_ALL
+			info.func = function()
+				Professions.SetAllInventorySlotsFiltered(false)
+				Skillet:SetDefaultFilters()
+				UIDropDownMenu_Refresh(SkilletFilterDropMenu, 1, 2)
+				Skillet.dataScanned = false
+				Skillet:UpdateTradeSkillWindow()
+			end
+			UIDropDownMenu_AddButton(info, level)
+
+			info.notCheckable = false
 			for i, inventorySlot in ipairs(inventorySlots) do
 				info.text = inventorySlot
 				info.func = function()
 					Skillet.SetSlotFilter(i)
 				end
-				info.notCheckable = true
 				info.hasArrow = false
 				UIDropDownMenu_AddButton(info, level)
 			end
 		elseif UIDROPDOWNMENU_MENU_VALUE == 2 then
-			local categories = {C_TradeSkillUI.GetCategories()}
-			for i, categoryId in ipairs(categories) do
-				local categoryData = C_TradeSkillUI.GetCategoryInfo(categoryId)
-				info.text = categoryData.name
-				info.func = function()
-					Skillet.SetSlotFilter(nil, categoryId, nil)
-				end
-				info.notCheckable = true
-				info.hasArrow = select("#", C_TradeSkillUI.GetSubCategories(categoryId)) > 0
-				info.keepShownOnClick = true;
-				info.value = categoryId
-				UIDropDownMenu_AddButton(info, level)
-			end
-		elseif UIDROPDOWNMENU_MENU_VALUE == 3 then
 			info.hasArrow = false
+			info.keepShownOnClick = true
 			info.isNotRadio = true
 			info.notCheckable = true
-			info.keepShownOnClick = true
 			info.text = CHECK_ALL
 			info.func = function()
 				C_TradeSkillUI.ClearRecipeSourceTypeFilter()
@@ -237,9 +250,29 @@ function Skillet.InitializeFilterDropdown(self, level)
 					UIDropDownMenu_AddButton(info, level)
 				end
 			end
+		elseif UIDROPDOWNMENU_MENU_VALUE == 3 then
+			local categories = {C_TradeSkillUI.GetCategories()}
+			for i, categoryId in ipairs(categories) do
+				local categoryData = C_TradeSkillUI.GetCategoryInfo(categoryId)
+				info.text = categoryData.name
+				info.func = function()
+					Skillet.SetSlotFilter(nil, categoryId, nil)
+				end
+--
+-- Uncomment the line below (and the level 3 code block) to enable subcategories
+--
+--				info.hasArrow = select("#", C_TradeSkillUI.GetSubCategories(categoryId)) > 0
+				info.keepShownOnClick = true;
+				info.value = categoryId
+				UIDropDownMenu_AddButton(info, level)
+			end
 		end
 
 	elseif level == 3 then
+--[[
+--
+-- Blizzard doesn't implement subcategories in 12.0.5
+--
 		local categoryID = UIDROPDOWNMENU_MENU_VALUE
 		local categoryData = C_TradeSkillUI.GetCategoryInfo(categoryID)
 		local subCategories = { C_TradeSkillUI.GetSubCategories(categoryID) }
@@ -249,15 +282,17 @@ function Skillet.InitializeFilterDropdown(self, level)
 			info.func = function()
 				Skillet.SetSlotFilter(nil, categoryID, subCategoryId)
 			end
-			info.notCheckable = true
+			info.notCheckable = false
 			info.keepShownOnClick = true
 			info.value = subCategoryId
 			UIDropDownMenu_AddButton(info, level)
 		end
+--]]
 	end
 end
 
 function Skillet.SetSlotFilter(inventorySlotIndex, categoryId, subCategoryId)
+	--DA.DEBUG(0,"SetSlotFilter("..tostring(inventorySlotIndex)..", "..tostring(categoryId)..", "..tostring(subCategoryId)..")")
 	C_TradeSkillUI.ClearInventorySlotFilter()
 	C_TradeSkillUI.ClearRecipeCategoryFilter()
 
@@ -273,6 +308,7 @@ function Skillet.SetSlotFilter(inventorySlotIndex, categoryId, subCategoryId)
 end
 
 function Skillet:SetDefaultFilters()
+	--DA.DEBUG(0,"SetDefaultFilters()")
 	C_TradeSkillUI.SetShowLearned(true)
 	C_TradeSkillUI.SetShowUnlearned(true)
 	C_TradeSkillUI.SetOnlyShowMakeableRecipes(false)
@@ -284,7 +320,11 @@ function Skillet:SetDefaultFilters()
 	C_TradeSkillUI.ClearRecipeCategoryFilter()
 end
 
+--
+-- Currently unused
+--
 function Skillet:GetCurrentFilterSet()
+	DA.DEBUG(0,"GetCurrentFilterSet()")
 	local filterSet =
 	{
 		textFilter = C_TradeSkillUI.GetRecipeItemNameFilter(),
@@ -303,7 +343,11 @@ function Skillet:GetCurrentFilterSet()
 	return filterSet
 end
 
+--
+-- Currently unused
+--
 function Skillet:ApplyfilterSet(filterSet)
+	DA.DEBUG(0,"ApplyfilterSet("..DA.DUMP1(filterSet)..")")
 	if filterSet then
 		C_TradeSkillUI.SetShowLearned(filterSet.showLearned)
 		C_TradeSkillUI.SetShowUnlearned(filterSet.showUnlearned)
