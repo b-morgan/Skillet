@@ -1,8 +1,10 @@
 local addonName,addonTable = ...
-local isRetail = WOW_PROJECT_ID == WOW_PROJECT_MAINLINE
-local isClassic = WOW_PROJECT_ID == WOW_PROJECT_CLASSIC
-local isBCC = WOW_PROJECT_ID == WOW_PROJECT_BURNING_CRUSADE_CLASSIC
-local isWrath = WOW_PROJECT_ID == WOW_PROJECT_WRATH_CLASSIC
+local isRetail = WOW_PROJECT_ID == WOW_PROJECT_MAINLINE -- 1
+local isClassic = WOW_PROJECT_ID == WOW_PROJECT_CLASSIC -- 2
+local isBCC = WOW_PROJECT_ID == WOW_PROJECT_BURNING_CRUSADE_CLASSIC -- 5
+local isWrath = WOW_PROJECT_ID == WOW_PROJECT_WRATH_CLASSIC -- 11
+local isCata = WOW_PROJECT_ID == WOW_PROJECT_CATACLYSM_CLASSIC -- 14
+local isMists = WOW_PROJECT_ID == WOW_PROJECT_MISTS_CLASSIC -- 19
 local DA
 if isRetail then
 	DA = _G[addonName] -- for DebugAids.lua
@@ -201,20 +203,6 @@ plugin.options =
 --			width = "full",
 			order = 20
 		},
---[[
-		alwaysEnchanting = {
-			type = "toggle",
-			name = "alwaysEnchanting",
-			desc = "Always show Enchanting profit (loss)",
-			get = function()
-				return Skillet.db.profile.plugins.ATR.alwaysEnchanting
-			end,
-			set = function(self,value)
-				Skillet.db.profile.plugins.ATR.alwaysEnchanting = value
-			end,
-			order = 21
-		},
---]]
 		calcProfitAhTax = {
 			type = "toggle",
 			name = "calcProfitAhTax",
@@ -314,7 +302,7 @@ plugin.options =
 			type = "range",
 			name = "buyFactor",
 			desc = "Multiply vendor sell price by this to get calculated buy price",
-			min = 1, max = 10, step = 1, isPercent = false,
+			min = 1, max = 10, step = .1, isPercent = false,
 			get = function()
 				return Skillet.db.profile.plugins.ATR.buyFactor
 			end,
@@ -459,6 +447,7 @@ local function GetBuyout(recipe)
 end
 
 local function GetReagentData(reagent)
+	--DA.DEBUG(0,"GetReagentData: reagent= "..DA.DUMP1(reagent))
 	local value = 0
 	local needed = 0
 	local custom = ""
@@ -478,6 +467,16 @@ local function GetReagentData(reagent)
 		else
 			value = 0
 		end
+		if Skillet:VendorSellsReagent(id) then
+			if Skillet.db.profile.plugins.ATR.buyablePrices then
+				if Skillet.db.profile.plugins.ATR.useVendorCalc then
+					local buyFactor = Skillet.db.profile.plugins.ATR.buyFactor or buyFactorDef
+					value = ( select(11,C_Item.GetItemInfo(id)) or 0 ) * buyFactor
+				end
+			else
+				value = 0
+			end
+		end
 		if Skillet.db.profile.plugins.ATR.customPrice then
 			local server = Skillet.data.server or 0
 			local customPrice = Skillet.db.global.customPrice[server]
@@ -495,21 +494,12 @@ local function GetReagentData(reagent)
 			end
 		end
 		value = value * needed
-		if Skillet:VendorSellsReagent(id) then
-			if Skillet.db.profile.plugins.ATR.buyablePrices then
-				if Skillet.db.profile.plugins.ATR.useVendorCalc then
-					local buyFactor = Skillet.db.profile.plugins.ATR.buyFactor or buyFactorDef
-					value = ( select(11,C_Item.GetItemInfo(id)) or 0 ) * needed * buyFactor
-				end
-			else
-				value = 0
-			end
-		end
 	end
 	return value, needed, id, name, custom
 end
 
 local function AddExtraText(value, needed, id, name, custom)
+	DA.DEBUG(0,"AddExtraText("..tostring(value)..", "..tostring(needed)..", "..tostring(id)..", "..tostring(name)..", "..tostring(custom)..")")
 	if not Skillet:VendorSellsReagent(id) then
 --
 -- Not sold by a vendor so use the default
@@ -1247,7 +1237,7 @@ Skillet:RegisterDisplayDetailPlugin("ATRPlugin")	-- we have a GetExtraText funct
 --    false (or nil) will search for the item and reagents in the MainFrame
 --
 function Skillet:AuctionatorSearch(whichOne)
-	DA.DEBUG(0, "AuctionatorSearch("..tostring(whichOne)..")")
+	--DA.DEBUG(0, "AuctionatorSearch("..tostring(whichOne)..")")
 	local shoppingListName
 	local items = {}
 	local recipe = Skillet:GetRecipeDataByTradeIndex(Skillet.currentTrade, Skillet.selectedSkill)
@@ -1261,7 +1251,7 @@ function Skillet:AuctionatorSearch(whichOne)
 		end
 		local list = Skillet:GetShoppingList(name, Skillet.db.profile.same_faction, Skillet.db.profile.include_guild)
 		if not list or #list == 0 then
-			DA.DEBUG(0,"AuctionatorSearch: Shopping List is empty")
+			--DA.DEBUG(0,"AuctionatorSearch: Shopping List is empty")
 			return
 		end
 		for i=1,#list,1 do
@@ -1269,7 +1259,7 @@ function Skillet:AuctionatorSearch(whichOne)
 			local name = C_Item.GetItemInfo(id)
 			if name and not Skillet:VendorSellsReagent(id) then
 				table.insert (items, name)
-				DA.DEBUG(1, "AuctionatorSearch: Item["..tostring(i).."] "..name.." ("..tostring(id)..") added")
+				--DA.DEBUG(1, "AuctionatorSearch: Item["..tostring(i).."] "..name.." ("..tostring(id)..") added")
 			end
 		end
 	else
@@ -1338,9 +1328,9 @@ function Skillet:AuctionatorSearch(whichOne)
 					if (bname) then
 						if not Skillet:VendorSellsReagent(id) then
 							table.insert (items, bname)
-							DA.DEBUG(1, "AuctionatorSearch:  Added  ["..i.."] ("..id..") "..bname)
+							--DA.DEBUG(1, "AuctionatorSearch:  Added  ["..i.."] ("..id..") "..bname)
 						else
-							DA.DEBUG(1, "AuctionatorSearch: Skipped ["..i.."] ("..id..") "..bname)
+							--DA.DEBUG(1, "AuctionatorSearch: Skipped ["..i.."] ("..id..") "..bname)
 						end
 					end
 				end
@@ -1353,24 +1343,24 @@ function Skillet:AuctionatorSearch(whichOne)
 				if (bname) then
 					if not Skillet:VendorSellsReagent(id) then
 						table.insert (items, bname)
-						DA.DEBUG(1, "AuctionatorSearch:  Added  ["..i.."] ("..id..") "..bname)
+						--DA.DEBUG(1, "AuctionatorSearch:  Added  ["..i.."] ("..id..") "..bname)
 					else
-						DA.DEBUG(1, "AuctionatorSearch: Skipped ["..i.."] ("..id..") "..bname)
+						--DA.DEBUG(1, "AuctionatorSearch: Skipped ["..i.."] ("..id..") "..bname)
 					end
 				end
 			end
 		end
 	end
 	if Atr_SelectPane and Atr_SearchAH then
-		DA.DEBUG(0, "AuctionatorSearch: shoppingListName= "..tostring(shoppingListName)..", items= "..DA.DUMP1(items))
+		--DA.DEBUG(0, "AuctionatorSearch: shoppingListName= "..tostring(shoppingListName)..", items= "..DA.DUMP1(items))
 		local BUY_TAB = 3;
 		Atr_SelectPane(BUY_TAB)
 		Atr_SearchAH(shoppingListName, items)
 	elseif useSearchExact and Auctionator.API.v1.MultiSearchExact then
-		DA.DEBUG(0, "AuctionatorSearch: (exact) addonName= "..tostring(addonName)..", items= "..DA.DUMP1(items))
+		--DA.DEBUG(0, "AuctionatorSearch: (exact) addonName= "..tostring(addonName)..", items= "..DA.DUMP1(items))
 		Auctionator.API.v1.MultiSearchExact(addonName, items)
 	elseif Auctionator.API.v1.MultiSearch then
-		DA.DEBUG(0, "AuctionatorSearch: addonName= "..tostring(addonName)..", items= "..DA.DUMP1(items))
+		--DA.DEBUG(0, "AuctionatorSearch: addonName= "..tostring(addonName)..", items= "..DA.DUMP1(items))
 		Auctionator.API.v1.MultiSearch(addonName, items)
 	end
 end
