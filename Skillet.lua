@@ -1242,7 +1242,7 @@ function Skillet:IsNotSupportedFollower(tradeID)
 		return true -- Any NPC for this tradeskill uses Blizzard Frame
 	end
 	local guid = UnitGUID("target")
-	if guid then
+	if guid and canaccessvalue(guid) then -- issecretvalue(foo) == not canaccessvalue(foo)
 		local gtype, zero, server_id, instance_id, zone_uid, npc_id, spawn_uid = strsplit("-",guid);
 		DA.DEBUG(3,"IsNotSupportedFollower: IsNPCCrafting="..tostring(C_TradeSkillUI.IsNPCCrafting())..", gtype="..tostring(gtype)..", npc_id="..tostring(npc_id))
 		if self:IsModKey2Down() and self:IsModKey3Down() then
