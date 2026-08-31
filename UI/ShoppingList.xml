@@ -118,7 +118,7 @@
 			if button == "LeftButton" and IsShiftKeyDown() then
 				local name,link = C_Item.GetItemInfo(self.id)
 				if not ChatEdit_InsertLink(self.count .. "x" .. link) then
-					DA.DEBUG(0,"ShoppingListItemLink: link= "..DA.PLINK(link))
+					Skillet:XMLDebugLink("ShoppingListItemLink: link= ", link)
 				end
 			end
 			<!-- control clicking will remove this player's entries. -->

@@ -102,7 +102,7 @@
 				<!-- Put a link to the *item* in chat into the current chat edit box -->
 					local link = Skillet:GetSalvageItemLink(Skillet.selectedSkill, self:GetID())
 					if not ChatEdit_InsertLink(link) then
-						DA.DEBUG(0,"SalvageItemLink: link= "..DA.PLINK(link))
+						Skillet:XMLDebugLink("SalvageItemLink: link= ", link)
 					end
 				else
 				<!-- generic click action -->

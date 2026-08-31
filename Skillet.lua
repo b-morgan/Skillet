@@ -1832,3 +1832,11 @@ end
 function Skillet:IsActive()
 	return Skillet:IsEnabled()
 end
+
+function Skillet:XMLDebug(text)
+	DA.DEBUG(0,text)
+end
+
+function Skillet:XMLDebugLink(text, link)
+	DA.DEBUG(0,text..DA.PLINK(link))
+end

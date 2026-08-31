@@ -2326,7 +2326,7 @@
 							<!-- This put a link to the *item* that can be created with this trade skill
 								 into the current chat  box -->
 							if not ChatEdit_InsertLink(link) then
-								DA.DEBUG(0,"SkilletSkillIcon: link= "..DA.PLINK(link))
+								Skillet:XMLDebugLink("SkilletSkillIcon: link= ", link)
 							end
 						elseif ( button == "LeftButton" and IsAltKeyDown() ) then
 						<!-- This will put a link to the *reagents* required by this *item*
