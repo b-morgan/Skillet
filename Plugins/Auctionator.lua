@@ -1,16 +1,5 @@
 local addonName,addonTable = ...
-local isRetail = WOW_PROJECT_ID == WOW_PROJECT_MAINLINE -- 1
-local isClassic = WOW_PROJECT_ID == WOW_PROJECT_CLASSIC -- 2
-local isBCC = WOW_PROJECT_ID == WOW_PROJECT_BURNING_CRUSADE_CLASSIC -- 5
-local isWrath = WOW_PROJECT_ID == WOW_PROJECT_WRATH_CLASSIC -- 11
-local isCata = WOW_PROJECT_ID == WOW_PROJECT_CATACLYSM_CLASSIC -- 14
-local isMists = WOW_PROJECT_ID == WOW_PROJECT_MISTS_CLASSIC -- 19
-local DA
-if isRetail then
-	DA = _G[addonName] -- for DebugAids.lua
-else
-	DA = LibStub("AceAddon-3.0"):GetAddon("Skillet") -- for DebugAids.lua
-end
+local DA = LibStub("AceAddon-3.0"):GetAddon("Skillet") -- for DebugAids.lua
 --[[
 Skillet: A tradeskill window replacement.
 
@@ -32,6 +21,9 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
 -- Includes changes from GuardsmanBogo
 -- Includes changes from Dranni21312
 --
+
+local isRetail = Skillet.isRetail
+local isClassic = Skillet.isClassic
 
 Skillet.ATRPlugin = {}
 
@@ -1351,16 +1343,22 @@ function Skillet:AuctionatorSearch(whichOne)
 			end
 		end
 	end
-	if Atr_SelectPane and Atr_SearchAH then
-		--DA.DEBUG(0, "AuctionatorSearch: shoppingListName= "..tostring(shoppingListName)..", items= "..DA.DUMP1(items))
-		local BUY_TAB = 3;
-		Atr_SelectPane(BUY_TAB)
-		Atr_SearchAH(shoppingListName, items)
-	elseif useSearchExact and Auctionator.API.v1.MultiSearchExact then
-		--DA.DEBUG(0, "AuctionatorSearch: (exact) addonName= "..tostring(addonName)..", items= "..DA.DUMP1(items))
-		Auctionator.API.v1.MultiSearchExact(addonName, items)
-	elseif Auctionator.API.v1.MultiSearch then
-		--DA.DEBUG(0, "AuctionatorSearch: addonName= "..tostring(addonName)..", items= "..DA.DUMP1(items))
-		Auctionator.API.v1.MultiSearch(addonName, items)
+--
+-- Make sure the Auction House is still open
+--
+--[[
+	if (not AuctionHouseFrame or not AuctionHouseFrame:IsShown()) and
+	   (not AuctionFrame      or not AuctionFrame:IsShown()) then
+		return
+	end
+--]]
+	if Skillet.auctionOpen then
+		if useSearchExact and Auctionator.API.v1.MultiSearchExact then
+			--DA.DEBUG(0, "AuctionatorSearch: (exact) addonName= "..tostring(addonName)..", items= "..DA.DUMP1(items))
+			Auctionator.API.v1.MultiSearchExact(addonName, items)
+		elseif Auctionator.API.v1.MultiSearch then
+			--DA.DEBUG(0, "AuctionatorSearch: addonName= "..tostring(addonName)..", items= "..DA.DUMP1(items))
+			Auctionator.API.v1.MultiSearch(addonName, items)
+		end
 	end
 end

@@ -1,3 +1,5 @@
+local addonName,addonTable = ...
+local DA = LibStub("AceAddon-3.0"):GetAddon("Skillet") -- for DebugAids.lua
 --[[
 Skillet: A tradeskill window replacement.
 

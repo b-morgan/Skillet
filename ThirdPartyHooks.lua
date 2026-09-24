@@ -16,6 +16,7 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
 ]]--
 
 --[[
+**** Not all of this documentation has been verified as accurate in Skillet ****
 
 This file contains functions intended to be used by authors of other mods.
 I will make every effort never to change the names or behaviour of any of the

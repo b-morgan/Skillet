@@ -135,42 +135,28 @@ Skillet.unknownRecipe = {
 
 function Skillet:DisableBlizzardFrame()
 	DA.DEBUG(0,"DisableBlizzardFrame()")
+	if isRetail then
 	if not ProfessionsFrame then
 		DA.WARN("DisableBlizzardFrame: ProfessionsFrame is nil")
 	elseif self.BlizzardTradeSkillFrame == nil then
+	if self.BlizzardTradeSkillFrame == nil then
 		self.BlizzardTradeSkillFrame = ProfessionsFrame
 		self.tradeSkillHide = ProfessionsFrame:GetScript("OnHide")
 		ProfessionsFrame:SetScript("OnHide", nil)
---[[ From @plusmouse on WoWUIDev Discord channel
-		if not self.craftingFrame then
-			DA.DEBUG(1,"DisableBlizzardFrame: creating hack frames")
-			self.craftingFrame = CreateFrame("Frame", nil, nil, "ProfessionsCraftingPageTemplate")
-			self.craftingFrame:SetParent(nil)
-			self.craftingFrame:Hide()
-			EventRegistry:UnregisterCallback("ProfessionsRecipeListMixin.Event.OnRecipeSelected", self.craftingFrame)
-			EventRegistry:UnregisterCallback("Professions.ProfessionSelected", self.craftingFrame)
-			EventRegistry:UnregisterCallback("Professions.ReagentClicked", self.craftingFrame)
-			EventRegistry:UnregisterCallback("Professions.TransactionUpdated", self.craftingFrame)
-			self.craftingFrame:RegisterEvent("UPDATE_TRADESKILL_CAST_COMPLETE")
-		end
---]]
-	end
-	if self.interface < 100100 then
-		SetUIPanelAttribute(ProfessionsFrame, "width", 0)	-- Prevent AH from closing when Skillet is opened
 	end
 	HideUIPanel(ProfessionsFrame)
 	self.BlizzardUIshowing = false
+	end
 end
 
 function Skillet:EnableBlizzardFrame()
 	DA.DEBUG(0,"EnableBlizzardFrame()")
-	if self.BlizzardTradeSkillFrame ~= nil then
-		self.BlizzardTradeSkillFrame = nil
-		if self.interface < 100100 then
-			SetUIPanelAttribute(ProfessionsFrame, "width", nil)	-- Allow the frame to use its real width
+	if isRetail then
+		if self.BlizzardTradeSkillFrame ~= nil then
+			self.BlizzardTradeSkillFrame = nil
+			ProfessionsFrame:SetScript("OnHide", self.tradeSkillHide)
+			self.tradeSkillHide = nil
 		end
-		ProfessionsFrame:SetScript("OnHide", self.tradeSkillHide)
-		self.tradeSkillHide = nil
 	end
 end
 
@@ -178,6 +164,7 @@ end
 -- Called when the addon is loaded
 --
 function Skillet:OnInitialize()
+	DA.DEBUG(0,"OnInitialize()");
 	if not SkilletWho then
 		SkilletWho = {}
 	end
@@ -1202,7 +1189,7 @@ end
 -- Shift key behavior can be swapped with "/skillet swapshiftkey"
 --
 function Skillet:IsSupportedTradeskill(tradeID)
-	--DA.DEBUG(0,"IsSupportedTradeskill("..tostring(tradeID)..")")
+	DA.DEBUG(0,"IsSupportedTradeskill("..tostring(tradeID)..")")
 	if self:IsModKey2Down() then
 		return true
 	end
@@ -1517,7 +1504,7 @@ end
 -- Shows the trade skill frame.
 --
 function Skillet:ShowTradeSkillWindow()
-	--DA.DEBUG(0,"ShowTradeSkillWindow()")
+	DA.DEBUG(0,"ShowTradeSkillWindow()")
 	if UnitAffectingCombat("player") then
 		print("|cff8888ffSkillet|r: Combat lockdown restriction." ..
 		  " Leave combat and try again.")
@@ -1546,6 +1533,7 @@ end
 -- Hides the Skillet trade skill window. Does nothing if the window is not visible
 --
 function Skillet:HideTradeSkillWindow()
+	--DA.DEBUG(0,"HideTradeSkillWindow()")
 	local closed -- was anything closed by us?
 	local frame = self.tradeSkillFrame
 	if frame and frame:IsVisible() then
@@ -1559,6 +1547,7 @@ end
 -- Hides any and all Skillet windows that are open
 --
 function Skillet:HideAllWindows()
+	DA.DEBUG(0,"HideAllWindows()")
 	local closed -- was anything closed?
 	if self:HideTradeSkillWindow() then
 		closed = true
@@ -1589,6 +1578,7 @@ function Skillet:HideAllWindows()
 	end
 	self.currentTrade = nil
 	self.selectedSkill = nil
+	DA.DEBUG(0,"End of HideAllWindows()")
 	return closed
 end
 

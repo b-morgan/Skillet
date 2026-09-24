@@ -1,14 +1,5 @@
 local addonName,addonTable = ...
-local isRetail = WOW_PROJECT_ID == WOW_PROJECT_MAINLINE
-local isClassic = WOW_PROJECT_ID == WOW_PROJECT_CLASSIC
-local isBCC = WOW_PROJECT_ID == WOW_PROJECT_BURNING_CRUSADE_CLASSIC
-local isWrath = WOW_PROJECT_ID == WOW_PROJECT_WRATH_CLASSIC
-local DA
-if isRetail then
-	DA = _G[addonName] -- for DebugAids.lua
-else
-	DA = LibStub("AceAddon-3.0"):GetAddon("Skillet") -- for DebugAids.lua
-end
+local DA = LibStub("AceAddon-3.0"):GetAddon("Skillet") -- for DebugAids.lua
 --[[
 Skillet: A tradeskill window replacement.
 
@@ -25,6 +16,8 @@ GNU General Public License for more details.
 You should have received a copy of the GNU General Public License
 along with this program.  If not, see <http://www.gnu.org/licenses/>.
 ]]--
+
+local GetItemInfo = C_Item and C_Item.GetItemInfo or GetItemInfo
 
 Skillet.DSAPlugin = {}
 
@@ -77,7 +70,7 @@ function plugin.RecipeNamePrefix(skill, recipe)
 	if Skillet.db.profile.plugins.DSA.enabled and DataStore then
 		itemID = recipe.itemID
 		if itemID and itemID ~= 0 then
-			itemName = C_Item.GetItemInfo(itemID)
+			itemName = GetItemInfo(itemID)
 		end
 		--DA.DEBUG(0,"RecipeNamePrefix: itemID = "..tostring(itemID).." ("..tostring(itemName)..")")
 --
@@ -86,7 +79,7 @@ function plugin.RecipeNamePrefix(skill, recipe)
 		if not Skillet.isCraft and recipe.tradeID == 7411 and itemID == 0 then
 			itemID = recipe.scrollID
 			if itemID and itemID ~= 0 then
-				itemName = C_Item.GetItemInfo(itemID)
+				itemName = GetItemInfo(itemID)
 			end
 			--DA.DEBUG(0,"RecipeNamePrefix: scrollID = "..tostring(itemID).." ("..tostring(itemName)..")")
 		end

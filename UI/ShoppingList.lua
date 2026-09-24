@@ -1,5 +1,5 @@
 local addonName,addonTable = ...
-local DA = _G[addonName] -- for DebugAids.lua
+local DA = LibStub("AceAddon-3.0"):GetAddon("Skillet") -- for DebugAids.lua
 --[[
 Skillet: A tradeskill window replacement.
 
@@ -24,11 +24,6 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
 # in the inventory
 #
 ]]--
-
-local isRetail = WOW_PROJECT_ID == WOW_PROJECT_MAINLINE
-local isClassic = WOW_PROJECT_ID == WOW_PROJECT_CLASSIC
-local isBCC = WOW_PROJECT_ID == WOW_PROJECT_BURNING_CRUSADE_CLASSIC
-local isWrath = WOW_PROJECT_ID == WOW_PROJECT_WRATH_CLASSIC
 
 local L = LibStub("AceLocale-3.0"):GetLocale("Skillet")
 
@@ -337,6 +332,10 @@ local function indexBags()
 	--DA.DEBUG(0,"indexBags()")
 	if not Skillet.currentPlayer then Skillet.currentPlayer = UnitName("player") end
 	local player = Skillet.currentPlayer 	
+	if player and not Skillet.db.realm.bagData then
+		Skillet.db.realm.bagData = {}
+		Skillet.db.realm.bagData[player] = {}
+	end
 	local bagData = Skillet.db.realm.bagData[player]
 --	local Bags = {0,1,2,3,4,5}
 	local Bags = {
@@ -401,6 +400,10 @@ local function indexBank()
 	--DA.DEBUG(0,"indexBank()")
 	if not Skillet.currentPlayer then Skillet.currentPlayer = UnitName("player") end
 	local player = Skillet.currentPlayer
+	if player and not Skillet.db.realm.bankData then
+		Skillet.db.realm.bankData = {}
+		Skillet.db.realm.bankData[player] = {}
+	end
 	local bankData = Skillet.db.realm.bankData[player]
 --	local bankBags = {-1,6,7,8,9,10,11,12,-3,}	-- -1 is main bank, -3 is reagent bank
 	local bankBags = {

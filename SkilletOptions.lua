@@ -1,5 +1,5 @@
 local addonName,addonTable = ...
-local DA = _G[addonName] -- for DebugAids.lua
+local DA = LibStub("AceAddon-3.0"):GetAddon("Skillet") -- for DebugAids.lua
 --[[
 Skillet: A tradeskill window replacement.
 
@@ -18,10 +18,9 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
 ]]--
 
 local L = Skillet.L
-local isRetail = WOW_PROJECT_ID == WOW_PROJECT_MAINLINE
-local isClassic = WOW_PROJECT_ID == WOW_PROJECT_CLASSIC
-local isBCC = WOW_PROJECT_ID == WOW_PROJECT_BURNING_CRUSADE_CLASSIC
-local isWrath = WOW_PROJECT_ID == WOW_PROJECT_WRATH_CLASSIC
+
+local isRetail = Skillet.isRetail
+local isForever = Skillet.isForever
 
 --
 -- All the options that we allow the user to control.
@@ -1284,11 +1283,75 @@ Skillet.options =
 			end,
 			order = 92
 		},
+		DebugOn = {
+			type = 'execute',
+			name = "DebugOn",
+			desc = "Turn Debug On",
+			func = function()
+--[[
+				if Skillet.db.profile.WarnShow then
+					Skillet.db.profile.WarnShow = true
+					Skillet.WarnShow = true
+				end
+				if Skillet.db.profile.WarnLog then
+					Skillet.db.profile.WarnLog = true
+					Skillet.WarnLog = true
+				end
+				if Skillet.db.profile.DebugShow then
+					Skillet.db.profile.DebugShow= true
+					Skillet.DebugShow = true
+				end
+				if Skillet.db.profile.DebugLogging then
+					Skillet.db.profile.DebugLogging = true
+					Skillet.DebugLogging = true
+				end
+				if Skillet.db.profile.DebugLevel then
+					Skillet.db.profile.DebugLevel = 4
+				end
+				if Skillet.db.profile.TableDump then
+					Skillet.db.profile.TableDump = true
+				end
+--
+-- LogLevel is left undefined or set to false as
+-- the default should be log everything.
+--
+				if Skillet.db.profile.LogLevel then
+					Skillet.db.profile.LogLevel = false
+					Skillet.LogLevel = false
+				end
+				if Skillet.db.profile.TraceShow then
+					Skillet.db.profile.TraceShow = true
+					Skillet.TraceShow = true
+				end
+				if Skillet.db.profile.TraceLog then
+					Skillet.db.profile.TraceLog = true
+					Skillet.TraceLog = true
+				end
+				if Skillet.db.profile.TraceLog2 then
+					Skillet.db.profile.TraceLog2 = false
+					Skillet.TraceLog2 = false
+				end
+				if Skillet.db.profile.TraceLog3 then
+					Skillet.db.profile.TraceLog3 = false
+					Skillet.TraceLog3 = false
+				end
+				if Skillet.db.profile.ProfileShow then
+					Skillet.db.profile.ProfileShow = false
+					Skillet.ProfileShow = false
+				end
+--]]
+				DA.DEBUGON()
+				Skillet:Print(GREEN_FONT_COLOR_CODE.."DebugOn:"..FONT_COLOR_CODE_CLOSE)
+				DA.DebugAidsStatus()
+			end,
+			order = 93
+		},
 		DebugOff = {
 			type = 'execute',
 			name = "DebugOff",
 			desc = "Turn Debug Off",
 			func = function()
+--[[
 				if Skillet.db.profile.WarnShow then
 					Skillet.db.profile.WarnShow = false
 					Skillet.WarnShow = false
@@ -1334,6 +1397,10 @@ Skillet.options =
 					Skillet.db.profile.ProfileShow = false
 					Skillet.ProfileShow = false
 				end
+--]]
+				DA.DEBUGOFF()
+				Skillet:Print(RED_FONT_COLOR_CODE.."DebugOff:"..FONT_COLOR_CODE_CLOSE)
+				DA.DebugAidsStatus()
 			end,
 			order = 93
 		},

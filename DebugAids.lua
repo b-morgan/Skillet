@@ -1,16 +1,5 @@
 local addonName,addonTable = ...
-local isRetail = WOW_PROJECT_ID == WOW_PROJECT_MAINLINE -- 1
-local isClassic = WOW_PROJECT_ID == WOW_PROJECT_CLASSIC -- 2
-local isBCC = WOW_PROJECT_ID == WOW_PROJECT_BURNING_CRUSADE_CLASSIC -- 5
-local isWrath = WOW_PROJECT_ID == WOW_PROJECT_WRATH_CLASSIC -- 11
-local isCata = WOW_PROJECT_ID == WOW_PROJECT_CATACLYSM_CLASSIC -- 14
-local isMists = WOW_PROJECT_ID == WOW_PROJECT_MISTS_CLASSIC -- 19
-local DA
-if isRetail then
-	DA = _G[addonName] -- for DebugAids.lua
-else
-	DA = LibStub("AceAddon-3.0"):GetAddon("Skillet") -- for DebugAids.lua
-end
+local DA = LibStub("AceAddon-3.0"):GetAddon("Skillet") -- for DebugAids.lua
 local tek = tekDebug and tekDebug:GetFrame("Skillet")
 --
 -- Chat and Debugging Aids
@@ -85,6 +74,35 @@ local function tekD(text)
 	if tek then 
 		tek:AddMessage(text)
 	end
+end
+
+--
+-- Enable debugging.
+--
+function DA.DEBUGON()
+	DA.WarnShow = true
+	DA.WarnLog = true
+	DA.DebugShow = true
+	DA.DebugLogging = true
+	DA.DebugLevel = 4
+	DA.TableDump = true
+	DA.TraceShow = true
+	DA.TraceLog = true
+	DA.TraceLog2 = false
+	DA.TraceLog3 = false
+	DA.ProfileShow = false
+end
+
+function DA.DEBUGOFF()
+	DA.WarnShow = false
+	DA.WarnLog = false
+	DA.DebugShow = false
+	DA.DebugLogging = false
+	DA.TraceShow = false
+	DA.TraceLog = false
+	DA.TraceLog2 = false
+	DA.TraceLog3 = false
+	DA.ProfileShow = false
 end
 
 function DA.CHAT(text)

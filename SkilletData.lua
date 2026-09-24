@@ -1,4 +1,5 @@
 local addonName,addonTable = ...
+local DA = LibStub("AceAddon-3.0"):GetAddon("Skillet") -- for DebugAids.lua
 --[[
 Skillet: A tradeskill window replacement.
 
@@ -16,15 +17,6 @@ You should have received a copy of the GNU General Public License
 along with this program.  If not, see <http://www.gnu.org/licenses/>.
 ]]--
 
-local isRetail = WOW_PROJECT_ID == WOW_PROJECT_MAINLINE
-local isClassic = WOW_PROJECT_ID == WOW_PROJECT_CLASSIC
-local isBCC = WOW_PROJECT_ID == WOW_PROJECT_BURNING_CRUSADE_CLASSIC
-local DA
-if isRetail then
-	DA = _G[addonName] -- for DebugAids.lua
-else
-	DA = LibStub("AceAddon-3.0"):GetAddon("Skillet") -- for DebugAids.lua
-end
 local PT = LibStub("LibPeriodicTable-3.1")
 local L = Skillet.L
 
@@ -515,8 +507,10 @@ function Skillet:CollectTradeSkillData()
 	for i=1,#TradeSkillList,1 do
 		local id = TradeSkillList[i]
 		local name = C_Spell.GetSpellName(id)
-		self.tradeSkillIDsByName[name] = id
-		self.tradeSkillNamesByID[id] = name
+		if name then
+			self.tradeSkillIDsByName[name] = id
+			self.tradeSkillNamesByID[id] = name
+		end
 	end
 	self.tradeSkillList = TradeSkillList
 	--DA.DEBUG(1,"tradeSkillIDsByName= "..DA.DUMP(self.tradeSkillIDsByName))
@@ -560,7 +554,9 @@ function Skillet:ScanPlayerTradeSkills(player)
 			local id = TradeSkillList[i]
 			--DA.DEBUG(3,"ScanPlayerTradeSkills: id= "..tostring(id))
 			local name = C_Spell.GetSpellName(id)
-			local name = C_Spell.GetSpellName(name)			-- only returns data if you have this spell in your spellbook
+			if name then
+				name = C_Spell.GetSpellName(name)			-- only returns data if you have this spell in your spellbook
+			end
 			--DA.DEBUG(3,"ScanPlayerTradeSkills: name= "..tostring(name))
 			if name then
 				if id == 2656 then id = 2575 end -- Ye old Smelting vs. Mining issue
@@ -821,7 +817,7 @@ end
 --
 local function ScanTrade()
 	--DA.PROFILE("ScanTrade()")
-	--DA.DEBUG(0,"ScanTrade()")
+	DA.DEBUG(0,"ScanTrade()")
 	local tradeID
 	local link = C_TradeSkillUI.GetTradeSkillListLink()
 	local parentSkillLineID, parentSkillLineName, skillLineRank, skillLineMaxRank
@@ -843,7 +839,8 @@ local function ScanTrade()
 		return false
 	end
 
-	if Skillet.BlizzardSkillList[parentSkillLineID] then
+--	if Skillet.BlizzardSkillList[parentSkillLineID] then
+	if Skillet.isForever or Skillet.BlizzardSkillList[parentSkillLineID] then
 		DA.MARK3("Skillet cannot display "..tostring(parentSkillLineName)..", use the Blizzard UI")
 		Skillet.useBlizzard = true
 		Skillet.currentTrade = nil

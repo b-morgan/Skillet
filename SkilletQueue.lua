@@ -1,5 +1,5 @@
 local addonName,addonTable = ...
-local DA = _G[addonName] -- for DebugAids.lua
+local DA = LibStub("AceAddon-3.0"):GetAddon("Skillet") -- for DebugAids.lua
 --[[
 Skillet: A tradeskill window replacement.
 
@@ -885,7 +885,7 @@ function Skillet:UNIT_SPELLCAST_SUCCEEDED(event, unitTarget, castGUID, spellID)
 		if self.processingLevel and self.processingLevel ~= 0 and self.processingSpellID then
 			DA.DEBUG(0,"UNIT_SPELLCAST_SUCCEEDED: "..tostring(unitTarget)..", "..tostring(spellID)..", "..tostring(self.processingSpellID))
 			self:ContinueCast(self.processingSpellID)
-		elseif spellID == self.processingSpellID then
+		elseif spellID and spellID == self.processingSpellID then
 			DA.DEBUG(0,"UNIT_SPELLCAST_SUCCEEDED: "..tostring(unitTarget)..", "..tostring(spellID))
 			self:ContinueCast(spellID)
 		else
@@ -900,7 +900,7 @@ function Skillet:UNIT_SPELLCAST_FAILED(event, unitTarget, castGUID, spellID)
 		if self.processingLevel and self.processingLevel ~= 0 and self.processingSpellID then
 			DA.DEBUG(0,"UNIT_SPELLCAST_FAILED: "..tostring(castGUID)..", "..tostring(spellID)..", "..tostring(self.processingSpellID))
 			self:StopCast(self.processingSpellID)
-		elseif spellID == self.processingSpellID then
+		elseif spellID and spellID == self.processingSpellID then
 			DA.DEBUG(0,"UNIT_SPELLCAST_FAILED: "..tostring(unitTarget)..", "..tostring(spellID))
 			self:StopCast(spellID)
 		else
@@ -915,7 +915,7 @@ function Skillet:UNIT_SPELLCAST_FAILED_QUIET(event, unitTarget, castGUID, spellI
 		if self.processingLevel and self.processingLevel ~= 0 and self.processingSpellID then
 			DA.DEBUG(0,"UNIT_SPELLCAST_FAILED_QUIET: "..tostring(unitTarget)..", "..tostring(spellID)..", "..tostring(self.processingSpellID))
 			self:StopCast(self.processingSpellID)
-		elseif spellID == self.processingSpellID then
+		elseif spellID and spellID == self.processingSpellID then
 			DA.DEBUG(0,"UNIT_SPELLCAST_FAILED_QUIET: "..tostring(unitTarget)..", "..tostring(spellID))
 			self:StopCast(spellID)
 		else
@@ -930,7 +930,7 @@ function Skillet:UNIT_SPELLCAST_INTERRUPTED(event, unitTarget, castGUID, spellID
 		if self.processingLevel and self.processingLevel ~= 0 and self.processingSpellID then
 			DA.DEBUG(0,"UNIT_SPELLCAST_INTERRUPTED: "..tostring(unitTarget)..", "..tostring(spellID)..", "..tostring(self.processingSpellID))
 			self:StopCast(self.processingSpellID)
-		elseif spellID == self.processingSpellID then
+		elseif spellID and spellID == self.processingSpellID then
 			DA.DEBUG(0,"UNIT_SPELLCAST_INTERRUPTED: "..tostring(unitTarget)..", "..tostring(spellID))
 			self:StopCast(spellID)
 		else
