@@ -17,12 +17,6 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
 ]]--
 
-local isRetail = WOW_PROJECT_ID == WOW_PROJECT_MAINLINE -- 1
-local isClassic = WOW_PROJECT_ID == WOW_PROJECT_CLASSIC -- 2
-local isBCC = WOW_PROJECT_ID == WOW_PROJECT_BURNING_CRUSADE_CLASSIC -- 5
-local isWrath = WOW_PROJECT_ID == WOW_PROJECT_WRATH_CLASSIC -- 11
-local isCata = WOW_PROJECT_ID == WOW_PROJECT_CATACLYSM_CLASSIC -- 14
-
 Skillet = LibStub("AceAddon-3.0"):NewAddon("Skillet", "AceConsole-3.0", "AceEvent-3.0", "AceHook-3.0", "AceTimer-3.0")
 local AceDB = LibStub("AceDB-3.0")
 
@@ -38,9 +32,24 @@ Skillet.L = L
 Skillet.version = C_AddOns.GetAddOnMetadata("Skillet", "Version")
 Skillet.isTest = string.find(Skillet.version,"-") or string.find(Skillet.version,"+")
 Skillet.interface = select(4, GetBuildInfo())
-Skillet.build = (Skillet.interface < 20000 and "Classic") or (Skillet.interface < 30000 and "BCC") or
-  (Skillet.interface < 40000 and "Wrath") or (Skillet.interface < 50000 and "Cata") or "Retail"
+Skillet.build = (Skillet.interface < 20000 and Skillet.interface > 16000 and "Forever") or 
+  (Skillet.interface < 30000 and "BCC") or
+  (Skillet.interface < 40000 and "Wrath") or 
+  (Skillet.interface < 50000 and "Cata") or
+  (Skillet.interface < 60000 and "Mists") or
+  "Retail"
+
 Skillet.project = WOW_PROJECT_ID
+-- Temporary measure because FOREVER has no distinct _PROJECT_
+if WOW_PROJECT_ID == WOW_PROJECT_MAINLINE then
+	-- ___ temporary measure for Forever ___
+	if LE_EXPANSION_LEVEL_CURRENT == LE_EXPANSION_MIDNIGHT then
+		Skillet.isRetail = true
+	elseif LE_EXPANSION_LEVEL_CURRENT == LE_EXPANSION_CLASSIC then
+		Skillet.isForever = true
+	end
+end
+
 Skillet.gttScale = GameTooltip:GetScale()
 
 local nonLinkingTrade = { [2656] = true, [53428] = true }				-- smelting, runeforging
@@ -136,16 +145,15 @@ Skillet.unknownRecipe = {
 function Skillet:DisableBlizzardFrame()
 	DA.DEBUG(0,"DisableBlizzardFrame()")
 	if isRetail then
-	if not ProfessionsFrame then
-		DA.WARN("DisableBlizzardFrame: ProfessionsFrame is nil")
-	elseif self.BlizzardTradeSkillFrame == nil then
-	if self.BlizzardTradeSkillFrame == nil then
-		self.BlizzardTradeSkillFrame = ProfessionsFrame
-		self.tradeSkillHide = ProfessionsFrame:GetScript("OnHide")
-		ProfessionsFrame:SetScript("OnHide", nil)
-	end
-	HideUIPanel(ProfessionsFrame)
-	self.BlizzardUIshowing = false
+		if not ProfessionsFrame then
+			DA.WARN("DisableBlizzardFrame: ProfessionsFrame is nil")
+		elseif self.BlizzardTradeSkillFrame == nil then
+			self.BlizzardTradeSkillFrame = ProfessionsFrame
+			self.tradeSkillHide = ProfessionsFrame:GetScript("OnHide")
+			ProfessionsFrame:SetScript("OnHide", nil)
+		HideUIPanel(ProfessionsFrame)
+		self.BlizzardUIshowing = false
+		end
 	end
 end
 
