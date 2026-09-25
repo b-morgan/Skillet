@@ -32,7 +32,8 @@ Skillet.L = L
 Skillet.version = C_AddOns.GetAddOnMetadata("Skillet", "Version")
 Skillet.isTest = string.find(Skillet.version,"-") or string.find(Skillet.version,"+")
 Skillet.interface = select(4, GetBuildInfo())
-Skillet.build = (Skillet.interface < 20000 and Skillet.interface > 16000 and "Forever") or 
+Skillet.build = (Skillet.interface < 16000 and "Classic") or
+  (Skillet.interface < 20000 and "Forever") or 
   (Skillet.interface < 30000 and "BCC") or
   (Skillet.interface < 40000 and "Wrath") or 
   (Skillet.interface < 50000 and "Cata") or
@@ -339,19 +340,6 @@ function Skillet:OnInitialize()
 		self:InitializeSkillLevels()
 	end
 
---[[
--- Hook default tooltips
---
-	local tooltipsToHook = { ItemRefTooltip, GameTooltip, ShoppingTooltip1, ShoppingTooltip2 };
-	for _, tooltip in pairs(tooltipsToHook) do
-		if tooltip then
-			tooltip:HookScript("OnTooltipSetItem", function(tooltip)
-				Skillet:AddItemNotesToTooltip(tooltip)
-			end)
-		end
-	end
---]]
-
 --
 -- configure the addon options and the slash command handler
 -- (Skillet.options is defined in SkilletOptions.lua)
@@ -451,10 +439,10 @@ StaticPopupDialogs["SKILLET_MANUAL_CHANGE"] = {
 --
 	if not Skillet.bagUpdateCounts then
 		Skillet.bagUpdateCounts = {}
-		Skillet.bagUpdateDelayedCount = 0
-		Skillet.unitInventoryChangedCount = 0
-		Skillet.bankUpdateCount = 0
 	end
+	Skillet.bagUpdateDelayedCount = 0
+	Skillet.unitInventoryChangedCount = 0
+	Skillet.bankUpdateCount = 0
 end
 
 --
@@ -472,10 +460,12 @@ function Skillet:FlushAllData()
 	Skillet.db.realm.auctionData = {}
 	Skillet.db.realm.inventoryData = {}
 	Skillet.db.realm.userIgnoredMats = {}
+	Skillet.db.realm.options = {}
 	Skillet:FlushCustomData()
 	Skillet:FlushQueueData()
 	Skillet:FlushRecipeData()
 	Skillet:FlushDetailData()
+	Skillet:FlushPlayerData()
 	Skillet:InitializeMissingVendorItems()
 end
 
@@ -603,6 +593,12 @@ function Skillet:InitializeDatabase(player)
 		if not self.db.realm.groupDB then
 			self.db.realm.groupDB = {}
 		end
+		if not self.db.realm.options then
+			self.db.realm.options = {}
+		end
+		if not self.db.realm.options[player] then
+			self.db.realm.options[player] = {}
+		end
 		if not self.db.realm.queueData then
 			self.db.realm.queueData = {}
 		end
@@ -636,70 +632,68 @@ function Skillet:InitializeDatabase(player)
 		if not self.db.global.server then
 			self.db.global.server = {}
 		end
-		if player == UnitName("player") then
-			if not self.db.realm.inventoryData then
-				self.db.realm.inventoryData = {}
-			end
-			if not self.db.realm.inventoryData[player] then
-				self.db.realm.inventoryData[player] = {}
-			end
-			if not self.db.realm.bagData then
-				self.db.realm.bagData = {}
-			end
-			if not self.db.realm.bagData[player] then
-				self.db.realm.bagData[player] = {}
-			end
-			if not self.db.realm.bagDetails then
-				self.db.realm.bagDetails = {}
-			end
-			if not self.db.realm.bagDetails[player] then
-				self.db.realm.bagDetails[player] = {}
-			end
-			if not self.db.realm.bankData then
-				self.db.realm.bankData = {}
-			end
-			if not self.db.realm.bankData[player] then
-				self.db.realm.bankData[player] = {}
-			end
-			if not self.db.realm.bankDetails then
-				self.db.realm.bankDetails = {}
-			end
-			if not self.db.realm.bankDetails[player] then
-				self.db.realm.bankDetails[player] = {}
-			end
-
-			if not self.db.realm.reagentsInQueue then
-				self.db.realm.reagentsInQueue = {}
-			end
-			if not self.db.realm.reagentsInQueue[player] then
-				self.db.realm.reagentsInQueue[player] = {}
-			end
-			if not self.db.realm.modifiedInQueue then
-				self.db.realm.modifiedInQueue = {}
-			end
-			if not self.db.realm.modifiedInQueue[player] then
-				self.db.realm.modifiedInQueue[player] = {}
-			end
-			if not self.db.realm.userIgnoredMats then
-				self.db.realm.userIgnoredMats = {}
-			end
-			if not self.db.realm.userIgnoredMats[player] then
-				self.db.realm.userIgnoredMats[player] = {}
-			end
-			if not self.db.profile.SavedQueues then
-				self.db.profile.SavedQueues = {}
-			end
-			if not self.db.profile.plugins then
-				self.db.profile.plugins = {}
-			end
-			if self.db.profile.plugins.recipeNamePlugin then
-				if not self.db.profile.plugins.recipeNameSuffix then
-					self.db.profile.plugins.recipeNameSuffix = self.db.profile.plugins.recipeNamePlugin
-				end
-				self.db.profile.plugins.recipeNamePlugin = nil
-			end
-			Skillet:InitializePlugins()
+		if not self.db.realm.inventoryData then
+			self.db.realm.inventoryData = {}
 		end
+		if not self.db.realm.inventoryData[player] then
+			self.db.realm.inventoryData[player] = {}
+		end
+		if not self.db.realm.bagData then
+			self.db.realm.bagData = {}
+		end
+		if not self.db.realm.bagData[player] then
+			self.db.realm.bagData[player] = {}
+		end
+		if not self.db.realm.bagDetails then
+			self.db.realm.bagDetails = {}
+		end
+		if not self.db.realm.bagDetails[player] then
+			self.db.realm.bagDetails[player] = {}
+		end
+		if not self.db.realm.bankData then
+			self.db.realm.bankData = {}
+		end
+		if not self.db.realm.bankData[player] then
+			self.db.realm.bankData[player] = {}
+		end
+		if not self.db.realm.bankDetails then
+			self.db.realm.bankDetails = {}
+		end
+		if not self.db.realm.bankDetails[player] then
+			self.db.realm.bankDetails[player] = {}
+		end
+
+		if not self.db.realm.reagentsInQueue then
+			self.db.realm.reagentsInQueue = {}
+		end
+		if not self.db.realm.reagentsInQueue[player] then
+			self.db.realm.reagentsInQueue[player] = {}
+		end
+		if not self.db.realm.modifiedInQueue then
+			self.db.realm.modifiedInQueue = {}
+		end
+		if not self.db.realm.modifiedInQueue[player] then
+			self.db.realm.modifiedInQueue[player] = {}
+		end
+		if not self.db.realm.userIgnoredMats then
+			self.db.realm.userIgnoredMats = {}
+		end
+		if not self.db.realm.userIgnoredMats[player] then
+			self.db.realm.userIgnoredMats[player] = {}
+		end
+		if not self.db.profile.SavedQueues then
+			self.db.profile.SavedQueues = {}
+		end
+		if not self.db.profile.plugins then
+			self.db.profile.plugins = {}
+		end
+		if self.db.profile.plugins.recipeNamePlugin then
+			if not self.db.profile.plugins.recipeNameSuffix then
+				self.db.profile.plugins.recipeNameSuffix = self.db.profile.plugins.recipeNamePlugin
+			end
+			self.db.profile.plugins.recipeNamePlugin = nil
+		end
+		Skillet:InitializePlugins()
 	end
 end
 
@@ -1440,11 +1434,11 @@ function Skillet:ChangeTradeSkill(tradeID, tradeName)
 			self.changingTrade = tradeID
 			self.changingName = self.tradeSkillNamesByID[tradeID]
 			self.dialogSwitch = true
-			if tradeName == "Mining" then tradeName = "Mining Journal" end
+			if self.isRetail and tradeName == "Mining" then tradeName = "Mining Journal" end
 			DA.DEBUG(0,"ChangeTradeSkill: changingTrade= "..tostring(self.changingTrade)..", changingName= "..tostring(self.changingName))
 			StaticPopup_Show("SKILLET_MANUAL_CHANGE", self.changingName)
 		else
-			if tradeName == "Mining" then tradeName = "Mining Journal" end
+			if self.isRetail and tradeName == "Mining" then tradeName = "Mining Journal" end
 			DA.DEBUG(1,"ChangeTradeSkill: executing CastSpellByName("..tostring(tradeName)..")")
 			CastSpellByName(tradeName)
 			self.delayTrade = tradeID
@@ -1603,24 +1597,26 @@ end
 -- Sets the specific trade skill that the user wants to see details on.
 --
 function Skillet:SetSelectedSkill(skillIndex)
-	--DA.DEBUG(0,"SetSelectedSkill("..tostring(skillIndex)..")")
-	self:HideNotesWindow()
-	self:ConfigureRecipeControls(false)
-	if Skillet.BlizzardUIshowing then
-		local skill = self:GetSkill(self.currentPlayer, self.currentTrade, skillIndex)
-		local recipeInfo = C_TradeSkillUI.GetRecipeInfo(skill.id)
-		if recipeInfo then
+	DA.DEBUG(0,"SetSelectedSkill("..tostring(skillIndex)..")")
+	if skillIndex then
+		self:HideNotesWindow()
+		self:ConfigureRecipeControls(false)
+		if Skillet.BlizzardUIshowing then
+			local skill = self:GetSkill(self.currentPlayer, self.currentTrade, skillIndex)
+			local recipeInfo = C_TradeSkillUI.GetRecipeInfo(skill.id)
+			if recipeInfo then
 --[[
-			ProfessionsFrame.CraftingPage:SelectRecipe(recipeInfo)
+				ProfessionsFrame.CraftingPage:SelectRecipe(recipeInfo)
 --]]
-			EventRegistry:TriggerEvent("ProfessionsRecipeListMixin.Event.OnRecipeSelected", recipeInfo, ProfessionsFrame.CraftingPage.RecipeList)
-			ProfessionsFrame.CraftingPage.RecipeList:SelectRecipe(recipeInfo, true)
+				EventRegistry:TriggerEvent("ProfessionsRecipeListMixin.Event.OnRecipeSelected", recipeInfo, ProfessionsFrame.CraftingPage.RecipeList)
+				ProfessionsFrame.CraftingPage.RecipeList:SelectRecipe(recipeInfo, true)
+			end
 		end
+		self.selectedSkill = skillIndex
+		self:ScrollToSkillIndex(skillIndex)
+		self:UpdateDetailWindow(skillIndex)
+		self:ClickSkillButton(skillIndex)
 	end
-	self.selectedSkill = skillIndex
-	self:ScrollToSkillIndex(skillIndex)
-	self:UpdateDetailWindow(skillIndex)
-	self:ClickSkillButton(skillIndex)
 end
 
 --

@@ -448,6 +448,8 @@ local function GetReagentData(reagent)
 		needed = reagent.numNeeded or 0
 		if isRetail then
 			id = reagent.reagentID
+		elseif isForever then
+			id = reagent.reagentID
 		else
 			id = reagent.id
 		end

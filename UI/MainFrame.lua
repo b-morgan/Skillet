@@ -837,9 +837,14 @@ function Skillet:UpdateTradeButtons(player)
 			end
 		else
 			local spellInfo = C_Spell.GetSpellInfo(additionalSpellId)
-			--DA.DEBUG(1,"UpdateTradeButtons: spellInfo= "..DA.DUMP1(spellInfo))
-			spellName = spellInfo.name
-			spellIcon = spellInfo.iconID
+			if spellInfo then
+				DA.DEBUG(1,"UpdateTradeButtons: spellInfo= "..DA.DUMP1(spellInfo))
+				spellName = spellInfo.name
+				spellIcon = spellInfo.iconID
+			else
+				spellName = nil
+				spellIcon = nil
+			end
 		end
 		if additionalPet then
 			_, petGUID = C_PetJournal.FindPetIDByName(additionalSpellName)
@@ -887,7 +892,9 @@ function Skillet:UpdateTradeButtons(player)
 			button:ClearAllPoints()
 			button:SetPoint("BOTTOMLEFT", SkilletRankFrame, "TOPLEFT", position, 3)
 			local buttonIcon = _G[buttonName.."Icon"]
-			buttonIcon:SetTexture(spellIcon)
+			if spellIcon then
+				buttonIcon:SetTexture(spellIcon)
+			end
 			position = position + button:GetWidth()
 			button:Show()
 			if additionalToy then

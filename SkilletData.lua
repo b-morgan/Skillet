@@ -42,6 +42,9 @@ local TradeSkillList = {
 	3908,		-- tailoring
 	2550,		-- cooking
 	3273,		-- first aid
+	2366,		-- herbalism (Forever Camping)
+	7620,		-- fishing (Forever Camping)
+	8613,		-- skinning (Forever Camping)
 }
 
 local DifficultyNum = {
@@ -823,8 +826,8 @@ local function ScanTrade()
 	local parentSkillLineID, parentSkillLineName, skillLineRank, skillLineMaxRank
 	local baseInfo = C_TradeSkillUI.GetBaseProfessionInfo()
 	local childInfo = C_TradeSkillUI.GetChildProfessionInfo()
-	--DA.DEBUG(1,"ScanTrade: GetBaseProfessionInfo= "..DA.DUMP1(baseInfo))
-	--DA.DEBUG(1,"ScanTrade: GetChildProfessionInfo= "..DA.DUMP1(childInfo))
+	DA.DEBUG(1,"ScanTrade: GetBaseProfessionInfo= "..DA.DUMP1(baseInfo))
+	DA.DEBUG(1,"ScanTrade: GetChildProfessionInfo= "..DA.DUMP1(childInfo))
 	if childInfo and childInfo.parentProfessionID then 
 		parentSkillLineID = childInfo.parentProfessionID
 		parentSkillLineName = childInfo.parentProfessionName
@@ -839,8 +842,7 @@ local function ScanTrade()
 		return false
 	end
 
---	if Skillet.BlizzardSkillList[parentSkillLineID] then
-	if Skillet.isForever or Skillet.BlizzardSkillList[parentSkillLineID] then
+	if Skillet.BlizzardSkillList[parentSkillLineID] then
 		DA.MARK3("Skillet cannot display "..tostring(parentSkillLineName)..", use the Blizzard UI")
 		Skillet.useBlizzard = true
 		Skillet.currentTrade = nil

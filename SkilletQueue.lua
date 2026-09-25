@@ -1093,6 +1093,12 @@ function Skillet:ScanQueuedReagents()
 	end
 	local reagentsInQueue = {}
 	local modifiedInQueue = {}
+	if not self.db.realm.queueData then
+		self.db.realm.queueData = {}
+	end
+	if not self.db.realm.queueData[self.currentPlayer] then
+		self.db.realm.queueData[self.currentPlayer] = {}
+	end
 	for i,command in pairs(self.db.realm.queueData[self.currentPlayer]) do
 		if command.op == "iterate" then
 			local recipe = self:GetRecipe(command.recipeID)

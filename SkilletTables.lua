@@ -22,7 +22,7 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
 --
 -- A table of SkillLineIDs returned by C_TradeSkillUI.GetTradeSkillLine() mapped to the Skill SpellID
 --
-Skillet.SkillLineIDList = {
+local RetailSkillLineIDList = {
 	[171] = 2259,		-- alchemy
 	[164] = 2018,		-- blacksmithing
 	[333] = 7411,		-- enchanting
@@ -33,39 +33,50 @@ Skillet.SkillLineIDList = {
 	[186] = 2575,		-- mining
 	[197] = 3908,		-- tailoring
 	[185] = 2550,		-- cooking
---	[129] = 3273,		-- first aid (removed in Battle for Azeroth)
--- Battle for Azeroth (not sure these are needed anymore)
-	[2482] = 2259,		-- alchemy
-	[2485] = 2259,		-- alchemy
-	[2474] = 2018,		-- blacksmithing
-	[2477] = 2018,		-- blacksmithing
-	[2491] = 7411,		-- enchanting
-	[2494] = 7411,		-- enchanting
-	[2503] = 4036,		-- engineering
-	[2506] = 4036,		-- engineering
-	[2511] = 45357,		-- inscription
-	[2514] = 45357,		-- inscription
-	[2521] = 25229,		-- jewelcrafting
-	[2524] = 25229,		-- jewelcrafting
-	[2529] = 2108,		-- leatherworking
-	[2532] = 2108,		-- leatherworking
-	[2569] = 2575,		-- mining
-	[2572] = 2575,		-- mining
-	[2537] = 3908,		-- tailoring
-	[2540] = 3908,		-- tailoring
-	[2545] = 2550,		-- cooking
-	[2548] = 2550,		-- cooking
+}
+
+local ForeverSkillLineIDList = {
+	[171] = 2259,		-- alchemy
+	[164] = 2018,		-- blacksmithing
+	[333] = 7411,		-- enchanting
+	[202] = 4036,		-- engineering
+	[773] = 45357,		-- inscription
+	[755] = 25229,		-- jewelcrafting
+	[165] = 2108,		-- leatherworking
+	[186] = 2575,		-- mining
+	[197] = 3908,		-- tailoring
+	[185] = 2550,		-- cooking
+	[129] = 3273,		-- first aid
+	[182] = 2366,		-- herbalism skills
+	[393] = 8613,		-- skinning skills
+	[356] = 7620,		-- fishing skills
 }
 
 --
 -- Table of tradeskills that should use the Blizzard frame
 --
-Skillet.BlizzardSkillList = {
+local RetailBlizzardSkillList = {
 	[182]    = true,		-- herbalism skills
 	[393]    = true,		-- skinning skills
 	[356]    = true,		-- fishing skills
 	[960]    = true,		-- runeforging
 }
+
+local ForeverBlizzardSkillList = {
+--	[182]    = true,		-- herbalism skills
+--	[393]    = true,		-- skinning skills
+--	[356]    = true,		-- fishing skills
+	[960]    = true,		-- runeforging
+}
+
+if Skillet.isRetail then
+	Skillet.SkillLineIDList = RetailSkillLineIDList
+	Skillet.BlizzardSkillList = RetailBlizzardSkillList
+end
+if Skillet.isForever then
+	Skillet.SkillLineIDList = ForeverSkillLineIDList
+	Skillet.BlizzardSkillList = ForeverBlizzardSkillList
+end
 
 --
 -- Table of follower (C_TradeSkillUI.IsNPCCrafting) tradeskills that should use the Blizzard frame

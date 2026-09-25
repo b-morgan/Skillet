@@ -855,7 +855,7 @@ end
 --
 function Skillet:BAG_UPDATE_DELAYED(event)
 	DA.TRACE2("BAG_UPDATE_DELAYED")
-	self.bagUpdateDelayedCount = self.bagUpdateDelayedCount + 1
+	self.bagUpdateDelayedCount = (self.bagUpdateDelayedCount or 0) + 1
 	if Skillet.bagsChanged and not UnitAffectingCombat("player") then
 		indexBags()
 		Skillet.bagsChanged = false
