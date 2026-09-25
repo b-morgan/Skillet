@@ -31,7 +31,7 @@ Skillet.NewsData = {
 			{	name = "Changes",
 				data = {
 					{ header = "Retail", body = "Preliminary support for Forever" },
-					{ header = "Forever", body = "Currently will not open Professions" },
+					{ header = "Forever", body = "Blizzard Professions UI remains on screen\nSome Profession buttons in the Skillet frame fail\nProfessions copied to Action Bars behave strangely" },
 				},
 			},
 		},

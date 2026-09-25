@@ -29,6 +29,12 @@ function Skillet:InventoryReagentCraftability(reagentID)
 		return 0, 0
 	end
 	local player = Skillet.currentPlayer
+	if not self.db.realm.inventoryData then
+		self.db.realm.inventoryData = {}
+	end
+	if player and not self.db.realm.inventoryData[player] then
+		self.db.realm.inventoryData[player] = {}
+	end
 	if self.visited[reagentID] then
 		local reagentA, reagentC, reagentCV = self:GetInventory(player, reagentID)
 		return reagentC, reagentCV
