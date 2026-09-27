@@ -718,7 +718,9 @@ function Skillet:CreateAdditionalButtonsList()
 						if not seenButtons[spellID] then
 							if additionalSpellTab[j][5] then
 								local name = C_Spell.GetSpellName(spellID)	-- always returns data
-								local name = C_Spell.GetSpellName(name)		-- only returns data if you have this spell in your spellbook
+								if name then
+									name = C_Spell.GetSpellName(name)		-- only returns data if you have this spell in your spellbook
+								end
 								--DA.DEBUG(1,"CreateAdditionalButtonsList: name= "..tostring(name))
 								if name then
 									table.insert(Skillet.AdditionalButtonsList, additionalSpellTab[j])

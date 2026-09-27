@@ -439,7 +439,7 @@ local function GetBuyout(recipe)
 end
 
 local function GetReagentData(reagent)
-	--DA.DEBUG(0,"GetReagentData: reagent= "..DA.DUMP1(reagent))
+	DA.DEBUG(0,"GetReagentData: reagent= "..DA.DUMP1(reagent))
 	local value = 0
 	local needed = 0
 	local custom = ""
@@ -452,6 +452,9 @@ local function GetReagentData(reagent)
 			id = reagent.reagentID
 		else
 			id = reagent.id
+		end
+		if not id then
+			return 0,0,0,0,0
 		end
 		name = C_Item.GetItemInfo(id) or id
 		if Atr_GetAuctionBuyout then
@@ -521,7 +524,7 @@ local function AddExtraText(value, needed, id, name, custom)
 end
 
 local function GetRecipeData(recipe)
-	--DA.DEBUG(0,"GetRecipeData: recipe= "..DA.DUMP(recipe,1))
+	DA.DEBUG(0,"GetRecipeData: recipe= "..DA.DUMP(recipe,1))
 	if not recipe then return end
 	local buyout, cost, profit, percentage, sellout, vprofit, vpercentage
 	local itemID
