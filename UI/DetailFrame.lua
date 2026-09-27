@@ -160,15 +160,6 @@ end
 --
 function Skillet:UpdateDetailWindow(skillIndex)
 	--DA.DEBUG(0,"UpdateDetailWindow("..tostring(skillIndex)..")")
---[[
-	if self.InProgress.detail then 
-		self.InProgress.detailDepth = self.InProgress.detailDepth + 1
-		self.InProgress.detailMax = max(self.InProgress.detailMax,self.InProgress.detailDepth)
-	else
-		self.InProgress.detailDepth = 1
-		self.InProgress.detailMax = 1
-	end
---]]
 	self.InProgress.detail = true
 	SkilletReagentParent.StarsFrame:Hide()
 	SkilletRecipeRankFrame:Hide()
@@ -330,7 +321,7 @@ PROFESSIONS_FIRST_CRAFT_DESCRIPTION = "Crafting this recipe for the first time w
 		texture = recipeInfo.icon
 	end
 	if recipe.itemID and recipe.itemID ~= 0 then
-		texture = GetItemIcon(recipe.itemID)
+		texture = C_Item.GetItemIconByID(recipe.itemID)
 	end
 	SkilletSkillIcon:SetNormalTexture(texture)
 	SkilletSkillIcon:Show()
@@ -434,7 +425,7 @@ PROFESSIONS_FIRST_CRAFT_DESCRIPTION = "Crafting this recipe for the first time w
 					needed:SetTextColor(1,1,1)
 				end
 			end
-			texture = GetItemIcon(reagent.reagentID)
+			texture = C_Item.GetItemIconByID(reagent.reagentID)
 			icon:SetNormalTexture(texture)
 			needed:SetText(reagent.numNeeded.."x")
 			button:SetWidth(width - 20)
@@ -547,7 +538,7 @@ PROFESSIONS_FIRST_CRAFT_DESCRIPTION = "Crafting this recipe for the first time w
 						self.modifiedSelected[j] = self:InitializeModifiedSelected(mreagent)
 					end
 				end
-				texture = GetItemIcon(mselected)
+				texture = C_Item.GetItemIconByID(mselected)
 				icon:SetNormalTexture(texture)
 				icon:Show()
 				button:SetID(j + 100)
@@ -615,7 +606,7 @@ PROFESSIONS_FIRST_CRAFT_DESCRIPTION = "Crafting this recipe for the first time w
 --
 					local name = self:nameWithQuality(rselected.itemID)
 					text:SetText(name)
-					texture = GetItemIcon(rselected.itemID)
+					texture = C_Item.GetItemIconByID(rselected.itemID)
 					icon:SetNormalTexture(texture)
 					local num, craftable = self:GetInventory(self.currentPlayer, rselected.itemID)
 					local count_text
@@ -715,7 +706,7 @@ PROFESSIONS_FIRST_CRAFT_DESCRIPTION = "Crafting this recipe for the first time w
 					local name, num, craftable
 					if oselected.itemID then
 						name = self:nameWithQuality(oselected.itemID)
-						texture = GetItemIcon(oselected.itemID)
+						texture = C_Item.GetItemIconByID(oselected.itemID)
 						num, craftable = self:GetInventory(self.currentPlayer, oselected.itemID)
 					elseif oselected.currencyID then
 						local info = C_CurrencyInfo.GetCurrencyInfo(oselected.currencyID)
@@ -828,7 +819,7 @@ PROFESSIONS_FIRST_CRAFT_DESCRIPTION = "Crafting this recipe for the first time w
 --
 					local name = self:nameWithQuality(fselected.itemID)
 					text:SetText(name)
-					texture = GetItemIcon(fselected.itemID)
+					texture = C_Item.GetItemIconByID(fselected.itemID)
 					icon:SetNormalTexture(texture)
 					local num, craftable = self:GetInventory(self.currentPlayer, fselected.itemID)
 					local count_text
@@ -927,7 +918,7 @@ PROFESSIONS_FIRST_CRAFT_DESCRIPTION = "Crafting this recipe for the first time w
 					--DA.DEBUG(0,"UpdateDetailWindow: sselected= "..tostring(sselected))
 					local name = self:nameWithQuality(sselected)
 					text:SetText(name)
-					texture = GetItemIcon(sselected)
+					texture = C_Item.GetItemIconByID(sselected)
 					icon:SetNormalTexture(texture)
 					local num, craftable = self:GetInventory(self.currentPlayer, sselected)
 					local count_text
