@@ -22,7 +22,7 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
 -- Includes changes from Dranni21312
 --
 
-local isRetail = Skillet.isRetail
+local isRetail = Skillet.isRetail or Skillet.isForever
 local isClassic = Skillet.isClassic
 
 Skillet.ATRPlugin = {}
@@ -439,7 +439,7 @@ local function GetBuyout(recipe)
 end
 
 local function GetReagentData(reagent)
-	DA.DEBUG(0,"GetReagentData: reagent= "..DA.DUMP1(reagent))
+	--DA.DEBUG(0,"GetReagentData: reagent= "..DA.DUMP1(reagent))
 	local value = 0
 	local needed = 0
 	local custom = ""
@@ -447,8 +447,6 @@ local function GetReagentData(reagent)
 	if reagent then
 		needed = reagent.numNeeded or 0
 		if isRetail then
-			id = reagent.reagentID
-		elseif isForever then
 			id = reagent.reagentID
 		else
 			id = reagent.id
@@ -496,7 +494,7 @@ local function GetReagentData(reagent)
 end
 
 local function AddExtraText(value, needed, id, name, custom)
-	DA.DEBUG(0,"AddExtraText("..tostring(value)..", "..tostring(needed)..", "..tostring(id)..", "..tostring(name)..", "..tostring(custom)..")")
+	--DA.DEBUG(0,"AddExtraText("..tostring(value)..", "..tostring(needed)..", "..tostring(id)..", "..tostring(name)..", "..tostring(custom)..")")
 	if not Skillet:VendorSellsReagent(id) then
 --
 -- Not sold by a vendor so use the default
@@ -524,7 +522,7 @@ local function AddExtraText(value, needed, id, name, custom)
 end
 
 local function GetRecipeData(recipe)
-	DA.DEBUG(0,"GetRecipeData: recipe= "..DA.DUMP(recipe,1))
+	--DA.DEBUG(0,"GetRecipeData: recipe= "..DA.DUMP(recipe,1))
 	if not recipe then return end
 	local buyout, cost, profit, percentage, sellout, vprofit, vpercentage
 	local itemID
@@ -553,9 +551,11 @@ local function GetRecipeData(recipe)
 		end
 		local ah_tax = Skillet.db.profile.plugins.ATR.calcProfitAhTax and ahtaxDef or 1
 		profit = buyout * ah_tax - cost
-		percentage = profit * 100 / cost
 		vprofit = sellout - cost
-		vpercentage = vprofit * 100 / cost
+		if cost ~= 0 then
+			percentage = profit * 100 / cost
+			vpercentage = vprofit * 100 / cost
+		end
 		--DA.DEBUG(0,"GetRecipeData: buyout= "..tostring(buyout)..", profit= "..tostring(profit)..", percentage= "..tostring(percentage))
 		--DA.DEBUG(0,"GetRecipeData: sellout= "..tostring(sellout)..", vprofit= "..tostring(vprofit)..", vpercentage= "..tostring(vpercentage))
 		recipe.cost = cost or 0
