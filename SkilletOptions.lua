@@ -398,21 +398,6 @@ Skillet.options =
 					width = "full",
 					order = 6
 				},
---[[
-				use_blizzard_for_optional = {
-					type = "toggle",
-					name = L["USEBLIZZFOROPTIONNAME"],
-					desc = L["USEBLIZZFOROPTIONDESC"],
-					get = function()
-						return Skillet.db.profile.use_blizzard_for_optional
-					end,
-					set = function(self,value)
-						Skillet.db.profile.use_blizzard_for_optional = value
-					end,
-					width = "full",
-					order = 7
-				},
---]]
 				always_show_progress_bar = {
 					type = "toggle",
 					name = L["SHOWPROGRESSBARNAME"],
@@ -426,6 +411,20 @@ Skillet.options =
 					width = "full",
 					order = 8
 				},
+				select_top_recipe = {
+					type = "toggle",
+					name = L["SELECTTOPRECIPENAME"],
+					desc = L["SELECTTOPRECIPEDESC"],
+					get = function()
+						return Skillet.db.profile.select_top_recipe
+					end,
+					set = function(self,value)
+						Skillet.db.profile.select_top_recipe = value
+						Skillet:UpdateTradeSkillWindow()
+					end,
+					width = "full",
+					order = 8,
+				},
 				enhanced_recipe_display = {
 					type = "toggle",
 					name = L["ENHANCHEDRECIPEDISPLAYNAME"],
@@ -437,8 +436,23 @@ Skillet.options =
 						Skillet.db.profile.enhanced_recipe_display = value
 						Skillet:UpdateTradeSkillWindow()
 					end,
-					width = "full",
+					width = 1.5,
 					order = 9
+				},
+				enhanced_chance_display = {
+					type = "toggle",
+					name = L["ENHANCHEDCHANCEDISPLAYNAME"],
+					desc = L["ENHANCHEDCHANCEDISPLAYDESC"],
+					get = function()
+						return Skillet.db.profile.enhanced_chance_display
+					end,
+					set = function(self,value)
+						Skillet.db.profile.enhanced_chance_display = value
+						Skillet:UpdateTradeSkillWindow()
+					end,
+--					width = "full",
+					width = 1.5,
+					order = 9,
 				},
 				confirm_queue_clear = {
 					type = "toggle",
@@ -532,7 +546,6 @@ Skillet.options =
 					set = function(self,value)
 						Skillet.db.profile.sound_on_empty_queue = value
 					end,
---					width = "full",
 					width = 1.5,
 					order = 15,
 				},
@@ -546,7 +559,6 @@ Skillet.options =
 					set = function(self,value)
 						Skillet.db.profile.flash_on_empty_queue = value
 					end,
---					width = "full",
 					width = 1.5,
 					order = 16,
 				},
@@ -560,7 +572,6 @@ Skillet.options =
 					set = function(self,value)
 						Skillet.db.profile.sound_on_remove_queue = value
 					end,
---					width = "full",
 					width = 1.5,
 					order = 17,
 				},
@@ -574,7 +585,6 @@ Skillet.options =
 					set = function(self,value)
 						Skillet.db.profile.flash_on_remove_queue = value
 					end,
---					width = "full",
 					width = 1.5,
 					order = 18,
 				},
@@ -1670,6 +1680,91 @@ Skillet.options =
 			end,
 			order = 109
 		},
+--
+-- commands to manage the manual toolData list
+--
+		tooladd = {
+			type = 'input',
+			name = "tooladd",
+			desc = "Add a tool (tooladd id|link,data)",
+			get = function()
+				return value
+			end,
+			set = function(self,value)
+				if not (UnitAffectingCombat("player")) then
+					if value then
+						local item, id, data, name, link
+						local player = Skillet.currentPlayer
+						DA.DEBUG(0,"value= "..value)
+						item, data = string.split(",",value)
+						if string.find(item,"|H") then
+							id = Skillet:GetItemIDFromLink(item)
+						else
+							id = tonumber(item)
+						end
+						name, link = C_Item.GetItemInfo(id)
+						data = tonumber(data)
+						DA.DEBUG(0,"id= "..tostring(id)..", name= "..tostring(name)..", data= "..tostring(data)..", link= "..tostring(link))
+						Skillet.db.realm.toolData[player][id] = { ["name"] = name, ["value"] = data }
+						end
+				else
+					DA.DEBUG(0,"|cff8888ffSkillet|r: Combat lockdown restriction. Leave combat and try again.")
+				end
+			end,
+			order = 120
+		},
+		tooldel = {
+			type = 'input',
+			name = "tooldel",
+			desc = "Delete a tool (tooldel id|link)",
+			get = function()
+				return value
+			end,
+			set = function(self,value)
+				if not (UnitAffectingCombat("player")) then
+					if value then
+						local id
+						local player = Skillet.currentPlayer
+						DA.DEBUG(0,"value= "..value)
+						if string.find(value,"|H") then
+							id = Skillet:GetItemIDFromLink(value)
+						else
+							id = tonumber(value)
+						end
+						Skillet.db.realm.toolData[player][id] = nil
+						end
+				else
+					DA.DEBUG(0,"|cff8888ffSkillet|r: Combat lockdown restriction. Leave combat and try again.")
+				end
+			end,
+			order = 121
+		},
+		tooldump = {
+			type = 'execute',
+			name = "tooldump",
+			desc = "Print the toolData table",
+			func = function()
+				local player = Skillet.currentPlayer
+				if next(Skillet.db.realm.toolData[player]) == nil then
+					print("toolData is empty")
+				end
+				for id,entry in pairs(Skillet.db.realm.toolData[player]) do
+					print("id= "..tostring(id)..", name= "..tostring(entry.name)..", value= "..tostring(entry.value))
+				end
+			end,
+			order = 122
+		},
+		toolclear = {
+			type = 'execute',
+			name = "toolclear",
+			desc = "Clear the custom reagent data table",
+			func = function()
+				local player = Skillet.currentPlayer
+				Skillet.db.realm.toolData[player] = {}
+			end,
+			order = 123
+		},
+
 --
 -- If set, MissAll will add all Merchant items to the MissingVendorItems table
 -- MissAll is not stored in the saved variables file.

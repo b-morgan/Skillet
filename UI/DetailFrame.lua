@@ -243,6 +243,14 @@ function Skillet:UpdateDetailWindow(skillIndex)
 				for c,s in pairs(SkilletRankFrame.subRanks) do
 					s:Show()
 				end
+				if self.db.profile.enhanced_chance_display then
+					local chance = getLvlUpChance()
+					chance = math.floor(chance*10)/10		-- one decimal is enough
+					SkilletRankFrameSkillChance:SetText(COLORORANGE..orange.."|r/"..COLORYELLOW..yellow.."|r/"..COLORGREEN..green.."|r/"..COLORGRAY..gray.."|r/ "..L["Chance"]..": "..chance.."|r%")
+					SkilletRankFrameSkillChance:Show()
+				else
+					SkilletRankFrameSkillChance:Hide()
+				end
 			end
 		end
 		recipeInfo = Skillet.data.recipeInfo[self.currentTrade][recipe.spellID]

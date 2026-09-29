@@ -213,8 +213,8 @@ function Skillet:ClearShoppingList(player)
 	self:UpdateTradeSkillWindow()
 end
 
-function Skillet:GetShoppingList(player, sameFaction, includeGuildbank)
-	--DA.DEBUG(0,"GetShoppingList("..tostring(player)..", "..tostring(sameFaction)..", "..tostring(includeGuildbank)..")")
+function Skillet:GetShoppingList(player, sameFaction, includeGuildbank, includeTools)
+	--DA.DEBUG(0,"GetShoppingList("..tostring(player)..", "..tostring(sameFaction)..", "..tostring(includeGuildbank)..", "..tostring(includeTools)..")")
 	self:InventoryScan()
 	local curPlayer = self.currentPlayer
 	if not self.db.realm.faction then
@@ -311,15 +311,28 @@ function Skillet:GetShoppingList(player, sameFaction, includeGuildbank)
 			end
 		end
 	end
+
+	if Skillet.db.profile.queue_tools and includeTools then
+		for id,entry in pairs(Skillet.db.realm.toolData[curPlayer]) do
+			local have = C_Item.GetItemCount(id,false)	-- bags only
+			local bank = C_Item.GetItemCount(id,true)	-- bags + bank
+			--DA.DEBUG(2,"toolData: id= "..tostring(id)..", name= "..tostring(entry.name)..", value= "..tostring(entry.value))
+			if have == 0 and bank > 0 then
+				local entry = { ["id"] = id, ["count"] = 1, ["player"] = curPlayer, ["value"] = 0, ["source"] = "bank" }
+				table.insert(list, entry)
+			end
+		end
+	end
+	
 	return list
 end
 
-local function cache_list(self)
+local function cache_list(self, includeTools)
 	local name = nil
 	if not Skillet.db.profile.include_alts then
 		name = Skillet.currentPlayer
 	end
-	self.cachedShoppingList = self:GetShoppingList(name, self.db.profile.same_faction, self.db.profile.include_guild)
+	self.cachedShoppingList = self:GetShoppingList(name, Skillet.db.profile.same_faction, Skillet.db.profile.include_guild, includeTools)
 end
 
 --
@@ -1485,8 +1498,8 @@ end
 --
 -- Fills out and displays the shopping list frame
 --
-function Skillet:DisplayShoppingList(atBank)
-	--DA.DEBUG(0,"DisplayShoppingList")
+function Skillet:DisplayShoppingList(atBank, includeTools)
+	--DA.DEBUG(0,"DisplayShoppingList("..tostring(atBank)..", "..tostring(includeTools)..")")
 	if not self.shoppingList then
 		self.shoppingList = createShoppingListFrame(self)
 	end
@@ -1500,7 +1513,7 @@ function Skillet:DisplayShoppingList(atBank)
 	else
 		SkilletShoppingListRetrieveButton:Hide()
 	end
-	cache_list(self)
+	cache_list(self, includeTools)
 	local frame = self.shoppingList
 	if not frame:IsVisible() then
 		frame:Show()

@@ -73,6 +73,7 @@ local defaults = {
 		ignore_queued_reagents = false,
 		ignore_on_hand = false,
 		queue_glyph_reagents = false,
+		select_top_recipe = false,
 		display_required_level = false,
 		display_shopping_list_at_bank = true,
 		display_shopping_list_at_guildbank = true,
@@ -85,6 +86,7 @@ local defaults = {
 		use_altcurrency_vendor_items = false,
 		show_max_upgrade = true,
 		enhanced_recipe_display = false,
+		enhanced_chance_display = false,
 		confirm_queue_clear = false,
 		queue_only_view = true,
 		dialog_switch = false,
@@ -566,11 +568,15 @@ function Skillet:InitializeMissingVendorItems()
 	}
 end
 
-function Skillet:InitializeDatabase(player)
-	DA.DEBUG(0,"Initialize database for "..tostring(player))
+function Skillet:InitializeDatabase(player, clean)
+	if clean then action = "Clean" else action = "Initialize" end
+	DA.DEBUG(0,action.." database for "..tostring(player))
 	if self.linkedSkill or self.isGuild then  -- Avoid adding unnecessary data to savedvariables
 		return
 	end
+--
+-- Session data
+--
 	if not self.data then
 		self.data = {}
 	end
@@ -583,12 +589,24 @@ function Skillet:InitializeDatabase(player)
 	if not self.data.skillList then
 		self.data.skillList = {}
 	end
+	if player and (not self.data.skillList[player] or clean) then
+		self.data.skillList[player] = {}
+	end
 	if not self.data.groupList then
 		self.data.groupList = {}
+	end
+	if player and (not self.data.groupList[player] or clean) then
+		self.data.groupList[player] = {}
 	end
 	if not self.data.skillIndexLookup then
 		self.data.skillIndexLookup = {}
 	end
+	if player and (not self.data.skillIndexLookup[player] or clean) then
+		self.data.skillIndexLookup[player] = {}
+	end
+--
+-- Realm data
+--
 	if player then
 		if not self.db.realm.groupDB then
 			self.db.realm.groupDB = {}
@@ -596,23 +614,32 @@ function Skillet:InitializeDatabase(player)
 		if not self.db.realm.options then
 			self.db.realm.options = {}
 		end
-		if not self.db.realm.options[player] then
+		if not self.db.realm.options[player] or clean then
 			self.db.realm.options[player] = {}
 		end
 		if not self.db.realm.queueData then
 			self.db.realm.queueData = {}
 		end
-		if not self.db.realm.queueData[player] then
+		if not self.db.realm.queueData[player] or clean then
 			self.db.realm.queueData[player] = {}
+		end
+		if not self.db.realm.toolData then
+			self.db.realm.toolData = {}
+		end
+		if not self.db.realm.toolData[player] or clean then
+			self.db.realm.toolData[player] = {}
 		end
 		if not self.db.realm.auctionData then
 			self.db.realm.auctionData = {}
 		end
-		if not self.db.realm.auctionData[player] then
+		if not self.db.realm.auctionData[player] or clean then
 			self.db.realm.auctionData[player] = {}
 		end
 		if not self.db.realm.tradeSkills then
 			self.db.realm.tradeSkills = {}
+		end
+		if not self.db.realm.tradeSkills[player] or clean then
+			self.db.realm.tradeSkills[player] = {}
 		end
 		if not self.db.realm.faction then
 			self.db.realm.faction = {}
@@ -635,50 +662,50 @@ function Skillet:InitializeDatabase(player)
 		if not self.db.realm.inventoryData then
 			self.db.realm.inventoryData = {}
 		end
-		if not self.db.realm.inventoryData[player] then
+		if not self.db.realm.inventoryData[player] or clean then
 			self.db.realm.inventoryData[player] = {}
 		end
 		if not self.db.realm.bagData then
 			self.db.realm.bagData = {}
 		end
-		if not self.db.realm.bagData[player] then
+		if not self.db.realm.bagData[player] or clean then
 			self.db.realm.bagData[player] = {}
 		end
 		if not self.db.realm.bagDetails then
 			self.db.realm.bagDetails = {}
 		end
-		if not self.db.realm.bagDetails[player] then
+		if not self.db.realm.bagDetails[player] or clean then
 			self.db.realm.bagDetails[player] = {}
 		end
 		if not self.db.realm.bankData then
 			self.db.realm.bankData = {}
 		end
-		if not self.db.realm.bankData[player] then
+		if not self.db.realm.bankData[player] or clean then
 			self.db.realm.bankData[player] = {}
 		end
 		if not self.db.realm.bankDetails then
 			self.db.realm.bankDetails = {}
 		end
-		if not self.db.realm.bankDetails[player] then
+		if not self.db.realm.bankDetails[player] or clean then
 			self.db.realm.bankDetails[player] = {}
 		end
 
 		if not self.db.realm.reagentsInQueue then
 			self.db.realm.reagentsInQueue = {}
 		end
-		if not self.db.realm.reagentsInQueue[player] then
+		if not self.db.realm.reagentsInQueue[player] or clean then
 			self.db.realm.reagentsInQueue[player] = {}
 		end
 		if not self.db.realm.modifiedInQueue then
 			self.db.realm.modifiedInQueue = {}
 		end
-		if not self.db.realm.modifiedInQueue[player] then
+		if not self.db.realm.modifiedInQueue[player] or clean then
 			self.db.realm.modifiedInQueue[player] = {}
 		end
 		if not self.db.realm.userIgnoredMats then
 			self.db.realm.userIgnoredMats = {}
 		end
-		if not self.db.realm.userIgnoredMats[player] then
+		if not self.db.realm.userIgnoredMats[player] or clean then
 			self.db.realm.userIgnoredMats[player] = {}
 		end
 		if not self.db.profile.SavedQueues then
@@ -1525,10 +1552,24 @@ function Skillet:ShowTradeSkillWindow()
 	end
 	self:ResetTradeSkillWindow()
 	self:ShowFullView()
+--	if not frame:IsVisible() then
+--		frame:Show()
+--	end
+--	self:UpdateTradeSkillWindow()
 	if not frame:IsVisible() then
 		frame:Show()
+		self:UpdateTradeSkillWindow()
+	else
+		self:UpdateTradeSkillWindow()
 	end
-	self:UpdateTradeSkillWindow()
+	if self.db.profile.select_top_recipe then
+		if SkilletScrollButton1.skill.skillIndex then
+			self:SetSelectedSkill(SkilletScrollButton1.skill.skillIndex)
+		else
+			self:SetSelectedSkill(SkilletScrollButton2.skill.skillIndex)
+		end
+	end
+	DA.DEBUG(0,"ShowTradeSkillWindow complete")
 end
 
 --
