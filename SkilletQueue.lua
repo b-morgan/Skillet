@@ -489,6 +489,9 @@ function Skillet:ProcessQueue(altMode)
 		if command and command.op == "iterate" then
 			local recipe = self:GetRecipe(command.recipeID)
 			craftable = true
+			if self.db.profile.queue_match_trade and self.currentTrade ~= tradeID then
+				craftable = false
+			end
 			if self:IsRecipeOnCooldown(command.recipeID) then
 				Skillet:Print(L["Skipping"],recipe.name,"-",PROFESSIONS_RECIPE_COOLDOWN) -- L["is on cooldown"], ON_COOLDOWN
 				craftable = false
@@ -805,9 +808,9 @@ function Skillet:QueueItems(button, count)
 		self.visited = {}
 		if count > 0 then
 			if recipe then
-				local first = false
+				local first = Skillet.db.profile.queue_insert_first or false
 				if button == "RightButton" then
-					first = true
+					first = not first
 				end
 				local queueCommand = self:QueueCommandIterate(recipe.spellID, count)
 				if self.db.profile.queue_one_at_a_time and queueCommand.modified then

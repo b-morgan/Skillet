@@ -158,6 +158,19 @@ Skillet.options =
 					width = 1.5,
 					order = 20
 				},
+				queue_tools = {
+					type = "toggle",
+					name = L["QUEUETOOLSNAME"],
+					desc = L["QUEUETOOLSDESC"],
+					get = function()
+						return Skillet.db.profile.queue_tools
+					end,
+					set = function(self,value)
+						Skillet.db.profile.queue_tools = value
+					end,
+					width = 1.5,
+					order = 21
+				},
 				ignore_banked_reagents = {
 					type = "toggle",
 					name = L["IGNOREBANKEDREAGENTSNAME"],
@@ -196,6 +209,32 @@ Skillet.options =
 					end,
 					width = "full",
 					order = 22
+				},
+				queue_match_trade = {
+					type = "toggle",
+					name = L["QUEUEMATCHTRADENAME"],
+					desc = L["QUEUEMARCHTRADEDESC"],
+					get = function()
+						return Skillet.db.profile.queue_match_trade
+					end,
+					set = function(self,value)
+						Skillet.db.profile.queue_match_trade = value
+					end,
+					width = 1.5,
+					order = 23
+				},
+				queue_insert_first = {
+					type = "toggle",
+					name = L["QUEUEINSERTFIRSTNAME"],
+					desc = L["QUEUEINSERTFIRSTDESC"],
+					get = function()
+						return Skillet.db.profile.queue_insert_first
+					end,
+					set = function(self,value)
+						Skillet.db.profile.queue_insert_first = value
+					end,
+					width = 1.5,
+					order = 23
 				},
 --[[
 				queue_to_front = {
