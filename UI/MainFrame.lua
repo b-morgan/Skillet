@@ -1297,7 +1297,7 @@ function Skillet:UpdateTradeSkillWindow()
 					local level = self:GetLevelRequiredToUse(recipe.itemID)
 					if level and level > 1 then
 						local _, _, rarity = C_Item.GetItemInfo("item:"..recipe.itemID)
-						local r, g, b = GetItemQualityColor(rarity)
+						local r, g, b = C_Item.GetItemQualityColor(rarity)
 						if r and g and b then
 							levelText:SetTextColor(r, g, b)
 						end
