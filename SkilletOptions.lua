@@ -460,6 +460,9 @@ Skillet.options =
 					end,
 					set = function(self,value)
 						Skillet.db.profile.hide_blizzard_frame = value
+						if not value then
+							ProfessionsFrame:SetScale(1.0)
+						end
 					end,
 					width = "full",
 					order = 8
@@ -1086,6 +1089,11 @@ Skillet.options =
 			end,
 			set = function(self,value)
 				local value = tonumber(value)
+				if value < 0.1 then
+					value = 0.1
+				elseif value > 1.0 then
+					value = 1.0
+				end
 				Skillet.db.profile.scale_blizzard_frame = value
 			end,
 			order = 75

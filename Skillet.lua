@@ -100,7 +100,7 @@ local defaults = {
 		flash_on_remove_queue = false,
 		always_show_progress_bar = true,
 		hide_blizzard_frame	= false,
-		scale_blizzard_frame = 0.1,
+		scale_blizzard_frame = 0.4,		-- 0.1 if buttons for skinning, fishing, and herbalism can be found/f
 		tsm_compat = false,
 		tsm_prefer = false,
 		transparency = 1.0,
@@ -161,11 +161,10 @@ function Skillet:DisableBlizzardFrame()
 			ProfessionsFrame:SetScript("OnHide", nil)
 		end
 		HideUIPanel(ProfessionsFrame)
-		self.BlizzardUIshowing = false
 	elseif Skillet.db.profile.hide_blizzard_frame then
 		ProfessionsFrame:SetScale(Skillet.db.profile.scale_blizzard_frame or 0.1)
-		self.BlizzardUIshowing = false	
 	end
+	self.BlizzardUIshowing = false	
 end
 
 function Skillet:EnableBlizzardFrame()
@@ -177,12 +176,11 @@ function Skillet:EnableBlizzardFrame()
 			self.tradeSkillHide = nil
 		end
 		ShowUIPanel(ProfessionsFrame)
-		self.BlizzardUIshowing = true
 	else
 --		Skillet.db.profile.hide_blizzard_frame
 		ProfessionsFrame:SetScale(1.0)
-		self.BlizzardUIshowing = true	
 	end
+	self.BlizzardUIshowing = true	
 end
 
 --
@@ -1464,6 +1462,7 @@ end
 --
 function Skillet:ChangeTradeSkill(tradeID, tradeName)
 	DA.DEBUG(0,"ChangeTradeSkill("..tostring(tradeID)..", "..tostring(tradeName)..")")
+	local byName = true
 	if not self.delayChange then
 		if self.db.profile.dialog_switch and not self.dialogSwitch then
 			self:HideAllWindows()
@@ -1476,8 +1475,25 @@ function Skillet:ChangeTradeSkill(tradeID, tradeName)
 			StaticPopup_Show("SKILLET_MANUAL_CHANGE", self.changingName)
 		else
 			if self.isRetail and tradeName == "Mining" then tradeName = "Mining Journal" end
-			DA.DEBUG(1,"ChangeTradeSkill: executing CastSpellByName("..tostring(tradeName)..")")
-			CastSpellByName(tradeName)
+			if Skillet.isForever then
+				if tradeID == 2366 then
+					tradeID = 1278062		-- herbalism skills (Gardening)
+					byName = false
+				elseif tradeID == 7620 then
+					tradeID = 1278067		-- fishing skills (Bait and Tackle)
+					byName = false
+				elseif tradeID == 8613 then
+					tradeID = 1278068		-- skinning skills (Tanning)
+					byName = false
+				end
+			end
+			if byName then
+				DA.DEBUG(1,"ChangeTradeSkill: executing CastSpellByName("..tostring(tradeName)..")")
+				CastSpellByName(tradeName)
+			else
+				DA.DEBUG(1,"ChangeTradeSkill: executing CastSpellByID("..tostring(tradeID)..")")
+				CastSpellByID(tradeID)
+			end
 			self.delayTrade = tradeID
 			self.delayName = tradeName
 			self.delayChange = true

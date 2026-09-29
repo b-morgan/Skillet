@@ -47,9 +47,9 @@ local ForeverSkillLineIDList = {
 	[197] = 3908,		-- tailoring
 	[185] = 2550,		-- cooking
 	[129] = 3273,		-- first aid
-	[182] = 2366,		-- herbalism skills
-	[393] = 8613,		-- skinning skills
-	[356] = 7620,		-- fishing skills
+	[182] = 2366,		-- herbalism skills (1278062, Gardening)
+	[356] = 7620,		-- fishing skills (1278067, Bait and Tackle)
+	[393] = 8613,		-- skinning skills (1278068, Tanning)
 }
 
 --
