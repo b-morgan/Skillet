@@ -451,6 +451,19 @@ Skillet.options =
 					width = "full",
 					order = 7
 				},
+				hide_blizzard_frame = {
+					type = "toggle",
+					name = L["HIDEBLIZZARDFRAMENAME"],
+					desc = L["HIDEBLIZZARDFRAMEDESC"],
+					get = function()
+						return Skillet.db.profile.hide_blizzard_frame
+					end,
+					set = function(self,value)
+						Skillet.db.profile.hide_blizzard_frame = value
+					end,
+					width = "full",
+					order = 8
+				},
 --[[
 				select_top_recipe = {
 					type = "toggle",
@@ -1060,6 +1073,20 @@ Skillet.options =
 				else
 					HideUIPanel(CraftFrame)
 				end
+			end,
+			order = 75
+		},
+		scaleframe = {
+			type = "input",
+			name = "scaleFrame",
+			desc = "Scale Blizzard frame",
+			get = function()
+				local value = tonumber(value)
+				return Skillet.db.profile.scale_blizzard_frame
+			end,
+			set = function(self,value)
+				local value = tonumber(value)
+				Skillet.db.profile.scale_blizzard_frame = value
 			end,
 			order = 75
 		},

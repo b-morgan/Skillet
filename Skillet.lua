@@ -99,6 +99,8 @@ local defaults = {
 		flash_on_empty_queue = false,
 		flash_on_remove_queue = false,
 		always_show_progress_bar = true,
+		hide_blizzard_frame	= false,
+		scale_blizzard_frame = 0.1,
 		tsm_compat = false,
 		tsm_prefer = false,
 		transparency = 1.0,
@@ -160,6 +162,9 @@ function Skillet:DisableBlizzardFrame()
 		end
 		HideUIPanel(ProfessionsFrame)
 		self.BlizzardUIshowing = false
+	elseif Skillet.db.profile.hide_blizzard_frame then
+		ProfessionsFrame:SetScale(Skillet.db.profile.scale_blizzard_frame or 0.1)
+		self.BlizzardUIshowing = false	
 	end
 end
 
@@ -171,6 +176,12 @@ function Skillet:EnableBlizzardFrame()
 			ProfessionsFrame:SetScript("OnHide", self.tradeSkillHide)
 			self.tradeSkillHide = nil
 		end
+		ShowUIPanel(ProfessionsFrame)
+		self.BlizzardUIshowing = true
+	else
+--		Skillet.db.profile.hide_blizzard_frame
+		ProfessionsFrame:SetScale(1.0)
+		self.BlizzardUIshowing = true	
 	end
 end
 
@@ -1330,8 +1341,6 @@ function Skillet:SkilletShow()
 		DA.DEBUG(3,"SkilletShow: "..tostring(self.currentTrade).." IsNotSupportedFollower")
 		self:HideAllWindows()
 		self:EnableBlizzardFrame()
-		ShowUIPanel(ProfessionsFrame)
-		Skillet.BlizzardUIshowing = true
 	elseif self:IsSupportedTradeskill(self.currentTrade) then
 		DA.DEBUG(3,"SkilletShow: "..tostring(self.currentTrade).." IsSupportedTradeskill")
 		self:DisableBlizzardFrame()
@@ -1345,8 +1354,6 @@ function Skillet:SkilletShow()
 		DA.DEBUG(3,"SkilletShow: "..tostring(self.currentTrade).." not IsSupportedTradeskill")
 		self:HideAllWindows()
 		self:EnableBlizzardFrame()
-		ShowUIPanel(ProfessionsFrame)
-		Skillet.BlizzardUIshowing = true
 	end
 end
 
