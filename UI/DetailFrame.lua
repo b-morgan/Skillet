@@ -244,7 +244,7 @@ function Skillet:UpdateDetailWindow(skillIndex)
 					s:Show()
 				end
 				if self.db.profile.enhanced_chance_display then
-					local chance = getLvlUpChance()
+					local chance = self:getLvlUpChance()
 					chance = math.floor(chance*10)/10		-- one decimal is enough
 					SkilletRankFrameSkillChance:SetText(COLORORANGE..orange.."|r/"..COLORYELLOW..yellow.."|r/"..COLORGREEN..green.."|r/"..COLORGRAY..gray.."|r/ "..L["Chance"]..": "..chance.."|r%")
 					SkilletRankFrameSkillChance:Show()

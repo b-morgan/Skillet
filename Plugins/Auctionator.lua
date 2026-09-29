@@ -22,9 +22,6 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
 -- Includes changes from Dranni21312
 --
 
-local isRetail = Skillet.isRetail or Skillet.isForever
-local isClassic = Skillet.isClassic
-
 Skillet.ATRPlugin = {}
 
 local plugin = Skillet.ATRPlugin
@@ -253,7 +250,7 @@ plugin.options =
 			order = 25
 		},
 		qualityBuyout = {
-			hidden = not isRetail,
+			hidden = not Skillet.isRetail,
 			type = "toggle",
 			name = "qualityBuyout",
 			desc = "Show all quality buyout values",
@@ -266,7 +263,7 @@ plugin.options =
 			order = 26
 		},
 		minmaxBuyout = {
-			hidden = not isRetail,
+			hidden = not Skillet.isRetail,
 			type = "toggle",
 			name = "minmaxBuyout",
 			desc = "Show minimum and maximum buyout values",
@@ -408,7 +405,7 @@ local function GetBuyout(recipe)
 		itemID = recipe.itemID
 	end
 	sellout = ( select(11,C_Item.GetItemInfo(itemID)) or 0 )
-	if isRetail and Skillet.db.profile.plugins.ATR.minmaxBuyout then
+	if Skillet.isRetail and Skillet.db.profile.plugins.ATR.minmaxBuyout then
 		minBuyout, maxBuyout = GetMinMaxBuyout(recipe)
 		if Skillet.db.profile.best_quality then
 			buyout = maxBuyout
@@ -419,7 +416,7 @@ local function GetBuyout(recipe)
 		if Atr_GetAuctionBuyout then
 			buyout = (Atr_GetAuctionBuyout(itemID) or 0) * recipe.numMade
 		elseif Auctionator and Auctionator.API.v1 then
-			if isRetail then
+			if Skillet.isRetail then
 				if Skillet.db.profile.best_quality then
 					outputItemInfo = C_TradeSkillUI.GetRecipeOutputItemData(recipe.spellID, {}, nil, 8)
 				else
@@ -446,7 +443,7 @@ local function GetReagentData(reagent)
 	local id, name
 	if reagent then
 		needed = reagent.numNeeded or 0
-		if isRetail then
+		if Skillet.isRetail or Skillet.isForever then
 			id = reagent.reagentID
 		else
 			id = reagent.id
@@ -1296,7 +1293,7 @@ function Skillet:AuctionatorSearch(whichOne)
 			end
 			local needed = reagent.numNeeded or 0
 			local id
-			if isRetail then
+			if Skillet.isRetail or Skillet.isForever then
 				id = reagent.reagentID
 			else
 				id = reagent.id

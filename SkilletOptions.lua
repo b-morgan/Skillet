@@ -359,19 +359,6 @@ Skillet.options =
 					width = "full",
 					order = 3
 				},
-				show_recipe_source_for_learned = {
-					type = "toggle",
-					name = L["SHOWRECIPESOURCEFORLEARNEDNAME"],
-					desc = L["SHOWRECIPESOURCEFORLEARNEDDESC"],
-					get = function()
-						return Skillet.db.profile.show_recipe_source_for_learned
-					end,
-					set = function(self,value)
-						Skillet.db.profile.show_recipe_source_for_learned = value
-					end,
-					width = "full",
-					order = 4
-				},
 				recipe_source_first = {
 					type = "toggle",
 					name = L["RECIPESOURCEFIRSTNAME"],
@@ -382,10 +369,24 @@ Skillet.options =
 					set = function(self,value)
 						Skillet.db.profile.recipe_source_first = value
 					end,
-					width = "full",
+					width = 1.5,
+					order = 4
+				},
+				show_recipe_source_for_learned = {
+					type = "toggle",
+					name = L["SHOWRECIPESOURCEFORLEARNEDNAME"],
+					desc = L["SHOWRECIPESOURCEFORLEARNEDDESC"],
+					get = function()
+						return Skillet.db.profile.show_recipe_source_for_learned
+					end,
+					set = function(self,value)
+						Skillet.db.profile.show_recipe_source_for_learned = value
+					end,
+					width = 1.5,
 					order = 5
 				},
 				use_blizzard_for_followers = {
+					hidden = not Skillet.isRetail,
 					type = "toggle",
 					name = L["USEBLIZZARDFORFOLLOWERSNAME"],
 					desc = L["USEBLIZZARDFORFOLLOWERSDESC"],
@@ -409,8 +410,9 @@ Skillet.options =
 						Skillet.db.profile.always_show_progress_bar = value
 					end,
 					width = "full",
-					order = 8
+					order = 7
 				},
+--[[
 				select_top_recipe = {
 					type = "toggle",
 					name = L["SELECTTOPRECIPENAME"],
@@ -425,6 +427,7 @@ Skillet.options =
 					width = "full",
 					order = 8,
 				},
+--]]
 				enhanced_recipe_display = {
 					type = "toggle",
 					name = L["ENHANCHEDRECIPEDISPLAYNAME"],

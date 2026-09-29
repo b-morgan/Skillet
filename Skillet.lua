@@ -1552,23 +1552,23 @@ function Skillet:ShowTradeSkillWindow()
 	end
 	self:ResetTradeSkillWindow()
 	self:ShowFullView()
---	if not frame:IsVisible() then
---		frame:Show()
---	end
---	self:UpdateTradeSkillWindow()
 	if not frame:IsVisible() then
 		frame:Show()
 		self:UpdateTradeSkillWindow()
 	else
 		self:UpdateTradeSkillWindow()
 	end
+--[[
 	if self.db.profile.select_top_recipe then
 		if SkilletScrollButton1.skill.skillIndex then
+			DA.DEBUG(1,"ShowTradeSkillWindow: Selecting First Recipe")
 			self:SetSelectedSkill(SkilletScrollButton1.skill.skillIndex)
 		else
+			DA.DEBUG(1,"ShowTradeSkillWindow: Selecting Second Recipe")
 			self:SetSelectedSkill(SkilletScrollButton2.skill.skillIndex)
 		end
 	end
+--]]
 	DA.DEBUG(0,"ShowTradeSkillWindow complete")
 end
 

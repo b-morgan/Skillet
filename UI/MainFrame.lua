@@ -2242,7 +2242,7 @@ function Skillet:PushSkill(player, tradeID, skillIndex)
 	table.insert(self.skillStack, entry)
 end
 
-local function getLvlUpChance()
+function Skillet:getLvlUpChance()
 --
 -- % to level up with this receipt is calculated by: (greySkill - yourSkill) / (greySkill - yellowSkill
 --
@@ -2289,7 +2289,7 @@ function Skillet:RankFrame_OnEnter(button)
 	local yellow = SkilletRankFrame.subRanks.orange:GetValue()
 	local orange = SkilletRankFrame.subRanks.red:GetValue()
 	-- lets add the chance to level up that skill with that receipt
-	local chance = getLvlUpChance()
+	local chance = self:getLvlUpChance()
 	chance = math.floor(chance*10)/10		-- one decimal is enough
 	GameTooltip:AddLine(COLORORANGE..orange.."|r/"..COLORYELLOW..yellow.."|r/"..COLORGREEN..green.."|r/"..COLORGRAY..gray.."|r/ Chance:"..chance.."|r%")
 	GameTooltip:Show()
