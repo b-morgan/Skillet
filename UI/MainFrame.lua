@@ -1855,8 +1855,12 @@ function Skillet:SkillButton_LinkRecipe()
 	local skill = Skillet.menuButton.skill
 	if skill and skill.recipeID then
 		local spellLink = C_TradeSkillUI.GetRecipeLink(skill.recipeID)
-		if not ChatEdit_InsertLink(spellLink) then
-			DA.DEBUG(0,"SkillButton_LinkRecipe: spellLink= "..DA.PLINK(spellLink))
+		if spellLink ~= nil then
+			if not C_ChatInfo.InChatMessagingLockdown or not C_ChatInfo.InChatMessagingLockdown() then
+--				ChatFrameUtil.GetActiveWindow() -- not sure what this does
+				ChatFrameUtil.InsertLink(spellLink) -- works if the chat is not empty
+--				ChatFrameUtil.OpenChat(spellLink) -- works if the chat is empty
+			end
 		end
 	end
 end
@@ -1865,36 +1869,41 @@ end
 -- Inspired by Kaliel's Tracker
 --
 StaticPopupDialogs["SKILLET_WowheadURL"] = {
-    text = "Skillet - Wowhead URL",
-    button2 = CLOSE,
-    hasEditBox = 1,
-    editBoxWidth = 300,
-    EditBoxOnTextChanged = function(self)
-        self:SetText(self.text)
-        self:HighlightText()
-    end,
-    EditBoxOnEnterPressed = function(self)
-        self:GetParent():Hide()
-    end,
-    EditBoxOnEscapePressed = function(self)
-        self:GetParent():Hide()
-    end,
-    OnShow = function(self)
-        local url = "https://www.wowhead.com/"
+	text = "Skillet - Wowhead URL",
+	button2 = CLOSE,
+	hasEditBox = true,
+	editBoxWidth = 300,
+	EditBoxOnEnterPressed = function(self)
+		self:GetParent():Hide()
+	end,
+	EditBoxOnEscapePressed = function(self)
+		self:GetParent():Hide()
+	end,
+	OnShow = function(self)
+		local textFrame = self.Text or self.text
+		local editBox = self.EditBox or self.editBox
+		local url = "https://www.wowhead.com/"
 		if WOW_PROJECT_ID == WOW_PROJECT_CLASSIC then
 			url = url.."classic/"
 		elseif WOW_PROJECT_ID == WOW_PROJECT_CATACLYSM_CLASSIC then
 			url = url.."cata/"
+		elseif WOW_PROJECT_ID == WOW_PROJECT_MISTS_CLASSIC then
+			url = url.."mop-classic/"
+		elseif Skillet.isForever then
+			url = url.."forever/"
+		elseif Skillet.isRetail then
+			url = url.."retail/"
 		end
-        local param = "item="..self.text.text_arg1
-        self.text:SetText(self.text:GetText().."\n\n"..self.text.text_arg2)
-        self.editBox.text = url..param
-        self.editBox:SetText(self.editBox.text)
-        self.editBox:SetFocus()
-    end,
-    timeout = 0,
-    whileDead = 1,
-    hideOnEscape = 1
+		local param = "item="..textFrame.text_arg1
+		textFrame:SetText(textFrame:GetText().."\n\n"..textFrame.text_arg2)
+		editBox.text = url..param
+		editBox:SetText(editBox.text)
+		editBox:SetFocus()
+		editBox:HighlightText()
+	end,
+	timeout = 0,
+	whileDead = 1,
+	hideOnEscape = 1
 }
 
 --
@@ -2592,10 +2601,10 @@ function Skillet:SkilletQueueMenu_Show(button)
 	end
 	self.queueMenuButton = button
 	MenuUtil.CreateButtonContextMenu(SkilletQueueMenu,
-    {L["Move to Top"], function() Skillet:QueueMoveToTop(Skillet.queueMenuButton:GetID()) end},
-    {L["Move Up"], function() Skillet:QueueMoveUp(Skillet.queueMenuButton:GetID()) end},
-    {L["Move Down"], function() Skillet:QueueMoveDown(Skillet.queueMenuButton:GetID()) end},
-    {L["Move to Bottom"], function() Skillet:QueueMoveToBottom(Skillet.queueMenuButton:GetID()) end}
+	{L["Move to Top"], function() Skillet:QueueMoveToTop(Skillet.queueMenuButton:GetID()) end},
+	{L["Move Up"], function() Skillet:QueueMoveUp(Skillet.queueMenuButton:GetID()) end},
+	{L["Move Down"], function() Skillet:QueueMoveDown(Skillet.queueMenuButton:GetID()) end},
+	{L["Move to Bottom"], function() Skillet:QueueMoveToBottom(Skillet.queueMenuButton:GetID()) end}
 	);
 end
 
