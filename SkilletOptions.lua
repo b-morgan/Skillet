@@ -23,6 +23,43 @@ local isRetail = Skillet.isRetail
 local isForever = Skillet.isForever
 
 --
+-- Inspired by Kaliel's Tracker
+--
+StaticPopupDialogs["SKILLET_Version"] = {
+	text = "Skillet - Version",
+	button2 = CLOSE,
+	hasEditBox = true,
+	editBoxWidth = 300,
+	EditBoxOnEnterPressed = function(self)
+		self:GetParent():Hide()
+	end,
+	EditBoxOnEscapePressed = function(self)
+		self:GetParent():Hide()
+	end,
+	OnShow = function(self)
+        local textFrame = self.Text or self.text
+        local editBox = self.EditBox or self.editBox
+		local version = textFrame.text_arg1
+ 		editBox:SetText(version)
+        editBox:SetFocus()
+        editBox:HighlightText()
+	end,
+	timeout = 0,
+	whileDead = true,
+	hideOnEscape = true
+}
+
+--
+-- Pop up a dialog with a Wowhead URL
+--
+function Skillet:ShowVersion()
+	DA.DEBUG(0,"ShowVersion()")
+	local wowVersion,wowBuild = GetBuildInfo();
+	local text = "Skillet "..tostring(Skillet.version).." on "..tostring(wowVersion).."."..tostring(wowBuild)..", "..tostring(GetLocale())
+	StaticPopup_Show("SKILLET_Version", text)
+end
+
+--
 -- All the options that we allow the user to control.
 --
 Skillet.options =
@@ -928,8 +965,9 @@ Skillet.options =
 			name = "Version",
 			desc = "Print version information",
 			func = function()
-				local wowVersion,wowBuild = GetBuildInfo();
-				print("Skillet "..tostring(Skillet.version).." on "..tostring(wowVersion).."."..tostring(wowBuild)..", "..tostring(GetLocale()))
+--				local wowVersion,wowBuild = GetBuildInfo();
+--				print("Skillet "..tostring(Skillet.version).." on "..tostring(wowVersion).."."..tostring(wowBuild)..", "..tostring(GetLocale()))
+			Skillet:ShowVersion()
 			end,
 			order = 66
 		},
@@ -1089,10 +1127,14 @@ Skillet.options =
 			end,
 			set = function(self,value)
 				local value = tonumber(value)
-				if value < 0.1 then
-					value = 0.1
-				elseif value > 1.0 then
-					value = 1.0
+				if value then
+					if value < 0.1 then
+						value = 0.1
+					elseif value > 1.0 then
+						value = 1.0
+					end
+				else
+					print("scaleframe= "..tostring(Skillet.db.profile.scale_blizzard_frame))
 				end
 				Skillet.db.profile.scale_blizzard_frame = value
 			end,
