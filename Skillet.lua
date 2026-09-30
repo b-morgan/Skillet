@@ -39,7 +39,14 @@ Skillet.build = (Skillet.interface < 16000 and "Classic") or
   (Skillet.interface < 50000 and "Cata") or
   (Skillet.interface < 60000 and "Mists") or
   "Retail"
-
+--
+--	isRetail = WOW_PROJECT_ID == WOW_PROJECT_MAINLINE -- 1
+--	isClassic = WOW_PROJECT_ID == WOW_PROJECT_CLASSIC -- 2
+--	isBCC = WOW_PROJECT_ID == WOW_PROJECT_BURNING_CRUSADE_CLASSIC -- 5
+--	isWrath = WOW_PROJECT_ID == WOW_PROJECT_WRATH_CLASSIC -- 11
+--	isCata = WOW_PROJECT_ID == WOW_PROJECT_CATACLYSM_CLASSIC -- 14
+--	isMists = WOW_PROJECT_ID == WOW_PROJECT_MISTS_CLASSIC -- 19
+--
 Skillet.project = WOW_PROJECT_ID
 -- Temporary measure because FOREVER has no distinct _PROJECT_
 if WOW_PROJECT_ID == WOW_PROJECT_MAINLINE then
@@ -99,7 +106,7 @@ local defaults = {
 		flash_on_empty_queue = false,
 		flash_on_remove_queue = false,
 		always_show_progress_bar = true,
-		hide_blizzard_frame	= false,
+		hide_blizzard_frame	= true,
 		scale_blizzard_frame = 0.4,		-- 0.1 if buttons for skinning, fishing, and herbalism can be found/f
 		tsm_compat = false,
 		tsm_prefer = false,
