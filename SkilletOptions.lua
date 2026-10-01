@@ -489,6 +489,7 @@ Skillet.options =
 					order = 7
 				},
 				hide_blizzard_frame = {
+					hidden = Skillet.isRetail,
 					type = "toggle",
 					name = L["HIDEBLIZZARDFRAMENAME"],
 					desc = L["HIDEBLIZZARDFRAMEDESC"],
