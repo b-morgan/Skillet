@@ -41,11 +41,13 @@ local TradeSkillList = {
 	2656,		-- mining skills, smelting (from mining, 2575)
 	3908,		-- tailoring
 	2550,		-- cooking
-	3273,		-- first aid
-	2366,		-- herbalism (Forever Camping)
-	7620,		-- fishing (Forever Camping)
-	8613,		-- skinning (Forever Camping)
 }
+if Skillet.isForever then
+	table.insert(TradeSkillList,3273)		-- first aid
+	table.insert(TradeSkillList,2366)		-- herbalism (Forever Camping)
+	table.insert(TradeSkillList,7620)		-- fishing (Forever Camping)
+	table.insert(TradeSkillList,8613)		-- skinning (Forever Camping)
+end
 
 local DifficultyNum = {
 	[0] = "optimal",
