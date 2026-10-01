@@ -1416,6 +1416,7 @@ function Skillet:SkilletClose()
 	DA.DEBUG(0,"SkilletClose()")
 	self.tradeSkillOpen = false
 	self:HideAllWindows()
+	self:EnableBlizzardFrame()		-- On Forever, this will reset the ProfessionsFrame scale
 	if Skillet.wasNPCCrafting then
 		DA.DEBUG(0,"wasNPCCrafting")
 		Skillet.wasNPCCrafting = false
