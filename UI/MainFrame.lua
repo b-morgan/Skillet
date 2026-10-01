@@ -1855,11 +1855,14 @@ function Skillet:SkillButton_LinkRecipe()
 	local skill = Skillet.menuButton.skill
 	if skill and skill.recipeID then
 		local spellLink = C_TradeSkillUI.GetRecipeLink(skill.recipeID)
-		if spellLink ~= nil then
+		if spellLink then
 			if not C_ChatInfo.InChatMessagingLockdown or not C_ChatInfo.InChatMessagingLockdown() then
 --				ChatFrameUtil.GetActiveWindow() -- not sure what this does
-				ChatFrameUtil.InsertLink(spellLink) -- works if the chat is not empty
---				ChatFrameUtil.OpenChat(spellLink) -- works if the chat is empty
+				if not ChatFrameUtil.OpenChat(spellLink) then
+					if not ChatFrameUtil.InsertLink(spellLink) then
+						DA.DEBUG(0,"SkillButton_LinkRecipe: spellLink= "..DA.PLINK(spellLink))
+					end
+				end
 			end
 		end
 	end
