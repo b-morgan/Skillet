@@ -1858,8 +1858,8 @@ function Skillet:SkillButton_LinkRecipe()
 		if spellLink then
 			if not C_ChatInfo.InChatMessagingLockdown or not C_ChatInfo.InChatMessagingLockdown() then
 --				ChatFrameUtil.GetActiveWindow() -- not sure what this does
-				if not ChatFrameUtil.OpenChat(spellLink) then
-					if not ChatFrameUtil.InsertLink(spellLink) then
+				if not ChatFrameUtil.InsertLink(spellLink) then -- OpenChat
+					if not ChatFrameUtil.OpenChat(spellLink) then -- InsertLink
 						DA.DEBUG(0,"SkillButton_LinkRecipe: spellLink= "..DA.PLINK(spellLink))
 					end
 				end
