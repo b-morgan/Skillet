@@ -45,17 +45,15 @@ Skillet.build = (Skillet.interface < 16000 and "Classic") or
 --	isBCC = WOW_PROJECT_ID == WOW_PROJECT_BURNING_CRUSADE_CLASSIC -- 5
 --	isWrath = WOW_PROJECT_ID == WOW_PROJECT_WRATH_CLASSIC -- 11
 --	isCata = WOW_PROJECT_ID == WOW_PROJECT_CATACLYSM_CLASSIC -- 14
+--	isForever = WOW_PROJECT_ID == WOW_PROJECT_CAMELOT -- 18
 --	isMists = WOW_PROJECT_ID == WOW_PROJECT_MISTS_CLASSIC -- 19
 --
 Skillet.project = WOW_PROJECT_ID
--- Temporary measure because FOREVER has no distinct _PROJECT_
 if WOW_PROJECT_ID == WOW_PROJECT_MAINLINE then
-	-- ___ temporary measure for Forever ___
-	if LE_EXPANSION_LEVEL_CURRENT == LE_EXPANSION_MIDNIGHT then
-		Skillet.isRetail = true
-	elseif LE_EXPANSION_LEVEL_CURRENT == LE_EXPANSION_CLASSIC then
-		Skillet.isForever = true
-	end
+	Skillet.isRetail = true
+end
+if WOW_PROJECT_ID == WOW_PROJECT_CAMELOT then
+	Skillet.isForever = true
 end
 
 Skillet.gttScale = GameTooltip:GetScale()
