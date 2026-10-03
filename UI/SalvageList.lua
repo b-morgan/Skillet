@@ -201,7 +201,7 @@ function Skillet:UpdateSalvageListWindow()
 			end
 			needed:SetText("")
 			needed:Show()
-			local num, craftable = self:GetInventory(self.currentPlayer, sreagentID)
+			local bags, num, craftable = self:GetInventory(self.currentPlayer, sreagentID)
 			local count_text
 			if craftable > 0 then
 				count_text = string.format("[%d/%d]", num, craftable)
@@ -292,7 +292,7 @@ function Skillet:SalvageReagentOnClick(button, mouse, skillIndex, reagentIndex)
 	local j = 1
 	for i=1, #recipe.salvage,1 do
 		if self.db.profile.hide_unowned then
-			local num, craftable = self:GetInventory(self.currentPlayer, recipe.salvage[i])
+			local bags, num, craftable = self:GetInventory(self.currentPlayer, recipe.salvage[i])
 			if num > 0 or craftable > 0 then
 				self.cachedSalvageList[j] = {}
 				self.cachedSalvageList[j].itemID = recipe.salvage[i]

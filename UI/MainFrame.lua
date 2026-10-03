@@ -845,7 +845,7 @@ function Skillet:UpdateTradeButtons(player)
 		else
 			local spellInfo = C_Spell.GetSpellInfo(additionalSpellId)
 			if spellInfo then
-				DA.DEBUG(1,"UpdateTradeButtons: spellInfo= "..DA.DUMP1(spellInfo))
+				--DA.DEBUG(1,"UpdateTradeButtons: spellInfo= "..DA.DUMP1(spellInfo))
 				spellName = spellInfo.name
 				spellIcon = spellInfo.iconID
 			else
@@ -1631,7 +1631,7 @@ function Skillet:SkillButton_OnEnter(button)
 		if not reagent then
 			break
 		end
-		local numInBoth, numCraftable = self:GetInventory(self.currentPlayer, reagent.reagentID)
+		local numInBags, numInBoth, numCraftable = self:GetInventory(self.currentPlayer, reagent.reagentID)
 		local itemName = C_Item.GetItemInfo(reagent.reagentID) or reagent.reagentID
 		local text
 		if self:VendorSellsReagent(reagent.reagentID) then
@@ -1640,12 +1640,16 @@ function Skillet:SkillButton_OnEnter(button)
 			text = string.format("  %d x %s", reagent.numNeeded, itemName)
 		end
 		local counts
-		counts = string.format("|cff808080[%d/%d]|r", numInBoth, numCraftable)
+		if self.isRetail then
+			counts = string.format("|cff808080[%d/%d]|r", numInBoth, numCraftable)
+		else
+			counts = string.format("|cff808080[%d|%d/%d]|r", numInBags, numInBoth, numCraftable)
+		end
 		tip:AddDoubleLine(text, counts, 1, 1, 1)
 	end
 	if recipe.modifiedData then
 		for i=1,#recipe.modifiedData do
-			local numInBoth, numCraftable = self:GetInventory(self.currentPlayer, recipe.modifiedData[i].schematic.reagents)
+			local numInBags, numInBoth, numCraftable = self:GetInventory(self.currentPlayer, recipe.modifiedData[i].schematic.reagents)
 			local itemName = C_Item.GetItemInfo(recipe.modifiedData[i].reagentID) or recipe.modifiedData[i].reagentID
 			local text
 			text = string.format("  %d x %s", recipe.modifiedData[i].numNeeded, itemName)

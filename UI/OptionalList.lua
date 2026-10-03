@@ -199,7 +199,7 @@ function Skillet:UpdateOptionalListWindow()
 				end
 				needed:SetText("")
 				needed:Show()
-				local num, craftable = self:GetInventory(self.currentPlayer, oreagentID)
+				local bags, num, craftable = self:GetInventory(self.currentPlayer, oreagentID)
 				local count_text
 				if craftable > 0 then
 					count_text = string.format("[%d/%d]", num, craftable)

@@ -197,7 +197,7 @@ function Skillet:UpdateFinishingListWindow()
 			end
 			needed:SetText("")
 			needed:Show()
-			local num, craftable = self:GetInventory(self.currentPlayer, freagentID)
+			local bags, num, craftable = self:GetInventory(self.currentPlayer, freagentID)
 			local count_text
 			if craftable > 0 then
 				count_text = string.format("[%d/%d]", num, craftable)

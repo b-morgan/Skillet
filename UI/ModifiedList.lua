@@ -185,7 +185,7 @@ function Skillet:UpdateModifiedListWindow()
 			button.mreagentID = mreagentID
 			needed:SetText("")
 			needed:Show()
-			local num, craftable = self:GetInventory(self.currentPlayer, mreagentID)
+			local bags, num, craftable = self:GetInventory(self.currentPlayer, mreagentID)
 			button.have = num
 			local count_text
 			if craftable > 0 then
@@ -454,11 +454,11 @@ function Skillet:InitializeModifiedSelected(mreagent)
 	local this = 0
 	local used = 0
 	local need = mreagent.numNeeded
-	local num
+	local bags, num
 	if self.db.profile.best_quality then
 		for k=#mreagent.schematic.reagents, 1 , -1 do
 			if used < need then
-				num = self:GetInventory(self.currentPlayer, mreagent.schematic.reagents[k].itemID)
+				bags, num = self:GetInventory(self.currentPlayer, mreagent.schematic.reagents[k].itemID)
 				this = math.min(num,(need-total))
 				total = total + this
 				if this > 0 then
@@ -471,7 +471,7 @@ function Skillet:InitializeModifiedSelected(mreagent)
 	else
 		for k=1, #mreagent.schematic.reagents, 1 do
 			if used < need then
-				num = self:GetInventory(self.currentPlayer, mreagent.schematic.reagents[k].itemID)
+				bags, num = self:GetInventory(self.currentPlayer, mreagent.schematic.reagents[k].itemID)
 				this = math.min(num,(need-total))
 				total = total + this
 				table.insert(modifiedSelected, { itemID = mreagent.schematic.reagents[k].itemID, quantity = this, dataSlotIndex = mreagent.slot, })

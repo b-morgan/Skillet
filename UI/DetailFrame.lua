@@ -71,7 +71,7 @@ function Skillet:SetReagentToolTip(reagentID, numNeeded, numCraftable)
 		local text = self:FormatMoneyFull(price,true)
 		GameTooltip:AddDoubleLine("Custom Price: ",text,0,1,0,1,1,1)
 	end
-	local inBoth = self:GetInventory(self.currentPlayer, reagentID)
+	local inBags, inBoth = self:GetInventory(self.currentPlayer, reagentID)
 	local surplus = inBoth - numNeeded * numCraftable
 	if inBoth < 0 then
 		GameTooltip:AddDoubleLine("in shopping list:",(-inBoth),1,1,0)
@@ -401,13 +401,25 @@ PROFESSIONS_FIRST_CRAFT_DESCRIPTION = "Crafting this recipe for the first time w
 			else
 				reagentName = "unknown"
 			end
-			local num, craftable = self:GetInventory(self.currentPlayer, reagent.reagentID)
+			local bags, num, craftable = self:GetInventory(self.currentPlayer, reagent.reagentID)
 			local count_text
-			if craftable > 0 then
-				count_text = string.format("[%d/%d]", num, craftable)
+			if Skillet.isRetail then
+				if craftable > 0 then
+					count_text = string.format("[%d/%d]", num, craftable)
+				else
+					count_text = string.format("[%d]", num)
+				end
 			else
-				count_text = string.format("[%d]", num)
+				if craftable > 0 then
+					count_text = string.format("[%d|%d/%d]", bags, num, craftable)
+				elseif num > 0 then
+					count_text = string.format("[%d|%d]", bags, num)
+				else
+					count_text = string.format("[%d]", bags)
+				end
+				num = bags
 			end
+
 			if num < reagent.numNeeded then
 --
 -- Grey it out if we don't have it
@@ -480,14 +492,14 @@ PROFESSIONS_FIRST_CRAFT_DESCRIPTION = "Crafting this recipe for the first time w
 				--DA.DEBUG(0,"UpdateDetailWindow: mreagent= "..DA.DUMP(mreagent))
 				needed:SetText(mreagent.numNeeded.."x")
 				local mselected
-				local mitem, name, link
+				local mitem, name, link, bags
 				local num = {}
 				local craftable = {}
 				local mtotal = 0
 				local count_text
 				for k=1, #mreagent.schematic.reagents, 1 do
 					mitem = mreagent.schematic.reagents[k].itemID
-					num[k], craftable[k] = self:GetInventory(self.currentPlayer, mitem)
+					bags, num[k], craftable[k] = self:GetInventory(self.currentPlayer, mitem)
 					if craftable[k] > 0 then
 						if count_text then
 							count_text = count_text .. string.format("+%d/%d", num[k], craftable[k])
@@ -616,7 +628,7 @@ PROFESSIONS_FIRST_CRAFT_DESCRIPTION = "Crafting this recipe for the first time w
 					text:SetText(name)
 					texture = C_Item.GetItemIconByID(rselected.itemID)
 					icon:SetNormalTexture(texture)
-					local num, craftable = self:GetInventory(self.currentPlayer, rselected.itemID)
+					local bags, num, craftable = self:GetInventory(self.currentPlayer, rselected.itemID)
 					local count_text
 					if craftable > 0 then
 						count_text = string.format("[%d/%d]", num, craftable)
@@ -711,11 +723,11 @@ PROFESSIONS_FIRST_CRAFT_DESCRIPTION = "Crafting this recipe for the first time w
 --
 -- An optional reagent has been selected for this slot
 --
-					local name, num, craftable
+					local name, bags, num, craftable
 					if oselected.itemID then
 						name = self:nameWithQuality(oselected.itemID)
 						texture = C_Item.GetItemIconByID(oselected.itemID)
-						num, craftable = self:GetInventory(self.currentPlayer, oselected.itemID)
+						bags, num, craftable = self:GetInventory(self.currentPlayer, oselected.itemID)
 					elseif oselected.currencyID then
 						local info = C_CurrencyInfo.GetCurrencyInfo(oselected.currencyID)
 						name = info.name
@@ -829,7 +841,7 @@ PROFESSIONS_FIRST_CRAFT_DESCRIPTION = "Crafting this recipe for the first time w
 					text:SetText(name)
 					texture = C_Item.GetItemIconByID(fselected.itemID)
 					icon:SetNormalTexture(texture)
-					local num, craftable = self:GetInventory(self.currentPlayer, fselected.itemID)
+					local bags, num, craftable = self:GetInventory(self.currentPlayer, fselected.itemID)
 					local count_text
 					if craftable > 0 then
 						count_text = string.format("[%d/%d]", num, craftable)
@@ -928,7 +940,7 @@ PROFESSIONS_FIRST_CRAFT_DESCRIPTION = "Crafting this recipe for the first time w
 					text:SetText(name)
 					texture = C_Item.GetItemIconByID(sselected)
 					icon:SetNormalTexture(texture)
-					local num, craftable = self:GetInventory(self.currentPlayer, sselected)
+					local bags, num, craftable = self:GetInventory(self.currentPlayer, sselected)
 					local count_text
 					if craftable > 0 then
 						count_text = string.format("[%d/%d]", num, craftable)

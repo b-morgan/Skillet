@@ -263,9 +263,9 @@ function Skillet:GetShoppingList(player, sameFaction, includeGuildbank, includeT
 				local name = C_Item.GetItemInfo(id)
 				--DA.DEBUG(2,"GetShoppingList: reagent= "..id.." ("..tostring(name)..") x "..count)
 				local deficit = count -- deficit is usually negative
-				local numInBoth, numInBothCurrent, numGuildbank = 0,0,0
+				local numInBags, numInBagsCurrent, numInBoth, numInBothCurrent, numGuildbank = 0,0,0,0,0
 				if not usedInventory[player][id] then
-					numInBoth = self:GetInventory(player, id)
+					numInBags, numInBoth = self:GetInventory(player, id)
 				end
 				--DA.DEBUG(2,"GetShoppingList: numInBoth= "..numInBoth)
 				if numInBoth > 0 then
@@ -273,7 +273,7 @@ function Skillet:GetShoppingList(player, sameFaction, includeGuildbank, includeT
 				end
 				if player ~= self.currentPlayer then
 					if not usedInventory[curPlayer] then
-						numInBothCurrent = self:GetInventory(curPlayer, id)
+						numInBagsCurrent, numInBothCurrent = self:GetInventory(curPlayer, id)
 					end
 					--DA.DEBUG(2,"GetShoppingList: numInBothCurrent= "..numInBothCurrent)
 					if numInBothCurrent > 0 then
@@ -281,7 +281,11 @@ function Skillet:GetShoppingList(player, sameFaction, includeGuildbank, includeT
 					end
 				end
 				if not self.db.profile.ignore_on_hand then
-					deficit = deficit + numInBoth + numInBothCurrent
+					if self.isRetail then
+						deficit = deficit + numInBoth + numInBothCurrent
+					else
+						deficit = deficit + numInBags + numInBagsCurrent
+					end
 				end
 --
 -- If the Guildbank should be included then
