@@ -256,7 +256,7 @@ function Skillet:OnInitialize()
 -- recipes have changed (i.e. different reagent requirements) so
 -- we clear the saved variables recipe data just to be safe.
 --
-	local dataVersion = 10
+	local dataVersion = 11
 	local queueVersion = 1
 	local customVersion = 1
 	local recipeVersion = 1
@@ -1414,7 +1414,7 @@ function Skillet:SkilletClose()
 	DA.DEBUG(0,"SkilletClose()")
 	self.tradeSkillOpen = false
 	self:HideAllWindows()
-	if self.isForever then
+	if self.isForever and ProfessionsFrame then
 		ProfessionsFrame:SetScale(1.0)	-- Just to make sure
 	end
 	if Skillet.wasNPCCrafting then
