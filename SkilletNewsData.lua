@@ -28,10 +28,14 @@ Skillet.NewsName = "Skillet News"
 Skillet.NewsData = {
 	{	version = "5.60",
 		data = {
-			{	name = "Changes",
+			{	name = "Retail",
 				data = {
-					{ header = "Retail", body = "Preliminary support for Forever" },
-					{ header = "Forever", body = "Blizzard Professions UI remains on screen\nSome Profession buttons in the Skillet frame fail\nProfessions copied to Action Bars behave strangely" },
+					{ header = "Changes", body = "Preliminary support for Forever\nPlease report any issues" },
+				},
+			},
+			{	name = "Forever",
+				data = {
+					{ header = "UI", body = "Blizzard Professions UI remains on screen\nSkillet option 'Hide Blizzard Frame' will scale it down\n'/skillet scaleframe <n>` to change scale from 0.1 to 1.0" },
 				},
 			},
 		},
