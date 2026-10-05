@@ -1896,9 +1896,9 @@ StaticPopupDialogs["SKILLET_WowheadURL"] = {
 			url = url.."cata/"
 		elseif WOW_PROJECT_ID == WOW_PROJECT_MISTS_CLASSIC then
 			url = url.."mop-classic/"
-		elseif Skillet.isForever then
+		elseif WOW_PROJECT_ID == WOW_PROJECT_CAMELOT then
 			url = url.."forever/"
-		elseif Skillet.isRetail then
+		elseif WOW_PROJECT_ID == WOW_PROJECT_MAINLINE then
 			url = url.."retail/"
 		end
 		local param = "item="..textFrame.text_arg1
