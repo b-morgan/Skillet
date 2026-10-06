@@ -58,8 +58,6 @@ end
 
 Skillet.gttScale = GameTooltip:GetScale()
 
-local nonLinkingTrade = { [2656] = true, [53428] = true }				-- smelting, runeforging
-
 local defaults = {
 	profile = {
 --

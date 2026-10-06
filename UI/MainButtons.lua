@@ -19,8 +19,15 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
 local L = LibStub("AceLocale-3.0"):GetLocale("Skillet")
 
+local nonLinkingTrade
+if Skillet.isRetail then
+	nonLinkingTrade = { [2656] = true, [53428] = true, [193290] = true, [250046] = true } -- smelting, runeforging, herbalism, skinning
+else
+	nonLinkingTrade = { [2656] = true, [53428] = true }	-- smelting, runeforging
+end
+
 function Skillet:TradeButton_OnEnter(this)
-	GameTooltip:SetOwner(button, "ANCHOR_TOPLEFT")
+	GameTooltip:SetOwner(this, "ANCHOR_TOPLEFT")
 	GameTooltip:ClearLines()
 	local bName = this:GetName()
 	local _, player, tradeID = string.split("-", bName)

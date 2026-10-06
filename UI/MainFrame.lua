@@ -62,8 +62,6 @@ local reagent_height
 -- min width of count text
 local SKILLET_COUNT_MIN_WIDTH = 100
 
-local nonLinkingTrade = { [2656] = true, [53428] = true , [193290] = true }				-- smelting, runeforging, herbalism
-
 --
 -- Stack of previsouly selected skills for use by the
 -- "click on reagent, go to recipe" code and for clicking on Queue'd recipes
