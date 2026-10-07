@@ -761,7 +761,7 @@ function Skillet:OnEnable()
 	self:RegisterEvent("TRADE_SKILL_SHOW")
 	self:RegisterEvent("TRADE_SKILL_NAME_UPDATE")
 	self:RegisterEvent("TRADE_SKILL_DATA_SOURCE_CHANGED")
-	self:RegisterEvent("TRADE_SKILL_DATA_SOURCE_CHANGING")
+--	self:RegisterEvent("TRADE_SKILL_DATA_SOURCE_CHANGING")
 	self:RegisterEvent("TRADE_SKILL_DETAILS_UPDATE")
 --	self:RegisterEvent("TRADE_SKILL_FILTER_UPDATE")
 	self:RegisterEvent("TRADE_SKILL_LIST_UPDATE")
@@ -1674,13 +1674,10 @@ function Skillet:SetSelectedSkill(skillIndex)
 	if skillIndex then
 		self:HideNotesWindow()
 		self:ConfigureRecipeControls(false)
-		if Skillet.BlizzardUIshowing then
+		if Skillet.BlizzardUIshowing or Skillet.isForever then
 			local skill = self:GetSkill(self.currentPlayer, self.currentTrade, skillIndex)
 			local recipeInfo = C_TradeSkillUI.GetRecipeInfo(skill.id)
 			if recipeInfo then
---[[
-				ProfessionsFrame.CraftingPage:SelectRecipe(recipeInfo)
---]]
 				EventRegistry:TriggerEvent("ProfessionsRecipeListMixin.Event.OnRecipeSelected", recipeInfo, ProfessionsFrame.CraftingPage.RecipeList)
 				ProfessionsFrame.CraftingPage.RecipeList:SelectRecipe(recipeInfo, true)
 			end
