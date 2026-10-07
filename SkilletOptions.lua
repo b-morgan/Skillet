@@ -289,6 +289,7 @@ Skillet.options =
 				},
 --]]
 				queue_glyph_reagents = {
+					hidden = not Skillet.isRetail,
 					type = "toggle",
 					name = L["QUEUEGLYPHREAGENTSNAME"],
 					desc = L["QUEUEGLYPHREAGENTSDESC"],
