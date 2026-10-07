@@ -861,8 +861,7 @@ local function ScanTrade()
 	end
 	local player = Skillet.currentPlayer
 	if not player or not tradeID then
-		DA.MARK3("ScanTrade: abort! player= "..tostring(player)..", tradeID= "..tostring(tradeID)..
-			", parentSkillLineID= "..tostring(parentSkillLineID)..", parentSkillLineName= "..tostring(parentSkillLineName))
+		DA.MARK3("ScanTrade: abort! player= "..tostring(player)..", tradeID= "..tostring(tradeID)..", parentSkillLineID= "..tostring(parentSkillLineID)..", parentSkillLineName= "..tostring(parentSkillLineName))
 		Skillet.InProgress.scan = false
 		Skillet.currentTrade = nil
 		return false

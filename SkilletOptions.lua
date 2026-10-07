@@ -776,8 +776,7 @@ Skillet.options =
 				if not (UnitAffectingCombat("player")) then
 					Skillet:ClearShoppingList()
 				else
-					DA.DEBUG(0,"|cff8888ffSkillet|r: Combat lockdown restriction." ..
-												  " Leave combat and try again.")
+					DA.DEBUG(0,"|cff8888ffSkillet|r: Combat lockdown restriction." .." Leave combat and try again.")
 				end
 			end,
 			order = 53
@@ -1665,8 +1664,7 @@ Skillet.options =
 						windowManager.SavePosition(SkilletFinishingList)
 					end
 				else
-					DA.DEBUG(0,"|cff8888ffSkillet|r: Combat lockdown restriction." ..
-												  " Leave combat and try again.")
+					DA.DEBUG(0,"|cff8888ffSkillet|r: Combat lockdown restriction." .." Leave combat and try again.")
 				end
 			end,
 			order = 99
@@ -1733,8 +1731,7 @@ Skillet.options =
 						Skillet.db.global.customPrice[server][id] = { ["name"] = name, ["value"] = price }
 						end
 				else
-					DA.DEBUG(0,"|cff8888ffSkillet|r: Combat lockdown restriction." ..
-												  " Leave combat and try again.")
+					DA.DEBUG(0,"|cff8888ffSkillet|r: Combat lockdown restriction." .." Leave combat and try again.")
 				end
 			end,
 			order = 105
@@ -1760,8 +1757,7 @@ Skillet.options =
 						Skillet.db.global.customPrice[server][id] = nil
 						end
 				else
-					DA.DEBUG(0,"|cff8888ffSkillet|r: Combat lockdown restriction." ..
-												  " Leave combat and try again.")
+					DA.DEBUG(0,"|cff8888ffSkillet|r: Combat lockdown restriction." .." Leave combat and try again.")
 				end
 			end,
 			order = 106
@@ -1930,8 +1926,7 @@ Skillet.options =
 						end
 					end
 				else
-					DA.DEBUG(0,"|cff8888ffSkillet|r: Combat lockdown restriction." ..
-												  " Leave combat and try again.")
+					DA.DEBUG(0,"|cff8888ffSkillet|r: Combat lockdown restriction." .." Leave combat and try again.")
 				end
 			end,
 			order = 112
@@ -1956,8 +1951,7 @@ Skillet.options =
 						end
 					end
 				else
-					DA.DEBUG(0,"|cff8888ffSkillet|r: Combat lockdown restriction." ..
-												  " Leave combat and try again.")
+					DA.DEBUG(0,"|cff8888ffSkillet|r: Combat lockdown restriction." .." Leave combat and try again.")
 				end
 			end,
 			order = 113
@@ -1986,8 +1980,7 @@ Skillet.options =
 						end
 					end
 				else
-					DA.DEBUG(0,"|cff8888ffSkillet|r: Combat lockdown restriction." ..
-												  " Leave combat and try again.")
+					DA.DEBUG(0,"|cff8888ffSkillet|r: Combat lockdown restriction." .." Leave combat and try again.")
 				end
 			end,
 			order = 116

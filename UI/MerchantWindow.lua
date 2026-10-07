@@ -321,8 +321,7 @@ function Skillet:BuyRequiredReagents()
 						count = math.ceil(count/quantity) * quantity 
 					end
 					local maxStack = GetMerchantItemMaxStack(i)
-					DA.DEBUG(0,"count= "..tostring(count)..", name= "..tostring(name)..", price= "..tostring(price)..", quantity= "..tostring(quantity)..
-						", maxStack= "..tostring(maxStack)..", extendedCost= "..tostring(extendedCost))
+					DA.DEBUG(0,"count= "..tostring(count)..", name= "..tostring(name)..", price= "..tostring(price)..", quantity= "..tostring(quantity)..", maxStack= "..tostring(maxStack)..", extendedCost= "..tostring(extendedCost))
 					while count > 0 do				-- if there is not enough currency, a UI_ERROR_MESSAGE event is generated (which Skillet ignores)
 						if count <= maxStack then
 							BuyMerchantItem(i,count)
