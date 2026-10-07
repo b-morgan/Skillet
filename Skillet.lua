@@ -886,6 +886,15 @@ function Skillet:OnEnable()
 	self:EnablePlugins()
 end
 
+--
+-- Called when the addon is disabled
+--
+function Skillet:OnDisable()
+	DA.DEBUG(0,"Skillet:OnDisable()");
+	self:UnregisterAllEvents()
+	self:EnableBlizzardFrame()
+end
+
 function Skillet:PLAYER_LOGIN()
 	DA.TRACE("PLAYER_LOGIN")
 end
@@ -1166,15 +1175,6 @@ function Skillet:PLAYER_INTERACTION_MANAGER_FRAME_HIDE(event,interactionType)
 	if interactionType == Enum.PlayerInteractionType.Auctioneer then -- 21
 		Skillet:AUCTION_HOUSE_CLOSED()
 	end
-end
-
---
--- Called when the addon is disabled
---
-function Skillet:OnDisable()
-	DA.DEBUG(0,"Skillet:OnDisable()");
-	self:UnregisterAllEvents()
-	self:EnableBlizzardFrame()
 end
 
 function Skillet:IsTradeSkillLinked()
