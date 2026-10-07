@@ -828,18 +828,20 @@ local function ScanTrade()
 	local parentSkillLineID, parentSkillLineName, skillLineRank, skillLineMaxRank
 	local baseInfo = C_TradeSkillUI.GetBaseProfessionInfo()
 	local childInfo = C_TradeSkillUI.GetChildProfessionInfo()
-	DA.DEBUG(1,"ScanTrade: GetBaseProfessionInfo= "..DA.DUMP1(baseInfo))
-	DA.DEBUG(1,"ScanTrade: GetChildProfessionInfo= "..DA.DUMP1(childInfo))
+	--DA.DEBUG(1,"ScanTrade: GetBaseProfessionInfo= "..DA.DUMP(baseInfo))
+	--DA.DEBUG(1,"ScanTrade: GetChildProfessionInfo= "..DA.DUMP(childInfo))
 	if childInfo and childInfo.parentProfessionID then 
 		parentSkillLineID = childInfo.parentProfessionID
 		parentSkillLineName = childInfo.parentProfessionName
 		skillLineRank = childInfo.skillLevel
 		skillLineMaxRank = childInfo.maxSkillLevel
+		DA.DEBUG(1,"ScanTrade: (childInfo) parentSkillLineID= "..tostring(parentSkillLineID)..", parentSkillLineName= "..tostring(parentSkillLineName)..", skillLineRank= "..tostring(skillLineRank)..", skillLineMaxRank= "..tostring(skillLineMaxRank))
 	elseif baseInfo and baseInfo.professionID then
 		parentSkillLineID = baseInfo.professionID
 		parentSkillLineName = baseInfo.professionName
 		skillLineRank = baseInfo.skillLevel
 		skillLineMaxRank = baseInfo.maxSkillLevel
+		DA.DEBUG(1,"ScanTrade: (baseInfo) parentSkillLineID= "..tostring(parentSkillLineID)..", parentSkillLineName= "..tostring(parentSkillLineName)..", skillLineRank= "..tostring(skillLineRank)..", skillLineMaxRank= "..tostring(skillLineMaxRank))
 	else
 		return false
 	end
@@ -855,9 +857,9 @@ local function ScanTrade()
 	local profession = Skillet.tradeSkillNamesByID[tradeID]
 	DA.DEBUG(1,"ScanTrade: tradeID= "..tostring(tradeID)..", profession= "..tostring(profession))
 	if link then
-		DA.DEBUG(1,"ScanTrade: "..tostring(skillLineName).." link="..link.." "..DA.PLINK(link))
+		DA.DEBUG(1,"ScanTrade: link= "..DA.PLINK(link))
 	else
-		DA.DEBUG(1,"ScanTrade: "..tostring(skillLineName).." not linkable")
+		DA.DEBUG(1,"ScanTrade: not linkable")
 	end
 	local player = Skillet.currentPlayer
 	if not player or not tradeID then
