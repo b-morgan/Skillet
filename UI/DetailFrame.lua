@@ -411,9 +411,9 @@ PROFESSIONS_FIRST_CRAFT_DESCRIPTION = "Crafting this recipe for the first time w
 				end
 			else
 				if craftable > 0 then
-					count_text = string.format("[%d|%d/%d]", bags, num, craftable)
+					count_text = "["..tostring(bags).."||"..tostring(num).."/"..tostring(craftable).."]" -- double vertical bar for _FONT_COLOR
 				elseif num > 0 then
-					count_text = string.format("[%d|%d]", bags, num)
+					count_text = "["..tostring(bags).."||"..tostring(num).."]"
 				else
 					count_text = string.format("[%d]", bags)
 				end
@@ -424,6 +424,7 @@ PROFESSIONS_FIRST_CRAFT_DESCRIPTION = "Crafting this recipe for the first time w
 --
 -- Grey it out if we don't have it
 --
+				--DA.DEBUG(1,"UpdateDetailWindow: (do not have) count_text= "..count_text)
 				count:SetText(GRAY_FONT_COLOR_CODE .. count_text .. FONT_COLOR_CODE_CLOSE)
 				text:SetText(GRAY_FONT_COLOR_CODE .. reagentName .. FONT_COLOR_CODE_CLOSE)
 				if self:VendorSellsReagent(reagent.reagentID) then
@@ -437,8 +438,9 @@ PROFESSIONS_FIRST_CRAFT_DESCRIPTION = "Crafting this recipe for the first time w
 --
 -- Ungrey it
 --
-				count:SetText(count_text)
-				text:SetText(reagentName)
+				--DA.DEBUG(1,"UpdateDetailWindow: (have) count_text= "..count_text)
+				count:SetText(NORMAL_FONT_COLOR_CODE .. count_text .. FONT_COLOR_CODE_CLOSE)
+				text:SetText(NORMAL_FONT_COLOR_CODE .. reagentName .. FONT_COLOR_CODE_CLOSE)
 				if reagent.modifiedReagent then
 					needed:SetTextColor(1,1,0)
 				else
