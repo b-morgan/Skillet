@@ -328,10 +328,10 @@ PROFESSIONS_FIRST_CRAFT_DESCRIPTION = "Crafting this recipe for the first time w
 --
 	local texture
 	if recipeInfo and recipeInfo.icon then
-		DA.DEBUG(1,"UpdateDetailWindow: texture from "..tostring(recipeInfo.icon))
+		--DA.DEBUG(1,"UpdateDetailWindow: texture from recipeInfo.icon= "..tostring(recipeInfo.icon))
 		texture = recipeInfo.icon
 	elseif recipe.itemID and recipe.itemID ~= 0 then
-		DA.DEBUG(1,"UpdateDetailWindow: texture from GetItemIconByID("..tostring(recipe.itemID)..")")
+		--DA.DEBUG(1,"UpdateDetailWindow: texture from GetItemIconByID("..tostring(recipe.itemID)..")")
 		texture = C_Item.GetItemIconByID(recipe.itemID)
 	end
 	if texture then
