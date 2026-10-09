@@ -1118,29 +1118,6 @@ Skillet.options =
 			end,
 			order = 75
 		},
-		enchantscale = {
-			type = "input",
-			name = "enchantScale",
-			desc = "Scale Blizzard Enchant frame",
-			get = function()
-				local value = tonumber(value)
-				return Skillet.db.profile.scale_enchant_frame
-			end,
-			set = function(self,value)
-				local value = tonumber(value)
-				if value then
-					if value < 0.1 then
-						value = 0.1
-					elseif value > 1.0 then
-						value = 1.0
-					end
-				else
-					print("scaleframe= "..tostring(Skillet.db.profile.scale_enchant_frame))
-				end
-				Skillet.db.profile.scale_enchant_frame = value
-			end,
-			order = 75
-		},
 		scaleframe = {
 			type = "input",
 			name = "scaleFrame",
@@ -1157,10 +1134,33 @@ Skillet.options =
 					elseif value > 1.0 then
 						value = 1.0
 					end
+					Skillet.db.profile.scale_blizzard_frame = value
 				else
 					print("scaleframe= "..tostring(Skillet.db.profile.scale_blizzard_frame))
 				end
-				Skillet.db.profile.scale_blizzard_frame = value
+			end,
+			order = 75
+		},
+		enchantscale = {
+			type = "input",
+			name = "enchantScale",
+			desc = "Scale Blizzard Enchant frame",
+			get = function()
+				local value = tonumber(value)
+				return Skillet.db.profile.scale_enchant_frame
+			end,
+			set = function(self,value)
+				local value = tonumber(value)
+				if value then
+					if value < 0.1 then
+						value = 0.1
+					elseif value > 1.0 then
+						value = 1.0
+					end
+					Skillet.db.profile.scale_enchant_frame = value
+				else
+					print("enchantscale= "..tostring(Skillet.db.profile.scale_enchant_frame))
+				end
 			end,
 			order = 75
 		},
