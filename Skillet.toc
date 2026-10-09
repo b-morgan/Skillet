@@ -76,7 +76,8 @@ SkilletQueue.lua
 ThirdPartyHooks.lua
 Upgrades.lua
 SkillLevelData.lua
-SkillLevelData12.lua
+SkillLevelData12.lua [AllowLoadGameType standard]
+SkillLevelData1.lua [AllowLoadGameType camelot]
 RecipeGroups.lua
 Inventory.lua
 SkilletPlugin.lua
