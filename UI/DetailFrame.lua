@@ -185,7 +185,6 @@ function Skillet:UpdateDetailWindow(skillIndex)
 		self:HideOptionalList(true)
 		self:HideFinishingList(true)
 	end
-	local texture
 	local recipe
 	local newInfo
 	local recipeSchematic
@@ -324,15 +323,26 @@ PROFESSIONS_FIRST_CRAFT_DESCRIPTION = "Crafting this recipe for the first time w
 			end
 		end
 	end
-
-	if recipeInfo and recipeInfo.alternateVerb then
+--
+-- Get the icon
+--
+	local texture
+	if recipeInfo and recipeInfo.icon then
+		DA.DEBUG(1,"UpdateDetailWindow: texture from "..tostring(recipeInfo.icon))
 		texture = recipeInfo.icon
-	end
-	if recipe.itemID and recipe.itemID ~= 0 then
+	elseif recipe.itemID and recipe.itemID ~= 0 then
+		DA.DEBUG(1,"UpdateDetailWindow: texture from GetItemIconByID("..tostring(recipe.itemID)..")")
 		texture = C_Item.GetItemIconByID(recipe.itemID)
 	end
-	SkilletSkillIcon:SetNormalTexture(texture)
-	SkilletSkillIcon:Show()
+	if texture then
+		SkilletSkillIcon:SetNormalTexture(texture)
+		SkilletSkillIcon:Show()
+	else
+		SkilletSkillIcon:Hide()
+	end
+--
+-- Check for Auction House
+--
 	if AuctionHouseFrame and Auctionator and self.ATRPlugin and self.db.profile.plugins.ATR.enabled and self.auctionOpen then
 		SkilletAuctionatorButton:Show()
 	else
