@@ -1343,11 +1343,10 @@ recipeSchematic= {
 }
 --]]
 		local recipeSchematic = C_TradeSkillUI.GetRecipeSchematic(recipeID, false)
-		--DA.DEBUG(2,"recipeSchematic= "..DA.DUMP(recipeSchematic))
+		DA.DEBUG(2,"recipeSchematic= "..DA.DUMP(recipeSchematic))
 		recipe.recipeType = recipeSchematic.recipeType
 		local itemLink = C_TradeSkillUI.GetRecipeItemLink(recipeID)
 		--DA.DEBUG(2,"recipeID= "..tostring(recipeID)..", itemLink = "..DA.PLINK(itemLink))
-		recipeInfo.itemLink = itemLink	-- save a copy for our records
 		if itemLink then
 			local itemID = Skillet:GetItemIDFromLink(itemLink)
 			--DA.DEBUG(2,"itemID= "..tostring(itemID))
@@ -1358,12 +1357,9 @@ recipeSchematic= {
 			recipe.itemID = itemID
 			recipe.itemType = select(2,C_Item.GetItemInfoInstant(itemID))
 			recipe.classID = select(6,C_Item.GetItemInfoInstant(itemID)) or 0
-			recipeInfo.itemID = itemID		-- save a copy for our records
 			if not recipeInfo.alternateVerb then
 				local minMade = recipeSchematic.quantityMin
 				local maxMade = recipeSchematic.quantityMax
-				recipeInfo.minMade = minMade	-- save a copy for our records
-				recipeInfo.maxMade = maxMade	-- save a copy for our records
 				recipe.numMade = (minMade + maxMade)/2
 				local adjustNumMade = Skillet.db.global.AdjustNumMade[recipeID]
 				if adjustNumMade then
@@ -1374,18 +1370,16 @@ recipeSchematic= {
 					end
 				end
 			elseif recipeInfo.alternateVerb == ENSCRIBE then -- use the itemID of the scroll created by using the enchant on vellum
-				--DA.DEBUG(2,"ScanTrade: recipeID= "..tostring(recipeID)..", name= "..tostring(recipeInfo.name)..", alternateVerb= "..tostring(recipeInfo.alternateVerb))
-				recipeInfo.numMade = 1		-- save a copy for our records
-				if Skillet.scrollData[recipeID] then					-- note that this table is maintained by datamining
-					recipeInfo.itemID = Skillet.scrollData[recipeID]	-- save a copy for our records
-					recipe.itemID = Skillet.scrollData[recipeID]
+				DA.DEBUG(2,"ScanTrade: recipeID= "..tostring(recipeID)..", name= "..tostring(recipeInfo.name)..", alternateVerb= "..tostring(recipeInfo.alternateVerb))
+				if Skillet.isRetail and Skillet.scrollData[recipeID] then  -- note that this table is maintained by datamining
+					recipe.itemID = 0
+					recipe.scrollID = Skillet.scrollData[recipeID]
 					itemID = Skillet.scrollData[recipeID]
 				else
-					--DA.DEBUG(0,"ScanTrade: recipeID= "..tostring(recipeID).." has no scrollData")
+					recipe.itemID = 0
 				end
 			else
 				--DA.DEBUG(2,"ScanTrade: recipeID= "..tostring(recipeID)..", name= "..tostring(recipeInfo.name)..", alternateVerb= "..tostring(recipeInfo.alternateVerb))
-				recipeInfo.numMade = 1		-- save a copy for our records
 			end
 			if recipe.numMade > 1 then
 				itemString = itemID..":"..recipe.numMade
