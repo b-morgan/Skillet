@@ -1178,7 +1178,14 @@ function Skillet:SkillButton_OnEnter(button)
 --
 -- Now the list of regents for this recipe and some info about them
 --
-	tip:AddLine("\n" .. SPELL_REAGENTS)
+	tip:AddLine("\n")
+	local text
+	if self.isRetail then
+		text = string.format("|cff808080[%s/%s]|r", L["Inventory"], L["Craftable"])
+	else
+		text = string.format("|cff808080[%s||%s/%s]|r", L["Bags"], L["Inventory"], L["Craftable"])
+	end
+	tip:AddDoubleLine(SPELL_REAGENTS, text)
 	for i=1,#recipe.reagentData do
 		local reagent = recipe.reagentData[i]
 		if not reagent then
@@ -1186,7 +1193,6 @@ function Skillet:SkillButton_OnEnter(button)
 		end
 		local numInBags, numInBoth, numCraftable = self:GetInventory(self.currentPlayer, reagent.reagentID)
 		local itemName = C_Item.GetItemInfo(reagent.reagentID) or reagent.reagentID
-		local text
 		if self:VendorSellsReagent(reagent.reagentID) then
 			text = string.format("  %d x %s  |cff808080(%s)|r", reagent.numNeeded, itemName, L["buyable"])
 		else
@@ -1211,11 +1217,21 @@ function Skillet:SkillButton_OnEnter(button)
 			tip:AddDoubleLine(text, counts, 1, 1, 1)
 		end
 	end
-	local text = string.format("[%s/%s]", L["Inventory"], L["craftable"]) -- match the case sometime
-	tip:AddDoubleLine("\n", text)
+--	local text = string.format("[%s/%s]", L["Inventory"], L["Craftable"])
+--	tip:AddDoubleLine("\n", text)
+	tip:AddLine("\n")
 	local text1 = string.format("recipeID= %d",skill.recipeID)
-	local text = string.format("itemID= %d",recipe.itemID)
-	tip:AddDoubleLine(text1, text)
+	local item = string.format("itemID= %d",recipe.itemID)
+	local scroll = string.format("scrollID= %d",recipe.scrollID)
+	if recipe.scrollID and recipe.scrollID ~= 0 then
+		tip:AddDoubleLine(text1, scroll)
+	elseif recipe.recipeType == Enum.TradeskillRecipeType.Enchant then
+		tip:AddDoubleLine(text1, "Enchant")
+	elseif recipe.itemID and recipe.itemID ~= 0 then
+		tip:AddDoubleLine(text1, item)
+	else 
+		tip:AddDoubleLine(text1, "itemID= nil")
+	end
 	tip:Show()
 	button.locked = false
 end
