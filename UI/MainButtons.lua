@@ -159,6 +159,8 @@ function Skillet:BlizzardUIButton_OnClick(this,button)
 		if Skillet.isRetail then
 			ShowUIPanel(ProfessionsFrame)
 			ProfessionsFrame.CloseButton:HookScript("OnClick",function(...) Skillet.BlizzardUIshowing = false end)
+		elseif self.db.profile.scale_enchant_frame and self.currentTrade == 7411 then -- Enchanting
+			ProfessionsFrame:SetScale(self.db.profile.scale_enchant_frame)
 		else
 			ProfessionsFrame:SetScale(1.0)
 		end
