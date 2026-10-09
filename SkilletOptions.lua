@@ -1118,6 +1118,29 @@ Skillet.options =
 			end,
 			order = 75
 		},
+		enchantscale = {
+			type = "input",
+			name = "enchantScale",
+			desc = "Scale Blizzard Enchant frame",
+			get = function()
+				local value = tonumber(value)
+				return Skillet.db.profile.scale_enchant_frame
+			end,
+			set = function(self,value)
+				local value = tonumber(value)
+				if value then
+					if value < 0.1 then
+						value = 0.1
+					elseif value > 1.0 then
+						value = 1.0
+					end
+				else
+					print("scaleframe= "..tostring(Skillet.db.profile.scale_enchant_frame))
+				end
+				Skillet.db.profile.scale_enchant_frame = value
+			end,
+			order = 75
+		},
 		scaleframe = {
 			type = "input",
 			name = "scaleFrame",
@@ -1207,6 +1230,43 @@ Skillet.options =
 			end,
 			order = 80
 		},
+		initskilllevels = {
+			type = 'execute',
+			name = "Init Skill Levels",
+			desc = "Initialize Skill Levels",
+			func = function()
+				if not (UnitAffectingCombat("player")) then
+					Skillet:InitializeSkillLevels()
+				else
+					DA.DEBUG(0,"|cff8888ffSkillet|r: Combat lockdown restriction. Leave combat and try again.")
+				end
+			end,
+			order = 81
+		},
+		altskilllevels = {
+			type = "toggle",
+			name = "AltSkillLevels",
+			desc = "Use Alternate Skill Levels",
+			get = function()
+				return Skillet.db.profile.altskilllevels
+			end,
+			set = function(self,value)
+				Skillet.db.profile.altskilllevels = value
+			end,
+			order = 82
+		},
+		baseskilllevel = {
+			type = "toggle",
+			name = "BaseSkillLevel",
+			desc = "Use Alternate Base Skill Level",
+			get = function()
+				return Skillet.db.profile.baseskilllevel
+			end,
+			set = function(self,value)
+				Skillet.db.profile.baseskilllevel = value
+			end,
+			order = 83
+		},
 		news = {
 			type = 'execute',
 			name = "Display news",
@@ -1218,7 +1278,7 @@ Skillet.options =
 					DA.DEBUG(0,"|cff8888ffSkillet|r: Combat lockdown restriction. Leave combat and try again.")
 				end
 			end,
-			order = 81
+			order = 84
 		},
 
 --
