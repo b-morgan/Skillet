@@ -349,11 +349,12 @@ function Skillet:OnInitialize()
 		self.db.global.SkillLineAbility = {}
 		initSkillLevels = true
 	end
---	if not self.db.global.NameToSpellID then
---		self.db.global.NameToSpellID = {}
---		initSkillLevels = true
---	end
-	if initSkillLevels then
+	if not self.db.global.NameToSpellID then
+		self.db.global.NameToSpellID = {}
+		initSkillLevels = true
+	end
+	if initSkillLevels or not self.db.global.SkillLevelBuild or self.db.global.SkillLevelBuild ~= self.SkillLevelBuild then
+		self.db.global.SkillLevelBuild = self.SkillLevelBuild
 		self:InitializeSkillLevels()
 	end
 

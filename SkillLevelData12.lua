@@ -49,15 +49,19 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
 -- no other entry is found. The format of this table is the same as
 -- the table Skillet.db.global.SkillLevels to facilitate adding to this table.
 --
--- InitializeSkillLevels is only called if the table does not exist.
+-- InitializeSkillLevels is called if the tables do not exist or
+-- the Skillet.SkillLevelBuild is different.
 --
 -- Force refresh with '/skillet initskilllevels'
 -- or '/run Skillet:InitializeSkillLevels()'
 -- or '/run Skillet.db.global.SkillLevels = nil'
 --
 
-function Skillet:InitializeSkillLevels()
 Skillet.SkillLevelVersion = 12
+Skillet.SkillLevelBuild = 69933
+
+function Skillet:InitializeSkillLevels()
+DA.DEBUG(0,"InitializeSkillLevels()");
 Skillet.db.global.MissingSkillLevels = {}
 Skillet.db.global.SkillLevels = {
 		[0] = "orange/yellow/green/gray",
