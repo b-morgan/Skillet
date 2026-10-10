@@ -1671,7 +1671,7 @@ end
 -- Sets the specific trade skill that the user wants to see details on.
 --
 function Skillet:SetSelectedSkill(skillIndex)
-	DA.DEBUG(0,"SetSelectedSkill("..tostring(skillIndex)..")")
+	--DA.DEBUG(0,"SetSelectedSkill("..tostring(skillIndex)..")")
 	if skillIndex then
 		self:HideNotesWindow()
 		self:ConfigureRecipeControls(false)

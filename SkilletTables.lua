@@ -254,6 +254,7 @@ Skillet.TradeSkillAutoTarget = {
 	}
 }
 
+if Skillet.isRetail then
 --
 -- Table used by Enchanting to target Enchanting Vellum
 --
@@ -1168,7 +1169,9 @@ Skillet.scrollData = {
 	[1281333] = 268033, -- Conjured Illusory Adornment - Nature's Embrace 
 	[1281334] = 268034, -- Conjured Illusory Adornment - Voidtouched 
 }
-
+else
+Skillet.scrollData = {} -- Skillet.isForever
+end
 --
 -- Items in this list are ignored because they can cause infinite loops.
 --

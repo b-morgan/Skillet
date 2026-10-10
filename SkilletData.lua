@@ -1343,7 +1343,7 @@ recipeSchematic= {
 }
 --]]
 		local recipeSchematic = C_TradeSkillUI.GetRecipeSchematic(recipeID, false)
-		DA.DEBUG(2,"recipeSchematic= "..DA.DUMP(recipeSchematic))
+		--DA.DEBUG(2,"recipeSchematic= "..DA.DUMP(recipeSchematic))
 		recipe.recipeType = recipeSchematic.recipeType
 		local itemLink = C_TradeSkillUI.GetRecipeItemLink(recipeID)
 		--DA.DEBUG(2,"recipeID= "..tostring(recipeID)..", itemLink = "..DA.PLINK(itemLink))
@@ -1357,6 +1357,7 @@ recipeSchematic= {
 			recipe.itemID = itemID
 			recipe.itemType = select(2,C_Item.GetItemInfoInstant(itemID))
 			recipe.classID = select(6,C_Item.GetItemInfoInstant(itemID)) or 0
+			--DA.DEBUG(2,"ScanTrade: recipeID= "..tostring(recipeID)..", name= "..tostring(recipeInfo.name)..", alternateVerb= "..tostring(recipeInfo.alternateVerb))
 			if not recipeInfo.alternateVerb then
 				local minMade = recipeSchematic.quantityMin
 				local maxMade = recipeSchematic.quantityMax
@@ -1370,7 +1371,7 @@ recipeSchematic= {
 					end
 				end
 			elseif recipeInfo.alternateVerb == ENSCRIBE then -- use the itemID of the scroll created by using the enchant on vellum
-				DA.DEBUG(2,"ScanTrade: recipeID= "..tostring(recipeID)..", name= "..tostring(recipeInfo.name)..", alternateVerb= "..tostring(recipeInfo.alternateVerb))
+				--DA.DEBUG(2,"ScanTrade: recipeID= "..tostring(recipeID)..", name= "..tostring(recipeInfo.name)..", alternateVerb= "..tostring(recipeInfo.alternateVerb)..", scrollData= "..tostring(Skillet.scrollData[recipeID]))
 				if Skillet.isRetail and Skillet.scrollData[recipeID] then  -- note that this table is maintained by datamining
 					recipe.itemID = 0
 					recipe.scrollID = Skillet.scrollData[recipeID]

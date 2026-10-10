@@ -1222,8 +1222,9 @@ function Skillet:SkillButton_OnEnter(button)
 	tip:AddLine("\n")
 	local text1 = string.format("recipeID= %d",skill.recipeID)
 	local item = string.format("itemID= %d",recipe.itemID)
-	local scroll = string.format("scrollID= %d",recipe.scrollID)
-	if recipe.scrollID and recipe.scrollID ~= 0 then
+	local scroll = string.format("scrollID= %d", Skillet.scrollData[skill.recipeID])
+	--DA.DEBUG(1,"SkillButton_OnEnter: recipeID= "..tostring(skill.recipeID)..", scrollData= "..tostring(Skillet.scrollData[skill.recipeID]))
+	if Skillet.scrollData[skill.recipeID] then
 		tip:AddDoubleLine(text1, scroll)
 	elseif recipe.recipeType == Enum.TradeskillRecipeType.Enchant then
 		tip:AddDoubleLine(text1, "Enchant")
