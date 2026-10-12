@@ -918,7 +918,7 @@ end
 --
 function Skillet:UNIT_INVENTORY_CHANGED(event, unit)
 	DA.TRACE2("UNIT_INVENTORY_CHANGED( ", unit, " )")
-	self.unitInventoryChangedCount = self.unitInventoryChangedCount + 1
+	self.unitInventoryChangedCount = (self.unitInventoryChangedCount or 0) + 1
 	if Skillet.bagsChanged and not UnitAffectingCombat("player") then
 		indexBags()
 		Skillet.bagsChanged = false
@@ -957,7 +957,7 @@ function Skillet:BANK_UPDATE(event,bagID)
 		else
 			self.bagUpdateCounts[bagID] = self.bagUpdateCounts[bagID] + 1
 		end
-	self.bankUpdateCount = self.bankUpdateCount + 1
+	self.bankUpdateCount = (self.bankUpdateCount or 0) + 1
 	end
 	if Skillet.bankBusy then
 		--DA.DEBUG(1, "BANK_UPDATE and bankBusy")
