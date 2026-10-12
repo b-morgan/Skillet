@@ -36,7 +36,7 @@ Skillet.NewsData = {
 			},
 			{	name = "Forever",
 				data = {
-					{ header = "UI", body = "'/skillet scaleframe` changed to '/skillet scalesmall'\n/skillet scalelarge' added" },
+					{ header = "UI", body = "'/skillet scaleframe' changed to '/skillet scalesmall'\n'/skillet scalelarge' added" },
 				},
 			},
 			{	name = "Both",
