@@ -638,10 +638,15 @@ function Skillet:UpdateTradeSkillWindow()
 -- Set the state of any craft specific options
 --
 	self:RecipeDifficultyButton_OnShow()
-	SkilletUseHighestQuality:SetChecked(self.db.profile.best_quality)
-	SkilletUseHighestQuality:Show()
-	SkilletUseConcentration:SetChecked(self.db.profile.use_concentration)
-	SkilletUseConcentration:Show()
+	if Skillet.isRetail then
+		SkilletUseHighestQuality:SetChecked(self.db.profile.best_quality)
+		SkilletUseHighestQuality:Show()
+		SkilletUseConcentration:SetChecked(self.db.profile.use_concentration)
+		SkilletUseConcentration:Show()
+	else
+		SkilletUseHighestQuality:Hide()
+		SkilletUseConcentration:Hide()
+	end
 	SkilletHideUncraftableRecipes:SetChecked(self:GetTradeSkillOption("hideuncraftable"))
 	C_TradeSkillUI.SetOnlyShowMakeableRecipes(self:GetTradeSkillOption("hideuncraftable"))
 	self:UpdateQueueWindow()
