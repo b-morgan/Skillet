@@ -148,26 +148,24 @@ end
 function Skillet:BlizzardUIButton_OnClick(this,button)
 	--DA.DEBUG(0,"BlizzardUIButton_OnClick")
 	GameTooltip:Hide()
-	if Skillet.BlizzardUIshowing then
+	if self.BlizzardUIshowing then
 		if Skillet.isRetail then
 			HideUIPanel(ProfessionsFrame)
 		else
-			ProfessionsFrame:SetScale(Skillet.db.profile.scale_blizzard_frame or 0.1)
+			ProfessionsFrame:SetScale(self.db.profile.scale_blizzard_down or 0.4)
 		end
-		Skillet.BlizzardUIshowing = false
+		self.BlizzardUIshowing = false
 	else
 		if Skillet.isRetail then
 			ShowUIPanel(ProfessionsFrame)
 			ProfessionsFrame.CloseButton:HookScript("OnClick",function(...) Skillet.BlizzardUIshowing = false end)
-		elseif self.db.profile.scale_enchant_frame and self.currentTrade == 7411 then -- Enchanting
-			ProfessionsFrame:SetScale(self.db.profile.scale_enchant_frame)
 		else
-			ProfessionsFrame:SetScale(1.0)
+			ProfessionsFrame:SetScale(self.db.profile.scale_blizzard_up or 1.0)
 		end
 		ProfessionsFrame:Refresh()
-		Skillet.BlizzardUIshowing = true
+		self.BlizzardUIshowing = true
 		if SkilletFrame.selectedSkill and SkilletFrame.selectedSkill ~= -1 then
-			Skillet:SetSelectedSkill(SkilletFrame.selectedSkill)
+			self:SetSelectedSkill(SkilletFrame.selectedSkill)
 		end
 	end
 end
