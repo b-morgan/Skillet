@@ -804,32 +804,14 @@ function Skillet:BAG_CONTAINER_UPDATE(event, bagID)
 	DA.TRACE("BAG_CONTAINER_UPDATE( ", bagID, " )")
 end
 
---[[
-  local frame = CreateFrame("Frame")
-  frame:RegisterEvent("BAG_UPDATE")
-  frame:RegisterEvent("BAG_UPDATE_DELAYED")
-  frame:RegisterEvent("UNIT_INVENTORY_CHANGED")
-  local bags = {}
-  frame:SetScript("OnEvent", function(_, event, data)
-    if data then
-      bags[data] = true
-    end
-    frame:SetScript("OnUpdate", function()
-      frame:SetScript("OnUpdate", nil)
-      for bagID in pairs(bags) do
-        self:BAG_UPDATE(event, bagID)
-      end
-      bags = {}
-      self:BAG_UPDATE_DELAYED()
-    end)
-  end)
---]]
-
 --
 -- So we can track when the players inventory changes and update craftable counts
 --
 function Skillet:BAG_UPDATE(event, bagID)
 	DA.TRACE2("BAG_UPDATE( "..bagID.." )")
+	if not self.bagUpdateCounts then
+		self.bagUpdateCounts = {}
+	end
 	if not self.bagUpdateCounts[bagID] then
 		self.bagUpdateCounts[bagID] = 1
 	else
