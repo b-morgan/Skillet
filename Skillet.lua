@@ -103,7 +103,8 @@ local defaults = {
 		flash_on_remove_queue = false,
 		always_show_progress_bar = true,
 		hide_blizzard_frame	= true,
-		scale_blizzard_frame = 0.4,		-- 0.1 if buttons for skinning, fishing, and herbalism can be found/f
+		scale_blizzard_down = 0.4,
+		scale_blizzard_up = 1.0,
 		tsm_compat = false,
 		tsm_prefer = false,
 		transparency = 1.0,
@@ -164,8 +165,8 @@ function Skillet:DisableBlizzardFrame()
 			ProfessionsFrame:SetScript("OnHide", nil)
 		end
 		HideUIPanel(ProfessionsFrame)
-	elseif Skillet.db.profile.hide_blizzard_frame then
-		ProfessionsFrame:SetScale(Skillet.db.profile.scale_blizzard_frame or 0.1)
+	elseif self.db.profile.hide_blizzard_frame then
+		ProfessionsFrame:SetScale(self.db.profile.scale_blizzard_down or 0.4)
 	end
 	self.BlizzardUIshowing = false	
 end
@@ -179,9 +180,8 @@ function Skillet:EnableBlizzardFrame()
 			self.tradeSkillHide = nil
 		end
 		ShowUIPanel(ProfessionsFrame)
-	else
---		Skillet.db.profile.hide_blizzard_frame
-		ProfessionsFrame:SetScale(1.0)
+	elseif self.db.profile.hide_blizzard_frame then
+		ProfessionsFrame:SetScale(self.db.profile.scale_blizzard_up or 1.0)
 	end
 	self.BlizzardUIshowing = true	
 end
