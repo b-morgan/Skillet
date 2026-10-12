@@ -26,6 +26,27 @@ local isCata = WOW_PROJECT_ID == WOW_PROJECT_CATACLYSM_CLASSIC
 
 Skillet.NewsName = "Skillet News"
 Skillet.NewsData = {
+	{	version = "5.62",
+		data = {
+			{	name = "Retail",
+				data = {
+					{ header = "TOC", body = "Update TOC for 120100" },
+					{ header = "Data", body = "Update scroll tables" },
+				},
+			},
+			{	name = "Forever",
+				data = {
+					{ header = "UI", body = "'/skillet scaleframe` changed to '/skillet scalesmall'\n/skillet scalelarge' added" },
+				},
+			},
+			{	name = "Both",
+				data = {
+					{ header = "UI", body = "Fix Enchant icons\nFix tooltips" },
+					{ header = "Data", body = "Update skillLevel tables" },
+				},
+			},
+		},
+	},
 	{	version = "5.61",
 		data = {
 			{	name = "Changes",
