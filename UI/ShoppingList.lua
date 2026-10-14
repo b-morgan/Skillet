@@ -675,7 +675,7 @@ local function getItemFromBank(itemID, bag, slot, count)
 		local tobag, toslot = findBagForItem(itemID, num_moved)
 		--DA.DEBUG(1,"getItemFromBank: tobag= "..tostring(tobag)..", toslot= "..tostring(toslot)..", findBagForItem("..tostring(itemID)..", "..tostring(num_moved)..")")
 		if not tobag then
-			Skillet:Print(L["Could not find bag space for"]..": "..C_Container.GetContainerItemLink(bag, slot))
+			DA.MARK2(L["Could not find bag space for"]..": "..C_Container.GetContainerItemLink(bag, slot))
 			ClearCursor()
 			return 0
 		end
@@ -711,7 +711,7 @@ local function getItemFromGuildBank(itemID, bag, slot, count)
 		local tobag, toslot = findBagForItem(itemID, num_moved)
 		--DA.DEBUG(1,"getItemFromGuildBank: tobag= "..tostring(tobag)..", toslot= "..tostring(toslot)", findBagForItem("..tostring(itemID)..", "..tostring(num_moved)..")")
 		if not tobag then
-			Skillet:Print(L["Could not find bag space for"]..": "..GetGuildBankItemLink(bag, slot))
+			DA.MARK2(L["Could not find bag space for"]..": "..GetGuildBankItemLink(bag, slot))
 			ClearCursor()
 			return 0
 		else

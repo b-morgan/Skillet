@@ -116,12 +116,15 @@ local function queueAppendReagent(command, reagentID, need, queueCraftables, mre
 		if Skillet.db.profile.ignore_queued_reagents then
 			numInQueue = 0
 		end
-		if Skillet.db.profile.ignore_banked_reagents then
+		if Skillet.db.profile.ignore_banked_reagents or Skillet.isForever then
 			have = numInBags + numInQueue
 		else
 			have = numInBoth + numInQueue
 		end
 	else
+--
+-- Modified reagent (Retail only)
+--
 		--DA.DEBUG(2,"queueAppendReagent: mreagent= "..DA.DUMP(mreagent))
 		for k=1, #mreagent.schematic.reagents, 1 do
 			mitem = mreagent.schematic.reagents[k].itemID
@@ -493,7 +496,7 @@ function Skillet:ProcessQueue(altMode)
 				craftable = false
 			end
 			if self:IsRecipeOnCooldown(command.recipeID) then
-				Skillet:Print(L["Skipping"],recipe.name,"-",PROFESSIONS_RECIPE_COOLDOWN) -- L["is on cooldown"], ON_COOLDOWN
+				DA.MARK2(L["Skipping"].." "..recipe.name.." - "..PROFESSIONS_RECIPE_COOLDOWN) -- L["is on cooldown"], ON_COOLDOWN
 				craftable = false
 			else
 				if command.recipeType == Enum.TradeskillRecipeType.Item or command.recipeType == Enum.TradeskillRecipeType.Enchant then
@@ -521,7 +524,7 @@ function Skillet:ProcessQueue(altMode)
 						local numInBank =  numInBoth - numInBags
 						--DA.DEBUG(2,"ProcessQueue: numInBoth= "..tostring(numInBoth)..", numInBags="..tostring(numInBags)..", numInBank="..tostring(numInBank))
 						if numInBoth < reagent.numNeeded then
-							Skillet:Print(L["Skipping"],recipe.name,"-",L["need"],reagent.numNeeded*command.count,"x",reagentName,"("..L["have"],numInBoth..")")
+							DA.MARK2(L["Skipping"].." "..recipe.name.." - "..L["need"].." "..tostring(reagent.numNeeded*command.count).." x "..reagentName.." ("..L["have"].." "..tostring(numInBoth)..")")
 							craftable = false
 							break
 						end
@@ -538,7 +541,7 @@ function Skillet:ProcessQueue(altMode)
 							end
 						end
 						if not craftable then
-							Skillet:Print(L["Skipping"],recipe.name)
+							DA.MARK2(L["Skipping"].." "..recipe.name)
 							--DA.DEBUG(2,"ProcessQueue: craftable= "..tostring(craftable)..", modifiedReagents="..DA.DUMP(command.modifiedReagents))
 							break
 						end
@@ -557,7 +560,7 @@ function Skillet:ProcessQueue(altMode)
 							local numInBank =  numInBoth - numInBags
 							--DA.DEBUG(2,"ProcessQueue(R): numInBoth= "..tostring(numInBoth)..", numInBags="..tostring(numInBags)..", numInBank="..tostring(numInBank))
 							if numInBoth < command.count then
-								Skillet:Print(L["Skipping"],recipe.name,"-",L["need"],command.count,"x",reagentName,"("..L["have"],numInBoth..")")
+								DA.MARK2(L["Skipping"].." "..recipe.name.." - "..L["need"].." "..tostring(command.count).." x "..reagentName.." ("..L["have"].." "..tostring(numInBoth)..")")
 								craftable = false
 								break
 							end
@@ -577,7 +580,7 @@ function Skillet:ProcessQueue(altMode)
 							local numInBank =  numInBoth - numInBags
 							--DA.DEBUG(2,"ProcessQueue(O): numInBoth= "..tostring(numInBoth)..", numInBags="..tostring(numInBags)..", numInBank="..tostring(numInBank))
 							if numInBoth < command.count then
-								Skillet:Print(L["Skipping"],recipe.name,"-",L["need"],command.count,"x",reagentName,"("..L["have"],numInBoth..")")
+								DA.MARK2(L["Skipping"].." "..recipe.name.." - "..L["need"].." "..tostring(command.count).." x "..reagentName.." ("..L["have"].." "..tostring(numInBoth)..")")
 								craftable = false
 								break
 							end
@@ -597,7 +600,7 @@ function Skillet:ProcessQueue(altMode)
 							local numInBank =  numInBoth - numInBags
 							--DA.DEBUG(2,"ProcessQueue(F): numInBoth= "..tostring(numInBoth)..", numInBags="..tostring(numInBags)..", numInBank="..tostring(numInBank))
 							if numInBoth < command.count then
-								Skillet:Print(L["Skipping"],recipe.name,"-",L["need"],command.count,"x",reagentName,"("..L["have"],numInBoth..")")
+								DA.MARK2(L["Skipping"].." "..recipe.name.." - "..L["need"].." "..tostring(command.count).." x "..reagentName.." ("..L["have"].." "..tostring(numInBoth)..")")
 								craftable = false
 								break
 							end
@@ -637,10 +640,10 @@ function Skillet:ProcessQueue(altMode)
 	if command and craftable then
 		if command.op == "iterate" then
 			if self.currentTrade ~= command.tradeID then
-				self:Print(L["Changing profession to"],tradeName,L["Press Process to continue"])
 				local tradeID = command.tradeID
 				local tradeName = command.tradeName
 				self.queuecasting = false
+				DA.MARK2(L["Changing profession to"].." "..tradeName..". "..L["Press Process to continue"])
 				self:ChangeTradeSkill(tradeID, tradeName)
 				self:QueueMoveToTop(qpos)
 				return
