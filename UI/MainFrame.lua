@@ -1207,7 +1207,7 @@ function Skillet:SkillButton_OnEnter(button)
 		if self.isRetail then
 			counts = string.format("|cff808080[%d/%d]|r", numInBoth, numCraftable)
 		else
-			counts = string.format("|cff808080[%d|%d/%d]|r", numInBags, numInBoth, numCraftable)
+			counts = string.format("|cff808080[%d||%d/%d]|r", numInBags, numInBoth, numCraftable)
 		end
 		tip:AddDoubleLine(text, counts, 1, 1, 1)
 	end
@@ -2347,8 +2347,11 @@ function Skillet:UpdateQueueWindow()
 						optionals = " +"..tostring(c)
 					end
 				end
-				queueName:SetText((self:GetTradeName(recipe.tradeID) or recipe.tradeID)..":"..(recipe.name or recipe.recipeID)..optionals)
-				queueCount:SetText(queueCommand.count)
+				local tname = queueCommand.tradeName or self:GetTradeName(recipe.tradeID) or queueCommand.tradeID or recipe.tradeID
+				local rname = queueCommand.recipeName or recipe.name or queueCommand.recipeID or recipe.recipeID
+				local count = queueCommand.count
+				queueName:SetText(tname..":"..rname..optionals)
+				queueCount:SetText(count)
 			end
 			nameButton:Show()
 			queueName:Show()
