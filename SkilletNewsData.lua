@@ -30,6 +30,7 @@ Skillet.NewsData = {
 		data = {
 			{	name = "Changes",
 				data = {
+					{ header = "Initialization", body = "Fix deleting saved options" },
 					{ header = "UI", body = "Fix recipe tooltip\nFix queue entry" },
 				},
 			},

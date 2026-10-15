@@ -789,7 +789,9 @@ Skillet.options =
 			func = function()
 				if not (UnitAffectingCombat("player")) then
 					Skillet:FlushAllData()
+					Skillet.CleanDatabase = true
 					Skillet:InitializeDatabase(UnitName("player"))
+					Skillet.CleanDatabase = false
 				else
 					DA.DEBUG(0,"|cff8888ffSkillet|r: Combat lockdown restriction. Leave combat and try again.")
 				end

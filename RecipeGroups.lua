@@ -612,6 +612,7 @@ end
 -- Called when the grouping drop down is displayed
 --
 function Skillet:RecipeGroupDropdown_OnShow()
+	--DA.DEBUG(0,"RecipeGroupDropdown_OnShow()")
 	UIDropDownMenu_Initialize(SkilletRecipeGroupDropdown, Skillet.RecipeGroupDropdown_Initialize)
 	SkilletRecipeGroupDropdown.displayMode = "MENU"
 	Skillet:RecipeGroupDeconstructDBStrings()
@@ -824,7 +825,7 @@ function Skillet:RecipeGroupOpDelete()
 		label = "Blizzard"
 		Skillet:SetTradeSkillOption("grouping", label)
 		Skillet.currentGroupLabel = label
-			UIDropDownMenu_SetSelectedName(SkilletRecipeGroupDropdown, label, true)
+		UIDropDownMenu_SetSelectedName(SkilletRecipeGroupDropdown, label, true)
 		UIDropDownMenu_SetText(SkilletRecipeGroupDropdown, label)
 		Skillet:SortAndFilterRecipes()
 		Skillet:UpdateTradeSkillWindow()

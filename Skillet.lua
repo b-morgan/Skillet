@@ -584,12 +584,13 @@ function Skillet:InitializeMissingVendorItems()
 	}
 end
 
-function Skillet:InitializeDatabase(player, clean)
-	if clean then action = "Clean" else action = "Initialize" end
-	DA.DEBUG(0,action.." database for "..tostring(player))
+function Skillet:InitializeDatabase(player)
 	if self.linkedSkill or self.isGuild then  -- Avoid adding unnecessary data to savedvariables
 		return
 	end
+	local clean = Skillet.CleanDatabase
+	if clean then action = "Clean" else action = "Initialize" end
+	DA.DEBUG(0,action.." database for "..tostring(player))
 --
 -- Session data
 --
@@ -1850,6 +1851,7 @@ function Skillet:AddItemNotesToTooltip(tooltip)
 end
 
 function Skillet:ToggleTradeSkillOption(option)
+	--DA.DEBUG(0,"ToggleTradeSkillOption("..tostring(option)..")")
 	local v = self:GetTradeSkillOption(option)
 	self:SetTradeSkillOption(option, not v)
 end
@@ -1869,6 +1871,7 @@ function Skillet:GetTradeSkillOption(option)
 	else
 		r = options[player][trade][option]
 	end
+	--DA.DEBUG(0,"GetTradeSkillOption("..tostring(option)..") value= "..tostring(r))
 	return r
 end
 
@@ -1876,6 +1879,7 @@ end
 -- sets the state of a craft specific option
 --
 function Skillet:SetTradeSkillOption(option, value)
+	--DA.DEBUG(0,"SetTradeSkillOption("..tostring(option)..", "..tostring(value)..")")
 	if not self.linkedSkill and not self.isGuild then
 		local player = self.currentPlayer
 		local trade = self.currentTrade
