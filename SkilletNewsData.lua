@@ -33,6 +33,12 @@ Skillet.NewsData = {
 					{ header = "Global", body = "Player names default to 'First Second' unless 'Use first name only' option is checked." },
 				},
 			},
+			{	name = "Retail",
+				data = {
+					{ header = "TOC", body = "Update TOC for 120100" },
+					{ header = "Data", body = "Update scroll tables" },
+				},
+			},
 		},
 	},
 	{	version = "5.63",
