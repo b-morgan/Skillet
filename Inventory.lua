@@ -194,7 +194,7 @@ end
 function Skillet:InventoryScan()
 	--DA.DEBUG(0,"InventoryScan()")
 	local player = self.currentPlayer
-	if self.linkedSkill or self.isGuild or player ~= UnitName("player") then
+	if self.linkedSkill or self.isGuild or player ~= Skillet:unitName("player") then
 		return
 	end
 	local cachedInventory = self.db.realm.inventoryData[player]

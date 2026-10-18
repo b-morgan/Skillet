@@ -523,7 +523,7 @@ function Skillet:ConfigureRecipeControls(enchant)
 		SkilletEnchantButton:Hide()
 	end
 	self:InitRecipeFilterButtons()
-	if self.currentPlayer ~= (UnitName("player")) then
+	if self.currentPlayer ~= (Skillet:unitName("player")) then
 --
 -- Disable processing because this is not the current player
 --
@@ -938,7 +938,7 @@ function Skillet:UpdateTradeSkillWindow()
 --
 -- Show the count of the item currently owned that the recipe will produce
 --
-				if showOwned and self.currentPlayer == UnitName("player") then
+				if showOwned and self.currentPlayer == Skillet:unitName("player") then
 					local numowned = (self.db.realm.auctionData[self.currentPlayer][recipe.itemID] or 0) + C_Item.GetItemCount(recipe.itemID,true)
 					if numowned > 0 then
 						if numowned >= 1000 then

@@ -130,7 +130,7 @@ function NewsGUI:Create()
 --	[3] = "Once per Player",
 --	[4] = "Never",
 --
-	local player = UnitName("player")
+	local player = Skillet:unitName("player")
 	local version = Skillet.version
 	--DA.DEBUG(1,"NewsGUI:Create: show_news= "..tostring(self.db.show_news)..", player= "..tostring(player)..", version= "..tostring(version))
 	--DA.DEBUG(1,"NewsGUI:Create: lastVersionA= "..tostring(self.db.lastVersionA)..", lastVersion[player]= "..tostring(self.db.lastVersion[player]))

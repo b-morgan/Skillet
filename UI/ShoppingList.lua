@@ -347,7 +347,7 @@ end
 --
 local function indexBags()
 	--DA.DEBUG(0,"indexBags()")
-	if not Skillet.currentPlayer then Skillet.currentPlayer = UnitName("player") end
+	if not Skillet.currentPlayer then Skillet.currentPlayer = Skillet:unitName("player") end
 	local player = Skillet.currentPlayer 	
 	if not Skillet.db.realm.bagData then
 		Skillet.db.realm.bagData = {}
@@ -417,7 +417,7 @@ end
 --
 local function indexBank()
 	--DA.DEBUG(0,"indexBank()")
-	if not Skillet.currentPlayer then Skillet.currentPlayer = UnitName("player") end
+	if not Skillet.currentPlayer then Skillet.currentPlayer = Skillet:unitName("player") end
 	local player = Skillet.currentPlayer
 	if not Skillet.db.realm.bankData then
 		Skillet.db.realm.bankData = {}

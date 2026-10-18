@@ -71,12 +71,25 @@ Skillet.options =
 			type = 'group',
 			name = L["Features"],
 			desc = L["FEATURESDESC"],
-			order = 10,
+			order = 1,
 			args = {
 				header = {
 					type = "header",
 					name = L["Skillet Trade Skills"].." "..Skillet.version,
-					order = 11
+					order = 2
+				},
+				use_first_name_only = {
+					type = "toggle",
+					name = L["USEFIRSTONLYNAME"],
+					desc = L["USEFIRSTONLYDESC"],
+					get = function()
+						return Skillet.db.global.useFirstNameOnly
+					end,
+					set = function(self,value)
+						Skillet.db.global.useFirstNameOnly = value
+					end,
+					width = "full",
+					order = 3
 				},
 				vendor_buy_button = {
 					type = "toggle",
@@ -790,7 +803,7 @@ Skillet.options =
 				if not (UnitAffectingCombat("player")) then
 					Skillet:FlushAllData()
 					Skillet.CleanDatabase = true
-					Skillet:InitializeDatabase(UnitName("player"))
+					Skillet:InitializeDatabase(Skillet:unitName("player"))
 					Skillet.CleanDatabase = false
 				else
 					DA.DEBUG(0,"|cff8888ffSkillet|r: Combat lockdown restriction. Leave combat and try again.")
@@ -805,7 +818,7 @@ Skillet.options =
 			func = function()
 				if not (UnitAffectingCombat("player")) then
 					Skillet:FlushRecipeData()
-					Skillet:InitializeDatabase(UnitName("player"))
+					Skillet:InitializeDatabase(Skillet:unitName("player"))
 				else
 					DA.DEBUG(0,"|cff8888ffSkillet|r: Combat lockdown restriction. Leave combat and try again.")
 				end
@@ -819,7 +832,7 @@ Skillet.options =
 			func = function()
 				if not (UnitAffectingCombat("player")) then
 					Skillet:FlushCustomData()
-					Skillet:InitializeDatabase(UnitName("player"))
+					Skillet:InitializeDatabase(Skillet:unitName("player"))
 				else
 					DA.DEBUG(0,"|cff8888ffSkillet|r: Combat lockdown restriction. Leave combat and try again.")
 				end
@@ -833,7 +846,7 @@ Skillet.options =
 			func = function()
 				if not (UnitAffectingCombat("player")) then
 					Skillet:FlushQueueData()
-					Skillet:InitializeDatabase(UnitName("player"))
+					Skillet:InitializeDatabase(Skillet:unitName("player"))
 				else
 					DA.DEBUG(0,"|cff8888ffSkillet|r: Combat lockdown restriction. Leave combat and try again.")
 				end
@@ -847,7 +860,7 @@ Skillet.options =
 			func = function()
 				if not (UnitAffectingCombat("player")) then
 					Skillet:FlushPlayerData()
-					Skillet:InitializeDatabase(UnitName("player"))
+					Skillet:InitializeDatabase(Skillet:unitName("player"))
 				else
 					DA.DEBUG(0,"|cff8888ffSkillet|r: Combat lockdown restriction. Leave combat and try again.")
 				end
@@ -861,7 +874,7 @@ Skillet.options =
 			func = function()
 				if not (UnitAffectingCombat("player")) then
 					Skillet:FlushDetailData()
-					Skillet:InitializeDatabase(UnitName("player"))
+					Skillet:InitializeDatabase(Skillet:unitName("player"))
 				else
 					DA.DEBUG(0,"|cff8888ffSkillet|r: Combat lockdown restriction. Leave combat and try again.")
 				end
@@ -928,11 +941,11 @@ Skillet.options =
 			desc = "Add to userIgnoredMats",
 			get = function()
 				local value = tonumber(value)
-				return Skillet.db.realm.userIgnoredMats[UnitName("player")][value]
+				return Skillet.db.realm.userIgnoredMats[Skillet:unitName("player")][value]
 			end,
 			set = function(self,value)
 				local value = tonumber(value)
-				Skillet.db.realm.userIgnoredMats[UnitName("player")][value] = 1
+				Skillet.db.realm.userIgnoredMats[Skillet:unitName("player")][value] = 1
 			end,
 			order = 64
 		},
@@ -942,11 +955,11 @@ Skillet.options =
 			desc = "Delete from userIgnoredMats",
 			get = function()
 				local value = tonumber(value)
-				return Skillet.db.realm.userIgnoredMats[UnitName("player")][value]
+				return Skillet.db.realm.userIgnoredMats[Skillet:unitName("player")][value]
 			end,
 			set = function(self,value)
 				local value = tonumber(value)
-				Skillet.db.realm.userIgnoredMats[UnitName("player")][value] = nil
+				Skillet.db.realm.userIgnoredMats[Skillet:unitName("player")][value] = nil
 			end,
 			order = 65
 		},

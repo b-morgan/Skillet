@@ -50,7 +50,7 @@ function Skillet:TradeButton_OnEnter(this)
 		if g == 0 then
 			GameTooltip:AddLine("scan incomplete...",1,0,0)
 		end
-		if nonLinkingTrade[tradeID] and player ~= UnitName("player") then
+		if nonLinkingTrade[tradeID] and player ~= Skillet:unitName("player") then
 			GameTooltip:AddLine(sName.." not available for alts")
 		end
 	end
@@ -65,7 +65,7 @@ function Skillet:TradeButton_OnClick(this,button)
 	tradeID = tonumber(tradeID)
 	local data =  self:GetSkillRanks(player, tradeID)
 	if button == "LeftButton" then
-		if player == UnitName("player") or (data and data ~= nil) then
+		if player == Skillet:unitName("player") or (data and data ~= nil) then
 			if IsShiftKeyDown() then
 				if self.currentTrade == tradeID then
 					local link = C_TradeSkillUI.GetTradeSkillListLink()
@@ -80,7 +80,7 @@ function Skillet:TradeButton_OnClick(this,button)
 					return
 				end
 			else
-				if player == UnitName("player") then
+				if player == Skillet:unitName("player") then
 					self:SetTradeSkill(self.currentPlayer, tradeID)
 				else
 					local link = self.db.realm.tradeSkills[player][tradeID].link
@@ -251,7 +251,7 @@ function Skillet:UpdateTradeButtons(player)
 				--DA.DEBUG(1,"UpdateTradeButtons: CreateFrame for "..tostring(buttonName))
 				button = CreateFrame("CheckButton", buttonName, frame, "SkilletTradeButtonTemplate")
 			end
-			if player ~= UnitName("player") and not tradeLink then		-- fade out buttons that don't have data collected
+			if player ~= Skillet:unitName("player") and not tradeLink then		-- fade out buttons that don't have data collected
 				button:SetAlpha(.4)
 				button:SetHighlightTexture("")
 				button:SetPushedTexture("")

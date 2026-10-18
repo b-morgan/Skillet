@@ -104,9 +104,9 @@ function Skillet:UpgradeDataAndOptions()
 		self.db.char.link_craftable_reagents = nil
 	end
 
-	-- Moved any recipe notes to the server level so all alts can see then
+	-- Moved any recipe notes to the server level so all alts can see them
 	if self.db.char.notes then
-		self.db.realm.notes[UnitName("player")] = self.db.char.notes
+		self.db.realm.notes[Skillet:unitName("player")] = self.db.char.notes
 		self.db.char.notes = nil
 	end
 

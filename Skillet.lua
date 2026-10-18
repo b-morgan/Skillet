@@ -255,6 +255,9 @@ function Skillet:OnInitialize()
 -- we clear the saved variables recipe data just to be safe.
 --
 	local dataVersion = 11
+	if Skillet.isForever then
+		dataVersion = 12
+	end
 	local queueVersion = 1
 	local customVersion = 1
 	local recipeVersion = 1
@@ -287,9 +290,10 @@ function Skillet:OnInitialize()
 -- Information useful for debugging
 --
 	self.db.global.locale = GetLocale()
-	self.db.global.version = self.version
-	self.db.global.build = self.build
-	self.db.global.project = self.project
+	self.db.global.version = self.version     -- from .toc
+	self.db.global.project = self.project     -- WOW_PROJECT_ID
+	self.db.global.interface = self.interface -- from GetBuildInfo
+	self.db.global.build = self.build         -- text derived from interface
 
 --
 -- Initialize global data
@@ -448,7 +452,7 @@ StaticPopupDialogs["SKILLET_MANUAL_CHANGE"] = {
 --
 -- Now do the character initialization
 --
-	self:InitializeDatabase(UnitName("player"))
+	self:InitializeDatabase(Skillet:unitName("player"))
 	self:InitializePlugins()
 	self.NewsGUI:Initialize()
 
@@ -479,6 +483,12 @@ function Skillet:FlushAllData()
 	Skillet.db.realm.inventoryData = {}
 	Skillet.db.realm.userIgnoredMats = {}
 	Skillet.db.realm.options = {}
+	Skillet.db.realm.toolData = {}
+	Skillet.db.realm.faction = {}
+	Skillet.db.realm.race = {}
+	Skillet.db.realm.class = {}
+	Skillet.db.realm.guid = {}
+	Skillet.db.global.server = {}
 	Skillet:FlushCustomData()
 	Skillet:FlushQueueData()
 	Skillet:FlushRecipeData()
@@ -492,7 +502,7 @@ end
 --
 function Skillet:FlushPlayerData()
 	DA.DEBUG(0,"FlushPlayerData()");
-	local player = UnitName("player")
+	local player = Skillet:unitName("player")
 	Skillet.db.realm.tradeSkills[player] = {}
 	Skillet.db.realm.auctionData[player] = {}
 	Skillet.db.realm.inventoryData[player] = {}
@@ -506,6 +516,11 @@ function Skillet:FlushPlayerData()
 	Skillet.db.realm.modifiedInQueue[player] = {}
 	Skillet.db.realm.groupDB[player] = {}
 	Skillet.db.realm.options[player] = {}
+	Skillet.db.realm.toolData[player] = {}
+	Skillet.db.realm.faction[player] = {}
+	Skillet.db.realm.race[player] = {}
+	Skillet.db.realm.class[player] = {}
+	Skillet.db.realm.guid[player]= {}
 end
 
 --
@@ -823,7 +838,8 @@ function Skillet:OnEnable()
 	self:RegisterEvent("UNIT_SPELLCAST_SENT")
 	self:RegisterEvent("UNIT_SPELLCAST_DELAYED")
 	self:RegisterEvent("UNIT_SPELLCAST_STOP")
-	self:RegisterEvent("SKILL_LINES_CHANGED") -- replacement for CHAT_MSG_SKILL?
+--	self:RegisterEvent("CHAT_MSG_SKILL")
+	self:RegisterEvent("SKILL_LINES_CHANGED") -- replacement for CHAT_MSG_SKILL
 	self:RegisterEvent("NEW_RECIPE_LEARNED") -- arg1 = recipeID
 
 	if Skillet.db.profile.BlizzOR then
@@ -873,7 +889,7 @@ function Skillet:OnEnable()
 	self.hideTrivialRecipes = false
 	self.currentTrade = nil
 	self.selectedSkill = nil
-	self.currentPlayer = UnitName("player")
+	self.currentPlayer = Skillet:unitName("player")
 	self.currentGroupLabel = "Blizzard"
 	self.currentGroup = nil
 	self.dataScanned = false
@@ -903,7 +919,8 @@ end
 
 function Skillet:PLAYER_ENTERING_WORLD()
 	DA.TRACE("PLAYER_ENTERING_WORLD")
-	local player, realm = UnitFullName("player")
+	local player = Skillet:unitName("player")
+	local realm = GetRealmName()
 	local faction = UnitFactionGroup("player")
 	local raceName, raceFile, raceID = UnitRace("player")
 	local className, classFile, classId = UnitClass("player")
@@ -993,11 +1010,12 @@ function Skillet:PLAYER_LOGOUT()
 	end
 end
 
-function Skillet:CHAT_MSG_SKILL()	-- Replaced by SKILL_LINES_CHANGED?
+function Skillet:CHAT_MSG_SKILL(event,text)	-- Replaced by SKILL_LINES_CHANGED
 	DA.TRACE("CHAT_MSG_SKILL")
 	if Skillet.tradeSkillOpen then
-		Skillet:RescanTrade()
-		Skillet:UpdateTradeSkillWindow()
+--		Skillet:RescanTrade()
+--		Skillet:UpdateTradeSkillWindow()
+--		Skillet.dataSourceChanged = true	-- Process the change on the next TRADE_SKILL_LIST_UPDATE
 	end
 end
 
@@ -1242,7 +1260,7 @@ function Skillet:IsSupportedTradeskill(tradeID)
 	if self:IsModKey1Down() then
 		return Skillet.db.profile.swapshiftkey
 	end
-	if not tradeID or self.BlizzardSkillList[tradeID] or self.currentPlayer ~= UnitName("player") then
+	if not tradeID or self.BlizzardSkillList[tradeID] or self.currentPlayer ~= Skillet:unitName("player") then
 		DA.DEBUG(3,"IsSupportedTradeskill: BlizzardSkillList="..tostring(self.BlizzardSkillList[tradeID]))
 		return false
 	end
@@ -1300,15 +1318,13 @@ end
 --
 function Skillet:SkilletShow()
 	DA.DEBUG(0,"SkilletShow: (was showing "..tostring(self.currentTrade)..")");
-	self.linkedSkill, self.currentPlayer, self.isGuild = self:IsTradeSkillLinked()
+	local linkedPlayer
+	self.linkedSkill, linkedPlayer, self.isGuild = self:IsTradeSkillLinked()
 	StaticPopup_Hide("SKILLET_MANUAL_CHANGE")
-	if self.linkedSkill then
-		if not self.currentPlayer then
-			return -- Wait for TRADE_SKILL_NAME_UPDATE
-		end
-	else
-		self.currentPlayer = (UnitName("player"))
+	if self.linkedSkill or self.isGuild then
+		return
 	end
+	self.currentPlayer = Skillet:unitName("player")
 	local frame = self.tradeSkillFrame
 	if not frame then
 		frame = self:CreateTradeSkillWindow()
@@ -1795,7 +1811,7 @@ function Skillet:AddItemNotesToTooltip(tooltip)
 					tooltip:AddLine("Skillet " .. L["Notes"] .. ":")
 					header_added = true
 				end
-				if player ~= UnitName("player") then
+				if player ~= Skillet:unitName("player") then
 					note = GRAY_FONT_COLOR_CODE .. player .. ": " .. FONT_COLOR_CODE_CLOSE .. note
 				end
 				tooltip:AddLine(" " .. note, 1, 1, 1, true) -- r,g,b, wrap
@@ -1909,3 +1925,51 @@ end
 function Skillet:XMLDebugLink(text, link)
 	DA.DEBUG(0,text..DA.PLINK(link))
 end
+
+--[[
+-- Player names ------------------------------------------------------------------
+-- In Forever every character has a first name and a surname, unique across the
+-- region: UnitName returns (first name, surname), and addon messages come from
+-- "First Surname" with no realm. Elsewhere it's (name, realm) and "Name-Realm".
+
+local function surnameSeparator()
+    local consts = Constants and Constants.CharacterNameSeparatorConsts
+    return consts and consts.CHARACTERNAME_SURNAME_SEPARATOR or " "
+end
+
+local function uniqueNames()
+    return RegionalUniqueNamesEnabled ~= nil and RegionalUniqueNamesEnabled() == true
+end
+
+-- A unit's name as addon messages from them show it, or nil if unknown.
+local function unitFullName(unit)
+    local getName = unit == "player" and UnitNameUnmodified or UnitName
+    local name, second = getName(unit)
+    if not name or issecretvalue(name) or (second and issecretvalue(second)) then
+		return nil 
+	end
+    if uniqueNames() then
+        local separator = surnameSeparator()
+        if second and second ~= "" and not name:find(separator, 1, true) then
+			return name .. separator .. second
+		end
+        return name
+    end
+end
+--]]
+
+--
+-- Note function name is intentionally different than the Blizzard function
+--
+function Skillet:unitName(target)
+	if Skillet.isForever then
+		if Skillet.db.global.useFirstNameOnly then
+			return UnitName(target)
+		else
+			return GetUnitName(target)
+		end
+	else
+		return UnitName(target)
+	end
+end
+	

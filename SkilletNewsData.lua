@@ -26,6 +26,15 @@ local isCata = WOW_PROJECT_ID == WOW_PROJECT_CATACLYSM_CLASSIC
 
 Skillet.NewsName = "Skillet News"
 Skillet.NewsData = {
+	{	version = "5.64",
+		data = {
+			{	name = "Forever",
+				data = {
+					{ header = "Global", body = "Player names default to 'First Second' unless 'Use first name only' option is checked." },
+				},
+			},
+		},
+	},
 	{	version = "5.63",
 		data = {
 			{	name = "Changes",

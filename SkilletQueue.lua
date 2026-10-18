@@ -474,7 +474,7 @@ function Skillet:ProcessQueue(altMode)
 	self.processingPosition = nil
 	self.processingCommand = nil
 	self.processingCount = nil
-	if self.currentPlayer ~= (UnitName("player")) then
+	if self.currentPlayer ~= (Skillet:unitName("player")) then
 		DA.DEBUG(0,"trying to process from an alt!")
 		return
 	end
