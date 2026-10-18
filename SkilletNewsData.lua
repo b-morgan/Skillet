@@ -35,8 +35,7 @@ Skillet.NewsData = {
 			},
 			{	name = "Retail",
 				data = {
-					{ header = "TOC", body = "Update TOC for 120100" },
-					{ header = "Data", body = "Update scroll tables" },
+					{ header = "Global", body = "No functional changes" },
 				},
 			},
 		},
