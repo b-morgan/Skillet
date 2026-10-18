@@ -79,6 +79,7 @@ Skillet.options =
 					order = 2
 				},
 				use_first_name_only = {
+					hidden = Skillet.isRetail,
 					type = "toggle",
 					name = L["USEFIRSTONLYNAME"],
 					desc = L["USEFIRSTONLYDESC"],
