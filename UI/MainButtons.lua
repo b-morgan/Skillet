@@ -149,19 +149,19 @@ function Skillet:BlizzardUIButton_OnClick(this,button)
 	--DA.DEBUG(0,"BlizzardUIButton_OnClick")
 	GameTooltip:Hide()
 	if self.BlizzardUIshowing then
-		if Skillet.isRetail then
+--		if Skillet.isRetail then
 			HideUIPanel(ProfessionsFrame)
-		else
-			ProfessionsFrame:SetScale(self.db.profile.scale_blizzard_down or 0.4)
-		end
+--		else
+--			ProfessionsFrame:SetScale(self.db.profile.scale_blizzard_down or 0.4)
+--		end
 		self.BlizzardUIshowing = false
 	else
-		if Skillet.isRetail then
+--		if Skillet.isRetail then
 			ShowUIPanel(ProfessionsFrame)
 			ProfessionsFrame.CloseButton:HookScript("OnClick",function(...) Skillet.BlizzardUIshowing = false end)
-		else
-			ProfessionsFrame:SetScale(self.db.profile.scale_blizzard_up or 1.0)
-		end
+--		else
+--			ProfessionsFrame:SetScale(self.db.profile.scale_blizzard_up or 1.0)
+--		end
 		ProfessionsFrame:Refresh()
 		self.BlizzardUIshowing = true
 		if SkilletFrame.selectedSkill and SkilletFrame.selectedSkill ~= -1 then

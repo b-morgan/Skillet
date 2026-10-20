@@ -1160,7 +1160,7 @@ Skillet.options =
 		scalelarge = {
 			type = "input",
 			name = "scaleLarge",
-			desc = "Scale Blizzard Enchant up",
+			desc = "Scale Blizzard frame up",
 			get = function()
 				local value = tonumber(value)
 				return Skillet.db.profile.scale_blizzard_up

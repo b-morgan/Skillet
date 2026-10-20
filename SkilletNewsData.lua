@@ -31,6 +31,7 @@ Skillet.NewsData = {
 			{	name = "Forever",
 				data = {
 					{ header = "Global", body = "Player names default to 'First Second' unless 'Use first name only' option is checked." },
+					{ header = "UI", body = "Remove ProfessionsFrame scaling as the frame can now actually be hidden" },
 				},
 			},
 			{	name = "Retail",

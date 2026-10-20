@@ -156,7 +156,7 @@ Skillet.unknownRecipe = {
 
 function Skillet:DisableBlizzardFrame()
 	DA.DEBUG(0,"DisableBlizzardFrame()")
-	if Skillet.isRetail then
+--	if Skillet.isRetail then
 		if not ProfessionsFrame then
 			DA.WARN("DisableBlizzardFrame: ProfessionsFrame is nil")
 		elseif self.BlizzardTradeSkillFrame == nil then
@@ -165,24 +165,24 @@ function Skillet:DisableBlizzardFrame()
 			ProfessionsFrame:SetScript("OnHide", nil)
 		end
 		HideUIPanel(ProfessionsFrame)
-	elseif self.db.profile.hide_blizzard_frame then
-		ProfessionsFrame:SetScale(self.db.profile.scale_blizzard_down or 0.4)
-	end
+--	elseif self.db.profile.hide_blizzard_frame then
+--		ProfessionsFrame:SetScale(self.db.profile.scale_blizzard_down or 0.4)
+--	end
 	self.BlizzardUIshowing = false	
 end
 
 function Skillet:EnableBlizzardFrame()
 	DA.DEBUG(0,"EnableBlizzardFrame()")
-	if Skillet.isRetail then
+--	if Skillet.isRetail then
 		if self.BlizzardTradeSkillFrame ~= nil then
 			self.BlizzardTradeSkillFrame = nil
 			ProfessionsFrame:SetScript("OnHide", self.tradeSkillHide)
 			self.tradeSkillHide = nil
 		end
 		ShowUIPanel(ProfessionsFrame)
-	elseif self.db.profile.hide_blizzard_frame then
-		ProfessionsFrame:SetScale(self.db.profile.scale_blizzard_up or 1.0)
-	end
+--	elseif self.db.profile.hide_blizzard_frame then
+--		ProfessionsFrame:SetScale(self.db.profile.scale_blizzard_up or 1.0)
+--	end
 	self.BlizzardUIshowing = true	
 end
 
@@ -1430,9 +1430,9 @@ function Skillet:SkilletClose()
 	DA.DEBUG(0,"SkilletClose()")
 	self.tradeSkillOpen = false
 	self:HideAllWindows()
-	if self.isForever and ProfessionsFrame then
-		ProfessionsFrame:SetScale(1.0)	-- Just to make sure
-	end
+--	if self.isForever and ProfessionsFrame then
+--		ProfessionsFrame:SetScale(1.0)	-- Just to make sure
+--	end
 	if Skillet.wasNPCCrafting then
 		DA.DEBUG(0,"wasNPCCrafting")
 		Skillet.wasNPCCrafting = false
