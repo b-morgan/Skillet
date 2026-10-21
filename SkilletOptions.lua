@@ -513,11 +513,34 @@ Skillet.options =
 					end,
 					set = function(self,value)
 						Skillet.db.profile.hide_blizzard_frame = value
-						if not value then
+						if not value and ProfessionsFrame then
 							ProfessionsFrame:SetScale(1.0)
 						end
+						if value and Skillet.db.profile.scale_blizzard_frame then
+							Skillet.db.profile.scale_blizzard_frame = false
+						end
 					end,
-					width = "full",
+					width = 1.5,
+					order = 7
+				},
+				scale_blizzard_frame = {
+					hidden = Skillet.isRetail,
+					type = "toggle",
+					name = L["SCALEBLIZZARDFRAMENAME"],
+					desc = L["SCALEBLIZZARDFRAMEDESC"],
+					get = function()
+						return Skillet.db.profile.scale_blizzard_frame
+					end,
+					set = function(self,value)
+						Skillet.db.profile.scale_blizzard_frame = value
+						if not value and ProfessionsFrame then
+							ProfessionsFrame:SetScale(1.0)
+						end
+						if value and Skillet.db.profile.hide_blizzard_frame then
+							Skillet.db.profile.hide_blizzard_frame = false
+						end
+					end,
+					width = 1.5,
 					order = 8
 				},
 --[[
