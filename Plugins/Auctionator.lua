@@ -937,7 +937,7 @@ function plugin.GetExtraText(skill, recipe)
 							price = Auctionator.API.v1.GetAuctionPriceByItemLink(addonName, outputItemInfo.hyperlink)
 							buyout = (price or 0) * recipe.numMade
 							--DA.DEBUG(0,"GetExtraText: quality= "..tostring(quality)..", buyout= "..tostring(buyout)..", outputItemInfo= "..DA.DUMP1(outputItemInfo))
-							local effectiveILvl, isPreview, baseILvl = GetDetailedItemLevelInfo(outputItemInfo.hyperlink)
+							local effectiveILvl, isPreview, baseILvl = C_Item.GetDetailedItemLevelInfo(outputItemInfo.hyperlink)
 							--DA.DEBUG(0,"GetExtraText: effectiveILvl= "..tostring(effectiveILvl)..", itemType= "..tostring(recipe.itemType)..", classID= "..tostring(recipe.classID))
 							if recipe.classID == 0 or recipe.classID == 7 then
 								label = label.."\n"..outputItemInfo.hyperlink
