@@ -45,6 +45,9 @@ Prices are returned in copper, but accurate to the last *silver* (with coppers a
 	OETooltip()		-> returns a boolean whether OE tooltips are enabled
 	OETooltip(true)	-> enables OE tooltips
 	OETooltip(false)	-> disables OE tooltips
+
+	https://www.curseforge.com/wow/addons/oribos-exchange
+	https://undermine.exchange/
 ]]--
 
 Skillet.OEPlugin = {}
