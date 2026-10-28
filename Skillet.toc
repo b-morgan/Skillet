@@ -94,6 +94,7 @@ Plugins\CanIMogIt.lua
 Plugins\Overachiever.lua
 Plugins\DataStoreAuctions.lua
 Plugins\OribosExchange.lua
+Plugins\AuctionDB.lua
 #### Obsolete or Unused Addons
 ## Plugins\TheUndermineJournal.lua
 
