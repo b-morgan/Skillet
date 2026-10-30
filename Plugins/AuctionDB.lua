@@ -15,6 +15,9 @@ GNU General Public License for more details.
 
 You should have received a copy of the GNU General Public License
 along with this program.  If not, see <http://www.gnu.org/licenses/>.
+
+	https://www.curseforge.com/wow/addons/auction-house-database
+	
 ]]--
 
 local GetItemInfo = C_Item and C_Item.GetItemInfo or GetItemInfo
