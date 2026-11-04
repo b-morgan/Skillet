@@ -20,8 +20,6 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
 	
 ]]--
 
-local GetItemInfo = C_Item and C_Item.GetItemInfo or GetItemInfo
-
 Skillet.AHDBPlugin = {}
 
 local plugin = Skillet.AHDBPlugin
@@ -168,29 +166,55 @@ function plugin.OnInitialize()
 	Skillet:AddPluginOptions(plugin.options)
 end
 
+local function AHDB_Price(itemID)
+--
+-- AuctionDB-v1.09.0
+--
+	if AuctionDB and AuctionDB.AHGetAuctionInfoByLink then
+		local auctionData = {}
+		local itemName, itemLink = C_Item.GetItemInfo(itemID)
+		if not itemLink then 
+			DA.DEBUG(0,"AHDB_Price: itemLink is nil")
+			return 0
+		end
+		auctionData = AuctionDB:AHGetAuctionInfoByLink(itemLink)
+		if not auctionData then
+			DA.DEBUG(0,"AHDB_Price: auctionData is nil")
+			return 0
+		end
+		return auctionData.minBuyout or 0
+--
+-- AuctionDB-v2.6.0
+-- Latest {ts, min, median, qty} for the item at that auction house: last scan that saw it, else its last day.
+--
+	elseif AuctionDB and AuctionDB.LastPrice and AuctionDB.ViewHouse then
+		local house = AuctionDB:ViewHouse()
+		--DA.MARK3("AHDB_Price: id= "..tostring(itemID)..", house= "..tostring(house))
+		local p = AuctionDB:LastPrice(itemID, house)
+		if p then
+			--DA.MARK3("    p= "..DA.DUMP(p))
+			return p[2] or 0
+		end
+	else
+		DA.DEBUG(0,"AHDB_Price: id= "..tostring(itemID).." Unknown")
+	end
+	return 0
+end
+
 function plugin.GetExtraText(skill, recipe)
 	local label, extra_text
 	if not recipe then return end
 	local itemID = recipe.itemID
 	local auctionData = {}
-	if Skillet.db.profile.plugins.AHDB.enabled and itemID and AuctionDB and AuctionDB.AHGetAuctionInfoByLink then
-		local itemName, itemLink = GetItemInfo(itemID)
+	if Skillet.db.profile.plugins.AHDB.enabled and itemID and AuctionDB then
+		local itemName, itemLink = C_Item.GetItemInfo(itemID)
 		if not itemLink then 
 			DA.DEBUG(0,"GetExtraText: itemLink is nil")
 			return
 		end
-		auctionData = AuctionDB:AHGetAuctionInfoByLink(itemLink)
-		if not auctionData then
-			DA.DEBUG(0,"GetExtraText: auctionData is nil")
-			return
-		end
-		--DA.DEBUG(0,"GetExtraText: auctionData= "..DA.DUMP(auctionData))
-		--DA.MARK3("GetExtraText: itemLink= "..DA.PLINK(itemLink)..", reagentData= "..DA.DUMP(reagentData))
-		local buyout = ( auctionData.minBuyout or 0 ) * recipe.numMade
-		if buyout then
-			extra_text = Skillet:FormatMoneyFull(buyout, true)
-			label = "|r".."AHDB "..L["Buyout"]..":"
-		end
+		local buyout = AHDB_Price(itemID) * recipe.numMade
+		extra_text = Skillet:FormatMoneyFull(buyout, true)
+		label = "|r".."AHDB "..L["Buyout"]..":"
 		if Skillet.db.profile.plugins.AHDB.reagentPrices then
 			local toConcatLabel = {}
 			local toConcatExtra = {}
@@ -202,26 +226,23 @@ function plugin.GetExtraText(skill, recipe)
 				end
 				local needed = reagent.numNeeded or 0
 				local id = reagent.id
+				if Skillet.isRetail or Skillet.isForever then
+					id = reagent.reagentID
+				end
 				local reagentName, reagentLink
-				local reagentData = {}
 				if id then
-					reagentName, reagentLink = GetItemInfo(id)
+					reagentName, reagentLink = C_Item.GetItemInfo(id)
 				else
 					reagentName = tostring(id)
 				end
-				if reagentLink then
-					reagentData = AuctionDB:AHGetAuctionInfoByLink(reagentLink)
-				end
-				--DA.DEBUG(0,"GetExtraText: reagentData= "..DA.DUMP(reagentData))
-				--DA.MARK3("GetExtraText: reagentLink= "..DA.PLINK(reagentLink)..", reagentData= "..DA.DUMP(reagentData))
 				local text
-				local value = ( reagentData.minBuyout or 0 ) * needed
+				local value = AHDB_Price(id) * needed
 				local buyFactor = Skillet.db.profile.plugins.AHDB.buyFactor or buyFactorDef
 				if Skillet:VendorSellsReagent(id) then
 					toConcatLabel[#toConcatLabel+1] = string.format("   %d x %s  |cff808080(%s)|r", needed, reagentName, L["buyable"])
 					if Skillet.db.profile.plugins.AHDB.buyablePrices then
 						if Skillet.db.profile.plugins.AHDB.useVendorCalc then
-							local sellValue = select(11, GetItemInfo(id))
+							local sellValue = select(11, C_Item.GetItemInfo(id))
 							value = ( sellValue or 0 ) * needed * buyFactor
 						end
 						toConcatExtra[#toConcatExtra+1] = Skillet:FormatMoneyFull(value, true)
@@ -253,39 +274,22 @@ function plugin.RecipeNameSuffix(skill, recipe)
 	if not recipe then return end
 	local itemID = recipe.itemID
 	local auctionData = {}
-	if Skillet.db.profile.plugins.AHDB.enabled and itemID and AuctionDB and AuctionDB.AHGetAuctionInfoByLink then
-		local itemName, itemLink = GetItemInfo(itemID)
-		if not itemLink then 
-			DA.DEBUG(0,"GetExtraText: itemLink is nil")
-			return
-		end
-		auctionData = AuctionDB:AHGetAuctionInfoByLink(itemLink)
-		if not auctionData then
-			DA.DEBUG(0,"GetExtraText: auctionData is nil")
-			return
-		end
-		local buyout = ( auctionData.minBuyout or 0 ) * recipe.numMade
+	if Skillet.db.profile.plugins.AHDB.enabled and itemID and AuctionDB then
+		local buyout = AHDB_Price(itemID) * recipe.numMade
 		if Skillet.db.profile.plugins.AHDB.reagentPrices then
 			local cost = 0
 			for i=1, #recipe.reagentData, 1 do
 				local needed = recipe.reagentData[i].numNeeded or 0
 				local id = recipe.reagentData[i].id
-				local reagentName, reagentLink
-				local reagentData = {}
-				if id then
-					reagentName, reagentLink = GetItemInfo(id)
-				else
-					reagentName = tostring(id)
+				if Skillet.isRetail or Skillet.isForever then
+					id = recipe.reagentData[i].reagentID
 				end
-				if reagentLink then
-					reagentData = AuctionDB:AHGetAuctionInfoByLink(reagentLink)
-				end
-				local value = ( reagentData.minBuyout or 0 ) * needed
+				local value = AHDB_Price(id) * recipe.numMade
 				local buyFactor = Skillet.db.profile.plugins.AHDB.buyFactor or buyFactorDef
 				if Skillet:VendorSellsReagent(id) then
 					if Skillet.db.profile.plugins.AHDB.buyablePrices then
 						if Skillet.db.profile.plugins.AHDB.useVendorCalc then
-							local sellValue = select(11, GetItemInfo(id))
+							local sellValue = select(11, C_Item.GetItemInfo(id))
 							value = ( sellValue or 0 ) * needed * buyFactor
 						end
 					else

@@ -130,27 +130,26 @@ function plugin.OnInitialize()
 	Skillet:AddPluginOptions(plugin.options)
 end
 
+local function OEMarketValue(itemID)
+	local o = {}
+	OEMarketInfo(itemID,o)
+	DA.MARK3("OEMarketValue: itemID= "..tostring(itemID)..", o= "..DA.DUMP(o))
+	return o['market']
+end
+
 function plugin.GetExtraText(skill, recipe)
 	local label, extra_text
 	local bop
 	if not skill or not recipe then return end
 	local itemID = recipe.itemID
 	if OEMarketInfo and Skillet.db.profile.plugins.OE.enabled and itemID then
-		local o={}
-		OEMarketInfo(itemID,o)
-		local value = o['market']
+		local value = OEMarketValue(itemID)
 		if value then
 			extra_text = Skillet:FormatMoneyFull(value, true);
 			label = "|r"..L["OEMarket"]..":"
 		end
 	end
 	return label, extra_text
-end
-
-local function OEMarketValue(itemID)
-	local o = {}
-	OEMarketInfo(itemID,o)
-	return o['market']
 end
 
 --
