@@ -55,6 +55,10 @@ end
 if WOW_PROJECT_ID == WOW_PROJECT_CAMELOT then
 	Skillet.isForever = true
 end
+if GetGameType then
+	Skillet.gametype = GetGameType()
+	Skillet.isTalebound = Skillet.gametype == "wowhack"
+end
 
 Skillet.gttScale = GameTooltip:GetScale()
 
@@ -193,6 +197,20 @@ end
 --
 function Skillet:OnInitialize()
 	DA.DEBUG(0,"OnInitialize()");
+--
+--	Create the database
+--
+	self.db = AceDB:New("SkilletDB", defaults)
+--
+-- Information useful for debugging
+--
+	self.db.global.locale = GetLocale()
+	self.db.global.version = self.version      -- from .toc
+	self.db.global.project = self.project      -- WOW_PROJECT_ID
+	self.db.global.interface = self.interface  -- from GetBuildInfo
+	self.db.global.build = self.build          -- text derived from interface
+	self.db.global.gametype = self.gametype    -- from GetGameType
+	
 	if not SkilletWho then
 		SkilletWho = {}
 	end
@@ -214,8 +232,6 @@ function Skillet:OnInitialize()
 	if not self.InProgress then
 		self.InProgress = {}
 	end
-	self.db = AceDB:New("SkilletDB", defaults)
-
 --
 -- Clean up obsolete data
 --
@@ -289,15 +305,6 @@ function Skillet:OnInitialize()
 	end
 
 --
--- Information useful for debugging
---
-	self.db.global.locale = GetLocale()
-	self.db.global.version = self.version     -- from .toc
-	self.db.global.project = self.project     -- WOW_PROJECT_ID
-	self.db.global.interface = self.interface -- from GetBuildInfo
-	self.db.global.build = self.build         -- text derived from interface
-
---
 -- Initialize global data
 --
 	if not self.db.global.recipeDB then
@@ -361,7 +368,9 @@ function Skillet:OnInitialize()
 	end
 	if initSkillLevels or not self.db.global.SkillLevelBuild or self.db.global.SkillLevelBuild ~= self.SkillLevelBuild then
 		self.db.global.SkillLevelBuild = self.SkillLevelBuild
-		self:InitializeSkillLevels()
+		if self.InitializeSkillLevels then
+			self:InitializeSkillLevels()
+		end
 	end
 
 --
@@ -1974,4 +1983,3 @@ function Skillet:unitName(target)
 		return UnitName(target)
 	end
 end
-	
