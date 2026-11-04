@@ -184,6 +184,8 @@ function plugin.GetExtraText(skill, recipe)
 			DA.DEBUG(0,"GetExtraText: auctionData is nil")
 			return
 		end
+		--DA.DEBUG(0,"GetExtraText: auctionData= "..DA.DUMP(auctionData))
+		--DA.MARK3("GetExtraText: itemLink= "..DA.PLINK(itemLink)..", reagentData= "..DA.DUMP(reagentData))
 		local buyout = ( auctionData.minBuyout or 0 ) * recipe.numMade
 		if buyout then
 			extra_text = Skillet:FormatMoneyFull(buyout, true)
@@ -210,6 +212,8 @@ function plugin.GetExtraText(skill, recipe)
 				if reagentLink then
 					reagentData = AuctionDB:AHGetAuctionInfoByLink(reagentLink)
 				end
+				--DA.DEBUG(0,"GetExtraText: reagentData= "..DA.DUMP(reagentData))
+				--DA.MARK3("GetExtraText: reagentLink= "..DA.PLINK(reagentLink)..", reagentData= "..DA.DUMP(reagentData))
 				local text
 				local value = ( reagentData.minBuyout or 0 ) * needed
 				local buyFactor = Skillet.db.profile.plugins.AHDB.buyFactor or buyFactorDef
@@ -227,7 +231,7 @@ function plugin.GetExtraText(skill, recipe)
 					end
 				else
 					toConcatExtra[#toConcatExtra+1] = Skillet:FormatMoneyFull(value, true)
-					toConcatLabel[#toConcatLabel+1] = string.format("   %d x %s", needed, reagentName)
+					toConcatLabel[#toConcatLabel+1] = string.format("   %d x %s", needed, reagentName or "Unknown")
 				end
 				cost = cost + value
 			end
