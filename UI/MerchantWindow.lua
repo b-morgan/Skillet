@@ -202,7 +202,11 @@ local function update_merchant_buy_button()
 	end
 	--DA.DEBUG(1,"Create and show the Merchant Buy Button")
 	SkilletMerchantBuyFrameButton:SetText(L["Reagents"])
-	SkilletMerchantBuyFrame:SetPoint("TOPLEFT", "MerchantFrame", "TOPLEFT" , 55, -5) -- May need to be adjusted for each WoW build
+	if Skillet.isForever then
+		SkilletMerchantBuyFrame:SetPoint("TOPLEFT", "MerchantFrame", "TOPLEFT" , 80, -5) -- May need to be adjusted for each WoW build
+	else
+		SkilletMerchantBuyFrame:SetPoint("TOPLEFT", "MerchantFrame", "TOPLEFT" , 45, 22) -- May need to be adjusted for each WoW build
+	end
 	SkilletMerchantBuyFrame:SetFrameStrata("HIGH")
 	SkilletMerchantBuyFrame:Show()
 	return true
@@ -294,6 +298,7 @@ function Skillet:BuyRequiredReagents()
 	end
 	local totalspent = 0
 	local purchased = 0
+	local money, cost, cash, message
 --
 -- for each item they sell, see if we need it and if so, buy it.
 --
@@ -315,38 +320,45 @@ function Skillet:BuyRequiredReagents()
 					end
 				end
 				if count > 0 then
-					purchased = 0;
---					count = math.ceil(count/quantity) * quantity	-- merchant charges us full price for a partial stack, so round up.
+					purchased = 0
 					if GetMerchantItemCostInfo(i) > 0 then			-- if not sold for alternate currency, merchant will sell partial stacks.
 						count = math.ceil(count/quantity) * quantity 
 					end
 					local maxStack = GetMerchantItemMaxStack(i)
-					DA.DEBUG(0,"count= "..tostring(count)..", name= "..tostring(name)..", price= "..tostring(price)..", quantity= "..tostring(quantity)..", maxStack= "..tostring(maxStack)..", extendedCost= "..tostring(extendedCost))
-					while count > 0 do				-- if there is not enough currency, a UI_ERROR_MESSAGE event is generated (which Skillet ignores)
-						if count <= maxStack then
-							BuyMerchantItem(i,count)
-							purchased = purchased + count
-							count = 0
-						else
-							BuyMerchantItem(i,maxStack)
-							purchased = purchased + maxStack
-							count = count - maxStack
-						end
+					local maxCount = count
+--
+-- We need it, can we afford it?
+--
+					money = GetMoney()
+					DA.DEBUG(0,"money= "..tostring(money)..", count= "..tostring(count)..", name= "..tostring(name)..", price= "..tostring(price)..", quantity= "..tostring(quantity)..", maxStack= "..tostring(maxStack)..", extendedCost= "..tostring(extendedCost))
+					cost = count * price / quantity
+					if money > cost then
+						while count > 0 do
+							if count <= maxStack then
+								BuyMerchantItem(i,count)
+								purchased = purchased + count
+								count = 0
+							else
+								BuyMerchantItem(i,maxStack)
+								purchased = purchased + maxStack
+								count = count - maxStack
+							end
+						end -- while
+						local itemspent = price * purchased / quantity -- spent on this type of item
+						totalspent = totalspent + itemspent  -- spent on all items from this merchant
+						cash = Skillet:FormatMoneyFull(itemspent, true);
+						message = L["Purchased"]..": "..tostring(purchased).." x "..link.." ("..cash..")"
+						DA.MARK2(message)
+					else
+						DA.MARK2(L["Insufficent funds for"].." "..tostring(name))
 					end
-					local itemspent = price * purchased / quantity -- spent on this type of item
-					totalspent = totalspent + itemspent  -- spent on all items from this merchant
-					local message = L["Purchased"]
-					local cash = Skillet:FormatMoneyFull(itemspent, true);
-					message = message..": "..tostring(purchased).." x "..link.." ("..cash..")"
-					DA.MARK2(message);
-				end
-			end
+				end -- if count > 0
+			end -- numAvailable
 		end
 	end
 	if totalspent > 0 and purchased > 1 then
-		local message = L["Total spent"]
-		local cash = Skillet:FormatMoneyFull(totalspent, true)
-		message = message..": "..cash
+		cash = Skillet:FormatMoneyFull(totalspent, true)
+		message = L["Total spent"]..": "..cash
 		DA.MARK2(message)
 	end
 	self:InventoryScan()

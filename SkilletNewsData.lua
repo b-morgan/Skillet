@@ -32,6 +32,7 @@ Skillet.NewsData = {
 				data = {
 					{ header = "Plugins", body = "Skillet/Skillet-Classic compatibility" },
 					{ header = "Global", body = "Talebound compatibility" },
+					{ header = "Merchants", body = "Check for insuffient funds" },
 				},
 			},
 		},

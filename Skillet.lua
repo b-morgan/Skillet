@@ -810,6 +810,8 @@ function Skillet:OnEnable()
 	self:RegisterEvent("MERCHANT_SHOW")
 	self:RegisterEvent("MERCHANT_UPDATE")
 	self:RegisterEvent("MERCHANT_CLOSED")
+	self:RegisterEvent("UI_ERROR_MESSAGE")
+	self:RegisterEvent("PLAYER_MONEY")
 --
 -- To show a shopping list when at the bank/guildbank/auction house
 --
@@ -926,6 +928,14 @@ end
 
 function Skillet:PLAYER_LOGIN()
 	DA.TRACE("PLAYER_LOGIN")
+end
+
+function Skillet:PLAYER_MONEY()
+	DA.TRACE("PLAYER_MONEY")
+end
+
+function Skillet:UI_ERROR_MESSAGE(event,errtype,text)
+	DA.TRACE("UI_ERROR_MESSAGE( "..tostring(errtype)..", "..tostring(text).." )")
 end
 
 function Skillet:PLAYER_ENTERING_WORLD()
