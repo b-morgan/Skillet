@@ -5,16 +5,16 @@
 	<Binding name="SKILLETPROFESSION2" category="Skillet">
 		Skillet:ShowProfession(2);
 	</Binding>
-	<Binding name="SKILLETARCHAEOLOGY" category="Skillet">
+	<Binding name="SKILLETPROFESSION3" category="Skillet">
 		Skillet:ShowProfession(3);
 	</Binding>
-	<Binding name="SKILLETFISHING" category="Skillet">
+	<Binding name="SKILLETPROFESSION4" category="Skillet">
 		Skillet:ShowProfession(4);
 	</Binding>
-	<Binding name="SKILLETCOOKING" category="Skillet">
+	<Binding name="SKILLETPROFESSION5" category="Skillet">
 		Skillet:ShowProfession(5);
 	</Binding>
-	<Binding name="SKILLETFIRSTAID" category="Skillet">
+	<Binding name="SKILLETPROFESSION6" category="Skillet">
 		Skillet:ShowProfession(6);
 	</Binding>
 	<Binding name="SKILLETPROFESSION7" category="Skillet">

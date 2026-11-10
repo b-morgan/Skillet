@@ -60,17 +60,6 @@ if GetGameType then
 	Skillet.isTalebound = Skillet.gametype == "wowhack"
 end
 
---
--- prof1, prof2, archaeology, fishing, cooking, firstAid, prof7 = GetProfessions()
---
-BINDING_NAME_SKILLETPROFESSION1 = L["Profession 1"]
-BINDING_NAME_SKILLETPROFESSION2 = L["Profession 2"]
-BINDING_NAME_SKILLETARCHAEOLOGY = L["Archaeology"]
-BINDING_NAME_SKILLETFISHING = L["Fishing"]
-BINDING_NAME_SKILLETCOOKING = L["Cooking"]
-BINDING_NAME_SKILLETFIRSTAID = L["First Aid"]
-BINDING_NAME_SKILLETPROFESSION7 = "Profession 7" -- Poisons?
-
 Skillet.gttScale = GameTooltip:GetScale()
 
 local defaults = {
@@ -1346,20 +1335,60 @@ function Skillet:IsNotSupportedFollower(tradeID)
 end
 
 --
--- called from keybindings
+-- Internet documentation says:
+--   prof1, prof2, archaeology, fishing, cooking, firstAid, prof7 = GetProfessions()
+--
+-- Forever returns something "dynamically" different
+--
+BINDING_NAME_SKILLETPROFESSION1 = L["Profession"].." 1"
+BINDING_NAME_SKILLETPROFESSION2 = L["Profession"].." 2"
+BINDING_NAME_SKILLETPROFESSION3 = L["Profession"].." 3"
+BINDING_NAME_SKILLETPROFESSION4 = L["Profession"].." 4"
+BINDING_NAME_SKILLETPROFESSION5 = L["Profession"].." 5"
+BINDING_NAME_SKILLETPROFESSION6 = L["Profession"].." 6"
+BINDING_NAME_SKILLETPROFESSION7 = L["Profession"].." 7"
+
+local function ChangeBindings(i, name)
+	DA.DEBUG(0,"ChangeBindings("..tostring(i)..", "..tostring(name)..")")
+	if i == 1 then
+		BINDING_NAME_SKILLETPROFESSION1 = name
+	end
+	if i == 2 then
+		BINDING_NAME_SKILLETPROFESSION2 = name
+	end
+	if i == 3 then
+		BINDING_NAME_SKILLETPROFESSION3 = name
+	end
+	if i == 4 then
+		BINDING_NAME_SKILLETPROFESSION4 = name
+	end
+	if i == 5 then
+		BINDING_NAME_SKILLETPROFESSION5 = name
+	end
+	if i == 6 then
+		BINDING_NAME_SKILLETPROFESSION6 = name
+	end
+	if i == 7 then
+		BINDING_NAME_SKILLETPROFESSION7 = name
+	end
+end
+
+--
+-- called from keybindings in Bindings.xml
 --
 function Skillet:ShowProfession(whichone)
 	local tradeName, tradeID
 	DA.DEBUG(0,"ShowProfession("..tostring(whichone)..")")
 	--DA.MARK3("ShowProfession("..tostring(whichone)..")")
-	local prof1, prof2, archaeology, fishing, cooking, firstAid, prof7 = GetProfessions()
-	for i, profIndex in ipairs({prof1, prof2, archaeology, fishing, cooking, firstAid, prof7}) do
+	local prof1, prof2, prof3, prof4, prof5, prof6, prof7 = GetProfessions()
+	for i, profIndex in ipairs({prof1, prof2, prof3, prof4, prof5, prof6, prof7}) do
 		if profIndex then
 		local name, icon, skillLevel, maxSkillLevel, numAbilities, spelloffset,
 			skillLine, skillModifier, specializationIndex,
 			specializationOffset = GetProfessionInfo(profIndex)
 			DA.DEBUG(1,"ShowProfession: i= "..tostring(i)..", index= "..tostring(profIndex)..", name= "..tostring(name))
 			--DA.MARK3("ShowProfession: i= "..tostring(i)..", index= "..tostring(profIndex)..", name= "..tostring(name))
+			ChangeBindings(i, name)
 			if i == whichone then tradeName = name end
 		end
 	end
