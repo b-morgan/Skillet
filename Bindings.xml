@@ -1,0 +1,23 @@
+<Bindings>
+	<Binding name="SKILLETPROFESSION1" category="Skillet">
+		Skillet:ShowProfession(1);
+	</Binding>
+	<Binding name="SKILLETPROFESSION2" category="Skillet">
+		Skillet:ShowProfession(2);
+	</Binding>
+	<Binding name="SKILLETARCHAEOLOGY" category="Skillet">
+		Skillet:ShowProfession(3);
+	</Binding>
+	<Binding name="SKILLETFISHING" category="Skillet">
+		Skillet:ShowProfession(4);
+	</Binding>
+	<Binding name="SKILLETCOOKING" category="Skillet">
+		Skillet:ShowProfession(5);
+	</Binding>
+	<Binding name="SKILLETFIRSTAID" category="Skillet">
+		Skillet:ShowProfession(6);
+	</Binding>
+	<Binding name="SKILLETPROFESSION7" category="Skillet">
+		Skillet:ShowProfession(7);
+	</Binding>
+</Bindings>

@@ -67,6 +67,7 @@ local ForeverBlizzardSkillList = {
 --	[393]    = true,		-- skinning skills
 --	[356]    = true,		-- fishing skills
 	[960]    = true,		-- runeforging
+	[40]	 = true,		-- poisons
 }
 
 if Skillet.isRetail then

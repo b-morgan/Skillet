@@ -280,24 +280,19 @@ end
 function Skillet:AddToQueue(command, first)
 	--DA.DEBUG(0,"AddToQueue("..DA.DUMP1(command)..", "..tostring(first)..")")
 	local queue = self.db.realm.queueData[self.currentPlayer]
-	if (not command.complex) then
+	local added
+	if Skillet.isForever and command.recipeType == Enum.TradeskillRecipeType.Enchant then
+		added = false
+	elseif (not command.complex) then
 --
 -- Check if we can add this queue entry to any of the other entries
 -- Add a new entry to either the beginning or the end of the queue
 --
-		local added
 		for i=1,#queue,1 do
 			if queue[i].op == "iterate" and queue[i].recipeID == command.recipeID and queue[i].recipeLevel == command.recipeLevel then
 				queue[i].count = queue[i].count + command.count
 				added = true
 				break
-			end
-		end
-		if not added then
-			if first then
-				table.insert(queue, 1, command)
-			else
-				table.insert(queue, command)
 			end
 		end
 	elseif queue and #queue > 0 then
@@ -313,14 +308,13 @@ function Skillet:AddToQueue(command, first)
 		end
 		if queue[i].op == "iterate" and queue[i].recipeID == command.recipeID and queue[i].recipeLevel == command.recipeLevel and sameOptionals(queue[i], command) then
 			queue[i].count = queue[i].count + command.count
-		else
-			if first then
-				table.insert(queue, 1, command)
-			else
-				table.insert(queue, command)
-			end
+			added = true
 		end
-	else
+	end
+--
+-- if the command has not been added to the queue, add it now
+--
+	if not added then
 		if first then
 			table.insert(queue, 1, command)
 		else
@@ -705,14 +699,14 @@ function Skillet:ProcessQueue(altMode)
 						DA.DEBUG(1,"ProcessQueue: HasAllAllocations= "..tostring(self.recipeTransaction:HasAllAllocations(command.count)))
 						DA.DEBUG(1,"ProcessQueue: HasMetQuantityRequirements= "..tostring(self.recipeTransaction:HasMetQuantityRequirements()))
 						if not self.recipeTransaction:HasMetQuantityRequirements() then
-							DA.MARK3("Insufficient Materials available")
+							DA.MARK3(L["Insufficient Materials available"])
 						end
 					else
 						if command.recipeType == Enum.TradeskillRecipeType.Item then
 							DA.DEBUG(1,"ProcessQueue(I): recipeID= "..tostring(command.recipeID))
 							C_TradeSkillUI.CraftRecipe(command.recipeID, command.count, reagentInfoTbl, recipeLevel, nil, self.db.profile.use_concentration)
 						elseif command.recipeType == Enum.TradeskillRecipeType.Enchant then
-							if command.count > 1 then
+							if Skillet.isRetail and command.count > 1 then
 								local itemID = Skillet:GetAutoTargetItem(command.tradeID)
 								DA.DEBUG(1,"ProcessQueue(E): itemID= "..tostring(itemID))
 								self.itemLocation = self:GetItemLocationFromItemID(itemID)
@@ -720,6 +714,8 @@ function Skillet:ProcessQueue(altMode)
 --								C_TradeSkillUI.CraftEnchant(recipeSpellID [, numCasts [, craftingReagents [, itemTarget [, applyConcentration]]]])
 								DA.DEBUG(1,"ProcessQueue(E): recipeID= "..tostring(command.recipeID))
 								C_TradeSkillUI.CraftEnchant(command.recipeID, command.count, reagentInfoTbl, self.itemLocation, self.db.profile.use_concentration)
+							elseif Skillet.isForever and command.count > 1 then
+								DA.MARK3(L["Insufficient Materials available"])
 							else
 --								C_TradeSkillUI.CraftRecipe(recipeSpellID [, numCasts [, craftingReagents [, recipeLevel [, orderID [, applyConcentration]]]]])
 								DA.DEBUG(1,"ProcessQueue(E1): recipeID= "..tostring(command.recipeID))
@@ -816,7 +812,9 @@ function Skillet:QueueItems(button, count)
 					first = not first
 				end
 				local queueCommand = self:QueueCommandIterate(recipe.spellID, count)
-				if self.db.profile.queue_one_at_a_time and queueCommand.modified then
+				if (self.db.profile.queue_one_at_a_time and queueCommand.modified) or
+				   (Skillet.isForever and queueCommand.recipeType == Enum.TradeskillRecipeType.Enchant and queueCommand.count > 1) then
+					DA.DEBUG(2,"QueueItems: One at a time")
 					queueCommand.count = 1
 					for i=1, count, 1 do
 						local c = tcopy(queueCommand)

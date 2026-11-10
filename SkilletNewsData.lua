@@ -33,6 +33,12 @@ Skillet.NewsData = {
 					{ header = "Plugins", body = "Skillet/Skillet-Classic compatibility" },
 					{ header = "Global", body = "Talebound compatibility" },
 					{ header = "Merchants", body = "Check for insuffient funds" },
+					{ header = "Bindings", body = "Add keybindings" },
+				},
+			},
+			{	name = "Forever",
+				data = {
+					{ header = "Enchanting", body = "Queue Enchants with count > 1 individually" },
 				},
 			},
 		},

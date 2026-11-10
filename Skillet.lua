@@ -60,6 +60,17 @@ if GetGameType then
 	Skillet.isTalebound = Skillet.gametype == "wowhack"
 end
 
+--
+-- prof1, prof2, archaeology, fishing, cooking, firstAid, prof7 = GetProfessions()
+--
+BINDING_NAME_SKILLETPROFESSION1 = L["Profession 1"]
+BINDING_NAME_SKILLETPROFESSION2 = L["Profession 2"]
+BINDING_NAME_SKILLETARCHAEOLOGY = L["Archaeology"]
+BINDING_NAME_SKILLETFISHING = L["Fishing"]
+BINDING_NAME_SKILLETCOOKING = L["Cooking"]
+BINDING_NAME_SKILLETFIRSTAID = L["First Aid"]
+BINDING_NAME_SKILLETPROFESSION7 = "Profession 7" -- Poisons?
+
 Skillet.gttScale = GameTooltip:GetScale()
 
 local defaults = {
@@ -1332,6 +1343,31 @@ function Skillet:IsNotSupportedFollower(tradeID)
 		end
 	end
 	return false -- Use Skillet frame
+end
+
+--
+-- called from keybindings
+--
+function Skillet:ShowProfession(whichone)
+	local tradeName, tradeID
+	DA.DEBUG(0,"ShowProfession("..tostring(whichone)..")")
+	--DA.MARK3("ShowProfession("..tostring(whichone)..")")
+	local prof1, prof2, archaeology, fishing, cooking, firstAid, prof7 = GetProfessions()
+	for i, profIndex in ipairs({prof1, prof2, archaeology, fishing, cooking, firstAid, prof7}) do
+		if profIndex then
+		local name, icon, skillLevel, maxSkillLevel, numAbilities, spelloffset,
+			skillLine, skillModifier, specializationIndex,
+			specializationOffset = GetProfessionInfo(profIndex)
+			DA.DEBUG(1,"ShowProfession: i= "..tostring(i)..", index= "..tostring(profIndex)..", name= "..tostring(name))
+			--DA.MARK3("ShowProfession: i= "..tostring(i)..", index= "..tostring(profIndex)..", name= "..tostring(name))
+			if i == whichone then tradeName = name end
+		end
+	end
+	if tradeName then
+		DA.DEBUG(1,"ShowProfession: executing CastSpellByName("..tostring(tradeName)..")")
+		--DA.MARK3("ShowProfession: executing CastSpellByName("..tostring(tradeName)..")")
+		CastSpellByName(tradeName)
+	end
 end
 
 --
