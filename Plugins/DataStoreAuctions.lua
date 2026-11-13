@@ -54,7 +54,12 @@ function plugin.OnInitialize()
 	end
 	Skillet:AddPluginOptions(plugin.options)
 	if DataStore then
-		local player = Skillet:unitName("player")
+		local player
+		if Skillet.unitName then
+			player = Skillet:unitName("player")
+		else
+			player = UnitName("player")
+		end
 		for characterName, character in pairs(DataStore:GetCharacters()) do
 			--DA.DEBUG(0,"DSA:OnInitialize: characterName= "..tostring(characterName)..", character= "..tostring(character))
 			if characterName == player then
