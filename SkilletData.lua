@@ -44,6 +44,7 @@ local TradeSkillList = {
 }
 if Skillet.isForever then
 	table.insert(TradeSkillList,3273)		-- first aid
+	table.insert(TradeSkillList,2842)		-- poisons
 	table.insert(TradeSkillList,2366)		-- herbalism (Forever Camping)
 	table.insert(TradeSkillList,7620)		-- fishing (Forever Camping)
 	table.insert(TradeSkillList,8613)		-- skinning (Forever Camping)

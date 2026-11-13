@@ -39,6 +39,7 @@ Skillet.NewsData = {
 			{	name = "Forever",
 				data = {
 					{ header = "Enchanting", body = "Queue Enchants with count > 1 individually" },
+					{ header = "Poisons", body = "Add Poisons (rogues only) tradeskill" },
 				},
 			},
 		},

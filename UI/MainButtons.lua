@@ -178,6 +178,7 @@ function Skillet:CreateAdditionalButtonsList()
 	for i=1,#tradeSkillList,1 do
 		local tradeID = tradeSkillList[i]
 		local ranks = self:GetSkillRanks(Skillet.currentPlayer, tradeID)
+		--DA.DEBUG(1,"tradeID= "..tostring(tradeID)..", ranks= "..tostring(ranks))
 		if ranks then	-- this player knows this skill
 			local additionalSpellTab = Skillet.TradeSkillAdditionalAbilities[tradeID]
 			if additionalSpellTab then -- this skill has additional abilities

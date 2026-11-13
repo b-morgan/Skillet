@@ -22,61 +22,56 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
 --
 -- A table of SkillLineIDs returned by C_TradeSkillUI.GetTradeSkillLine() mapped to the Skill SpellID
 --
-local RetailSkillLineIDList = {
-	[171] = 2259,		-- alchemy
-	[164] = 2018,		-- blacksmithing
-	[333] = 7411,		-- enchanting
-	[202] = 4036,		-- engineering
-	[773] = 45357,		-- inscription
-	[755] = 25229,		-- jewelcrafting
-	[165] = 2108,		-- leatherworking
-	[186] = 2575,		-- mining
-	[197] = 3908,		-- tailoring
-	[185] = 2550,		-- cooking
-}
+if Skillet.isRetail then
+	Skillet.SkillLineIDList = {
+		[171] = 2259,		-- alchemy
+		[164] = 2018,		-- blacksmithing
+		[333] = 7411,		-- enchanting
+		[202] = 4036,		-- engineering
+		[773] = 45357,		-- inscription
+		[755] = 25229,		-- jewelcrafting
+		[165] = 2108,		-- leatherworking
+		[186] = 2575,		-- mining
+		[197] = 3908,		-- tailoring
+		[185] = 2550,		-- cooking
+	}
+end
 
-local ForeverSkillLineIDList = {
-	[171] = 2259,		-- alchemy
-	[164] = 2018,		-- blacksmithing
-	[333] = 7411,		-- enchanting
-	[202] = 4036,		-- engineering
-	[773] = 45357,		-- inscription
-	[755] = 25229,		-- jewelcrafting
-	[165] = 2108,		-- leatherworking
-	[186] = 2575,		-- mining
-	[197] = 3908,		-- tailoring
-	[185] = 2550,		-- cooking
-	[129] = 3273,		-- first aid
-	[182] = 2366,		-- herbalism skills (1278062, Gardening)
-	[356] = 7620,		-- fishing skills (1278067, Bait and Tackle)
-	[393] = 8613,		-- skinning skills (1278068, Tanning)
-}
-
+if Skillet.isForever then
+	Skillet.SkillLineIDList = {
+		[171] = 2259,		-- alchemy
+		[164] = 2018,		-- blacksmithing
+		[333] = 7411,		-- enchanting
+		[202] = 4036,		-- engineering
+		[773] = 45357,		-- inscription
+		[755] = 25229,		-- jewelcrafting
+		[165] = 2108,		-- leatherworking
+		[186] = 2575,		-- mining
+		[197] = 3908,		-- tailoring
+		[185] = 2550,		-- cooking
+		[129] = 3273,		-- first aid
+		[40]  = 2842,		-- poisons?
+		[182] = 2366,		-- herbalism skills (1278062, Gardening)
+		[356] = 7620,		-- fishing skills (1278067, Bait and Tackle)
+		[393] = 8613,		-- skinning skills (1278068, Tanning)
+	}
+end
 --
 -- Table of tradeskills that should use the Blizzard frame
 --
-local RetailBlizzardSkillList = {
-	[182]    = true,		-- herbalism skills
-	[393]    = true,		-- skinning skills
-	[356]    = true,		-- fishing skills
-	[960]    = true,		-- runeforging
-}
-
-local ForeverBlizzardSkillList = {
---	[182]    = true,		-- herbalism skills
---	[393]    = true,		-- skinning skills
---	[356]    = true,		-- fishing skills
-	[960]    = true,		-- runeforging
-	[40]	 = true,		-- poisons
-}
-
 if Skillet.isRetail then
-	Skillet.SkillLineIDList = RetailSkillLineIDList
-	Skillet.BlizzardSkillList = RetailBlizzardSkillList
+	Skillet.BlizzardSkillList = {
+		[182]    = true,		-- herbalism skills
+		[393]    = true,		-- skinning skills
+		[356]    = true,		-- fishing skills
+		[960]    = true,		-- runeforging
+	}
 end
+
 if Skillet.isForever then
-	Skillet.SkillLineIDList = ForeverSkillLineIDList
-	Skillet.BlizzardSkillList = ForeverBlizzardSkillList
+	Skillet.BlizzardSkillList = {
+--		[40]	 = true,		-- poisons?
+	}
 end
 
 --
@@ -105,25 +100,36 @@ Skillet.FollowerNPC = {
 -- use for testing:
 --				{883,"Call Pet",false,true},	-- Hunter skill
 --
-Skillet.TradeSkillAdditionalAbilities = {
-	[7411]	=	{13262,"Disenchant"},		-- enchanting = disenchant
-	[2550]	=	{
-				{818,"Basic_Campfire"},				-- cooking = basic campfire
-				{117573,"Wayfarer's Bonfire",true,false}, -- cooking bonfire
-				{134020,"Chef's_Hat",true,false},	-- cooking = Chef's Hat (toy)
-				{138824,"Pierre",false,true},		-- cooking pet
-				{95787,"Lil' Ragnaros",false,true},	-- cooking pet
-				},
---	[45357] =	{51005,"Milling"},			-- inscription = milling
---	[25229] =	{31252,"Prospecting"},		-- jewelcrafting = prospecting
-	[2018]	=	{
-				{126462,"Thermal_Anvil"},	-- blacksmithing = thermal anvil (item:87216)
-				{255650,"Forge_of_Light",false,false,true}, -- Lightforged Draenei racial skill
-				},
-	[4036]	=	{126462,"Thermal_Anvil"},	-- engineering = thermal anvil (item:87216)
-	[2575]	=	{126462,"Thermal_Anvil"},	-- smelting = thermal anvil (item:87216)
-}
+if Skillet.isRetail then
+	Skillet.TradeSkillAdditionalAbilities = {
+		[7411]	=	{13262,"Disenchant"},		-- enchanting = disenchant
+		[2550]	=	{
+					{818,"Basic_Campfire"},				-- cooking = basic campfire
+					{117573,"Wayfarer's Bonfire",true,false}, -- cooking bonfire
+					{134020,"Chef's_Hat",true,false},	-- cooking = Chef's Hat (toy)
+					{138824,"Pierre",false,true},		-- cooking pet
+					{95787,"Lil' Ragnaros",false,true},	-- cooking pet
+					},
+	--	[45357] =	{51005,"Milling"},			-- inscription = milling
+	--	[25229] =	{31252,"Prospecting"},		-- jewelcrafting = prospecting
+		[2018]	=	{
+					{126462,"Thermal_Anvil"},	-- blacksmithing = thermal anvil (item:87216)
+					{255650,"Forge_of_Light",false,false,true}, -- Lightforged Draenei racial skill
+					},
+		[4036]	=	{126462,"Thermal_Anvil"},	-- engineering = thermal anvil (item:87216)
+		[2575]	=	{126462,"Thermal_Anvil"},	-- smelting = thermal anvil (item:87216)
+	}
+end
 
+if Skillet.isForever then	
+	Skillet.TradeSkillAdditionalAbilities = {
+		[7411]	=	{13262,"Disenchant"},		-- enchanting = disenchant
+		[2018]	=	{126462,"Thermal_Anvil"},	-- blacksmithing = thermal anvil (item:87216)
+		[4036]	=	{126462,"Thermal_Anvil"},	-- engineering = thermal anvil (item:87216)
+		[2575]	=	{126462,"Thermal_Anvil"},	-- smelting = thermal anvil (item:87216)
+--		[2842]  =   {2842,"Poisons"},			-- Poisons?
+	}
+end	
 --
 -- Table of magic for Enchanting, Prospecting, Milling
 --
@@ -1267,4 +1273,3 @@ Skillet.SpecialVendorItems = {
 	[79255] = {10, topink},			--Starlight Ink
 	[158189] = {10, topink},		--Viridescent Ink
 }
-
