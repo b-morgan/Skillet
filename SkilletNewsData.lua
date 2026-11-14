@@ -34,6 +34,7 @@ Skillet.NewsData = {
 					{ header = "Global", body = "Talebound compatibility" },
 					{ header = "Merchants", body = "Check for insuffient funds" },
 					{ header = "Bindings", body = "Add keybindings" },
+					{ header = "UI", body = "Clean up Tooltip code" },
 				},
 			},
 			{	name = "Forever",
