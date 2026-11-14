@@ -1103,6 +1103,9 @@ function Skillet:SkillButton_OnEnter(button)
 	end
 	local tip = GameTooltip -- SkilletTradeskillTooltip
 	tip:SetOwner(button, "ANCHOR_BOTTOMRIGHT",-300);
+	if not tip.SetBackdrop then
+		Mixin(tip, BackdropTemplateMixin)
+	end
 	tip:SetBackdropColor(0,0,0,1);
 	tip:ClearLines();
 	tip:SetClampedToScreen(true)
