@@ -5,17 +5,27 @@
 # This program takes up to three SkillLineAbility file name arguments on the command line which are
 # .csv tables from https://wago.tools/db2/SkillLineAbility and https://wago.tools/db2/SpellName
 #
-# The output will be .lua tables containing the data for inclusion in 
-# Skillet-Classic's SkillLevelData1.lua or SkillLevelData4.lua
+# The output will be .lua tables containing the data.
+# 
+# Skillet-Classic.toc:
+#   SkillLevelData1.lua [AllowLoadGameType vanilla]
+#   SkillLevelData2.lua [AllowLoadGameType tbc]
+#   # SkillLevelData4.lua [AllowLoadGameType cata]
+#   SkillLevelData5.lua [AllowLoadGameType mists]
 #
-# Skillet (retail) will use SkillLevelData2.lua (which is empty in the Skillet-Classic release)
+# Skillet.toc:
+#   SkillLevelData12.lua [AllowLoadGameType standard]
+#   SkillLevelData1.lua [AllowLoadGameType camelot]
 #
 # There may be some post-processing needed for names that include the double quote character.
+# There may be some post-processing needed for names that include quality icons.
+# (both of these are currently handled in python).
 #
 
 import sys
 import os
 import csv
+import re
 
 #
 # Open the .csv file and extract the necessary data
@@ -52,6 +62,7 @@ def spells_list_str(item_id):
 	if item_id in spell_to_name:
 		result = result + "',    -- "
 		result = result + str(spell_to_name[item_id])
+		result = re.sub(r' \|A:.*\|a', '', result)
 		result = result + "\n"
 	else:
 		result = result + "',\n"
@@ -76,6 +87,7 @@ def spells_list_write(file_name):
 		o.write(spells_list_str(item_id))
 		if item_id in spell_to_name:
 			name = spell_to_name[item_id].replace('"','\\"')
+			name = re.sub(r' \|A:.*\|a', '', name)
 			result = '["' + name + '"] = '
 			result = result + str(item_id)
 			result = result + ",\n"
