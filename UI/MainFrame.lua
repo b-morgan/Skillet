@@ -1247,7 +1247,7 @@ function Skillet:SkillButton_OnEnter(button)
 	button.locked = false
 end
 
-function Skillet:ClearRecipeTooltip(skillIndex)
+function Skillet:ClearRecipeTooltip()
 	if self.db.profile.use_default_tooltip then
 		tip = GameTooltip
 	else
