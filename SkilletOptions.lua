@@ -120,7 +120,7 @@ Skillet.options =
 				},
 				show_item_notes_tooltip = {
 					type = "toggle",
-					name = L["SHOWITEMNOTESTOOLTIPNAME"],
+					name = L["SHOWITEMNOTESTOOLTIPNAME"],  -- "Add user specified notes to tooltip"
 					desc = L["SHOWITEMNOTESTOOLTIPDESC"],
 					get = function()
 						return Skillet.db.profile.show_item_notes_tooltip
@@ -133,7 +133,7 @@ Skillet.options =
 				},
 				show_crafters_tooltip = {
 					type = "toggle",
-					name = L["SHOWCRAFTERSTOOLTIPNAME"],
+					name = L["SHOWCRAFTERSTOOLTIPNAME"],  -- "Show crafters in tooltips"
 					desc = L["SHOWCRAFTERSTOOLTIPDESC"],
 					get = function()
 						return Skillet.db.profile.show_crafters_tooltip
@@ -146,7 +146,7 @@ Skillet.options =
 				},
 				show_detailed_recipe_tooltip = {
 					type = "toggle",
-					name = L["SHOWDETAILEDRECIPETOOLTIPNAME"],
+					name = L["SHOWDETAILEDRECIPETOOLTIPNAME"],  -- "Display tooltip for recipes"
 					desc = L["SHOWDETAILEDRECIPETOOLTIPDESC"],
 					get = function()
 						return Skillet.db.profile.show_detailed_recipe_tooltip
@@ -157,9 +157,10 @@ Skillet.options =
 					width = "full",
 					order = 16
 				},
+--[[
 				display_full_tooltip = {
 					type = "toggle",
-					name = L["SHOWFULLTOOLTIPNAME"],
+					name = L["SHOWFULLTOOLTIPNAME"],  -- "Use standard tooltips"
 					desc = L["SHOWFULLTOOLTIPDESC"],
 					get = function()
 						return Skillet.db.profile.display_full_tooltip
@@ -172,7 +173,7 @@ Skillet.options =
 				},
 				display_item_tooltip = {
 					type = "toggle",
-					name = L["SHOWITEMTOOLTIPNAME"],
+					name = L["SHOWITEMTOOLTIPNAME"],  -- "Display item tooltip when possible"
 					desc = L["SHOWITEMTOOLTIPDESC"],
 					get = function()
 						return Skillet.db.profile.display_item_tooltip
@@ -182,6 +183,20 @@ Skillet.options =
 					end,
 					width = "full",
 					order = 18
+				},
+--]]
+				use_default_tooltip = {
+					type = "toggle",
+					name = L["DEFAULTTOOLTIPNAME"],  -- "Use default tooltip"
+					desc = L["DEFAULTTOOLTIPDESC"],
+					get = function()
+						return Skillet.db.profile.use_default_tooltip
+					end,
+					set = function(self,value)
+						Skillet.db.profile.use_default_tooltip = value
+					end,
+					width = "full",
+					order = 17
 				},
 				link_craftable_reagents = {
 					type = "toggle",
@@ -561,7 +576,7 @@ Skillet.options =
 --]]
 				enhanced_recipe_display = {
 					type = "toggle",
-					name = L["ENHANCHEDRECIPEDISPLAYNAME"],
+					name = L["ENHANCHEDRECIPEDISPLAYNAME"],  -- "Show recipe difficulty as text"
 					desc = L["ENHANCHEDRECIPEDISPLAYDESC"],
 					get = function()
 						return Skillet.db.profile.enhanced_recipe_display
@@ -575,7 +590,7 @@ Skillet.options =
 				},
 				enhanced_chance_display = {
 					type = "toggle",
-					name = L["ENHANCHEDCHANCEDISPLAYNAME"],
+					name = L["ENHANCHEDCHANCEDISPLAYNAME"],  -- "Display Skill Up Chance"
 					desc = L["ENHANCHEDCHANCEDISPLAYDESC"],
 					get = function()
 						return Skillet.db.profile.enhanced_chance_display
@@ -659,7 +674,7 @@ Skillet.options =
 				},
 				scale_tooltip = {
 					type = "toggle",
-					name = L["SCALETOOLTIPNAME"],
+					name = L["SCALETOOLTIPNAME"],  -- "Scale All Tooltips"
 					desc = L["SCALETOOLTIPDESC"],
 					get = function()
 						return Skillet.db.profile.scale_tooltip

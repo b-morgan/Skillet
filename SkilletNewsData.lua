@@ -31,6 +31,7 @@ Skillet.NewsData = {
 			{	name = "Changes",
 				data = {
 					{ header = "Data", body = "Update skillLevel tables" },
+					{ header = "UI", body = "Update Tooltip code" },
 				},
 			},
 		},

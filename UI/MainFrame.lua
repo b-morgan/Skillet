@@ -326,7 +326,7 @@ function Skillet:CreateTradeSkillWindow()
 --
 	self:InitializeSorting()
 	self:ConfigureRecipeControls(false)				-- initial setting
-	self.skilletStandaloneQueue=Skillet:CreateStandaloneQueueFrame()
+	self.skilletStandaloneQueue = Skillet:CreateStandaloneQueueFrame()
 	self.fullView = true
 	self.saved_full_button_count = 0
 	self.saved_SA_button_count = 0
@@ -1101,14 +1101,17 @@ function Skillet:SkillButton_OnEnter(button)
 		button.locked = false
 		return
 	end
-	local tip = GameTooltip -- SkilletTradeskillTooltip
-	tip:SetOwner(button, "ANCHOR_BOTTOMRIGHT",-300);
---[[
-	if not tip.SetBackdrop then
-		Mixin(tip, BackdropTemplateMixin)
+	local tip
+	if self.db.profile.use_default_tooltip then
+		tip = GameTooltip
+	else
+		tip = SkilletTradeskillTooltip
+		if not tip.SetBackdrop then
+			Mixin(tip, BackdropTemplateMixin)
+		end
+		tip:SetBackdropColor(0,0,0,1);
 	end
-	tip:SetBackdropColor(0,0,0,1);
---]]
+	tip:SetOwner(button, "ANCHOR_BOTTOMRIGHT",-300);
 	tip:ClearLines();
 	tip:SetClampedToScreen(true)
 --
@@ -1121,6 +1124,7 @@ function Skillet:SkillButton_OnEnter(button)
 	if Skillet.db.profile.ttscale then
 		uiScale = uiScale * Skillet.db.profile.ttscale
 	end
+	--DA.DEBUG(1,"SkillButton_OnEnter: uiScale= "..tostring(uiScale))
 	tip:SetScale(uiScale)
 --
 -- Name of the recipe
@@ -1222,8 +1226,9 @@ function Skillet:SkillButton_OnEnter(button)
 			tip:AddDoubleLine(text, counts, 1, 1, 1)
 		end
 	end
---	local text = string.format("[%s/%s]", L["Inventory"], L["Craftable"])
---	tip:AddDoubleLine("\n", text)
+--
+-- Information useful for debugging
+--
 	tip:AddLine("\n")
 	local text1 = string.format("recipeID= %d",skill.recipeID)
 	local item = string.format("itemID= %d",recipe.itemID)
@@ -1240,6 +1245,19 @@ function Skillet:SkillButton_OnEnter(button)
 	end
 	tip:Show()
 	button.locked = false
+end
+
+function Skillet:ClearRecipeTooltip(skillIndex)
+	if self.db.profile.use_default_tooltip then
+		tip = GameTooltip
+	else
+		tip = SkilletTradeskillTooltip
+	end
+	if Skillet.db.profile.scale_tooltip then
+		tip:SetScale(Skillet.gttScale)
+	end
+	tip:Hide()
+	ResetCursor()
 end
 
 --
@@ -1281,7 +1299,7 @@ end
 --
 -- Clears any changes and hides the game tooltip
 --
-function Skillet:ClearTradeSkillToolTip(skillIndex)
+function Skillet:ClearTradeSkillTooltip(skillIndex)
 	if Skillet.db.profile.scale_tooltip then
 		GameTooltip:SetScale(Skillet.gttScale)
 	end

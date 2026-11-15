@@ -73,6 +73,7 @@ local defaults = {
 		show_crafters_tooltip = false,
 		show_detailed_recipe_tooltip = true,	-- show any tooltips?
 		display_full_tooltip = true,			-- show full blizzards tooltip
+		use_default_tooltip = false,			-- Use GameTooltip for recipes
 		link_craftable_reagents = true,
 		queue_craftable_reagents = true,
 		queue_tools = false,

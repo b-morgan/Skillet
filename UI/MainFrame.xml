@@ -445,7 +445,7 @@
 				local ct = _G[self:GetName().."Counts"]
 				local r,g,b = ct:GetTextColor()
 				_G[self:GetName().."Name"]:SetTextColor(r, g, b)
-				Skillet:ClearTradeSkillToolTip()
+				Skillet:ClearRecipeTooltip()
 				Skillet.mouseOver = nil
 			</OnLeave>
 			<OnEvent>
@@ -2353,7 +2353,7 @@
 						end
 					</OnEnter>
 					<OnLeave>
-						Skillet:ClearTradeSkillToolTip(SkilletFrame.selectedSkill)
+						Skillet:ClearTradeSkillTooltip(SkilletFrame.selectedSkill)
 					</OnLeave>
 					<OnUpdate>
 						CursorOnUpdate(self)
