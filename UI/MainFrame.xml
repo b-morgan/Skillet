@@ -445,6 +445,7 @@
 				local ct = _G[self:GetName().."Counts"]
 				local r,g,b = ct:GetTextColor()
 				_G[self:GetName().."Name"]:SetTextColor(r, g, b)
+				Skillet:ClearTradeSkillToolTip()
 				Skillet.mouseOver = nil
 			</OnLeave>
 			<OnEvent>
@@ -843,7 +844,6 @@
 	# Tool tip to be used when hovering over recipe lines in the skill list
 	#
 	-->
-	<!--
 	<GameTooltip name="SkilletTradeskillTooltip" frameStrata="TOOLTIP" hidden="true" inherits="GameTooltipTemplate">
 		<Layers>
 			<Layer level="ARTWORK">
@@ -868,7 +868,6 @@
 			</Layer>
 		</Layers>
 	</GameTooltip>
-	-->
 	<!--
 	#
 	#   Frames
