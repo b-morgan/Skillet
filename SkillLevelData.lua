@@ -88,7 +88,7 @@ end
 
 local a,b,c,d,e,f,g,h
 
-local function compareLevels(levelsWowhead, levelsByRecipe)
+local function compareLevels(levelsWowhead, levelsByRecipe, spellID)
 --
 -- Compare the sources
 --				
@@ -105,6 +105,12 @@ local function compareLevels(levelsWowhead, levelsByRecipe)
 	end
 	if levelsByRecipe and type(levelsByRecipe) == 'string' then
 		e,f,g,h = string.split("/", levelsByRecipe)
+--
+-- if the SkillLevelLearned exists for this recipe, it is a better orange value than 1.
+--
+		if tonumber(e) == 1 and Skillet.db.global.SkillLevelLearned and Skillet.db.global.SkillLevelLearned[spellID] then
+			e = Skillet.db.global.SkillLevelLearned[spellID]
+		end
 		e = (tonumber(e) or 0) + rb
 		f = (tonumber(f) or 0) + rb
 		g = (tonumber(g) or 0) + rb
@@ -132,30 +138,39 @@ local function compareLevels(levelsWowhead, levelsByRecipe)
 --
 -- Choose the best value(s)
 -- levelsWowhead will be nil if there is no Wowhead data
--- levelsByRecipe will be nil if CraftInfoAnywhere is not loaded or the Wago Tools table(s) have no data
--- if both values are available, Wowhead orange value is more accurate than the Wago Tools data
+-- levelsByRecipe will be nil if the Wago Tools table(s) have no data or CraftInfoAnywhere is not loaded
 --
 	if levelsWowhead and levelsByRecipe then
-		if Skillet.db.profile.baseskilllevel then
+--
+-- if both values are available, use Wago Tools data 
+-- Optionally, replace the orange value with the 
+-- Wowhead orange value which is more accurate than the Wago Tools data
+--
+		if not Skillet.db.profile.altskilllevels then
+			--DA.DEBUG(1,"compareLevels: levelsWowhead= "..tostring(a).."/"..tostring(b).."/"..tostring(c).."/"..tostring(d))
+			--DA.DEBUG(1,"compareLevels: levelsByRecipe= "..tostring(e).."/"..tostring(f).."/"..tostring(g).."/"..tostring(h))
 			a = e
 		end
 		b = f
 		c = g
 		d = h
+		if a > b then
+			a = b - 1
+		end
 		--DA.DEBUG(1,"compareLevels: levelsReturned= "..tostring(a).."/"..tostring(b).."/"..tostring(c).."/"..tostring(d))
-		Skillet.sourceTradeSkillLevel = 2
-		return 1
-	elseif levelsWowhead then
-		--DA.DEBUG(1,"compareLevels: levelsReturned= "..tostring(a).."/"..tostring(b).."/"..tostring(c).."/"..tostring(d))
-		Skillet.sourceTradeSkillLevel = 2
+		Skillet.sourceTradeSkillLevel = 1
 		return 1
 	elseif levelsByRecipe then
 		--DA.DEBUG(1,"compareLevels: levelsReturned= "..tostring(e).."/"..tostring(f).."/"..tostring(g).."/"..tostring(h))
 		Skillet.sourceTradeSkillLevel = 2
 		return 2
+	elseif levelsWowhead then
+		--DA.DEBUG(1,"compareLevels: levelsReturned= "..tostring(a).."/"..tostring(b).."/"..tostring(c).."/"..tostring(d))
+		Skillet.sourceTradeSkillLevel = 1
+		return 1
 	end
 	return 0
-end
+end -- compareLevels
 
 --
 -- Get TradeSkill Difficulty Levels
@@ -166,64 +181,59 @@ function Skillet:GetTradeSkillLevels(itemID, spellID)
 	--DA.DEBUG(0,"GetTradeSkillLevels("..tostring(itemID)..", "..tostring(spellID)..")")
 	local rb = getRacialBonus()
 	local skillLevels = Skillet.db.global.SkillLevels
-	local levels
 	local SkillLineAbility = Skillet.db.global.SkillLineAbility
-	local possibleRecipes, recipeID, levelsByRecipe
+	local levels, possibleRecipes, levelsByRecipe
 	if itemID and type(itemID) == 'number' and itemID ~= 0 then 
 --
 -- The CraftInfoAnywhere (https://www.curseforge.com/wow/addons/craft-info-anywhere) API
--- is used to get the recipeID that produces this itemID
+-- is used to get the spellID that produces this itemID
 --
 -- (for now, use the last value returned)
 --
 		if CraftInfoAnywhere and CraftInfoAnywhere.API then
 			possibleRecipes = CraftInfoAnywhere.API.GetRecipesForItem(itemID)
 			if possibleRecipes ~= nil then
-				recipeID = possibleRecipes[#possibleRecipes]
+				spellID = possibleRecipes[#possibleRecipes]
 			end
 --
 -- Use the appropriate table to find the data
 --
 		end
-		levelsByRecipe = SkillLineAbility[recipeID]
---
--- If there is an entry in our own table(s), use it
---
-		if skillLevels then
+		levelsByRecipe = SkillLineAbility[spellID]
+
+		if skillLevels and (skillLevels[itemID] or skillLevels[-itemID]) then
 --
 -- The data from Wowhead is not specific to the game version
 --
-			if skillLevels[itemID] or skillLevels[-itemID] then
-				if skillLevels[itemID] then
-					levels = skillLevels[itemID]
-				else
-					levels = skillLevels[-itemID]
-				end
-				if type(levels) == 'table' then
-					if spellID then
-						if isRetail then
-							levels = skillLevels[itemID][spellID]
-						else
-							for spell, strng in pairs(levels) do
-								name = getSpellName(spell)
-								--DA.DEBUG(1,"GetTradeSkillLevels: name= "..tostring(name))
-								if name == spellID then
-									levels = strng
-									break
-								end
+			if skillLevels[itemID] then
+				levels = skillLevels[itemID]
+			else
+				levels = skillLevels[-itemID]
+			end
+			if type(levels) == 'table' then
+				if spellID then
+					if isRetail then
+						levels = skillLevels[itemID][spellID]
+					else
+						for spell, strng in pairs(levels) do
+							name = getSpellName(spell)
+							--DA.DEBUG(1,"GetTradeSkillLevels: name= "..tostring(name))
+							if name == spellID then
+								levels = strng
+								break
 							end
 						end
 					end
 				end
 			end
 		end
-		local r = compareLevels(levels,levelsByRecipe)
+		local r = compareLevels(levels,levelsByRecipe, spellID)
 		if r == 1 then
 			return a,b,c,d
 		elseif r == 2 then
 			return e,f,g,h
 		end
---
+--[[
 -- The TradeskillInfo addon seems to be more accurate than LibPeriodicTable-3.1
 --
 		if isRetail and TradeskillInfo then
@@ -251,6 +261,8 @@ function Skillet:GetTradeSkillLevels(itemID, spellID)
 				--DA.DEBUG(1,"GetTradeSkillLevels: itemID= "..tostring(itemID)..", recipeSource= "..tostring(recipeSource))
 			end
 		end
+--]]
+
 --
 -- Check LibPeriodicTable
 -- Note: The itemID for Enchants is negative
@@ -320,7 +332,7 @@ function Skillet:GetTradeSkillLevels(itemID, spellID)
 				end
 			end
 		end
-		local r = compareLevels(levels,levelsByRecipe)
+		local r = compareLevels(levels,levelsByRecipe, spellID)
 		if r == 1 then
 			return a,b,c,d
 		elseif r == 2 then
@@ -351,7 +363,7 @@ function Skillet:GetTradeSkillLevels(itemID, spellID)
 	c = (tonumber(c) or 0)
 	d = (tonumber(d) or 0)
 	return a, b, c, d
-end
+end -- Skillet:GetTradeSkillLevels
 
 function Skillet:GetTradeSkillLevelColor(itemID, rank)
 	--DA.DEBUG(0,"GetTradeSkillLevelColor("..tostring(itemID)..", "..tostring(rank)")")
@@ -412,21 +424,46 @@ end
 --    6 if itemID was missing (obsolete)
 --    7 if it wasn't found (and was added to Skillet.db.global.MissingSkillLevels)
 --
-function Skillet:PrintTradeSkillLevels(itemID, spellID)
-	--DA.DEBUG(0,"PrintTradeSkillLevels("..tostring(itemID)..", "..tostring(spellID)..")")
-	DA.MARK3(Skillet.version..", "..Skillet.wowVersion..", "..Skillet.SkillLevelVersion..", "..GetLocale())
-	DA.MARK3("PrintTradeSkillLevels: altskilllevels= "..tostring(self.db.profile.altskilllevels))
-	DA.MARK3("PrintTradeSkillLevels: baseskilllevel= "..tostring(self.db.profile.baseskilllevel))
-	DA.MARK3("PrintTradeSkillLevels: #SkillLevels= "..tostring(tablelength(self.db.global.SkillLevels)))
-	DA.MARK3("PrintTradeSkillLevels: #SkillLineAbility= "..tostring(tablelength(self.db.global.SkillLineAbility)))
-	DA.MARK3("PrintTradeSkillLevels: #NameToSpellID= "..tostring(tablelength(self.db.global.NameToSpellID)))
+function Skillet:PrintTradeSkillLevel(itemID, spellID)
+	--DA.DEBUG(0,"PrintTradeSkillLevel("..tostring(itemID)..", "..tostring(spellID)..")")
+	DA.MARK3(Skillet.version..", "..Skillet.wowVersion..", "..Skillet.SkillLevelVersion..", "..Skillet.SkillLevelBuild..", "..GetLocale())
+	DA.MARK3("altskilllevels= "..tostring(Skillet.db.profile.altskilllevels))
+	DA.MARK3("PrintTradeSkillLevel: #SkillLevels= "..tostring(tablelength(self.db.global.SkillLevels)))
+	DA.MARK3("PrintTradeSkillLevel: #SkillLineAbility= "..tostring(tablelength(self.db.global.SkillLineAbility)))
+	DA.MARK3("PrintTradeSkillLevel: #NameToSpellID= "..tostring(tablelength(self.db.global.NameToSpellID)))
 	if CraftInfoAnywhere then
-		DA.MARK3("PrintTradeSkillLevels: #ItemsToRecipes= "..tostring(tablelength(CraftInfoAnywhere.Data.ItemsToRecipes)))
+		DA.MARK3("PrintTradeSkillLevel: #ItemsToRecipes= "..tostring(tablelength(CraftInfoAnywhere.Data.ItemsToRecipes)))
 	end
-	if itemID then
+	if itemID or spellID then
 		local orange, yellow, green, gray = self:GetTradeSkillLevels(itemID, spellID)
-		DA.MARK3("PrintTradeSkillLevels: itemID= "..tostring(itemID)..", spellID= "..tostring(spellID))
-		DA.MARK3("PrintTradeSkillLevels: source= "..tostring(self.sourceTradeSkillLevel))
-		DA.MARK3("PrintTradeSkillLevels: levels= "..tostring(orange).."/"..tostring(yellow).."/"..tostring(green).."/"..tostring(gray))
+		DA.MARK3("PrintTradeSkillLevel: itemID= "..tostring(itemID)..", spellID= "..tostring(spellID))
+		DA.MARK3("PrintTradeSkillLevel: source= "..tostring(self.sourceTradeSkillLevel))
+		DA.MARK3("PrintTradeSkillLevel: levels= "..tostring(orange).."/"..tostring(yellow).."/"..tostring(green).."/"..tostring(gray))
+		local skillLevels = Skillet.db.global.SkillLevels
+		if skillLevels and skillLevels[itemID] then
+			DA.MARK3("PrintTradeSkillLevel: SkillLevels= "..tostring(skillLevels[itemID]))
+		end
+		local SkillLineAbility = Skillet.db.global.SkillLineAbility
+		if SkillLineAbility and SkillLineAbility[spellID] then
+			DA.MARK3("PrintTradeSkillLevel: SkillLineAbility= "..tostring(SkillLineAbility[spellID]))
+		end
 	end
 end
+
+function Skillet:PrintTradeSkillLevelByName(spellName)
+	if Skillet.db.global.NameToSpellID then
+		local spellID = Skillet.db.global.NameToSpellID[spellName]
+		if spellID then
+			local recipe = self:GetRecipe(spellID)
+			--DA.MARK3("PrintTradeSkillLevelByName: recipe= "..DA.DUMP(recipe))
+			if recipe.itemID ~= 0 then
+				--DA.MARK3("PrintTradeSkillLevelByName: itemID= "..tostring(recipe.itemID))
+				self:PrintTradeSkillLevel(recipe.itemID,spellID)
+			else
+				--DA.MARK3("PrintTradeSkillLevelByName: itemID= nil")
+				self:PrintTradeSkillLevel(nil,spellID)
+			end
+		end
+	end
+end
+				

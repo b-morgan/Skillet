@@ -135,6 +135,7 @@ Skillet.defaultOptions = {
 	["grouping"] = "Blizzard",
 	["searchtext"] = "",
 	["filterInventory-bag"] = true,
+	["filterInventory-bank"] = true,
 	["filterInventory-crafted"] = true,
 	["filterInventory-vendor"] = true,
 	["filterInventory-alts"] = false,
@@ -350,6 +351,9 @@ function Skillet:OnInitialize()
 --
 -- Initialize the Skill Levels data if any of the tables are missing
 --
+	if not Skillet.db.global.SkillLevelLearned then
+		Skillet.db.global.SkillLevelLearned = {}
+	end
 	local initSkillLevels
 	if not self.db.global.MissingSkillLevels then
 		self.db.global.MissingSkillLevels = {}
@@ -1035,17 +1039,12 @@ end
 function Skillet:CHAT_MSG_SKILL(event,text)	-- Replaced by SKILL_LINES_CHANGED
 	DA.TRACE("CHAT_MSG_SKILL")
 	if Skillet.tradeSkillOpen then
---		Skillet:RescanTrade()
---		Skillet:UpdateTradeSkillWindow()
---		Skillet.dataSourceChanged = true	-- Process the change on the next TRADE_SKILL_LIST_UPDATE
 	end
 end
 
 function Skillet:SKILL_LINES_CHANGED()
 	DA.TRACE("SKILL_LINES_CHANGED")
 	if Skillet.tradeSkillOpen then
---		Skillet:RescanTrade()
---		Skillet:UpdateTradeSkillWindow()
 		Skillet.dataSourceChanged = true	-- Process the change on the next TRADE_SKILL_LIST_UPDATE
 	end
 end

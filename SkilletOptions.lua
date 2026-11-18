@@ -1309,15 +1309,20 @@ Skillet.options =
 			end,
 			order = 82
 		},
-		baseskilllevel = {
-			type = "toggle",
-			name = "BaseSkillLevel",
-			desc = "Use Alternate Base Skill Level",
-			get = function()
-				return Skillet.db.profile.baseskilllevel
-			end,
+		printskilllevel = {
+			type = "input",
+			name = "PrintSkillLevel",
+			desc = "Print data from the SkillLevelData tables",
+			get = nil,
 			set = function(self,value)
-				Skillet.db.profile.baseskilllevel = value
+				if string.find(value,",") then
+					local i,s = string.split(",",value)
+					i = tonumber(i)
+					s = tonumber(s)
+					Skillet:PrintTradeSkillLevel(i, s)
+				else
+					Skillet:PrintTradeSkillLevelByName(value)
+				end
 			end,
 			order = 83
 		},
