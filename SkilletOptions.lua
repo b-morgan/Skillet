@@ -1312,14 +1312,11 @@ Skillet.options =
 		printskilllevel = {
 			type = "input",
 			name = "PrintSkillLevel",
-			desc = "Print data from the SkillLevelData tables",
+			desc = "Print data from the SkillLevel tables",
 			get = nil,
 			set = function(self,value)
-				if string.find(value,",") then
-					local i,s = string.split(",",value)
-					i = tonumber(i)
-					s = tonumber(s)
-					Skillet:PrintTradeSkillLevel(i, s)
+				if tonumber(value) then
+					Skillet:PrintTradeSkillLevel(tonumber(value))
 				else
 					Skillet:PrintTradeSkillLevelByName(value)
 				end

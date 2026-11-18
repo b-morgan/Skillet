@@ -234,28 +234,6 @@ function Skillet:OnInitialize()
 	if not self.InProgress then
 		self.InProgress = {}
 	end
---
--- Clean up obsolete data
---
-	if self.db.realm.dataVersion then
-		self.db.global.dataVersion = self.db.realm.dataVersion
-		self.db.realm.dataVersion = nil
-	end
-	if self.db.realm.reagentBank then
-		self.db.realm.reagentBank = nil
-	end
-	if self.db.global.AllRecipe then
-		self.db.global.AllRecipe = nil
-	end
-	if self.db.realm.Filtered then
-		self.db.realm.Filtered = nil
-	end
-	if self.db.realm.recipeInfo then
-		self.db.realm.recipeInfo = nil
-	end
-	if self.db.realm.skillDB then
-		self.db.realm.skillDB = nil
-	end
 
 --
 -- Change the dataVersion when (major) code changes
@@ -330,12 +308,6 @@ function Skillet:OnInitialize()
 	if not self.db.global.AdjustNumMade then
 		self.db.global.AdjustNumMade = {}
 	end
-	if not self.db.global.MissingSkillLevels then
-		self.db.global.MissingSkillLevels = {}
-	end
-	if not self.db.global.SkillLevels then
-		self:InitializeSkillLevels()
-	end
 	if not self.db.global.cachedGuildbank then
 		self.db.global.cachedGuildbank = {}
 	end
@@ -359,10 +331,6 @@ function Skillet:OnInitialize()
 		self.db.global.MissingSkillLevels = {}
 		initSkillLevels = true
 	end
-	if not self.db.global.SkillLevels then
-		self.db.global.SkillLevels = {}
-		initSkillLevels = true
-	end
 	if not self.db.global.SkillLineAbility then
 		self.db.global.SkillLineAbility = {}
 		initSkillLevels = true
@@ -373,13 +341,20 @@ function Skillet:OnInitialize()
 	end
 	if initSkillLevels or not self.db.global.SkillLevelBuild or self.db.global.SkillLevelBuild ~= self.SkillLevelBuild then
 		self.db.global.SkillLevelBuild = self.SkillLevelBuild
+		if self.db.global.SkillLevel then
+			self.db.global.SkillLevel = nil -- This table is no longer used
+		end
 		if self.InitializeSkillLevels then
 			self:InitializeSkillLevels()
 		end
+--
+-- Entries in the MissingSkillLevels table could be redundant so
+-- here would be a good place to fix that
+--
 	end
 
 --
--- configure the addon options and the slash command handler
+-- Configure the addon options and the slash command handler
 -- (Skillet.options is defined in SkilletOptions.lua)
 --
 	Skillet:ConfigureOptions()

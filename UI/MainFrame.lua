@@ -797,7 +797,7 @@ function Skillet:UpdateTradeSkillWindow()
 				end
 			end
 			if self.currentGroupLabel ~= "Blizzard" then 
-				DA.DEBUG(0,"UpdateTradeSkillWindow: skill.subGroup = "..tostring(skill.subGroup))
+				--DA.DEBUG(0,"UpdateTradeSkillWindow: skill.subGroup = "..tostring(skill.subGroup))
 			end
 			if skill.subGroup then
 				if SkillButtonNameEdit.originalButton ~= buttonText then
