@@ -607,8 +607,8 @@ function Skillet:CalculateCraftableCounts()
 			if skill and skill.id ~= 0 then -- skip headers
 				local recipe = self:GetRecipe(skill.id)
 				if recipe then
-					skill.numCraftable, skill.numRecursive, skill.numCraftableVendor, skill.numCraftableAlts = self:InventorySkillIterations(self.currentTrade, recipe)
-					--DA.DEBUG(2,"name= "..tostring(skill.name)..", numCraftable= "..tostring(skill.numCraftable)..", numRecursive= "..tostring(skill.numRecursive)..", numCraftableVendor= "..tostring(skill.numCraftableVendor)..", numCraftableAlts= "..tostring(skill.numCraftableAlts))
+					skill.numCraftable, skill.numRecursive, skill.numCraftableVendor, skill.numCraftableAlts, skill.numCraftableBank = self:InventorySkillIterations(self.currentTrade, recipe)
+					--DA.DEBUG(2,"name= "..tostring(skill.name)..", numCraftable= "..tostring(skill.numCraftable)..", numRecursive= "..tostring(skill.numRecursive)..", numCraftableVendor= "..tostring(skill.numCraftableVendor)..", numCraftableAlts= "..tostring(skill.numCraftableAlts)..", numCraftableBank= "..tostring(skill.numCraftableBank))
 				end
 			end
 		end

@@ -443,6 +443,7 @@ function Skillet:RecipeGroupFlatten(group, depth, list, index)
 					if Skillet:GetTradeSkillOption("hideuncraftable") then
 						--DA.DEBUG(1,"RecipeGroupFlatten: name="..tostring(skillData.name)..", numCraftable="..tostring(skillData.numCraftable)..", numRecursive="..tostring(skillData.numRecursive)..", numCraftableVendor="..tostring(skillData.numCraftableVendor)..", numCraftableAlts="..tostring(skillData.numCraftableAlts))
 						if not (skillData.numCraftable and skillData.numCraftable > 0 and Skillet:GetTradeSkillOption("filterInventory-bag")) and
+						   not (skillData.numCraftableBank and skillData.numCraftableBank > 0 and Skillet:GetTradeSkillOption("filterInventory-bank")) and
 						   not (skillData.numRecursive and skillData.numRecursive > 0 and Skillet:GetTradeSkillOption("filterInventory-crafted")) and
 						   not (skillData.numCraftableVendor and skillData.numCraftableVendor > 0 and Skillet:GetTradeSkillOption("filterInventory-vendor")) and
 						   not (skillData.numCraftableAlts and skillData.numCraftableAlts > 0 and Skillet:GetTradeSkillOption("filterInventory-alts")) then

@@ -63,7 +63,7 @@ function Skillet:TradeButton_OnClick(this,button)
 	local sName = C_Spell.GetSpellName(tradeID)
 	DA.DEBUG(0,"TradeButton_OnClick: bName= "..tostring(bName)..", player= "..tostring(player)..", tradeID= "..tostring(tradeID)..", sName= "..tostring(sName))
 	tradeID = tonumber(tradeID)
-	local data =  self:GetSkillRanks(player, tradeID)
+	local data = self:GetSkillRanks(player, tradeID)
 	if button == "LeftButton" then
 		if player == Skillet:unitName("player") or (data and data ~= nil) then
 			if IsShiftKeyDown() then

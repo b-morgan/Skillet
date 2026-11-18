@@ -1521,9 +1521,25 @@
 					</OnLoad>
 				</Scripts>
 			</CheckButton>
-			<CheckButton name="SkilletInventoryFilterCraft" inherits="SkilletInvFilterButtonTemplate" hidden="true">
+			<CheckButton name="SkilletInventoryFilterBank" inherits="SkilletInvFilterButtonTemplate" hidden="true">
 				<Anchors>
 					<Anchor point="LEFT" relativeTo="SkilletInventoryFilterBag" relativePoint="RIGHT">
+						<Offset>
+							<AbsDimension x="0" y="0"/>
+						</Offset>
+					</Anchor>
+				</Anchors>
+				<NormalTexture name="$parentIcon" file="Interface\Addons\Skillet\Icons\bank_icon.tga"/>
+				<Scripts>
+					<OnLoad>
+						self:SetFrameLevel(self:GetFrameLevel()+5)
+						self.slot = "bank"
+					</OnLoad>
+				</Scripts>
+			</CheckButton>
+			<CheckButton name="SkilletInventoryFilterCraft" inherits="SkilletInvFilterButtonTemplate" hidden="true">
+				<Anchors>
+					<Anchor point="LEFT" relativeTo="SkilletInventoryFilterBank" relativePoint="RIGHT">
 						<Offset>
 							<AbsDimension x="0" y="0"/>
 						</Offset>

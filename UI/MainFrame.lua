@@ -61,6 +61,10 @@ local reagent_height
 
 -- min width of count text
 local SKILLET_COUNT_MIN_WIDTH = 100
+if Skillet.isForever then
+	SKILLET_COUNT_MIN_WIDTH = 120 -- Added the bank option
+end
+
 
 --
 -- Stack of previsouly selected skills for use by the
@@ -127,8 +131,9 @@ local function get_craftable_counts(skill, numMade)
 	local numrecursive = math.floor((skill.numRecursive or 0) / factor)
 	local numwvendor   = math.floor((skill.numCraftableVendor or 0) / factor)
 	local numwalts     = math.floor((skill.numCraftableAlts or 0) / factor)
-	--DA.DEBUG(2,"get_craftable_counts = "..tostring(num)..", "..tostring(numrecursive)..", "..tostring(numwvendor)..", "..tostring(numwalts))
-	return num, numrecursive, numwvendor, numwalts
+	local numwbank     = math.floor((skill.numCraftableBank or 0) / factor)
+	--DA.DEBUG(2,"get_craftable_counts = "..tostring(num)..", "..tostring(numrecursive)..", "..tostring(numwvendor)..", "..tostring(numwalts)..", "..tostring(numwbank))
+	return num, numrecursive, numwvendor, numwalts, numwbank
 end
 
 function Skillet:CreateTradeSkillWindow()
@@ -711,6 +716,7 @@ function Skillet:UpdateTradeSkillWindow()
 	local max_text_width = width
 	local showOwned = self:GetTradeSkillOption("filterInventory-owned") -- count from Altoholic
 	local showBag = self:GetTradeSkillOption("filterInventory-bag")
+	local showBank = self:GetTradeSkillOption("filterInventory-bank")
 	local showCraft = self:GetTradeSkillOption("filterInventory-crafted")
 	local showVendor = self:GetTradeSkillOption("filterInventory-vendor")
 	local showAlts = self:GetTradeSkillOption("filterInventory-alts")
@@ -888,14 +894,21 @@ function Skillet:UpdateTradeSkillWindow()
 --
 -- Prepare the counts (displayed on the right)
 --
-				local num, numrecursive, numwvendor, numwalts = get_craftable_counts(skill.skillData, recipe.numMade)
-				if (num > 0 and showBag) or (numrecursive > 0 and showCraft) or (numwvendor > 0 and showVendor) or (numwalts > 0 and showAlts) then
+				local num, numrecursive, numwvendor, numwalts, numwbank = get_craftable_counts(skill.skillData, recipe.numMade)
+				if (num > 0 and showBag) or (numwbank > 0 and showBank) or (numrecursive > 0 and showCraft) or (numwvendor > 0 and showVendor) or (numwalts > 0 and showAlts) then
 					local c = 1
 					if showBag then
 						if num >= 1000 then
 							num = "##"
 						end
 						catstring[c] = CBAG..num
+						c = c + 1
+					end
+					if showBank then
+						if numwbank >= 1000 then
+							numwbank = "##"
+						end
+						catstring[c] = CBANK..numwbank
 						c = c + 1
 					end
 					if showCraft then
@@ -1138,9 +1151,9 @@ function Skillet:SkillButton_OnEnter(button)
 --
 --	Add Skillet specific information to the tooltip
 --
-	local num, numrecursive, numwvendor, numwalts, numowned = 0, 0, 0, 0, 0
+	local num, numrecursive, numwvendor, numwalts, numowned, numwbank = 0, 0, 0, 0, 0, 0
 	if skill.skillData then
-		num, numrecursive, numwvendor, numwalts = get_craftable_counts(skill.skillData, recipe.numMade)
+		num, numrecursive, numwvendor, numwalts, numwbank = get_craftable_counts(skill.skillData, recipe.numMade)
 	end
 	numowned = C_Item.GetItemCount(recipe.itemID,true,false,true,true)
 --
@@ -1151,10 +1164,17 @@ function Skillet:SkillButton_OnEnter(button)
 		tip:AddLine(text, 1, 1, 1, false) -- (text, r, g, b, wrap)
 	end
 --
--- How many can be created with the reagents in the inventory
+-- How many can be created with the reagents in bags
 --
 	if num > 0 then
-		local text = "\n" .. CBAG..num .. "|r " .. L["can be created from reagents in your inventory"]
+		local text = "\n" .. CBAG..num .. "|r " .. L["can be created from reagents in your bags"]
+		tip:AddLine(text, 1, 1, 1, false) -- (text, r, g, b, wrap)
+	end
+--
+-- How many can be created with the reagents in the inventory (bags + bank)
+--
+	if numwbank > 0 then
+		local text = "\n" .. CBANK..numwbank .. "|r " .. L["can be created from reagents in your inventory"]
 		tip:AddLine(text, 1, 1, 1, false) -- (text, r, g, b, wrap)
 	end
 --
@@ -1167,7 +1187,7 @@ function Skillet:SkillButton_OnEnter(button)
 --
 -- How many can be created with reagents bought at vendor
 --
-	if numwvendor and numwvendor > 0 and numwvendor ~= num then
+	if numwvendor and numwvendor > 0 and numwvendor ~= numwbank then
 		if numwvendor >= 1000 then
 			numwvendor = "##"
 		end
@@ -1177,7 +1197,7 @@ function Skillet:SkillButton_OnEnter(button)
 --
 -- How many can be crafted with reagents on *all* alts, including this one.
 --
-	if numwalts and numwalts > 0 and numwalts ~= num then
+	if numwalts and numwalts > 0 and numwalts ~= numwbank then
 		if numwalts >= 1000 then
 			numwalts = "##"
 		end
@@ -2015,8 +2035,21 @@ function Skillet:InventoryFilterButton_OnShow(button)
 	end
 end
 
+function Skillet:InventoryFilterCraft_Shift(which)
+	if which then
+		SkilletInventoryFilterCraft:SetPoint("LEFT",SkilletInventoryFilterBag,"RIGHT")
+	else
+		SkilletInventoryFilterCraft:SetPoint("LEFT",SkilletInventoryFilterBank,"RIGHT")
+	end
+end
+
 function Skillet:InventoryFilterButtons_Show()
 	SkilletInventoryFilterBag:Show()
+	if Skillet.isForever then
+		SkilletInventoryFilterBank:Show()
+	else
+		Skillet:InventoryFilterCraft_Shift(true)
+	end
 	SkilletInventoryFilterCraft:Show()
 	SkilletInventoryFilterVendor:Show()
 	SkilletInventoryFilterAlts:Show()
@@ -2025,6 +2058,7 @@ end
 
 function Skillet:InventoryFilterButtons_Hide()
 	SkilletInventoryFilterBag:Hide()
+	SkilletInventoryFilterBank:Hide()
 	SkilletInventoryFilterCraft:Hide()
 	SkilletInventoryFilterVendor:Hide()
 	SkilletInventoryFilterAlts:Hide()

@@ -26,6 +26,15 @@ local isCata = WOW_PROJECT_ID == WOW_PROJECT_CATACLYSM_CLASSIC
 
 Skillet.NewsName = "Skillet News"
 Skillet.NewsData = {
+	{	version = "5.69",
+		data = {
+			{	name = "Forever",
+				data = {
+					{ header = "UI", body = "Add separate craft using bank, issue #141" },
+				},
+			},
+		},
+	},
 	{	version = "5.68",
 		data = {
 			{	name = "Changes",
