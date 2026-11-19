@@ -897,7 +897,7 @@ function Skillet:UpdateTradeSkillWindow()
 				local num, numrecursive, numwvendor, numwalts, numwbank = get_craftable_counts(skill.skillData, recipe.numMade)
 				if (num > 0 and showBag) or (numwbank > 0 and showBank) or (numrecursive > 0 and showCraft) or (numwvendor > 0 and showVendor) or (numwalts > 0 and showAlts) then
 					local c = 1
-					if showBag then
+					if Skillet.isForever and showBag then
 						if num >= 1000 then
 							num = "##"
 						end
@@ -1166,7 +1166,7 @@ function Skillet:SkillButton_OnEnter(button)
 --
 -- How many can be created with the reagents in bags
 --
-	if num > 0 then
+	if Skillet.isForever and num > 0 then
 		local text = "\n" .. CBAG..num .. "|r " .. L["can be created from reagents in your bags"]
 		tip:AddLine(text, 1, 1, 1, false) -- (text, r, g, b, wrap)
 	end
@@ -2035,7 +2035,10 @@ function Skillet:InventoryFilterButton_OnShow(button)
 	end
 end
 
-function Skillet:InventoryFilterCraft_Shift(which)
+--
+-- Hide the Bank button
+--
+function Skillet:InventoryFilterBank_Shift(which)
 	if which then
 		SkilletInventoryFilterCraft:SetPoint("LEFT",SkilletInventoryFilterBag,"RIGHT")
 	else
@@ -2043,26 +2046,37 @@ function Skillet:InventoryFilterCraft_Shift(which)
 	end
 end
 
-function Skillet:InventoryFilterButtons_Show()
-	SkilletInventoryFilterBag:Show()
-	if Skillet.isForever then
-		SkilletInventoryFilterBank:Show()
+--
+-- Hide the Bag button
+--
+function Skillet:InventoryFilterBag_Shift(which)
+	if which then
+		SkilletInventoryFilterBank:SetPoint("LEFT",SkilletInventoryFilterOwned,"RIGHT")
 	else
-		Skillet:InventoryFilterCraft_Shift(true)
+		SkilletInventoryFilterBank:SetPoint("LEFT",SkilletInventoryFilterBag,"RIGHT")
 	end
+end
+
+function Skillet:InventoryFilterButtons_Show()
+	SkilletInventoryFilterOwned:Show()
+	if Skillet.isForever then
+		SkilletInventoryFilterBag:Show()
+	else
+		Skillet:InventoryFilterBag_Shift(true)
+	end
+	SkilletInventoryFilterBank:Show()
 	SkilletInventoryFilterCraft:Show()
 	SkilletInventoryFilterVendor:Show()
 	SkilletInventoryFilterAlts:Show()
-	SkilletInventoryFilterOwned:Show()
 end
 
 function Skillet:InventoryFilterButtons_Hide()
+	SkilletInventoryFilterOwned:Hide()
 	SkilletInventoryFilterBag:Hide()
 	SkilletInventoryFilterBank:Hide()
 	SkilletInventoryFilterCraft:Hide()
 	SkilletInventoryFilterVendor:Hide()
 	SkilletInventoryFilterAlts:Hide()
-	SkilletInventoryFilterOwned:Hide()
 end
 
 local function SkillMenuList(SkilletSkillMenu, rootDescription)
