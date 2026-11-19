@@ -260,6 +260,7 @@ function Skillet:OnInitialize()
 	local customVersion = 1
 	local recipeVersion = 1
 	local detailsVersion = 1
+	local inventoryVersion = 1
 	local _,wowBuild,_,wowVersion = GetBuildInfo();
 	self.wowBuild = wowBuild
 	self.wowVersion = wowVersion
@@ -278,6 +279,9 @@ function Skillet:OnInitialize()
 	elseif not self.db.global.detailsVersion or self.db.global.detailsVersion ~= detailsVersion then
 		self.db.global.detailsVersion = detailsVersion
 		self:FlushDetailData()
+	elseif not self.db.global.inventoryVersion or self.db.global.inventoryVersion ~= inventoryVersion then
+		self.db.global.inventoryVersion = inventoryVersion
+		self:FlushInventoryData()
 	elseif not self.db.global.wowBuild or self.db.global.wowBuild ~= self.wowBuild then
 		self.db.global.wowBuild = self.wowBuild
 		self.db.global.wowVersion = self.wowVersion -- actually TOC version
@@ -471,7 +475,6 @@ function Skillet:FlushAllData()
 	Skillet.data = {}
 	Skillet.db.realm.tradeSkills = {}
 	Skillet.db.realm.auctionData = {}
-	Skillet.db.realm.inventoryData = {}
 	Skillet.db.realm.userIgnoredMats = {}
 	Skillet.db.realm.options = {}
 	Skillet.db.realm.toolData = {}
@@ -484,6 +487,7 @@ function Skillet:FlushAllData()
 	Skillet:FlushQueueData()
 	Skillet:FlushRecipeData()
 	Skillet:FlushDetailData()
+	Skillet:FlushInventoryData()
 	Skillet:FlushPlayerData()
 	Skillet:InitializeMissingVendorItems()
 end
@@ -570,6 +574,15 @@ function Skillet:FlushDetailData()
 	Skillet.db.global.warbandData = {}
 	Skillet.db.global.warbandDetails = {}
 	Skillet.db.global.detailedGuildbank = {}
+end
+
+--
+-- inventoryData may need to be flushed if
+-- the data format changes.
+--
+function Skillet:FlushInventoryData()
+	DA.DEBUG(0,"FlushInventoryData()");
+	Skillet.db.realm.inventoryData = {}
 end
 
 --
