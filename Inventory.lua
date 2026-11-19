@@ -27,10 +27,11 @@ local PT = LibStub("LibPeriodicTable-3.1")
 --
 function Skillet:InventoryReagentCraftability(reagentID, level)
 	if level == nil then level = 1 end
-	DA.DEBUG(1,"InventoryReagentCraftability("..tostring(reagentID)..", "..tostring(level)..") -- "..tostring((C_Item.GetItemInfo(reagentID))))
 	if not reagentID or type(reagentID) == "table" or reagentID == 0 then
+		DA.DEBUG(1,"InventoryReagentCraftability("..tostring(reagentID)..", "..tostring(level)..")")
 		return 0, 0, 0
 	end
+	DA.DEBUG(1,"InventoryReagentCraftability("..tostring(reagentID)..", "..tostring(level)..") -- "..tostring((C_Item.GetItemInfo(reagentID))))
 	local player = Skillet.currentPlayer
 	if not self.db.realm.inventoryData then
 		self.db.realm.inventoryData = {}
@@ -63,6 +64,7 @@ function Skillet:InventoryReagentCraftability(reagentID, level)
 					local numReagentOnHand, numReagentPlusBank
 					if Skillet.isRetail then
 						numReagentOnHand = C_Item.GetItemCount(childReagent.reagentID,true,false,true,true)
+						numReagentPlusBank = 0
 					else
 						numReagentOnHand = C_Item.GetItemCount(childReagent.reagentID,false) -- Forever can only craft from bags
 						numReagentPlusBank = C_Item.GetItemCount(childReagent.reagentID,true)
