@@ -554,7 +554,9 @@ function Skillet:ScanPlayerTradeSkills(player)
 		if not self.db.realm.tradeSkills then
 			self.db.realm.tradeSkills = {}
 		end
-		self.db.realm.tradeSkills[player] = {}
+		if not self.db.realm.tradeSkills[player] then
+			self.db.realm.tradeSkills[player] = {}
+		end
 		local skillRanksData = Skillet.db.realm.tradeSkills[player]
 		for i=1,#TradeSkillList,1 do
 			local id = TradeSkillList[i]
