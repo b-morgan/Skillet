@@ -1534,7 +1534,6 @@ Skillet.options =
 			name = "DebugOn",
 			desc = "Turn Debug On",
 			func = function()
---[[
 				if Skillet.db.profile.WarnShow then
 					Skillet.db.profile.WarnShow = true
 					Skillet.WarnShow = true
@@ -1585,7 +1584,14 @@ Skillet.options =
 					Skillet.db.profile.ProfileShow = false
 					Skillet.ProfileShow = false
 				end
---]]
+			end,
+			order = 93
+		},
+		DAbugOn = {
+			type = 'execute',
+			name = "DAbugOn",
+			desc = "Turn Debug On",
+			func = function()
 				DA.DEBUGON()
 				Skillet:Print(GREEN_FONT_COLOR_CODE.."DebugOn:"..FONT_COLOR_CODE_CLOSE)
 				DA.DebugAidsStatus()
@@ -1597,7 +1603,6 @@ Skillet.options =
 			name = "DebugOff",
 			desc = "Turn Debug Off",
 			func = function()
---[[
 				if Skillet.db.profile.WarnShow then
 					Skillet.db.profile.WarnShow = false
 					Skillet.WarnShow = false
@@ -1643,7 +1648,14 @@ Skillet.options =
 					Skillet.db.profile.ProfileShow = false
 					Skillet.ProfileShow = false
 				end
---]]
+			end,
+			order = 93
+		},
+		DAbugOff = {
+			type = 'execute',
+			name = "DAbugOff",
+			desc = "Turn Debug Off",
+			func = function()
 				DA.DEBUGOFF()
 				Skillet:Print(RED_FONT_COLOR_CODE.."DebugOff:"..FONT_COLOR_CODE_CLOSE)
 				DA.DebugAidsStatus()
