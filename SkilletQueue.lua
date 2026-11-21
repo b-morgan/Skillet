@@ -1156,7 +1156,6 @@ function Skillet:ScanQueuedReagents()
 				end
 			end
 --]]
-		reagentsInQueue[recipe.itemID] = (reagentsInQueue[recipe.itemID] or 0) + command.count * recipe.numMade;
 		end
 	end
 	self.db.realm.reagentsInQueue[self.currentPlayer] = reagentsInQueue
