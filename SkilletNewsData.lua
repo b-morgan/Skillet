@@ -32,6 +32,12 @@ Skillet.NewsData = {
 				data = {
 					{ header = "UI", body = "Add separate craft using bank, issue #141" },
 				},
+			{	name = "Changes",
+				data = {
+					{ header = "Plugins", body = "Update Oribos Exchange plugin" },
+					{ header = "Queuing", body = "Fix double counting (#147)" },
+				},
+			},
 			},
 		},
 	},
