@@ -18,37 +18,47 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
 ]]--
 
 --[[
-	o={}
-	OEMarketInfo(item,o)
 
-The item can be identified by anything C_Item.GetItemInfo takes (itemid, itemstring, itemlink) or a battlepet itemstring/itemlink.
-Prices are returned in copper, but accurate to the last *silver* (with coppers always 0).
+Oribos Exchange addon, v 1.4
+From Erorus, the author of Undermine Exchange https://undermine.exchange/
 
-	o['input']			-> the item/battlepet parameter you just passed in, verbatim
-	o['itemid']			-> the ID of the item you just passed in
-	o['bonuses']		-> if present, a colon-separated list of bonus IDs that were considered as uniquely identifying the item for pricing
-	o['species']		-> the species of the battlepet you just passed in
-	o['breed']			-> the numeric breed ID of the battlepet
-	o['quality']		-> the numeric quality/rarity of the battlepet
-	o['age']			-> number of seconds since data was compiled
-	o['globalMedian']	-> median market price across all realms in this region
-	o['globalMean']		-> mean market price across all realms in this region
-	o['globalStdDev']	-> standard deviation of the market price across all realms in this region
-	o['market']			-> average market price of the item on this AH over the past 14 days.
-	o['stddev']			-> standard deviation of market price of the item on this AH over the past 14 days.
-	o['recent']			-> average market price of the item on this AH over the past 3 days.
-	o['days']			-> number of days since item was last seen on the auction house, when data was compiled. valid values 0 - 250.
-		o['days'] = 251 means item was seen on this AH, but over 250 days ago
-		o['days'] = 252 means the item is sold by vendors in unlimited quantities
-		o['days'] = 255 means item was never seen on this AH (since 6.0 patch)
+You should be able to query this DB from other addons:
 
-	OETooltip()		-> returns a boolean whether OE tooltips are enabled
-	OETooltip(true)	-> enables OE tooltips
-	OETooltip(false)	-> disables OE tooltips
+    o={}
+    OEMarketInfo(52719,o)
+    print(o['market'])
 
-	https://www.curseforge.com/wow/addons/oribos-exchange
-	https://undermine.exchange/
-]]--
+Prints the market price of Greater Celestial Essence.
+The item can be identified by anything GetItemInfo takes (itemid, itemstring, itemlink) or a battlepet itemstring/itemlink.
+
+Prices are returned in copper.
+
+    o['input']          -> the item/battlepet parameter you just passed in, verbatim
+
+    o['itemid']         -> the ID of the item you just passed in
+
+    o['species']        -> the species of the battlepet you just passed in
+    o['breed']          -> the numeric breed ID of the battlepet
+    o['quality']        -> the numeric quality/rarity of the battlepet
+
+    o['age']            -> number of seconds since data was compiled
+
+    o['region']         -> median market price across all realms in this region
+    o['market']         -> median market price of the item on this AH over the past 4 days.
+
+    o['days']           -> number of days since item was last seen on the auction house, when data was compiled. valid values 0 - 250.
+     o['days'] = 251 means item was seen on this AH, but over 250 days ago
+     o['days'] = 252 means the item is sold by vendors in unlimited quantities
+
+
+You can also query and set whether the additional tooltip lines appear from this addon.
+This is useful for other addons (Auctioneer, TSM, etc) that have their own fancy tooltips to disable OE tooltips and use OE simply as a data source.
+
+    OETooltip()        -> returns a boolean whether OE tooltips are enabled
+    OETooltip(true)    -> enables OE tooltips
+    OETooltip(false)   -> disables OE tooltips
+
+]]
 
 Skillet.OEPlugin = {}
 
@@ -133,8 +143,12 @@ end
 local function OEMarketValue(itemID)
 	local o = {}
 	OEMarketInfo(itemID,o)
-	DA.MARK3("OEMarketValue: itemID= "..tostring(itemID)..", o= "..DA.DUMP(o))
-	return o['market']
+	DA.DEBUG(0,"OEMarketValue: itemID= "..tostring(itemID)..", o= "..DA.DUMP(o))
+	local best = o['market']
+	if best == 0 then
+		best = o['region']
+	end
+	return best, o['market'], o['region']
 end
 
 function plugin.GetExtraText(skill, recipe)
@@ -143,10 +157,16 @@ function plugin.GetExtraText(skill, recipe)
 	if not skill or not recipe then return end
 	local itemID = recipe.itemID
 	if OEMarketInfo and Skillet.db.profile.plugins.OE.enabled and itemID then
-		local value = OEMarketValue(itemID)
-		if value then
-			extra_text = Skillet:FormatMoneyFull(value, true);
+		local value, market, region = OEMarketValue(itemID)
+		if market > 0 then
+			extra_text = Skillet:FormatMoneyFull(market, true);
 			label = "|r"..L["OEMarket"]..":"
+		elseif region > 0 then
+			extra_text = Skillet:FormatMoneyFull(region, true);
+			label = "|r"..L["OERegion"]..":"
+		else
+			extra_text = Skillet:FormatMoneyFull(0, true);
+			label = "|r"..L["OEUnknown"]..":"
 		end
 	end
 	return label, extra_text
