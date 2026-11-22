@@ -1136,26 +1136,26 @@ function Skillet:ScanQueuedReagents()
 					modifiedInQueue[reagent.reagentID] = reagent.schematic.reagents
 				end
 			end
---[[
-			if command.requiredReagents then
-				for i,reagent in pairs(command.requiredReagents) do
-					DA.DEBUG(2,"QueueAppendCommand: i= "..tostring(i)..", reagent= "..DA.DUMP(reagent))
-					reagentsInQueue[reagent.reagentID] = (reagentsInQueue[reagent.reagentID] or 0) - reagent.numNeeded * command.count
+			if Skillet.isRetail then
+				if command.requiredReagents then
+					for i,reagent in pairs(command.requiredReagents) do
+						DA.DEBUG(2,"QueueAppendCommand: i= "..tostring(i)..", reagent= "..DA.DUMP(reagent))
+						reagentsInQueue[reagent.reagentID] = (reagentsInQueue[reagent.reagentID] or 0) - reagent.numNeeded * command.count
+					end
+				end
+				if command.optionalReagents then
+					for i,reagent in pairs(command.optionalReagents) do
+						DA.DEBUG(2,"QueueAppendCommand: i= "..tostring(i)..", reagent= "..DA.DUMP(reagent))
+						reagentsInQueue[reagent.reagentID] = (reagentsInQueue[reagent.reagentID] or 0) - reagent.numNeeded * command.count
+					end
+				end
+				if command.finishingReagents then
+					for i,reagent in pairs(command.finishingReagents) do
+						DA.DEBUG(2,"QueueAppendCommand: i= "..tostring(i)..", reagent= "..DA.DUMP(reagent))
+						reagentsInQueue[reagent.reagentID] = (reagentsInQueue[reagent.reagentID] or 0) - reagent.numNeeded * command.count
+					end
 				end
 			end
-			if command.optionalReagents then
-				for i,reagent in pairs(command.optionalReagents) do
-					DA.DEBUG(2,"QueueAppendCommand: i= "..tostring(i)..", reagent= "..DA.DUMP(reagent))
-					reagentsInQueue[reagent.reagentID] = (reagentsInQueue[reagent.reagentID] or 0) - reagent.numNeeded * command.count
-				end
-			end
-			if command.finishingReagents then
-				for i,reagent in pairs(command.finishingReagents) do
-					DA.DEBUG(2,"QueueAppendCommand: i= "..tostring(i)..", reagent= "..DA.DUMP(reagent))
-					reagentsInQueue[reagent.reagentID] = (reagentsInQueue[reagent.reagentID] or 0) - reagent.numNeeded * command.count
-				end
-			end
---]]
 		end
 	end
 	self.db.realm.reagentsInQueue[self.currentPlayer] = reagentsInQueue
