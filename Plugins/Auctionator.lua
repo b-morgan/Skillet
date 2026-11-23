@@ -491,31 +491,33 @@ local function GetReagentData(reagent)
 end
 
 local function AddExtraText(value, needed, id, name, custom)
+	local vendor
 	--DA.DEBUG(0,"AddExtraText("..tostring(value)..", "..tostring(needed)..", "..tostring(id)..", "..tostring(name)..", "..tostring(custom)..")")
-	if not Skillet:VendorSellsReagent(id) then
---
--- Not sold by a vendor so use the default
---
-		toConcatLabel[#toConcatLabel+1] = string.format("   %d x %s%s", needed, name, custom)
-		toConcatExtra[#toConcatExtra+1] = Skillet:FormatMoneyFull(value, true)
-	else
+	if Skillet:VendorSellsReagent(id) then
 		toConcatLabel[#toConcatLabel+1] = string.format("   %d x %s  |cff808080(%s)|r", needed, name, L["buyable"])
 		if Skillet.db.profile.plugins.ATR.buyablePrices then
 --
 -- If this reagent is sold by a vendor, then use that (calculated) price instead
 --
 			local buyFactor = Skillet.db.profile.plugins.ATR.buyFactor or buyFactorDef
-			value = ( select(11,C_Item.GetItemInfo(id)) or 0 ) * needed * buyFactor
-			toConcatExtra[#toConcatExtra+1] = Skillet:FormatMoneyFull(value, true)
+			vendor = ( select(11,C_Item.GetItemInfo(id)) or 0 ) * needed * buyFactor
+			toConcatExtra[#toConcatExtra+1] = Skillet:FormatMoneyFull(vendor, true)
 		else
---
--- If this reagent is sold by a vendor, don't use the Auctionator price
---
-			value = 0
 			toConcatExtra[#toConcatExtra+1] = ""
 		end
 	end
-	return value
+--
+-- Not sold by a vendor or the vendor price is higher than the AH price
+--
+	if not vendor or value < vendor then
+		toConcatLabel[#toConcatLabel+1] = string.format("   %d x %s%s", needed, name, custom)
+		toConcatExtra[#toConcatExtra+1] = Skillet:FormatMoneyFull(value, true)
+	end
+	if vendor and vendor < value then
+		return vendor
+	else
+		return value
+	end
 end
 
 local function GetRecipeData(recipe)
