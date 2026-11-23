@@ -25,7 +25,7 @@
 ## X-Website: https://www.curseforge.com/wow/addons/skillet
 ## SavedVariables: SkilletDB
 ## SavedVariablesPerCharacter: SkilletWho, SkilletDBPC, SkilletMemory, SkilletProfile
-## OptionalDeps: Ace3, LibWindow-1.1, LibPeriodicTable-3.1, TradeSkillMaster, OribosExchange, BeanCounter, Auctionator, Journalator, DataStore, tekDebug
+## OptionalDeps: TradeSkillMaster, OribosExchange, BeanCounter, Auctionator, Journalator, DataStore, tekDebug, MissingTradeSkillsList, SkillUpForever
 ## X-Embeds: Ace3, LibStub, CallbackHandler-1.0, LibWindow-1.1, LibPeriodicTable-3.1
 
 ## LoadManagers: AddonLoader
@@ -77,7 +77,7 @@ ThirdPartyHooks.lua
 Upgrades.lua
 SkillLevelData.lua
 SkillLevelData12.lua [AllowLoadGameType standard]
-SkillLevelData1.lua [AllowLoadGameType camelot]
+SkillLevelData1.lua [AllowLoadGameType forever]
 RecipeGroups.lua
 Inventory.lua
 SkilletPlugin.lua
@@ -95,6 +95,7 @@ Plugins\Overachiever.lua
 Plugins\DataStoreAuctions.lua
 Plugins\OribosExchange.lua
 Plugins\AuctionDB.lua
+Plugins\MissingTradeSkillsList.lua [AllowLoadGameType forever]
 #### Obsolete or Unused Addons
 ## Plugins\TheUndermineJournal.lua
 

@@ -28,16 +28,18 @@ Skillet.NewsName = "Skillet News"
 Skillet.NewsData = {
 	{	version = "5.69",
 		data = {
-			{	name = "Forever",
-				data = {
-					{ header = "UI", body = "Add separate craft using bank, issue #141" },
-				},
 			{	name = "Changes",
 				data = {
-					{ header = "Plugins", body = "Update Oribos Exchange plugin" },
-					{ header = "Queuing", body = "Fix double counting (#147)" },
+					{ header = "Plugins", body = "Update Oribos Exchange plugin\nUpdate Auctionator plugin" },
+					{ header = "Queuing", body = "Fix double counting (issue #147)" },
 				},
 			},
+			{	name = "Forever",
+				data = {
+					{ header = "UI", body = "Separate bag and bank counts (issue #141)" },
+					{ header = "Plugins", body = "Add MissingTradeSkillsList plugin" },
+					{ header = "Legacy", body = "Add 'Working Overtime' support via SkillUpForever addon" },
+				},
 			},
 		},
 	},
