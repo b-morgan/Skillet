@@ -148,7 +148,7 @@ local function OEMarketValue(itemID)
 	if best == 0 then
 		best = o['region']
 	end
-	return best, o['market'], o['region']
+	return best or 0, o['market'] or 0, o['region'] or 0
 end
 
 function plugin.GetExtraText(skill, recipe)
