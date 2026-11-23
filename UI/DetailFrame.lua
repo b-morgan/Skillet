@@ -218,7 +218,8 @@ function Skillet:UpdateDetailWindow(skillIndex)
 		SkilletSkillName:SetText(recipe.name)
 		SkilletRecipeNotesButton:Show()
 		if recipe.spellID then
-			local orange,yellow,green,gray = self:GetTradeSkillLevels(recipe.spellID)
+			local orange,yellow,green,gray,bonus = self:GetTradeSkillLevels(recipe.spellID)
+			--DA.DEBUG(1,"UpdateDetailsWindow: orange= "..tostring(orange)..", yellow= "..tostring(yellow)..", green= "..tostring(green)..", gray= "..tostring(gray)..", bonus= "..tostring(bonus))
 			if not gray or not green or not yellow or not orange then
 				--DA.DEBUG(1,"UpdateDetailsWindow: orange= "..tostring(orange)..", yellow= "..tostring(yellow)..", green= "..tostring(green)..", gray= "..tostring(gray))
 			else
@@ -230,6 +231,7 @@ function Skillet:UpdateDetailWindow(skillIndex)
 				SkilletRankFrame.green = green
 				SkilletRankFrame.yellow = yellow
 				SkilletRankFrame.orange = orange
+				SkilletRankFrame.bonus = bonus
 --
 -- Set the graphical values
 --
@@ -243,7 +245,11 @@ function Skillet:UpdateDetailWindow(skillIndex)
 				if self.db.profile.enhanced_chance_display then
 					local chance = self:getLvlUpChance()
 					chance = math.floor(chance*10)/10		-- one decimal is enough
-					SkilletRankFrameSkillChance:SetText(COLORORANGE..orange.."|r/"..COLORYELLOW..yellow.."|r/"..COLORGREEN..green.."|r/"..COLORGRAY..gray.."|r/ "..L["Chance"]..": "..chance.."|r%")
+					if bonus ~= 0 then
+						SkilletRankFrameSkillChance:SetText(COLORORANGE..orange.."|r/"..COLORYELLOW..yellow.."|r/"..COLORGREEN..green.."|r/"..COLORGRAY..gray.."|r/ "..L["Chance"]..": "..chance.."% "..L["Bonus"]..": "..bonus.."%")
+					else
+						SkilletRankFrameSkillChance:SetText(COLORORANGE..orange.."|r/"..COLORYELLOW..yellow.."|r/"..COLORGREEN..green.."|r/"..COLORGRAY..gray.."|r/ "..L["Chance"]..": "..chance.."%")
+					end
 					SkilletRankFrameSkillChance:Show()
 				else
 					SkilletRankFrameSkillChance:Hide()
