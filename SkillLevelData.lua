@@ -83,31 +83,56 @@ function Skillet:GetTradeSkillLevels(spellID)
 	local rb = getRacialBonus()
 	local SkillLineAbility = Skillet.db.global.SkillLineAbility
 	local levelsByRecipe
+--
+-- a,a1 = orange, b,b1 = yellow, c,c1 = green, d,d1 = gray
+-- bonus is from Forever Legacy option "Working Overtime" 
+--
+	local a, b, c, d
+	local a1, b1, c1, d1
+	local bonus = 0
 	if spellID then
 		if type(spellID) == 'number' and spellID ~= 0 then
 			levelsByRecipe = SkillLineAbility[spellID]
-			--DA.DEBUG(1,"GetTradeSkillLevels: spellID= "..tostring(spellID)..", levelsByRecipe= "..tostring(levelsByRecipe))
+			DA.DEBUG(1,"GetTradeSkillLevels: spellID= "..tostring(spellID)..", levelsByRecipe= "..tostring(levelsByRecipe))
 		elseif type(spellID) == 'string' then
 			local spellName = spellID
 			spellID = Skillet.db.global.NameToSpellID[spellName] or 0
 			levelsByRecipe = SkillLineAbility[spellID]
 			DA.DEBUG(1,"GetTradeSkillLevels: spellName= "..tostring(spellName)..", spellID= "..tostring(spellID)..", levelsByRecipe= "..tostring(levelsByRecipe))
 		end
-		local a,b,c,d
 		if levelsByRecipe and type(levelsByRecipe) == 'string' then
 			a,b,c,d = string.split("/", levelsByRecipe)
 --
--- if the SkillLevelLearned exists for this recipe, it is a better orange value than 1.
+-- if the SkillLevelLearned exists for this recipe, it is a better a1 value than 1.
 --
 			if tonumber(a) == 1 and Skillet.db.global.SkillLevelLearned and Skillet.db.global.SkillLevelLearned[spellID] then
 				a = Skillet.db.global.SkillLevelLearned[spellID]
 			end
 		end
+--
+-- if the addon SkillUpForever is available, get its data
+--   orange (a1) is probably better than ours and bonus is from Forever Legacy option "Working Overtime". 
+--
+		if 	SkillUpForever and SkillUpForever.API.RecipeSkill then
+			local r = SkillUpForever.API.RecipeSkill(spellID)
+			DA.DEBUG(1,"GetTradeSkillLevels: spellID= "..tostring(spellID)..", r= "..DA.DUMP(r))
+			a1 = r.orange
+--			b1 = r.yellow
+--			c1 = r.green
+--			d1 = r.grey
+			bonus = r.chanceBonus
+			if a1 ~= 1 then
+				a = a1
+			end
+		end
+--
+-- 
+--
 		a = (tonumber(a) or 0) + rb
 		b = (tonumber(b) or 0) + rb
 		c = (tonumber(c) or 0) + rb
 		d = (tonumber(d) or 0) + rb
-		return a, b, c, d
+		return a, b, c, d, bonus or 0
 	end -- spellID
 --
 -- Searching SpellID failed.
@@ -130,17 +155,17 @@ function Skillet:GetTradeSkillLevels(spellID)
 	b = (tonumber(b) or 0)
 	c = (tonumber(c) or 0)
 	d = (tonumber(d) or 0)
-	return a, b, c, d
+	return a, b, c, d, bonus
 end -- Skillet:GetTradeSkillLevels
 
 function Skillet:GetTradeSkillLevelColor(itemID, rank)
 	--DA.DEBUG(0,"GetTradeSkillLevelColor("..tostring(itemID)..", "..tostring(rank)")")
 	if itemID then
-		local orange, yellow, green, gray = self:GetTradeSkillLevels(itemID)
-		if rank >= gray then return skillColors["trivial"] end
-		if rank >= green then return skillColors["easy"] end
-		if rank >= yellow then return skillColors["moderate"] end
-		if rank >= orange then return skillColors["optimal"] end
+		local a1, b1, c1, d1 = self:GetTradeSkillLevels(itemID)
+		if rank >= d1 then return skillColors["trivial"] end
+		if rank >= c1 then return skillColors["easy"] end
+		if rank >= b1 then return skillColors["moderate"] end
+		if rank >= a1 then return skillColors["optimal"] end
 	end
 	return skillColors["unknown"]
 end
@@ -162,12 +187,17 @@ function Skillet:PrintTradeSkillLevel(spellID)
 	DA.MARK3("PrintTradeSkillLevel: #SkillLineAbility= "..tostring(tablelength(self.db.global.SkillLineAbility)))
 	DA.MARK3("PrintTradeSkillLevel: #NameToSpellID= "..tostring(tablelength(self.db.global.NameToSpellID)))
 	if spellID then
-		local orange, yellow, green, gray = self:GetTradeSkillLevels(spellID)
+		local a1, b1, c1, d1, bonus = self:GetTradeSkillLevels(spellID)
 		DA.MARK3("PrintTradeSkillLevel: spellID= "..tostring(spellID))
-		DA.MARK3("PrintTradeSkillLevel: levels= "..tostring(orange).."/"..tostring(yellow).."/"..tostring(green).."/"..tostring(gray))
+		DA.MARK3("PrintTradeSkillLevel: levels= "..tostring(a1).."/"..tostring(b1).."/"..tostring(c1).."/"..tostring(d1))
+		DA.MARK3("PrintTradeSkillLevel: bonus= "..tostring(bonus))
 		local SkillLineAbility = Skillet.db.global.SkillLineAbility
 		if SkillLineAbility and SkillLineAbility[spellID] then
 			DA.MARK3("PrintTradeSkillLevel: SkillLineAbility= "..tostring(SkillLineAbility[spellID]))
+			if 	SkillUpForever and SkillUpForever.API.RecipeSkill then
+				a1, b1, c1, d1, bonus = SkillUpForever.API.RecipeSkill(spellID)
+				DA.MARK3("PrintTradeSkillLevel: a1= "..tostring(a1)..", b1= "..tostring(b1)..", c1= "..tostring(c1)..", d1= "..tostring(d1)..", bonus= "..tostring(bonus))
+			end
 		end
 	end
 end
