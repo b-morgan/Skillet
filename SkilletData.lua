@@ -182,6 +182,7 @@ end
 -- Adds an recipe source for an itemID (recipeID produces itemID)
 --
 function Skillet:ItemDataAddRecipeSource(itemID,recipeID)
+	--DA.DEBUG(0,"ItemDataAddRecipeSource("..tostring(itemID)..", "..tostring(recipeID)..")")
 	if not itemID or not recipeID then return end
 --	if not self.db.global.itemRecipeSource then
 --		self.db.global.itemRecipeSource = {}
@@ -199,10 +200,11 @@ end
 -- Adds a recipe usage for an itemID (recipeID uses itemID as a reagent)
 --
 function Skillet:ItemDataAddUsedInRecipe(itemID,recipeID)
+	--DA.DEBUG(0,"ItemDataAddUsedInRecipe("..tostring(itemID)..", "..tostring(recipeID)..")")
 	if not itemID or not recipeID or itemID == 0 then return end
---	if not self.db.global.itemRecipeUsedIn then
---		self.db.global.itemRecipeUsedIn = {}
---	end
+	if not self.db.global.itemRecipeUsedIn then
+		self.db.global.itemRecipeUsedIn = {}
+	end
 	if not self.db.global.itemRecipeUsedIn[itemID] then
 		self.db.global.itemRecipeUsedIn[itemID] = {}
 	end
@@ -213,6 +215,7 @@ end
 -- Goes thru the stored recipe list and collects reagent and item information as well as skill lookups
 --
 function Skillet:CollectRecipeInformation()
+	--DA.DEBUG(0,"CollectRecipeInformation()")
 	for recipeID, recipeString in pairs(self.db.global.recipeDB) do
 		local tradeID, itemString, reagentString, numOptional = string.split(" ",recipeString)
 		local itemID = 0
@@ -864,7 +867,7 @@ local function ScanTrade()
 	else
 		DA.DEBUG(1,"ScanTrade: not linkable")
 	end
-	local player = Skillet.currentPlayer
+	local player = Skillet.currentPlayer --**
 	if not player or not tradeID then
 		DA.MARK3("ScanTrade: abort! player= "..tostring(player)..", tradeID= "..tostring(tradeID)..", parentSkillLineID= "..tostring(parentSkillLineID)..", parentSkillLineName= "..tostring(parentSkillLineName))
 		Skillet.InProgress.scan = false

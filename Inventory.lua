@@ -28,10 +28,10 @@ local PT = LibStub("LibPeriodicTable-3.1")
 function Skillet:InventoryReagentCraftability(reagentID, level)
 	if level == nil then level = 1 end
 	if not reagentID or type(reagentID) == "table" or reagentID == 0 then
-		DA.DEBUG(1,"InventoryReagentCraftability("..tostring(reagentID)..", "..tostring(level)..")")
+		--DA.DEBUG(1,"InventoryReagentCraftability("..tostring(reagentID)..", "..tostring(level)..")")
 		return 0, 0, 0
 	end
-	DA.DEBUG(1,"InventoryReagentCraftability("..tostring(reagentID)..", "..tostring(level)..") -- "..tostring((C_Item.GetItemInfo(reagentID))))
+	--DA.DEBUG(1,"InventoryReagentCraftability("..tostring(reagentID)..", "..tostring(level)..") -- "..tostring((C_Item.GetItemInfo(reagentID))))
 	local player = Skillet.currentPlayer
 	if not self.db.realm.inventoryData then
 		self.db.realm.inventoryData = {}
@@ -50,7 +50,7 @@ function Skillet:InventoryReagentCraftability(reagentID, level)
 	local skillIndexLookup = self.data.skillIndexLookup
 	local recipeSource = self.db.global.itemRecipeSource[reagentID]
 	if recipeSource then
-		DA.DEBUG(2,"     ReagentCraftability: reagentID= "..tostring(reagentID).."("..tostring((C_Item.GetItemInfo(reagentID))).."), recipeSource= "..DA.DUMP1(recipeSource))
+		--DA.DEBUG(2,"     ReagentCraftability: reagentID= "..tostring(reagentID).."("..tostring((C_Item.GetItemInfo(reagentID))).."), recipeSource= "..DA.DUMP1(recipeSource))
 		for childRecipeID in pairs(recipeSource) do
 			local childRecipe = self:GetRecipe(childRecipeID)
 			local childSkillIndex = skillIndexLookup[childRecipeID]
@@ -86,7 +86,7 @@ function Skillet:InventoryReagentCraftability(reagentID, level)
 			end
 		end
 	else
-		DA.DEBUG(2,"     ReagentCraftability: reagentID= "..tostring(reagentID).."("..tostring((C_Item.GetItemInfo(reagentID))).."), recipeSource= nil")
+		--DA.DEBUG(2,"     ReagentCraftability: reagentID= "..tostring(reagentID).."("..tostring((C_Item.GetItemInfo(reagentID))).."), recipeSource= nil")
 	end
 	local queued = 0
 	if self.db.realm.reagentsInQueue[player] then
@@ -101,7 +101,7 @@ function Skillet:InventoryReagentCraftability(reagentID, level)
 	else
 		self.db.realm.inventoryData[player][reagentID] = numInBags.." "..numInBoth.." "..numCrafted.." "..numCraftedVendor
 	end
-	DA.DEBUG(1,"InventoryReagentCraftability: numCrafted= "..tostring(numCrafted)..", numCraftedVendor= "..tostring(numCraftedVendor)..", numCraftedBank= "..tostring(numCraftedBank))
+	--DA.DEBUG(1,"InventoryReagentCraftability: numCrafted= "..tostring(numCrafted)..", numCraftedVendor= "..tostring(numCraftedVendor)..", numCraftedBank= "..tostring(numCraftedBank))
 	return numCrafted or 0, numCraftedVendor or 0, numCraftedBank or 0
 end
 
@@ -333,11 +333,14 @@ function Skillet:VendorSellsReagent(itemID)
 	if self.db.global.MissingVendorItems[itemID] then
 		if type(self.db.global.MissingVendorItems[itemID]) == 'table' then
 			if Skillet.db.profile.use_altcurrency_vendor_items then
-				--DA.DEBUG(1,"VendorSellsReagent: "..tostring(itemID))
+				--DA.DEBUG(1,"VendorSellsReagent: "..tostring(itemID).." (altcurrency)")
+				return true
+			else
+				--DA.DEBUG(1,"VendorSellsReagent: "..tostring(itemID).." (table)")
 				return true
 			end
 		else
-				--DA.DEBUG(1,"VendorSellsReagent: "..tostring(itemID))
+			--DA.DEBUG(1,"VendorSellsReagent: "..tostring(itemID))
 			return true
 		end
 	end

@@ -66,12 +66,18 @@ end
 -- The input is an index into the currently selected tradeskill
 -- or craft.
 function Skillet:GetRecipeItemLink(index)
+	DA.DEBUG(0,"GetRecipeItemLink("..tostring(index)..")")
 	local recipe, recipeID = self:GetRecipeDataByTradeIndex(self.currentTrade, index)
-		if recipe then
-		local _, link = C_Item.GetItemInfo(recipe.itemID)
+	if recipe then
+		local link
+		if recipe.recipeType == Enum.TradeskillRecipeType.Enchant then
+			link = C_TradeSkillUI.GetRecipeLink(recipeID)
+		elseif recipe.itemID and recipe.itemID ~= 0 then
+			link = C_TradeSkillUI.GetRecipeItemLink(recipeID)
+		end
+		DA.DEBUG(0,"GetRecipeItemLink: link= "..DA.PLINK(link))
 		return link
 	end
-		return nil
 end
 
 function Skillet:AdjustNumberMade(index, adjust)

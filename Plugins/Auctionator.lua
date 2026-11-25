@@ -459,7 +459,7 @@ local function GetReagentData(reagent)
 		else
 			value = 0
 		end
-		if Skillet:VendorSellsReagent(id) then
+		if value == 0 and Skillet:VendorSellsReagent(id) then
 			if Skillet.db.profile.plugins.ATR.buyablePrices then
 				if Skillet.db.profile.plugins.ATR.useVendorCalc then
 					local buyFactor = Skillet.db.profile.plugins.ATR.buyFactor or buyFactorDef
@@ -492,17 +492,24 @@ end
 
 local function AddExtraText(value, needed, id, name, custom)
 	local vendor
-	--DA.DEBUG(0,"AddExtraText("..tostring(value)..", "..tostring(needed)..", "..tostring(id)..", "..tostring(name)..", "..tostring(custom)..")")
+	DA.DEBUG(0,"AddExtraText("..tostring(value)..", "..tostring(needed)..", "..tostring(id)..", "..tostring(name)..", "..tostring(custom)..")")
 	if Skillet:VendorSellsReagent(id) then
 		toConcatLabel[#toConcatLabel+1] = string.format("   %d x %s  |cff808080(%s)|r", needed, name, L["buyable"])
 		if Skillet.db.profile.plugins.ATR.buyablePrices then
 --
 -- If this reagent is sold by a vendor, then use that (calculated) price instead
 --
-			local buyFactor = Skillet.db.profile.plugins.ATR.buyFactor or buyFactorDef
-			vendor = ( select(11,C_Item.GetItemInfo(id)) or 0 ) * needed * buyFactor
+			if Skillet.db.global.MissingVendorItems[id] and type(Skillet.db.global.MissingVendorItems[id]) == "table" then
+				vendor = Skillet.db.global.MissingVendorItems[id].price
+				DA.DEBUG(1,"AddExtraText: vendor= "..tostring(vendor).." (from table)")
+			else
+				local buyFactor = Skillet.db.profile.plugins.ATR.buyFactor or buyFactorDef
+				vendor = ( select(11,C_Item.GetItemInfo(id)) or 0 ) * needed * buyFactor
+				DA.DEBUG(1,"AddExtraText: vendor= "..tostring(vendor)..", buyFactor= "..tostring(buyFactor))
+			end
 			toConcatExtra[#toConcatExtra+1] = Skillet:FormatMoneyFull(vendor, true)
 		else
+			DA.DEBUG(1,"AddExtraText: buyablePrices= "..tostring(Skillet.db.profile.plugins.ATR.buyablePrices))
 			toConcatExtra[#toConcatExtra+1] = ""
 		end
 	end
@@ -510,6 +517,7 @@ local function AddExtraText(value, needed, id, name, custom)
 -- Not sold by a vendor or the vendor price is higher than the AH price
 --
 	if not vendor or value < vendor then
+		DA.DEBUG(1,"AddExtraText: value= "..tostring(value))
 		toConcatLabel[#toConcatLabel+1] = string.format("   %d x %s%s", needed, name, custom)
 		toConcatExtra[#toConcatExtra+1] = Skillet:FormatMoneyFull(value, true)
 	end

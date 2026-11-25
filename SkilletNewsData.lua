@@ -30,6 +30,7 @@ Skillet.NewsData = {
 		data = {
 			{	name = "Changes",
 				data = {
+					{ header = "UI", body = "Fix Enchant tooltips (issues #148, #151)" },
 					{ header = "Plugins", body = "Update Oribos Exchange plugin\nUpdate Auctionator plugin" },
 					{ header = "Queuing", body = "Fix double counting (issue #147)" },
 				},

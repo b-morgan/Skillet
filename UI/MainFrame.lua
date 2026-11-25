@@ -1298,18 +1298,16 @@ function Skillet:SetTradeSkillToolTip(skillIndex)
 	end
 	local recipe, recipeID = self:GetRecipeDataByTradeIndex(self.currentTrade, skillIndex)
 	if recipe then
-		if recipe.itemID ~= 0 then
-			if self.currentTrade == 7411 then		-- Enchanting
-				GameTooltip:SetHyperlink("item:"..recipe.itemID)
-			else
-				GameTooltip:SetHyperlink(C_TradeSkillUI.GetRecipeItemLink(recipeID))
-			end
-			if IsShiftKeyDown() then
-				GameTooltip_ShowCompareItem()
-			end
-		else
-			--DA.DEBUG(2,"SetTradeSkillToolTip: Using SetHyperlink (spellID)")
+		if recipe.recipeType == Enum.TradeskillRecipeType.Enchant then
 			GameTooltip:SetHyperlink("enchant:"..recipe.spellID)				-- doesn't create an item, just tell us about the recipe
+--			GameTooltip:SetHyperlink(C_TradeSkillUI.GetRecipeLink(recipeID))	-- doesn't create an item, just tell us about the recipe
+			return C_TradeSkillUI.GetRecipeLink(recipeID)
+		elseif recipe.itemID and recipe.itemID ~= 0 then
+			GameTooltip:SetHyperlink("item:"..recipe.itemID)
+--			GameTooltip:SetHyperlink(C_TradeSkillUI.GetRecipeItemLink(recipeID))
+--			if IsShiftKeyDown() then
+--				GameTooltip_ShowCompareItem()
+--			end
 		end
 	end
 	GameTooltip:Show()
@@ -1880,13 +1878,15 @@ function Skillet:getLvlUpChance()
 --
 -- % to level up with this receipt is calculated by: (greySkill - yourSkill) / (greySkill - yellowSkill
 --
+-- (assumes that SkilletRankFrame has been populated before calling this function)
+--
 	local skilRanks = Skillet:GetSkillRanks(Skillet.currentPlayer, Skillet.currentTrade)
 	local currentLevel, maxLevel = 0, 0
 	if skilRanks then
 		currentLevel, maxLevel = skilRanks.rank, skilRanks.maxRank
 	end
-	local gray = tonumber(SkilletRankFrame.subRanks.green:GetValue())
-	local yellow = tonumber(SkilletRankFrame.subRanks.orange:GetValue())
+	local gray = SkilletRankFrame.gray
+	local yellow = SkilletRankFrame.yellow
 	--DA.DEBUG(0,"getLvlUpChance: currentLevel= "..tostring(currentLevel)..", gray= "..tostring(gray)..", yellow= "..tostring(yellow))
 	if (currentLevel > gray) then
 		return 0

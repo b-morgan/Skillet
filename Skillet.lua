@@ -1392,28 +1392,20 @@ end
 --
 function Skillet:SkilletShow()
 	DA.DEBUG(0,"SkilletShow: (was showing "..tostring(self.currentTrade)..")");
-	local linkedPlayer
-	self.linkedSkill, linkedPlayer, self.isGuild = self:IsTradeSkillLinked()
+	self.linkedSkill, self.linkedPlayer, self.isGuild = self:IsTradeSkillLinked()
 	StaticPopup_Hide("SKILLET_MANUAL_CHANGE")
-	if self.linkedSkill or self.isGuild then
-		return
-	end
-	self.currentPlayer = Skillet:unitName("player")
+	local baseinfo = C_TradeSkillUI.GetBaseProfessionInfo()
+	--DA.DEBUG(3,"SkilletShow: GetBaseProfessionInfo info= "..DA.DUMP1(baseinfo))
+	local childinfo = C_TradeSkillUI.GetChildProfessionInfos()
+	--DA.DEBUG(3,"SkilletShow: GetChildProfessionInfos info= "..DA.DUMP(childinfo))
+	self.currentTrade = self.tradeSkillIDsByName[baseinfo.professionName]	-- names are localized so use a table to translate
+	DA.DEBUG(0,"SkilletShow: trade= "..tostring(self.currentTrade))
 	local frame = self.tradeSkillFrame
 	if not frame then
 		frame = self:CreateTradeSkillWindow()
 		self.tradeSkillFrame = frame
 		tinsert(UISpecialFrames, frame:GetName())
 	end
-	self:ScanPlayerTradeSkills(self.currentPlayer)
-	local baseinfo = C_TradeSkillUI.GetBaseProfessionInfo()
-	--DA.DEBUG(3,"SkilletShow: GetBaseProfessionInfo info= "..DA.DUMP1(baseinfo))
-	local childinfo = C_TradeSkillUI.GetChildProfessionInfos()
-	--DA.DEBUG(3,"SkilletShow: GetChildProfessionInfos info= "..DA.DUMP(childinfo))
-
-	self.currentTrade = self.tradeSkillIDsByName[baseinfo.professionName]	-- names are localized so use a table to translate
-
-	DA.DEBUG(0,"SkilletShow: trade= "..tostring(self.currentTrade))
 	local link = C_TradeSkillUI.GetTradeSkillListLink()
 	if not link then
 		DA.DEBUG(0,"SkilletShow: "..tostring(skillLineName).." not linkable")
@@ -1424,9 +1416,14 @@ function Skillet:SkilletShow()
 --
 		DA.DEBUG(3,"SkilletShow: "..tostring(self.currentTrade).." TSM Preferred")
 		self:HideAllWindows()
---		self:EnableBlizzardFrame()
+		self:EnableBlizzardFrame()
 --		ShowUIPanel(ProfessionsFrame)
-		Skillet.BlizzardUIshowing = true
+--		Skillet.BlizzardUIshowing = true
+	elseif self.linkedPlayer then
+		DA.DEBUG(3,"SkilletShow: "..tostring(self.currentTrade).." for "..tostring(self.linkedPlayer))
+		self:HideAllWindows()
+		self:EnableBlizzardFrame()
+--		ShowUIPanel(ProfessionsFrame)
 	elseif self:IsNotSupportedFollower(self.currentTrade) or Skillet.db.profile.tsm_prefer then
 --
 -- Use the Blizzard UI for any garrison follower that can't use ours
@@ -1436,6 +1433,8 @@ function Skillet:SkilletShow()
 		self:EnableBlizzardFrame()
 	elseif self:IsSupportedTradeskill(self.currentTrade) then
 		DA.DEBUG(3,"SkilletShow: "..tostring(self.currentTrade).." IsSupportedTradeskill")
+		self.currentPlayer = Skillet:unitName("player")
+		self:ScanPlayerTradeSkills(self.currentPlayer)
 		self:DisableBlizzardFrame()
 		self.tradeSkillOpen = true
 		self.selectedSkill = nil

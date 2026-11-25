@@ -63,24 +63,28 @@ local function does_merchant_sell_required_items(list)
 	return false
 end
 
+--[[
 local GetMerchantItemInfo = GetMerchantItemInfo or function(index)
   local info = C_MerchantFrame.GetItemInfo(index);
   if info then
     return info.name, info.texture, info.price, info.stackCount, info.numAvailable, info.isPurchasable, info.isUsable, info.hasExtendedCost, info.currencyID, info.spellID;
   end
 end
+--]]
+
+local function tcopy(t)
+	local u = {}
+	if t then
+		for k, v in pairs(t) do u[k] = v end
+		return setmetatable(u, getmetatable(t))
+	end
+	return {}
+end
 
 --
 -- Scans everything the merchant has and adds it to a table
 -- that we can refer to when looking for items to buy.
 --
---[[
-    local m, x, y = TomTom:GetCurrentPlayerPosition()
-    TomTom:AddWaypoint(m, x, y, {
-        title = title,
-        from = "Your title here"
-    })
-]]--
 local function update_merchant_inventory()
 	DA.DEBUG(0,"update_merchant_inventory()")
 	if MerchantFrame and MerchantFrame:IsVisible() then
@@ -92,21 +96,25 @@ local function update_merchant_inventory()
 			position = C_Map.GetPlayerMapPosition(mapID, "player")
 			if position then
 				mapX, mapY = position:GetXY()
+				mapX = math.floor(mapX*1000)/10		-- one decimal is enough
+				mapY = math.floor(mapY*1000)/10		-- one decimal is enough
 			end
 		end
+		local info
 		for i=1, count, 1 do
 			local link = GetMerchantItemLink(i)
 			if link then
 				local itemCount, itemTexture, itemValue, itemLink, currencyName, currencyID
 				local id = Skillet:GetItemIDFromLink(link)
-				local name, texture, price, quantity, numAvailable, isPurchasable, isUsable, extendedCost, currencyID, spellID = GetMerchantItemInfo(i)
-				if extendedCost then
+--				local name, texture, price, stackCount, numAvailable, isPurchasable, isUsable, extendedCost, currencyID, spellID = GetMerchantItemInfo(i)
+				info = C_MerchantFrame.GetItemInfo(i)
+				if info.extendedCost then
 					itemCount = GetMerchantItemCostInfo(i)
 --
--- Loop through all the items for debugging but only use the first.
+-- Loop through all the extendedCost items for debugging but only use the first.
 --
 					if itemCount > 0 then
-						DA.DEBUG(2,"For "..tostring(name).." ("..tostring(id)..") itemCount= "..tostring(itemCount))
+						DA.DEBUG(1,"For "..tostring(info.name).." ("..tostring(id)..") itemCount= "..tostring(itemCount))
 						for j=itemCount, 1, -1 do
 							itemTexture, itemValue, itemLink, currencyName = GetMerchantItemCostItem(i, j)
 							if currencyName then
@@ -115,62 +123,57 @@ local function update_merchant_inventory()
 								currencyName = C_Item.GetItemInfo(itemLink)
 								currencyID = Skillet:GetItemIDFromLink(itemLink)
 							end
-							DA.DEBUG(2,"  ["..tostring(j).."]: itemValue= "..tostring(itemValue)..", itemLink= "..tostring(itemLink)..", currencyName= "..tostring(currencyName).." ("..tostring(currencyID)..")")
+							DA.DEBUG(2,"  ["..tostring(j).."]: itemValue= "..tostring(itemValue)..", itemLink= "..DA.PLINK(itemLink)..", currencyName= "..tostring(currencyName).." ("..tostring(currencyID)..")")
 						end
 					end
 				end
 --
 -- Only check unlimited quantity items.
 --
-				if numAvailable == -1  then
+				if info.numAvailable == -1  then
 					merchant_inventory[id] = {}
-					merchant_inventory[id].price = price
-					merchant_inventory[id].quantity = quantity
+					merchant_inventory[id].price = info.price
+					merchant_inventory[id].stackCount = info.stackCount
 					if Skillet.db.global.itemRecipeUsedIn[id] or Skillet.MissAll then		-- if this item is used in any recipes we know about
 						if not Skillet:VendorSellsReagent(id) then		-- if its not a known vendor item
 							if Skillet.db.global.MissingVendorItems[id] then
-								DA.DEBUG(1,"updating "..tostring(name).." ("..tostring(id)..")")
+								DA.DEBUG(1,"updating "..tostring(info.name).." ("..tostring(id)..")")
 							else
-								DA.DEBUG(1,"adding "..tostring(name).." ("..tostring(id)..")")
+								DA.DEBUG(1,"adding "..tostring(info.name).." ("..tostring(id)..")")
 							end
 							if itemCount and itemCount > 0 then
---								Skillet.db.global.MissingVendorItems[id] = {name or true, quantity, currencyName, currencyID, itemValue}		-- add it to our table
-								Skillet.db.global.MissingVendorItems[id] = {name or true, quantity or 0, currencyName or "", currencyID or 0, itemValue or 0, 
-									vendorName or "", mapID or 0, mapX or 0, mapY or 0}		-- convert it
+								Skillet.db.global.MissingVendorItems[id] = tcopy(info) -- info = C_MerchantFrame.GetItemInfo(index)
+--								Skillet.db.global.MissingVendorItems[id].vendor = { name = vendorName, map = mapID, X = mapX, Y = mapY }
+								Skillet.db.global.MissingVendorItems[id].vendor = { vendorName, mapID, mapX, mapY }
 							else
-								Skillet.db.global.MissingVendorItems[id] = name or true		-- add it to our table
+								Skillet.db.global.MissingVendorItems[id] = info.name or true		-- add it to our table
 							end
 						else
-							DA.DEBUG(1,"known "..tostring(name).." ("..tostring(id)..")")
+							DA.DEBUG(1,"known "..tostring(info.name).." ("..tostring(id)..")")
 							if type(Skillet.db.global.MissingVendorItems[id]) == "table" then
-								local size = #Skillet.db.global.MissingVendorItems[id]
-								if not (size == 5 or size == 9) then
-									Skillet.db.global.MissingVendorItems[id] = "Fix Me"
+								if info.price < Skillet.db.global.MissingVendorItems[id].price then
+									DA.DEBUG(1,"adjusting "..tostring(info.name).." ("..tostring(id)..")")
+									Skillet.db.global.MissingVendorItems[id].price = info.price
 								end
 							end
 						end
 						if Skillet.db.global.MissingVendorItems[id] then
-							if itemCount and itemCount > 0 and type(Skillet.db.global.MissingVendorItems[id]) ~= "table" then
-								DA.DEBUG(1,"converting "..tostring(name).." ("..tostring(id)..")")
---								Skillet.db.global.MissingVendorItems[id] = {name or true, quantity, currencyName, currencyID, itemValue}		-- convert it
-								Skillet.db.global.MissingVendorItems[id] = {name or true, quantity or 0, currencyName or "", currencyID or 0, itemValue or 0, 
-									vendorName or "", mapID or 0, mapX or 0, mapY or 0}		-- convert it
-							elseif PT then
-								if id~=0 and PT:ItemInSet(id,"Tradeskill.Mat.BySource.Vendor") then
-									DA.DEBUG(1,"removing "..tostring(name).." ("..tostring(id)..")")
-									Skillet.db.global.MissingVendorItems[id] = nil		-- remove it from our table
-								end
+							if type(Skillet.db.global.MissingVendorItems[id]) ~= "table" then
+								DA.DEBUG(1,"converting "..tostring(info.name).." ("..tostring(id)..")")
+								Skillet.db.global.MissingVendorItems[id] = tcopy(info) -- info = C_MerchantFrame.GetItemInfo(index)
+--								Skillet.db.global.MissingVendorItems[id].vendor = { name = vendorName, map = mapID, X = mapX, Y = mapY }
+								Skillet.db.global.MissingVendorItems[id].vendor = { vendorName, mapID, mapX, mapY }
 							end
 						end
 					else
-						DA.DEBUG(1,"not used "..tostring(name).." ("..tostring(id)..")")
+						DA.DEBUG(1,"not used "..tostring(info.name).." ("..tostring(id)..")")
 					end
 				end
 			else
 				DA.DEBUG(1,"no link "..tostring(i))
 			end
-		end
-	end
+		end -- for
+	end -- visible
 end
 
 --
@@ -306,8 +309,9 @@ function Skillet:BuyRequiredReagents()
 	for i=1, numItems, 1 do
 		local link = GetMerchantItemLink(i)
 		if link then
-			local name, texture, price, quantity, numAvailable, isPurchasable, isUsable, extendedCost, currencyID, spellID = GetMerchantItemInfo(i)
-			if numAvailable == -1 then			-- only buy unlimited items automatically.
+--			local name, texture, price, stackCount, numAvailable, isPurchasable, isUsable, extendedCost, currencyID, spellID = GetMerchantItemInfo(i)
+			local info = C_MerchantFrame.GetItemInfo(i)
+			if info.numAvailable == -1 then			-- only buy unlimited items automatically.
 				local id = self:GetItemIDFromLink(link)
 --
 -- OK, lets see if we need it.
@@ -322,7 +326,7 @@ function Skillet:BuyRequiredReagents()
 				if count > 0 then
 					purchased = 0
 					if GetMerchantItemCostInfo(i) > 0 then			-- if not sold for alternate currency, merchant will sell partial stacks.
-						count = math.ceil(count/quantity) * quantity 
+						count = math.ceil(count/stackCount) * stackCount 
 					end
 					local maxStack = GetMerchantItemMaxStack(i)
 					local maxCount = count
@@ -330,8 +334,8 @@ function Skillet:BuyRequiredReagents()
 -- We need it, can we afford it?
 --
 					money = GetMoney()
-					DA.DEBUG(0,"money= "..tostring(money)..", count= "..tostring(count)..", name= "..tostring(name)..", price= "..tostring(price)..", quantity= "..tostring(quantity)..", maxStack= "..tostring(maxStack)..", extendedCost= "..tostring(extendedCost))
-					cost = count * price / quantity
+					DA.DEBUG(0,"money= "..tostring(money)..", count= "..tostring(count)..", name= "..tostring(name)..", price= "..tostring(price)..", stackCount= "..tostring(stackCount)..", maxStack= "..tostring(maxStack)..", extendedCost= "..tostring(extendedCost))
+					cost = count * info.price / info.stackCount
 					if money > cost then
 						while count > 0 do
 							if count <= maxStack then
@@ -344,7 +348,7 @@ function Skillet:BuyRequiredReagents()
 								count = count - maxStack
 							end
 						end -- while
-						local itemspent = price * purchased / quantity -- spent on this type of item
+						local itemspent = info.price * purchased / info.stackCount -- spent on this type of item
 						totalspent = totalspent + itemspent  -- spent on all items from this merchant
 						cash = Skillet:FormatMoneyFull(itemspent, true);
 						message = L["Purchased"]..": "..tostring(purchased).." x "..link.." ("..cash..")"
@@ -375,7 +379,7 @@ function Skillet:MerchantBuyButton_OnEnter(button)
 	for i=1,#needList,1 do
 		local itemID = needList[i].id
 		if merchant_inventory[itemID] then
-			local cost = merchant_inventory[itemID].price * math.ceil(needList[i].count / merchant_inventory[itemID].quantity)
+			local cost = merchant_inventory[itemID].price * math.ceil(needList[i].count / merchant_inventory[itemID].stackCount)
 			totalCost = totalCost + cost
 			GameTooltip:AddDoubleLine((C_Item.GetItemInfo(itemID)).." x "..needList[i].count, Skillet:FormatMoneyFull(cost, true),1,1,0)
 		end

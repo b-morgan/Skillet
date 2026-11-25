@@ -2014,9 +2014,9 @@ Skillet.options =
 -- If set, MissAll will add all Merchant items to the MissingVendorItems table
 -- MissAll is not stored in the saved variables file.
 --
-		MissAll = {
+		missall = {
 			type = "toggle",
-			name = "MissAll",
+			name = "missall",
 			desc = "Option for debugging",
 			get = function()
 				return Skillet.MissAll
@@ -2035,23 +2035,18 @@ Skillet.options =
 -- commands to manage the MissingVendorItems table
 --
 		missingshow = {
-			type = 'input',
+			type = 'execute',
 			name = "missingshow",
 			desc = "Print the MissingVendorItems table",
-			get = function()
-				return value
-			end,
-			set = function(self,value)
+			func = function()
 				if not (UnitAffectingCombat("player")) then
-					if value then
-						DA.DEBUG(0,"value= "..value)
-						local id
-						for id,entry in pairs(Skillet.db.global.MissingVendorItems) do
-							if type(entry) == 'table' then	-- table entries are {name, quantity, currencyName, currencyID, currencyCount}
-								if #entry ~= tonumber(value) then
-									print("id= "..tostring(id)..", size= "..tostring(#entry)..", "..DA.DUMP(entry))
-								end
-							end
+					print("#MissingVendorItems= "..tostring(#Skillet.db.global.MissingVendorItems))
+					local id
+					for id,entry in pairs(Skillet.db.global.MissingVendorItems) do
+						if type(entry) == 'table' then	-- table entries are {name, quantity, currencyName, currencyID, currencyCount}
+							print("id= "..tostring(id)..", "..DA.DUMP(entry))
+						else
+							print("id= "..tostring(id)..", entry= "..tostring(entry))
 						end
 					end
 				else
@@ -2059,31 +2054,6 @@ Skillet.options =
 				end
 			end,
 			order = 112
-		},
-		missingdel = {
-			type = 'execute',
-			name = "missingdel",
-			desc = "Delete MissingVendorItems entries that are tables and not the correct size",
-			func = function()
-				if not (UnitAffectingCombat("player")) then
-					if not Skillet.db.global.RemovedVendorItems then
-						Skillet.db.global.RemovedVendorItems = {}
-					end
-					for id,entry in pairs(Skillet.db.global.MissingVendorItems) do
-						if type(entry) == 'table' then
-							local size = #entry
-							if not (size == 5 or size == 9) then
-								print("id= "..tostring(id)..", size= "..tostring(size)..", "..DA.DUMP(entry))
-								Skillet.db.global.RemovedVendorItems[id] = entry
-								Skillet.db.global.MissingVendorItems[id] = nil
-							end
-						end
-					end
-				else
-					DA.DEBUG(0,"|cff8888ffSkillet|r: Combat lockdown restriction." .." Leave combat and try again.")
-				end
-			end,
-			order = 113
 		},
 		missingclear = {
 			type = 'execute',
@@ -2093,35 +2063,6 @@ Skillet.options =
 				Skillet.db.global.MissingVendorItems = {}
 			end,
 			order = 114
-		},
---
--- commands to manage the RemovedVendorItems table
---
-		removedshow = {
-			type = 'execute',
-			name = "removedshow",
-			desc = "Print the RemovedVendorItems table",
-			func = function()
-				if not (UnitAffectingCombat("player")) then
-					if Skillet.db.global.RemovedVendorItems then
-						for id,entry in pairs(Skillet.db.global.RemovedVendorItems) do
-							print("id= "..tostring(id)..", size= "..tostring(#entry)..", "..DA.DUMP(entry))
-						end
-					end
-				else
-					DA.DEBUG(0,"|cff8888ffSkillet|r: Combat lockdown restriction." .." Leave combat and try again.")
-				end
-			end,
-			order = 116
-		},
-		removedclear = {
-			type = 'execute',
-			name = "removedclear",
-			desc = "Clear the RemovedVendorItems table",
-			func = function()
-				Skillet.db.global.RemovedVendorItems = {}
-			end,
-			order = 117
 		},
 --
 -- Debug options to deal with bag update events slowing bag and bank sorting

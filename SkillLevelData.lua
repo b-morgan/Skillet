@@ -155,17 +155,17 @@ function Skillet:GetTradeSkillLevels(spellID)
 	b = (tonumber(b) or 0)
 	c = (tonumber(c) or 0)
 	d = (tonumber(d) or 0)
-	return a, b, c, d, bonus
+	return a, b, c, d, bonus or 0
 end -- Skillet:GetTradeSkillLevels
 
 function Skillet:GetTradeSkillLevelColor(itemID, rank)
 	--DA.DEBUG(0,"GetTradeSkillLevelColor("..tostring(itemID)..", "..tostring(rank)")")
 	if itemID then
-		local a1, b1, c1, d1 = self:GetTradeSkillLevels(itemID)
-		if rank >= d1 then return skillColors["trivial"] end
-		if rank >= c1 then return skillColors["easy"] end
-		if rank >= b1 then return skillColors["moderate"] end
-		if rank >= a1 then return skillColors["optimal"] end
+		local a, b, c, d = self:GetTradeSkillLevels(itemID)
+		if rank >= d then return skillColors["trivial"] end
+		if rank >= c then return skillColors["easy"] end
+		if rank >= b then return skillColors["moderate"] end
+		if rank >= a then return skillColors["optimal"] end
 	end
 	return skillColors["unknown"]
 end
