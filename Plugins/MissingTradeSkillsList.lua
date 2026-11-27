@@ -48,11 +48,59 @@ plugin.options =
 			width = "double",
 			order = 1
 		},
+		location = {
+			type = "toggle",
+			name = "location",
+			desc = "Attach to SkilletPluginButton or SkilletFrame",
+			get = function()
+				return Skillet.db.profile.plugins.MTSL.location
+			end,
+			set = function(self,value)
+				Skillet.db.profile.plugins.MTSL.location = value
+			end,
+			order = 2
+		},
 	},
 }
 
+--
+-- Only do something if the MTSLUI_ToggleButton button exists (i.e. the addon MissingTradeSkillsList exists)
+--
+function plugin.moveButton()
+	DA.DEBUG(0,"MTSL Plugin moveButton")
+	if MTSLUI_ToggleButton and Skillet.tradeSkillFrame then
+		if not plugin.setupMTSL then
+			plugin.oldPoint = {}
+			plugin.oldPoint[1], plugin.oldPoint[2], plugin.oldPoint[3], plugin.oldPoint[4], plugin.oldPoint[5] = MTSLUI_ToggleButton:GetPoint(1)
+			plugin.newPoint = {}
+			plugin.newPoint[1] = plugin.oldPoint[1]
+			plugin.newPoint[2] = SkilletPluginButton
+			plugin.newPoint[3] = plugin.oldPoint[3]
+			plugin.newPoint[4] = 0
+			plugin.newPoint[5] = 4
+			plugin.setupMTSL = true
+		end
+		Skillet.db.profile.plugins.MTSL.location = not Skillet.db.profile.plugins.MTSL.location
+		plugin.showButton()
+	end
+end
+
+function plugin.showButton()
+	DA.DEBUG(0,"MTSL Plugin showButton")
+	if MTSLUI_ToggleButton and Skillet.tradeSkillFrame then
+		if Skillet.db.profile.plugins.MTSL.location then
+			MTSLUI_ToggleButton:SetParent(SkilletFrame)
+			MTSLUI_ToggleButton:SetPoint(plugin.oldPoint[1], plugin.oldPoint[2], plugin.oldPoint[3], plugin.oldPoint[4], plugin.oldPoint[5])
+		else
+			MTSLUI_ToggleButton:SetParent(SkilletPluginButton)
+			MTSLUI_ToggleButton:SetPoint(plugin.newPoint[1], plugin.newPoint[2], plugin.newPoint[3], plugin.newPoint[4], plugin.newPoint[5])
+		end
+		MTSLUI_ToggleButton:Show()
+	end
+end
+
 function plugin.OnInitialize()
-	--DA.DEBUG(0,"MTSL Plugin OnInitialize")
+	DA.DEBUG(0,"MTSL Plugin OnInitialize")
 	if not Skillet.db.profile.plugins.MTSL then
 		Skillet.db.profile.plugins.MTSL = {}
 		Skillet.db.profile.plugins.MTSL.enabled = true
@@ -67,40 +115,13 @@ function plugin.OnInitialize()
 		plugin.moveMTSLButton:RegisterForClicks("LeftButtonUp")
 		plugin.moveMTSLButton:SetText(L["Move MTSL"])
 		plugin.moveMTSLButton:SetScript("OnClick", function(self, mouseButton, isDown)
---
--- Only do something if the MTSLUI_ToggleButton button exists (i.e. the addon MissingTradeSkillsList exists)
---
-			if MTSLUI_ToggleButton and Skillet.tradeSkillFrame and Skillet.tradeSkillFrame:IsVisible() then
-				plugin.nowPoint = {}
-				plugin.nowPoint[1], plugin.nowPoint[2], plugin.nowPoint[3], plugin.nowPoint[4], plugin.nowPoint[5] = MTSLUI_ToggleButton:GetPoint(1)
-				if not plugin.setupMTSL then
-					plugin.oldPoint = {}
-					plugin.oldPoint[1], plugin.oldPoint[2], plugin.oldPoint[3], plugin.oldPoint[4], plugin.oldPoint[5] = MTSLUI_ToggleButton:GetPoint(1)
-					plugin.newPoint = {}
-					plugin.newPoint[1] = plugin.oldPoint[1]
-					plugin.newPoint[2] = SkilletPluginButton
-					plugin.newPoint[3] = plugin.oldPoint[3]
-					plugin.newPoint[4] = 0
-					plugin.newPoint[5] = 4
-					plugin.setupMTSL = true
-					plugin.movedMTSL = false
-				end
-				if plugin.nowPoint[2] == plugin.newPoint[2] then
-					MTSLUI_ToggleButton:SetParent(SkilletFrame)
-					MTSLUI_ToggleButton:SetPoint(plugin.oldPoint[1], plugin.oldPoint[2], plugin.oldPoint[3], plugin.oldPoint[4], plugin.oldPoint[5])
-					plugin.movedMTSL = false
-				else
-					MTSLUI_ToggleButton:SetParent(SkilletPluginButton)
-					MTSLUI_ToggleButton:SetPoint(plugin.newPoint[1], plugin.newPoint[2], plugin.newPoint[3], plugin.newPoint[4], plugin.newPoint[5])
-					plugin.movedMTSL = true
-				end
-			end
+			plugin.moveButton(self, mouseButton, isDown)
 		end)
-		if C_AddOns.IsAddOnLoaded("MissingTradeSkillsList_TBC") then
+		if C_AddOns.IsAddOnLoaded("MissingTradeSkillsList") then
 			Skillet:AddButtonToTradeskillWindow(plugin.moveMTSLButton)
 		end
 	end
-	if not C_AddOns.IsAddOnLoaded("MissingTradeSkillsList_TBC") then
+	if not C_AddOns.IsAddOnLoaded("MissingTradeSkillsList") then
 		Skillet.db.profile.plugins.MTSL.enabled = false
 	end
 end
@@ -110,11 +131,10 @@ end
 --
 function plugin.Update()
 	--DA.DEBUG(0,"MTSL Plugin Update")
-	if MTSLUI_ToggleButton and not MTSLUI_ToggleButton:IsVisible() then
-		if MTSLUI_TOGGLE_BUTTON and MTSLUI_TOGGLE_BUTTON.Show then
-			MTSLUI_TOGGLE_BUTTON:Show()
-		end
+	if not plugin.setupMTSL then
+		plugin.moveButton()
 	end
+	plugin.showButton()
 end
 
 Skillet:RegisterUpdatePlugin("MTSLPlugin")		-- we have an Update function
