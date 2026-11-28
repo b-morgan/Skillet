@@ -347,7 +347,7 @@ function Skillet:VendorSellsReagent(itemID)
 --
 -- Check the LibPeriodicTable data next
 --
-	if PT then
+	if PT and not Skillet.db.profile.ignorePT then
 		if itemID~=0 and PT:ItemInSet(itemID,"Tradeskill.Mat.BySource.Vendor") then
 				--DA.DEBUG(1,"VendorSellsReagent: "..tostring(itemID))
 			return true

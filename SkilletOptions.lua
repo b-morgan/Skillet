@@ -16,6 +16,7 @@ GNU General Public License for more details.
 You should have received a copy of the GNU General Public License
 along with this program.  If not, see <http://www.gnu.org/licenses/>.
 ]]--
+local PT = LibStub("LibPeriodicTable-3.1")
 
 local L = Skillet.L
 
@@ -2031,6 +2032,50 @@ Skillet.options =
 			end,
 			order = 111
 		},
+		ignorePT = {
+			type = "toggle",
+			name = "ignorePT",
+			desc = "Ignore PT = LibStub('LibPeriodicTable-3.1')",
+			get = function()
+				return Skillet.db.profile.ignorePT
+			end,
+			set = function(self,value)
+				Skillet.db.profile.ignorePT = value
+				if Skillet.db.profile.ignorePT then
+					Skillet:Print(RED_FONT_COLOR_CODE.."ignorePT is on"..FONT_COLOR_CODE_CLOSE)
+				else
+					Skillet:Print(GREEN_FONT_COLOR_CODE.."ignorePT is off"..FONT_COLOR_CODE_CLOSE)
+				end
+			end,
+			order = 112
+		},
+		checkPT = {
+			type = 'input',
+			name = "checkPT",
+			desc = "Check for item in PT = LibStub('LibPeriodicTable-3.1') (checkPT id)",
+			get = function()
+				return value
+			end,
+			set = function(self,value)
+				if not (UnitAffectingCombat("player")) then
+					if value then
+						local id
+						DA.DEBUG(0,"value= "..value)
+						id = tonumber(value)
+						if PT then
+							if id and id ~= 0 and PT:ItemInSet(id,"Tradeskill.Mat.BySource.Vendor") then
+								print("id= "..tostring(id).." true ")
+							else
+								print("id= "..tostring(id).." false ")
+							end
+						end
+					end
+				else
+					DA.DEBUG(0,"|cff8888ffSkillet|r: Combat lockdown restriction. Leave combat and try again.")
+				end
+			end,
+			order = 113
+		},
 --
 -- commands to manage the MissingVendorItems table
 --
@@ -2053,7 +2098,7 @@ Skillet.options =
 					DA.DEBUG(0,"|cff8888ffSkillet|r: Combat lockdown restriction." .." Leave combat and try again.")
 				end
 			end,
-			order = 112
+			order = 114
 		},
 		missingclear = {
 			type = 'execute',
@@ -2062,7 +2107,7 @@ Skillet.options =
 			func = function()
 				Skillet.db.global.MissingVendorItems = {}
 			end,
-			order = 114
+			order = 115
 		},
 --
 -- Debug options to deal with bag update events slowing bag and bank sorting

@@ -889,6 +889,7 @@ function Skillet:OnEnable()
 	self:RegisterEvent("PLAYER_LOGOUT")
 	self:RegisterEvent("PLAYER_LOGIN")
 	self:RegisterEvent("PLAYER_ENTERING_WORLD")
+--	self:RegisterEvent("ADDON_LOADED")
 
 	self.bagsChanged = true
 	self.hideUncraftableRecipes = false
@@ -921,6 +922,10 @@ end
 
 function Skillet:PLAYER_LOGIN()
 	DA.TRACE("PLAYER_LOGIN")
+end
+
+function Skillet:ADDON_LOADED(event,arg1,...)
+	DA.TRACE("ADDON_LOADED( "..tostring(event)..", "..tostring(arg1).." )")
 end
 
 function Skillet:PLAYER_MONEY()
